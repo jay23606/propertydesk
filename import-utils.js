@@ -22,6 +22,15 @@
     return amount;
   }
 
+  function csvRate(value, label, { optional = false } = {}) {
+    const raw = String(value ?? '').trim().replace(/%$/, '').trim();
+    if (!raw && optional) return 0;
+    if (!/^\d+(?:\.\d{1,5})?$/.test(raw)) throw new Error(`Invalid rate “${value}” for ${label}.`);
+    const rate = Number(raw);
+    if (!Number.isFinite(rate) || rate < 0 || rate > 100) throw new Error(`Rate for ${label} must be between 0 and 100%.`);
+    return rate;
+  }
+
   function validIsoDate(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return false;
     const date = new Date(`${value}T12:00:00`);
@@ -40,6 +49,19 @@
 
   function selectImportRows(rows, includePossibleDuplicates = false) {
     return rows.filter(row => includePossibleDuplicates || !row._possible_duplicate);
+  }
+
+  function validateImportRows(rows, validateRow) {
+    const valid = [], errors = [];
+    rows.forEach((source, index) => {
+      const rowNumber = source._source_row || index + 2;
+      try {
+        if (source._parse_error) throw new Error(source._parse_error);
+        valid.push({ ...validateRow(source), _source_row: rowNumber });
+      }
+      catch (error) { errors.push({ row: rowNumber, message: error.message || String(error) }); }
+    });
+    return { valid, errors, total: rows.length };
   }
 
   function parseCSV(text) {
@@ -69,13 +91,16 @@
     if (headers.length) headers[0] = headers[0].replace(/^\uFEFF/, '');
     if (headers.some(value => !value)) throw new Error('CSV has an empty column heading.');
     if (new Set(headers).size !== headers.length) throw new Error('CSV has duplicate column headings.');
-    return rows.filter(values => values.some(value => value.trim())).map((values, index) => {
-      if (values.length > headers.length) throw new Error(`CSV row ${index + 2} contains more values than there are column headings.`);
-      return Object.fromEntries(headers.map((header, column) => [header, (values[column] || '').trim()]));
-    });
+    return rows.map((values, index) => {
+      if (!values.some(value => value.trim())) return null;
+      const record = Object.fromEntries(headers.map((header, column) => [header, (values[column] || '').trim()]));
+      Object.defineProperty(record, '_source_row', { value: index + 2, enumerable: false });
+      if (values.length > headers.length) Object.defineProperty(record, '_parse_error', { value: `This row has more values than the CSV column headings.` , enumerable: false });
+      return record;
+    }).filter(Boolean);
   }
 
-  const helpers = Object.freeze({ csvMoney, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate });
+  const helpers = Object.freeze({ csvMoney, csvRate, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate, validateImportRows });
   globalThis.PropertyDeskImportUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

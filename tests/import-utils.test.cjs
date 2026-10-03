@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { csvMoney, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate } = require('../import-utils.js');
+const { csvMoney, csvRate, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate, validateImportRows } = require('../import-utils.js');
 
 test('all provided CSV templates parse with their example row', () => {
   for (const filename of ['accounts-template.csv', 'payments-template.csv', 'expenses-template.csv']) {
@@ -19,13 +19,28 @@ test('CSV parser handles BOM, CRLF, quoted commas, doubled quotes, and quoted ne
   ]);
 });
 
-test('CSV parser rejects duplicate or empty headings and malformed quoting/row widths', () => {
+test('CSV parser rejects duplicate or empty headings and malformed quoting', () => {
   assert.throws(() => parseCSV('a,a\n1,2'), /duplicate column/i);
   assert.throws(() => parseCSV('a,,c\n1,2,3'), /empty column/i);
   assert.throws(() => parseCSV('a,b\n1,"unfinished'), /unclosed quoted/i);
-  assert.throws(() => parseCSV('a,b\n1,2,3'), /more values/i);
+  assert.match(parseCSV('a,b\n1,2,3')[0]._parse_error, /more values/i);
   assert.throws(() => parseCSV('a,b\n1,"closed"x'), /unexpected characters/i);
   assert.throws(() => parseCSV('a,b\n1,un"closed'), /quote inside/i);
+});
+
+test('row validation keeps valid rows and reports every bad source row', () => {
+  const rows = parseCSV('name,amount\nGood,10\nBad,nope\nExtra,4,unexpected\n\nAlso good,2');
+  const result = validateImportRows(rows, row => {
+    const amount = csvMoney(row.amount, `amount for ${row.name}`, { minimum: 0.01 });
+    return { name: row.name, amount };
+  });
+
+  assert.equal(result.total, 4);
+  assert.deepEqual(result.valid.map(row => [row._source_row, row.name, row.amount]), [[2, 'Good', 10], [6, 'Also good', 2]]);
+  assert.deepEqual(result.errors, [
+    { row: 3, message: 'Invalid amount “nope” for amount for Bad.' },
+    { row: 4, message: 'This row has more values than the CSV column headings.' },
+  ]);
 });
 
 test('CSV money accepts valid currency and rejects malformed, negative, or too-precise values', () => {
@@ -36,6 +51,14 @@ test('CSV money accepts valid currency and rejects malformed, negative, or too-p
     assert.throws(() => csvMoney(value, 'amount'), /Invalid amount/i, value);
   }
   assert.throws(() => csvMoney('0', 'payment', { minimum: 0.01 }), /greater than zero/i);
+});
+
+test('CSV rates preserve contractual precision up to five decimal places', () => {
+  assert.equal(csvRate('7.2028%', 'annual rate'), 7.2028);
+  assert.equal(csvRate('', 'optional rate', { optional: true }), 0);
+  for (const value of ['-1', '100.001', '7.123456', 'rate']) {
+    assert.throws(() => csvRate(value, 'annual rate'), /Invalid rate|between 0 and 100/i, value);
+  }
 });
 
 test('date validator accepts real ISO dates and rejects impossible dates', () => {

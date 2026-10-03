@@ -43,6 +43,8 @@ Keep the primary navigation small:
 - **Overview:** portfolio totals, upcoming items, recent activity, and properties.
 - **Properties:** property list and a property detail view.
 - **Accounts:** rentals, land contracts, and private notes.
+- **Separate contract terms from ledger balance:** preserve the signed original principal and payment terms while allowing an owner-set opening balance and its as-of date. Agreement-only imports may initialize the ledger balance at $0 until historical payments establish a trustworthy starting point.
+- Store a tenant/buyer email only when provided by the owner or clearly identified in the agreement; reminder messages remain disabled until explicitly enabled and configured.
 - **Transactions:** income and expenses in a unified, filterable ledger.
 - **Reports:** income, expenses, net cash flow, balances, and export/import.
 

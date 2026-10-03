@@ -11,4 +11,8 @@
 .duplicate-import-toggle input{accent-color:#9a762b}
 .import-history-table{max-height:260px;overflow:auto}
 .import-history-table table{min-width:620px}
+.import-preview-errors{margin-top:18px;padding:16px;border:1px solid #edd4d1;border-radius:12px;background:#fff8f7;color:#7d3933}
+.import-preview-errors h3{margin:0 0 6px;font-size:14px}
+.import-preview-errors ul{max-height:180px;overflow:auto;margin:8px 0 0;padding-left:22px;font-size:12px;line-height:1.6}
+.import-preview-errors .field-hint{margin:0;color:#7d3933}
 @media(max-width:760px){.heading-actions{flex-wrap:wrap;justify-content:flex-end}.import-preview-table table{min-width:620px}}

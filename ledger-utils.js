@@ -10,8 +10,11 @@
     return transactions.filter(isPosted).reduce((sum, transaction) => sum + Number(transaction[amountField] || 0), 0);
   }
 
-  function principalBalance(originalPrincipal, payments) {
-    return Math.max(0, Number(originalPrincipal || 0) - sumPosted(payments, 'principal_amount'));
+  function principalBalance(originalPrincipal, payments, openingBalance = originalPrincipal, openingDate = null) {
+    const eligible = openingDate
+      ? payments.filter(payment => !payment.received_date || String(payment.received_date) > String(openingDate))
+      : payments;
+    return Math.max(0, Number(openingBalance ?? originalPrincipal ?? 0) - sumPosted(eligible, 'principal_amount'));
   }
 
   const helpers = Object.freeze({ isPosted, principalBalance, sumPosted });

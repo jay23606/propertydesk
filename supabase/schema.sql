@@ -24,11 +24,14 @@ create table if not exists public.pd_accounts (
   account_type text not null check (account_type in ('rental','land_contract','note')),
   name text not null,
   party_name text,
+  party_email text,
   start_date date not null,
   next_due_date date,
   payment_amount numeric(14,2) not null default 0 check (payment_amount >= 0),
   payment_frequency text not null default 'monthly' check (payment_frequency in ('monthly','weekly','biweekly','quarterly','annual')),
   original_principal numeric(14,2) not null default 0 check (original_principal >= 0),
+  ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0),
+  ledger_opening_date date,
   interest_rate numeric(9,5) not null default 0 check (interest_rate >= 0 and interest_rate <= 100),
   term_months integer check (term_months is null or term_months > 0),
   balloon_date date,
@@ -40,6 +43,10 @@ create table if not exists public.pd_accounts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.pd_accounts add column if not exists ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0);
+alter table public.pd_accounts add column if not exists ledger_opening_date date;
+alter table public.pd_accounts add column if not exists party_email text;
 
 create table if not exists public.pd_payments (
   id uuid primary key default gen_random_uuid(),
@@ -264,21 +271,25 @@ create trigger pd_expenses_void_guard before insert or update on public.pd_expen
 
 -- Account and transaction imports are atomic and keep a private source receipt.
 drop function if exists public.pd_import_propertydesk_accounts(jsonb);
-create or replace function public.pd_import_propertydesk_accounts(p_rows jsonb, p_source_name text)
+drop function if exists public.pd_import_propertydesk_accounts(jsonb, text);
+create or replace function public.pd_import_propertydesk_accounts(p_rows jsonb, p_source_name text, p_rows_total integer default null)
 returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare
   item jsonb;
   property_id uuid;
   batch_id uuid;
   inserted_count integer := 0;
+  total_count integer;
 begin
   if auth.uid() is null then raise exception 'Authentication required'; end if;
   if p_rows is null or jsonb_typeof(p_rows) <> 'array' or jsonb_array_length(p_rows) = 0 then
     raise exception 'An account import must contain at least one row';
   end if;
-  if jsonb_array_length(p_rows) > 500 then raise exception 'Import is limited to 500 accounts'; end if;
+  total_count := coalesce(p_rows_total, jsonb_array_length(p_rows));
+  if jsonb_array_length(p_rows) > 500 or total_count > 500 then raise exception 'Import is limited to 500 accounts'; end if;
+  if total_count < jsonb_array_length(p_rows) then raise exception 'Total CSV rows cannot be less than accepted rows'; end if;
   insert into public.pd_import_batches(user_id, source_type, source_name, status, rows_total)
-    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Accounts CSV'), 255), 'staged', jsonb_array_length(p_rows))
+    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Accounts CSV'), 255), 'staged', total_count)
     returning id into batch_id;
 
   for item in
@@ -306,36 +317,41 @@ begin
         and lower(p.address) = lower(item->>'property_address')
       limit 1;
     if property_id is null then raise exception 'Property was not created or is not visible to this user'; end if;
-    insert into public.pd_accounts(user_id, property_id, account_type, name, party_name,
+    insert into public.pd_accounts(user_id, property_id, account_type, name, party_name, party_email,
       start_date, next_due_date, payment_amount, payment_frequency, original_principal,
+      ledger_opening_balance, ledger_opening_date,
       interest_rate, term_months, balloon_date, late_fee, grace_days, notes, import_batch_id)
     values (auth.uid(), property_id, item->>'account_type', item->>'account_name',
-      nullif(item->>'party_name',''), (item->>'start_date')::date,
+      nullif(item->>'party_name',''), nullif(item->>'party_email',''), (item->>'start_date')::date,
       nullif(item->>'next_due_date','')::date,
       coalesce(nullif(item->>'payment_amount','')::numeric, 0),
       coalesce(nullif(item->>'payment_frequency',''), 'monthly'),
       coalesce(nullif(item->>'original_principal','')::numeric, 0),
+      nullif(item->>'ledger_opening_balance','')::numeric,
+      nullif(item->>'ledger_opening_date','')::date,
       coalesce(nullif(item->>'interest_rate','')::numeric, 0),
       nullif(item->>'term_months','')::integer, nullif(item->>'balloon_date','')::date,
       coalesce(nullif(item->>'late_fee','')::numeric, 0),
       coalesce(nullif(item->>'grace_days','')::integer, 0), nullif(item->>'notes',''), batch_id);
     inserted_count := inserted_count + 1;
   end loop;
-  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, committed_at = now() where id = batch_id;
-  return jsonb_build_object('batch_id', batch_id, 'rows_total', jsonb_array_length(p_rows), 'rows_accepted', inserted_count, 'rows_rejected', 0);
+  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, rows_rejected = total_count - inserted_count, committed_at = now() where id = batch_id;
+  return jsonb_build_object('batch_id', batch_id, 'rows_total', total_count, 'rows_accepted', inserted_count, 'rows_rejected', total_count - inserted_count);
 end;
 $$;
 
-revoke all on function public.pd_import_propertydesk_accounts(jsonb, text) from public, anon, authenticated;
-grant execute on function public.pd_import_propertydesk_accounts(jsonb, text) to authenticated;
+revoke all on function public.pd_import_propertydesk_accounts(jsonb, text, integer) from public, anon, authenticated;
+grant execute on function public.pd_import_propertydesk_accounts(jsonb, text, integer) to authenticated;
 
-create or replace function public.pd_import_propertydesk_transactions(p_kind text, p_rows jsonb, p_source_name text)
+drop function if exists public.pd_import_propertydesk_transactions(text, jsonb, text);
+create or replace function public.pd_import_propertydesk_transactions(p_kind text, p_rows jsonb, p_source_name text, p_rows_total integer default null)
 returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare
   item jsonb;
   batch_id uuid;
   inserted_count integer := 0;
   row_count integer;
+  total_count integer;
 begin
   if auth.uid() is null then raise exception 'Authentication required'; end if;
   if p_kind is null or p_kind not in ('payments','expenses') then raise exception 'Import type must be payments or expenses'; end if;
@@ -343,10 +359,12 @@ begin
     raise exception 'An import must contain at least one row';
   end if;
   row_count := jsonb_array_length(p_rows);
-  if row_count > 500 then raise exception 'Import is limited to 500 rows'; end if;
+  total_count := coalesce(p_rows_total, row_count);
+  if row_count > 500 or total_count > 500 then raise exception 'Import is limited to 500 rows'; end if;
+  if total_count < row_count then raise exception 'Total CSV rows cannot be less than accepted rows'; end if;
 
   insert into public.pd_import_batches(user_id, source_type, source_name, status, rows_total)
-    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Transactions CSV'), 255), 'staged', row_count)
+    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Transactions CSV'), 255), 'staged', total_count)
     returning id into batch_id;
 
   for item in select value from jsonb_array_elements(p_rows) as source(value)
@@ -375,13 +393,13 @@ begin
     inserted_count := inserted_count + 1;
   end loop;
 
-  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, committed_at = now() where id = batch_id;
-  return jsonb_build_object('batch_id', batch_id, 'rows_total', row_count, 'rows_accepted', inserted_count, 'rows_rejected', 0);
+  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, rows_rejected = total_count - inserted_count, committed_at = now() where id = batch_id;
+  return jsonb_build_object('batch_id', batch_id, 'rows_total', total_count, 'rows_accepted', inserted_count, 'rows_rejected', total_count - inserted_count);
 end;
 $$;
 
-revoke all on function public.pd_import_propertydesk_transactions(text, jsonb, text) from public, anon, authenticated;
-grant execute on function public.pd_import_propertydesk_transactions(text, jsonb, text) to authenticated;
+revoke all on function public.pd_import_propertydesk_transactions(text, jsonb, text, integer) from public, anon, authenticated;
+grant execute on function public.pd_import_propertydesk_transactions(text, jsonb, text, integer) to authenticated;
 
 -- Signed-out clients cannot read or mutate portfolio records.
 revoke all on table public.pd_properties, public.pd_accounts, public.pd_payments,

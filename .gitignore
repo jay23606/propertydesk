@@ -4,6 +4,10 @@ config.local.js
 .env
 .env.*
 !.env.example
+/agreements/
+/private-data/
+/imports/private/
+/exports/
 node_modules/
 supabase/.temp/
 .DS_Store
