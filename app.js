@@ -427,10 +427,11 @@
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(error => console.warn('PropertyDesk shell cache could not be registered:', error));
     if(!configured){showConfigError();return;}
     state.client=window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    state.client.auth.onAuthStateChange((event,sessionNow)=>{if(event==='SIGNED_OUT'){state.user=null;state.passwordRecoveryInProgress=false;showAuth();setAuthMode(false);return;}if(event==='PASSWORD_RECOVERY'&&sessionNow?.user){state.user=sessionNow.user;showPasswordReset();return;}if(sessionNow?.user){const previousUserId=state.user?.id;state.user=sessionNow.user;if(event==='SIGNED_IN'&&previousUserId!==sessionNow.user.id&&!state.passwordRecoveryInProgress)startWorkspace();}});
     const {data:{session}}=await state.client.auth.getSession();
-    const recoveryLink=new URLSearchParams(window.location.hash.replace(/^#/,'')).get('type')==='recovery';
-    if(session?.user){state.user=session.user;if(recoveryLink)showPasswordReset();else await startWorkspace();} else showAuth();
-    state.client.auth.onAuthStateChange((event,sessionNow)=>{if(event==='PASSWORD_RECOVERY'&&sessionNow?.user){state.user=sessionNow.user;showPasswordReset();return;}if(sessionNow?.user){state.user=sessionNow.user;if(!state.passwordRecoveryInProgress)startWorkspace();}else if(state.user){state.user=null;showAuth();}});
+    const recoveryParams=new URLSearchParams(window.location.hash.replace(/^#/,''));
+    const recoveryLink=recoveryParams.get('type')==='recovery'&&recoveryParams.get('access_token')===session?.access_token;
+    if(session?.user){state.user=session.user;if(recoveryLink)showPasswordReset();else if(!state.passwordRecoveryInProgress)await startWorkspace();} else showAuth();
   }
   document.addEventListener('DOMContentLoaded',init);
 })();

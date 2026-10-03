@@ -13,7 +13,7 @@ The product should feel calm and minimal. It should make routine bookkeeping fas
 3. **Keep the ledger explainable.** Store original transactions and explicit allocations. Derive totals from them; do not silently rewrite history when terms change.
 4. **Private by default.** Each person sees only records owned by their authenticated Supabase user. Enforce this in database policies, not just in the interface.
 5. **Make imports reviewable.** Support manual app entry and CSV imports. Show mapped fields and validation errors before writing imported records.
-6. **Stay focused.** Avoid heavyweight enterprise dashboards, payment collection, maintenance dispatch, tenant screening, and legal automation until users ask for them.
+6. **Stay focused.** Avoid heavyweight enterprise dashboards, payment processing, maintenance dispatch, tenant screening, and legal automation until users ask for them. Basic property issue notes and agreement history can remain lightweight.
 
 ## People and use cases
 
@@ -24,9 +24,10 @@ Primary jobs:
 - Add a property and attach one or more accounts to it.
 - Quickly record rent, an installment payment, a partial payment, or another receipt.
 - Record an expense for repairs, contractors, taxes, insurance, or other property costs.
-- See collected income, expenses, net cash flow, remaining loan principal, and upcoming due dates by property and across the portfolio.
+- Track lease security deposits, land-contract down payments, scheduled installments, late charges, interest, principal, and other useful agreement amounts separately and traceably.
+- See collected income, expenses, net cash flow, remaining loan principal, and upcoming or overdue items by property and across the portfolio.
 - Import historical data before regular use, or keep making entries in the app while optionally backfilling data later.
-- Export records for backup, taxes, or review in a spreadsheet.
+- Export records for backup, tax preparation, or spreadsheet review, with a dated complete data backup available as JSON or ZIP.
 - Optionally invite a buyer/tenant to a separate, narrowly scoped portal for their own account.
 - Enable email notices independently of portal access; notices are off by default.
 
@@ -43,12 +44,13 @@ Keep the primary navigation small:
 - **Overview:** portfolio totals, upcoming items, recent activity, and properties.
 - **Properties:** property list and a property detail view.
 - **Accounts:** rentals, land contracts, and private notes.
-- **Separate contract terms from ledger balance:** preserve the signed original principal and payment terms while allowing an owner-set opening balance and its as-of date. Agreement-only imports may initialize the ledger balance at $0 until historical payments establish a trustworthy starting point.
+- **Agreements and parties:** preserve original signed terms and documents, then record amendments as dated versions. Keep prior occupants/buyers and agreements in history while making current parties and terms easy for the owner to update.
+- **Separate agreement terms from ledger balance:** preserve signed original principal, down payment, fixed rate, term, installment amount, due-date rules, and any late-charge terms while allowing an owner-set opening balance and its as-of date. Agreement-only imports may initialize the ledger balance at $0 until historical payments establish a trustworthy starting point.
 - Store a tenant/buyer email only when provided by the owner or clearly identified in the agreement; reminder messages remain disabled until explicitly enabled and configured.
 - **Transactions:** income and expenses in a unified, filterable ledger.
-- **Reports:** income, expenses, net cash flow, balances, and export/import.
+- **Reports:** income, expenses, net cash flow, balances, tax-preparation summaries, and export/import.
 
-Property detail is the organizing screen. It should show a compact property summary, related accounts, recent income and expenses, attachments or source references, and property-level totals. Account detail holds the agreement terms, payment history, current balance, and (for loans) an estimated amortization schedule.
+Property detail is the organizing screen. It should show the address, current and prior agreements/occupants, related accounts, recent income and expenses, optional attachments or source references, and property-level totals. Do not require unit counts, bedroom counts, or other residential inventory detail for the basic workflow. Account detail holds current and prior agreement terms, payment history, deposits, charges, current balance, and (for loans) an amortization schedule with assumptions and an as-of date.
 
 The owner workspace and tenant/buyer portal must have distinct navigation and authorization. Portal users do not see owner dashboards, property expenses, other accounts, portfolio reports, imports, or administrative settings. Sharing is account-specific and explicit; account access is not inherited merely because two accounts use the same email address or property.
 
@@ -56,21 +58,35 @@ The owner workspace and tenant/buyer portal must have distinct navigation and au
 
 ### Fast income entry
 
-Provide a persistent **Record income** action. When opened from a property, preselect that property and let the user choose an account if there is more than one. Required fields are property/account, amount, and received date. Default the date to today. Payment method and memo are optional. For a rental, categorize the receipt as rent, late fee, deposit, or other income. For a note or land contract, preview the suggested interest/principal/fee/unapplied allocation and allow editing before saving.
+Provide a persistent **Record income** action. When opened from a property, preselect that property and let the user choose an account if there is more than one. Required fields are property/account, amount, and received date. Default the date to today. Payment method and memo are optional. For a rental, categorize the receipt as rent, late fee, security deposit, deposit refund, or other receipt; track a security deposit as a separate liability/balance and do not count it as rent income. For a note or land contract, track the down payment separately from later installments, preview the suggested interest/principal/fee/unapplied allocation, and allow editing before saving.
 
 Support entering several receipts in sequence without returning to the portfolio overview. Make the next due date and last payment visible on each account so monthly bookkeeping can be done with a short scan.
 
+Maintain an expected schedule separately from actual receipts. The schedule describes rent installments or fixed loan due dates and amounts; it does not itself post income or reduce principal. Support partial, missed, early, and extra payments, with the received date and covered due period recorded separately when needed.
+
+For rentals, allow the owner to record a lease/security-deposit amount, held balance, receipt date, and eventual refund or amount retained with an explanation. Keep deposit movements distinct from rent and operating income. The product records owner-entered deposit handling; it does not determine legal compliance or custody requirements.
+
 ### Expense entry
 
-Provide a persistent **Record expense** action, available from the portfolio and property detail. Required fields are property, amount, date, and category. Optional fields include related account, payee/contractor, payment method, memo, and receipt attachment. Seed categories with repairs, contractor labor, materials, taxes, insurance, utilities, management, and other. Allow notes and category edits without losing the original transaction record.
+Provide a persistent **Record expense** action, available from the portfolio and property detail. Required fields are property, amount, date, and category. Optional fields include related account, payee/contractor, payment method, memo, and receipt attachment. Receipt uploads and other supporting documents are useful but optional. Seed categories with repairs, contractor labor, materials, taxes, insurance, utilities, management, and other. Allow the owner to correct transaction details without losing the original values and edit history.
 
 For this initial bookkeeping workflow, expenses reduce property cash flow but do not change loan principal or rental account balances. Track reimbursements or refunds as separate linked transactions when supported.
 
 ### Land contract and note payment allocation
 
-Store the received payment as an immutable transaction and store its allocation as separate rows or explicit allocation fields. Support principal, interest, fees, and unapplied funds. The app can suggest an allocation from the account terms and prior ledger, but it must label the calculation as an estimate and allow manual correction. Keep a dated audit trail for edits and reversals. Since posted ledger rows are append-only, provide an owner-only **Void** action for mistakes: it changes only the transaction status, preserves the original row and reason/timestamp, and records before/after values in the audit log. A voided entry must not affect balances or reports and must never be restorable to posted status; enter a corrected transaction as a new row.
+Store received payments as transactions and their allocations as separate rows or explicit allocation fields. Support down payment, principal, interest, late charges/fees, and unapplied funds. The app can suggest an allocation from the account terms and prior ledger, but it must show its assumptions, label balances as estimates, and allow owner correction. Keep a dated audit trail for changes and reversals. Owners can correct terms and transaction details easily, while retaining who changed what and when. A correction must preserve prior values and resulting balance impact rather than silently changing the historical basis of reports. Provide an owner-only void/reversal action with reason and timestamp, and exclude reversed entries from current calculations while preserving history.
 
-Display original principal, principal paid, current principal, scheduled payment, next due date, interest rate, term, and balloon date when provided. Amortization previews are informational until validated against the signed agreement and jurisdiction-specific terms.
+For fixed-rate land contracts and notes, display original principal, down payment, principal paid, current estimated principal, scheduled payment, next due date, interest rate, term, maturity/balloon date, late-charge terms, and amendments. Generate a standard amortization table from active fixed-rate terms, showing assumptions, effective date, and an as-of balance. An amendment creates a new dated term version and schedule from its effective date; keep prior schedules and payment history available and do not recast previous payments automatically. Calculate or suggest late charges when an installment passes its due date plus the agreement's grace period, show the calculation, and let the owner review or correct it. These figures are bookkeeping estimates, not payoff quotes or legal determinations. Any future buyer-facing balance must be marked as an estimate.
+
+### Agreement and occupant changes
+
+Keep a simple address-based property record as the anchor. An owner can update the current occupant/buyer and agreement when a new agreement or amendment applies to the same address. Preserve earlier agreement versions, parties, effective dates, and optional signed-document attachments so historical receipts and tax summaries remain understandable. Do not require bedrooms, unit inventory, lease renewal workflows, or extensive property classification in the initial design.
+
+### Tax preparation and backup export
+
+Provide owner-reviewed annual summaries that make common Schedule E and installment-sale inputs easier to assemble, then let the owner file in their chosen tax software. Keep source ledger detail and category totals exportable. For rentals, track gross rent, late fees/other income, operating-expense categories, and security-deposit receipts/refunds separately from rent income. For land contracts/notes, track sale/down-payment amounts, gross installment receipts, principal, interest, late charges, and owner-entered sale-basis or installment-sale reference figures separately. Do not calculate tax liability, decide tax treatment, or present these summaries as filed tax forms. Label them as preparation aids and allow category edits and detailed export.
+
+Offer **Export everything** as a dated JSON backup, with an optional ZIP containing the JSON, a manifest/schema version, and user-uploaded supporting files. Include properties, current and prior agreement/occupant versions, schedules and assumptions, transactions and allocations, deposit/charge records, import receipts, audit history, and uploaded files. Show the export date and data scope. Keep the export private and require an authenticated owner session. Design the format for validation and possible restore; if restore is not initially supported, say so clearly and keep the export usable without the app.
 
 ### Import and AI-assisted backfill
 
@@ -97,25 +113,31 @@ Forms should default dates and known property/account values, accept decimal amo
 
 Core tables in the current Supabase schema use the `pd_` project prefix:
 
-- `pd_properties`: owner, name, address, type, notes.
-- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), party, contract terms, scheduled amount/frequency, optional P&I-only installment amount when the scheduled total includes escrow, status.
-- `pd_payments`: owner, account, gross amount, received date, method, memo, source/import batch, explicit principal/interest/fee/unapplied allocation columns, and posted/voided state.
-- `pd_expenses`: owner, property, optional account, amount, expense date, category, payee, method, memo, optional receipt path, source/import batch, and posted/voided state.
+- `pd_properties`: owner, address, display name, notes; do not require unit or bedroom classification.
+- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), current party, status, active agreement version, and simple due schedule.
+- Agreement history (for example `pd_agreements`): account/property, parties, effective dates, agreement type, fixed principal/sale amount, down payment, fixed interest rate, term, installment amount, due date/grace period, late-charge rule, maturity/balloon date, tax-preparation reference fields, and optional document reference. Preserve superseded terms on amendment rather than overwriting them.
+- `pd_payments`: owner, account, gross amount, received date, covered due period, method, memo, source/import batch, explicit down-payment/principal/interest/late-fee/other/unapplied allocation, and correction/reversal audit metadata.
+- Expected charges or schedule rows (for example `pd_scheduled_items`): account, due date, expected amount, charge type, agreement version, and status. These are separate from actual transactions and support rental due status and loan installment tracking.
+- Deposit records (for example `pd_deposit_entries`): account/lease, transaction date, receipt/refund/retention type, amount, reason, and linked payment or expense when applicable. Keep security-deposit balances distinct from earned income.
+- `pd_expenses`: owner, property, optional account, amount, expense date, tax/reporting category, payee, method, memo, optional receipt path, source/import batch, and correction/reversal history.
 - `pd_import_batches`: owner, filename or description, created/committed timestamps, row counts and status. Avoid retaining raw uploaded financial documents by default; keep only what is needed to audit the imported rows.
-- `pd_audit_events`: owner, entity, action, timestamp, prior/new values or a safe change summary.
+- `pd_audit_events`: owner, entity, action, timestamp, prior/new values or a safe change summary; include agreement amendments and owner corrections.
+- Dated export manifest: export timestamp, schema version, included record/file counts, and format version; backup files remain private and are generated only for the authenticated owner.
 - Future portal support: a `pd_account_portal_access` table linking one authenticated portal user to an explicitly shared account, plus separate invitation/verification state. Do not grant portal users access to owner-scoped tables directly; expose a narrow, tested view or server-side API that returns only the approved account ledger fields.
 - Future email support: per-account notice preferences and recipient address (default disabled), optional reply-to/CC settings, and a delivery-attempt log with minimal metadata; name these `pd_` tables too.
 
-Use decimal/numeric storage for money. Use ISO calendar dates for transaction dates and UTC timestamps for audit metadata. Add checks for positive amounts, allowed categories/types, and correct ownership relationships. Enable row-level security on every owner-scoped table. Authenticated reads and writes must be scoped to `auth.uid()`; child records must also reference a parent owned by that user. Never put a Supabase service-role key or private secret in the static GitHub Pages app.
+Use decimal/numeric storage for money. Use ISO calendar dates for due/effective/transaction dates and UTC timestamps for audit metadata. Add checks for valid signs by transaction type, allowed categories/types, and correct ownership relationships. Enable row-level security on every owner-scoped table. Authenticated reads and writes must be scoped to `auth.uid()`; child records must also reference a parent owned by that user. Never put a Supabase service-role key or private secret in the static GitHub Pages app.
 
 ## Portfolio calculations
 
 - **Income collected:** sum of posted receipt transactions in the selected period.
-- **Expenses:** sum of posted expense transactions in the selected period.
+- **Expenses:** sum of posted operating/capital expense transactions in the selected period, with owner-editable reporting categories.
 - **Net cash flow:** income minus expenses; keep loan principal and interest separately reportable.
-- **Loan principal balance:** original principal minus posted principal allocations, adjusted only by explicit principal adjustments or reversals.
-- **Rental balance:** show open charges/receipts if a charge ledger is introduced; do not present a bank-style loan balance for a rental.
-- **Scheduled monthly amount:** normalize frequency only for portfolio summaries and label it as an estimate when payment cadence is not monthly.
+- **Loan principal balance:** active agreement's principal basis adjusted for dated amendments and down payment, less posted principal allocations and explicit corrections; show the as-of date and allocation assumptions.
+- **Rental balance:** calculate amount due only from posted expected charges minus linked receipts/credits as of a stated date. Track security deposits separately as held, refunded, or retained amounts.
+- **Late charges:** derive eligibility from each due date plus agreement grace period; show the rule and calculated charge and preserve owner overrides.
+- **Scheduled amount:** show upcoming expected rent installments or fixed loan payments without treating them as received income; normalize frequency only for summaries and label estimates.
+- **Tax preparation:** annual exports group owner-reviewed categories and expose underlying transactions; deposits held are not rent income, and loan principal and interest remain separate.
 
 Calculations must be reproducible from ledger rows and must be covered by examples with partial payments, overpayments, refunds/reversals, and backdated entries before broader use.
 
@@ -125,7 +147,7 @@ Each owner account is a private workspace. Enforce row-level security for proper
 
 Portal authentication is optional and separate from owner access. An invitation can only grant access to a specific account after the owner explicitly shares it and the invitee verifies control of their email. A portal identity must never inherit the owner's user id or receive access through a broad owner policy. Use a separate portal authorization model and narrow server-side interface; test that a portal user cannot enumerate properties, read expenses, or access another account by changing an id. Email delivery remains independent of portal identity: notices can go to a verified contact without an app login, and all buyer/tenant notices stay disabled until enabled by the owner.
 
-Do not expose records in public pages, search indexes, logs, client error reports, or shared links. Use HTTPS in transit and Supabase-managed encryption at rest; enforce row-level security and private storage. Client-side CSV parsing and preview should avoid unnecessary copies and clear parsed data from memory after import. Provide account deletion/export controls and recommend a separate backup. Do not store bank credentials or payment card details. If payment processing is added later, use a provider-hosted/tokenized flow and assess servicing, consumer protection, money-transmission, tax, and privacy requirements first.
+Do not expose records in public pages, search indexes, logs, client error reports, or shared links. Use HTTPS in transit and Supabase-managed encryption at rest; enforce row-level security and private storage. Client-side CSV parsing and preview should avoid unnecessary copies and clear parsed data from memory after import. Provide account deletion/export controls and recommend a separate backup. Support a dated, private JSON/ZIP export of all owner records and uploaded files. Do not store bank credentials or payment card details. If payment processing is added later, use a provider-hosted/tokenized flow and assess servicing, consumer protection, money-transmission, tax, and privacy requirements first.
 
 Supabase-managed encryption at rest and TLS are the first-release baseline, but they do not mean that data is end-to-end encrypted from the service operator. True client-side encryption would require each user to keep a separate recovery key and would limit server-side search, reporting, and account recovery. Do not claim end-to-end encryption unless that design is implemented and independently reviewed.
 
@@ -157,16 +179,20 @@ Domain setup status and exact DNS records are tracked in `email-setup.md`; never
 
 1. **Private portfolio foundation:** authentication, RLS, properties, accounts, per-user workspace, export.
 2. **Daily ledger:** quick income entry, expense entry, property detail, searchable transaction ledger, simple cash-flow summaries.
-3. **Loan tracking:** amortization preview, editable payment allocations, due tracking, statements, audit history.
+3. **Agreement and ledger tracking:** address-based owner records, agreement/occupant history, rental charges and security deposits, fixed-rate amortization schedules, down payments, editable payment allocations, late-charge dates, statements, and audit history.
 4. **Historical imports:** CSV template and staging preview, duplicate checks, and import receipts. Users may prepare files with their own AI assistant; PropertyDesk does not need an AI API integration for the initial flow.
-5. **Optional integrations:** receipt storage, accounting exports, borrower portal, and only later payment collection if validated.
+5. **Tax and optional integrations:** Schedule E/installment-sale preparation summaries, optional receipt/document storage, borrower portal, and only later payment collection if validated.
 
 ## Product boundaries and open decisions
 
 - Initial release records payments; it does not initiate or collect them.
-- Choose whether expenses can be linked to an account as well as a property; default to property-level expense with an optional account link.
-- Define whether rental charges are needed in the first release or whether the first version tracks cash received and costs only.
-- Confirm the intended loan interest method and date rules against actual contracts before relying on payoff calculations.
+- Expenses default to property-level with an optional account link; allow owner edits while retaining change history.
+- Track rental charges and deposits so amount-due and held-deposit figures have explicit ledger support.
+- Support fixed-rate standard amortization and dated amendments; leave variable rates and non-standard servicing outside the current product scope.
+- Define report categories and owner-entered tax reference fields that make Schedule E and installment-sale filing easier without attempting to determine tax treatment.
+- Confirm day-count, due-date, grace-period, and late-charge conventions against actual agreements before relying on calculations.
+- Decide whether a later owner-facing portal should show any estimated balance; any displayed figure must show its as-of date and non-payoff status.
+- Define JSON/ZIP backup format and whether restore is included in the first export release.
 - Confirm the user's jurisdiction and data-retention needs before adding legal notices, contract generation, payment collection, or compliance claims.
 
 ## Success measures
@@ -176,3 +202,5 @@ Domain setup status and exact DNS records are tracked in `email-setup.md`; never
 - An import preview makes ambiguous and duplicate rows visible before commit, without sending the data to an AI provider.
 - A user can export their complete records and can verify that a second user cannot read or change them.
 - The owner can reconcile an account balance to its source payment and allocation history.
+- An owner can update an agreement or occupants while viewing the prior version that explains historical ledger entries.
+- A dated backup contains the owner's complete records and uploaded files in a documented format.
