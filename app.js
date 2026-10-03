@@ -3,7 +3,8 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const { csvMoney, csvRate, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate, validateImportRows } = window.PropertyDeskImportUtils;
+  const { parseCSV, selectImportRows } = window.PropertyDeskImportUtils;
+  const { validateAccountRows, validateExpenseRows, validatePaymentRows } = window.PropertyDeskImportWorkflows;
   const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumIncome, sumPosted } = window.PropertyDeskLedgerUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
@@ -346,33 +347,7 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no account rows.');
-      const validateRows=sourceRows=>{const seenAccounts=new Set();return validateImportRows(sourceRows,row=>{
-        const required=['property_name','property_address','account_type','account_name'];
-        for(const key of required)if(!row[key])throw new Error(`Missing required value “${key}”.`);
-        const type=row.account_type.toLowerCase();
-        if(!['rental','land_contract','note'].includes(type))throw new Error(`Invalid account_type “${row.account_type}”. Use rental, land_contract, or note.`);
-        const accountKey=`${row.account_name.toLowerCase()}|${row.property_name.toLowerCase()}|${row.property_address.toLowerCase()}`;
-        if(state.accounts.some(a=>a.name.toLowerCase()===row.account_name.toLowerCase()&&state.properties.find(p=>p.id===a.property_id)?.name.toLowerCase()===row.property_name.toLowerCase()&&state.properties.find(p=>p.id===a.property_id)?.address.toLowerCase()===row.property_address.toLowerCase())||seenAccounts.has(accountKey))throw new Error(`Possible duplicate account: ${row.account_name} at ${row.property_address}.`);
-        const amount=csvMoney(row.payment_amount,`${row.account_name} payment amount`,{optional:true});
-        const principal=type==='rental'?0:csvMoney(row.original_principal,`${row.account_name} principal`,{optional:true});
-        const principalInterestAmount=type==='rental'||!row.principal_interest_amount?null:csvMoney(row.principal_interest_amount,`${row.account_name} P&I payment`);
-        const openingBalance=(row.ledger_opening_balance||'').trim()===''?null:csvMoney(row.ledger_opening_balance,`${row.account_name} opening balance`);
-        if(openingBalance!==null&&!row.ledger_opening_date)throw new Error(`A ledger opening date is required when an opening balance is set for ${row.account_name}.`);
-        const rate=csvRate(row.interest_rate,`${row.account_name} interest rate`,{optional:true});
-        if(rate>100)throw new Error(`Interest rate must be 100% or less for ${row.account_name}.`);
-        const frequency=row.payment_frequency||'monthly',startDate=row.start_date||todayIso();
-        if(!['monthly','weekly','biweekly','quarterly','annual'].includes(frequency)||!validIsoDate(startDate)||(row.next_due_date&&!validIsoDate(row.next_due_date))||(row.balloon_date&&!validIsoDate(row.balloon_date))||(row.ledger_opening_date&&!validIsoDate(row.ledger_opening_date)))throw new Error(`Invalid payment frequency or date for ${row.account_name}.`);
-        const term=row.term_months?Number(row.term_months):null,graceDays=Number(row.grace_days||0);
-        if(term!==null&&(!Number.isInteger(term)||term<1))throw new Error(`Term months must be a positive whole number for ${row.account_name}.`);
-        if(!Number.isInteger(graceDays)||graceDays<0)throw new Error(`Grace days must be a nonnegative whole number for ${row.account_name}.`);
-        const propertyKind=row.property_kind||'residential';
-        if(!['residential','land','commercial','other'].includes(propertyKind))throw new Error(`Invalid property_kind “${propertyKind}” for ${row.property_name}.`);
-        const lateFee=csvMoney(row.late_fee,`${row.account_name} late fee`,{optional:true});
-        const partyEmail=(row.party_email||'').split(/[;,]/).map(email=>email.trim()).filter(Boolean);
-        if(partyEmail.some(email=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
-        seenAccounts.add(accountKey);
-        return {property_name:row.property_name,property_address:row.property_address,account_type:type,account_name:row.account_name,party_name:row.party_name||'',party_email:partyEmail.join(', '),start_date:startDate,next_due_date:row.next_due_date||'',payment_amount:amount,payment_frequency:frequency,original_principal:principal,principal_interest_amount:principalInterestAmount,ledger_opening_balance:openingBalance,ledger_opening_date:row.ledger_opening_date||'',interest_rate:rate,term_months:row.term_months||'',balloon_date:row.balloon_date||'',late_fee:lateFee,grace_days:graceDays,notes:row.notes||'',city:row.city||null,state:row.state||null,postal_code:row.postal_code||null,property_kind:propertyKind};
-      });};
+      const validateRows=sourceRows=>validateAccountRows(sourceRows,state.properties,state.accounts,todayIso());
       const validation=validateRows(rows);
       const staged=validation.valid;
       stageImport('Review account import',staged,async(rowsToImport,review)=>{
@@ -393,21 +368,7 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no expense rows.');
-      const expenseKey=(propertyId,accountId,date,amount,payee,memo)=>JSON.stringify([propertyId,accountId||'',date,Number(amount).toFixed(2),String(payee||'').trim().toLowerCase(),String(memo||'').trim().toLowerCase()]);
-      const existingKeys=state.expenses.map(x=>expenseKey(x.property_id,x.account_id,x.expense_date,x.amount,x.payee,x.memo));
-      const validateRows=sourceRows=>{const validation=validateImportRows(sourceRows,row=>{
-        if(!row.property_name||!row.property_address||!row.expense_date||!row.amount)throw new Error('Each expense row needs property_name, property_address, expense_date, and amount.');
-        const p=state.properties.find(x=>x.name.toLowerCase()===row.property_name.toLowerCase()&&x.address.toLowerCase()===row.property_address.toLowerCase());
-        if(!p)throw new Error(`Property not found: ${row.property_name} at ${row.property_address}. Add or import the property first.`);
-        const account=row.account_name?state.accounts.find(a=>a.property_id===p.id&&a.name.toLowerCase()===row.account_name.toLowerCase()):null;
-        if(row.account_name&&!account)throw new Error(`Account not found for ${row.property_name}: ${row.account_name}.`);
-        const amount=csvMoney(row.amount,`expense at ${row.property_name}`,{minimum:0.01});
-        if(!validIsoDate(row.expense_date))throw new Error(`Invalid expense date ${row.expense_date}.`);
-        const category=row.category||'other',method=row.payment_method||'manual';
-        if(!['repairs','contractor','materials','taxes','insurance','utilities','management','other'].includes(category))throw new Error(`Invalid expense category “${category}”.`);
-        if(!['manual','check','cash','bank_transfer','card','other'].includes(method))throw new Error(`Invalid payment method “${method}” for expense.`);
-        return {property_name:p.name,property_address:p.address,account_name:account?.name||'',expense_date:row.expense_date,amount,category,payee:row.payee||'',payment_method:method,memo:[row.memo,row.source_note].filter(Boolean).join(' · ')};
-      });const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=row.account_name?state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name):null;return expenseKey(p?.id,a?.id,row.expense_date,row.amount,row.payee,row.memo);});return {...validation,valid:reviewed};};
+      const validateRows=sourceRows=>validateExpenseRows(sourceRows,state.properties,state.accounts,state.expenses);
       const validation=validateRows(rows);
       stageImport('Review expense import',validation.valid,async(rowsToImport,review)=>{
         const payload=rowsToImport.map(row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=row.account_name?state.accounts.find(x=>x.property_id===p.id&&x.name===row.account_name):null;return {property_id:p.id,account_id:a?.id||null,expense_date:row.expense_date,amount:row.amount,category:row.category,payee:row.payee||null,payment_method:row.payment_method,memo:row.memo||null};});
@@ -427,25 +388,7 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no payment rows.');
-      const paymentKey=(accountId,date,amount,memo)=>JSON.stringify([accountId,date,Number(amount).toFixed(2),String(memo||'').trim().toLowerCase()]);
-      const existingKeys=state.payments.map(x=>paymentKey(x.account_id,x.received_date,x.amount,x.memo));
-      const validateRows=sourceRows=>{const validation=validateImportRows(sourceRows,row=>{
-        if(!row.property_name||!row.property_address||!row.account_name||!row.received_date||!row.amount)throw new Error('Each payment row needs property_name, property_address, account_name, received_date, and amount.');
-        const p=state.properties.find(x=>x.name.toLowerCase()===row.property_name.toLowerCase()&&x.address.toLowerCase()===row.property_address.toLowerCase());
-        if(!p)throw new Error(`Property not found: ${row.property_name} at ${row.property_address}. Import properties and accounts first.`);
-        const a=state.accounts.find(x=>x.property_id===p.id&&x.name.toLowerCase()===row.account_name.toLowerCase());
-        if(!a)throw new Error(`Account not found: ${row.account_name} at ${row.property_name}.`);
-        const amount=csvMoney(row.amount,`payment for ${a.name}`,{minimum:0.01}),paymentDate=row.received_date;
-        if(!validIsoDate(paymentDate))throw new Error(`Invalid payment date ${row.received_date}.`);
-        const incomeCategory=row.income_category||(a.account_type==='rental'?'rent':'installment');
-        if(!['rent','late_fee','deposit','installment','other'].includes(incomeCategory))throw new Error(`Invalid income category “${incomeCategory}”.`);
-        const method=row.payment_method||'manual';
-        if(!['manual','check','cash','bank_transfer','money_order','card'].includes(method))throw new Error(`Invalid payment method “${method}”.`);
-        const alloc={principal:csvMoney(row.principal_amount,`${a.name} principal allocation`,{optional:true}),interest:csvMoney(row.interest_amount,`${a.name} interest allocation`,{optional:true}),fee:csvMoney(row.fee_amount,`${a.name} fee allocation`,{optional:true}),unapplied:csvMoney(row.unapplied_amount,`${a.name} unapplied allocation`,{optional:true})};
-        if(a.account_type==='rental')alloc.principal=alloc.interest=alloc.fee=alloc.unapplied=0;
-        else if(Math.round((alloc.principal+alloc.interest+alloc.fee+alloc.unapplied)*100)!==Math.round(amount*100))throw new Error(`Payment allocations for ${a.name} on ${paymentDate} must add up to ${money(amount)}.`);
-        return {property_name:p.name,property_address:p.address,account_name:a.name,received_date:paymentDate,amount,income_category:incomeCategory,payment_method:method,principal_amount:alloc.principal,interest_amount:alloc.interest,fee_amount:alloc.fee,unapplied_amount:alloc.unapplied,memo:row.memo||''};
-      });const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name);return paymentKey(a?.id,row.received_date,row.amount,row.memo);});return {...validation,valid:reviewed};};
+      const validateRows=sourceRows=>validatePaymentRows(sourceRows,state.properties,state.accounts,state.payments);
       const validation=validateRows(rows);
       stageImport('Review payment import',validation.valid,async(rowsToImport,review)=>{
         const rowsToInsert=rowsToImport.map(row=>({account_id:state.accounts.find(a=>a.name===row.account_name&&state.properties.find(p=>p.id===a.property_id)?.name===row.property_name&&state.properties.find(p=>p.id===a.property_id)?.address===row.property_address).id,received_date:row.received_date,amount:row.amount,income_category:row.income_category,payment_method:row.payment_method,principal_amount:row.principal_amount,interest_amount:row.interest_amount,fee_amount:row.fee_amount,unapplied_amount:row.unapplied_amount,memo:row.memo||null}));
