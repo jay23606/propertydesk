@@ -39,4 +39,4 @@ PropertyDesk is a recordkeeping tool and does not collect payments. Loan allocat
 
 ## Local checks
 
-With Node.js installed, run `npm test` from this directory to test CSV parsing, template compatibility, money/date validation, and posted-versus-voided balance calculations. These tests do not replace a live Supabase test of RLS, RPC rollback, or record isolation.
+With Node.js installed, run `npm test` from this directory to test CSV parsing, template compatibility, money/date validation, and posted-versus-voided balance calculations. To exercise workspace RLS against the linked Supabase project without retaining test records, run `supabase db query --linked --file supabase/tests/workspace_security.sql`; the transaction rolls back its synthetic users and records. `supabase/tests/payment_allocation_integrity.sql` similarly checks database allocation constraints. These live database checks do not replace periodic independent security review.
