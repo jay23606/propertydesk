@@ -5,4 +5,8 @@
 .negative-amount{color:#a35f45!important}
 .transaction-voided{opacity:.6}
 .transaction-voided td strong{text-decoration:line-through}
+.duplicate-import-row{background:#fffaf0}
+.duplicate-import-row td:last-child{color:#8d6b2b;font-weight:700}
+.duplicate-import-toggle{display:flex;align-items:center;gap:8px;margin:8px 0 14px;color:#715b2b;font-size:12px;font-weight:600}
+.duplicate-import-toggle input{accent-color:#9a762b}
 @media(max-width:760px){.heading-actions{flex-wrap:wrap;justify-content:flex-end}.import-preview-table table{min-width:620px}}

@@ -26,6 +26,7 @@ All PropertyDesk tables use the `pd_` prefix (`pd_properties`, `pd_accounts`, `p
 - Record income from the account or portfolio screen. Record repair and contractor costs in the Expenses screen.
 - Mistaken transactions can be voided from the transaction ledger. The original remains in the audit history and exports; voided rows no longer affect balances or reports.
 - Import accounts from `templates/accounts-template.csv`; import expenses from `templates/expenses-template.csv`. Review data before importing. Screenshot reading happens outside this site; AI-prepared rows can be saved as CSV or entered through Supabase, where RLS and constraints still apply.
+- Payment and expense imports flag matching rows in the full preview and skip them by default on re-import. A possible duplicate can be included explicitly if it represents a separate real transaction.
 - Export a backup from Reports. Keep a separate copy of `config.js` and your exported records.
 
 ## Important product limits

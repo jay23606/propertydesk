@@ -28,6 +28,20 @@
     return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
   }
 
+  function markPossibleDuplicates(rows, existingKeys, keyForRow) {
+    const seen = new Set(existingKeys);
+    return rows.map(row => {
+      const key = keyForRow(row);
+      const possibleDuplicate = seen.has(key);
+      seen.add(key);
+      return { ...row, _possible_duplicate: possibleDuplicate };
+    });
+  }
+
+  function selectImportRows(rows, includePossibleDuplicates = false) {
+    return rows.filter(row => includePossibleDuplicates || !row._possible_duplicate);
+  }
+
   function parseCSV(text) {
     const rows = [];
     let row = [], field = '', quoted = false, afterQuote = false;
@@ -61,7 +75,7 @@
     });
   }
 
-  const helpers = Object.freeze({ csvMoney, parseCSV, validIsoDate });
+  const helpers = Object.freeze({ csvMoney, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate });
   globalThis.PropertyDeskImportUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

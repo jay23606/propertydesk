@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { csvMoney, parseCSV, validIsoDate } = require('../import-utils.js');
+const { csvMoney, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate } = require('../import-utils.js');
 
 test('all provided CSV templates parse with their example row', () => {
   for (const filename of ['accounts-template.csv', 'payments-template.csv', 'expenses-template.csv']) {
@@ -43,4 +43,18 @@ test('date validator accepts real ISO dates and rejects impossible dates', () =>
   assert.equal(validIsoDate('2025-02-29'), false);
   assert.equal(validIsoDate('10/01/2025'), false);
   assert.equal(validIsoDate('2025-13-01'), false);
+});
+
+test('re-imported and repeated rows are flagged and excluded unless explicitly included', () => {
+  const key = row => `${row.account}|${row.date}|${row.amount}|${row.memo}`;
+  const rows = [
+    { account: 'a1', date: '2025-01-01', amount: '100.00', memo: 'January' },
+    { account: 'a1', date: '2025-02-01', amount: '100.00', memo: 'February' },
+    { account: 'a1', date: '2025-02-01', amount: '100.00', memo: 'February' },
+  ];
+  const flagged = markPossibleDuplicates(rows, [key(rows[0])], key);
+
+  assert.deepEqual(flagged.map(row => row._possible_duplicate), [true, false, true]);
+  assert.deepEqual(selectImportRows(flagged).map(row => row.memo), ['February']);
+  assert.equal(selectImportRows(flagged, true).length, 3);
 });
