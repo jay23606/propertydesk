@@ -70,6 +70,17 @@ test('expense import reports property, date, category, and positive-amount error
   assert.match(result.errors[1].message, /zero or greater|greater than zero|Invalid expense date|Invalid expense category/);
 });
 
+test('security deposit refund imports require and match a rental account', () => {
+  const rows=parseCSV('property_name,property_address,account_name,expense_date,amount,category,memo\nMaple Street Home,123 Maple Street,Maple Street Rental,2026-10-02,250,deposit_refund,Deposit returned');
+  const property=[{id:'tp1',name:'Maple Street Home',address:'123 Maple Street'}];
+  const rental=[{id:'tr1',property_id:'tp1',name:'Maple Street Rental',account_type:'rental'}];
+  const note=[{id:'tn1',property_id:'tp1',name:'Maple Street Rental',account_type:'note'}];
+  assert.equal(validateExpenseRows(rows,property,rental,[]).valid[0].category,'deposit_refund');
+  assert.match(validateExpenseRows(rows,property,note,[]).errors[0].message,/rental account/);
+  const withoutAccount=parseCSV('property_name,property_address,expense_date,amount,category\nMaple Street Home,123 Maple Street,2026-10-02,250,deposit_refund');
+  assert.match(validateExpenseRows(withoutAccount,property,rental,[]).errors[0].message,/rental account/);
+});
+
 test('payment import enforces loan allocation totals and excludes duplicate receipts by default', () => {
   const rows = parseCSV('property_name,property_address,account_name,received_date,amount,principal_amount,interest_amount,fee_amount,unapplied_amount,memo\nOak House,10 Oak St,Oak Contract,2026-10-01,200,150,50,0,0,October\nOak House,10 Oak St,Oak Contract,2026-10-01,200,150,50,0,0,October\nOak House,10 Oak St,Oak Contract,2026-10-02,100,90,0,0,0,Wrong total');
   const result = validatePaymentRows(rows, properties, accounts, []);

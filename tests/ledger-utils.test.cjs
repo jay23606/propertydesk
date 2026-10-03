@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumIncome, sumPosted } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -52,6 +52,29 @@ test('security deposits remain cash receipts but are excluded from income totals
   assert.equal(sumIncome(receipts), 1025);
 });
 
+test('security deposit refunds are excluded from operating expense totals', () => {
+  assert.equal(sumOperatingExpenses([
+    { amount: 100, category: 'repairs' },
+    { amount: 200, category: 'deposit_refund' },
+    { amount: 50, category: 'insurance', status: 'voided' },
+  ]), 100);
+});
+
+test('security deposit held balance reconciles posted receipts, refunds, retention, and reversals', () => {
+  const entries=[
+    { id:'r1', entry_type:'received', amount:1000, source_payment_id:'p1' },
+    { id:'r2', entry_type:'received', amount:200, source_payment_id:'p2' },
+    { id:'f1', entry_type:'refunded', amount:250, source_expense_id:'e1' },
+    { id:'t1', entry_type:'retained', amount:100 },
+    { id:'t2', entry_type:'restored', amount:25 },
+  ];
+  const result=securityDepositBalance(entries,[
+    { id:'p1', status:'posted' }, { id:'p2', status:'voided' }
+  ],[{ id:'e1', status:'posted' }]);
+  assert.deepEqual(result.totals,{received:1000,refunded:250,retained:100,restored:25,held:675});
+  assert.deepEqual(result.active.map(entry=>entry.id),['r1','f1','t1','t2']);
+});
+
 test('monthly scheduled totals normalize payment cadence and exclude inactive accounts', () => {
   assert.equal(monthlyScheduledEstimate([
     { payment_amount: 1200, payment_frequency: 'monthly' },
@@ -76,6 +99,14 @@ test('unpaid scheduled charges accumulate from 2026 and carry forward, crediting
     { account_id: 'a2', amount: 250, received_date: '2026-01-03', income_category: 'rent' },
   ];
   assert.equal(amountDueSince(accounts, payments, '2026-01-01', '2026-03-31'), 1500);
+});
+
+test('running amount due adds each installment when due and a recorded payment reduces it dollar-for-dollar', () => {
+  const account = { id: 'rolling', start_date: '2025-12-15', next_due_date: '2026-01-15', payment_amount: 100, payment_frequency: 'monthly' };
+  const payments = [{ account_id: 'rolling', amount: 60, received_date: '2026-01-20', income_category: 'installment' }];
+  assert.equal(amountDueSince([account], payments, '2026-01-01', '2026-02-14'), 40, 'one due installment less the payment recorded');
+  assert.equal(amountDueSince([account], payments, '2026-01-01', '2026-02-15'), 140, 'the next month adds another scheduled installment');
+  assert.equal(amountDueSince([account], [...payments, { account_id: 'rolling', amount: 100, received_date: '2026-02-15', income_category: 'installment' }], '2026-01-01', '2026-02-28'), 40, 'recording the next payment subtracts from the carry-forward amount');
 });
 
 test('monthly due dates stay anchored at month end', () => {

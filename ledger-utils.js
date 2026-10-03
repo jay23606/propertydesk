@@ -14,6 +14,19 @@
     return sumPosted(transactions.filter(transaction => transaction.income_category !== 'deposit'), amountField);
   }
 
+  function sumOperatingExpenses(transactions, amountField = 'amount') {
+    return sumPosted(transactions.filter(transaction => transaction.category !== 'deposit_refund'), amountField);
+  }
+
+  function securityDepositBalance(entries, payments, expenses) {
+    const paymentById=new Map(payments.map(row=>[row.id,row])),expenseById=new Map(expenses.map(row=>[row.id,row]));
+    const active=entries.filter(row=>row.entry_type==='retained'||row.entry_type==='restored'||(row.entry_type==='received'&&isPosted(paymentById.get(row.source_payment_id)))||(row.entry_type==='refunded'&&isPosted(expenseById.get(row.source_expense_id))));
+    const totals={received:0,refunded:0,retained:0,restored:0};
+    for(const entry of active)totals[entry.entry_type]+=Number(entry.amount||0);
+    totals.held=totals.received-totals.refunded-totals.retained+totals.restored;
+    return {active,totals};
+  }
+
   function monthlyScheduledEstimate(accounts) {
     const multipliers = { monthly: 1, weekly: 52 / 12, biweekly: 26 / 12, quarterly: 1 / 3, annual: 1 / 12 };
     const estimate = accounts
@@ -126,7 +139,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumIncome, sumPosted });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

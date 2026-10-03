@@ -46,7 +46,8 @@
       const amount=csvMoney(row.amount,`expense at ${row.property_name}`,{minimum:0.01});
       if(!validIsoDate(row.expense_date))throw new Error(`Invalid expense date ${row.expense_date}.`);
       const category=row.category||'other',method=row.payment_method||'manual';
-      if(!['repairs','contractor','materials','taxes','insurance','utilities','management','other'].includes(category))throw new Error(`Invalid expense category “${category}”.`);
+      if(!['repairs','contractor','materials','taxes','insurance','utilities','management','deposit_refund','other'].includes(category))throw new Error(`Invalid expense category “${category}”.`);
+      if(category==='deposit_refund'&&account?.account_type!=='rental')throw new Error('A security deposit refund must be linked to a rental account.');
       if(!['manual','check','cash','bank_transfer','card','other'].includes(method))throw new Error(`Invalid payment method “${method}” for expense.`);
       return {property_name:property.name,property_address:property.address,account_name:account?.name||'',expense_date:row.expense_date,amount,category,payee:row.payee||'',payment_method:method,memo:[row.memo,row.source_note].filter(Boolean).join(' · ')};
     });

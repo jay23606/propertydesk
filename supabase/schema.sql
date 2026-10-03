@@ -113,7 +113,7 @@ create table if not exists public.pd_expenses (
   account_id uuid references public.pd_accounts(id) on delete set null,
   amount numeric(14,2) not null check (amount > 0),
   expense_date date not null,
-  category text not null default 'other' check (category in ('repairs','contractor','materials','taxes','insurance','utilities','management','other')),
+  category text not null default 'other' check (category in ('repairs','contractor','materials','taxes','insurance','utilities','management','deposit_refund','other')),
   payee text,
   payment_method text not null default 'manual' check (payment_method in ('manual','check','cash','bank_transfer','card','other')),
   memo text,
@@ -129,6 +129,27 @@ create table if not exists public.pd_expenses (
 alter table public.pd_expenses add column if not exists voided_at timestamptz;
 alter table public.pd_expenses add column if not exists void_reason text;
 alter table public.pd_expenses add column if not exists correction_of_expense_id uuid references public.pd_expenses(id);
+alter table public.pd_expenses drop constraint if exists pd_expenses_category_check;
+alter table public.pd_expenses add constraint pd_expenses_category_check
+  check (category in ('repairs','contractor','materials','taxes','insurance','utilities','management','deposit_refund','other'));
+
+create table if not exists public.pd_deposit_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null references public.pd_accounts(id) on delete cascade,
+  entry_type text not null check (entry_type in ('received','refunded','retained','restored')),
+  amount numeric(14,2) not null check (amount > 0),
+  movement_date date not null,
+  reason text not null,
+  source_payment_id uuid references public.pd_payments(id) on delete cascade,
+  source_expense_id uuid references public.pd_expenses(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  check (
+    (entry_type='received' and source_payment_id is not null and source_expense_id is null) or
+    (entry_type='refunded' and source_payment_id is null and source_expense_id is not null) or
+    (entry_type in ('retained','restored') and source_payment_id is null and source_expense_id is null)
+  )
+);
 
 create table if not exists public.pd_import_batches (
   id uuid primary key default gen_random_uuid(),
@@ -184,6 +205,9 @@ create index if not exists pd_payments_user_date_idx on public.pd_payments(user_
 create index if not exists pd_payments_account_idx on public.pd_payments(account_id, received_date desc);
 create index if not exists pd_expenses_user_date_idx on public.pd_expenses(user_id, expense_date desc);
 create index if not exists pd_expenses_property_idx on public.pd_expenses(property_id, expense_date desc);
+create index if not exists pd_deposit_entries_account_date_idx on public.pd_deposit_entries(user_id,account_id,movement_date desc,created_at desc);
+create unique index if not exists pd_deposit_entries_payment_source_idx on public.pd_deposit_entries(source_payment_id) where source_payment_id is not null;
+create unique index if not exists pd_deposit_entries_expense_source_idx on public.pd_deposit_entries(source_expense_id) where source_expense_id is not null;
 create index if not exists pd_import_batches_user_idx on public.pd_import_batches(user_id, created_at desc);
 create index if not exists pd_audit_events_user_entity_idx on public.pd_audit_events(user_id, entity_type, entity_id, created_at desc);
 create unique index if not exists pd_payments_one_correction_idx on public.pd_payments(correction_of_payment_id) where correction_of_payment_id is not null;
@@ -195,6 +219,7 @@ alter table public.pd_agreement_versions enable row level security;
 alter table public.pd_documents enable row level security;
 alter table public.pd_payments enable row level security;
 alter table public.pd_expenses enable row level security;
+alter table public.pd_deposit_entries enable row level security;
 alter table public.pd_import_batches enable row level security;
 alter table public.pd_audit_events enable row level security;
 
@@ -586,11 +611,12 @@ grant execute on function public.pd_import_propertydesk_transactions(text, jsonb
 
 -- Signed-out clients cannot read or mutate portfolio records.
 revoke all on table public.pd_properties, public.pd_accounts, public.pd_payments,
-  public.pd_expenses, public.pd_import_batches, public.pd_audit_events, public.pd_agreement_versions, public.pd_documents from anon;
+  public.pd_expenses, public.pd_deposit_entries, public.pd_import_batches, public.pd_audit_events, public.pd_agreement_versions, public.pd_documents from anon;
 revoke all on table public.pd_properties, public.pd_accounts, public.pd_payments,
-  public.pd_expenses, public.pd_import_batches, public.pd_audit_events, public.pd_agreement_versions, public.pd_documents from authenticated;
+  public.pd_expenses, public.pd_deposit_entries, public.pd_import_batches, public.pd_audit_events, public.pd_agreement_versions, public.pd_documents from authenticated;
 grant select, insert, update on table public.pd_properties, public.pd_accounts to authenticated;
 grant select, insert on table public.pd_payments, public.pd_expenses to authenticated;
+grant select, insert on table public.pd_deposit_entries to authenticated;
 grant update (status, voided_at, void_reason) on table public.pd_payments, public.pd_expenses to authenticated;
 grant select, insert, update on table public.pd_import_batches to authenticated;
 grant select on table public.pd_audit_events to authenticated;
@@ -750,6 +776,16 @@ using (public.pd_can_access_workspace(user_id)) with check (
   and (account_id is null or exists(select 1 from public.pd_accounts a where a.id=account_id and a.user_id=user_id and a.property_id=property_id))
   and (import_batch_id is null or exists(select 1 from public.pd_import_batches b where b.id=import_batch_id and b.user_id=user_id))
 );
+drop policy if exists "pd workspace deposit entry read" on public.pd_deposit_entries;
+create policy "pd workspace deposit entry read" on public.pd_deposit_entries
+  for select to authenticated using (public.pd_can_access_workspace(user_id));
+drop policy if exists "pd workspace deposit entry insert" on public.pd_deposit_entries;
+create policy "pd workspace deposit entry insert" on public.pd_deposit_entries
+  for insert to authenticated with check (
+    user_id=public.pd_workspace_id() and exists(
+      select 1 from public.pd_accounts a where a.id=account_id and a.user_id=user_id and a.account_type='rental'
+    )
+  );
 drop policy if exists "Users manage pd_import_batches" on public.pd_import_batches;
 create policy "Users manage pd_import_batches" on public.pd_import_batches for all to authenticated
 using (public.pd_can_access_workspace(user_id)) with check (user_id=public.pd_workspace_id());

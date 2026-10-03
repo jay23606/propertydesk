@@ -1,0 +1,2 @@
+-- This shared Supabase project already records the Space Invaders signaling migration.
+-- Its source belongs to another repository; this empty placeholder preserves the shared migration history.
