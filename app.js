@@ -180,13 +180,15 @@
     ['alloc-interest','alloc-principal','alloc-fee','alloc-unapplied'].forEach(id=>$(id).addEventListener('input',updateTotal));updateTotal();
   }
   async function savePayment(event) {
-    event.preventDefault(); const account=state.accounts.find(a=>a.id===$('payment-account').value), amount=moneyInput($('payment-amount').value); if(!account||!amount)return;
+    event.preventDefault(); const addAnother=event.submitter?.id==='payment-save-next',account=state.accounts.find(a=>a.id===$('payment-account').value), amount=moneyInput($('payment-amount').value); if(!account||!amount)return;
     const alloc=account.account_type==='rental'?{principal:0,interest:0,fee:0,unapplied:0}:{principal:moneyInput($('alloc-principal').value),interest:moneyInput($('alloc-interest').value),fee:moneyInput($('alloc-fee').value),unapplied:moneyInput($('alloc-unapplied').value)};
     const allocated=alloc.principal+alloc.interest+alloc.fee+alloc.unapplied;
     if(account.account_type!=='rental'&&Math.round(allocated*100)!==Math.round(amount*100)){toast('Adjust the allocation so it equals the amount received');return;}
     const payload={user_id:state.user.id,account_id:account.id,amount,received_date:$('payment-date').value,payment_method:$('payment-method').value,income_category:account.account_type==='rental'?$('income-category').value:'installment',principal_amount:alloc.principal,interest_amount:alloc.interest,fee_amount:alloc.fee,unapplied_amount:alloc.unapplied,memo:$('payment-memo').value.trim()||null,source_type:'manual'};
     const {error}=await state.client.from('pd_payments').insert(payload); if(error){toast(error.message);return;}
-    closeModal($('payment-modal')); $('payment-form').reset(); $('payment-date').value=todayIso(); await fetchAll(); toast('Payment recorded');
+    $('payment-form').reset(); $('payment-date').value=todayIso(); $('payment-account').value=account.id; await fetchAll();
+    if(addAnother){updateAllocationPreview();$('payment-amount').focus();toast('Payment recorded. Ready for the next entry');return;}
+    closeModal($('payment-modal')); toast('Payment recorded');
   }
   async function saveExpense(event) {
     event.preventDefault();
