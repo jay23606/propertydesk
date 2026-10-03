@@ -12,6 +12,7 @@ create table if not exists public.pd_properties (
   postal_code text,
   property_kind text not null default 'residential' check (property_kind in ('residential','land','commercial','other')),
   notes text,
+  import_batch_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -35,6 +36,7 @@ create table if not exists public.pd_accounts (
   grace_days integer not null default 0 check (grace_days >= 0),
   status text not null default 'active' check (status in ('active','paused','closed')),
   notes text,
+  import_batch_id uuid,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -56,6 +58,7 @@ create table if not exists public.pd_payments (
   status text not null default 'posted' check (status in ('posted','voided')),
   voided_at timestamptz,
   void_reason text,
+  import_batch_id uuid,
   recorded_at timestamptz not null default now()
 );
 
@@ -99,6 +102,26 @@ create table if not exists public.pd_import_batches (
   committed_at timestamptz
 );
 
+alter table public.pd_properties add column if not exists import_batch_id uuid;
+alter table public.pd_accounts add column if not exists import_batch_id uuid;
+alter table public.pd_payments add column if not exists import_batch_id uuid;
+alter table public.pd_expenses add column if not exists import_batch_id uuid;
+
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'pd_properties_import_batch_id_fkey' and conrelid = 'public.pd_properties'::regclass) then
+    alter table public.pd_properties add constraint pd_properties_import_batch_id_fkey foreign key (import_batch_id) references public.pd_import_batches(id) on delete set null;
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'pd_accounts_import_batch_id_fkey' and conrelid = 'public.pd_accounts'::regclass) then
+    alter table public.pd_accounts add constraint pd_accounts_import_batch_id_fkey foreign key (import_batch_id) references public.pd_import_batches(id) on delete set null;
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'pd_payments_import_batch_id_fkey' and conrelid = 'public.pd_payments'::regclass) then
+    alter table public.pd_payments add constraint pd_payments_import_batch_id_fkey foreign key (import_batch_id) references public.pd_import_batches(id) on delete set null;
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'pd_expenses_import_batch_id_fkey' and conrelid = 'public.pd_expenses'::regclass) then
+    alter table public.pd_expenses add constraint pd_expenses_import_batch_id_fkey foreign key (import_batch_id) references public.pd_import_batches(id) on delete set null;
+  end if;
+end $$;
+
 create table if not exists public.pd_audit_events (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
@@ -129,19 +152,24 @@ alter table public.pd_import_batches enable row level security;
 alter table public.pd_audit_events enable row level security;
 
 drop policy if exists "Users manage pd_properties" on public.pd_properties;
-create policy "Users manage pd_properties" on public.pd_properties for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy "Users manage pd_properties" on public.pd_properties for all to authenticated using (user_id = auth.uid()) with check (
+  user_id = auth.uid() and (import_batch_id is null or exists (select 1 from public.pd_import_batches b where b.id = import_batch_id and b.user_id = auth.uid()))
+);
 drop policy if exists "Users manage pd_accounts" on public.pd_accounts;
 create policy "Users manage pd_accounts" on public.pd_accounts for all to authenticated using (user_id = auth.uid()) with check (
   user_id = auth.uid() and exists (select 1 from public.pd_properties p where p.id = property_id and p.user_id = auth.uid())
+  and (import_batch_id is null or exists (select 1 from public.pd_import_batches b where b.id = import_batch_id and b.user_id = auth.uid()))
 );
 drop policy if exists "Users manage pd_payments" on public.pd_payments;
 create policy "Users manage pd_payments" on public.pd_payments for all to authenticated using (user_id = auth.uid()) with check (
   user_id = auth.uid() and exists (select 1 from public.pd_accounts a where a.id = account_id and a.user_id = auth.uid())
+  and (import_batch_id is null or exists (select 1 from public.pd_import_batches b where b.id = import_batch_id and b.user_id = auth.uid()))
 );
 drop policy if exists "Users manage pd_expenses" on public.pd_expenses;
 create policy "Users manage pd_expenses" on public.pd_expenses for all to authenticated using (user_id = auth.uid()) with check (
   user_id = auth.uid() and exists (select 1 from public.pd_properties p where p.id = property_id and p.user_id = auth.uid())
   and (account_id is null or exists (select 1 from public.pd_accounts a where a.id = account_id and a.user_id = auth.uid() and a.property_id = property_id))
+  and (import_batch_id is null or exists (select 1 from public.pd_import_batches b where b.id = import_batch_id and b.user_id = auth.uid()))
 );
 drop policy if exists "Users manage pd_import_batches" on public.pd_import_batches;
 create policy "Users manage pd_import_batches" on public.pd_import_batches for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
@@ -234,13 +262,14 @@ create trigger pd_payments_void_guard before insert or update on public.pd_payme
 drop trigger if exists pd_expenses_void_guard on public.pd_expenses;
 create trigger pd_expenses_void_guard before insert or update on public.pd_expenses for each row execute function public.pd_guard_transaction_void();
 
--- Import properties and their accounts in one transaction. As an invoker function,
--- this runs under the caller's grants and RLS policies; failures roll back all rows.
-create or replace function public.pd_import_propertydesk_accounts(p_rows jsonb)
-returns integer language plpgsql security invoker set search_path = '' as $$
+-- Account and transaction imports are atomic and keep a private source receipt.
+drop function if exists public.pd_import_propertydesk_accounts(jsonb);
+create or replace function public.pd_import_propertydesk_accounts(p_rows jsonb, p_source_name text)
+returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare
   item jsonb;
   property_id uuid;
+  batch_id uuid;
   inserted_count integer := 0;
 begin
   if auth.uid() is null then raise exception 'Authentication required'; end if;
@@ -248,6 +277,9 @@ begin
     raise exception 'An account import must contain at least one row';
   end if;
   if jsonb_array_length(p_rows) > 500 then raise exception 'Import is limited to 500 accounts'; end if;
+  insert into public.pd_import_batches(user_id, source_type, source_name, status, rows_total)
+    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Accounts CSV'), 255), 'staged', jsonb_array_length(p_rows))
+    returning id into batch_id;
 
   for item in
     select distinct on (lower(value->>'property_name'), lower(value->>'property_address')) value
@@ -259,10 +291,10 @@ begin
         and lower(p.address) = lower(item->>'property_address')
       limit 1;
     if property_id is null then
-      insert into public.pd_properties(user_id, name, address, city, state, postal_code, property_kind)
-      values (auth.uid(), item->>'property_name', item->>'property_address',
-        nullif(item->>'city',''), nullif(item->>'state',''), nullif(item->>'postal_code',''),
-        coalesce(nullif(item->>'property_kind',''), 'residential'))
+       insert into public.pd_properties(user_id, name, address, city, state, postal_code, property_kind, import_batch_id)
+       values (auth.uid(), item->>'property_name', item->>'property_address',
+         nullif(item->>'city',''), nullif(item->>'state',''), nullif(item->>'postal_code',''),
+         coalesce(nullif(item->>'property_kind',''), 'residential'), batch_id)
       returning id into property_id;
     end if;
   end loop;
@@ -276,7 +308,7 @@ begin
     if property_id is null then raise exception 'Property was not created or is not visible to this user'; end if;
     insert into public.pd_accounts(user_id, property_id, account_type, name, party_name,
       start_date, next_due_date, payment_amount, payment_frequency, original_principal,
-      interest_rate, term_months, balloon_date, late_fee, grace_days, notes)
+      interest_rate, term_months, balloon_date, late_fee, grace_days, notes, import_batch_id)
     values (auth.uid(), property_id, item->>'account_type', item->>'account_name',
       nullif(item->>'party_name',''), (item->>'start_date')::date,
       nullif(item->>'next_due_date','')::date,
@@ -286,15 +318,70 @@ begin
       coalesce(nullif(item->>'interest_rate','')::numeric, 0),
       nullif(item->>'term_months','')::integer, nullif(item->>'balloon_date','')::date,
       coalesce(nullif(item->>'late_fee','')::numeric, 0),
-      coalesce(nullif(item->>'grace_days','')::integer, 0), nullif(item->>'notes',''));
+      coalesce(nullif(item->>'grace_days','')::integer, 0), nullif(item->>'notes',''), batch_id);
     inserted_count := inserted_count + 1;
   end loop;
-  return inserted_count;
+  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, committed_at = now() where id = batch_id;
+  return jsonb_build_object('batch_id', batch_id, 'rows_total', jsonb_array_length(p_rows), 'rows_accepted', inserted_count, 'rows_rejected', 0);
 end;
 $$;
 
-revoke all on function public.pd_import_propertydesk_accounts(jsonb) from public, anon, authenticated;
-grant execute on function public.pd_import_propertydesk_accounts(jsonb) to authenticated;
+revoke all on function public.pd_import_propertydesk_accounts(jsonb, text) from public, anon, authenticated;
+grant execute on function public.pd_import_propertydesk_accounts(jsonb, text) to authenticated;
+
+create or replace function public.pd_import_propertydesk_transactions(p_kind text, p_rows jsonb, p_source_name text)
+returns jsonb language plpgsql security invoker set search_path = '' as $$
+declare
+  item jsonb;
+  batch_id uuid;
+  inserted_count integer := 0;
+  row_count integer;
+begin
+  if auth.uid() is null then raise exception 'Authentication required'; end if;
+  if p_kind is null or p_kind not in ('payments','expenses') then raise exception 'Import type must be payments or expenses'; end if;
+  if p_rows is null or jsonb_typeof(p_rows) <> 'array' or jsonb_array_length(p_rows) = 0 then
+    raise exception 'An import must contain at least one row';
+  end if;
+  row_count := jsonb_array_length(p_rows);
+  if row_count > 500 then raise exception 'Import is limited to 500 rows'; end if;
+
+  insert into public.pd_import_batches(user_id, source_type, source_name, status, rows_total)
+    values (auth.uid(), 'csv', left(coalesce(nullif(btrim(p_source_name), ''), 'Transactions CSV'), 255), 'staged', row_count)
+    returning id into batch_id;
+
+  for item in select value from jsonb_array_elements(p_rows) as source(value)
+  loop
+    if p_kind = 'payments' then
+      insert into public.pd_payments(user_id, account_id, amount, received_date, payment_method,
+        income_category, principal_amount, interest_amount, fee_amount, unapplied_amount,
+        memo, source_type, import_batch_id)
+      values (auth.uid(), (item->>'account_id')::uuid, (item->>'amount')::numeric,
+        (item->>'received_date')::date, coalesce(nullif(item->>'payment_method',''), 'manual'),
+        coalesce(nullif(item->>'income_category',''), 'installment'),
+        coalesce(nullif(item->>'principal_amount','')::numeric, 0),
+        coalesce(nullif(item->>'interest_amount','')::numeric, 0),
+        coalesce(nullif(item->>'fee_amount','')::numeric, 0),
+        coalesce(nullif(item->>'unapplied_amount','')::numeric, 0),
+        nullif(item->>'memo',''), 'csv_import', batch_id);
+    else
+      insert into public.pd_expenses(user_id, property_id, account_id, amount, expense_date,
+        category, payee, payment_method, memo, source_type, import_batch_id)
+      values (auth.uid(), (item->>'property_id')::uuid, nullif(item->>'account_id','')::uuid,
+        (item->>'amount')::numeric, (item->>'expense_date')::date,
+        coalesce(nullif(item->>'category',''), 'other'), nullif(item->>'payee',''),
+        coalesce(nullif(item->>'payment_method',''), 'manual'), nullif(item->>'memo',''),
+        'csv_import', batch_id);
+    end if;
+    inserted_count := inserted_count + 1;
+  end loop;
+
+  update public.pd_import_batches set status = 'committed', rows_accepted = inserted_count, committed_at = now() where id = batch_id;
+  return jsonb_build_object('batch_id', batch_id, 'rows_total', row_count, 'rows_accepted', inserted_count, 'rows_rejected', 0);
+end;
+$$;
+
+revoke all on function public.pd_import_propertydesk_transactions(text, jsonb, text) from public, anon, authenticated;
+grant execute on function public.pd_import_propertydesk_transactions(text, jsonb, text) to authenticated;
 
 -- Signed-out clients cannot read or mutate portfolio records.
 revoke all on table public.pd_properties, public.pd_accounts, public.pd_payments,
