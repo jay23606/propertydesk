@@ -1,5 +1,5 @@
-const CACHE_NAME = 'propertydesk-shell-v14';
-const SHELL_FILES = ['./', './index.html', './styles.css', './overrides.css', './import-utils.js', './import-workflows.js', './ledger-utils.js', './app.js', './propertydesk.webmanifest', './icons/propertydesk.svg'];
+const CACHE_NAME = 'propertydesk-shell-v15';
+const SHELL_FILES = ['./', './index.html', './styles.css', './overrides.css', './import-utils.js', './import-workflows.js', './ledger-utils.js', './zip-utils.js', './app.js', './propertydesk.webmanifest', './icons/propertydesk.svg'];
 const SHELL_URLS = new Set(SHELL_FILES.map(path => new URL(path, self.registration.scope).href));
 
 self.addEventListener('install', event => {

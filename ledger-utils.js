@@ -36,15 +36,17 @@
   }
 
   function amountDueSince(accounts, payments, accrualStart, asOf) {
-    const start = new Date(`${accrualStart}T12:00:00`), end = new Date(`${asOf}T12:00:00`);
-    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start > end) return 0;
+    const start = new Date(`${accrualStart}T12:00:00`), asOfDate = new Date(`${asOf}T12:00:00`);
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(asOfDate.getTime()) || start > asOfDate) return 0;
+    // The current calendar month's installment is assumed unpaid even before its due day.
+    const end = new Date(asOfDate.getFullYear(), asOfDate.getMonth() + 1, 0, 12);
     const cents = value => Math.round((value + Number.EPSILON) * 100) / 100;
     const interval = { monthly: [1,0], weekly: [0,7], biweekly: [0,14], quarterly: [3,0], annual: [12,0] };
     let scheduled = 0;
     for (const account of accounts.filter(item => (item.status || 'active') === 'active')) {
       const scheduleStart = new Date(`${account.start_date || account.next_due_date}T12:00:00`);
       const nextDue = new Date(`${account.next_due_date || account.start_date}T12:00:00`);
-      if (!Number.isFinite(scheduleStart.getTime()) || !Number.isFinite(nextDue.getTime())) continue;
+      if (!Number.isFinite(scheduleStart.getTime()) || !Number.isFinite(nextDue.getTime()) || scheduleStart > asOfDate) continue;
       const step = interval[account.payment_frequency] || interval.monthly;
       const due = new Date(nextDue);
       const dueDay = nextDue.getDate();
@@ -87,6 +89,68 @@
     return Math.max(0, Math.round((base + Number(account.balance_adjustment || 0) + Number.EPSILON) * 100) / 100);
   }
 
+  const cents = value => Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
+  const ASSUMED_PAID_THROUGH = '2025-12-31';
+
+  function loanOpeningState(account) {
+    const importedZeroOpening = account.import_batch_id && Number(account.ledger_opening_balance) === 0;
+    if (account.ledger_opening_balance != null && !importedZeroOpening) {
+      return {
+        balance: Math.max(0, Number(account.ledger_opening_balance || 0)),
+        date: account.ledger_opening_date || account.start_date || ASSUMED_PAID_THROUGH
+      };
+    }
+    if (String(account.start_date || '') > ASSUMED_PAID_THROUGH) {
+      return { balance: Math.max(0, Number(account.original_principal || 0)), date: account.start_date };
+    }
+    return {
+      balance: scheduledLoanBalance(account, ASSUMED_PAID_THROUGH) ?? Math.max(0, Number(account.original_principal || 0)),
+      date: ASSUMED_PAID_THROUGH
+    };
+  }
+
+  function loanLedgerState(account, payments, asOf = new Date().toISOString().slice(0,10)) {
+    const opening = loanOpeningState(account);
+    let balance = cents(opening.balance), accruedInterest = 0, lastDate = opening.date;
+    const rate = Number(account.interest_rate || 0) / 100;
+    const eligible = (payments || []).filter(payment => payment.account_id === account.id && isPosted(payment) &&
+      !['deposit', 'late_fee'].includes(payment.income_category) && String(payment.received_date || '') > opening.date &&
+      String(payment.received_date || '') <= asOf)
+      .sort((a, b) => String(a.received_date).localeCompare(String(b.received_date)) || String(a.recorded_at || '').localeCompare(String(b.recorded_at || '')) || String(a.id || '').localeCompare(String(b.id || '')));
+    for (const payment of eligible) {
+      const date = String(payment.received_date);
+      if (rate > 0 && balance > 0 && lastDate) {
+        const days = Math.max(0, Math.round((new Date(`${date}T12:00:00`) - new Date(`${lastDate}T12:00:00`)) / 86400000));
+        accruedInterest = cents(accruedInterest + balance * rate * days / 365);
+      }
+      const amount = Math.max(0, Number(payment.amount || 0));
+      const storedPrincipal = payment.principal_amount == null ? null : Number(payment.principal_amount);
+      const storedInterest = payment.interest_amount == null ? null : Number(payment.interest_amount);
+      const explicitAllocation = (storedPrincipal || 0) > 0 || (storedInterest || 0) > 0;
+      const interestApplied = explicitAllocation ? Math.min(accruedInterest, Math.max(0, storedInterest || 0)) : Math.min(accruedInterest, amount);
+      const principalApplied = explicitAllocation ? Math.min(balance, Math.max(0, storedPrincipal || 0)) : Math.min(balance, Math.max(0, amount - interestApplied));
+      accruedInterest = cents(Math.max(0, accruedInterest - interestApplied));
+      balance = cents(Math.max(0, balance - principalApplied));
+      lastDate = date;
+    }
+    if (rate > 0 && balance > 0 && lastDate && String(asOf) > lastDate) {
+      const days = Math.max(0, Math.round((new Date(`${asOf}T12:00:00`) - new Date(`${lastDate}T12:00:00`)) / 86400000));
+      accruedInterest = cents(accruedInterest + balance * rate * days / 365);
+    }
+    return { balance, accruedInterest, opening };
+  }
+
+  function estimatedLoanBalance(account, payments, asOf = new Date().toISOString().slice(0,10)) {
+    if (!account || account.account_type === 'rental') return null;
+    const state = loanLedgerState(account, payments, asOf);
+    return cents(Math.max(0, state.balance + Number(account.balance_adjustment || 0)));
+  }
+
+  function estimatedLoanInterestDue(account, payments, asOf = new Date().toISOString().slice(0,10)) {
+    if (!account || account.account_type === 'rental') return 0;
+    return loanLedgerState(account, payments, asOf).accruedInterest;
+  }
+
   function principalBalance(originalPrincipal, payments, openingBalance = originalPrincipal, openingDate = null) {
     const eligible = openingDate
       ? payments.filter(payment => !payment.received_date || String(payment.received_date) > String(openingDate))
@@ -122,24 +186,26 @@
     return rows;
   }
 
-  function createBackup(records, exportedAt = new Date().toISOString()) {
-    const tables = ['pd_properties', 'pd_accounts', 'pd_agreement_versions', 'pd_payments', 'pd_expenses', 'pd_documents', 'pd_import_batches', 'pd_audit_events', 'pd_workspace_members', 'pd_property_holders'];
+  function createBackup(records, exportedAt = new Date().toISOString(), includedFiles = []) {
+    const tables = ['pd_properties', 'pd_accounts', 'pd_agreement_versions', 'pd_payments', 'pd_expenses', 'pd_deposit_entries', 'pd_documents', 'pd_import_batches', 'pd_audit_events', 'pd_workspace_members', 'pd_property_holders'];
     const data = Object.fromEntries(tables.map(table => [table, Array.isArray(records?.[table]) ? records[table] : []]));
     return {
       manifest: {
         format: 'propertydesk-backup',
-        format_version: 4,
-        schema_version: 4,
+        format_version: 5,
+        schema_version: 5,
         exported_at: exportedAt,
         restore_supported: false,
         included_tables: tables,
-        record_counts: Object.fromEntries(tables.map(table => [table, data[table].length]))
+        record_counts: Object.fromEntries(tables.map(table => [table, data[table].length])),
+        included_files: includedFiles.map(file => ({ path: file.path, file_name: file.file_name, content_type: file.content_type, file_size: file.file_size, property_id: file.property_id, account_id: file.account_id })),
+        file_count: includedFiles.length
       },
       data
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

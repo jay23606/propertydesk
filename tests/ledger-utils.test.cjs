@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -101,12 +101,22 @@ test('unpaid scheduled charges accumulate from 2026 and carry forward, crediting
   assert.equal(amountDueSince(accounts, payments, '2026-01-01', '2026-03-31'), 1500);
 });
 
-test('running amount due adds each installment when due and a recorded payment reduces it dollar-for-dollar', () => {
+test('running amount due includes the whole current month and a recorded payment reduces it dollar-for-dollar', () => {
   const account = { id: 'rolling', start_date: '2025-12-15', next_due_date: '2026-01-15', payment_amount: 100, payment_frequency: 'monthly' };
   const payments = [{ account_id: 'rolling', amount: 60, received_date: '2026-01-20', income_category: 'installment' }];
-  assert.equal(amountDueSince([account], payments, '2026-01-01', '2026-02-14'), 40, 'one due installment less the payment recorded');
+  assert.equal(amountDueSince([account], payments, '2026-01-01', '2026-02-14'), 140, 'the February installment is assumed unpaid before its due day');
   assert.equal(amountDueSince([account], payments, '2026-01-01', '2026-02-15'), 140, 'the next month adds another scheduled installment');
   assert.equal(amountDueSince([account], [...payments, { account_id: 'rolling', amount: 100, received_date: '2026-02-15', income_category: 'installment' }], '2026-01-01', '2026-02-28'), 40, 'recording the next payment subtracts from the carry-forward amount');
+});
+
+test('current month is assumed unpaid and the carry-forward grows each month without a payment', () => {
+  const account = { id: 'october', start_date: '2025-12-15', next_due_date: '2026-10-15', payment_amount: 100, payment_frequency: 'monthly' };
+  const janThroughSep = Array.from({ length: 9 }, (_, index) => ({
+    account_id: 'october', amount: 100, received_date: `2026-${String(index + 1).padStart(2, '0')}-15`, income_category: 'installment'
+  }));
+  assert.equal(amountDueSince([account], janThroughSep, '2026-01-01', '2026-10-03'), 100, 'October is included before the October 15 due day');
+  assert.equal(amountDueSince([account], janThroughSep, '2026-01-01', '2026-11-03'), 200, 'a missed October amount carries forward with November');
+  assert.equal(amountDueSince([account], [...janThroughSep, { account_id: 'october', amount: 100, received_date: '2026-10-15', income_category: 'installment' }], '2026-01-01', '2026-11-03'), 100, 'a recorded October payment subtracts from the running total');
 });
 
 test('monthly due dates stay anchored at month end', () => {
@@ -117,9 +127,9 @@ test('monthly due dates stay anchored at month end', () => {
 
 test('unpaid charges backfill from the current next-due date through the 2026 accrual window', () => {
   const account = { id: 'advanced-due', start_date: '2020-01-15', next_due_date: '2026-10-15', payment_amount: 100, payment_frequency: 'monthly' };
-  assert.equal(amountDueSince([account], [], '2026-01-01', '2026-10-03'), 900);
-  assert.equal(amountDueSince([{ ...account, next_due_date: '2026-11-15' }], [], '2026-01-01', '2026-10-03'), 900);
-  assert.equal(amountDueSince([{ ...account, start_date: '2026-05-15' }], [], '2026-01-01', '2026-10-03'), 500);
+  assert.equal(amountDueSince([account], [], '2026-01-01', '2026-10-03'), 1000);
+  assert.equal(amountDueSince([{ ...account, next_due_date: '2026-11-15' }], [], '2026-01-01', '2026-10-03'), 1000);
+  assert.equal(amountDueSince([{ ...account, start_date: '2026-05-15' }], [], '2026-01-01', '2026-10-03'), 600);
 });
 
 test('future next-due dates retain the month-end anchor when backfilling prior installments', () => {
@@ -133,6 +143,38 @@ test('scheduled loan balance follows amortization and accepts positive or negati
   assert.equal(scheduledLoanBalance(account, '2026-02-01'), 500);
   assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: 125 }, '2026-02-01'), 625);
   assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -125 }, '2026-02-01'), 375);
+});
+
+test('estimated balance assumes the contract schedule was paid through 2025, then holds until actual principal is posted', () => {
+  const account = { id: 'estimate', account_type: 'land_contract', original_principal: 1200, interest_rate: 0,
+    term_months: 24, start_date: '2024-12-01', import_batch_id: 'batch-1', ledger_opening_balance: 0 };
+  assert.equal(scheduledLoanBalance(account, '2025-12-31'), 600);
+  assert.equal(estimatedLoanBalance(account, [], '2026-12-31'), 600);
+  assert.equal(estimatedLoanBalance(account, [
+    { id: 'p1', account_id: 'estimate', amount: 25, principal_amount: 12, interest_amount: 13,
+      received_date: '2026-01-02', income_category: 'installment' },
+    { id: 'void', account_id: 'estimate', amount: 100, principal_amount: 30, received_date: '2026-01-03', status: 'voided' },
+    { id: 'deposit', account_id: 'estimate', amount: 100, principal_amount: 100, received_date: '2026-01-04', income_category: 'deposit' }
+  ], '2026-12-31'), 588);
+});
+
+test('partial and unallocated loan receipts cover daily estimated interest before principal', () => {
+  const account = { id: 'partial', account_type: 'note', original_principal: 1200, interest_rate: 36.5,
+    term_months: 36, start_date: '2024-01-01', ledger_opening_balance: 1000, ledger_opening_date: '2026-01-01' };
+  const smallPayment = { account_id: 'partial', amount: 5, received_date: '2026-01-11', income_category: 'installment' };
+  assert.equal(estimatedLoanBalance(account, [smallPayment], '2026-01-11'), 1000,
+    'the first $5 only covers $10 accrued interest partially');
+  assert.equal(estimatedLoanInterestDue(account, [smallPayment], '2026-01-11'), 5);
+  const paidMore = { account_id: 'partial', amount: 25, received_date: '2026-01-21', income_category: 'installment' };
+  assert.equal(estimatedLoanBalance(account, [smallPayment, paidMore], '2026-01-21'), 990,
+    'the second payment covers $15 interest, then reduces principal by $10');
+});
+
+test('manual opening balance and signed owner adjustment take precedence in estimated balances', () => {
+  const account = { id: 'manual', account_type: 'land_contract', original_principal: 1200, interest_rate: 0,
+    term_months: 24, start_date: '2024-12-01', ledger_opening_balance: 750, ledger_opening_date: '2026-01-01', balance_adjustment: -50 };
+  assert.equal(estimatedLoanBalance(account, [], '2026-01-01'), 700);
+  assert.equal(estimatedLoanBalance({ ...account, balance_adjustment: 100 }, [], '2026-01-01'), 850);
 });
 
 test('amended land-contract terms produce the documented payment and 2026 estimates', () => {
@@ -184,16 +226,35 @@ test('backup manifest identifies its version and counts every supported table', 
     pd_audit_events: [{ id: 'h1' }, { id: 'h2' }],
     pd_workspace_members: [{ member_user_id: 'u1' }],
     pd_property_holders: [{ property_id: 'p1', member_user_id: 'u1' }]
-  }, '2026-10-03T12:00:00.000Z');
+  }, '2026-10-03T12:00:00.000Z', [{ path: 'agreements/p1/d1-lease.pdf', file_name: 'lease.pdf', content_type: 'application/pdf', file_size: 42, property_id: 'p1', account_id: 'a1' }]);
   assert.equal(backup.manifest.format, 'propertydesk-backup');
-  assert.equal(backup.manifest.format_version, 4);
-  assert.equal(backup.manifest.schema_version, 4);
+  assert.equal(backup.manifest.format_version, 5);
+  assert.equal(backup.manifest.schema_version, 5);
   assert.equal(backup.manifest.exported_at, '2026-10-03T12:00:00.000Z');
   assert.equal(backup.manifest.restore_supported, false);
+  assert.equal(backup.manifest.file_count, 1);
+  assert.deepEqual(backup.manifest.included_files[0], {
+    path: 'agreements/p1/d1-lease.pdf', file_name: 'lease.pdf', content_type: 'application/pdf',
+    file_size: 42, property_id: 'p1', account_id: 'a1'
+  });
   assert.deepEqual(backup.manifest.record_counts, {
     pd_properties: 1, pd_accounts: 2, pd_agreement_versions: 1, pd_payments: 0,
-    pd_expenses: 1, pd_documents: 1, pd_import_batches: 1, pd_audit_events: 2,
+    pd_expenses: 1, pd_deposit_entries: 0, pd_documents: 1, pd_import_batches: 1, pd_audit_events: 2,
     pd_workspace_members: 1, pd_property_holders: 1
   });
   assert.equal(backup.data.pd_audit_events.length, 2);
+});
+
+test('private ZIP helper writes readable stored entries and rejects unsafe paths', async () => {
+  const { createZip, crc32 } = require('../zip-utils.js');
+  assert.equal(crc32(Buffer.from('123456789')), 0xcbf43926);
+  const bytes = new Uint8Array(await createZip([
+    { name: 'propertydesk-backup.json', data: '{"ok":true}' },
+    { name: 'agreements/property-1/lease.pdf', data: new Uint8Array([0x25, 0x50, 0x44, 0x46]) }
+  ], new Date('2026-10-03T12:00:00Z')).arrayBuffer());
+  const view = new DataView(bytes.buffer);
+  assert.equal(view.getUint32(0, true), 0x04034b50);
+  assert.equal(view.getUint16(8, true), 0, 'entries are stored without a compression dependency');
+  assert.ok(bytes.some((_, index) => index <= bytes.length - 4 && view.getUint32(index, true) === 0x06054b50), 'archive has a central-directory end record');
+  assert.throws(() => createZip([{ name: '../private.txt', data: 'nope' }]), /relative paths/);
 });

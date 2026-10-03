@@ -5,11 +5,13 @@ const path = require('node:path');
 const { parseCSV, selectImportRows } = require('../import-utils.js');
 const { validateAccountRows, validateExpenseRows, validatePaymentRows } = require('../import-workflows.js');
 
-test('the browser loads tested import workflows before the app and precaches them in the PWA shell', () => {
+test('the browser loads tested import and backup workflows before the app and precaches them in the PWA shell', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
+  assert.match(worker, /'\.\/zip-utils\.js'/);
 });
 
 const properties = [{ id: 'p1', name: 'Oak House', address: '10 Oak St' }];
