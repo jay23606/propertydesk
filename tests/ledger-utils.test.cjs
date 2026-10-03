@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amortizationSchedule, isPosted, principalBalance, sumPosted } = require('../ledger-utils.js');
+const { amortizationSchedule, isPosted, monthlyScheduledEstimate, principalBalance, sumPosted } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -39,6 +39,18 @@ test('voided expenses no longer count toward posted expenses', () => {
     { amount: '75.00', status: 'posted' },
     { amount: '25.00', status: 'voided' },
   ]), 75);
+});
+
+test('monthly scheduled totals normalize payment cadence and exclude inactive accounts', () => {
+  assert.equal(monthlyScheduledEstimate([
+    { payment_amount: 1200, payment_frequency: 'monthly' },
+    { payment_amount: 300, payment_frequency: 'weekly' },
+    { payment_amount: 500, payment_frequency: 'biweekly' },
+    { payment_amount: 900, payment_frequency: 'quarterly' },
+    { payment_amount: 1200, payment_frequency: 'annual' },
+    { payment_amount: 1000, payment_frequency: 'monthly', status: 'paused' },
+    { payment_amount: 700, payment_frequency: 'monthly', status: 'closed' },
+  ]), 3983.33);
 });
 
 test('amortization estimates derive P&I from terms when no contractual P&I amount is supplied', () => {

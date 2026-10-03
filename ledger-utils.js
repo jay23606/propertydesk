@@ -10,6 +10,14 @@
     return transactions.filter(isPosted).reduce((sum, transaction) => sum + Number(transaction[amountField] || 0), 0);
   }
 
+  function monthlyScheduledEstimate(accounts) {
+    const multipliers = { monthly: 1, weekly: 52 / 12, biweekly: 26 / 12, quarterly: 1 / 3, annual: 1 / 12 };
+    const estimate = accounts
+      .filter(account => (account.status || 'active') === 'active')
+      .reduce((sum, account) => sum + Number(account.payment_amount || 0) * (multipliers[account.payment_frequency] || 1), 0);
+    return Math.round((estimate + Number.EPSILON) * 100) / 100;
+  }
+
   function principalBalance(originalPrincipal, payments, openingBalance = originalPrincipal, openingDate = null) {
     const eligible = openingDate
       ? payments.filter(payment => !payment.received_date || String(payment.received_date) > String(openingDate))
@@ -45,7 +53,7 @@
     return rows;
   }
 
-  const helpers = Object.freeze({ amortizationSchedule, isPosted, principalBalance, sumPosted });
+  const helpers = Object.freeze({ amortizationSchedule, isPosted, monthlyScheduledEstimate, principalBalance, sumPosted });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

@@ -4,7 +4,7 @@
 
   const $ = (id) => document.getElementById(id);
   const { csvMoney, csvRate, markPossibleDuplicates, parseCSV, selectImportRows, validIsoDate, validateImportRows } = window.PropertyDeskImportUtils;
-  const { amortizationSchedule, isPosted, principalBalance, sumPosted } = window.PropertyDeskLedgerUtils;
+  const { amortizationSchedule, isPosted, monthlyScheduledEstimate, principalBalance, sumPosted } = window.PropertyDeskLedgerUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
   const state = { client: null, user: null, view: 'overview', properties: [], accounts: [], payments: [], expenses: [], importBatches: [], pendingImport: null, editingProperty: null, editingAccount: null, selectedPropertyId: null, toastTimer: null };
@@ -56,10 +56,7 @@
     return { principal: moneyInput(principal), interest: moneyInput(interest), fee: feeDue, unapplied: moneyInput(Math.max(0, amount - interest - principal - feeDue)) };
   }
   function paymentFrequencyLabel(f) { return ({ monthly: 'Monthly', weekly: 'Weekly', biweekly: 'Every 2 weeks', quarterly: 'Quarterly', annual: 'Annually' }[f] || 'Monthly'); }
-  function expectedThisMonth() {
-    const now = new Date(); const month = now.getMonth(), year = now.getFullYear();
-    return state.accounts.filter(a => a.status === 'active' && a.next_due_date && (dateOnly(a.next_due_date).getMonth() === month && dateOnly(a.next_due_date).getFullYear() === year)).reduce((s,a) => s + Number(a.payment_amount || 0), 0);
-  }
+  function scheduledMonthlyRunRate() { return monthlyScheduledEstimate(state.accounts); }
   function collectedSince(date) { return sumPosted(state.payments.filter(p => String(p.received_date) >= date)); }
 
   async function fetchAll() {
@@ -90,12 +87,14 @@
   }
   function propertyCard(property, compact = false) {
     const related = state.accounts.filter(a => a.property_id === property.id);
+    const scheduledMonthly = monthlyScheduledEstimate(related);
+    const hasNonMonthly = related.some(a => (a.status || 'active') === 'active' && a.payment_frequency !== 'monthly');
     const locationText = [location(property)].filter(Boolean).join('');
-    return `<article class="property-card" data-property-card="${esc(property.id)}"><div class="property-art"><span class="property-type">${esc(prettyKind(property.property_kind))}</span><span class="property-building"></span></div><div class="property-info"><h3>${esc(property.name)}</h3><div class="property-address">${esc(propertyAddress(property))}</div><div class="property-meta"><span>${related.length} account${related.length === 1 ? '' : 's'}</span><strong>${related.reduce((s,a) => s + Number(a.payment_amount || 0), 0) ? `${money(related.reduce((s,a) => s + Number(a.payment_amount || 0), 0))} / mo` : 'View details'}</strong></div></div></article>`;
+    return `<article class="property-card" data-property-card="${esc(property.id)}"><div class="property-art"><span class="property-type">${esc(prettyKind(property.property_kind))}</span><span class="property-building"></span></div><div class="property-info"><h3>${esc(property.name)}</h3><div class="property-address">${esc(propertyAddress(property))}</div><div class="property-meta"><span>${related.length} account${related.length === 1 ? '' : 's'}</span><strong>${scheduledMonthly ? `${hasNonMonthly ? '≈ ' : ''}${money(scheduledMonthly)} / mo${hasNonMonthly ? ' est.' : ''}` : 'View details'}</strong></div></div></article>`;
   }
   function renderOverview() {
-    $('stat-properties').textContent = state.properties.length; $('stat-accounts').textContent = state.accounts.filter(a => a.status === 'active').length;
-    $('stat-collected').textContent = money(collectedSince(monthStart())); $('stat-expected').textContent = money(expectedThisMonth());
+    $('stat-properties').textContent = state.properties.length; $('stat-accounts').textContent = state.accounts.filter(a => (a.status || 'active') === 'active').length;
+    $('stat-collected').textContent = money(collectedSince(monthStart())); $('stat-expected').textContent = money(scheduledMonthlyRunRate());
     const postedThisMonth=state.payments.filter(p=>isPosted(p)&&String(p.received_date)>=monthStart()); $('stat-collected-foot').textContent = `${postedThisMonth.length} payment${postedThisMonth.length === 1 ? '' : 's'} recorded`;
     const upcoming = state.accounts.filter(a => a.status === 'active' && a.next_due_date).sort((a,b) => String(a.next_due_date).localeCompare(String(b.next_due_date))).slice(0,4);
     $('upcoming-list').innerHTML = upcoming.length ? upcoming.map(a => { const p = state.properties.find(x => x.id === a.property_id); return `<div class="list-row"><span class="round-icon">${a.account_type === 'rental' ? '⌂' : '▤'}</span><div class="row-copy"><strong>${esc(a.party_name || a.name)}</strong><small>${esc(p?.name || 'Property')} · ${esc(prettyType(a.account_type))}</small></div><div class="row-right"><strong>${money(a.payment_amount)}</strong><small>Due ${fmtDate(a.next_due_date,{month:'short',day:'numeric'})}</small></div></div>`; }).join('') : '<div class="list-empty">No upcoming payments yet. Add an account to get started.</div>';
