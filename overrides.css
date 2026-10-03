@@ -21,4 +21,10 @@
 .property-detail-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
 .property-detail-table{max-height:250px;overflow:auto;border:1px solid var(--line);border-radius:8px}
 .property-detail-table table{min-width:650px}
+.audit-list{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.audit-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 12px;background:#fff;border-bottom:1px solid #eff1ed}
+.audit-row:last-child{border-bottom:0}
+.audit-row strong{display:block;font-size:11px;font-weight:650}
+.audit-row small{display:block;margin-top:4px;color:#8c6256;font-size:10px}
+.audit-row time{flex:0 0 auto;color:#89948c;font-size:10px;text-align:right}
 @media(max-width:760px){.property-detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.property-detail-actions button{flex:1 1 145px}}
