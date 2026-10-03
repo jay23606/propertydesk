@@ -7,32 +7,55 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: github-pages
-  cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  verify:
     runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.config.outputs.configured }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm test
+      - name: Check deployment configuration
+        id: config
+        env:
+          PROPERTYDESK_SUPABASE_URL: ${{ secrets.PROPERTYDESK_SUPABASE_URL }}
+          PROPERTYDESK_SUPABASE_ANON_KEY: ${{ secrets.PROPERTYDESK_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -n "$PROPERTYDESK_SUPABASE_URL" ] && [ -n "$PROPERTYDESK_SUPABASE_ANON_KEY" ]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo 'Tests passed. Pages deployment is skipped until both Supabase repository secrets are configured.'
+          fi
+
+  deploy:
+    needs: verify
+    if: needs.verify.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Generate untracked browser config
         env:
           PROPERTYDESK_SUPABASE_URL: ${{ secrets.PROPERTYDESK_SUPABASE_URL }}
           PROPERTYDESK_SUPABASE_ANON_KEY: ${{ secrets.PROPERTYDESK_SUPABASE_ANON_KEY }}
         run: |
-          test -n "$PROPERTYDESK_SUPABASE_URL" || { echo 'Missing PROPERTYDESK_SUPABASE_URL secret' >&2; exit 1; }
-          test -n "$PROPERTYDESK_SUPABASE_ANON_KEY" || { echo 'Missing PROPERTYDESK_SUPABASE_ANON_KEY secret' >&2; exit 1; }
           node -e 'const fs=require("fs"); const config={supabaseUrl:process.env.PROPERTYDESK_SUPABASE_URL,supabaseAnonKey:process.env.PROPERTYDESK_SUPABASE_ANON_KEY}; fs.writeFileSync("config.js", `window.PROPERTYDESK_CONFIG = ${JSON.stringify(config)};\n`);'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
