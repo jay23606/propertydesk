@@ -29,13 +29,17 @@
     const interval = { monthly: [1,0], weekly: [0,7], biweekly: [0,14], quarterly: [3,0], annual: [12,0] };
     let scheduled = 0;
     for (const account of accounts.filter(item => (item.status || 'active') === 'active')) {
-      const first = new Date(`${account.next_due_date || account.start_date}T12:00:00`);
-      if (!Number.isFinite(first.getTime())) continue;
+      const scheduleStart = new Date(`${account.start_date || account.next_due_date}T12:00:00`);
+      const nextDue = new Date(`${account.next_due_date || account.start_date}T12:00:00`);
+      if (!Number.isFinite(scheduleStart.getTime()) || !Number.isFinite(nextDue.getTime())) continue;
       const step = interval[account.payment_frequency] || interval.monthly;
-      const due = new Date(first);
-      const dueDay = first.getDate();
-      let skipGuard = 0;
-      while (due < start && skipGuard++ < 1200) advanceDueDate(due, step[0], step[1], dueDay);
+      const due = new Date(nextDue);
+      const dueDay = nextDue.getDate();
+      const lowerBound = scheduleStart > start ? scheduleStart : start;
+      let backGuard = 0;
+      while (due >= lowerBound && due > scheduleStart && backGuard++ < 1200) retreatDueDate(due, step[0], step[1], dueDay);
+      let forwardGuard = 0;
+      while (due < lowerBound && forwardGuard++ < 1200) advanceDueDate(due, step[0], step[1], dueDay);
       let guard = 0;
       while (due <= end && guard++ < 1200) {
         scheduled += Number(account.payment_amount || 0);
@@ -51,6 +55,13 @@
   function advanceDueDate(date, months, days, anchorDay = date.getDate()) {
     if (days) { date.setDate(date.getDate() + days); return; }
     const first = new Date(date.getFullYear(), date.getMonth() + months, 1, 12);
+    const lastDay = new Date(first.getFullYear(), first.getMonth() + 1, 0, 12).getDate();
+    first.setDate(Math.min(anchorDay, lastDay)); date.setTime(first.getTime());
+  }
+
+  function retreatDueDate(date, months, days, anchorDay = date.getDate()) {
+    if (days) { date.setDate(date.getDate() - days); return; }
+    const first = new Date(date.getFullYear(), date.getMonth() - months, 1, 12);
     const lastDay = new Date(first.getFullYear(), first.getMonth() + 1, 0, 12).getDate();
     first.setDate(Math.min(anchorDay, lastDay)); date.setTime(first.getTime());
   }

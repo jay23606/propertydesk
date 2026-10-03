@@ -84,6 +84,19 @@ test('monthly due dates stay anchored at month end', () => {
   ], [], '2026-01-01', '2026-03-31'), 300);
 });
 
+test('unpaid charges backfill from the current next-due date through the 2026 accrual window', () => {
+  const account = { id: 'advanced-due', start_date: '2020-01-15', next_due_date: '2026-10-15', payment_amount: 100, payment_frequency: 'monthly' };
+  assert.equal(amountDueSince([account], [], '2026-01-01', '2026-10-03'), 900);
+  assert.equal(amountDueSince([{ ...account, next_due_date: '2026-11-15' }], [], '2026-01-01', '2026-10-03'), 900);
+  assert.equal(amountDueSince([{ ...account, start_date: '2026-05-15' }], [], '2026-01-01', '2026-10-03'), 500);
+});
+
+test('future next-due dates retain the month-end anchor when backfilling prior installments', () => {
+  assert.equal(amountDueSince([
+    { id: 'advanced-month-end', start_date: '2020-01-31', next_due_date: '2026-10-31', payment_amount: 80, payment_frequency: 'monthly' }
+  ], [], '2026-01-01', '2026-03-31'), 240);
+});
+
 test('scheduled loan balance follows amortization and accepts positive or negative owner adjustments', () => {
   const account = { account_type: 'land_contract', original_principal: 1000, interest_rate: 0, term_months: 4, start_date: '2025-12-01' };
   assert.equal(scheduledLoanBalance(account, '2026-02-01'), 500);
