@@ -69,7 +69,8 @@
       const amount=csvMoney(row.amount,`payment for ${account.name}`,{minimum:0.01}),paymentDate=row.received_date;
       if(!validIsoDate(paymentDate))throw new Error(`Invalid payment date ${row.received_date}.`);
       const incomeCategory=row.income_category||(account.account_type==='rental'?'rent':'installment');
-      if(!['rent','late_fee','deposit','installment','other'].includes(incomeCategory))throw new Error(`Invalid income category “${incomeCategory}”.`);
+      const allowedCategories=account.account_type==='rental'?['rent','late_fee','deposit','other']:['installment','late_fee','other'];
+      if(!allowedCategories.includes(incomeCategory))throw new Error(`Invalid income category “${incomeCategory}” for ${account.account_type}.`);
       const method=row.payment_method||'manual';
       if(!['manual','check','cash','bank_transfer','money_order','card'].includes(method))throw new Error(`Invalid payment method “${method}”.`);
       const allocation={principal:csvMoney(row.principal_amount,`${account.name} principal allocation`,{optional:true}),interest:csvMoney(row.interest_amount,`${account.name} interest allocation`,{optional:true}),fee:csvMoney(row.fee_amount,`${account.name} fee allocation`,{optional:true}),unapplied:csvMoney(row.unapplied_amount,`${account.name} unapplied allocation`,{optional:true})};

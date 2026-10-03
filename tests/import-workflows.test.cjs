@@ -107,3 +107,13 @@ test('payment template example maps to a clean rental receipt', () => {
   assert.equal(result.valid[0].income_category, 'rent');
   assert.equal(result.valid[0].memo, 'October rent');
 });
+
+test('payment import rejects rental and financing categories on the wrong account type', () => {
+  const rows = parseCSV('property_name,property_address,account_name,received_date,amount,income_category,principal_amount,interest_amount,fee_amount,unapplied_amount\nOak House,10 Oak St,Oak Rental,2026-10-01,50,installment,0,0,0,0\nOak House,10 Oak St,Oak Contract,2026-10-01,50,rent,50,0,0,0');
+  const result = validatePaymentRows(rows, properties, accounts, []);
+
+  assert.deepEqual(result.valid, []);
+  assert.deepEqual(result.errors.map(error => error.row), [2, 3]);
+  assert.match(result.errors[0].message, /rental/);
+  assert.match(result.errors[1].message, /land_contract/);
+});
