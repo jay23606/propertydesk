@@ -19,6 +19,7 @@
   const monthStart = () => { const d = new Date(); d.setDate(1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; };
   const location = p => [p.city, p.state, p.postal_code].filter(Boolean).join(', ');
   const propertyAddress = p => [p.address, location(p)].filter(Boolean).join(', ');
+  const streetAddress = p => String(p.address || p.name || '').split(',')[0].trim();
 
   function toast(message) {
     const el = $('toast'); el.textContent = message; el.classList.add('show');
@@ -118,12 +119,13 @@
       if(property.archived_at&&!showArchived)continue;
       if(holder!=='all'&&!tags.includes(holder))continue;
       const allRelated=state.accounts.filter(a=>a.property_id===property.id), related=allRelated.filter(a=>showArchived||(a.status||'active')==='active'), matches=related.filter(a=>(type==='all'||a.account_type===type)&&(!q||`${property.name} ${propertyAddress(property)} ${a.name} ${a.party_name||''}`.toLowerCase().includes(q)));
+      const street=streetAddress(property);
       if(matches.length)for(const account of matches){
         const due=amountDueSince([account],state.payments,'2026-01-01',todayIso());
         const monthly=monthlyScheduledEstimate([{...account,status:'active'}]);
-        rows.push(`<tr><td><button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button></td><td class="portfolio-due">${money(due)}</td><td><button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(property.address||property.name)}${property.archived_at?' · Archived':''}</button></td><td><button class="table-action" data-detail="${esc(account.id)}">${esc(account.party_name||account.name)}</button><small class="table-subtext">${esc(account.name)}${(account.status||'active')!=='active'?' · Inactive':''}</small></td><td>${account.payment_frequency==='monthly'?money(account.payment_amount):`≈ ${money(monthly)}`}<small class="table-subtext">${account.payment_frequency==='monthly'?'Monthly':`${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`}</small></td><td>${account.account_type==='rental'?'—':money(accountBalance(account))}</td></tr>`);
+        rows.push(`<tr><td><button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button></td><td class="portfolio-due">${money(due)}</td><td><button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(street)}${property.archived_at?' · Archived':''}</button></td><td><button class="table-action" data-detail="${esc(account.id)}">${esc(account.party_name||account.name)}</button><small class="table-subtext">${esc(account.name)}${(account.status||'active')!=='active'?' · Inactive':''}</small></td><td>${account.payment_frequency==='monthly'?money(account.payment_amount):`≈ ${money(monthly)}`}<small class="table-subtext">${account.payment_frequency==='monthly'?'Monthly':`${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`}</small></td><td>${account.account_type==='rental'?'—':money(accountBalance(account))}</td></tr>`);
       } else if(allRelated.length===0&&type==='all'&&(!q||`${property.name} ${propertyAddress(property)}`.toLowerCase().includes(q))){
-        rows.push(`<tr><td><button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button></td><td class="portfolio-due">—</td><td><button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(property.address||property.name)}${property.archived_at?' · Archived':''}</button></td><td colspan="2" class="muted">No rental or contract recorded</td><td>—</td></tr>`);
+        rows.push(`<tr><td><button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button></td><td class="portfolio-due">—</td><td><button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(street)}${property.archived_at?' · Archived':''}</button></td><td colspan="2" class="muted">No rental or contract recorded</td><td>—</td></tr>`);
       }
     }
     $('accounts-table').innerHTML=rows.join('');$('accounts-empty').classList.toggle('hidden',rows.length>0);if(!rows.length)$('accounts-empty').textContent='No matching active properties. Use “Show inactive / archived” to include inactive records.';
