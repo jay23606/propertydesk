@@ -98,7 +98,7 @@ Forms should default dates and known property/account values, accept decimal amo
 Core tables in the current Supabase schema use the `pd_` project prefix:
 
 - `pd_properties`: owner, name, address, type, notes.
-- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), party, contract terms, scheduled amount/frequency, status.
+- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), party, contract terms, scheduled amount/frequency, optional P&I-only installment amount when the scheduled total includes escrow, status.
 - `pd_payments`: owner, account, gross amount, received date, method, memo, source/import batch, explicit principal/interest/fee/unapplied allocation columns, and posted/voided state.
 - `pd_expenses`: owner, property, optional account, amount, expense date, category, payee, method, memo, optional receipt path, source/import batch, and posted/voided state.
 - `pd_import_batches`: owner, filename or description, created/committed timestamps, row counts and status. Avoid retaining raw uploaded financial documents by default; keep only what is needed to audit the imported rows.

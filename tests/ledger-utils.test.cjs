@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { isPosted, principalBalance, sumPosted } = require('../ledger-utils.js');
+const { amortizationSchedule, isPosted, principalBalance, sumPosted } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -39,4 +39,25 @@ test('voided expenses no longer count toward posted expenses', () => {
     { amount: '75.00', status: 'posted' },
     { amount: '25.00', status: 'voided' },
   ]), 75);
+});
+
+test('amortization estimates derive P&I from terms when no contractual P&I amount is supplied', () => {
+  const schedule = amortizationSchedule(1000, 12, 12, '2024-01-01');
+  assert.equal(schedule.length, 12);
+  assert.ok(schedule[0].payment > 0);
+  assert.ok(schedule[0].interest > 0);
+  assert.equal(schedule.at(-1).balance, 0);
+});
+
+test('contractual P&I can be estimated separately from escrow-inclusive installments', () => {
+  const schedule = amortizationSchedule(1000, 0, 2, '2024-01-01', 600);
+  assert.equal(schedule[0].payment, 600);
+  assert.equal(schedule[0].balance, 400);
+  assert.equal(schedule[1].payment, 400);
+  assert.equal(schedule[1].balance, 0);
+});
+
+test('amortization due dates preserve month-end dates without overflowing', () => {
+  const schedule = amortizationSchedule(1000, 0, 2, '2024-01-31');
+  assert.deepEqual(schedule.map(row => row.date), ['2024-02-29', '2024-03-31']);
 });

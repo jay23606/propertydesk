@@ -30,6 +30,7 @@ create table if not exists public.pd_accounts (
   payment_amount numeric(14,2) not null default 0 check (payment_amount >= 0),
   payment_frequency text not null default 'monthly' check (payment_frequency in ('monthly','weekly','biweekly','quarterly','annual')),
   original_principal numeric(14,2) not null default 0 check (original_principal >= 0),
+  principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0),
   ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0),
   ledger_opening_date date,
   interest_rate numeric(9,5) not null default 0 check (interest_rate >= 0 and interest_rate <= 100),
@@ -47,6 +48,7 @@ create table if not exists public.pd_accounts (
 alter table public.pd_accounts add column if not exists ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0);
 alter table public.pd_accounts add column if not exists ledger_opening_date date;
 alter table public.pd_accounts add column if not exists party_email text;
+alter table public.pd_accounts add column if not exists principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0);
 
 create table if not exists public.pd_payments (
   id uuid primary key default gen_random_uuid(),
@@ -318,7 +320,7 @@ begin
       limit 1;
     if property_id is null then raise exception 'Property was not created or is not visible to this user'; end if;
     insert into public.pd_accounts(user_id, property_id, account_type, name, party_name, party_email,
-      start_date, next_due_date, payment_amount, payment_frequency, original_principal,
+      start_date, next_due_date, payment_amount, payment_frequency, original_principal, principal_interest_amount,
       ledger_opening_balance, ledger_opening_date,
       interest_rate, term_months, balloon_date, late_fee, grace_days, notes, import_batch_id)
     values (auth.uid(), property_id, item->>'account_type', item->>'account_name',
@@ -327,6 +329,7 @@ begin
       coalesce(nullif(item->>'payment_amount','')::numeric, 0),
       coalesce(nullif(item->>'payment_frequency',''), 'monthly'),
       coalesce(nullif(item->>'original_principal','')::numeric, 0),
+      nullif(item->>'principal_interest_amount','')::numeric,
       nullif(item->>'ledger_opening_balance','')::numeric,
       nullif(item->>'ledger_opening_date','')::date,
       coalesce(nullif(item->>'interest_rate','')::numeric, 0),
