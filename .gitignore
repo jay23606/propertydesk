@@ -1,0 +1,9 @@
+# Local-only configuration and user data
+config.js
+config.local.js
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+.heading-actions{display:flex;gap:8px;align-items:center}
+.expense-pill{display:inline-block;border-radius:20px;padding:4px 8px;font-size:9px;font-weight:700;background:#fbefea;color:#a35f45}
+.import-preview-table{max-height:48vh;overflow:auto;margin-bottom:12px}
+.import-preview-table table{min-width:680px}
+.negative-amount{color:#a35f45!important}
+@media(max-width:760px){.heading-actions{flex-wrap:wrap;justify-content:flex-end}.import-preview-table table{min-width:620px}}

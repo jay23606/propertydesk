@@ -1,0 +1,14 @@
+{
+  "id": "./",
+  "name": "PropertyDesk",
+  "short_name": "PropertyDesk",
+  "description": "Private property income, expense, and account tracking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f4",
+  "theme_color": "#f5f6f2",
+  "icons": [
+    { "src": "icons/propertydesk.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

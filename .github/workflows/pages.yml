@@ -1,0 +1,42 @@
+name: Deploy PropertyDesk to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Generate untracked browser config
+        env:
+          PROPERTYDESK_SUPABASE_URL: ${{ secrets.PROPERTYDESK_SUPABASE_URL }}
+          PROPERTYDESK_SUPABASE_ANON_KEY: ${{ secrets.PROPERTYDESK_SUPABASE_ANON_KEY }}
+        run: |
+          test -n "$PROPERTYDESK_SUPABASE_URL" || { echo 'Missing PROPERTYDESK_SUPABASE_URL secret' >&2; exit 1; }
+          test -n "$PROPERTYDESK_SUPABASE_ANON_KEY" || { echo 'Missing PROPERTYDESK_SUPABASE_ANON_KEY secret' >&2; exit 1; }
+          node -e 'const fs=require("fs"); const config={supabaseUrl:process.env.PROPERTYDESK_SUPABASE_URL,supabaseAnonKey:process.env.PROPERTYDESK_SUPABASE_ANON_KEY}; fs.writeFileSync("config.js", `window.PROPERTYDESK_CONFIG = ${JSON.stringify(config)};\n`);'
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
