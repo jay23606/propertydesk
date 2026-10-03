@@ -15,21 +15,23 @@ The future tenant/buyer portal is optional and separate from the owner workspace
 1. Create a Supabase project.
 2. Run `supabase/schema.sql` in the Supabase SQL editor.
 3. Copy `config.example.js` to `config.js`, then set your project URL and public anon key. This key is public project identification; Supabase RLS and grants protect records. Never use a service-role/secret key here.
-4. Enable email/password auth and email confirmation in Supabase. Each owner gets a separate account and sees only their own records through database RLS. Before public onboarding, configure Auth rate limits and abuse protection; never rely on obscurity of the app URL as an access control.
+4. Enable email/password auth and email confirmation in Supabase. Each owner gets a separate account; records remain workspace-private except for people explicitly added by the owner. Before public onboarding, configure Auth rate limits and abuse protection; never rely on obscurity of the app URL as an access control.
 5. Configure GitHub repository secrets `PROPERTYDESK_SUPABASE_URL` and `PROPERTYDESK_SUPABASE_ANON_KEY`, enable GitHub Pages with GitHub Actions as the source, and push to `main`. The workflow generates ignored `config.js` only in the deployment artifact. The public anon key is not a service credential; RLS and least-privilege grants are the access boundary.
 
-All PropertyDesk tables use the `pd_` prefix (`pd_properties`, `pd_accounts`, `pd_payments`, `pd_expenses`, `pd_import_batches`, and `pd_audit_events`) so they can coexist with other apps in a shared Supabase project.
+All PropertyDesk tables use the `pd_` prefix so they can coexist with other apps in a shared Supabase project. The schema also creates a private agreement-file bucket with owner-scoped upload and read policies.
 
 ## Records and imports
 
 - Create properties, then attach rental, land contract, or note accounts.
-- Record income from the account or portfolio screen. Record repair and contractor costs in the Expenses screen.
+- Use the Properties menu as the single portfolio view. It lists property agreements with payment, estimated balance, carry-forward amount due, and a quick payment action. Record repair and contractor costs in the Transactions screen.
+- Use Workspace to set a display name and add/remove a trusted person by their verified account email. Members can manage the whole workspace. Property holder tags help filter the Properties grid and do not restrict access. Adding a member currently requires that person to sign up first; this release does not send invitation emails.
+- Upload PDFs or DOCX agreements from a property's detail view and download them there later. Storage is private and downloads use short-lived signed links. JSON backups contain document metadata and prior agreement terms, not file bytes.
 - Mistaken transactions can be voided from the transaction ledger. The original remains in the audit history and exports; voided rows no longer affect balances or reports.
 - Import accounts from `templates/accounts-template.csv`; import expenses from `templates/expenses-template.csv`. Review data before importing. Screenshot reading happens outside this site; AI-prepared rows can be saved as CSV or entered through Supabase, where RLS and constraints still apply.
-- Contract imports can preserve original principal while starting the ledger balance at $0 with an explicit as-of date. Set a verified balance and date before recording payments that should reduce it; previously recorded payments are not reallocated automatically. Buyer/tenant email is private account contact data only; reminders remain disabled unless separately enabled.
+- Contract imports preserve original terms while the portfolio estimates the scheduled loan balance from the agreement's standard amortization schedule. By default it assumes all pre-2026 installments were paid, calculates scheduled charges due since Jan 1, 2026 less posted non-deposit/non-late-fee payments, and carries unpaid amounts forward. Apply a signed adjustment to the scheduled loan balance in account details at any time. Buyer/tenant email is private account contact data only; reminders remain disabled unless separately enabled.
 - Payment and expense imports flag matching rows in the full preview and skip them by default on re-import. A possible duplicate can be included explicitly if it represents a separate real transaction.
 - Successful CSV imports are committed with a private batch receipt that records the source filename, time, status, and row counts. Imported rows link to that receipt; failed imports roll back instead of leaving a partial batch.
-- Review import receipts in Reports and export them with properties, accounts, income, expenses, and void details in the backup CSV. Keep a separate copy of `config.js` and your exported records.
+- Review import receipts in Reports and export them with properties, accounts, income, expenses, and void details in the backup. JSON backups include workspace-member links and property-holder labels, but not agreement-file bytes. Keep a separate copy of `config.js`, your exported records, and any downloaded agreement files.
 
 ## Important product limits
 

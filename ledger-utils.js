@@ -18,6 +18,47 @@
     return Math.round((estimate + Number.EPSILON) * 100) / 100;
   }
 
+  function amountDueSince(accounts, payments, accrualStart, asOf) {
+    const start = new Date(`${accrualStart}T12:00:00`), end = new Date(`${asOf}T12:00:00`);
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || start > end) return 0;
+    const cents = value => Math.round((value + Number.EPSILON) * 100) / 100;
+    const interval = { monthly: [1,0], weekly: [0,7], biweekly: [0,14], quarterly: [3,0], annual: [12,0] };
+    let scheduled = 0;
+    for (const account of accounts.filter(item => (item.status || 'active') === 'active')) {
+      const first = new Date(`${account.next_due_date || account.start_date}T12:00:00`);
+      if (!Number.isFinite(first.getTime())) continue;
+      const step = interval[account.payment_frequency] || interval.monthly;
+      const due = new Date(first);
+      const dueDay = first.getDate();
+      let skipGuard = 0;
+      while (due < start && skipGuard++ < 1200) advanceDueDate(due, step[0], step[1], dueDay);
+      let guard = 0;
+      while (due <= end && guard++ < 1200) {
+        scheduled += Number(account.payment_amount || 0);
+        advanceDueDate(due, step[0], step[1], dueDay);
+      }
+    }
+    const accountIds = new Set(accounts.map(item => item.id));
+    const received = payments.filter(item => accountIds.has(item.account_id) && isPosted(item) && !['deposit','late_fee'].includes(item.income_category) && String(item.received_date || '') >= accrualStart && String(item.received_date || '') <= asOf)
+      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    return cents(Math.max(0, scheduled - received));
+  }
+
+  function advanceDueDate(date, months, days, anchorDay = date.getDate()) {
+    if (days) { date.setDate(date.getDate() + days); return; }
+    const first = new Date(date.getFullYear(), date.getMonth() + months, 1, 12);
+    const lastDay = new Date(first.getFullYear(), first.getMonth() + 1, 0, 12).getDate();
+    first.setDate(Math.min(anchorDay, lastDay)); date.setTime(first.getTime());
+  }
+
+  function scheduledLoanBalance(account, asOf = new Date().toISOString().slice(0,10)) {
+    if (!account || account.account_type === 'rental') return null;
+    const rows = amortizationSchedule(account.original_principal, account.interest_rate, account.term_months, account.start_date, account.principal_interest_amount);
+    const dueRows = rows.filter(row => row.date <= asOf);
+    const base = dueRows.length ? dueRows.at(-1).balance : Number(account.original_principal || 0);
+    return Math.max(0, Math.round((base + Number(account.balance_adjustment || 0) + Number.EPSILON) * 100) / 100);
+  }
+
   function principalBalance(originalPrincipal, payments, openingBalance = originalPrincipal, openingDate = null) {
     const eligible = openingDate
       ? payments.filter(payment => !payment.received_date || String(payment.received_date) > String(openingDate))
@@ -53,7 +94,24 @@
     return rows;
   }
 
-  const helpers = Object.freeze({ amortizationSchedule, isPosted, monthlyScheduledEstimate, principalBalance, sumPosted });
+  function createBackup(records, exportedAt = new Date().toISOString()) {
+    const tables = ['pd_properties', 'pd_accounts', 'pd_agreement_versions', 'pd_payments', 'pd_expenses', 'pd_documents', 'pd_import_batches', 'pd_audit_events', 'pd_workspace_members', 'pd_property_holders'];
+    const data = Object.fromEntries(tables.map(table => [table, Array.isArray(records?.[table]) ? records[table] : []]));
+    return {
+      manifest: {
+        format: 'propertydesk-backup',
+        format_version: 4,
+        schema_version: 4,
+        exported_at: exportedAt,
+        restore_supported: false,
+        included_tables: tables,
+        record_counts: Object.fromEntries(tables.map(table => [table, data[table].length]))
+      },
+      data
+    };
+  }
+
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumPosted });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();
