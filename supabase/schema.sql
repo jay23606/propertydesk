@@ -271,6 +271,29 @@ create trigger pd_payments_void_guard before insert or update on public.pd_payme
 drop trigger if exists pd_expenses_void_guard on public.pd_expenses;
 create trigger pd_expenses_void_guard before insert or update on public.pd_expenses for each row execute function public.pd_guard_transaction_void();
 
+create or replace function public.pd_validate_payment_allocation()
+returns trigger language plpgsql security invoker set search_path = '' as $$
+declare
+  parent_account_type text;
+begin
+  select a.account_type into parent_account_type
+    from public.pd_accounts a
+    where a.id = new.account_id and a.user_id = auth.uid() and a.user_id = new.user_id;
+  if not found then raise exception 'Payment account is not visible to this user'; end if;
+  if parent_account_type = 'rental' then
+    if new.principal_amount <> 0 or new.interest_amount <> 0 or new.fee_amount <> 0 or new.unapplied_amount <> 0 then
+      raise exception 'Rental receipts cannot carry loan allocations';
+    end if;
+  elsif new.principal_amount + new.interest_amount + new.fee_amount + new.unapplied_amount <> new.amount then
+    raise exception 'Loan payment allocations must equal the amount received';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists pd_payments_allocation_guard on public.pd_payments;
+create trigger pd_payments_allocation_guard before insert or update on public.pd_payments for each row execute function public.pd_validate_payment_allocation();
+
 -- Account and transaction imports are atomic and keep a private source receipt.
 drop function if exists public.pd_import_propertydesk_accounts(jsonb);
 drop function if exists public.pd_import_propertydesk_accounts(jsonb, text);
