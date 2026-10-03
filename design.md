@@ -99,7 +99,7 @@ Import flow:
 1. Parse a CSV into a staging preview before saving it.
 2. Match property and account names, dates, amounts, categories, and parties. Flag uncertain or missing values.
 3. Detect possible duplicate transactions using property/account, date, amount, and memo/source note. Label each suspected row in the preview and exclude it from the default import selection so re-uploading a file does not silently create duplicates. Let the owner explicitly include a suspected duplicate when the match is intentional.
-4. Let the owner review and correct the rows, then explicitly commit them.
+4. Let the owner review and correct editable values directly in the local preview, then explicitly commit them. If the CSV structure itself is malformed, identify the source row and require the file to be fixed and reselected.
 5. Preserve source metadata (filename or owner-entered source note, import batch, and import timestamp) so entries can be traced.
 6. Produce a row-level success/error report and permit safe re-import without duplication.
 

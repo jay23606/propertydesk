@@ -43,6 +43,24 @@ test('row validation keeps valid rows and reports every bad source row', () => {
   ]);
 });
 
+test('a corrected staged row can be revalidated and keeps its original CSV row number', () => {
+  const rows = parseCSV('name,amount\nFix me,bad');
+  const validate = sourceRows => validateImportRows(sourceRows, row => {
+    if (!row.name.trim()) throw new Error('Name is required.');
+    return { name: row.name.trim(), amount: csvMoney(row.amount, 'amount', { minimum: 0.01 }) };
+  });
+  assert.equal(validate(rows).errors[0].row, 2);
+
+  rows[0].amount = '275.50';
+  const corrected = validate(rows);
+  assert.deepEqual(corrected.errors, []);
+  assert.deepEqual(corrected.valid, [{ name: 'Fix me', amount: 275.5, _source_row: 2 }]);
+
+  const missingColumn = parseCSV('name\nSupply missing column');
+  missingColumn[0].amount = '18.25';
+  assert.deepEqual(validate(missingColumn).valid, [{ name: 'Supply missing column', amount: 18.25, _source_row: 2 }]);
+});
+
 test('CSV money accepts valid currency and rejects malformed, negative, or too-precise values', () => {
   assert.equal(csvMoney('$1,200.00', 'amount'), 1200);
   assert.equal(csvMoney('(5.25)', 'amount', { minimum: -10 }), -5.25);

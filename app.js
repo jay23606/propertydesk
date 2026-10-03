@@ -312,20 +312,33 @@
     const total=Number(report.total??rows.length), errors=report.errors||[];
     if(total>500)throw new Error('Imports are limited to 500 rows at a time. Split the CSV and review each batch.');
     if(!rows.length&&!errors.length)throw new Error('The CSV file has no importable rows.');
-    const duplicateCount=rows.filter(row=>row._possible_duplicate).length;
-    state.pendingImport={rows,commit,errors,total};$('import-preview-title').textContent=title;
+    state.pendingImport={title,rows,commit,errors,total,note,rawRows:report.rawRows||[],correctionKeys:report.correctionKeys||[],revalidate:report.revalidate||null};
+    $('import-include-duplicates').checked=false;
+    renderImportPreview();
+    openModal('import-preview-modal');
+  }
+  function renderImportPreview(){
+    const pending=state.pendingImport;if(!pending)return;
+    const {rows,errors,total,note}=pending,duplicateCount=rows.filter(row=>row._possible_duplicate).length;
+    $('import-preview-title').textContent=pending.title;
     $('import-preview-summary').textContent=`${total} CSV row${total===1?'':'s'} · ${rows.length} valid${errors.length?` · ${errors.length} need correction`:''}${duplicateCount?` · ${duplicateCount} possible duplicate${duplicateCount===1?'':'s'} excluded by default`:''}${note?` · ${note}`:''}`;
-    $('import-include-duplicates-wrap').classList.toggle('hidden',duplicateCount===0);$('import-include-duplicates').checked=false;
-    updateImportCommitButton();
+    $('import-include-duplicates-wrap').classList.toggle('hidden',duplicateCount===0);
     const keys=[...new Set(rows.flatMap(row=>Object.keys(row).filter(key=>!['_possible_duplicate','_source_row'].includes(key))))];
     if(duplicateCount||errors.length)keys.unshift('source_row');
     if(duplicateCount)keys.push('review_status');
     $('import-preview-head').innerHTML=keys.length?`<tr>${keys.map(key=>`<th>${esc(key.replaceAll('_',' '))}</th>`).join('')}</tr>`:'';
     $('import-preview-body').innerHTML=rows.map(row=>`<tr class="${row._possible_duplicate?'duplicate-import-row':''}">${keys.map(key=>`<td>${esc(key==='review_status'?(row._possible_duplicate?'Possible duplicate — skipped':'New row'):key==='source_row'?row._source_row:(row[key]??''))}</td>`).join('')}</tr>`).join('');
     $('import-preview-errors').classList.toggle('hidden',errors.length===0);
-    $('import-preview-error-summary').textContent=errors.length?`${errors.length} row${errors.length===1?' needs':'s need'} correction. These rows will not be imported.`:'';
-    $('import-preview-error-list').innerHTML=errors.slice(0,50).map(error=>`<li><strong>Row ${Number(error.row)}:</strong> ${esc(error.message)}</li>`).join('')+(errors.length>50?`<li>…and ${errors.length-50} more row errors.</li>`:'');
-    openModal('import-preview-modal');
+    $('import-preview-error-summary').textContent=errors.length?'Correct the editable cells below; corrected rows are revalidated immediately and become eligible for import. Rows with malformed CSV structure must be fixed in the source file.':'';
+    const rawKeys=[...new Set([...pending.correctionKeys,...pending.rawRows.flatMap(row=>Object.keys(row))])];
+    $('import-correction-head').innerHTML=rawKeys.length?`<tr><th>CSV ROW</th>${rawKeys.map(key=>`<th>${esc(key.replaceAll('_',' '))}</th>`).join('')}<th>VALIDATION</th></tr>`:'';
+    $('import-correction-body').innerHTML=errors.map(error=>{
+      const raw=pending.rawRows.find(row=>Number(row._source_row)===Number(error.row));
+      const cells=rawKeys.map(key=>`<td>${raw&&!raw._parse_error?`<input type="text" data-import-correction data-row="${Number(error.row)}" data-column="${esc(key)}" aria-label="CSV row ${Number(error.row)} ${esc(key)}" value="${esc(raw[key]??'')}">`:esc(raw?.[key]??'')}</td>`).join('');
+      return `<tr><td>${Number(error.row)}</td>${cells}<td>${esc(error.message)}</td></tr>`;
+    }).join('');
+    $('import-correction-table').classList.toggle('hidden',errors.length===0||rawKeys.length===0);
+    updateImportCommitButton();
   }
   function updateImportCommitButton(){const pending=state.pendingImport,selected=selectImportRows(pending?.rows||[],$('import-include-duplicates').checked),count=selected.length;$('import-commit').textContent=count?`Import ${count} row${count===1?'':'s'}`:'No valid rows to import';$('import-commit').disabled=count===0;}
   async function importAccounts(file) {
@@ -333,8 +346,7 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no account rows.');
-      const seenAccounts=new Set();
-      const validation=validateImportRows(rows,row=>{
+      const validateRows=sourceRows=>{const seenAccounts=new Set();return validateImportRows(sourceRows,row=>{
         const required=['property_name','property_address','account_type','account_name'];
         for(const key of required)if(!row[key])throw new Error(`Missing required value “${key}”.`);
         const type=row.account_type.toLowerCase();
@@ -360,7 +372,8 @@
         if(partyEmail.some(email=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
         seenAccounts.add(accountKey);
         return {property_name:row.property_name,property_address:row.property_address,account_type:type,account_name:row.account_name,party_name:row.party_name||'',party_email:partyEmail.join(', '),start_date:startDate,next_due_date:row.next_due_date||'',payment_amount:amount,payment_frequency:frequency,original_principal:principal,principal_interest_amount:principalInterestAmount,ledger_opening_balance:openingBalance,ledger_opening_date:row.ledger_opening_date||'',interest_rate:rate,term_months:row.term_months||'',balloon_date:row.balloon_date||'',late_fee:lateFee,grace_days:graceDays,notes:row.notes||'',city:row.city||null,state:row.state||null,postal_code:row.postal_code||null,property_kind:propertyKind};
-      });
+      });};
+      const validation=validateRows(rows);
       const staged=validation.valid;
       stageImport('Review account import',staged,async(rowsToImport,review)=>{
         const payload=rowsToImport.map(row=>({property_name:row.property_name,property_address:row.property_address,city:row.city,state:row.state,postal_code:row.postal_code,property_kind:row.property_kind,account_type:row.account_type,account_name:row.account_name,party_name:row.party_name||null,party_email:row.party_email||null,start_date:row.start_date,next_due_date:row.next_due_date||null,payment_amount:row.payment_amount,payment_frequency:row.payment_frequency,original_principal:row.original_principal,principal_interest_amount:row.principal_interest_amount,ledger_opening_balance:row.ledger_opening_balance,ledger_opening_date:row.ledger_opening_date||null,interest_rate:row.interest_rate,term_months:row.term_months?Number(row.term_months):null,balloon_date:row.balloon_date||null,late_fee:row.late_fee,grace_days:row.grace_days,notes:row.notes||null}));
@@ -370,7 +383,7 @@
         const imported=Number(data?.rows_accepted)||payload.length,rejected=review.total-imported;
         status.textContent=`Imported ${imported} account${imported===1?'':'s'}; ${rejected} row${rejected===1?' was':'s were'} skipped or need correction. Source saved to import history.`;
         status.classList.add('success');toast('Import complete');
-      },'',{total:validation.total,errors:validation.errors});
+      },'',{total:validation.total,errors:validation.errors,rawRows:rows,correctionKeys:['property_name','property_address','city','state','postal_code','property_kind','account_type','account_name','party_name','party_email','start_date','next_due_date','payment_amount','payment_frequency','original_principal','principal_interest_amount','ledger_opening_balance','ledger_opening_date','interest_rate','term_months','balloon_date','late_fee','grace_days','notes'],revalidate:validateRows});
     }catch(error){status.textContent=`Import failed: ${error.message}`;}
     $('import-file').value='';
   }
@@ -380,7 +393,9 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no expense rows.');
-      const validation=validateImportRows(rows,row=>{
+      const expenseKey=(propertyId,accountId,date,amount,payee,memo)=>JSON.stringify([propertyId,accountId||'',date,Number(amount).toFixed(2),String(payee||'').trim().toLowerCase(),String(memo||'').trim().toLowerCase()]);
+      const existingKeys=state.expenses.map(x=>expenseKey(x.property_id,x.account_id,x.expense_date,x.amount,x.payee,x.memo));
+      const validateRows=sourceRows=>{const validation=validateImportRows(sourceRows,row=>{
         if(!row.property_name||!row.property_address||!row.expense_date||!row.amount)throw new Error('Each expense row needs property_name, property_address, expense_date, and amount.');
         const p=state.properties.find(x=>x.name.toLowerCase()===row.property_name.toLowerCase()&&x.address.toLowerCase()===row.property_address.toLowerCase());
         if(!p)throw new Error(`Property not found: ${row.property_name} at ${row.property_address}. Add or import the property first.`);
@@ -392,11 +407,9 @@
         if(!['repairs','contractor','materials','taxes','insurance','utilities','management','other'].includes(category))throw new Error(`Invalid expense category “${category}”.`);
         if(!['manual','check','cash','bank_transfer','card','other'].includes(method))throw new Error(`Invalid payment method “${method}” for expense.`);
         return {property_name:p.name,property_address:p.address,account_name:account?.name||'',expense_date:row.expense_date,amount,category,payee:row.payee||'',payment_method:method,memo:[row.memo,row.source_note].filter(Boolean).join(' · ')};
-      });
-      const expenseKey=(propertyId,accountId,date,amount,payee,memo)=>JSON.stringify([propertyId,accountId||'',date,Number(amount).toFixed(2),String(payee||'').trim().toLowerCase(),String(memo||'').trim().toLowerCase()]);
-      const existingKeys=state.expenses.map(x=>expenseKey(x.property_id,x.account_id,x.expense_date,x.amount,x.payee,x.memo));
-      const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=row.account_name?state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name):null;return expenseKey(p?.id,a?.id,row.expense_date,row.amount,row.payee,row.memo);});
-      stageImport('Review expense import',reviewed,async(rowsToImport,review)=>{
+      });const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=row.account_name?state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name):null;return expenseKey(p?.id,a?.id,row.expense_date,row.amount,row.payee,row.memo);});return {...validation,valid:reviewed};};
+      const validation=validateRows(rows);
+      stageImport('Review expense import',validation.valid,async(rowsToImport,review)=>{
         const payload=rowsToImport.map(row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=row.account_name?state.accounts.find(x=>x.property_id===p.id&&x.name===row.account_name):null;return {property_id:p.id,account_id:a?.id||null,expense_date:row.expense_date,amount:row.amount,category:row.category,payee:row.payee||null,payment_method:row.payment_method,memo:row.memo||null};});
         const {data,error}=await state.client.rpc('pd_import_propertydesk_transactions',{p_kind:'expenses',p_rows:payload,p_source_name:file.name,p_rows_total:review.total});
         if(error)throw error;
@@ -404,7 +417,7 @@
         const imported=Number(data?.rows_accepted)||payload.length,rejected=review.total-imported;
         status.textContent=`Imported ${imported} expense${imported===1?'':'s'}; ${rejected} row${rejected===1?' was':'s were'} skipped or need correction. Source saved to import history.`;
         status.classList.add('success');toast('Expense import complete');
-      },'',{total:validation.total,errors:validation.errors});
+      },'',{total:validation.total,errors:validation.errors,rawRows:rows,correctionKeys:['property_name','property_address','account_name','expense_date','amount','category','payee','payment_method','memo','source_note'],revalidate:validateRows});
     }catch(error){status.textContent=`Import needs review: ${error.message}`;}
     $('expense-import-file').value='';
   }
@@ -414,7 +427,9 @@
     try {
       const rows=parseCSV(await file.text());
       if(!rows.length)throw new Error('The CSV file has no payment rows.');
-      const validation=validateImportRows(rows,row=>{
+      const paymentKey=(accountId,date,amount,memo)=>JSON.stringify([accountId,date,Number(amount).toFixed(2),String(memo||'').trim().toLowerCase()]);
+      const existingKeys=state.payments.map(x=>paymentKey(x.account_id,x.received_date,x.amount,x.memo));
+      const validateRows=sourceRows=>{const validation=validateImportRows(sourceRows,row=>{
         if(!row.property_name||!row.property_address||!row.account_name||!row.received_date||!row.amount)throw new Error('Each payment row needs property_name, property_address, account_name, received_date, and amount.');
         const p=state.properties.find(x=>x.name.toLowerCase()===row.property_name.toLowerCase()&&x.address.toLowerCase()===row.property_address.toLowerCase());
         if(!p)throw new Error(`Property not found: ${row.property_name} at ${row.property_address}. Import properties and accounts first.`);
@@ -430,11 +445,9 @@
         if(a.account_type==='rental')alloc.principal=alloc.interest=alloc.fee=alloc.unapplied=0;
         else if(Math.round((alloc.principal+alloc.interest+alloc.fee+alloc.unapplied)*100)!==Math.round(amount*100))throw new Error(`Payment allocations for ${a.name} on ${paymentDate} must add up to ${money(amount)}.`);
         return {property_name:p.name,property_address:p.address,account_name:a.name,received_date:paymentDate,amount,income_category:incomeCategory,payment_method:method,principal_amount:alloc.principal,interest_amount:alloc.interest,fee_amount:alloc.fee,unapplied_amount:alloc.unapplied,memo:row.memo||''};
-      });
-      const paymentKey=(accountId,date,amount,memo)=>JSON.stringify([accountId,date,Number(amount).toFixed(2),String(memo||'').trim().toLowerCase()]);
-      const existingKeys=state.payments.map(x=>paymentKey(x.account_id,x.received_date,x.amount,x.memo));
-      const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name);return paymentKey(a?.id,row.received_date,row.amount,row.memo);});
-      stageImport('Review payment import',reviewed,async(rowsToImport,review)=>{
+      });const reviewed=markPossibleDuplicates(validation.valid,existingKeys,row=>{const p=state.properties.find(x=>x.name===row.property_name&&x.address===row.property_address),a=state.accounts.find(x=>x.property_id===p?.id&&x.name===row.account_name);return paymentKey(a?.id,row.received_date,row.amount,row.memo);});return {...validation,valid:reviewed};};
+      const validation=validateRows(rows);
+      stageImport('Review payment import',validation.valid,async(rowsToImport,review)=>{
         const rowsToInsert=rowsToImport.map(row=>({account_id:state.accounts.find(a=>a.name===row.account_name&&state.properties.find(p=>p.id===a.property_id)?.name===row.property_name&&state.properties.find(p=>p.id===a.property_id)?.address===row.property_address).id,received_date:row.received_date,amount:row.amount,income_category:row.income_category,payment_method:row.payment_method,principal_amount:row.principal_amount,interest_amount:row.interest_amount,fee_amount:row.fee_amount,unapplied_amount:row.unapplied_amount,memo:row.memo||null}));
         const {data,error}=await state.client.rpc('pd_import_propertydesk_transactions',{p_kind:'payments',p_rows:rowsToInsert,p_source_name:file.name,p_rows_total:review.total});
         if(error)throw error;
@@ -442,7 +455,7 @@
         const imported=Number(data?.rows_accepted)||rowsToInsert.length,rejected=review.total-imported;
         status.textContent=`Imported ${imported} payment${imported===1?'':'s'}; ${rejected} row${rejected===1?' was':'s were'} skipped or need correction. Source saved to import history.`;
         status.classList.add('success');toast('Payment import complete');
-      },'',{total:validation.total,errors:validation.errors});
+      },'',{total:validation.total,errors:validation.errors,rawRows:rows,correctionKeys:['property_name','property_address','account_name','received_date','amount','income_category','payment_method','principal_amount','interest_amount','fee_amount','unapplied_amount','memo'],revalidate:validateRows});
     }catch(error){status.textContent=`Payment import needs review: ${error.message}`;}
     $('payment-import-file').value='';
   }  function csvCell(v){const s=String(v??'');return /[",\r\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
@@ -491,6 +504,7 @@
     $('display-name-form').addEventListener('submit',saveProfile);$('member-add-form').addEventListener('submit',addWorkspaceMember);$('user-menu').addEventListener('click',()=>{renderWorkspaceSettings();navigate('workspace');});$('property-archive-toggle').addEventListener('click',toggleArchiveProperty);
     $('sign-out').addEventListener('click',async()=>{await state.client.auth.signOut();state.user=null;state.properties=[];state.accounts=[];state.payments=[];showAuth();setAuthMode(false);}); $('auth-toggle').addEventListener('click',()=>setAuthMode($('auth-form').dataset.mode!=='signup')); $('auth-form').addEventListener('submit',submitAuth); $('forgot-password').addEventListener('click',requestPasswordReset); $('password-reset-form').addEventListener('submit',submitPasswordReset); $('reset-password-cancel').addEventListener('click',()=>{state.passwordRecoveryInProgress=false;setAuthMode(false);showAuth();});
     document.querySelectorAll('[data-open="expense-modal"]').forEach(x=>x.addEventListener('click',()=>{if(!state.properties.length){toast('Add a property before recording an expense');navigate('properties');return;}openExpense();}));
+    $('import-correction-body').addEventListener('change',event=>{const input=event.target.closest('[data-import-correction]'),pending=state.pendingImport;if(!input||!pending?.revalidate)return;const row=pending.rawRows.find(item=>Number(item._source_row)===Number(input.dataset.row));if(!row)return;Object.defineProperty(row,input.dataset.column,{value:input.value,enumerable:true,writable:true,configurable:true});const reviewed=pending.revalidate(pending.rawRows);pending.rows=reviewed.valid;pending.errors=reviewed.errors;pending.total=reviewed.total;$('import-include-duplicates').checked=false;renderImportPreview();});
     $('import-include-duplicates').addEventListener('change',updateImportCommitButton);
     $('import-commit').addEventListener('click',async()=>{const pending=state.pendingImport;if(!pending)return;const selected=selectImportRows(pending.rows,$('import-include-duplicates').checked);if(!selected.length){toast('No new rows to import.');return;}$('import-commit').disabled=true;$('import-commit').textContent='Importing…';try{await pending.commit(selected,pending);state.pendingImport=null;closeModal($('import-preview-modal'));}catch(error){$('import-preview-summary').textContent=`Import failed; no rows were committed. ${error.message}`;updateImportCommitButton();}finally{$('import-commit').disabled=false;}});
     $('import-file').addEventListener('change',e=>{if(e.target.files[0])importAccounts(e.target.files[0]);}); $('payment-import-file').addEventListener('change',e=>{if(e.target.files[0])importPayments(e.target.files[0]);}); $('expense-import-file').addEventListener('change',e=>{if(e.target.files[0])importExpenses(e.target.files[0]);}); $('export-all').addEventListener('click',exportAll); $('export-report').addEventListener('click',exportReport);

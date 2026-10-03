@@ -15,6 +15,10 @@
 .import-preview-errors h3{margin:0 0 6px;font-size:14px}
 .import-preview-errors ul{max-height:180px;overflow:auto;margin:8px 0 0;padding-left:22px;font-size:12px;line-height:1.6}
 .import-preview-errors .field-hint{margin:0;color:#7d3933}
+.import-correction-table{max-height:32vh;overflow:auto;margin-top:10px;border-color:#e8cbc7}
+.import-correction-table table{min-width:760px}
+.import-correction-table input{min-width:110px;width:100%;padding:8px;border:1px solid #d9b8b3;border-radius:7px;background:#fff;color:#252b28;font:inherit}
+.import-correction-table input:focus{outline:2px solid #8da99b;outline-offset:1px}
 @media(max-width:760px){.heading-actions{flex-wrap:wrap;justify-content:flex-end}.import-preview-table table{min-width:620px}}
 .property-detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #eff1ed}
 .property-detail-actions button:disabled{opacity:.5;cursor:not-allowed}
