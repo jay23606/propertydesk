@@ -131,6 +131,8 @@ Supabase-managed encryption at rest and TLS are the first-release baseline, but 
 
 For this product, prioritize correct RLS, least-privilege database grants, secure account recovery, and private backups before considering field-level encryption.
 
+The owner sign-in screen must provide password recovery through Supabase Auth. Recovery links must return to the deployed app, accept a new password only with the verified recovery session, and show generic request feedback so the page does not reveal whether an email address has an account.
+
 ## Progressive web app
 
 Ship PropertyDesk as an installable PWA for phone and desktop use. The service worker may cache the static app shell only. Do not cache authenticated API responses, tokens, property/account data, or uploaded documents in Cache Storage. The first release supports on-the-go use when connected; it does not queue financial writes offline. Offline transaction queues would need unique idempotency keys, visible sync status, conflict handling, and device logout/lock behavior before being enabled.

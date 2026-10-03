@@ -32,7 +32,14 @@
         <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters"></label>
         <button id="auth-submit" class="button primary full" type="submit">Sign in</button>
       </form>
+      <form id="password-reset-form" class="form-stack hidden">
+        <label>New password<input id="reset-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></label>
+        <label>Confirm new password<input id="reset-password-confirm" type="password" autocomplete="new-password" required minlength="8" placeholder="Type it again"></label>
+        <button id="reset-password-submit" class="button primary full" type="submit">Update password</button>
+        <button id="reset-password-cancel" class="text-button" type="button">Back to sign in</button>
+      </form>
       <p id="auth-message" class="form-message" role="status"></p>
+      <button id="forgot-password" class="text-button" type="button">Forgot password?</button>
       <button id="auth-toggle" class="text-button">Create an account</button>
       <p class="privacy-note"><span>🔒</span> Your portfolio is private to your account.</p>
     </section>
