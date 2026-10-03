@@ -24,6 +24,7 @@ All PropertyDesk tables use the `pd_` prefix (`pd_properties`, `pd_accounts`, `p
 
 - Create properties, then attach rental, land contract, or note accounts.
 - Record income from the account or portfolio screen. Record repair and contractor costs in the Expenses screen.
+- Mistaken transactions can be voided from the transaction ledger. The original remains in the audit history and exports; voided rows no longer affect balances or reports.
 - Import accounts from `templates/accounts-template.csv`; import expenses from `templates/expenses-template.csv`. Review data before importing. Screenshot reading happens outside this site; AI-prepared rows can be saved as CSV or entered through Supabase, where RLS and constraints still apply.
 - Export a backup from Reports. Keep a separate copy of `config.js` and your exported records.
 
@@ -33,4 +34,4 @@ PropertyDesk is a recordkeeping tool and does not collect payments. Loan allocat
 
 ## Local checks
 
-With Node.js installed, run `node --test tests/import-utils.test.cjs` from this directory to test CSV parsing, template compatibility, money validation, and date validation. These tests do not replace a live Supabase test of RLS, RPC rollback, or record isolation.
+With Node.js installed, run `npm test` from this directory to test CSV parsing, template compatibility, money/date validation, and posted-versus-voided balance calculations. These tests do not replace a live Supabase test of RLS, RPC rollback, or record isolation.

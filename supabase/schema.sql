@@ -53,8 +53,15 @@ create table if not exists public.pd_payments (
   unapplied_amount numeric(14,2) not null default 0 check (unapplied_amount >= 0),
   memo text,
   source_type text not null default 'manual' check (source_type in ('manual','csv_import','other')),
+  status text not null default 'posted' check (status in ('posted','voided')),
+  voided_at timestamptz,
+  void_reason text,
   recorded_at timestamptz not null default now()
 );
+
+alter table public.pd_payments add column if not exists status text not null default 'posted' check (status in ('posted','voided'));
+alter table public.pd_payments add column if not exists voided_at timestamptz;
+alter table public.pd_payments add column if not exists void_reason text;
 
 create table if not exists public.pd_expenses (
   id uuid primary key default gen_random_uuid(),
@@ -71,8 +78,13 @@ create table if not exists public.pd_expenses (
   source_type text not null default 'manual' check (source_type in ('manual','csv_import','other')),
   import_batch_id uuid,
   status text not null default 'posted' check (status in ('posted','voided')),
+  voided_at timestamptz,
+  void_reason text,
   recorded_at timestamptz not null default now()
 );
+
+alter table public.pd_expenses add column if not exists voided_at timestamptz;
+alter table public.pd_expenses add column if not exists void_reason text;
 
 create table if not exists public.pd_import_batches (
   id uuid primary key default gen_random_uuid(),
@@ -170,9 +182,20 @@ begin
   end if;
   row_user_id := new.user_id;
   row_id := new.id;
-  event_action := case when tg_op = 'INSERT' then 'created' else 'updated' end;
+  if tg_op = 'INSERT' then
+    event_action := 'created';
+  elsif tg_table_name in ('pd_payments','pd_expenses') then
+    if old.status = 'posted' and new.status = 'voided' then
+      event_action := 'voided';
+    else
+      event_action := 'updated';
+    end if;
+  else
+    event_action := 'updated';
+  end if;
   insert into public.pd_audit_events(user_id, entity_type, entity_id, action, summary, before_data, after_data)
-    values (row_user_id, tg_table_name, row_id, event_action, 'Recorded ' || lower(tg_op) || ' in ' || tg_table_name,
+    values (row_user_id, tg_table_name, row_id, event_action,
+      case when event_action = 'voided' then 'Voided transaction in ' || tg_table_name else 'Recorded ' || lower(tg_op) || ' in ' || tg_table_name end,
       case when tg_op = 'INSERT' then null else to_jsonb(old) end, to_jsonb(new));
   return new;
 end;
@@ -186,6 +209,30 @@ drop trigger if exists pd_payments_audit on public.pd_payments;
 create trigger pd_payments_audit after insert or update or delete on public.pd_payments for each row execute function public.propertydesk_audit_row();
 drop trigger if exists pd_expenses_audit on public.pd_expenses;
 create trigger pd_expenses_audit after insert or update or delete on public.pd_expenses for each row execute function public.propertydesk_audit_row();
+
+create or replace function public.pd_guard_transaction_void()
+returns trigger language plpgsql security invoker set search_path = '' as $$
+begin
+  if tg_op = 'INSERT' then
+    if new.status <> 'posted' or new.voided_at is not null or new.void_reason is not null then
+      raise exception 'Transactions must be inserted as posted; use the void action for corrections';
+    end if;
+    return new;
+  end if;
+  if old.status = 'voided' then raise exception 'Voided transactions cannot be changed or reposted'; end if;
+  if old.status <> 'posted' or new.status <> 'voided' then
+    raise exception 'The only permitted transaction update is posted to voided';
+  end if;
+  new.voided_at := now();
+  new.void_reason := left(coalesce(nullif(btrim(new.void_reason), ''), 'Voided by owner'), 500);
+  return new;
+end;
+$$;
+
+drop trigger if exists pd_payments_void_guard on public.pd_payments;
+create trigger pd_payments_void_guard before insert or update on public.pd_payments for each row execute function public.pd_guard_transaction_void();
+drop trigger if exists pd_expenses_void_guard on public.pd_expenses;
+create trigger pd_expenses_void_guard before insert or update on public.pd_expenses for each row execute function public.pd_guard_transaction_void();
 
 -- Import properties and their accounts in one transaction. As an invoker function,
 -- this runs under the caller's grants and RLS policies; failures roll back all rows.
@@ -256,5 +303,6 @@ revoke all on table public.pd_properties, public.pd_accounts, public.pd_payments
   public.pd_expenses, public.pd_import_batches, public.pd_audit_events from authenticated;
 grant select, insert, update on table public.pd_properties, public.pd_accounts to authenticated;
 grant select, insert on table public.pd_payments, public.pd_expenses to authenticated;
+grant update (status, voided_at, void_reason) on table public.pd_payments, public.pd_expenses to authenticated;
 grant select, insert, update on table public.pd_import_batches to authenticated;
 grant select on table public.pd_audit_events to authenticated;

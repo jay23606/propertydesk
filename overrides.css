@@ -3,4 +3,6 @@
 .import-preview-table{max-height:48vh;overflow:auto;margin-bottom:12px}
 .import-preview-table table{min-width:680px}
 .negative-amount{color:#a35f45!important}
+.transaction-voided{opacity:.6}
+.transaction-voided td strong{text-decoration:line-through}
 @media(max-width:760px){.heading-actions{flex-wrap:wrap;justify-content:flex-end}.import-preview-table table{min-width:620px}}

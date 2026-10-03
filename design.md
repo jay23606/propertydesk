@@ -66,7 +66,7 @@ For this initial bookkeeping workflow, expenses reduce property cash flow but do
 
 ### Land contract and note payment allocation
 
-Store the received payment as an immutable transaction and store its allocation as separate rows or explicit allocation fields. Support principal, interest, fees, and unapplied funds. The app can suggest an allocation from the account terms and prior ledger, but it must label the calculation as an estimate and allow manual correction. Keep a dated audit trail for edits and reversals.
+Store the received payment as an immutable transaction and store its allocation as separate rows or explicit allocation fields. Support principal, interest, fees, and unapplied funds. The app can suggest an allocation from the account terms and prior ledger, but it must label the calculation as an estimate and allow manual correction. Keep a dated audit trail for edits and reversals. Since posted ledger rows are append-only, provide an owner-only **Void** action for mistakes: it changes only the transaction status, preserves the original row and reason/timestamp, and records before/after values in the audit log. A voided entry must not affect balances or reports and must never be restorable to posted status; enter a corrected transaction as a new row.
 
 Display original principal, principal paid, current principal, scheduled payment, next due date, interest rate, term, and balloon date when provided. Amortization previews are informational until validated against the signed agreement and jurisdiction-specific terms.
 
@@ -97,8 +97,8 @@ Core tables in the current Supabase schema use the `pd_` project prefix:
 
 - `pd_properties`: owner, name, address, type, notes.
 - `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), party, contract terms, scheduled amount/frequency, status.
-- `pd_payments`: owner, account, gross amount, received date, method, memo, source/import batch, and explicit principal/interest/fee/unapplied allocation columns.
-- `pd_expenses`: owner, property, optional account, amount, expense date, category, payee, method, memo, optional receipt path, source/import batch, status.
+- `pd_payments`: owner, account, gross amount, received date, method, memo, source/import batch, explicit principal/interest/fee/unapplied allocation columns, and posted/voided state.
+- `pd_expenses`: owner, property, optional account, amount, expense date, category, payee, method, memo, optional receipt path, source/import batch, and posted/voided state.
 - `pd_import_batches`: owner, filename or description, created/committed timestamps, row counts and status. Avoid retaining raw uploaded financial documents by default; keep only what is needed to audit the imported rows.
 - `pd_audit_events`: owner, entity, action, timestamp, prior/new values or a safe change summary.
 - Future portal support: a `pd_account_portal_access` table linking one authenticated portal user to an explicitly shared account, plus separate invitation/verification state. Do not grant portal users access to owner-scoped tables directly; expose a narrow, tested view or server-side API that returns only the approved account ledger fields.
