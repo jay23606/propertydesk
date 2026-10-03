@@ -133,7 +133,7 @@ Use decimal/numeric storage for money. Use ISO calendar dates for due/effective/
 
 ## Portfolio calculations
 
-- **Income collected:** sum of posted receipt transactions in the selected period.
+- **Income collected:** sum of posted income receipts in the selected period; refundable security-deposit receipts remain cash received but are excluded from income and operating net cash flow.
 - **Expenses:** sum of posted operating/capital expense transactions in the selected period, with owner-editable reporting categories.
 - **Net cash flow:** income minus expenses; keep loan principal and interest separately reportable.
 - **Loan principal balance:** active agreement's principal basis adjusted for dated amendments and down payment, less posted principal allocations and explicit corrections; show the as-of date and allocation assumptions.

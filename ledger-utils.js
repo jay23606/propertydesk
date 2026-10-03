@@ -10,6 +10,10 @@
     return transactions.filter(isPosted).reduce((sum, transaction) => sum + Number(transaction[amountField] || 0), 0);
   }
 
+  function sumIncome(transactions, amountField = 'amount') {
+    return sumPosted(transactions.filter(transaction => transaction.income_category !== 'deposit'), amountField);
+  }
+
   function monthlyScheduledEstimate(accounts) {
     const multipliers = { monthly: 1, weekly: 52 / 12, biweekly: 26 / 12, quarterly: 1 / 3, annual: 1 / 12 };
     const estimate = accounts
@@ -111,7 +115,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumPosted });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumIncome, sumPosted });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

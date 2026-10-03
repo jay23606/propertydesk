@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumPosted } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, sumIncome, sumPosted } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -39,6 +39,17 @@ test('voided expenses no longer count toward posted expenses', () => {
     { amount: '75.00', status: 'posted' },
     { amount: '25.00', status: 'voided' },
   ]), 75);
+});
+
+test('security deposits remain cash receipts but are excluded from income totals', () => {
+  const receipts = [
+    { amount: 1000, income_category: 'rent' },
+    { amount: 500, income_category: 'deposit' },
+    { amount: 25, income_category: 'late_fee' },
+    { amount: 200, income_category: 'deposit', status: 'voided' },
+  ];
+  assert.equal(sumPosted(receipts), 1525);
+  assert.equal(sumIncome(receipts), 1025);
 });
 
 test('monthly scheduled totals normalize payment cadence and exclude inactive accounts', () => {
