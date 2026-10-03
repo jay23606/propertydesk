@@ -192,9 +192,12 @@
   }
   async function saveExpense(event) {
     event.preventDefault();
-    const payload={user_id:state.user.id,property_id:$('expense-property').value,account_id:$('expense-account').value||null,amount:moneyInput($('expense-amount').value),expense_date:$('expense-date').value,category:$('expense-category').value,payee:$('expense-payee').value.trim()||null,payment_method:$('expense-method').value,memo:$('expense-memo').value.trim()||null,source_type:'manual'};
+    const addAnother=event.submitter?.id==='expense-save-next',propertyId=$('expense-property').value,accountId=$('expense-account').value,category=$('expense-category').value,payee=$('expense-payee').value.trim(),method=$('expense-method').value;
+    const payload={user_id:state.user.id,property_id:propertyId,account_id:accountId||null,amount:moneyInput($('expense-amount').value),expense_date:$('expense-date').value,category,payee:payee||null,payment_method:method,memo:$('expense-memo').value.trim()||null,source_type:'manual'};
     const {error}=await state.client.from('pd_expenses').insert(payload);if(error){toast(error.message);return;}
-    closeModal($('expense-modal'));$('expense-form').reset();$('expense-date').value=todayIso();await fetchAll();toast('Expense recorded');
+    $('expense-form').reset();$('expense-date').value=todayIso();await fetchAll();
+    if(addAnother){$('expense-property').value=propertyId;$('expense-property').dispatchEvent(new Event('change'));$('expense-account').value=accountId;$('expense-category').value=category;$('expense-payee').value=payee;$('expense-method').value=method;$('expense-amount').focus();toast('Expense recorded. Ready for the next entry');return;}
+    closeModal($('expense-modal'));toast('Expense recorded');
   }
   function scheduleFor(account) {
     return amortizationSchedule(account.original_principal,account.interest_rate,account.term_months,account.start_date,account.principal_interest_amount);
