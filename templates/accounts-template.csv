@@ -1,2 +1,2 @@
-property_name,property_address,city,state,postal_code,property_kind,account_type,account_name,party_name,party_email,start_date,next_due_date,payment_amount,payment_frequency,original_principal,principal_interest_amount,escrow_amount,ledger_opening_balance,ledger_opening_date,interest_rate,term_months,balloon_date,late_fee,grace_days,notes
-Maple Street Home,123 Maple Street,Exampletown,ST,00000,residential,rental,Maple Street Rental,Jane Tenant,,2026-01-01,2026-11-01,1500,monthly,,,,,,,,,50,5,
+property_name,property_address,city,state,postal_code,property_kind,account_type,account_name,party_name,party_email,start_date,next_due_date,payment_amount,payment_frequency,original_principal,principal_interest_amount,escrow_amount,interest_rate,term_months,balloon_date,late_fee,grace_days,notes
+Maple Street Home,123 Maple Street,Exampletown,ST,00000,residential,rental,Maple Street Rental,Jane Tenant,,2026-01-01,2026-11-01,1500,monthly,,,,,,,50,5,

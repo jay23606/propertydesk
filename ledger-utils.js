@@ -88,72 +88,11 @@
 
   function scheduledLoanBalance(account, asOf = new Date().toISOString().slice(0,10)) {
     if (!account || account.account_type === 'rental') return null;
+    // This is a hypothetical on-time schedule estimate. Actual receipt history is intentionally ignored.
     const rows = amortizationSchedule(account.original_principal, account.interest_rate, account.term_months, account.start_date, account.principal_interest_amount);
     const dueRows = rows.filter(row => row.date <= asOf);
     const base = dueRows.length ? dueRows.at(-1).balance : Number(account.original_principal || 0);
     return Math.max(0, Math.round((base + Number(account.balance_adjustment || 0) + Number.EPSILON) * 100) / 100);
-  }
-
-  const cents = value => Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
-  const ASSUMED_PAID_THROUGH = '2025-12-31';
-
-  function loanOpeningState(account) {
-    const importedZeroOpening = account.import_batch_id && Number(account.ledger_opening_balance) === 0;
-    if (account.ledger_opening_balance != null && !importedZeroOpening) {
-      return {
-        balance: Math.max(0, Number(account.ledger_opening_balance || 0)),
-        date: account.ledger_opening_date || account.start_date || ASSUMED_PAID_THROUGH
-      };
-    }
-    if (String(account.start_date || '') > ASSUMED_PAID_THROUGH) {
-      return { balance: Math.max(0, Number(account.original_principal || 0)), date: account.start_date };
-    }
-    return {
-      balance: scheduledLoanBalance(account, ASSUMED_PAID_THROUGH) ?? Math.max(0, Number(account.original_principal || 0)),
-      date: ASSUMED_PAID_THROUGH
-    };
-  }
-
-  function loanLedgerState(account, payments, asOf = new Date().toISOString().slice(0,10)) {
-    const opening = loanOpeningState(account);
-    let balance = cents(opening.balance), accruedInterest = 0, lastDate = opening.date;
-    const rate = Number(account.interest_rate || 0) / 100;
-    const eligible = (payments || []).filter(payment => payment.account_id === account.id && isPosted(payment) &&
-      !['deposit', 'late_fee'].includes(payment.income_category) && String(payment.received_date || '') > opening.date &&
-      String(payment.received_date || '') <= asOf)
-      .sort((a, b) => String(a.received_date).localeCompare(String(b.received_date)) || String(a.recorded_at || '').localeCompare(String(b.recorded_at || '')) || String(a.id || '').localeCompare(String(b.id || '')));
-    for (const payment of eligible) {
-      const date = String(payment.received_date);
-      if (rate > 0 && balance > 0 && lastDate) {
-        const days = Math.max(0, Math.round((new Date(`${date}T12:00:00`) - new Date(`${lastDate}T12:00:00`)) / 86400000));
-        accruedInterest = cents(accruedInterest + balance * rate * days / 365);
-      }
-      const amount = Math.max(0, Number(payment.amount || 0));
-      const storedPrincipal = payment.principal_amount == null ? null : Number(payment.principal_amount);
-      const storedInterest = payment.interest_amount == null ? null : Number(payment.interest_amount);
-      const explicitAllocation = (storedPrincipal || 0) > 0 || (storedInterest || 0) > 0;
-      const interestApplied = explicitAllocation ? Math.min(accruedInterest, Math.max(0, storedInterest || 0)) : Math.min(accruedInterest, amount);
-      const principalApplied = explicitAllocation ? Math.min(balance, Math.max(0, storedPrincipal || 0)) : Math.min(balance, Math.max(0, amount - interestApplied));
-      accruedInterest = cents(Math.max(0, accruedInterest - interestApplied));
-      balance = cents(Math.max(0, balance - principalApplied));
-      lastDate = date;
-    }
-    if (rate > 0 && balance > 0 && lastDate && String(asOf) > lastDate) {
-      const days = Math.max(0, Math.round((new Date(`${asOf}T12:00:00`) - new Date(`${lastDate}T12:00:00`)) / 86400000));
-      accruedInterest = cents(accruedInterest + balance * rate * days / 365);
-    }
-    return { balance, accruedInterest, opening };
-  }
-
-  function estimatedLoanBalance(account, payments, asOf = new Date().toISOString().slice(0,10)) {
-    if (!account || account.account_type === 'rental') return null;
-    const state = loanLedgerState(account, payments, asOf);
-    return cents(Math.max(0, state.balance + Number(account.balance_adjustment || 0)));
-  }
-
-  function estimatedLoanInterestDue(account, payments, asOf = new Date().toISOString().slice(0,10)) {
-    if (!account || account.account_type === 'rental') return 0;
-    return loanLedgerState(account, payments, asOf).accruedInterest;
   }
 
   function principalBalance(originalPrincipal, payments, openingBalance = originalPrincipal, openingDate = null) {
@@ -161,26 +100,6 @@
       ? payments.filter(payment => !payment.received_date || String(payment.received_date) > String(openingDate))
       : payments;
     return Math.max(0, Number(openingBalance ?? originalPrincipal ?? 0) - sumPosted(eligible, 'principal_amount'));
-  }
-
-  function suggestedLoanAllocation(account, amount, balance, paymentDate = new Date().toISOString().slice(0, 10)) {
-    const received = cents(amount);
-    const escrow = cents(Math.min(received, Number(account?.escrow_amount || 0)));
-    const loanPortion = cents(Math.max(0, received - escrow));
-    const currentBalance = Math.max(0, Number(balance || 0));
-    const schedule = amortizationSchedule(account?.original_principal, account?.interest_rate, account?.term_months, account?.start_date, account?.principal_interest_amount);
-    if (!schedule.length) return { principal: 0, interest: 0, fee: 0, escrow, unapplied: loanPortion };
-    const period = schedule.filter(row => row.date <= paymentDate).at(-1) || schedule[0];
-    const scheduledPayment = Number(period?.payment || account?.principal_interest_amount || Math.max(0, Number(account?.payment_amount || 0) - Number(account?.escrow_amount || 0)));
-    const scheduledInterest = cents(currentBalance * Math.max(0, Number(account?.interest_rate || 0)) / 1200);
-    const scheduledPortion = Math.min(loanPortion, scheduledPayment);
-    const interest = cents(Math.min(scheduledPortion, scheduledInterest));
-    const scheduledPrincipal = Math.max(0, scheduledPortion - interest);
-    const extraPrincipal = Math.max(0, loanPortion - scheduledPayment);
-    const principal = cents(Math.min(currentBalance, scheduledPrincipal + extraPrincipal));
-    const fee = 0;
-    const unapplied = cents(Math.max(0, loanPortion - interest - principal - fee));
-    return { principal, interest, fee, escrow, unapplied };
   }
 
   function amortizationSchedule(originalPrincipal, annualRate, termMonths, startDate, principalInterestAmount = null) {
@@ -230,7 +149,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, suggestedLoanAllocation, unpaidDueAccrualStart });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, suggestedLoanAllocation, unpaidDueAccrualStart } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -162,39 +162,7 @@ test('scheduled loan balance follows amortization and accepts positive or negati
   assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -125 }, '2026-02-01'), 375);
 });
 
-test('estimated balance assumes the contract schedule was paid through 2025, then holds until actual principal is posted', () => {
-  const account = { id: 'estimate', account_type: 'land_contract', original_principal: 1200, interest_rate: 0,
-    term_months: 24, start_date: '2024-12-01', import_batch_id: 'batch-1', ledger_opening_balance: 0 };
-  assert.equal(scheduledLoanBalance(account, '2025-12-31'), 600);
-  assert.equal(estimatedLoanBalance(account, [], '2026-12-31'), 600);
-  assert.equal(estimatedLoanBalance(account, [
-    { id: 'p1', account_id: 'estimate', amount: 25, principal_amount: 12, interest_amount: 13,
-      received_date: '2026-01-02', income_category: 'installment' },
-    { id: 'void', account_id: 'estimate', amount: 100, principal_amount: 30, received_date: '2026-01-03', status: 'voided' },
-    { id: 'deposit', account_id: 'estimate', amount: 100, principal_amount: 100, received_date: '2026-01-04', income_category: 'deposit' }
-  ], '2026-12-31'), 588);
-});
-
-test('partial and unallocated loan receipts cover daily estimated interest before principal', () => {
-  const account = { id: 'partial', account_type: 'note', original_principal: 1200, interest_rate: 36.5,
-    term_months: 36, start_date: '2024-01-01', ledger_opening_balance: 1000, ledger_opening_date: '2026-01-01' };
-  const smallPayment = { account_id: 'partial', amount: 5, received_date: '2026-01-11', income_category: 'installment' };
-  assert.equal(estimatedLoanBalance(account, [smallPayment], '2026-01-11'), 1000,
-    'the first $5 only covers $10 accrued interest partially');
-  assert.equal(estimatedLoanInterestDue(account, [smallPayment], '2026-01-11'), 5);
-  const paidMore = { account_id: 'partial', amount: 25, received_date: '2026-01-21', income_category: 'installment' };
-  assert.equal(estimatedLoanBalance(account, [smallPayment, paidMore], '2026-01-21'), 990,
-    'the second payment covers $15 interest, then reduces principal by $10');
-});
-
-test('manual opening balance and signed owner adjustment take precedence in estimated balances', () => {
-  const account = { id: 'manual', account_type: 'land_contract', original_principal: 1200, interest_rate: 0,
-    term_months: 24, start_date: '2024-12-01', ledger_opening_balance: 750, ledger_opening_date: '2026-01-01', balance_adjustment: -50 };
-  assert.equal(estimatedLoanBalance(account, [], '2026-01-01'), 700);
-  assert.equal(estimatedLoanBalance({ ...account, balance_adjustment: 100 }, [], '2026-01-01'), 850);
-});
-
-test('amended land-contract terms produce the documented payment and 2026 estimates', () => {
+test('on-time land-contract schedule provides the hypothetical balance independently of payments received', () => {
   const account = {
     id: 'amended-note', account_type: 'land_contract', start_date: '2025-05-01',
     original_principal: 49000, interest_rate: 9.0864, term_months: 348,
@@ -204,10 +172,14 @@ test('amended land-contract terms produce the documented payment and 2026 estima
     account.term_months, account.start_date, account.principal_interest_amount);
   assert.equal(schedule[0].date, '2025-06-01');
   assert.equal(schedule[0].payment, 400);
-  assert.equal(scheduledLoanBalance(account, '2026-10-03'), 48476.48);
+  const hypothetical = scheduledLoanBalance(account, '2026-10-03');
+  assert.equal(hypothetical, 48476.48);
+  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -250 }, '2026-10-03'), 48226.48);
+  const received = [{ account_id: account.id, amount: 1000, received_date: '2026-04-01', income_category: 'installment' }];
   assert.equal(amountDueSince([account], [], '2026-01-01', '2026-10-03'), 5500);
-  assert.equal(amountDueSince([account], [{ account_id: account.id, amount: 1000,
-    received_date: '2026-04-01', income_category: 'installment' }], '2026-01-01', '2026-10-03'), 4500);
+  assert.equal(amountDueSince([account], received, '2026-01-01', '2026-10-03'), 4500);
+  assert.equal(scheduledLoanBalance(account, '2026-10-03'), hypothetical,
+    'recording money received changes Unpaid Due, not the on-time balance estimate');
 });
 
 test('amortization estimates derive P&I from terms when no contractual P&I amount is supplied', () => {
@@ -216,19 +188,6 @@ test('amortization estimates derive P&I from terms when no contractual P&I amoun
   assert.ok(schedule[0].payment > 0);
   assert.ok(schedule[0].interest > 0);
   assert.equal(schedule.at(-1).balance, 0);
-});
-
-test('suggested loan allocations use amortized monthly interest and separate taxes and insurance escrow', () => {
-  const account = { account_type: 'land_contract', original_principal: 65000, interest_rate: 10.6113, term_months: 360, start_date: '2026-10-01', payment_amount: 750, principal_interest_amount: 600, escrow_amount: 150 };
-  const allocation = suggestedLoanAllocation(account, 750, 65000, '2026-10-04');
-  assert.deepEqual(allocation, { principal: 25.22, interest: 574.78, fee: 0, escrow: 150, unapplied: 0 });
-  const partial = suggestedLoanAllocation(account, 500, 65000, '2026-10-04');
-  assert.deepEqual(partial, { principal: 0, interest: 350, fee: 0, escrow: 150, unapplied: 0 });
-});
-
-test('suggested loan allocation leaves funds unapplied when amortization terms are missing', () => {
-  const account = { account_type: 'land_contract', payment_amount: 849, escrow_amount: 0, interest_rate: 0, term_months: null };
-  assert.deepEqual(suggestedLoanAllocation(account, 849, 30000, '2026-10-04'), { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: 849 });
 });
 
 test('contractual P&I can be estimated separately from escrow-inclusive installments', () => {
