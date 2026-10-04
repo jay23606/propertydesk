@@ -9,7 +9,7 @@
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
-  const state = { client: null, user: null, workspaceOwnerId: null, workspaceMembers: [], propertyHolders: [], depositEntries: [], reminderLogs: [], view: 'overview', properties: [], accounts: [], payments: [], expenses: [], documents: [], agreementVersions: [], importBatches: [], pendingImport: null, pendingCorrection: null, editingProperty: null, editingAccount: null, selectedPropertyId: null, auditRequestId: 0, passwordRecoveryInProgress: false, toastTimer: null };
+  const state = { client: null, user: null, workspaceOwnerId: null, workspaceMembers: [], propertyHolders: [], depositEntries: [], reminderLogs: [], view: 'properties', properties: [], accounts: [], payments: [], expenses: [], documents: [], agreementVersions: [], importBatches: [], pendingImport: null, pendingCorrection: null, editingProperty: null, editingAccount: null, selectedPropertyId: null, auditRequestId: 0, passwordRecoveryInProgress: false, toastTimer: null };
   const money = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(value || 0));
   const dateOnly = (value) => value ? new Date(`${value}T12:00:00`) : null;
   const fmtDate = (value, opts = { month: 'short', day: 'numeric', year: 'numeric' }) => { const d = dateOnly(value); return d ? d.toLocaleDateString(undefined, opts) : '—'; };

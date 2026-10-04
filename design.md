@@ -41,7 +41,7 @@ Tenant/buyer jobs, only if invited and they choose to sign in:
 
 ## Navigation and information architecture
 
-Keep the primary navigation small:
+Keep the primary navigation small. After sign-in, land on **Properties**, the primary day-to-day screen; Overview remains available as a secondary summary.
 
 - **Overview:** portfolio totals, upcoming items, recent activity, and properties.
 - **Properties:** the only portfolio navigation view; fold the former Accounts functionality into this screen. Use a searchable, filterable account-style grid with payment action and unpaid-due amount as the first columns, followed by a clickable street address, renter/buyer, scheduled amount, and estimated loan balance. Keep rows in a stable A–Z order by renter/buyer name, then account name and address; put properties without accounts last. Show an optional short property note in italic below the street address; make it quickly editable from the grid and searchable with the other property fields. The loan balance always assumes on-time installments and is independent of recorded receipts. Do not show a Type column. Hide inactive accounts and archived properties by default; let the user reveal them with a Show inactive / archived toggle. On narrow screens, keep Payment and Unpaid Due pinned while the remaining columns scroll horizontally. In the property detail account table, let account name and party name open the account editor; keep the Open action on one line and remove the redundant Status column. Properties without an agreement remain visible with an Add account action. Show the street address once as the link; omit city/state/postal details and duplicate subtext from this view.

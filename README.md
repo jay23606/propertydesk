@@ -8,6 +8,8 @@ See `email-setup.md` for the MailerSend reminder schedule and the current domain
 
 Buyer/tenant month-end unpaid reminders are available per account and remain off by default. The account editor includes an email preview, and Workspace shows accepted, failed, and skipped attempts. The scheduled backend sends separate emails to each saved address only when no payment was recorded for the calendar month and unpaid scheduled charges remain. It does not copy the owner or include the hypothetical loan balance.
 
+After sign-in, PropertyDesk opens directly to **Properties**, the primary day-to-day view.
+
 The Properties grid can also open a manual reminder draft in the user's email app from the buyer/tenant name. It uses the reminder subject and message format; sending remains under the owner's control.
 
 The future tenant/buyer portal is optional and separate from the owner workspace. Buyers and tenants will not need to sign up to receive owner-enabled email notices; all notices default to disabled. Portal logins, when offered, must be explicitly invited and restricted to the shared account.
