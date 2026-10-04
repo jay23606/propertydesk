@@ -92,3 +92,6 @@ html[data-theme="dark"] .modal-backdrop{background:#050907c9}html[data-theme="da
 html[data-theme="dark"] .loan-fields,html[data-theme="dark"] .schedule-table{border-color:var(--line)}html[data-theme="dark"] .allocation-preview{background:#26312a;color:#c3d0c7}html[data-theme="dark"] .property-row-note,html[data-theme="dark"] .table-subtext{color:#a7b3aa}html[data-theme="dark"] .duplicate-import-row{background:#3a3424}html[data-theme="dark"] .duplicate-import-toggle{color:#e5ce8a}
 html[data-theme="dark"] .auth-view{background:radial-gradient(ellipse at 50% 20%,#26372c 0,#151b17 58%)}html[data-theme="dark"] .auth-intro,html[data-theme="dark"] .privacy-note{color:#a4b0a7}html[data-theme="dark"] .text-button{color:#78c99d}
 html[data-theme="dark"] .portfolio-table td.portfolio-due{color:#b8f0cd!important}
+.property-account-table table{width:100%;min-width:0;table-layout:fixed}
+.property-account-table th,.property-account-table td{overflow-wrap:anywhere}
+.property-account-table th:last-child,.property-account-table td:last-child{position:sticky;right:0;width:58px;min-width:58px;max-width:58px;text-align:center;z-index:2;background:var(--surface)}
