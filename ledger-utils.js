@@ -68,8 +68,8 @@
   }
 
   function unpaidDueAccrualStart(account) {
-    // Loan agreements begin accruing tracked arrears with the first reliable month of use.
-    return account?.account_type === 'rental' ? '2026-01-01' : '2026-10-01';
+    // Imported payment histories are incomplete before October 2026, so don't infer older arrears.
+    return '2026-10-01';
   }
 
   function advanceDueDate(date, months, days, anchorDay = date.getDate()) {

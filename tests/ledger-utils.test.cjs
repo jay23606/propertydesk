@@ -119,7 +119,7 @@ test('current month is assumed unpaid and the carry-forward grows each month wit
   assert.equal(amountDueSince([account], [...janThroughSep, { account_id: 'october', amount: 100, received_date: '2026-10-15', income_category: 'installment' }], '2026-01-01', '2026-11-03'), 100, 'a recorded October payment subtracts from the running total');
 });
 
-test('land-contract unpaid due starts in October 2026, ignores unrecorded earlier months, then carries forward', () => {
+test('unpaid due starts in October 2026 across account types, ignores unrecorded earlier months, then carries forward', () => {
   const account = { id: 'contract-october', account_type: 'land_contract', start_date: '2020-04-01', next_due_date: '2026-10-15', payment_amount: 550, payment_frequency: 'monthly' };
   const priorReceipts = Array.from({ length: 9 }, (_, index) => ({
     account_id: account.id, amount: 550, received_date: `2026-${String(index + 1).padStart(2, '0')}-15`, income_category: 'installment'
@@ -129,7 +129,11 @@ test('land-contract unpaid due starts in October 2026, ignores unrecorded earlie
   assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-10-03'), 550, 'only October is assumed unpaid at launch');
   assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-11-03'), 1100, 'an unpaid October installment carries into November');
   assert.equal(amountDueSince([account], [...priorReceipts, { account_id: account.id, amount: 550, received_date: '2026-10-15', income_category: 'installment' }], trackingStart, '2026-11-03'), 550, 'recording October payment reduces the carry-forward');
-  assert.equal(unpaidDueAccrualStart({ account_type: 'rental' }), '2026-01-01', 'rental unpaid-due tracking retains its existing 2026 starting point');
+  const rental = { ...account, id: 'rental-october', account_type: 'rental' };
+  const rentalReceipts = priorReceipts.map(payment => ({ ...payment, account_id: rental.id, income_category: 'rent' }));
+  assert.equal(unpaidDueAccrualStart(rental), '2026-10-01');
+  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(rental), '2026-10-03'), 550, 'rentals also start at October because earlier receipts are not fully recorded');
+  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(rental), '2026-11-03'), 1100, 'missed rent then carries forward in later months');
 });
 
 test('monthly due dates stay anchored at month end', () => {
