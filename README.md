@@ -2,11 +2,13 @@
 
 Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
-The app is installable as a PWA when served over HTTPS. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
+The app is installable as a PWA when served over HTTPS. Dark mode is the default, with a light/dark toggle remembered on the device. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
 See `email-setup.md` for the MailerSend reminder schedule and the current domain setup status.
 
 Buyer/tenant month-end unpaid reminders are available per account and remain off by default. The account editor includes an email preview, and Workspace shows accepted, failed, and skipped attempts. The scheduled backend sends separate emails to each saved address only when no payment was recorded for the calendar month and unpaid scheduled charges remain. It does not copy the owner or include the hypothetical loan balance.
+
+The Properties grid can also open a manual reminder draft in the user's email app from the buyer/tenant name. It uses the reminder subject and message format; sending remains under the owner's control.
 
 The future tenant/buyer portal is optional and separate from the owner workspace. Buyers and tenants will not need to sign up to receive owner-enabled email notices; all notices default to disabled. Portal logins, when offered, must be explicitly invited and restricted to the shared account.
 
@@ -25,7 +27,7 @@ All PropertyDesk tables use the `pd_` prefix so they can coexist with other apps
 - Create properties, then attach rental, land contract, or note accounts.
 - Use the Properties menu as the single portfolio view. Payment and Unpaid Due lead the row; on mobile those columns stay visible while the remaining property/account columns scroll horizontally. The property link shows the street only, without city/state/ZIP. The current month's installment is included even before its due day, and recorded payments reduce the rolling amount due. All unpaid-due tracking starts Oct 2026 because earlier payment history is incomplete; January–September installments are not assumed unpaid. Later missed installments carry forward. Inactive accounts and archived properties are hidden by default; use Show inactive / archived to reveal them. Record repair and contractor costs in the Transactions screen.
 - Use Workspace to set a display name and add/remove a trusted person by their verified account email. Members can manage the whole workspace. Property holder tags help filter the Properties grid and do not restrict access. Adding a member currently requires that person to sign up first; this release does not send invitation emails.
-- Upload PDFs or DOCX agreements from a property's detail view and download them there later. Storage is private and downloads use short-lived signed links. ZIP backups contain the records and private agreement files.
+- Upload PDF, DOCX, or JPEG agreements from a property's detail view. Click a filename to open it through a short-lived private link; the browser handles viewing and downloading (PDFs can be saved from the browser viewer). ZIP backups contain the records and private agreement files.
 - Correct a transaction from the ledger to atomically void the original and create a linked replacement with a reason; both entries remain in history, and only the replacement affects current balances and reports. A separate Void action remains available when no replacement is needed.
 - Rental security-deposit receipts, refunds, retention, and retention reversals have a separate held-balance ledger. Choose **Security deposit refund** as an expense category and link it to the rental account; it does not count as rent or an operating expense.
 - Import accounts from `templates/accounts-template.csv`; import expenses from `templates/expenses-template.csv`. Review data before importing. Screenshot reading happens outside this site; AI-prepared rows can be saved as CSV or entered through Supabase, where RLS and constraints still apply.
