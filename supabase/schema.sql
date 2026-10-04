@@ -75,7 +75,7 @@ create table if not exists public.pd_documents (
   account_id uuid references public.pd_accounts(id) on delete set null,
   file_name text not null,
   storage_path text not null unique,
-  content_type text not null check (content_type in ('application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document')),
+  content_type text not null check (content_type in ('application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','image/jpeg')),
   file_size bigint not null check (file_size > 0 and file_size <= 15728640),
   created_at timestamptz not null default now()
 );
@@ -242,7 +242,7 @@ create policy "Users manage pd_documents" on public.pd_documents for all to auth
 );
 
 insert into storage.buckets(id, name, public, file_size_limit, allowed_mime_types)
-values ('pd-private-agreements', 'pd-private-agreements', false, 15728640, array['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+values ('pd-private-agreements', 'pd-private-agreements', false, 15728640, array['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','image/jpeg'])
 on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 drop policy if exists "Users read their private PropertyDesk files" on storage.objects;
 create policy "Users read their private PropertyDesk files" on storage.objects for select to authenticated
