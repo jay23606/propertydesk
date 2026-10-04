@@ -15,6 +15,24 @@
       && String(payment.received_date || '').slice(0, 7) === yearMonth);
   }
 
+  function postedPaymentTotalInMonth(payments, accountId, month) {
+    const yearMonth = String(month || '').slice(0, 7);
+    if (!/^\d{4}-\d{2}$/.test(yearMonth)) return 0;
+    const total = payments.filter(payment => payment.account_id === accountId
+      && isPosted(payment)
+      && !['deposit', 'late_fee'].includes(payment.income_category)
+      && String(payment.received_date || '').slice(0, 7) === yearMonth)
+      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+    return Math.round((total + Number.EPSILON) * 100) / 100;
+  }
+
+  function paymentStatusInMonth(payments, accountId, month, scheduledAmount) {
+    const total = postedPaymentTotalInMonth(payments, accountId, month);
+    if (total <= 0) return 'none';
+    const expected = Number(scheduledAmount || 0);
+    return expected > 0 && total + 0.004 >= expected ? 'full' : 'partial';
+  }
+
   function sumPosted(transactions, amountField = 'amount') {
     return transactions.filter(isPosted).reduce((sum, transaction) => sum + Number(transaction[amountField] || 0), 0);
   }
@@ -158,7 +176,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

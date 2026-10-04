@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const { parseCSV, selectImportRows } = window.PropertyDeskImportUtils;
   const { validateAccountRows, validateExpenseRows, validatePaymentRows } = window.PropertyDeskImportWorkflows;
-  const { amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = window.PropertyDeskLedgerUtils;
+  const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = window.PropertyDeskLedgerUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
@@ -18,6 +18,7 @@
   const prettyType = (t) => ({ rental: 'Rental', land_contract: 'Land contract', note: 'Private note' }[t] || t || 'Account');
   const prettyKind = (t) => ({ residential: 'Residential', land: 'Land', commercial: 'Commercial', other: 'Other' }[t] || t || 'Property');
   const monthStart = () => { const d = new Date(); d.setDate(1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; };
+  const monthEnd = () => { const d = new Date(); d.setMonth(d.getMonth() + 1, 0); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const location = p => [p.city, p.state, p.postal_code].filter(Boolean).join(', ');
   const propertyAddress = p => [p.address, location(p)].filter(Boolean).join(', ');
   const streetAddress = p => String(p.address || p.name || '').split(',')[0].trim();
@@ -119,8 +120,11 @@
         const partyName=account.party_name||account.name, fullAddress=propertyAddress(property);
         const reminderHref=lateReminderMailto({email:account.party_email,address:fullAddress,unpaidDue:money(due),senderName:state.user?.user_metadata?.display_name?.trim()||'PropertyDesk'});
         const recipientHint=account.party_email?'Draft late reminder email':'No email saved; opens an unaddressed late reminder draft';
-        const paidThisMonth=hasPostedPaymentInMonth(state.payments,account.id,monthStart());
-        rows.push({hasAccount:true,party:partyName,account:account.name,address:street,id:account.id,html:`<tr><td class="${paidThisMonth?'payment-received-this-month':''}"${paidThisMonth?' title="Payment received this month"':''}><button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button></td><td class="portfolio-due">${money(due)}</td>${propertyAddressCell(property,street)}<td><a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a><small class="table-subtext">${esc(account.name)}${(account.status||'active')!=='active'?' · Inactive':''}</small></td><td>${account.payment_frequency==='monthly'?money(account.payment_amount):`≈ ${money(monthly)}`}<small class="table-subtext">${account.payment_frequency==='monthly'?'Monthly':`${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`}</small></td><td>${account.account_type==='rental'?'—':money(accountBalance(account))}</td></tr>`});
+        const scheduledThisMonth=amountDueSince([{...account,status:'active'}],[],monthStart(),monthEnd())||Number(account.payment_amount||0);
+        const paymentStatus=paymentStatusInMonth(state.payments,account.id,monthStart(),scheduledThisMonth);
+        const paymentCellClass={none:'payment-not-received-this-month',partial:'payment-received-this-month',full:'payment-paid-in-full-this-month'}[paymentStatus];
+        const paymentCellTitle={none:'No payment received this month',partial:'Partial payment received this month',full:'Full scheduled amount received this month'}[paymentStatus];
+        rows.push({hasAccount:true,party:partyName,account:account.name,address:street,id:account.id,html:`<tr><td class="${paymentCellClass}" title="${paymentCellTitle}"><button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button></td><td class="portfolio-due">${money(due)}</td>${propertyAddressCell(property,street)}<td><a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a><small class="table-subtext">${esc(account.name)}${(account.status||'active')!=='active'?' · Inactive':''}</small></td><td>${account.payment_frequency==='monthly'?money(account.payment_amount):`≈ ${money(monthly)}`}<small class="table-subtext">${account.payment_frequency==='monthly'?'Monthly':`${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`}</small></td><td>${account.account_type==='rental'?'—':money(accountBalance(account))}</td></tr>`});
       } else if(allRelated.length===0&&type==='all'&&(!q||`${property.name} ${propertyAddress(property)} ${property.notes||''}`.toLowerCase().includes(q))){
         rows.push({hasAccount:false,party:'',account:'',address:street,id:property.id,html:`<tr><td><button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button></td><td class="portfolio-due">—</td>${propertyAddressCell(property,street)}<td colspan="2" class="muted">No rental or contract recorded</td><td>—</td></tr>`});
       }

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
 
 test('payment-month highlighting recognizes any posted installment or rent receipt in the selected month', () => {
   const receipts = [
@@ -16,6 +16,10 @@ test('payment-month highlighting recognizes any posted installment or rent recei
   assert.equal(hasPostedPaymentInMonth(receipts.filter(row => row.id !== 'rent' && row.id !== 'partial'), 'a1', '2026-10-01'), false, 'voids, deposits, late fees, other months and other accounts do not count');
   assert.equal(hasPostedPaymentInMonth(receipts, 'a2', '2026-10-01'), true, 'a rent receipt counts for its own account');
   assert.equal(hasPostedPaymentInMonth(receipts, 'a1', 'bad-date'), false, 'invalid month input does not highlight');
+  assert.equal(postedPaymentTotalInMonth(receipts, 'a1', '2026-10-01'), 125, 'only posted rent and installment receipts add to the total');
+  assert.equal(paymentStatusInMonth(receipts, 'a1', '2026-10-01', 125), 'full', 'multiple receipts can reach the full scheduled amount');
+  assert.equal(paymentStatusInMonth(receipts.filter(row => row.id !== 'rent'), 'a1', '2026-10-01', 125), 'partial');
+  assert.equal(paymentStatusInMonth(receipts.filter(row => row.id !== 'rent' && row.id !== 'partial'), 'a1', '2026-10-01', 125), 'none');
 });
 
 test('voided payments remain recorded but no longer affect collected income', () => {

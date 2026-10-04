@@ -50,6 +50,10 @@
 .document-row .document-delete{color:#98483d;border-color:#edd8d3;background:#fff}
 .portfolio-table tbody td.payment-received-this-month{background:#e7f3eb}
 .portfolio-table tbody tr:hover td.payment-received-this-month{background:#dceee2}
+.portfolio-table tbody td.payment-paid-in-full-this-month{background:#b8d9c3}
+.portfolio-table tbody tr:hover td.payment-paid-in-full-this-month{background:#a6cfb4}
+.portfolio-table tbody td.payment-not-received-this-month{background:#fbe9e9}
+.portfolio-table tbody tr:hover td.payment-not-received-this-month{background:#f6dddd}
 .document-row small{font-size:10px;color:var(--muted);margin-top:3px}
 .portfolio-table{overflow:auto}
 .portfolio-table table{min-width:1120px}
