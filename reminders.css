@@ -1,0 +1,21 @@
+.reminder-toggle-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft)}
+.reminder-toggle{display:flex;align-items:center;gap:10px;font-weight:650}
+.reminder-toggle input{width:auto;margin:0;accent-color:var(--accent)}
+.reminder-toggle-row .field-hint{grid-column:1/-1;margin:0}
+.reminder-preview{display:grid;gap:16px}
+.reminder-preview-meta{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft)}
+.reminder-preview-meta>div{display:grid;gap:4px;overflow-wrap:anywhere}
+.reminder-preview-meta small{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.68rem}
+.reminder-preview-body{padding:18px;border:1px solid var(--line);border-radius:10px;line-height:1.65;background:var(--surface);overflow-wrap:anywhere}
+.reminder-status{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:.76rem;font-weight:650}
+.reminder-accepted{background:#d8eee0;color:#176846}
+.reminder-failed{background:#f9dedb;color:#903a32}
+.reminder-skipped{background:#ecefe9;color:#59665c}
+.reminder-sending{background:#e3e9fa;color:#405991}
+html[data-theme="dark"] .reminder-toggle-row,html[data-theme="dark"] .reminder-preview-meta,html[data-theme="dark"] .reminder-preview-body{background:#18211b;border-color:#435248}
+html[data-theme="dark"] .reminder-status{color:#e4ece6}
+html[data-theme="dark"] .reminder-accepted{background:#183d2b}
+html[data-theme="dark"] .reminder-failed{background:#4b2926}
+html[data-theme="dark"] .reminder-skipped{background:#303a32}
+html[data-theme="dark"] .reminder-sending{background:#29354d}
+@media(max-width:680px){.reminder-toggle-row{grid-template-columns:1fr}.reminder-toggle-row .field-hint{grid-column:auto}}

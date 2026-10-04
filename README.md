@@ -4,9 +4,9 @@ Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Au
 
 The app is installable as a PWA when served over HTTPS. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
-See `email-setup.md` for the Resend/Supabase Auth email plan and the current domain verification status.
+See `email-setup.md` for the MailerSend reminder schedule and the current domain setup status.
 
-Buyer/tenant reminders and statements are planned for a later stage. The design includes monthly and late reminder controls, admin previews/test sends, and optional per-account reply-to/copy settings; they are not enabled in this starter.
+Buyer/tenant month-end unpaid reminders are available per account and remain off by default. The account editor includes an email preview, and Workspace shows accepted, failed, and skipped attempts. The scheduled backend sends separate emails to each saved address only when no payment was recorded for the calendar month and unpaid scheduled charges remain. It does not copy the owner or include the hypothetical loan balance.
 
 The future tenant/buyer portal is optional and separate from the owner workspace. Buyers and tenants will not need to sign up to receive owner-enabled email notices; all notices default to disabled. Portal logins, when offered, must be explicitly invited and restricted to the shared account.
 

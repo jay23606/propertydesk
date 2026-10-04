@@ -1,0 +1,4 @@
+project_id = "zbtgonklxweikgukzukg"
+
+[functions.pd-month-end-reminders]
+verify_jwt = false

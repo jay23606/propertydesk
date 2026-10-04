@@ -34,6 +34,9 @@ begin
     values(ids.owner_id,'Owner property','1 Workspace Way') returning id into v_owner_property_id;
   insert into public.pd_accounts(user_id,property_id,account_type,name,start_date,payment_amount)
     values(ids.owner_id,v_owner_property_id,'rental','Owner rental',date '2026-01-01',100) returning id into v_owner_account_id;
+  if (select monthly_reminder_enabled from public.pd_accounts where id=v_owner_account_id) then raise exception 'FAIL: new account reminder toggle was not off by default'; end if;
+  insert into public.pd_reminder_logs(user_id,account_id,reminder_month,recipient_email,status,reason,unpaid_due)
+    values(ids.owner_id,v_owner_account_id,date '2026-10-01','tenant@example.test','accepted',null,100);
   insert into public.pd_payments(user_id,account_id,amount,received_date,income_category)
     values(ids.owner_id,v_owner_account_id,100,date '2026-10-01','rent');
   insert into public.pd_expenses(user_id,property_id,amount,expense_date,category)
@@ -64,6 +67,7 @@ begin
   if (select count(*) from public.pd_list_workspace_members()) <> 2 then raise exception 'FAIL: member list exposed the wrong workspace members'; end if;
   if (select count(*) from public.pd_payments where account_id=ids.owner_account_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared payments'; end if;
   if (select count(*) from public.pd_expenses where property_id=ids.owner_property_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared expenses'; end if;
+  if (select count(*) from public.pd_reminder_logs where account_id=ids.owner_account_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared reminder activity'; end if;
   if (select count(*) from public.pd_properties where id=ids.outsider_property_id) <> 0 then raise exception 'FAIL: workspace member can read another workspace'; end if;
 
   update public.pd_properties set notes='Updated by a workspace member' where id=ids.owner_property_id;
@@ -90,6 +94,7 @@ begin
   if (select count(*) from public.pd_list_workspace_members()) <> 1 then raise exception 'FAIL: unrelated user can list another workspace members'; end if;
   if (select count(*) from public.pd_payments where account_id=ids.owner_account_id) <> 0 then raise exception 'FAIL: unrelated user can read another workspace payments'; end if;
   if (select count(*) from public.pd_expenses where property_id=ids.owner_property_id) <> 0 then raise exception 'FAIL: unrelated user can read another workspace expenses'; end if;
+  if (select count(*) from public.pd_reminder_logs where account_id=ids.owner_account_id) <> 0 then raise exception 'FAIL: unrelated user can read another workspace reminder activity'; end if;
 
   begin
     insert into public.pd_payments(user_id,account_id,amount,received_date,income_category)

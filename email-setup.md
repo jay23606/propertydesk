@@ -1,45 +1,44 @@
 # PropertyDesk email setup
 
-## Proposed use
+## Providers and scope
 
-Use Resend for PropertyDesk transactional email:
+- MailerSend is used for buyer/tenant month-end reminders because Resend rejected the free public dynv6 hostname.
+- Supabase Auth confirmation and password reset email are separate and are not considered configured by this integration.
+- The MailerSend API token is stored in Supabase as `MAILERSEND_API_TOKEN`. Never copy it into the repository, GitHub Pages assets, or client configuration.
+- Sender address: `notifications@propertydesk.dynv6.net` (must be on a verified MailerSend domain).
 
-- Supabase Auth confirmation and password reset email, through Resend SMTP.
-- Later: owner-configured buyer/tenant monthly and late reminders through a Supabase Edge Function, with preview/test-send and per-account recipient controls.
+## Domain state
 
-Do not call Resend from the static browser app. Keep all Resend API/SMTP secrets inside Supabase project secrets or Supabase Auth SMTP settings. Email content should be minimal: avoid including balances, full property addresses, contract terms, or payment details; direct the user to sign in to view them.
+The dynv6 records were added for SPF, two DKIM CNAMEs, and the MailerSend return path. The destinations use trailing periods so dynv6 treats them as absolute DNS names. Confirm verification in the MailerSend dashboard before enabling reminders; the Sending-access API token cannot read domain-verification status.
 
-## Domain state from the supplied setup note
+## Reminder behavior
 
-- Sending domain to try: `propertydesk.dynv6.net`.
-- The dynv6 zone exists, but its IP address is not configured. No web-host IP is needed just to add email DNS records.
-- Resend acceptance and verification are not confirmed.
-- DNS record values are not available yet. Do not invent them.
-- Candidate sender after verification: `PropertyDesk <notifications@propertydesk.dynv6.net>`.
+- The `pd_accounts.monthly_reminder_enabled` switch defaults to false. No account is enrolled until the owner explicitly enables it.
+- At the last calendar day in `America/New_York`, the scheduled `pd-month-end-reminders` function rechecks each active enabled account and its posted payment records.
+- It skips accounts with any rent/installment/other payment recorded during that calendar month. Security deposits and late-fee-only entries do not count as a payment for this check.
+- It also skips accounts with no valid recipient, no unpaid scheduled amount, or a paused/closed status.
+- It calculates rolling Unpaid Due from the app's tracking start, Oct 1, 2026. The message includes the month, property address, and unpaid amount as of month end. It excludes the hypothetical loan balance.
+- Multiple tenant/buyer addresses receive separate messages to avoid disclosing addresses to one another. The owner is not copied.
+- Workspace shows accepted, failed, and skipped outcomes. “Accepted by MailerSend” means the provider accepted the API request; it does not confirm inbox delivery. Email bodies and API keys are never stored in the log.
+- The account editor includes an admin preview marked “Nothing sent.” It does not send a test email.
 
-## Setup sequence
+## Production schedule prerequisites
 
-1. In Resend, add `propertydesk.dynv6.net` as a sending domain and choose the sending region.
-2. Copy the exact DNS record type, host/name, value, and priority shown by Resend into the existing dynv6 zone. Follow Resend's current instructions for host formatting; do not guess whether a name is relative or fully qualified.
-3. Wait for Resend to verify the domain and sending capability.
-4. Create a dedicated Resend API key for PropertyDesk/Auth mail.
-5. In the Supabase project, configure custom Auth SMTP using Resend's current SMTP settings. Resend currently documents `smtp.resend.com`, username `resend`, API key as the password, and port `465` for SMTPS. Keep those credentials in Supabase, never in `config.js` or GitHub Pages.
-6. Set the sender address/name to the verified domain and configure Supabase Auth's Site URL and allowed redirect URLs to the deployed PropertyDesk HTTPS URL.
-7. Customize and test signup confirmation and password reset templates with a test account. Confirm links return to the correct app URL.
-8. Keep signup confirmation enabled and set a suitable Auth email rate limit before public onboarding.
+The Supabase Edge Function requires these production secrets:
 
-If Resend rejects the dynv6 hostname or DNS configuration, record its exact error and choose a domain the owner controls that Resend accepts. Do not claim mail is configured until Resend reports the domain verified and an end-to-end test email is received.
+- `MAILERSEND_API_TOKEN` — already stored through the Supabase CLI.
+- `MAILERSEND_FROM_EMAIL` — `notifications@propertydesk.dynv6.net`.
+- `PD_REMINDER_CRON_SECRET` — a randomly generated value shared with Supabase Vault for the scheduled invocation.
 
-## Later buyer/tenant notices
+Supabase Vault now stores the project URL, public publishable key, and matching reminder cron secret. The `propertydesk-month-end-reminders` `pg_cron` job runs daily at 03:30 UTC (about 10:30 or 11:30 p.m. in New York); the function exits without sending except on the last New York calendar day. The cron request is authenticated with the random header secret; never place that value in a tracked SQL file. The schedule definition is in `supabase/reminders-schedule.sql`.
 
-Scheduled notices must be triggered from trusted server-side code such as a Supabase Edge Function; store the Resend key in Supabase secrets. The owner should be able to enable monthly reminders and late reminders separately for each buyer/tenant account, preview the exact rendered message, and send a test message before enabling. Include current amount due and recorded payments where the ledger supports it. For notes/land contracts, identify principal as an estimated ledger balance with an as-of date, not an official payoff quote. For rentals, only state an amount due when charges are recorded well enough to calculate it.
+## Future items
 
-Buyer/tenant portal registration is never a prerequisite for email delivery. Every contact's notices start disabled; the owner must enable the selected notice types. The recipient can receive email without a PropertyDesk login.
-
-Allow an optional per-account copy-to address configured by the owner. Set it as `Reply-To` so replies reach the supplied inbox; make CC a separate opt-in toggle because CC reveals that address to the recipient. Do not send from the browser. Recheck due status and recent payments immediately before a late notice, limit to one late notice per due cycle, and skip paused/closed accounts. Log recipient, cycle, template version, timestamp, and delivery result without retaining rendered email bodies. Apply per-user RLS to recipient settings and logs, and add a manual pause/disable control. These features need schema, RLS, schedule, and delivery tests before use with real contacts.
+Late reminders, owner CC/reply-to options, provider delivery webhooks, and actual test sends are not included. Any test send should be an explicit owner action to a controlled address before enabling reminders for a tenant or buyer.
 
 ## References
 
-- [Supabase custom SMTP setup](https://supabase.com/docs/guides/auth/auth-smtp)
-- [Resend SMTP settings](https://resend.com/changelog/smtp-service)
-- [Supabase Auth emails with Resend and an Edge Function](https://supabase.com/docs/guides/functions/examples/auth-send-email-hook-react-email-resend)
+- [MailerSend sending API](https://developers.mailersend.com/api/v1/email)
+- [MailerSend domain API and verification](https://developers.mailersend.com/api/v1/email/domains)
+- [Supabase scheduling Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions)
+- [Supabase Edge Function secrets](https://supabase.com/docs/guides/functions/secrets)

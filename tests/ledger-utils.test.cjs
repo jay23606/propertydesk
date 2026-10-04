@@ -234,11 +234,12 @@ test('backup manifest identifies its version and counts every supported table', 
     pd_import_batches: [{ id: 'b1' }],
     pd_audit_events: [{ id: 'h1' }, { id: 'h2' }],
     pd_workspace_members: [{ member_user_id: 'u1' }],
-    pd_property_holders: [{ property_id: 'p1', member_user_id: 'u1' }]
+    pd_property_holders: [{ property_id: 'p1', member_user_id: 'u1' }],
+    pd_reminder_logs: [{ id: 'r1' }]
   }, '2026-10-03T12:00:00.000Z', [{ path: 'agreements/p1/d1-lease.pdf', file_name: 'lease.pdf', content_type: 'application/pdf', file_size: 42, property_id: 'p1', account_id: 'a1' }]);
   assert.equal(backup.manifest.format, 'propertydesk-backup');
-  assert.equal(backup.manifest.format_version, 6);
-  assert.equal(backup.manifest.schema_version, 6);
+  assert.equal(backup.manifest.format_version, 7);
+  assert.equal(backup.manifest.schema_version, 7);
   assert.equal(backup.manifest.exported_at, '2026-10-03T12:00:00.000Z');
   assert.equal(backup.manifest.restore_supported, false);
   assert.equal(backup.manifest.file_count, 1);
@@ -249,7 +250,7 @@ test('backup manifest identifies its version and counts every supported table', 
   assert.deepEqual(backup.manifest.record_counts, {
     pd_properties: 1, pd_accounts: 2, pd_agreement_versions: 1, pd_payments: 0,
     pd_expenses: 1, pd_deposit_entries: 0, pd_documents: 1, pd_import_batches: 1, pd_audit_events: 2,
-    pd_workspace_members: 1, pd_property_holders: 1
+    pd_workspace_members: 1, pd_property_holders: 1, pd_reminder_logs: 1
   });
   assert.equal(backup.data.pd_audit_events.length, 2);
 });

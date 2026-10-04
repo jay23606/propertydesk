@@ -45,6 +45,7 @@ create table if not exists public.pd_accounts (
   late_fee numeric(14,2) not null default 0 check (late_fee >= 0),
   grace_days integer not null default 0 check (grace_days >= 0),
   status text not null default 'active' check (status in ('active','paused','closed')),
+  monthly_reminder_enabled boolean not null default false,
   notes text,
   import_batch_id uuid,
   created_at timestamptz not null default now(),
@@ -55,6 +56,7 @@ alter table public.pd_accounts add column if not exists ledger_opening_balance n
 alter table public.pd_accounts add column if not exists ledger_opening_date date;
 alter table public.pd_accounts add column if not exists party_email text;
 alter table public.pd_accounts add column if not exists party_phone text;
+alter table public.pd_accounts add column if not exists monthly_reminder_enabled boolean not null default false;
 alter table public.pd_accounts add column if not exists principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0);
 alter table public.pd_accounts add column if not exists escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0);
 alter table public.pd_accounts add column if not exists balance_adjustment numeric(14,2) not null default 0;
@@ -202,6 +204,21 @@ create table if not exists public.pd_audit_events (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.pd_reminder_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null references public.pd_accounts(id) on delete cascade,
+  reminder_month date not null check (extract(day from reminder_month) = 1),
+  recipient_email text,
+  recipient_key text generated always as (coalesce(lower(btrim(recipient_email)), '')) stored,
+  status text not null check (status in ('sending','accepted','failed','skipped')),
+  reason text,
+  unpaid_due numeric(14,2) check (unpaid_due is null or unpaid_due >= 0),
+  provider_message_id text,
+  attempted_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+
 create index if not exists pd_properties_user_idx on public.pd_properties(user_id);
 create index if not exists pd_accounts_user_idx on public.pd_accounts(user_id);
 create index if not exists pd_accounts_property_idx on public.pd_accounts(property_id);
@@ -216,6 +233,8 @@ create unique index if not exists pd_deposit_entries_payment_source_idx on publi
 create unique index if not exists pd_deposit_entries_expense_source_idx on public.pd_deposit_entries(source_expense_id) where source_expense_id is not null;
 create index if not exists pd_import_batches_user_idx on public.pd_import_batches(user_id, created_at desc);
 create index if not exists pd_audit_events_user_entity_idx on public.pd_audit_events(user_id, entity_type, entity_id, created_at desc);
+create unique index if not exists pd_reminder_logs_account_month_recipient_idx on public.pd_reminder_logs(account_id, reminder_month, recipient_key);
+create index if not exists pd_reminder_logs_workspace_attempted_idx on public.pd_reminder_logs(user_id, attempted_at desc);
 create unique index if not exists pd_payments_one_correction_idx on public.pd_payments(correction_of_payment_id) where correction_of_payment_id is not null;
 create unique index if not exists pd_expenses_one_correction_idx on public.pd_expenses(correction_of_expense_id) where correction_of_expense_id is not null;
 
@@ -228,6 +247,7 @@ alter table public.pd_expenses enable row level security;
 alter table public.pd_deposit_entries enable row level security;
 alter table public.pd_import_batches enable row level security;
 alter table public.pd_audit_events enable row level security;
+alter table public.pd_reminder_logs enable row level security;
 
 drop policy if exists "Users manage pd_properties" on public.pd_properties;
 create policy "Users manage pd_properties" on public.pd_properties for all to authenticated using (user_id = auth.uid()) with check (
@@ -629,6 +649,9 @@ grant select, insert on table public.pd_deposit_entries to authenticated;
 grant update (status, voided_at, void_reason) on table public.pd_payments, public.pd_expenses to authenticated;
 grant select, insert, update on table public.pd_import_batches to authenticated;
 grant select on table public.pd_audit_events to authenticated;
+revoke all on table public.pd_reminder_logs from anon, authenticated;
+grant select on table public.pd_reminder_logs to authenticated;
+grant select, insert, update on table public.pd_reminder_logs to service_role;
 grant select on table public.pd_agreement_versions to authenticated;
 grant select, insert, delete on table public.pd_documents to authenticated;
 
@@ -800,6 +823,8 @@ create policy "Users manage pd_import_batches" on public.pd_import_batches for a
 using (public.pd_can_access_workspace(user_id)) with check (user_id=public.pd_workspace_id());
 drop policy if exists "Users can read pd_audit_events" on public.pd_audit_events;
 create policy "Users can read pd_audit_events" on public.pd_audit_events for select to authenticated using (public.pd_can_access_workspace(user_id));
+drop policy if exists "Workspace can read pd_reminder_logs" on public.pd_reminder_logs;
+create policy "Workspace can read pd_reminder_logs" on public.pd_reminder_logs for select to authenticated using (public.pd_can_access_workspace(user_id));
 
 drop policy if exists "pd workspace audit visible" on public.pd_audit_events;
 create policy "pd workspace audit visible" on public.pd_audit_events for select to authenticated using (public.pd_can_access_workspace(user_id));
