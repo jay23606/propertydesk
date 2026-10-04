@@ -165,7 +165,7 @@ The owner sign-in screen must provide password recovery through Supabase Auth. R
 Use a dark color theme by default on first visit. Provide a visible light/dark toggle on sign-in and workspace screens, and remember each device/browser preference locally without syncing a theme preference to the workspace. Keep the status bar and standalone PWA shell colors aligned with the active theme.
 
 
-Ship PropertyDesk as an installable PWA for phone and desktop use. The service worker may cache the static app shell only. Do not cache authenticated API responses, tokens, property/account data, or uploaded documents in Cache Storage. The first release supports on-the-go use when connected; it does not queue financial writes offline. Offline transaction queues would need unique idempotency keys, visible sync status, conflict handling, and device logout/lock behavior before being enabled.
+Ship PropertyDesk as an installable PWA for phone and desktop use. The web app manifest must include compatible 192×192 and 512×512 PNG icons in addition to any scalable SVG icon. The service worker may cache the static app shell only. Do not cache authenticated API responses, tokens, property/account data, or uploaded documents in Cache Storage. The first release supports on-the-go use when connected; it does not queue financial writes offline. Offline transaction queues would need unique idempotency keys, visible sync status, conflict handling, and device logout/lock behavior before being enabled.
 
 ## Transactional email
 

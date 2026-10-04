@@ -9,6 +9,8 @@
   "background_color": "#151b17",
   "theme_color": "#151b17",
   "icons": [
+    { "src": "icons/propertydesk-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/propertydesk-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icons/propertydesk.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
