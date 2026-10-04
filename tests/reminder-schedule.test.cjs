@@ -55,5 +55,6 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   assert.match(app, /if\(\$\('account-reminder-enabled'\)\.checked&&!partyEmails\.length\)/);
   assert.match(migration, /monthly_reminder_enabled boolean not null default false/);
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
+  assert.match(app, /function previewReminderEmail\(\)[\s\S]*?openModal\('reminder-preview-modal'\)/);
   assert.match(worker, /'\.\/reminders\.css'/);
 });
