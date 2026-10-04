@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -117,6 +117,19 @@ test('current month is assumed unpaid and the carry-forward grows each month wit
   assert.equal(amountDueSince([account], janThroughSep, '2026-01-01', '2026-10-03'), 100, 'October is included before the October 15 due day');
   assert.equal(amountDueSince([account], janThroughSep, '2026-01-01', '2026-11-03'), 200, 'a missed October amount carries forward with November');
   assert.equal(amountDueSince([account], [...janThroughSep, { account_id: 'october', amount: 100, received_date: '2026-10-15', income_category: 'installment' }], '2026-01-01', '2026-11-03'), 100, 'a recorded October payment subtracts from the running total');
+});
+
+test('land-contract unpaid due starts in October 2026, ignores unrecorded earlier months, then carries forward', () => {
+  const account = { id: 'contract-october', account_type: 'land_contract', start_date: '2020-04-01', next_due_date: '2026-10-15', payment_amount: 550, payment_frequency: 'monthly' };
+  const priorReceipts = Array.from({ length: 9 }, (_, index) => ({
+    account_id: account.id, amount: 550, received_date: `2026-${String(index + 1).padStart(2, '0')}-15`, income_category: 'installment'
+  }));
+  const trackingStart = unpaidDueAccrualStart(account);
+  assert.equal(trackingStart, '2026-10-01');
+  assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-10-03'), 550, 'only October is assumed unpaid at launch');
+  assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-11-03'), 1100, 'an unpaid October installment carries into November');
+  assert.equal(amountDueSince([account], [...priorReceipts, { account_id: account.id, amount: 550, received_date: '2026-10-15', income_category: 'installment' }], trackingStart, '2026-11-03'), 550, 'recording October payment reduces the carry-forward');
+  assert.equal(unpaidDueAccrualStart({ account_type: 'rental' }), '2026-01-01', 'rental unpaid-due tracking retains its existing 2026 starting point');
 });
 
 test('monthly due dates stay anchored at month end', () => {

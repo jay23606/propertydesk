@@ -67,6 +67,11 @@
     return cents(Math.max(0, scheduled - received));
   }
 
+  function unpaidDueAccrualStart(account) {
+    // Loan agreements begin accruing tracked arrears with the first reliable month of use.
+    return account?.account_type === 'rental' ? '2026-01-01' : '2026-10-01';
+  }
+
   function advanceDueDate(date, months, days, anchorDay = date.getDate()) {
     if (days) { date.setDate(date.getDate() + days); return; }
     const first = new Date(date.getFullYear(), date.getMonth() + months, 1, 12);
@@ -205,7 +210,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();
