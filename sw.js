@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v25';
+const CACHE_NAME = 'propertydesk-shell-v26';
 const SHELL_FILES = ['./', './index.html', './styles.css', './overrides.css', './import-utils.js', './import-workflows.js', './email-utils.js', './ledger-utils.js', './zip-utils.js', './app.js', './propertydesk.webmanifest', './icons/propertydesk.svg'];
 const SHELL_URLS = new Set(SHELL_FILES.map(path => new URL(path, self.registration.scope).href));
 

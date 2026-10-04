@@ -48,6 +48,8 @@
 .document-name-link:hover{text-decoration:underline}
 .document-name-link:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:2px}
 .document-row .document-delete{color:#98483d;border-color:#edd8d3;background:#fff}
+.portfolio-table tbody td.payment-received-this-month{background:#e7f3eb}
+.portfolio-table tbody tr:hover td.payment-received-this-month{background:#dceee2}
 .document-row small{font-size:10px;color:var(--muted);margin-top:3px}
 .portfolio-table{overflow:auto}
 .portfolio-table table{min-width:1120px}

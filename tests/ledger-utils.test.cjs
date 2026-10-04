@@ -1,6 +1,22 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
+
+test('payment-month highlighting recognizes any posted installment or rent receipt in the selected month', () => {
+  const receipts = [
+    { id: 'partial', account_id: 'a1', amount: 25, received_date: '2026-10-02', income_category: 'installment' },
+    { id: 'voided', account_id: 'a1', amount: 550, received_date: '2026-10-03', income_category: 'installment', status: 'voided' },
+    { id: 'deposit', account_id: 'a1', amount: 500, received_date: '2026-10-04', income_category: 'deposit' },
+    { id: 'late-fee', account_id: 'a1', amount: 25, received_date: '2026-10-05', income_category: 'late_fee' },
+    { id: 'other-month', account_id: 'a1', amount: 550, received_date: '2026-09-30', income_category: 'installment' },
+    { id: 'other-account', account_id: 'a2', amount: 825, received_date: '2026-10-01', income_category: 'rent' },
+    { id: 'rent', account_id: 'a1', amount: 100, received_date: '2026-10-06', income_category: 'rent' },
+  ];
+  assert.equal(hasPostedPaymentInMonth(receipts, 'a1', '2026-10-01'), true, 'a partial payment counts');
+  assert.equal(hasPostedPaymentInMonth(receipts.filter(row => row.id !== 'rent' && row.id !== 'partial'), 'a1', '2026-10-01'), false, 'voids, deposits, late fees, other months and other accounts do not count');
+  assert.equal(hasPostedPaymentInMonth(receipts, 'a2', '2026-10-01'), true, 'a rent receipt counts for its own account');
+  assert.equal(hasPostedPaymentInMonth(receipts, 'a1', 'bad-date'), false, 'invalid month input does not highlight');
+});
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [

@@ -6,6 +6,15 @@
     return !transaction?.status || transaction.status === 'posted';
   }
 
+  function hasPostedPaymentInMonth(payments, accountId, month) {
+    const yearMonth = String(month || '').slice(0, 7);
+    if (!/^\d{4}-\d{2}$/.test(yearMonth)) return false;
+    return payments.some(payment => payment.account_id === accountId
+      && isPosted(payment)
+      && !['deposit', 'late_fee'].includes(payment.income_category)
+      && String(payment.received_date || '').slice(0, 7) === yearMonth);
+  }
+
   function sumPosted(transactions, amountField = 'amount') {
     return transactions.filter(isPosted).reduce((sum, transaction) => sum + Number(transaction[amountField] || 0), 0);
   }
@@ -149,7 +158,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();
