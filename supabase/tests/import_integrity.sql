@@ -70,7 +70,7 @@ begin
 
   result := public.pd_import_propertydesk_accounts(
     jsonb_build_array(
-      jsonb_build_object('property_name','Imported home','property_address','10 CSV Way','account_type','rental','account_name','Imported rental A','party_name','Test occupant A','start_date','2026-01-01','payment_amount','850'),
+      jsonb_build_object('property_name','Imported home','property_address','10 CSV Way','account_type','rental','account_name','Imported rental A','party_name','Test occupant A','party_phone','555-0100','start_date','2026-01-01','payment_amount','850'),
       jsonb_build_object('property_name','Imported home','property_address','10 CSV Way','account_type','rental','account_name','Imported rental B','party_name','Test occupant B','start_date','2026-01-01','payment_amount','900')
     ), 'synthetic-accounts.csv', 3);
   batch_id := (result->>'batch_id')::uuid;
@@ -89,6 +89,9 @@ begin
 
   select id into owner_property from public.pd_properties where user_id=ids.owner_id and name='Imported home';
   select id into owner_account from public.pd_accounts where user_id=ids.owner_id and name='Imported rental A';
+  if (select party_phone from public.pd_accounts where id=owner_account) <> '555-0100' then
+    raise exception 'FAIL: account import did not preserve the tenant phone number';
+  end if;
   result := public.pd_import_propertydesk_transactions('payments', jsonb_build_array(
     jsonb_build_object('account_id',owner_account,'amount','850','received_date','2026-02-01','income_category','rent','memo','synthetic payment')
   ), 'synthetic-payments.csv', 1);

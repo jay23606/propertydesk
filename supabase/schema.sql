@@ -28,6 +28,7 @@ create table if not exists public.pd_accounts (
   name text not null,
   party_name text,
   party_email text,
+  party_phone text,
   start_date date not null,
   next_due_date date,
   payment_amount numeric(14,2) not null default 0 check (payment_amount >= 0),
@@ -53,6 +54,7 @@ create table if not exists public.pd_accounts (
 alter table public.pd_accounts add column if not exists ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0);
 alter table public.pd_accounts add column if not exists ledger_opening_date date;
 alter table public.pd_accounts add column if not exists party_email text;
+alter table public.pd_accounts add column if not exists party_phone text;
 alter table public.pd_accounts add column if not exists principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0);
 alter table public.pd_accounts add column if not exists escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0);
 alter table public.pd_accounts add column if not exists balance_adjustment numeric(14,2) not null default 0;
@@ -298,7 +300,7 @@ begin
   end if;
   if jsonb_build_object(
     'property_id',old.property_id,'account_type',old.account_type,'name',old.name,
-    'party_name',old.party_name,'party_email',old.party_email,'start_date',old.start_date,
+    'party_name',old.party_name,'party_email',old.party_email,'party_phone',old.party_phone,'start_date',old.start_date,
     'next_due_date',old.next_due_date,'payment_amount',old.payment_amount,
     'payment_frequency',old.payment_frequency,'original_principal',old.original_principal,
     'principal_interest_amount',old.principal_interest_amount,'escrow_amount',old.escrow_amount,
@@ -307,7 +309,7 @@ begin
     'late_fee',old.late_fee,'grace_days',old.grace_days,'notes',old.notes
   ) is distinct from jsonb_build_object(
     'property_id',new.property_id,'account_type',new.account_type,'name',new.name,
-    'party_name',new.party_name,'party_email',new.party_email,'start_date',new.start_date,
+    'party_name',new.party_name,'party_email',new.party_email,'party_phone',new.party_phone,'start_date',new.start_date,
     'next_due_date',new.next_due_date,'payment_amount',new.payment_amount,
     'payment_frequency',new.payment_frequency,'original_principal',new.original_principal,
     'principal_interest_amount',new.principal_interest_amount,'escrow_amount',new.escrow_amount,
@@ -529,12 +531,12 @@ begin
         and lower(p.address) = lower(item->>'property_address')
       limit 1;
     if property_id is null then raise exception 'Property was not created or is not visible to this user'; end if;
-    insert into public.pd_accounts(user_id, property_id, account_type, name, party_name, party_email,
+    insert into public.pd_accounts(user_id, property_id, account_type, name, party_name, party_email, party_phone,
       start_date, next_due_date, payment_amount, payment_frequency, original_principal, principal_interest_amount, escrow_amount,
       ledger_opening_balance, ledger_opening_date,
       interest_rate, term_months, balloon_date, late_fee, grace_days, notes, import_batch_id)
     values (auth.uid(), property_id, item->>'account_type', item->>'account_name',
-      nullif(item->>'party_name',''), nullif(item->>'party_email',''), (item->>'start_date')::date,
+      nullif(item->>'party_name',''), nullif(item->>'party_email',''), nullif(item->>'party_phone',''), (item->>'start_date')::date,
       nullif(item->>'next_due_date','')::date,
       coalesce(nullif(item->>'payment_amount','')::numeric, 0),
       coalesce(nullif(item->>'payment_frequency',''), 'monthly'),

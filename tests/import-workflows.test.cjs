@@ -32,10 +32,11 @@ test('account import maps template fields and applies safe defaults', () => {
   assert.equal(result.valid[0].original_principal, 0);
   assert.equal(result.valid[0].late_fee, 50);
   assert.equal(result.valid[0].grace_days, 5);
+  assert.equal(result.valid[0].party_phone, '(555) 555-0100');
 });
 
 test('account import reports bad values and revalidates edits against existing accounts', () => {
-  const rows = parseCSV('property_name,property_address,account_type,account_name,start_date,party_email\nOak House,10 Oak St,rental,Oak Rental,2026-01-01,\nOak House,10 Oak St,rental,New Lease,not-a-date,invalid-email');
+  const rows = parseCSV('property_name,property_address,account_type,account_name,start_date,party_email,party_phone\nOak House,10 Oak St,rental,Oak Rental,2026-01-01,,555-0100\nOak House,10 Oak St,rental,New Lease,not-a-date,invalid-email,');
   const first = validateAccountRows(rows, properties, accounts, '2026-10-03');
   assert.deepEqual(first.errors.map(error => error.row), [2, 3]);
 
@@ -46,6 +47,7 @@ test('account import reports bad values and revalidates edits against existing a
   assert.equal(corrected.errors.length, 0);
   assert.deepEqual(corrected.valid.map(row => row._source_row), [2, 3]);
   assert.equal(corrected.valid[1].party_email, 'tenant@example.com');
+  assert.equal(corrected.valid[0].party_phone, '555-0100');
 });
 
 test('expense import matches property/account, combines source notes, and skips possible duplicates', () => {

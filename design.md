@@ -116,7 +116,7 @@ Forms should default dates and known property/account values, accept decimal amo
 Core tables in the current Supabase schema use the `pd_` project prefix:
 
 - `pd_properties`: owner, address, display name, notes; do not require unit or bedroom classification.
-- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), current party, status, active agreement version, simple due schedule, and owner-editable signed adjustment to the estimated loan balance.
+- `pd_accounts`: owner, property, account type (`rental`, `land_contract`, `note`), current party and private contact fields (email and optional phone), status, active agreement version, simple due schedule, and owner-editable signed adjustment to the estimated loan balance. Contact fields are visible to authorized workspace members only and covered by the same RLS policies and private backup handling as other account records.
 - `pd_documents`: owner, property/account, private Storage object path, filename, MIME type, file size, and timestamp. Access is restricted to its owner by both table RLS and Storage object policies.
 - Agreement history (for example `pd_agreements`): account/property, parties, effective dates, agreement type, fixed principal/sale amount, down payment, fixed interest rate, term, installment amount, due date/grace period, late-charge rule, maturity/balloon date, tax-preparation reference fields, and optional document reference. Preserve superseded terms on amendment rather than overwriting them.
 - pd_payments: owner, account, gross amount, received date, covered due period, method, memo, source/import batch, legacy allocation fields retained for imported history, and correction/reversal audit metadata. New loan receipts do not require an allocation.
