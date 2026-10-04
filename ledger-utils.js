@@ -163,6 +163,26 @@
     return Math.max(0, Number(openingBalance ?? originalPrincipal ?? 0) - sumPosted(eligible, 'principal_amount'));
   }
 
+  function suggestedLoanAllocation(account, amount, balance, paymentDate = new Date().toISOString().slice(0, 10)) {
+    const received = cents(amount);
+    const escrow = cents(Math.min(received, Number(account?.escrow_amount || 0)));
+    const loanPortion = cents(Math.max(0, received - escrow));
+    const currentBalance = Math.max(0, Number(balance || 0));
+    const schedule = amortizationSchedule(account?.original_principal, account?.interest_rate, account?.term_months, account?.start_date, account?.principal_interest_amount);
+    if (!schedule.length) return { principal: 0, interest: 0, fee: 0, escrow, unapplied: loanPortion };
+    const period = schedule.filter(row => row.date <= paymentDate).at(-1) || schedule[0];
+    const scheduledPayment = Number(period?.payment || account?.principal_interest_amount || Math.max(0, Number(account?.payment_amount || 0) - Number(account?.escrow_amount || 0)));
+    const scheduledInterest = cents(currentBalance * Math.max(0, Number(account?.interest_rate || 0)) / 1200);
+    const scheduledPortion = Math.min(loanPortion, scheduledPayment);
+    const interest = cents(Math.min(scheduledPortion, scheduledInterest));
+    const scheduledPrincipal = Math.max(0, scheduledPortion - interest);
+    const extraPrincipal = Math.max(0, loanPortion - scheduledPayment);
+    const principal = cents(Math.min(currentBalance, scheduledPrincipal + extraPrincipal));
+    const fee = 0;
+    const unapplied = cents(Math.max(0, loanPortion - interest - principal - fee));
+    return { principal, interest, fee, escrow, unapplied };
+  }
+
   function amortizationSchedule(originalPrincipal, annualRate, termMonths, startDate, principalInterestAmount = null) {
     const principal = Number(originalPrincipal || 0), months = Number(termMonths || 0);
     if (!Number.isFinite(principal) || principal <= 0 || !Number.isInteger(months) || months <= 0) return [];
@@ -197,8 +217,8 @@
     return {
       manifest: {
         format: 'propertydesk-backup',
-        format_version: 5,
-        schema_version: 5,
+        format_version: 6,
+        schema_version: 6,
         exported_at: exportedAt,
         restore_supported: false,
         included_tables: tables,
@@ -210,7 +230,7 @@
     };
   }
 
-  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart });
+  const helpers = Object.freeze({ amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, suggestedLoanAllocation, unpaidDueAccrualStart });
   globalThis.PropertyDeskLedgerUtils = helpers;
   if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
 })();

@@ -1,2 +1,2 @@
-property_name,property_address,account_name,received_date,amount,income_category,payment_method,principal_amount,interest_amount,fee_amount,unapplied_amount,memo
-Maple Street Home,123 Maple Street,Maple Street Rental,2026-10-01,1500.00,rent,bank_transfer,0,0,0,0,October rent
+property_name,property_address,account_name,received_date,amount,income_category,payment_method,principal_amount,interest_amount,fee_amount,escrow_amount,unapplied_amount,memo
+Maple Street Home,123 Maple Street,Maple Street Rental,2026-10-01,1500.00,rent,bank_transfer,0,0,0,0,0,October rent

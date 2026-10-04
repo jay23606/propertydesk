@@ -44,6 +44,9 @@ begin
   insert into public.pd_payments(user_id,account_id,amount,received_date,income_category,principal_amount,interest_amount)
     values(test_user,note_account,200,date '2026-10-01','installment',150,50);
 
+  insert into public.pd_payments(user_id,account_id,amount,received_date,income_category,principal_amount,interest_amount,escrow_amount)
+    values(test_user,note_account,750,date '2026-10-04','installment',25.22,574.78,150);
+
   begin
     insert into public.pd_payments(user_id,account_id,amount,received_date,income_category,principal_amount)
       values(test_user,note_account,200,date '2026-10-02','installment',100);

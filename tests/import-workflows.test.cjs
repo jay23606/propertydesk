@@ -96,6 +96,12 @@ test('payment import enforces loan allocation totals and excludes duplicate rece
   assert.equal(result.valid[0].interest_amount, 50);
 });
 
+test('payment import counts escrow separately from interest and principal', () => {
+  const rows = parseCSV('property_name,property_address,account_name,received_date,amount,principal_amount,interest_amount,fee_amount,escrow_amount,unapplied_amount\nOak House,10 Oak St,Oak Contract,2026-10-01,750,24.39,575.61,0,150,0');
+  const result = validatePaymentRows(rows, properties, accounts, []);
+  assert.equal(result.valid[0].escrow_amount, 150);
+});
+
 test('payment import validates account lookup and normalizes rental allocations to zero', () => {
   const rows = parseCSV('property_name,property_address,account_name,received_date,amount,principal_amount,interest_amount,fee_amount,unapplied_amount\nOak House,10 Oak St,Oak Rental,2026-10-01,50,25,25,0,0\nOak House,10 Oak St,No Such Account,2026-10-01,50,0,0,0,0');
   const result = validatePaymentRows(rows, properties, accounts, []);

@@ -34,6 +34,7 @@ create table if not exists public.pd_accounts (
   payment_frequency text not null default 'monthly' check (payment_frequency in ('monthly','weekly','biweekly','quarterly','annual')),
   original_principal numeric(14,2) not null default 0 check (original_principal >= 0),
   principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0),
+  escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0),
   balance_adjustment numeric(14,2) not null default 0,
   ledger_opening_balance numeric(14,2) check (ledger_opening_balance is null or ledger_opening_balance >= 0),
   ledger_opening_date date,
@@ -53,6 +54,7 @@ alter table public.pd_accounts add column if not exists ledger_opening_balance n
 alter table public.pd_accounts add column if not exists ledger_opening_date date;
 alter table public.pd_accounts add column if not exists party_email text;
 alter table public.pd_accounts add column if not exists principal_interest_amount numeric(14,2) check (principal_interest_amount is null or principal_interest_amount >= 0);
+alter table public.pd_accounts add column if not exists escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0);
 alter table public.pd_accounts add column if not exists balance_adjustment numeric(14,2) not null default 0;
 alter table public.pd_accounts add column if not exists agreement_effective_date date;
 alter table public.pd_accounts add column if not exists agreement_change_reason text;
@@ -91,6 +93,7 @@ create table if not exists public.pd_payments (
   principal_amount numeric(14,2) not null default 0 check (principal_amount >= 0),
   interest_amount numeric(14,2) not null default 0 check (interest_amount >= 0),
   fee_amount numeric(14,2) not null default 0 check (fee_amount >= 0),
+  escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0),
   unapplied_amount numeric(14,2) not null default 0 check (unapplied_amount >= 0),
   memo text,
   source_type text not null default 'manual' check (source_type in ('manual','csv_import','other')),
@@ -102,6 +105,7 @@ create table if not exists public.pd_payments (
 );
 
 alter table public.pd_payments add column if not exists status text not null default 'posted' check (status in ('posted','voided'));
+alter table public.pd_payments add column if not exists escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0);
 alter table public.pd_payments add column if not exists voided_at timestamptz;
 alter table public.pd_payments add column if not exists void_reason text;
 alter table public.pd_payments add column if not exists correction_of_payment_id uuid references public.pd_payments(id);
@@ -297,7 +301,7 @@ begin
     'party_name',old.party_name,'party_email',old.party_email,'start_date',old.start_date,
     'next_due_date',old.next_due_date,'payment_amount',old.payment_amount,
     'payment_frequency',old.payment_frequency,'original_principal',old.original_principal,
-    'principal_interest_amount',old.principal_interest_amount,
+    'principal_interest_amount',old.principal_interest_amount,'escrow_amount',old.escrow_amount,
     'ledger_opening_balance',old.ledger_opening_balance,'ledger_opening_date',old.ledger_opening_date,
     'interest_rate',old.interest_rate,'term_months',old.term_months,'balloon_date',old.balloon_date,
     'late_fee',old.late_fee,'grace_days',old.grace_days,'notes',old.notes
@@ -306,7 +310,7 @@ begin
     'party_name',new.party_name,'party_email',new.party_email,'start_date',new.start_date,
     'next_due_date',new.next_due_date,'payment_amount',new.payment_amount,
     'payment_frequency',new.payment_frequency,'original_principal',new.original_principal,
-    'principal_interest_amount',new.principal_interest_amount,
+    'principal_interest_amount',new.principal_interest_amount,'escrow_amount',new.escrow_amount,
     'ledger_opening_balance',new.ledger_opening_balance,'ledger_opening_date',new.ledger_opening_date,
     'interest_rate',new.interest_rate,'term_months',new.term_months,'balloon_date',new.balloon_date,
     'late_fee',new.late_fee,'grace_days',new.grace_days,'notes',new.notes
@@ -421,13 +425,14 @@ begin
     if exists(select 1 from public.pd_payments where correction_of_payment_id=p_transaction_id) then raise exception 'This payment already has a correction'; end if;
     update public.pd_payments set status='voided',void_reason='Corrected: ' || correction_reason where id=p_transaction_id;
     insert into public.pd_payments(user_id,account_id,amount,received_date,payment_method,income_category,
-      principal_amount,interest_amount,fee_amount,unapplied_amount,memo,source_type,import_batch_id,correction_of_payment_id)
+      principal_amount,interest_amount,fee_amount,escrow_amount,unapplied_amount,memo,source_type,import_batch_id,correction_of_payment_id)
     values(workspace_id,(p_correction->>'account_id')::uuid,(p_correction->>'amount')::numeric,
       (p_correction->>'received_date')::date,coalesce(nullif(p_correction->>'payment_method',''),'manual'),
       coalesce(nullif(p_correction->>'income_category',''),'installment'),
       coalesce(nullif(p_correction->>'principal_amount','')::numeric,0),
       coalesce(nullif(p_correction->>'interest_amount','')::numeric,0),
       coalesce(nullif(p_correction->>'fee_amount','')::numeric,0),
+      coalesce(nullif(p_correction->>'escrow_amount','')::numeric,0),
       coalesce(nullif(p_correction->>'unapplied_amount','')::numeric,0),nullif(p_correction->>'memo',''),
       'other',original_payment.import_batch_id,p_transaction_id) returning id into replacement_id;
   elsif p_kind = 'expense' then
@@ -466,7 +471,7 @@ begin
     if new.principal_amount <> 0 or new.interest_amount <> 0 or new.fee_amount <> 0 or new.unapplied_amount <> 0 then
       raise exception 'Rental receipts cannot carry loan allocations';
     end if;
-  elsif new.principal_amount + new.interest_amount + new.fee_amount + new.unapplied_amount <> new.amount then
+  elsif new.principal_amount + new.interest_amount + new.fee_amount + new.escrow_amount + new.unapplied_amount <> new.amount then
     raise exception 'Loan payment allocations must equal the amount received';
   end if;
   return new;
@@ -525,7 +530,7 @@ begin
       limit 1;
     if property_id is null then raise exception 'Property was not created or is not visible to this user'; end if;
     insert into public.pd_accounts(user_id, property_id, account_type, name, party_name, party_email,
-      start_date, next_due_date, payment_amount, payment_frequency, original_principal, principal_interest_amount,
+      start_date, next_due_date, payment_amount, payment_frequency, original_principal, principal_interest_amount, escrow_amount,
       ledger_opening_balance, ledger_opening_date,
       interest_rate, term_months, balloon_date, late_fee, grace_days, notes, import_batch_id)
     values (auth.uid(), property_id, item->>'account_type', item->>'account_name',
@@ -535,6 +540,7 @@ begin
       coalesce(nullif(item->>'payment_frequency',''), 'monthly'),
       coalesce(nullif(item->>'original_principal','')::numeric, 0),
       nullif(item->>'principal_interest_amount','')::numeric,
+      coalesce(nullif(item->>'escrow_amount','')::numeric, 0),
       nullif(item->>'ledger_opening_balance','')::numeric,
       nullif(item->>'ledger_opening_date','')::date,
       coalesce(nullif(item->>'interest_rate','')::numeric, 0),
@@ -579,7 +585,7 @@ begin
   loop
     if p_kind = 'payments' then
       insert into public.pd_payments(user_id, account_id, amount, received_date, payment_method,
-        income_category, principal_amount, interest_amount, fee_amount, unapplied_amount,
+        income_category, principal_amount, interest_amount, fee_amount, escrow_amount, unapplied_amount,
         memo, source_type, import_batch_id)
       values (auth.uid(), (item->>'account_id')::uuid, (item->>'amount')::numeric,
         (item->>'received_date')::date, coalesce(nullif(item->>'payment_method',''), 'manual'),
@@ -587,6 +593,7 @@ begin
         coalesce(nullif(item->>'principal_amount','')::numeric, 0),
         coalesce(nullif(item->>'interest_amount','')::numeric, 0),
         coalesce(nullif(item->>'fee_amount','')::numeric, 0),
+        coalesce(nullif(item->>'escrow_amount','')::numeric, 0),
         coalesce(nullif(item->>'unapplied_amount','')::numeric, 0),
         nullif(item->>'memo',''), 'csv_import', batch_id);
     else
@@ -819,7 +826,7 @@ begin
   select * into account_row from public.pd_accounts a where a.id=new.account_id and public.pd_can_access_workspace(a.user_id) and a.user_id=new.user_id;
   if not found then raise exception 'Payment account is outside the active workspace'; end if;
   if account_row.account_type = 'rental' then
-    if new.principal_amount <> 0 or new.interest_amount <> 0 or new.fee_amount <> 0 or new.unapplied_amount <> 0 then
+    if new.principal_amount <> 0 or new.interest_amount <> 0 or new.fee_amount <> 0 or new.escrow_amount <> 0 or new.unapplied_amount <> 0 then
       raise exception 'Rental receipts cannot carry loan allocations';
     end if;
     if new.income_category not in ('rent','late_fee','deposit','other') then
@@ -829,7 +836,7 @@ begin
     if new.income_category not in ('installment','late_fee','other') then
       raise exception 'Financing receipts must use a financing income category';
     end if;
-    if round(new.amount::numeric,2) <> round(new.principal_amount + new.interest_amount + new.fee_amount + new.unapplied_amount,2) then
+    if round(new.amount::numeric,2) <> round(new.principal_amount + new.interest_amount + new.fee_amount + new.escrow_amount + new.unapplied_amount,2) then
       raise exception 'Loan payment allocations must sum to the amount received';
     end if;
   end if;

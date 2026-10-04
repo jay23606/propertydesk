@@ -16,6 +16,7 @@
       const amount=csvMoney(row.payment_amount,`${row.account_name} payment amount`,{optional:true});
       const principal=type==='rental'?0:csvMoney(row.original_principal,`${row.account_name} principal`,{optional:true});
       const principalInterestAmount=type==='rental'||!row.principal_interest_amount?null:csvMoney(row.principal_interest_amount,`${row.account_name} P&I payment`);
+      const escrowAmount=type==='rental'?0:csvMoney(row.escrow_amount,`${row.account_name} monthly escrow`,{optional:true});
       const openingBalance=(row.ledger_opening_balance||'').trim()===''?null:csvMoney(row.ledger_opening_balance,`${row.account_name} opening balance`);
       if(openingBalance!==null&&!row.ledger_opening_date)throw new Error(`A ledger opening date is required when an opening balance is set for ${row.account_name}.`);
       const rate=csvRate(row.interest_rate,`${row.account_name} interest rate`,{optional:true});
@@ -30,7 +31,7 @@
       const partyEmail=(row.party_email||'').split(/[;,]/).map(email=>email.trim()).filter(Boolean);
       if(partyEmail.some(email=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
       seenAccounts.add(accountKey);
-      return {property_name:row.property_name,property_address:row.property_address,account_type:type,account_name:row.account_name,party_name:row.party_name||'',party_email:partyEmail.join(', '),start_date:startDate,next_due_date:row.next_due_date||'',payment_amount:amount,payment_frequency:frequency,original_principal:principal,principal_interest_amount:principalInterestAmount,ledger_opening_balance:openingBalance,ledger_opening_date:row.ledger_opening_date||'',interest_rate:rate,term_months:row.term_months||'',balloon_date:row.balloon_date||'',late_fee:lateFee,grace_days:graceDays,notes:row.notes||'',city:row.city||null,state:row.state||null,postal_code:row.postal_code||null,property_kind:propertyKind};
+      return {property_name:row.property_name,property_address:row.property_address,account_type:type,account_name:row.account_name,party_name:row.party_name||'',party_email:partyEmail.join(', '),start_date:startDate,next_due_date:row.next_due_date||'',payment_amount:amount,payment_frequency:frequency,original_principal:principal,principal_interest_amount:principalInterestAmount,escrow_amount:escrowAmount,ledger_opening_balance:openingBalance,ledger_opening_date:row.ledger_opening_date||'',interest_rate:rate,term_months:row.term_months||'',balloon_date:row.balloon_date||'',late_fee:lateFee,grace_days:graceDays,notes:row.notes||'',city:row.city||null,state:row.state||null,postal_code:row.postal_code||null,property_kind:propertyKind};
     });
   }
 
@@ -74,10 +75,10 @@
       if(!allowedCategories.includes(incomeCategory))throw new Error(`Invalid income category “${incomeCategory}” for ${account.account_type}.`);
       const method=row.payment_method||'manual';
       if(!['manual','check','cash','bank_transfer','money_order','card'].includes(method))throw new Error(`Invalid payment method “${method}”.`);
-      const allocation={principal:csvMoney(row.principal_amount,`${account.name} principal allocation`,{optional:true}),interest:csvMoney(row.interest_amount,`${account.name} interest allocation`,{optional:true}),fee:csvMoney(row.fee_amount,`${account.name} fee allocation`,{optional:true}),unapplied:csvMoney(row.unapplied_amount,`${account.name} unapplied allocation`,{optional:true})};
-      if(account.account_type==='rental')allocation.principal=allocation.interest=allocation.fee=allocation.unapplied=0;
-      else if(Math.round((allocation.principal+allocation.interest+allocation.fee+allocation.unapplied)*100)!==Math.round(amount*100))throw new Error(`Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(amount)}.`);
-      return {property_name:property.name,property_address:property.address,account_name:account.name,received_date:paymentDate,amount,income_category:incomeCategory,payment_method:method,principal_amount:allocation.principal,interest_amount:allocation.interest,fee_amount:allocation.fee,unapplied_amount:allocation.unapplied,memo:row.memo||''};
+      const allocation={principal:csvMoney(row.principal_amount,`${account.name} principal allocation`,{optional:true}),interest:csvMoney(row.interest_amount,`${account.name} interest allocation`,{optional:true}),fee:csvMoney(row.fee_amount,`${account.name} fee allocation`,{optional:true}),escrow:csvMoney(row.escrow_amount,`${account.name} escrow allocation`,{optional:true}),unapplied:csvMoney(row.unapplied_amount,`${account.name} unapplied allocation`,{optional:true})};
+      if(account.account_type==='rental')allocation.principal=allocation.interest=allocation.fee=allocation.escrow=allocation.unapplied=0;
+      else if(Math.round((allocation.principal+allocation.interest+allocation.fee+allocation.escrow+allocation.unapplied)*100)!==Math.round(amount*100))throw new Error(`Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(amount)}.`);
+      return {property_name:property.name,property_address:property.address,account_name:account.name,received_date:paymentDate,amount,income_category:incomeCategory,payment_method:method,principal_amount:allocation.principal,interest_amount:allocation.interest,fee_amount:allocation.fee,escrow_amount:allocation.escrow,unapplied_amount:allocation.unapplied,memo:row.memo||''};
     });
     const valid=markPossibleDuplicates(validation.valid,existingKeys,row=>{
       const property=properties.find(x=>x.name===row.property_name&&x.address===row.property_address),account=accounts.find(x=>x.property_id===property?.id&&x.name===row.account_name);

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, createBackup, estimatedLoanBalance, estimatedLoanInterestDue, isPosted, monthlyScheduledEstimate, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, suggestedLoanAllocation, unpaidDueAccrualStart } = require('../ledger-utils.js');
 
 test('voided payments remain recorded but no longer affect collected income', () => {
   const payments = [
@@ -218,6 +218,19 @@ test('amortization estimates derive P&I from terms when no contractual P&I amoun
   assert.equal(schedule.at(-1).balance, 0);
 });
 
+test('suggested loan allocations use amortized monthly interest and separate taxes and insurance escrow', () => {
+  const account = { account_type: 'land_contract', original_principal: 65000, interest_rate: 10.6113, term_months: 360, start_date: '2026-10-01', payment_amount: 750, principal_interest_amount: 600, escrow_amount: 150 };
+  const allocation = suggestedLoanAllocation(account, 750, 65000, '2026-10-04');
+  assert.deepEqual(allocation, { principal: 25.22, interest: 574.78, fee: 0, escrow: 150, unapplied: 0 });
+  const partial = suggestedLoanAllocation(account, 500, 65000, '2026-10-04');
+  assert.deepEqual(partial, { principal: 0, interest: 350, fee: 0, escrow: 150, unapplied: 0 });
+});
+
+test('suggested loan allocation leaves funds unapplied when amortization terms are missing', () => {
+  const account = { account_type: 'land_contract', payment_amount: 849, escrow_amount: 0, interest_rate: 0, term_months: null };
+  assert.deepEqual(suggestedLoanAllocation(account, 849, 30000, '2026-10-04'), { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: 849 });
+});
+
 test('contractual P&I can be estimated separately from escrow-inclusive installments', () => {
   const schedule = amortizationSchedule(1000, 0, 2, '2024-01-01', 600);
   assert.equal(schedule[0].payment, 600);
@@ -245,8 +258,8 @@ test('backup manifest identifies its version and counts every supported table', 
     pd_property_holders: [{ property_id: 'p1', member_user_id: 'u1' }]
   }, '2026-10-03T12:00:00.000Z', [{ path: 'agreements/p1/d1-lease.pdf', file_name: 'lease.pdf', content_type: 'application/pdf', file_size: 42, property_id: 'p1', account_id: 'a1' }]);
   assert.equal(backup.manifest.format, 'propertydesk-backup');
-  assert.equal(backup.manifest.format_version, 5);
-  assert.equal(backup.manifest.schema_version, 5);
+  assert.equal(backup.manifest.format_version, 6);
+  assert.equal(backup.manifest.schema_version, 6);
   assert.equal(backup.manifest.exported_at, '2026-10-03T12:00:00.000Z');
   assert.equal(backup.manifest.restore_supported, false);
   assert.equal(backup.manifest.file_count, 1);
