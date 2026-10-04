@@ -133,7 +133,7 @@
         const due=amountDueSince([account],state.payments,unpaidDueAccrualStart(account),todayIso());
         const monthly=monthlyScheduledEstimate([{...account,status:'active'}]);
         const partyName=account.party_name||account.name, fullAddress=propertyAddress(property);
-        const reminderHref=lateReminderMailto({email:account.party_email,address:fullAddress,unpaidDue:money(due),senderName:state.user?.user_metadata?.display_name?.trim()||'PropertyDesk'});
+        const reminderPeriod=dateOnly(monthStart()).toLocaleDateString(undefined,{month:'long',year:'numeric'}),reminderAsOf=monthEnd(); const reminderHref=lateReminderMailto({email:account.party_email,address:fullAddress,unpaidDue:money(due),senderName:state.user?.user_metadata?.display_name?.trim()||'PropertyDesk',recipientName:partyName,month:reminderPeriod,asOf:reminderAsOf});
         const recipientHint=account.party_email?'Draft late reminder email':'No email saved; opens an unaddressed late reminder draft';
         const scheduledThisMonth=amountDueSince([{...account,status:'active'}],[],monthStart(),monthEnd())||Number(account.payment_amount||0);
         const paymentStatus=paymentStatusInMonth(state.payments,account.id,monthStart(),scheduledThisMonth);
