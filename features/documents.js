@@ -63,8 +63,7 @@
           file_size: file.size,
         }));
       } catch (requestError) {
-        const cleaned = await removeUploadedFile(path);
-        toast(`Agreement record failed${cleaned ? "; uploaded file removed" : "; uploaded file may need cleanup"}. ${requestError.message || "Check your connection and try again."}`);
+        toast(`Agreement record status couldn't be confirmed. Reload the property details before retrying; the private file was kept to avoid breaking a saved record. ${requestError.message || "Check your connection and try again."}`);
         return;
       }
       if (error) {

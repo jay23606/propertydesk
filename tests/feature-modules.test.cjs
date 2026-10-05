@@ -1523,6 +1523,46 @@ test("private document workflows handle rejected storage requests without leakin
   ]);
 });
 
+test("uncertain document metadata writes keep the private file for reconciliation", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
+    context,
+  );
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from() {
+          return {
+            upload: async () => ({ error: null }),
+            remove: async () => assert.fail("uncertain metadata must not delete its file"),
+          };
+        },
+      },
+      from: () => ({ insert: async () => { throw new Error("connection lost"); } }),
+    },
+  };
+  const messages = [];
+  const feature = context.window.PropertyDeskDocuments.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("an unconfirmed write must not show success"),
+    openPropertyDetails: () => assert.fail("an unconfirmed write must not reopen details"),
+    makeId: () => "file-id",
+  });
+
+  await assert.doesNotReject(feature.uploadPropertyDocument({
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  }));
+
+  assert.match(messages[0], /status couldn't be confirmed/i);
+  assert.match(messages[0], /file was kept/i);
+});
+
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
