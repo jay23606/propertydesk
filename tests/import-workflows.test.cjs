@@ -27,6 +27,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/notifications.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/reminder-preview.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
@@ -47,6 +48,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/deposit-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
+  assert.match(worker, /'\.\/features\/notifications\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(app, /attachImportEvents\(\)/);

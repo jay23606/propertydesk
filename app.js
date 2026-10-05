@@ -62,15 +62,8 @@
     selectedPropertyId: null,
     auditRequestId: 0,
     passwordRecoveryInProgress: false,
-    toastTimer: null,
   };
-  function toast(message) {
-    const element = $('toast');
-    element.textContent = message;
-    element.classList.add('show');
-    clearTimeout(state.toastTimer);
-    state.toastTimer = setTimeout(() => element.classList.remove('show'), 2800);
-  }
+  const { toast } = window.PropertyDeskNotifications.create({ $ });
   const {
     accountBalance,
     scheduledMonthlyRunRate,

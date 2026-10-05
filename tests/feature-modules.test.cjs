@@ -52,6 +52,57 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
   assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
+test("notification feature replaces its timer and hides transient feedback", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "notifications.js"), "utf8"),
+    context,
+  );
+  const classes = new Set();
+  const element = {
+    textContent: "",
+    classList: {
+      add: (value) => classes.add(value),
+      remove: (value) => classes.delete(value),
+    },
+  };
+  const cleared = [];
+  const timers = [];
+  const { toast } = context.window.PropertyDeskNotifications.create({
+    $: (id) => {
+      assert.equal(id, "toast");
+      return element;
+    },
+    delayMs: 2500,
+    setTimeoutFn: (callback, delay) => {
+      const timer = { callback, delay };
+      timers.push(timer);
+      return timer;
+    },
+    clearTimeoutFn: (timer) => {
+      if (timer) timer.cancelled = true;
+      cleared.push(timer);
+    },
+  });
+
+  toast("Saved");
+  const firstTimer = timers[0];
+  toast("Updated");
+
+  assert.equal(element.textContent, "Updated");
+  assert.equal(classes.has("show"), true);
+  assert.deepEqual(cleared, [null, firstTimer]);
+  assert.equal(timers[0].delay, 2500);
+  assert.equal(timers[1].delay, 2500);
+  if (!timers[0].cancelled) timers[0].callback();
+  assert.equal(classes.has("show"), true);
+  if (!timers[1].cancelled) timers[1].callback();
+  assert.equal(classes.has("show"), false);
+  toast("Visible again");
+  if (!timers[2].cancelled) timers[2].callback();
+  assert.equal(classes.has("show"), false);
+});
+
 test("ledger context scopes balance, collections, and deposits to workspace state", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -346,6 +397,12 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?updateAllocationPreview/,
   );
+});
+
+test("app coordinator delegates transient notices to the notification feature", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(app, /PropertyDeskNotifications\.create\(\{\s*\$\s*\}\)/);
+  assert.doesNotMatch(app, /toastTimer|function toast\(/);
 });
 
 test("service worker caches a cloned shell response within the fetch lifetime", async () => {
