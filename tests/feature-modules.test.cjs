@@ -26,6 +26,19 @@ function loadLedgerEntryForms(context) {
   }
 }
 
+function loadImportFeatures(context) {
+  for (const filename of [
+    "account-import.js",
+    "transaction-imports.js",
+    "imports.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 test("app lifecycle preserves render, event-binding, and startup order", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -121,16 +134,15 @@ test("CSV import feature loads as an isolated browser module", () => {
     fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
     context,
   );
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "imports.js"),
-    "utf8",
-  );
-
-  vm.runInContext(source, context);
+  loadImportFeatures(context);
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
   const preview = context.window.PropertyDeskImportPreview.create({});
+  const handlers = new Map();
   const feature = context.window.PropertyDeskImportFeature.create({
+    $: (id) => ({
+      addEventListener: (event, handler) => handlers.set(`${id}:${event}`, handler),
+    }),
     stageImport: preview.stageImport,
   });
   assert.equal(typeof feature.attachEvents, "function");
@@ -138,6 +150,12 @@ test("CSV import feature loads as an isolated browser module", () => {
   assert.equal(typeof feature.importExpenses, "function");
   assert.equal(typeof feature.importPayments, "function");
   assert.equal(typeof preview.attachEvents, "function");
+  feature.attachEvents();
+  assert.deepEqual([...handlers.keys()], [
+    "import-file:change",
+    "payment-import-file:change",
+    "expense-import-file:change",
+  ]);
 });
 
 test("CSV import preview escapes staged data and excludes possible duplicates by default", () => {
@@ -2441,11 +2459,7 @@ test("recording a loan payment does not invent principal or interest splits", as
 
 test("CSV imports report a real zero accepted by the server as zero", async () => {
   const context = vm.createContext({ window: {} });
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "imports.js"),
-    "utf8",
-  );
-  vm.runInContext(source, context);
+  loadImportFeatures(context);
 
   const elements = new Map();
   const element = (id) => {
