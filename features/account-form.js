@@ -8,16 +8,14 @@
       formModel,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create(context);
-    const { resetAccountForm, updateLoanFields, editAccount } = formView;
+    const { resetAccountForm, updateLoanFields, readValues, editAccount } = formView;
 
     async function saveAccount(event) {
       event.preventDefault();
-      const id = $("account-id").value;
-      const type = $("account-type").value;
-      const reminderEnabled = $("account-reminder-enabled").checked;
+      const form = readValues();
       const contacts = formModel.partyEmails(
-        $("account-party-email").value,
-        reminderEnabled,
+        form.partyEmail,
+        form.reminderEnabled,
       );
       if (contacts.error) {
         toast(contacts.error);
@@ -26,34 +24,34 @@
       const payload = buildAccountPayload(
         {
           ownerId: state.workspaceOwnerId,
-          propertyId: $("account-property").value,
-          accountType: type,
-          name: $("account-name").value.trim(),
-          partyName: $("account-party").value.trim(),
+          propertyId: form.propertyId,
+          accountType: form.type,
+          name: form.name,
+          partyName: form.partyName,
           partyEmails: contacts.emails,
-          partyPhone: $("account-party-phone").value.trim(),
-          reminderEnabled,
-          startDate: $("account-start").value,
-          nextDueDate: $("account-next-due").value,
-          paymentAmount: $("account-payment").value,
-          paymentFrequency: $("account-frequency").value,
-          originalPrincipal: $("account-principal").value,
-          principalInterestAmount: $("account-pi-payment").value,
-          escrowAmount: $("account-escrow").value,
-          balanceAdjustment: $("account-balance-adjustment").value,
-          interestRate: $("account-rate").value,
-          termMonths: $("account-term").value,
-          balloonDate: $("account-balloon").value,
-          agreementEffectiveDate: $("account-effective-date").value,
-          agreementChangeReason: $("account-change-reason").value.trim(),
-          lateFee: $("account-late-fee").value,
-          graceDays: $("account-grace").value,
-          notes: $("account-notes").value.trim(),
+          partyPhone: form.partyPhone,
+          reminderEnabled: form.reminderEnabled,
+          startDate: form.startDate,
+          nextDueDate: form.nextDueDate,
+          paymentAmount: form.paymentAmount,
+          paymentFrequency: form.paymentFrequency,
+          originalPrincipal: form.originalPrincipal,
+          principalInterestAmount: form.principalInterestAmount,
+          escrowAmount: form.escrowAmount,
+          balanceAdjustment: form.balanceAdjustment,
+          interestRate: form.interestRate,
+          termMonths: form.termMonths,
+          balloonDate: form.balloonDate,
+          agreementEffectiveDate: form.agreementEffectiveDate,
+          agreementChangeReason: form.agreementChangeReason,
+          lateFee: form.lateFee,
+          graceDays: form.graceDays,
+          notes: form.notes,
         },
         moneyInput,
       );
-      const query = id
-        ? state.client.from("pd_accounts").update(payload).eq("id", id)
+      const query = form.id
+        ? state.client.from("pd_accounts").update(payload).eq("id", form.id)
         : state.client.from("pd_accounts").insert(payload);
       let error;
       try {
@@ -73,7 +71,7 @@
       } catch {
         return;
       }
-      toast(id ? "Account updated" : "Account added");
+      toast(form.id ? "Account updated" : "Account added");
     }
 
     function attachEvents(previewReminderEmail) {

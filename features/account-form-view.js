@@ -21,6 +21,35 @@
       $("loan-fields").classList.toggle("hidden", isRental);
     }
 
+    function readValues() {
+      return {
+        id: $("account-id").value,
+        type: $("account-type").value,
+        propertyId: $("account-property").value,
+        name: $("account-name").value.trim(),
+        partyName: $("account-party").value.trim(),
+        partyEmail: $("account-party-email").value,
+        partyPhone: $("account-party-phone").value.trim(),
+        reminderEnabled: $("account-reminder-enabled").checked,
+        startDate: $("account-start").value,
+        nextDueDate: $("account-next-due").value,
+        paymentAmount: $("account-payment").value,
+        paymentFrequency: $("account-frequency").value,
+        originalPrincipal: $("account-principal").value,
+        principalInterestAmount: $("account-pi-payment").value,
+        escrowAmount: $("account-escrow").value,
+        balanceAdjustment: $("account-balance-adjustment").value,
+        interestRate: $("account-rate").value,
+        termMonths: $("account-term").value,
+        balloonDate: $("account-balloon").value,
+        agreementEffectiveDate: $("account-effective-date").value,
+        agreementChangeReason: $("account-change-reason").value.trim(),
+        lateFee: $("account-late-fee").value,
+        graceDays: $("account-grace").value,
+        notes: $("account-notes").value.trim(),
+      };
+    }
+
     function editAccount(account) {
       resetAccountForm();
       populateFormOptions();
@@ -64,7 +93,7 @@
       $("account-type").addEventListener("change", updateLoanFields);
     }
 
-    return { resetAccountForm, updateLoanFields, editAccount, attachEvents };
+    return { resetAccountForm, updateLoanFields, readValues, editAccount, attachEvents };
   }
 
   window.PropertyDeskAccountFormView = Object.freeze({

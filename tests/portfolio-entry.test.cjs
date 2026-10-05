@@ -386,6 +386,35 @@ test("account form view resets and populates fields without owning persistence",
   assert.equal(elements("account-party-phone").value, "555-0100");
   assert.equal(elements("account-escrow").value, 150);
   assert.equal(elements("account-term").value, 360);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(view.readValues())),
+    {
+      id: "account-1",
+      type: "note",
+      propertyId: "property-1",
+      name: "Seller note",
+      partyName: "Buyer",
+      partyEmail: "buyer@example.com",
+      partyPhone: "555-0100",
+      reminderEnabled: false,
+      startDate: "2024-01-01",
+      nextDueDate: "2026-11-01",
+      paymentAmount: 550,
+      paymentFrequency: "monthly",
+      originalPrincipal: 40000,
+      principalInterestAmount: 400,
+      escrowAmount: 150,
+      balanceAdjustment: 100,
+      interestRate: 5,
+      termMonths: 360,
+      balloonDate: "",
+      agreementEffectiveDate: "2025-06-01",
+      agreementChangeReason: "",
+      lateFee: 25,
+      graceDays: 5,
+      notes: "Current agreement",
+    },
+  );
   assert.deepEqual(opened, ["options", "account-modal"]);
   assert.deepEqual(toggles.at(-1), ["hidden", false]);
 
