@@ -178,6 +178,13 @@ async function main() {
     signedInPage.on("console", (message) => {
       if (message.type() === "error") signedInConsoleErrors.push(message.text());
     });
+    signedInContext.on("serviceworker", (worker) => {
+      worker.on("console", (message) => {
+        if (message.type() === "error") {
+          signedInConsoleErrors.push(`Service worker: ${message.text()}`);
+        }
+      });
+    });
     await signedInPage.route("**/@supabase/supabase-js@2*", (route) =>
       route.fulfill({ contentType: "text/javascript", body: "" }),
     );
