@@ -10,6 +10,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.ok(html.indexOf('features/app-state.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/app-lifecycle.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/backend-client.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/imports.js'));
@@ -45,6 +46,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/overview\.js'/);
   assert.match(worker, /'\.\/features\/app-state\.js'/);
+  assert.match(worker, /'\.\/features\/app-lifecycle\.js'/);
   assert.match(worker, /'\.\/features\/backend-client\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
   assert.match(worker, /'\.\/features\/app-utils\.js'/);
@@ -69,7 +71,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/pwa-registration\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
-  assert.match(app, /attachImportEvents\(\)/);
+  assert.match(app, /attachImportEvents,/);
 });
 
 const properties = [{ id: 'p1', name: 'Oak House', address: '10 Oak St' }];

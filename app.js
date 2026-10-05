@@ -3,6 +3,10 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
+  let appLifecycle;
+  function render() {
+    appLifecycle.render();
+  }
   const {
     amortizationSchedule,
     amountDueSince,
@@ -376,44 +380,38 @@
       uploadPropertyDocument,
     });
 
-  function render() {
-    updateGreeting();
-    renderOverview();
-    renderProperties();
-    renderPayments();
-    renderReports();
-  }
-  function attachEvents() {
-    attachModalEvents();
-    attachNavigationEvents();
-    attachPropertyViewEvents();
-    attachTransactionViewEvents();
-    attachCreateActions(navigate);
-    attachPropertyFormEvents(previewReminderEmail);
-    attachLedgerEntryFormEvents();
-    attachActionRouterEvents();
-    attachPropertyEvents(toggleArchiveProperty);
-    attachWorkspaceEvents();
-    attachAuthEvents();
-    attachImportPreviewEvents();
-    attachImportEvents();
-    attachExportEvents();
-  }
-  async function init() {
-    attachEvents();
-    $('payment-date').value = todayIso();
-    $('account-start').value = todayIso();
-    setAuthMode(false);
-    window.PropertyDeskPwa.registerShell();
-
-    if (!backend.configured) {
-      showConfigError();
-      return;
-    }
-
-    state.client = backend.createClient();
-    state.client.auth.onAuthStateChange(handleAuthStateChange);
-    await restoreAuthSession();
-  }
-  document.addEventListener('DOMContentLoaded', init);
+  appLifecycle = window.PropertyDeskAppLifecycle.create({
+    $, state, backend, todayIso,
+    registerShell: () => window.PropertyDeskPwa.registerShell(),
+    auth: {
+      setAuthMode,
+      showConfigError,
+      handleAuthStateChange,
+      restoreAuthSession,
+    },
+    renderers: [
+      updateGreeting,
+      renderOverview,
+      renderProperties,
+      renderPayments,
+      renderReports,
+    ],
+    eventBinders: [
+      attachModalEvents,
+      attachNavigationEvents,
+      attachPropertyViewEvents,
+      attachTransactionViewEvents,
+      () => attachCreateActions(navigate),
+      () => attachPropertyFormEvents(previewReminderEmail),
+      attachLedgerEntryFormEvents,
+      attachActionRouterEvents,
+      () => attachPropertyEvents(toggleArchiveProperty),
+      attachWorkspaceEvents,
+      attachAuthEvents,
+      attachImportPreviewEvents,
+      attachImportEvents,
+      attachExportEvents,
+    ],
+  });
+  document.addEventListener('DOMContentLoaded', appLifecycle.initialize);
 })();
