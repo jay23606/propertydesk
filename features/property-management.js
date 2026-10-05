@@ -20,15 +20,25 @@
         toast("Quick notes are limited to 140 characters.");
         return;
       }
-      const { error } = await state.client.from("pd_properties")
-        .update({ notes: note || null })
-        .eq("id", id)
-        .eq("user_id", state.workspaceOwnerId);
+      let error;
+      try {
+        ({ error } = await state.client.from("pd_properties")
+          .update({ notes: note || null })
+          .eq("id", id)
+          .eq("user_id", state.workspaceOwnerId));
+      } catch {
+        toast("Property note couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       toast(note ? "Property note saved" : "Property note removed");
     }
 
@@ -37,30 +47,50 @@
       const selected = [...documentRef.querySelectorAll("[data-holder-choice]:checked")]
         .map((input) => input.value);
       if (!id) return;
-      const { error: deleteError } = await state.client.from("pd_property_holders")
-        .delete()
-        .eq("user_id", state.workspaceOwnerId)
-        .eq("property_id", id);
+      let deleteError;
+      try {
+        ({ error: deleteError } = await state.client.from("pd_property_holders")
+          .delete()
+          .eq("user_id", state.workspaceOwnerId)
+          .eq("property_id", id));
+      } catch {
+        toast("Account-holder labels couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (deleteError) {
         toast(deleteError.message);
         return;
       }
       if (selected.length) {
-        const { error } = await state.client.from("pd_property_holders").insert(
-          selected.map((member_user_id) => ({
-            user_id: state.workspaceOwnerId,
-            property_id: id,
-            member_user_id,
-          })),
-        );
+        let error;
+        try {
+          ({ error } = await state.client.from("pd_property_holders").insert(
+            selected.map((member_user_id) => ({
+              user_id: state.workspaceOwnerId,
+              property_id: id,
+              member_user_id,
+            })),
+          ));
+        } catch {
+          toast("Account-holder labels couldn't be saved right now. Check your connection and try again.");
+          return;
+        }
         if (error) {
           toast(error.message);
-          await fetchAll();
-          openPropertyDetails(id);
+          try {
+            await fetchAll();
+            openPropertyDetails(id);
+          } catch {
+            return;
+          }
           return;
         }
       }
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       openPropertyDetails(id);
       toast("Account-holder labels saved");
     }
@@ -70,15 +100,25 @@
       const property = state.properties.find((item) => item.id === id);
       if (!property) return;
       const archived_at = property.archived_at ? null : todayIso();
-      const { error } = await state.client.from("pd_properties")
-        .update({ archived_at })
-        .eq("id", id)
-        .eq("user_id", state.workspaceOwnerId);
+      let error;
+      try {
+        ({ error } = await state.client.from("pd_properties")
+          .update({ archived_at })
+          .eq("id", id)
+          .eq("user_id", state.workspaceOwnerId));
+      } catch {
+        toast("Property status couldn't be updated right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       openPropertyDetails(id);
       toast(archived_at ? "Property archived" : "Property restored");
     }

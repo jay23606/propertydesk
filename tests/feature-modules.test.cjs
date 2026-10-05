@@ -2145,6 +2145,64 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
+test("property management workflows report rejected writes without running success actions", async () => {
+  const context = vm.createContext({ window: {}, document: { querySelectorAll: () => [] } });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-management.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  const rejectingQuery = () => {
+    let filters = 0;
+    const query = {
+      eq() {
+        filters += 1;
+        return filters === 2 ? Promise.reject(new Error("offline")) : query;
+      },
+    };
+    return query;
+  };
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    selectedPropertyId: "property-1",
+    properties: [{ id: "property-1", address: "10 Main St", archived_at: null }],
+    client: {
+      from() {
+        return {
+          update() {
+            return rejectingQuery();
+          },
+          delete() {
+            return rejectingQuery();
+          },
+        };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskPropertyManagement.create({
+    $() {},
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("a rejected write must not refresh"),
+    todayIso: () => "2026-10-05",
+    streetAddress: (property) => property.address,
+    openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
+    promptAction: () => "Keep this note",
+  });
+
+  await assert.doesNotReject(feature.editPropertyQuickNote("property-1"));
+  await assert.doesNotReject(feature.savePropertyHolders());
+  await assert.doesNotReject(feature.toggleArchiveProperty());
+  assert.deepEqual(messages, [
+    "Property note couldn't be saved right now. Check your connection and try again.",
+    "Account-holder labels couldn't be saved right now. Check your connection and try again.",
+    "Property status couldn't be updated right now. Check your connection and try again.",
+  ]);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
