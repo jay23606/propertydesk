@@ -242,6 +242,93 @@ test("password reset requests keep generic feedback and restore the submit contr
   assert.equal(element("forgot-password").disabled, false);
 });
 
+test("workspace settings render member labels and escape untrusted text", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id)) elements.set(id, {
+      value: "",
+      innerHTML: "",
+      classList: { toggle(name, hidden) { this.lastToggle = [name, hidden]; } },
+    });
+    return elements.get(id);
+  };
+  const state = {
+    user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+    workspaceOwnerId: "owner-1",
+    workspaceMembers: [
+      { member_user_id: "owner-1", display_name: "<Owner>", email: "owner@example.test", is_owner: true },
+      { member_user_id: "member-1", display_name: "Member", email: "member@example.test", is_owner: false },
+    ],
+    reminderLogs: [],
+    accounts: [],
+    properties: [],
+  };
+  const feature = context.window.PropertyDeskWorkspace.create({
+    $: element,
+    state,
+    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])),
+    fmtDate: () => "Oct 2026",
+    money: () => "$0.00",
+    toast() {},
+    fetchAll: async () => {},
+    updateGreeting() {},
+    confirmAction: () => true,
+  });
+
+  feature.renderWorkspaceSettings();
+
+  assert.equal(element("display-name").value, "Owner");
+  assert.match(element("workspace-members").innerHTML, /&lt;Owner&gt;/);
+  assert.match(element("workspace-members").innerHTML, /Full workspace access/);
+  assert.deepEqual(element("member-add-form").classList.lastToggle, ["hidden", false]);
+  assert.match(element("reminder-activity").innerHTML, /Reminders are off/);
+});
+
+test("adding a workspace member clears the address only after successful refresh", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id)) elements.set(id, { value: id === "member-email" ? " spouse@example.test " : "", classList: { toggle() {} } });
+    return elements.get(id);
+  };
+  const calls = [];
+  const messages = [];
+  const feature = context.window.PropertyDeskWorkspace.create({
+    $: element,
+    state: {
+      client: { async rpc(name, args) { calls.push([name, args]); return { error: null }; } },
+      workspaceMembers: [], reminderLogs: [], accounts: [], properties: [],
+      user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+      workspaceOwnerId: "owner-1",
+    },
+    esc: String,
+    fmtDate: () => "",
+    money: () => "",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => calls.push(["refresh"]),
+    updateGreeting() {},
+  });
+
+  await feature.addWorkspaceMember({ preventDefault() {} });
+
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0][0], "pd_add_workspace_member");
+  assert.equal(calls[0][1].p_email, "spouse@example.test");
+  assert.equal(calls[1][0], "refresh");
+  assert.equal(element("display-name").value, "Owner");
+  assert.equal(element("member-email").value, "");
+  assert.equal(messages.at(-1), "Workspace member added");
+});
+
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(

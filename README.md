@@ -2,7 +2,7 @@
 
 Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
-The browser code stays build-free. Reusable ledger, import, email, and backup helpers live in separate files; portfolio, transaction, detail, private document, export/backup, sign-in/recovery, and record-entry/CSV-import workflows are grouped under `features/`; `app.js` coordinates shared state and user actions.
+The browser code stays build-free. Reusable ledger, import, email, and backup helpers live in separate files; portfolio, transaction, detail, private document, export/backup, sign-in/recovery, workspace, and record-entry/CSV-import workflows are grouped under `features/`; `app.js` coordinates shared state and user actions.
 
 The app is installable as a PWA when served over HTTPS. Dark mode is the default, with a light/dark toggle remembered on the device. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
