@@ -215,22 +215,13 @@ test("deposit details workflow composes ledger rendering with adjustment actions
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 
-test("workspace settings workflow shares reminder activity with settings and preview", () => {
+test("reminder workflow composes the activity view and email preview", () => {
   const passed = {};
   const reminderActivity = () => "activity";
   const context = vm.createContext({
     window: {
       PropertyDeskReminderActivityView: {
         create: () => ({ renderReminderActivity: reminderActivity }),
-      },
-      PropertyDeskWorkspace: {
-        create: (options) => {
-          passed.workspace = options;
-          return {
-            renderWorkspaceSettings: () => "settings",
-            attachEvents: () => "settings events",
-          };
-        },
       },
       PropertyDeskReminderPreview: {
         create: (options) => {
@@ -241,17 +232,46 @@ test("workspace settings workflow shares reminder activity with settings and pre
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace-settings-workflow.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-workflow.js"), "utf8"),
     context,
   );
   const openModal = () => {};
-  const workflow = context.window.PropertyDeskWorkspaceSettingsWorkflow.create({ openModal });
+  const workflow = context.window.PropertyDeskReminderWorkflow.create({ openModal });
+
+  assert.equal(passed.preview.openModal, openModal);
+  assert.equal(workflow.renderReminderActivity, reminderActivity);
+  assert.equal(workflow.previewReminderEmail(), "preview");
+});
+
+test("workspace settings workflow receives reminder activity without owning preview", () => {
+  const passed = {};
+  const reminderActivity = () => "activity";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskWorkspace: {
+        create: (options) => {
+          passed.workspace = options;
+          return {
+            renderWorkspaceSettings: () => "settings",
+            attachEvents: () => "settings events",
+          };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace-settings-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskWorkspaceSettingsWorkflow.create({
+    $() {}, state: {}, esc() {}, toast() {}, fetchAll() {}, updateGreeting() {},
+    renderReminderActivity: reminderActivity,
+  });
 
   assert.equal(passed.workspace.renderReminderActivity, reminderActivity);
-  assert.equal(passed.preview.openModal, openModal);
   assert.equal(workflow.renderWorkspaceSettings(), "settings");
   assert.equal(workflow.attachWorkspaceEvents(), "settings events");
-  assert.equal(workflow.previewReminderEmail(), "preview");
+  assert.equal("previewReminderEmail" in workflow, false);
 });
 
 test("app coordinator delegates shared setup to the app services workflow", () => {

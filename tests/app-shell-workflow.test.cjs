@@ -11,7 +11,7 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
   const handlers = {
     renderWorkspaceSettings() {},
     attachWorkspaceEvents() {},
-    previewReminderEmail() {},
+    renderReminderActivity() {},
     navigate() {},
     attachNavigationEvents() {},
     attachThemeEvents() {},
@@ -24,7 +24,6 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
           return {
             renderWorkspaceSettings: handlers.renderWorkspaceSettings,
             attachWorkspaceEvents: handlers.attachWorkspaceEvents,
-            previewReminderEmail: handlers.previewReminderEmail,
           };
         },
       },
@@ -51,11 +50,9 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
   );
 
   const options = {
-    $: () => {}, state: { view: "properties" }, esc() {}, fmtDate() {},
-    money() {}, toast() {}, fetchAll() {}, updateGreeting() {},
-    amountDueSince() {}, unpaidDueAccrualStart() {}, todayIso() {}, monthEnd() {},
-    moneyInput() {}, dateOnly() {}, monthStart() {}, propertyAddress() {},
-    openModal() {}, unrelatedDependency() {},
+    $: () => {}, state: { view: "properties" }, esc() {}, toast() {},
+    fetchAll() {}, updateGreeting() {}, renderReminderActivity() {},
+    unrelatedDependency() {},
   };
   const shell = context.window.PropertyDeskAppShellWorkflow.create(options);
 
@@ -64,17 +61,15 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
     "attachThemeEvents",
     "attachWorkspaceEvents",
     "navigate",
-    "previewReminderEmail",
   ].sort());
   assert.equal(calls[0][0], "settings");
   assert.notEqual(calls[0][1], options);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
-    "$", "amountDueSince", "dateOnly", "esc", "fetchAll", "fmtDate", "money",
-    "moneyInput", "monthEnd", "monthStart", "openModal", "propertyAddress",
-    "state", "todayIso", "toast", "unpaidDueAccrualStart", "updateGreeting",
+    "$", "esc", "fetchAll", "renderReminderActivity", "state", "toast",
+    "updateGreeting",
   ].sort());
   assert.equal(calls[0][1].state, options.state);
-  assert.equal(calls[0][1].openModal, options.openModal);
+  assert.equal(calls[0][1].renderReminderActivity, options.renderReminderActivity);
   assert.equal(calls[1][1].renderWorkspaceSettings, handlers.renderWorkspaceSettings);
   assert.deepEqual(calls.map(([name]) => name), ["settings", "navigation", "theme"]);
   assert.equal(shell.attachWorkspaceEvents, handlers.attachWorkspaceEvents);
@@ -90,6 +85,10 @@ test("app shell workflow loads before the coordinator and is precached", () => {
   assert.ok(html.indexOf("features/app-shell-workflow.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/app-shell-workflow\.js'/);
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
+  assert.match(app, /PropertyDeskReminderWorkflow\.create/);
+  assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
+  assert.match(app, /renderReminderActivity/);
+  assert.doesNotMatch(app, /PropertyDesk(?:ReminderActivityView|ReminderPreview)\.create/);
   assert.doesNotMatch(app, /PropertyDeskNavigation\.create/);
   assert.doesNotMatch(app, /PropertyDeskTheme\.create/);
 });

@@ -4,14 +4,10 @@
 
   function create(context) {
     const {
-      $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
-      amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
-      dateOnly, monthStart, propertyAddress, openModal,
+      $, state, esc, toast, fetchAll, updateGreeting, renderReminderActivity,
     } = context;
     const settings = window.PropertyDeskWorkspaceSettingsWorkflow.create({
-      $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
-      amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
-      dateOnly, monthStart, propertyAddress, openModal,
+      $, state, esc, toast, fetchAll, updateGreeting, renderReminderActivity,
     });
     const navigation = window.PropertyDeskNavigation.create({
       $: context.$,
@@ -22,7 +18,6 @@
 
     return {
       navigate: navigation.navigate,
-      previewReminderEmail: settings.previewReminderEmail,
       attachWorkspaceEvents: settings.attachWorkspaceEvents,
       attachNavigationEvents: navigation.attachEvents,
       attachThemeEvents: theme.attachEvents,
