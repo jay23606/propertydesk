@@ -40,6 +40,7 @@ function loadPropertyAccountForms(context) {
     "property-form.js",
     "account-form-model.js",
     "account-payload.js",
+    "account-form-view.js",
     "account-form.js",
     "property-account-forms.js",
   ]) {

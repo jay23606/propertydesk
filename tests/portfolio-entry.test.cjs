@@ -342,6 +342,61 @@ test("property and account form workflow publishes an explicit interface", () =>
   assert.deepEqual(calls, ["property events", ["account events", preview]]);
 });
 
+test("account form view resets and populates fields without owning persistence", () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAccountForms(context);
+  const elements = formElements({ "account-type": "rental" });
+  const toggles = [];
+  const opened = [];
+  elements("loan-fields").classList.toggle = (...args) => toggles.push(args);
+  const view = context.window.PropertyDeskAccountFormView.create({
+    $: elements,
+    todayIso: () => "2026-10-05",
+    populateFormOptions: () => opened.push("options"),
+    openModal: (id) => opened.push(id),
+  });
+
+  view.editAccount({
+    id: "account-1",
+    account_type: "note",
+    property_id: "property-1",
+    name: "Seller note",
+    party_name: "Buyer",
+    party_email: "buyer@example.com",
+    party_phone: "555-0100",
+    monthly_reminder_enabled: false,
+    start_date: "2024-01-01",
+    next_due_date: "2026-11-01",
+    payment_amount: 550,
+    payment_frequency: "monthly",
+    original_principal: 40000,
+    principal_interest_amount: 400,
+    escrow_amount: 150,
+    balance_adjustment: 100,
+    agreement_effective_date: "2025-06-01",
+    interest_rate: 5,
+    term_months: 360,
+    balloon_date: "",
+    late_fee: 25,
+    grace_days: 5,
+    notes: "Current agreement",
+  });
+
+  assert.equal(elements("account-modal-title").textContent, "Edit account");
+  assert.equal(elements("account-party-phone").value, "555-0100");
+  assert.equal(elements("account-escrow").value, 150);
+  assert.equal(elements("account-term").value, 360);
+  assert.deepEqual(opened, ["options", "account-modal"]);
+  assert.deepEqual(toggles.at(-1), ["hidden", false]);
+
+  elements("account-type").value = "rental";
+  view.resetAccountForm();
+  assert.equal(elements("account-id").value, "");
+  assert.equal(elements("account-start").value, "2026-10-05");
+  assert.equal(elements("account-reminder-enabled").checked, false);
+  assert.deepEqual(toggles.at(-1), ["hidden", true]);
+});
+
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
