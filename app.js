@@ -154,20 +154,23 @@
     const negative = /^\(.*\)$/.test(raw);
     const normalized = raw.replace(/[,$\s()]/g, '');
     const amount = Number(normalized) * (negative ? -1 : 1);
-    if (!Number.isFinite(amount)) return 0;
+    if (!Number.isFinite(amount)) {
+      return 0;
+    }
     return Math.round((amount + Number.EPSILON) * 100) / 100;
   }
   function accountBalance(account, asOf = todayIso()) {
     return scheduledLoanBalance(account, asOf);
   }
   function paymentFrequencyLabel(frequency) {
-    return ({
+    const labels = {
       monthly: 'Monthly',
       weekly: 'Weekly',
       biweekly: 'Every 2 weeks',
       quarterly: 'Quarterly',
       annual: 'Annually',
-    }[frequency] || 'Monthly');
+    };
+    return labels[frequency] || 'Monthly';
   }
   function scheduledMonthlyRunRate() {
     return monthlyScheduledEstimate(state.accounts);
@@ -190,7 +193,9 @@
     return { ...result, entries };
   }
   function expenseCategoryLabel(category) {
-    if (category === 'deposit_refund') return 'Security deposit refund';
+    if (category === 'deposit_refund') {
+      return 'Security deposit refund';
+    }
     return String(category || 'other').replaceAll('_', ' ');
   }
   // Feature modules receive shared state and helpers; app.js connects the workflows.
