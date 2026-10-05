@@ -1,11 +1,11 @@
-/* PropertyDesk private backup and account CSV export workflows. */
+/* PropertyDesk private JSON/ZIP backup workflow. */
 (() => {
   "use strict";
 
   function create(context) {
     const {
-      $, state, createBackup, todayIso, toast, prettyType,
-      accountBalance, downloadBlob = (blob, filename) => {
+      $, state, createBackup, todayIso, toast,
+      downloadBlob = (blob, filename) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -15,18 +15,6 @@
       },
       zipUtils = window.PropertyDeskZipUtils,
     } = context;
-
-    function csvCell(value) {
-      const text = String(value ?? "");
-      return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-    }
-
-    function downloadCSV(filename, headers, rows) {
-      const csv = [headers, ...rows]
-        .map((row) => row.map(csvCell).join(","))
-        .join("\r\n");
-      downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
-    }
 
     async function exportAll() {
       if (!state.user || !state.client) {
@@ -105,29 +93,11 @@
       }
     }
 
-    function exportReport() {
-      downloadCSV(
-        `propertydesk-accounts-${todayIso()}.csv`,
-        ["account_name", "account_type", "property", "party", "monthly_due", "estimated_on_time_loan_balance", "next_due_date", "status"],
-        state.accounts.map((account) => [
-          account.name,
-          prettyType(account.account_type),
-          state.properties.find((property) => property.id === account.property_id)?.name || "",
-          account.party_name,
-          account.payment_amount,
-          account.account_type === "rental" ? "" : accountBalance(account),
-          account.next_due_date,
-          account.status,
-        ]),
-      );
-    }
-
     function attachEvents() {
       $("export-all").addEventListener("click", exportAll);
-      $("export-report").addEventListener("click", exportReport);
     }
 
-    return { attachEvents, exportAll, exportReport };
+    return { attachEvents, exportAll };
   }
 
   window.PropertyDeskExports = { create };

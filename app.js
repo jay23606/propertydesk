@@ -339,6 +339,12 @@
       createBackup,
       todayIso,
       toast,
+    });
+  const { attachEvents: attachReportExportEvents } =
+    window.PropertyDeskReportExport.create({
+      $,
+      state,
+      todayIso,
       prettyType,
       accountBalance,
     });
@@ -449,6 +455,7 @@
       attachImportPreviewEvents,
       attachImportEvents,
       attachExportEvents,
+      attachReportExportEvents,
     ],
   });
   document.addEventListener('DOMContentLoaded', appLifecycle.initialize);

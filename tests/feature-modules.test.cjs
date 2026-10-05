@@ -531,23 +531,69 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
   ]);
 });
 
-test("export feature owns backup and report button bindings", () => {
-  const context = vm.createContext({ window: {} });
+test("backup and report exports own separate button bindings", () => {
+  for (const [file, globalName, expected] of [
+    ["exports.js", "PropertyDeskExports", ["export-all:click"]],
+    ["report-export.js", "PropertyDeskReportExport", ["export-report:click"]],
+  ]) {
+    const context = vm.createContext({ window: {} });
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", file), "utf8"),
+      context,
+    );
+    const bindings = new Map();
+    const feature = context.window[globalName].create({
+      $: (id) => ({
+        addEventListener: (event, handler) => bindings.set(`${id}:${event}`, handler),
+      }),
+    });
+
+    feature.attachEvents();
+
+    assert.deepEqual([...bindings.keys()], expected);
+    assert.ok([...bindings.values()].every((handler) => typeof handler === "function"));
+  }
+});
+
+test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
+  const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "exports.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "report-export.js"), "utf8"),
     context,
   );
-  const bindings = new Map();
-  const feature = context.window.PropertyDeskExports.create({
-    $: (id) => ({
-      addEventListener: (event, handler) => bindings.set(`${id}:${event}`, handler),
-    }),
+  const downloads = [];
+  const feature = context.window.PropertyDeskReportExport.create({
+    $: () => ({ addEventListener() {} }),
+    state: {
+      properties: [{ id: "property-1", name: "Main House, East" }],
+      accounts: [
+        {
+          id: "rental-1", property_id: "property-1", name: "Lease", account_type: "rental",
+          party_name: "Tenant", payment_amount: 825, next_due_date: "2026-11-01", status: "active",
+        },
+        {
+          id: "note-1", property_id: "property-1", name: "Seller note", account_type: "note",
+          party_name: "Buyer", payment_amount: 400, next_due_date: "2026-11-01", status: "active",
+        },
+      ],
+    },
+    todayIso: () => "2026-10-05",
+    prettyType: (type) => type,
+    accountBalance: (account) => account.id === "note-1" ? 12000 : 0,
+    downloadBlob: (blob, filename) => downloads.push({ blob, filename }),
   });
 
-  feature.attachEvents();
+  feature.exportReport();
 
-  assert.deepEqual([...bindings.keys()], ["export-all:click", "export-report:click"]);
-  assert.ok([...bindings.values()].every((handler) => typeof handler === "function"));
+  assert.equal(downloads[0].filename, "propertydesk-accounts-2026-10-05.csv");
+  assert.equal(
+    await downloads[0].blob.text(),
+    [
+      "account_name,account_type,property,party,monthly_due,estimated_on_time_loan_balance,next_due_date,status",
+      'Lease,rental,"Main House, East",Tenant,825,,2026-11-01,active',
+      'Seller note,note,"Main House, East",Buyer,400,12000,2026-11-01,active',
+    ].join("\r\n"),
+  );
 });
 
 test("property and account detail modules expose separate workflows", () => {
