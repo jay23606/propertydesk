@@ -54,6 +54,15 @@ function loadImportFeatures(context) {
   }
 }
 
+function loadImportPreview(context) {
+  for (const filename of ["import-preview-rendering.js", "import-preview.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 function formElements(values = {}) {
   const elements = new Map();
   return (id) => {
@@ -166,10 +175,7 @@ test("CSV import feature loads as an isolated browser module", () => {
   const context = vm.createContext({
     window: { PropertyDeskImportWorkflows: validators },
   });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
-    context,
-  );
+  loadImportPreview(context);
   loadImportFeatures(context);
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
@@ -287,10 +293,7 @@ test("payment and expense CSV importers save their own validated transaction pay
 
 test("CSV import preview escapes staged data and excludes possible duplicates by default", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
-    context,
-  );
+  loadImportPreview(context);
   const elements = new Map();
   const getElement = (id) => {
     if (!elements.has(id)) {
@@ -337,10 +340,7 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
 
 test("an unconfirmed import disables retry and directs the owner to verify the receipt", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
-    context,
-  );
+  loadImportPreview(context);
   const elements = new Map();
   const handlers = new Map();
   const $ = (id) => {

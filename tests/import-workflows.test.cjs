@@ -35,6 +35,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/app-lifecycle.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/backend-client.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/import-preview-rendering.js') < html.indexOf('features/import-preview.js'));
   assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/imports.js'));
   assert.ok(html.indexOf('features/account-import.js') < html.indexOf('features/imports.js'));
   assert.ok(html.indexOf('features/payment-import.js') < html.indexOf('features/transaction-imports.js'));
