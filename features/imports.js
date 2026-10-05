@@ -25,12 +25,20 @@
       fetchAll,
       toast,
     });
-    const transactions = window.PropertyDeskTransactionImports.create({
+    const payments = window.PropertyDeskPaymentImport.create({
       $,
       state,
       stageImport,
       parseCSV,
       validatePaymentRows,
+      fetchAll,
+      toast,
+    });
+    const expenses = window.PropertyDeskExpenseImport.create({
+      $,
+      state,
+      stageImport,
+      parseCSV,
       validateExpenseRows,
       fetchAll,
       toast,
@@ -38,13 +46,14 @@
 
     function attachEvents() {
       accounts.attachEvents();
-      transactions.attachEvents();
+      payments.attachEvents();
+      expenses.attachEvents();
     }
 
     return {
       importAccounts: accounts.importAccounts,
-      importPayments: transactions.importPayments,
-      importExpenses: transactions.importExpenses,
+      importPayments: payments.importPayments,
+      importExpenses: expenses.importExpenses,
       attachEvents,
     };
   }
