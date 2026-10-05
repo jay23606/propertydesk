@@ -10,6 +10,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.ok(html.indexOf('features/app-state.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/backend-client.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/imports.js'));
   assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
@@ -43,6 +44,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/overview\.js'/);
   assert.match(worker, /'\.\/features\/app-state\.js'/);
+  assert.match(worker, /'\.\/features\/backend-client\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
   assert.match(worker, /'\.\/features\/app-utils\.js'/);
   assert.match(worker, /'\.\/features\/ledger-context\.js'/);

@@ -129,6 +129,47 @@ test("app state starts in Properties with fresh workspace collections", () => {
   assert.equal(second.properties.length, 0);
 });
 
+test("backend client only initializes with complete public Supabase config", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "backend-client.js"), "utf8"),
+    context,
+  );
+  let captured;
+  const supabase = {
+    createClient(...args) {
+      captured = args;
+      return { connected: true };
+    },
+  };
+  const incomplete = context.window.PropertyDeskBackendClient.create({
+    config: { supabaseUrl: "https://example.test" },
+    supabase,
+  });
+  assert.equal(incomplete.configured, false);
+  assert.equal(incomplete.createClient(), null);
+  assert.equal(captured, undefined);
+
+  const backend = context.window.PropertyDeskBackendClient.create({
+    config: {
+      supabaseUrl: "https://example.test",
+      supabaseAnonKey: "public-anon-key",
+    },
+    supabase,
+  });
+  assert.equal(backend.configured, true);
+  assert.deepEqual(backend.createClient(), { connected: true });
+  assert.equal(captured[0], "https://example.test");
+  assert.equal(captured[1], "public-anon-key");
+  assert.deepEqual(JSON.parse(JSON.stringify(captured[2])), {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
+});
+
 test("notification feature replaces its timer and hides transient feedback", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

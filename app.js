@@ -36,9 +36,10 @@
   } = window.PropertyDeskAppUtils;
   const workspaceData = window.PropertyDeskWorkspaceData.create();
   const config = window.PROPERTYDESK_CONFIG || {};
-  const configured = Boolean(
-    config.supabaseUrl && config.supabaseAnonKey && window.supabase,
-  );
+  const backend = window.PropertyDeskBackendClient.create({
+    config,
+    supabase: window.supabase,
+  });
   const state = window.PropertyDeskAppState.create();
   const { toast } = window.PropertyDeskNotifications.create({ $ });
   const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
@@ -405,22 +406,12 @@
     setAuthMode(false);
     window.PropertyDeskPwa.registerShell();
 
-    if (!configured) {
+    if (!backend.configured) {
       showConfigError();
       return;
     }
 
-    state.client = window.supabase.createClient(
-      config.supabaseUrl,
-      config.supabaseAnonKey,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      },
-    );
+    state.client = backend.createClient();
     state.client.auth.onAuthStateChange(handleAuthStateChange);
     await restoreAuthSession();
   }
