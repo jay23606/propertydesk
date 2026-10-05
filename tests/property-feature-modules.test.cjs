@@ -405,10 +405,16 @@ test("deposit detail event router refreshes the ledger after a recorded adjustme
 
 test("account history renders scoped prior terms and escaped void reasons", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-history-details.js"), "utf8"),
-    context,
-  );
+  for (const filename of [
+    "account-history-model.js",
+    "account-history-view.js",
+    "account-history-details.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const seenAuditIds = [];
   const state = {
     agreementVersions: [{
