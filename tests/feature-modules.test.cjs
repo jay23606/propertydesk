@@ -329,6 +329,60 @@ test("adding a workspace member clears the address only after successful refresh
   assert.equal(messages.at(-1), "Workspace member added");
 });
 
+test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-management.js"), "utf8"),
+    context,
+  );
+  const updates = [];
+  const messages = [];
+  let refreshed = false;
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    selectedPropertyId: "property-1",
+    properties: [{ id: "property-1", address: "10 Main St", notes: "Old note" }],
+    client: {
+      from(table) {
+        assert.equal(table, "pd_properties");
+        return {
+          update(values) {
+            updates.push(values);
+            return {
+              eq(column, value) {
+                updates.push([column, value]);
+                return { eq: async (ownerColumn, ownerId) => {
+                  updates.push([ownerColumn, ownerId]);
+                  return { error: null };
+                } };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskPropertyManagement.create({
+    $: () => {}, state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => { refreshed = true; },
+    todayIso: () => "2026-10-04",
+    streetAddress: (property) => property.address,
+    openPropertyDetails() {},
+    promptAction: () => "  Follow-up\n needed   soon ",
+  });
+
+  await feature.editPropertyQuickNote("property-1");
+
+  assert.equal(updates[0].notes, "Follow-up needed soon");
+  assert.equal(updates[1][0], "id");
+  assert.equal(updates[1][1], "property-1");
+  assert.equal(updates[2][0], "user_id");
+  assert.equal(updates[2][1], "workspace-1");
+  assert.equal(refreshed, true);
+  assert.equal(messages.at(-1), "Property note saved");
+});
+
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
