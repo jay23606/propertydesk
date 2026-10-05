@@ -176,9 +176,7 @@
         )
         .join("");
       $("import-history").innerHTML = state.importBatches.length
-        ? state.importBatches
-            .map(renderImportBatchRow)
-            .join("")
+        ? state.importBatches.map(renderImportBatchRow).join("")
         : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
     }
 

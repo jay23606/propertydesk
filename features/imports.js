@@ -47,9 +47,10 @@
     }
 
     function renderCorrectionCell(error, raw, key) {
-      const content = raw && !raw._parse_error
-        ? `<input type="text" data-import-correction data-row="${Number(error.row)}" data-column="${esc(key)}" aria-label="CSV row ${Number(error.row)} ${esc(key)}" value="${esc(raw[key] ?? "")}">`
-        : esc(raw?.[key] ?? "");
+      const content =
+        raw && !raw._parse_error
+          ? `<input type="text" data-import-correction data-row="${Number(error.row)}" data-column="${esc(key)}" aria-label="CSV row ${Number(error.row)} ${esc(key)}" value="${esc(raw[key] ?? "")}">`
+          : esc(raw?.[key] ?? "");
       return `<td>${content}</td>`;
     }
 

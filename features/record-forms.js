@@ -157,9 +157,12 @@
     function prefillPaymentAmount() {
       const amountInput = $("payment-amount");
       if (amountInput.value) return false;
-      const account = state.accounts.find((item) => item.id === $("payment-account").value);
+      const account = state.accounts.find(
+        (item) => item.id === $("payment-account").value,
+      );
       const scheduledAmount = Number(account?.payment_amount || 0);
-      if (!Number.isFinite(scheduledAmount) || scheduledAmount <= 0) return false;
+      if (!Number.isFinite(scheduledAmount) || scheduledAmount <= 0)
+        return false;
       amountInput.value = account.payment_amount;
       return true;
     }
