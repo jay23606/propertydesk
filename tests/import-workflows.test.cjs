@@ -16,6 +16,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/record-forms.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/imports.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/details.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/documents.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
@@ -23,6 +24,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/record-forms\.js'/);
   assert.match(worker, /'\.\/features\/imports\.js'/);
   assert.match(worker, /'\.\/features\/details\.js'/);
+  assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(app, /attachImportEvents\(\)/);
 });
 

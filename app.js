@@ -92,6 +92,10 @@
       ...window.PropertyDeskImportWorkflows,
       esc, todayIso, openModal, closeModal, fetchAll, toast,
     });
+  const { uploadPropertyDocument, deletePropertyDocument, openPropertyDocument } =
+    window.PropertyDeskDocuments.create({
+      state, toast, fetchAll, openPropertyDetails,
+    });
 
   async function fetchAll() {
     const {data:workspaceId,error:workspaceError}=await state.client.rpc('pd_workspace_id');
@@ -150,37 +154,6 @@
   }
   function scheduleFor(account) {
     return amortizationSchedule(account.original_principal,account.interest_rate,account.term_months,account.start_date,account.principal_interest_amount);
-  }
-  async function uploadPropertyDocument(input) {
-    const file=input.files?.[0], propertyId=state.selectedPropertyId; input.value=''; if(!file||!propertyId)return;
-    const ext=file.name.split('.').pop().toLowerCase(), contentTypes={pdf:'application/pdf',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',jpg:'image/jpeg',jpeg:'image/jpeg'}, contentType=contentTypes[ext];
-    if(!contentType||file.size>15*1024*1024){toast('Choose a PDF, DOCX, or JPEG agreement under 15 MB');return;}
-    const safeName=file.name.normalize('NFKC').replace(/[^\w.() -]/g,'_').replace(/\s+/g,'_').slice(-100)||`agreement.${ext}`;
-    const path=`${state.workspaceOwnerId}/${propertyId}/${crypto.randomUUID()}-${safeName}`;
-    const {error:uploadError}=await state.client.storage.from('pd-private-agreements').upload(path,file,{contentType,upsert:false});
-    if(uploadError){toast(`Agreement upload failed: ${uploadError.message}`);return;}
-    const {error}=await state.client.from('pd_documents').insert({user_id:state.workspaceOwnerId,property_id:propertyId,account_id:null,file_name:file.name,storage_path:path,content_type:file.type||contentType,file_size:file.size});
-    if(error){await state.client.storage.from('pd-private-agreements').remove([path]);toast(`Agreement record failed: ${error.message}`);return;}
-    toast('Agreement uploaded privately');await fetchAll();openPropertyDetails(propertyId);
-  }
-  async function deletePropertyDocument(id) {
-    const doc=state.documents.find(item=>item.id===id), propertyId=state.selectedPropertyId;
-    if(!doc||!propertyId||doc.property_id!==propertyId||doc.user_id!==state.workspaceOwnerId)return;
-    if(!window.confirm(`Permanently delete “${doc.file_name}” from this property? This cannot be undone.`))return;
-    const {error:storageError}=await state.client.storage.from('pd-private-agreements').remove([doc.storage_path]);
-    if(storageError){toast(`Agreement removal failed: ${storageError.message}`);return;}
-    const {error}=await state.client.from('pd_documents').delete().eq('id',doc.id).eq('user_id',state.workspaceOwnerId).eq('property_id',propertyId);
-    if(error){toast(`File deleted, but its document record could not be removed: ${error.message}`);return;}
-    toast('Agreement deleted');await fetchAll();openPropertyDetails(propertyId);
-  }
-  async function openPropertyDocument(id) {
-    const doc=state.documents.find(item=>item.id===id); if(!doc)return;
-    const viewer=window.open('about:blank','_blank');
-    if(!viewer){toast('Allow pop-ups to open this agreement; you can also use Download.');return;}
-    viewer.opener=null;
-    const {data,error}=await state.client.storage.from('pd-private-agreements').createSignedUrl(doc.storage_path,60);
-    if(error){viewer.close();toast(`Agreement link failed: ${error.message}`);return;}
-    viewer.location.href=data.signedUrl;
   }
   async function saveProfile(event){event.preventDefault();const display_name=$('display-name').value.trim();if(!display_name){toast('Enter a display name');return;}const {data,error}=await state.client.auth.updateUser({data:{display_name}});if(error){toast(error.message);return;}state.user=data.user||state.user;updateGreeting();toast('Display name saved');}
   async function addWorkspaceMember(event){event.preventDefault();const email=$('member-email').value.trim();if(!email)return;const {error}=await state.client.rpc('pd_add_workspace_member',{p_email:email});if(error){toast(error.message);return;} $('member-email').value='';await fetchAll();renderWorkspaceSettings();toast('Workspace member added');}

@@ -63,6 +63,86 @@ test("record-entry module exposes property, account, and transaction workflows",
   }
 });
 
+test("private document module exposes upload, delete, and open workflows", () => {
+  const context = vm.createContext({ window: {} });
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "documents.js"),
+    "utf8",
+  );
+  vm.runInContext(source, context);
+
+  const feature = context.window.PropertyDeskDocuments.create({});
+  for (const action of [
+    "uploadPropertyDocument",
+    "deletePropertyDocument",
+    "openPropertyDocument",
+  ]) {
+    assert.equal(typeof feature[action], "function", action);
+  }
+});
+
+test("document upload stores objects privately and removes an orphan after metadata failure", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
+    context,
+  );
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from(bucket) {
+          assert.equal(bucket, "pd-private-agreements");
+          return {
+            async upload(path, file, options) {
+              state.upload = { path, file, options };
+              return { error: null };
+            },
+            async remove(paths) {
+              state.removed = paths;
+              return { error: null };
+            },
+          };
+        },
+      },
+      from(table) {
+        assert.equal(table, "pd_documents");
+        return {
+          async insert(row) {
+            state.document = row;
+            return { error: { message: "metadata insert failed" } };
+          },
+        };
+      },
+    },
+  };
+  const messages = [];
+  const input = {
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  };
+  const feature = context.window.PropertyDeskDocuments.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("failed metadata must not refresh"),
+    openPropertyDetails: () => assert.fail("failed metadata must not reopen details"),
+    makeId: () => "file-id",
+  });
+
+  await feature.uploadPropertyDocument(input);
+
+  assert.equal(input.value, "");
+  assert.equal(state.upload.path, "workspace-1/property-1/file-id-Agreement.pdf");
+  assert.equal(state.upload.options.contentType, "application/pdf");
+  assert.equal(state.upload.options.upsert, false);
+  assert.equal(state.document.user_id, "workspace-1");
+  assert.equal(state.removed.length, 1);
+  assert.equal(state.removed[0], state.upload.path);
+  assert.match(messages[0], /metadata insert failed/);
+});
+
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
