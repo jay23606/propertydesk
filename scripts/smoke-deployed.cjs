@@ -5,9 +5,21 @@ async function main() {
   if (!url) throw new Error("Pass the deployed PropertyDesk URL as an argument.");
 
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  const context = await browser.newContext();
+  const page = await context.newPage();
   const runtimeErrors = [];
+  const consoleErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+  context.on("serviceworker", (worker) => {
+    worker.on("console", (message) => {
+      if (message.type() === "error") {
+        consoleErrors.push(`Service worker: ${message.text()}`);
+      }
+    });
+  });
 
   try {
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
@@ -97,6 +109,9 @@ async function main() {
     }
     if (runtimeErrors.length) {
       throw new Error(`Uncaught browser errors: ${runtimeErrors.join(" | ")}`);
+    }
+    if (consoleErrors.length) {
+      throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
     console.log("Deployed PropertyDesk loaded and rendered a note amortization detail without uncaught browser errors.");
   } finally {
