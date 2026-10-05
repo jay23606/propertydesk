@@ -116,7 +116,7 @@
             const due = amountDueSince(
               [account],
               state.payments,
-              unpaidDueAccrualStart(account),
+              unpaidDueAccrualStart(),
               todayIso(),
             );
             const monthly = monthlyScheduledEstimate([

@@ -34,7 +34,7 @@
       const amount = amountDueSince(
         [account],
         state.payments,
-        unpaidDueAccrualStart(account),
+        unpaidDueAccrualStart(),
         monthEnd(),
       );
       const label = dateOnly(monthStart()).toLocaleDateString(undefined, {

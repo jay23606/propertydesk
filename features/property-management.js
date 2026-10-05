@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+    state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
     documentRef = document,
     promptAction = (message, initialValue) => window.prompt(message, initialValue),
   }) {

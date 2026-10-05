@@ -56,7 +56,7 @@
       const max = Math.max(1, ...counts);
       $("account-breakdown").innerHTML = labels
         .map(
-          ([type, label], index) =>
+          ([, label], index) =>
             `<div class="breakdown-row"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(counts[index] / max) * 100}%"></div></div><strong>${counts[index]}</strong></div>`,
         )
         .join("");

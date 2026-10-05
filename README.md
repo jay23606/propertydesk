@@ -47,7 +47,7 @@ PropertyDesk is a recordkeeping tool and does not collect payments. Loan allocat
 
 ## Local checks
 
-With Node.js installed, run `npm run lint` and `npm test` from this directory. The lint check catches undefined names in browser code; the tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
+With Node.js installed, run `npm run lint` and `npm test` from this directory. The lint check catches undefined and unused names in browser code; the tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
 
 - `supabase db query --linked --file supabase/tests/workspace_security.sql` checks workspace row-level security.
 - `supabase db query --linked --file supabase/tests/payment_allocation_integrity.sql` checks legacy allocation constraints.

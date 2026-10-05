@@ -177,7 +177,7 @@
     return cents(Math.max(0, scheduled - received));
   }
 
-  function unpaidDueAccrualStart(account) {
+  function unpaidDueAccrualStart() {
     // Imported payment histories are incomplete before October 2026, so don't infer older arrears.
     return '2026-10-01';
   }

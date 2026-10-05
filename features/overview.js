@@ -48,7 +48,7 @@
       });
     }
 
-    function propertyCard(property, compact = false) {
+    function propertyCard(property) {
       const related = state.accounts.filter(
         (a) => a.property_id === property.id,
       );
@@ -66,7 +66,7 @@
           amountDueSince(
             [account],
             state.payments,
-            unpaidDueAccrualStart(account),
+          unpaidDueAccrualStart(),
             todayIso(),
           ),
         0,
@@ -165,7 +165,7 @@
         state.properties
           .filter((p) => !p.archived_at)
           .slice(0, 3)
-          .map((p) => propertyCard(p, true))
+          .map(propertyCard)
           .join("") ||
         '<div class="list-empty">Add your first property to build your portfolio.</div>';
     }

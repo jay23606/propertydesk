@@ -6,7 +6,6 @@
     $,
     state,
     toast,
-    confirmAction = (message) => window.confirm(message),
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
     prettyType,

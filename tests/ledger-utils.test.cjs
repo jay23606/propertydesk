@@ -144,16 +144,16 @@ test('unpaid due starts in October 2026 across account types, ignores unrecorded
   const priorReceipts = Array.from({ length: 9 }, (_, index) => ({
     account_id: account.id, amount: 550, received_date: `2026-${String(index + 1).padStart(2, '0')}-15`, income_category: 'installment'
   }));
-  const trackingStart = unpaidDueAccrualStart(account);
+  const trackingStart = unpaidDueAccrualStart();
   assert.equal(trackingStart, '2026-10-01');
   assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-10-03'), 550, 'only October is assumed unpaid at launch');
   assert.equal(amountDueSince([account], priorReceipts, trackingStart, '2026-11-03'), 1100, 'an unpaid October installment carries into November');
   assert.equal(amountDueSince([account], [...priorReceipts, { account_id: account.id, amount: 550, received_date: '2026-10-15', income_category: 'installment' }], trackingStart, '2026-11-03'), 550, 'recording October payment reduces the carry-forward');
   const rental = { ...account, id: 'rental-october', account_type: 'rental' };
   const rentalReceipts = priorReceipts.map(payment => ({ ...payment, account_id: rental.id, income_category: 'rent' }));
-  assert.equal(unpaidDueAccrualStart(rental), '2026-10-01');
-  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(rental), '2026-10-03'), 550, 'rentals also start at October because earlier receipts are not fully recorded');
-  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(rental), '2026-11-03'), 1100, 'missed rent then carries forward in later months');
+  assert.equal(unpaidDueAccrualStart(), '2026-10-01');
+  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(), '2026-10-03'), 550, 'rentals also start at October because earlier receipts are not fully recorded');
+  assert.equal(amountDueSince([rental], rentalReceipts, unpaidDueAccrualStart(), '2026-11-03'), 1100, 'missed rent then carries forward in later months');
 });
 
 test('monthly due dates stay anchored at month end', () => {

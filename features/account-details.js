@@ -78,7 +78,7 @@
         <div class="list-row">
         <div class="row-copy">
         <strong>${esc(propertyAddress(p || {}))}</strong>
-        <small>Next due ${fmtDate(a.next_due_date)} · ${esc(paymentFrequencyLabel(a.payment_frequency))} · unpaid due tracked since ${fmtDate(unpaidDueAccrualStart(a), { month: "short", day: "numeric", year: "numeric" })}: ${money(amountDueSince([a], state.payments, unpaidDueAccrualStart(a), todayIso()))}</small>
+        <small>Next due ${fmtDate(a.next_due_date)} · ${esc(paymentFrequencyLabel(a.payment_frequency))} · unpaid due tracked since ${fmtDate(unpaidDueAccrualStart(), { month: "short", day: "numeric", year: "numeric" })}: ${money(amountDueSince([a], state.payments, unpaidDueAccrualStart(), todayIso()))}</small>
         </div>
         <button id="detail-edit" class="button secondary compact">Edit</button>
         <button id="detail-record" class="button primary compact">Record payment</button>

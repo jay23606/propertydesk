@@ -408,7 +408,6 @@
       money,
     });
   const {
-    removeWorkspaceMember,
     renderWorkspaceSettings,
     attachEvents: attachWorkspaceEvents,
   } = window.PropertyDeskWorkspace.create({
@@ -445,7 +444,6 @@
     });
   const { editPropertyQuickNote, savePropertyHolders, toggleArchiveProperty } =
     window.PropertyDeskPropertyManagement.create({
-      $,
       state,
       toast,
       fetchAll,
