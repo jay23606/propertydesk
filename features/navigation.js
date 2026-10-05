@@ -1,43 +1,11 @@
-/* PropertyDesk: theme preferences and workspace page navigation. */
+/* PropertyDesk workspace page navigation. */
 (() => {
   'use strict';
 
   function create({
     $, state, renderWorkspaceSettings,
-    documentRef = document, windowRef = window, storage,
+    documentRef = document, windowRef = window,
   }) {
-    function setTheme(theme, persist = false) {
-      const next = theme === 'light' ? 'light' : 'dark';
-      documentRef.documentElement.dataset.theme = next;
-      const themeColor = next === 'dark' ? '#151b17' : '#f6f7f4';
-      documentRef
-        .querySelector('meta[name="theme-color"]')
-        ?.setAttribute('content', themeColor);
-      if (persist) {
-        try {
-          (storage || windowRef.localStorage).setItem('propertydesk-theme', next);
-        } catch {
-          // Keep the active theme for this page when storage is unavailable.
-        }
-      }
-
-      documentRef.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-        const action = next === 'dark' ? 'light' : 'dark';
-        button.setAttribute('aria-label', `Switch to ${action} mode`);
-        button.setAttribute('aria-pressed', String(next === 'dark'));
-        const label = button.querySelector('.theme-label');
-        if (label) {
-          label.textContent = `${action[0].toUpperCase()}${action.slice(1)} mode`;
-        }
-        const icon = button.querySelector('.theme-icon');
-        if (icon) icon.textContent = next === 'dark' ? '☼' : '☾';
-      });
-    }
-
-    function syncThemeButtons() {
-      setTheme(documentRef.documentElement.dataset.theme);
-    }
-
     function navigate(view) {
       state.view = view;
       documentRef.querySelectorAll('.page').forEach((page) => {
@@ -52,18 +20,6 @@
     }
 
     function attachEvents() {
-      documentRef.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-        button.addEventListener('click', () =>
-          setTheme(
-            documentRef.documentElement.dataset.theme === 'dark'
-              ? 'light'
-              : 'dark',
-            true,
-          ),
-        );
-      });
-      syncThemeButtons();
-
       documentRef.querySelectorAll('.nav-link').forEach((link) => {
         link.addEventListener('click', () => {
           if (link.dataset.view === 'workspace') renderWorkspaceSettings();
@@ -79,7 +35,7 @@
       });
     }
 
-    return { setTheme, syncThemeButtons, navigate, attachEvents };
+    return { navigate, attachEvents };
   }
 
   window.PropertyDeskNavigation = { create };

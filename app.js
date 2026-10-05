@@ -476,6 +476,8 @@
       state,
       renderWorkspaceSettings,
     });
+  const { attachEvents: attachThemeEvents } =
+    window.PropertyDeskTheme.create();
   const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
     state,
     toast,
@@ -508,6 +510,7 @@
     ],
     eventBinders: [
       attachModalEvents,
+      attachThemeEvents,
       attachNavigationEvents,
       attachOverviewEvents,
       attachPropertyViewEvents,

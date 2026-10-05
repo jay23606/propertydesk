@@ -2896,14 +2896,13 @@ test("auth session restore and sign-out report rejected requests without clearin
   ]);
 });
 
-test("navigation owns theme toggles and page routing", () => {
+test("navigation owns page routing and workspace settings navigation", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", "navigation.js"), "utf8"),
     context,
   );
   const handlers = new Map();
-  const attributes = {};
   const classes = new Set();
   const makeElement = (id, dataset = {}) => ({
     id,
@@ -2915,24 +2914,10 @@ test("navigation owns theme toggles and page routing", () => {
         else classes.delete(`${id}:${name}`);
       },
     },
-    setAttribute(name, value) {
-      attributes[`${id}:${name}`] = value;
-    },
     addEventListener(name, handler) {
       handlers.set(`${id}:${name}`, handler);
     },
-    querySelector(selector) {
-      return selector === ".theme-label"
-        ? themeLabel
-        : selector === ".theme-icon"
-          ? themeIcon
-          : null;
-    },
   });
-  const themeLabel = { textContent: "" };
-  const themeIcon = { textContent: "" };
-  const meta = { setAttribute: (name, value) => (attributes[`meta:${name}`] = value) };
-  const toggle = makeElement("theme");
   const propertiesPage = makeElement("page-properties");
   const workspacePage = makeElement("page-workspace");
   const reportsPage = makeElement("page-reports");
@@ -2942,17 +2927,13 @@ test("navigation owns theme toggles and page routing", () => {
   const gotoLink = makeElement("goto-link", { goto: "reports" });
   const userMenu = makeElement("user-menu");
   const selectors = {
-    "[data-theme-toggle]": [toggle],
     ".page": [propertiesPage, workspacePage, reportsPage],
     ".nav-link": [propertiesLink, reportsLink, workspaceLink],
     "[data-goto]": [gotoLink],
   };
   const documentRef = {
-    documentElement: { dataset: { theme: "dark" } },
-    querySelector: (selector) => (selector === 'meta[name="theme-color"]' ? meta : null),
     querySelectorAll: (selector) => selectors[selector] || [],
   };
-  const storageWrites = [];
   const routes = [];
   const state = { view: "properties" };
   const crumb = { textContent: "" };
@@ -2963,20 +2944,9 @@ test("navigation owns theme toggles and page routing", () => {
     renderWorkspaceSettings: () => routes.push("workspace-settings"),
     documentRef,
     windowRef: { scrollTo: () => routes.push("scroll") },
-    storage: { setItem: (...args) => storageWrites.push(args) },
   });
 
   feature.attachEvents();
-  assert.equal(attributes["theme:aria-label"], "Switch to light mode");
-  assert.equal(attributes["theme:aria-pressed"], "true");
-  assert.equal(themeLabel.textContent, "Light mode");
-  assert.equal(themeIcon.textContent, "☼");
-
-  handlers.get("theme:click")();
-  assert.equal(documentRef.documentElement.dataset.theme, "light");
-  assert.equal(attributes["meta:content"], "#f6f7f4");
-  assert.deepEqual(storageWrites, [["propertydesk-theme", "light"]]);
-
   handlers.get("workspace-link:click")();
   assert.equal(state.view, "workspace");
   assert.equal(crumb.textContent, "Workspace");
@@ -2993,6 +2963,63 @@ test("navigation owns theme toggles and page routing", () => {
   assert.deepEqual(routes.slice(-2), ["workspace-settings", "scroll"]);
 });
 
+test("theme controller synchronizes toggles and persists theme changes", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "theme-controller.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const attributes = {};
+  const labels = [];
+  const icons = [];
+  const makeToggle = (id) => ({
+    setAttribute(name, value) {
+      attributes[`${id}:${name}`] = value;
+    },
+    addEventListener(name, handler) {
+      handlers.set(`${id}:${name}`, handler);
+    },
+    querySelector(selector) {
+      return selector === ".theme-label"
+        ? labels[id]
+        : selector === ".theme-icon"
+          ? icons[id]
+          : null;
+    },
+  });
+  const toggles = [makeToggle(0), makeToggle(1)];
+  labels.push({ textContent: "" }, { textContent: "" });
+  icons.push({ textContent: "" }, { textContent: "" });
+  const meta = { setAttribute: (name, value) => (attributes[`meta:${name}`] = value) };
+  const documentRef = {
+    documentElement: { dataset: { theme: "dark" } },
+    querySelector: (selector) => selector === 'meta[name="theme-color"]' ? meta : null,
+    querySelectorAll: (selector) => selector === "[data-theme-toggle]" ? toggles : [],
+  };
+  const storageWrites = [];
+  const theme = context.window.PropertyDeskTheme.create({
+    documentRef,
+    windowRef: {},
+    storage: { setItem: (...args) => storageWrites.push(args) },
+  });
+
+  theme.attachEvents();
+  assert.equal(attributes["0:aria-label"], "Switch to light mode");
+  assert.equal(attributes["0:aria-pressed"], "true");
+  assert.equal(labels[0].textContent, "Light mode");
+  assert.equal(icons[0].textContent, "☼");
+  assert.equal(attributes["meta:content"], "#151b17");
+
+  handlers.get("0:click")();
+  assert.equal(documentRef.documentElement.dataset.theme, "light");
+  assert.equal(attributes["meta:content"], "#f6f7f4");
+  assert.equal(attributes["1:aria-label"], "Switch to dark mode");
+  assert.equal(labels[1].textContent, "Dark mode");
+  assert.equal(icons[1].textContent, "☾");
+  assert.deepEqual(storageWrites, [["propertydesk-theme", "light"]]);
+});
+
 test("navigation feature loads before app startup and is precached", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
@@ -3001,6 +3028,14 @@ test("navigation feature loads before app startup and is precached", () => {
     "navigation should load before the app coordinator",
   );
   assert.match(worker, /'\.\/features\/navigation\.js'/);
+});
+
+test("theme controller loads before app startup and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(html.indexOf("features/theme-controller.js") < html.indexOf("app.js"));
+  assert.match(worker, /'\.\/features\/theme-controller\.js'/);
+  assert.match(fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"), /PropertyDeskTheme\.create/);
 });
 
 test("workspace settings render member labels and escape untrusted text", () => {
