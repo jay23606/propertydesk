@@ -107,13 +107,134 @@ async function main() {
     if (!detailText.includes("Estimated amortization schedule")) {
       throw new Error("The note detail did not render its amortization schedule.");
     }
+
+    const signedInContext = await browser.newContext();
+    const signedInPageErrors = [];
+    const signedInConsoleErrors = [];
+    const signedInPage = await signedInContext.newPage();
+    signedInPage.on("pageerror", (error) => signedInPageErrors.push(error.message));
+    signedInPage.on("console", (message) => {
+      if (message.type() === "error") signedInConsoleErrors.push(message.text());
+    });
+    await signedInPage.route("**/@supabase/supabase-js@2*", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "" }),
+    );
+    await signedInPage.route("**/config.js", (route) =>
+      route.fulfill({
+        contentType: "text/javascript",
+        body: 'window.PROPERTYDESK_CONFIG = { supabaseUrl: "https://smoke.invalid", supabaseAnonKey: "smoke" };',
+      }),
+    );
+    await signedInPage.addInitScript(() => {
+      const property = {
+        id: "smoke-property",
+        name: "Browser smoke-test property",
+        address: "10 Smoke Street",
+        city: "Testville",
+        state: "PA",
+        postal_code: "00000",
+        property_kind: "residential",
+        archived_at: null,
+      };
+      const account = {
+        id: "smoke-account",
+        property_id: property.id,
+        name: "Browser smoke-test note",
+        party_name: "Smoke Test Buyer",
+        account_type: "note",
+        original_principal: 10000,
+        interest_rate: 5,
+        term_months: 360,
+        start_date: "2025-01-01",
+        payment_amount: 53.68,
+        payment_frequency: "monthly",
+        status: "active",
+        next_due_date: "2026-10-01",
+      };
+      const rows = {
+        pd_properties: [property],
+        pd_accounts: [account],
+        pd_payments: [],
+        pd_expenses: [],
+        pd_import_batches: [],
+        pd_documents: [],
+        pd_agreement_versions: [],
+        pd_property_holders: [],
+        pd_deposit_entries: [],
+        pd_reminder_logs: [],
+        pd_audit_events: [],
+      };
+      function queryFor(table) {
+        const result = { data: rows[table] || [], error: null };
+        const query = {
+          select: () => query,
+          eq: () => query,
+          order: () => query,
+          in: () => query,
+          limit: () => Promise.resolve(result),
+          then: (resolve, reject) => Promise.resolve(result).then(resolve, reject),
+        };
+        return query;
+      }
+      window.supabase = {
+        createClient: () => ({
+          auth: {
+            onAuthStateChange() {},
+            getSession: async () => ({
+              data: {
+                session: {
+                  access_token: "smoke-token",
+                  user: {
+                    id: "smoke-user",
+                    email: "smoke@example.invalid",
+                    user_metadata: { display_name: "Browser smoke test" },
+                  },
+                },
+              },
+              error: null,
+            }),
+          },
+          rpc: async (name) => ({
+            data: name === "pd_workspace_id" ? "smoke-workspace" : [],
+            error: null,
+          }),
+          from: queryFor,
+        }),
+      };
+      Object.defineProperty(navigator, "serviceWorker", {
+        configurable: true,
+        value: { register: async () => ({}) },
+      });
+    });
+
+    await signedInPage.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+    await signedInPage
+      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .waitFor({ state: "visible", timeout: 30000 });
+    await signedInPage
+      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .click();
+    await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    await signedInPage
+      .locator('#property-detail-content [data-detail="smoke-account"]')
+      .click();
+    await signedInPage.locator("#detail-modal:not(.hidden)").waitFor();
+    const signedInDetail = await signedInPage.locator("#detail-content").innerText();
+    if (!signedInDetail.includes("Estimated amortization schedule")) {
+      throw new Error("The signed-in app did not open the smoke note schedule through the Properties UI.");
+    }
+    if (signedInPageErrors.length || signedInConsoleErrors.length) {
+      throw new Error(
+        `Signed-in app browser errors: ${[...signedInPageErrors, ...signedInConsoleErrors].join(" | ")}`,
+      );
+    }
     if (runtimeErrors.length) {
       throw new Error(`Uncaught browser errors: ${runtimeErrors.join(" | ")}`);
     }
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("Deployed PropertyDesk loaded and rendered a note amortization detail without uncaught browser errors.");
+    console.log("Deployed PropertyDesk loaded and rendered a note amortization detail in the signed-in app without browser errors.");
   } finally {
     await browser.close();
   }
