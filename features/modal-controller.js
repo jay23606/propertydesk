@@ -2,7 +2,14 @@
 (() => {
   'use strict';
 
-  function create({ $, state, esc, propertyAddress, prettyType }) {
+  function create({
+    $,
+    state,
+    esc,
+    propertyAddress,
+    prettyType,
+    documentRef = document,
+  }) {
     function openModal(id) {
       $(id).classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -35,6 +42,15 @@
       state.pendingCorrection = null;
       if (modal.id === 'payment-modal') resetPaymentModal();
       else resetExpenseModal();
+    }
+
+    function attachEvents() {
+      documentRef.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        documentRef
+          .querySelectorAll('.modal:not(.hidden)')
+          .forEach(closeModal);
+      });
     }
 
     function fillSelect(id, options, placeholder) {
@@ -71,6 +87,7 @@
     }
 
     return {
+      attachEvents,
       openModal,
       closeModal,
       fillSelect,

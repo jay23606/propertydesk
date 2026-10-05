@@ -6,7 +6,12 @@ const vm = require('node:vm');
 
 function createController() {
   const elements = new Map();
-  const document = { body: { style: { overflow: '' } } };
+  const listeners = new Map();
+  const document = {
+    body: { style: { overflow: '' } },
+    addEventListener: (name, handler) => listeners.set(name, handler),
+    querySelectorAll: () => [elements.get('payment-modal')].filter(Boolean),
+  };
   const getElement = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
@@ -59,7 +64,7 @@ function createController() {
     propertyAddress: (property) => property.address,
     prettyType: (type) => type,
   });
-  return { controller, document, elements, getElement, state };
+  return { controller, document, elements, getElement, listeners, state };
 }
 
 test('modal controller clears workflow state and resets payment forms when closing', () => {
@@ -98,6 +103,21 @@ test('modal controller cleans up import/detail state and escapes populated selec
   assert.match(getElement('payment-account').innerHTML, /&lt;Tenant&gt;/);
   assert.doesNotMatch(getElement('payment-account').innerHTML, /Old lease/);
   assert.match(getElement('expense-account').innerHTML, /Old lease/);
+});
+
+test('modal controller closes the active dialog on Escape', () => {
+  const { controller, document, getElement, listeners, state } = createController();
+  const paymentModal = getElement('payment-modal');
+  controller.openModal('payment-modal');
+  controller.attachEvents();
+
+  listeners.get('keydown')({ key: 'Enter' });
+  assert.equal(paymentModal.classList.lastAdded, undefined);
+  listeners.get('keydown')({ key: 'Escape' });
+
+  assert.equal(paymentModal.classList.lastAdded, 'hidden');
+  assert.equal(document.body.style.overflow, '');
+  assert.equal(state.pendingCorrection, null);
 });
 
 test('modal controller is loaded before app startup and precached', () => {

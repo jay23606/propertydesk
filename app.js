@@ -231,13 +231,20 @@
       sumOperatingExpenses,
       accountBalance,
     });
-  const { openModal, closeModal, fillSelect, populateFormOptions } =
+  const {
+    attachEvents: attachModalEvents,
+    openModal,
+    closeModal,
+    fillSelect,
+    populateFormOptions,
+  } =
     window.PropertyDeskModalController.create({
       $,
       state,
       esc,
       propertyAddress,
       prettyType,
+      documentRef: document,
     });
   const recordForms = window.PropertyDeskRecordForms.create({
     $,
@@ -460,15 +467,8 @@
     renderPayments();
     renderReports();
   }
-  function attachKeyboardEvents() {
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        document.querySelectorAll('.modal:not(.hidden)').forEach(closeModal);
-      }
-    });
-  }
-
   function attachEvents() {
+    attachModalEvents();
     attachNavigationEvents();
     attachPropertyViewEvents();
     attachTransactionViewEvents();
@@ -480,7 +480,6 @@
     attachAuthEvents();
     attachImportEvents();
     attachExportEvents();
-    attachKeyboardEvents();
   }
   function setupServiceWorker() {
     if (
