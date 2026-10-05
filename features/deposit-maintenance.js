@@ -1,17 +1,14 @@
-/* PropertyDesk account lifecycle and ledger adjustment workflows. */
+/* PropertyDesk security-deposit retention and reversal workflow. */
 (() => {
   "use strict";
 
   function create({
-    $,
     state,
     moneyInput,
     todayIso,
     toast,
     fetchAll,
-    closeModal,
     openAccountDetails,
-    confirmAction = (message) => window.confirm(message),
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
   }) {
@@ -54,28 +51,8 @@
       );
     }
 
-    async function deleteAccount(account) {
-      if (
-        !confirmAction(
-          `Close “${account.name}”? Its payment history will remain in your records.`,
-        )
-      )
-        return;
-      const { error } = await state.client
-        .from("pd_accounts")
-        .update({ status: "closed" })
-        .eq("id", account.id);
-      if (error) {
-        toast(error.message);
-        return;
-      }
-      closeModal($("detail-modal"));
-      await fetchAll();
-      toast("Account closed");
-    }
-
-    return { recordDepositAdjustment, deleteAccount };
+    return { recordDepositAdjustment };
   }
 
-  window.PropertyDeskLedgerActions = { create };
+  window.PropertyDeskDepositMaintenance = { create };
 })();

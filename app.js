@@ -254,19 +254,23 @@
     attachEvents: attachRecordFormEvents,
     attachCreateActions: attachRecordCreateActions,
   } = recordForms;
-  const {
-    recordDepositAdjustment,
-    deleteAccount,
-  } = window.PropertyDeskLedgerActions.create({
+  const { deleteAccount: closeAccount } =
+    window.PropertyDeskAccountMaintenance.create({
     $,
     state,
-    moneyInput,
-    todayIso,
     toast,
     fetchAll,
     closeModal,
-    openAccountDetails: (...args) => openAccountDetails(...args),
   });
+  const { recordDepositAdjustment } =
+    window.PropertyDeskDepositMaintenance.create({
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      fetchAll,
+      openAccountDetails: (...args) => openAccountDetails(...args),
+    });
   const { correctTransaction, voidTransaction } =
     window.PropertyDeskTransactionMaintenance.create({
       $,
@@ -307,7 +311,7 @@
       openExpense,
       resetAccountForm,
       populateFormOptions,
-      deleteAccount,
+      deleteAccount: closeAccount,
       propertyAddress,
     });
   const { attachEvents: attachImportEvents } =

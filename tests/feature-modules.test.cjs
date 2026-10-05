@@ -1219,11 +1219,11 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
-test("account ledger actions retain deposit audit details", async () => {
+test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "ledger-actions.js"),
+      path.join(__dirname, "..", "features", "deposit-maintenance.js"),
       "utf8",
     ),
     context,
@@ -1246,8 +1246,7 @@ test("account ledger actions retain deposit audit details", async () => {
       },
     },
   };
-  const feature = context.window.PropertyDeskLedgerActions.create({
-    $: (id) => ({ id }),
+  const feature = context.window.PropertyDeskDepositMaintenance.create({
     state,
     moneyInput: Number,
     todayIso: () => "2026-10-04",
@@ -1270,6 +1269,53 @@ test("account ledger actions retain deposit audit details", async () => {
   );
   assert.equal(messages.at(-1), "Deposit retention recorded");
   assert.equal(calls.filter((call) => call === "refresh").length, 1);
+});
+
+test("account maintenance closes an account while preserving its history", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const updates = [];
+  const calls = [];
+  const messages = [];
+  const state = {
+    client: {
+      from(table) {
+        return {
+          update(payload) {
+            updates.push([table, payload]);
+            return {
+              async eq(column, value) {
+                updates.push([column, value]);
+                return { error: null };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskAccountMaintenance.create({
+    $: (id) => ({ id }),
+    state,
+    confirmAction: () => true,
+    closeModal: (modal) => calls.push(["close", modal.id]),
+    fetchAll: async () => calls.push("refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await feature.closeAccount({ id: "account-1", name: "Rental" });
+
+  assert.equal(updates[0][0], "pd_accounts");
+  assert.equal(updates[0][1].status, "closed");
+  assert.deepEqual(updates[1], ["id", "account-1"]);
+  assert.deepEqual(calls, [["close", "detail-modal"], "refresh"]);
+  assert.equal(messages.at(-1), "Account closed");
 });
 
 test("transaction maintenance voids a posted row with an audit reason", async () => {
