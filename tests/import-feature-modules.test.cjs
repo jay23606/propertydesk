@@ -48,6 +48,7 @@ test("CSV import feature loads as an isolated browser module", () => {
 
 test("transaction import workflow publishes explicit payment and expense actions", () => {
   const calls = [];
+  const passed = {};
   const payments = {
     importPayments: () => "payments",
     attachEvents: () => calls.push("payment events"),
@@ -58,8 +59,8 @@ test("transaction import workflow publishes explicit payment and expense actions
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskPaymentImport: { create: () => payments },
-      PropertyDeskExpenseImport: { create: () => expenses },
+      PropertyDeskPaymentImport: { create: (options) => { passed.payment = options; return payments; } },
+      PropertyDeskExpenseImport: { create: (options) => { passed.expense = options; return expenses; } },
     },
   });
   vm.runInContext(
@@ -69,7 +70,12 @@ test("transaction import workflow publishes explicit payment and expense actions
     ),
     context,
   );
-  const imports = context.window.PropertyDeskTransactionImports.create({});
+  const dependencies = {
+    $() {}, state: {}, stageImport() {}, parseCSV() {},
+    validatePaymentRows() {}, validateExpenseRows() {}, fetchAll() {}, toast() {},
+    unrelatedDependency() {},
+  };
+  const imports = context.window.PropertyDeskTransactionImports.create(dependencies);
 
   assert.deepEqual(
     Object.keys(imports).sort(),
@@ -77,12 +83,23 @@ test("transaction import workflow publishes explicit payment and expense actions
   );
   assert.equal(imports.importPayments, payments.importPayments);
   assert.equal(imports.importExpenses, expenses.importExpenses);
+  assert.deepEqual(Object.keys(passed.payment).sort(), [
+    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
+    "validatePaymentRows",
+  ].sort());
+  assert.deepEqual(Object.keys(passed.expense).sort(), [
+    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
+    "validateExpenseRows",
+  ].sort());
+  assert.equal(passed.payment.validatePaymentRows, dependencies.validatePaymentRows);
+  assert.equal(passed.expense.validateExpenseRows, dependencies.validateExpenseRows);
   imports.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
 test("import workflow publishes explicit account, payment, and expense actions", () => {
   const calls = [];
+  const passed = {};
   const accounts = {
     importAccounts: () => "accounts",
     attachEvents: () => calls.push("account events"),
@@ -94,8 +111,8 @@ test("import workflow publishes explicit account, payment, and expense actions",
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountImport: { create: () => accounts },
-      PropertyDeskTransactionImports: { create: () => transactions },
+      PropertyDeskAccountImport: { create: (options) => { passed.account = options; return accounts; } },
+      PropertyDeskTransactionImports: { create: (options) => { passed.transaction = options; return transactions; } },
     },
   });
   vm.runInContext(
@@ -105,7 +122,12 @@ test("import workflow publishes explicit account, payment, and expense actions",
     ),
     context,
   );
-  const imports = context.window.PropertyDeskImportFeature.create({});
+  const dependencies = {
+    $() {}, state: {}, stageImport() {}, parseCSV() {}, todayIso() {},
+    validateAccountRows() {}, validatePaymentRows() {}, validateExpenseRows() {},
+    fetchAll() {}, toast() {}, unrelatedDependency() {},
+  };
+  const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
   assert.deepEqual(
     Object.keys(imports).sort(),
@@ -119,6 +141,14 @@ test("import workflow publishes explicit account, payment, and expense actions",
   assert.equal(imports.importAccounts, accounts.importAccounts);
   assert.equal(imports.importPayments, transactions.importPayments);
   assert.equal(imports.importExpenses, transactions.importExpenses);
+  assert.deepEqual(Object.keys(passed.account).sort(), [
+    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
+    "todayIso", "validateAccountRows",
+  ].sort());
+  assert.deepEqual(Object.keys(passed.transaction).sort(), [
+    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
+    "validateExpenseRows", "validatePaymentRows",
+  ].sort());
   imports.attachEvents();
   assert.deepEqual(calls, ["account events", "transaction events"]);
 });
