@@ -111,25 +111,20 @@
       prettyType,
       documentRef: document,
     });
-  const propertyAccountForms = window.PropertyDeskPropertyAccountForms.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
-    populateFormOptions,
-    openModal,
+  const {
+    resetAccountForm,
+    editAccount,
+    updateAllocationPreview,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachPropertyFormEvents,
+    attachLedgerEntryFormEvents,
+    attachCreateActions,
+  } = window.PropertyDeskEntryWorkflow.create({
+    $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
+    fillSelect, populateFormOptions, prettyType, openModal, documentRef: document,
   });
-  const { saveCorrection } =
-    window.PropertyDeskTransactionCorrections.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-    });
   const {
     closeAccount,
     recordDepositAdjustment,
@@ -137,33 +132,6 @@
   } = window.PropertyDeskRecordMaintenance.create({
     $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
   });
-  const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
-    fillSelect,
-    populateFormOptions,
-    prettyType,
-    openModal,
-    saveCorrection,
-  });
-  const {
-    resetPropertyForm,
-    resetAccountForm,
-    editAccount,
-    attachEvents: attachPropertyFormEvents,
-  } = propertyAccountForms;
-  const {
-    updateAllocationPreview,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachEvents: attachLedgerEntryFormEvents,
-  } = ledgerEntryForms;
   const {
     renderPayments,
     attachTransactionViewEvents,
@@ -174,19 +142,6 @@
     openExpense, updateAllocationPreview, EventClass: Event, OptionClass: Option,
     voidTransaction,
   });
-  const { attachEvents: attachCreateActions } =
-    window.PropertyDeskCreateActions.create({
-      $,
-      state,
-      toast,
-      resetPropertyForm,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
-      openPayment,
-      openExpense,
-      documentRef: document,
-    });
   const {
     openAccountDetails,
     attachAccountDetailEvents,

@@ -1791,6 +1791,64 @@ test("property actions workflow composes holder, document, and detail event beha
   assert.equal(workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty), action);
 });
 
+test("entry workflow shares correction saving across forms and create actions", () => {
+  const passed = {};
+  const correction = () => {};
+  const resetPropertyForm = () => {};
+  const resetAccountForm = () => {};
+  const openPayment = () => {};
+  const openExpense = () => {};
+  const preview = () => {};
+  const navigate = () => {};
+  const calls = [];
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionCorrections: {
+        create: () => ({ saveCorrection: correction }),
+      },
+      PropertyDeskPropertyAccountForms: {
+        create: () => ({
+          resetPropertyForm, resetAccountForm, editAccount: () => {},
+          attachEvents: (callback) => calls.push(["property forms", callback]),
+        }),
+      },
+      PropertyDeskLedgerEntryForms: {
+        create: (options) => {
+          passed.ledger = options;
+          return {
+            updateAllocationPreview: () => {}, openPayment, openPropertyPayment: () => {},
+            openExpense,
+            attachEvents: () => calls.push(["ledger forms"]),
+          };
+        },
+      },
+      PropertyDeskCreateActions: {
+        create: (options) => {
+          passed.actions = options;
+          return { attachEvents: (callback) => calls.push(["create actions", callback]) };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "entry-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskEntryWorkflow.create({ documentRef: {} });
+
+  assert.equal(passed.ledger.saveCorrection, correction);
+  assert.equal(passed.actions.resetPropertyForm, resetPropertyForm);
+  assert.equal(passed.actions.resetAccountForm, resetAccountForm);
+  assert.equal(passed.actions.openPayment, openPayment);
+  assert.equal(passed.actions.openExpense, openExpense);
+  workflow.attachPropertyFormEvents(preview);
+  workflow.attachLedgerEntryFormEvents();
+  workflow.attachCreateActions(navigate);
+  assert.deepEqual(calls, [
+    ["property forms", preview], ["ledger forms"], ["create actions", navigate],
+  ]);
+});
+
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
@@ -1806,14 +1864,14 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyActionsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:PropertyDetailEvents|Documents|PropertyQuickNote|PropertyManagement)\.create/);
   assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?voidTransaction/);
-  assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
   assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);
-  assert.match(app, /window\.PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection,/);
+  assert.match(app, /window\.PropertyDeskEntryWorkflow\.create\(/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
   assert.doesNotMatch(app, /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/);
+  assert.doesNotMatch(app, /PropertyDesk(?:TransactionCorrections|PropertyAccountForms|LedgerEntryForms|CreateActions)\.create/);
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 

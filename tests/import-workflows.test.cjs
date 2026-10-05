@@ -57,10 +57,15 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/property-form.js') < html.indexOf('features/property-account-forms.js'));
   assert.ok(html.indexOf('features/account-form.js') < html.indexOf('features/property-account-forms.js'));
   assert.ok(html.indexOf('features/property-account-forms.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-account-forms.js') < html.indexOf('features/entry-workflow.js'));
   assert.ok(html.indexOf('features/payment-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
   assert.ok(html.indexOf('features/expense-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
   assert.ok(html.indexOf('features/ledger-entry-forms.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/ledger-entry-forms.js') < html.indexOf('features/entry-workflow.js'));
   assert.ok(html.indexOf('features/create-actions.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/create-actions.js') < html.indexOf('features/entry-workflow.js'));
+  assert.ok(html.indexOf('features/transaction-corrections.js') < html.indexOf('features/entry-workflow.js'));
+  assert.ok(html.indexOf('features/entry-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/imports.js') < html.indexOf('features/csv-import-workflow.js'));
   assert.ok(html.indexOf('features/csv-import-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/property-views.js'));
@@ -148,6 +153,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/payment-entry-form\.js'/);
   assert.match(worker, /'\.\/features\/expense-entry-form\.js'/);
   assert.match(worker, /'\.\/features\/ledger-entry-forms\.js'/);
+  assert.match(worker, /'\.\/features\/entry-workflow\.js'/);
   assert.match(worker, /'\.\/features\/create-actions\.js'/);
   assert.match(worker, /'\.\/features\/imports\.js'/);
   assert.match(worker, /'\.\/features\/csv-import-workflow\.js'/);
