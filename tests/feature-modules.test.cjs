@@ -37,6 +37,25 @@ test("property and account detail views expose focused render actions", () => {
   assert.equal(typeof feature.openAccountDetails, "function");
 });
 
+test("app coordinator passes the amortization helper into account details", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(
+    app,
+    /amortizationSchedule,[\s\S]*?\} = window\.PropertyDeskLedgerUtils;/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskDetailViews\.create\(\{[\s\S]*?amortizationSchedule,/,
+  );
+});
+
+test("service worker clones before caching and avoids late fetch waitUntil calls", () => {
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.match(worker, /const cachedResponse = response\.clone\(\);\s*const cache = await caches\.open/);
+  assert.match(worker, /propertydesk-shell-v53/);
+  assert.doesNotMatch(worker, /then\(response\s*=>\s*\{[\s\S]*?event\.waitUntil\(/);
+});
+
 test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
   const elements = new Map();
   const getElement = (id) => {

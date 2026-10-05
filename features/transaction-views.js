@@ -44,7 +44,7 @@
         : item.payment_method.replace("_", " ");
       const actionButtons = isVoided
         ? '<span class="muted">Voided</span>'
-        : `<button type='button' class='text-button' data-correct-transaction data-kind='${record.kind}' data-id='${esc(item.id)}'>Correct</button> <button type='button' class='text-button' data-void-transaction data-kind='${record.kind}' data-id='${esc(item.id)}'>Void</button>`;
+        : `<button type="button" class="text-button" data-correct-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Correct</button> <button type="button" class="text-button" data-void-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Void</button>`;
 
       return `<tr class='${isVoided ? "transaction-voided" : ""}'>
         <td>${fmtDate(record.date)}</td>
@@ -131,6 +131,16 @@
       $("expenses-total").textContent = money(expenses);
       $("net-cash-flow").textContent = money(income - expenses);
     }
+    function renderImportBatchRow(batch) {
+      return `<tr>
+        <td><strong>${esc(batch.source_name || "CSV import")}</strong></td>
+        <td>${esc(batch.source_type)}</td>
+        <td>${esc(new Date(batch.created_at).toLocaleString())}</td>
+        <td>${Number(batch.rows_accepted)} of ${Number(batch.rows_total)}</td>
+        <td><span class="status-pill">${esc(batch.status)}</span></td>
+      </tr>`;
+    }
+
     function renderReports() {
       const y = new Date().getFullYear(),
         yearPayments = state.payments.filter(
@@ -167,10 +177,7 @@
         .join("");
       $("import-history").innerHTML = state.importBatches.length
         ? state.importBatches
-            .map(
-              (batch) =>
-                `<tr><td><strong>${esc(batch.source_name || "CSV import")}</strong></td><td>${esc(batch.source_type)}</td><td>${esc(new Date(batch.created_at).toLocaleString())}</td><td>${Number(batch.rows_accepted)} of ${Number(batch.rows_total)}</td><td><span class="status-pill">${esc(batch.status)}</span></td></tr>`,
-            )
+            .map(renderImportBatchRow)
             .join("")
         : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
     }

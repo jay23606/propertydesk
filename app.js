@@ -3,7 +3,20 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const { amountDueSince, createBackup, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = window.PropertyDeskLedgerUtils;
+  const {
+    amortizationSchedule,
+    amountDueSince,
+    createBackup,
+    isPosted,
+    monthlyScheduledEstimate,
+    paymentStatusInMonth,
+    scheduledLoanBalance,
+    securityDepositBalance,
+    sumIncome,
+    sumOperatingExpenses,
+    sumPosted,
+    unpaidDueAccrualStart,
+  } = window.PropertyDeskLedgerUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);

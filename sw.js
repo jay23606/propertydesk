@@ -1,6 +1,17 @@
-const CACHE_NAME = 'propertydesk-shell-v52';
+const CACHE_NAME = 'propertydesk-shell-v53';
 const SHELL_FILES = ['./', './index.html', './styles.css', './overrides.css', './reminders.css', './import-utils.js', './import-workflows.js', './email-utils.js', './ledger-utils.js', './zip-utils.js', './features/property-views.js', './features/transaction-views.js', './features/record-forms.js', './features/imports.js', './features/details.js', './features/documents.js', './features/exports.js', './features/auth.js', './features/workspace.js', './features/property-management.js', './features/ledger-actions.js', './features/reminder-preview.js', './app.js', './propertydesk.webmanifest', './icons/propertydesk.svg', './icons/propertydesk-192.png', './icons/propertydesk-512.png'];
 const SHELL_URLS = new Set(SHELL_FILES.map(path => new URL(path, self.registration.scope).href));
+
+async function fetchAndCache(request, cacheKey = request) {
+  const response = await fetch(request);
+  if (!response.ok) return response;
+
+  // Clone before caching or returning the network response to the browser.
+  const cachedResponse = response.clone();
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(cacheKey, cachedResponse);
+  return response;
+}
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
@@ -17,17 +28,20 @@ self.addEventListener('fetch', event => {
   // Cache only this static app shell. Never cache API, auth, user records, or config.js responses.
   if (!SHELL_URLS.has(url.href.split('?')[0])) return;
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).then(response => {
-      if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put('./index.html', response.clone())));
-      return response;
-    }).catch(() => caches.match('./index.html')));
+    event.respondWith(
+      fetchAndCache(request, './index.html')
+        .catch(() => caches.match('./index.html')),
+    );
     return;
   }
-  event.respondWith(caches.match(request).then(cached => {
-    const network = fetch(request).then(response => {
-      if (response.ok) event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone())));
-      return response;
-    });
-    return cached || network;
-  }));
+
+  const network = fetchAndCache(request).catch(async (error) => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    throw error;
+  });
+  // Extend the fetch event from its synchronous handler; do not call waitUntil
+  // from a later promise callback after the event dispatch has completed.
+  event.waitUntil(network.then(() => undefined).catch(() => undefined));
+  event.respondWith(caches.match(request).then((cached) => cached || network));
 });
