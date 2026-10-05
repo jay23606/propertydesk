@@ -160,6 +160,43 @@ test("property portfolio workflow connects its model, table, and action routers"
   assert.equal(workflow.attachPropertyActionEvents(), "actions");
 });
 
+test("ledger entry workflow publishes an explicit payment and expense interface", () => {
+  const calls = [];
+  const paymentActions = {
+    updateAllocationPreview: () => "preview",
+    prefillPaymentAmount: () => "prefill",
+    savePayment: () => "payment",
+    openPayment: () => "open payment",
+    openPropertyPayment: () => "open property payment",
+    attachEvents: () => calls.push("payment events"),
+  };
+  const expenseActions = {
+    saveExpense: () => "expense",
+    openExpense: () => "open expense",
+    attachEvents: () => calls.push("expense events"),
+  };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPaymentEntryForm: { create: () => paymentActions },
+      PropertyDeskExpenseEntryForm: { create: () => expenseActions },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-entry-forms.js"), "utf8"),
+    context,
+  );
+  const forms = context.window.PropertyDeskLedgerEntryForms.create({});
+
+  assert.deepEqual(Object.keys(forms).sort(), [
+    "attachEvents", "openExpense", "openPayment", "openPropertyPayment",
+    "prefillPaymentAmount", "saveExpense", "savePayment", "updateAllocationPreview",
+  ].sort());
+  assert.equal(forms.updateAllocationPreview, paymentActions.updateAllocationPreview);
+  assert.equal(forms.openExpense, expenseActions.openExpense);
+  forms.attachEvents();
+  assert.deepEqual(calls, ["payment events", "expense events"]);
+});
+
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

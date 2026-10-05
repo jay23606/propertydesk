@@ -11,9 +11,15 @@
       expenses.attachEvents();
     }
 
+    // Keep the combined API explicit so either form cannot shadow the other.
     return {
-      ...payments,
-      ...expenses,
+      updateAllocationPreview: payments.updateAllocationPreview,
+      prefillPaymentAmount: payments.prefillPaymentAmount,
+      savePayment: payments.savePayment,
+      openPayment: payments.openPayment,
+      openPropertyPayment: payments.openPropertyPayment,
+      saveExpense: expenses.saveExpense,
+      openExpense: expenses.openExpense,
       attachEvents,
     };
   }
