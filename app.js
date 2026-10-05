@@ -379,6 +379,14 @@
     restoreAuthSession,
     attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
+  const { renderReminderActivity } =
+    window.PropertyDeskReminderActivityView.create({
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+    });
   const {
     removeWorkspaceMember,
     renderWorkspaceSettings,
@@ -387,11 +395,10 @@
     $,
     state,
     esc,
-    fmtDate,
-    money,
     toast,
     fetchAll,
     updateGreeting,
+    renderReminderActivity,
   });
   const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
     $,

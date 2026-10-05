@@ -2559,10 +2559,8 @@ test("workspace settings render member labels and escape untrusted text", () => 
         is_owner: false,
       },
     ],
-    reminderLogs: [],
-    accounts: [],
-    properties: [],
   };
+  let remindersRendered = false;
   const feature = context.window.PropertyDeskWorkspace.create({
     $: element,
     state,
@@ -2578,11 +2576,10 @@ test("workspace settings render member labels and escape untrusted text", () => 
             "'": "&#39;",
           })[char],
       ),
-    fmtDate: () => "Oct 2026",
-    money: () => "$0.00",
     toast() {},
     fetchAll: async () => {},
     updateGreeting() {},
+    renderReminderActivity: () => { remindersRendered = true; },
     confirmAction: () => true,
   });
 
@@ -2595,7 +2592,48 @@ test("workspace settings render member labels and escape untrusted text", () => 
     "hidden",
     false,
   ]);
-  assert.match(element("reminder-activity").innerHTML, /Reminders are off/);
+  assert.equal(remindersRendered, true);
+});
+
+test("reminder activity view summarizes delivery results and escapes log data", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-activity-view.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) elements.set(id, { innerHTML: "" });
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskReminderActivityView.create({
+    $,
+    state: {
+      accounts: [{ id: "account-1", property_id: "property-1", party_name: "<Buyer>" }],
+      properties: [{ id: "property-1", address: "<10 Main St>" }],
+      reminderLogs: [{
+        account_id: "account-1",
+        reminder_month: "2026-10-01",
+        recipient_email: "buyer@example.test",
+        status: "failed",
+        reason: "mailersend_http_403",
+        unpaid_due: 550,
+        attempted_at: "2026-10-31T12:00:00Z",
+      }],
+    },
+    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    fmtDate: () => "Oct 2026",
+    money: (value) => `$${Number(value).toFixed(2)}`,
+  });
+
+  feature.renderReminderActivity();
+  const html = $("reminder-activity").innerHTML;
+  assert.match(html, /&lt;10 Main St&gt;/);
+  assert.match(html, /&lt;Buyer&gt;/);
+  assert.match(html, /buyer@example\.test/);
+  assert.match(html, /MailerSend rejected the request/);
+  assert.match(html, /Unpaid due: \$550\.00/);
+  assert.match(html, /reminder-failed/);
 });
 
 test("workspace feature owns profile and member form bindings", () => {
@@ -2650,15 +2688,11 @@ test("adding a workspace member clears the address only after successful refresh
         },
       },
       workspaceMembers: [],
-      reminderLogs: [],
-      accounts: [],
-      properties: [],
       user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
       workspaceOwnerId: "owner-1",
     },
     esc: String,
-    fmtDate: () => "",
-    money: () => "",
+    renderReminderActivity: () => calls.push(["render-reminders"]),
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
     updateGreeting() {},
@@ -2666,10 +2700,11 @@ test("adding a workspace member clears the address only after successful refresh
 
   await feature.addWorkspaceMember({ preventDefault() {} });
 
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 3);
   assert.equal(calls[0][0], "pd_add_workspace_member");
   assert.equal(calls[0][1].p_email, "spouse@example.test");
   assert.equal(calls[1][0], "refresh");
+  assert.equal(calls[2][0], "render-reminders");
   assert.equal(element("display-name").value, "Owner");
   assert.equal(element("member-email").value, "");
   assert.equal(messages.at(-1), "Workspace member added");

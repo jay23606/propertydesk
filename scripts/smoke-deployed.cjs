@@ -406,6 +406,12 @@ async function main() {
         throw new Error(`The Reports view did not include the expected value: ${expected}.`);
       }
     }
+    await signedInPage.locator('.nav-link[data-view="workspace"]').click();
+    const workspacePage = await signedInPage.locator("#page-workspace").innerText();
+    if (!workspacePage.includes("Email reminder activity") ||
+        !workspacePage.includes("Reminder attempts will appear here")) {
+      throw new Error("Workspace settings did not render reminder delivery activity.");
+    }
     if (signedInPageErrors.length || signedInConsoleErrors.length) {
       throw new Error(
         `Signed-in app browser errors: ${[...signedInPageErrors, ...signedInConsoleErrors].join(" | ")}`,
@@ -417,7 +423,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered signed-in Overview and Properties actions, payment entry and correction, note amortization, rental deposits, account history, and Reports without browser errors or unhandled rejections.");
+    console.log("PropertyDesk rendered signed-in Overview, Properties, payment entry and correction, note amortization, rental deposits, account history, Reports, Workspace settings, and reminder activity without browser errors or unhandled rejections.");
   } finally {
     await browser.close();
   }
