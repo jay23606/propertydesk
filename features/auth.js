@@ -13,16 +13,13 @@
     const { showAuth, showApp, showConfigError } =
       window.PropertyDeskAuthScreens.create({ $, documentRef });
 
-    const {
-      setAuthMode,
-      submitAuth,
-      attachEvents: attachAuthFormEvents,
-    } = window.PropertyDeskAuthForm.create({
-      $,
-      state,
-      documentRef,
-      startWorkspace,
-    });
+    const { setAuthMode, attachEvents: attachAuthFormEvents } =
+      window.PropertyDeskAuthForm.create({
+        $,
+        state,
+        documentRef,
+        startWorkspace,
+      });
 
     const {
       showPasswordReset,
@@ -67,15 +64,10 @@
     }
 
     return {
-      showAuth,
-      showApp,
       showConfigError,
       setAuthMode,
-      submitAuth,
-      startWorkspace,
       handleAuthStateChange,
       restoreAuthSession,
-      signOut,
       attachEvents,
     };
   }

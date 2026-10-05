@@ -381,6 +381,7 @@ test("auth feature restores login controls when the auth request rejects", async
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id))
       elements.set(id, {
@@ -390,6 +391,9 @@ test("auth feature restores login controls when the auth request rejects", async
         autocomplete: "",
         dataset: { mode: "signin" },
         classList: { add() {}, remove() {}, toggle() {} },
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
       });
     return elements.get(id);
   };
@@ -410,8 +414,18 @@ test("auth feature restores login controls when the auth request rejects", async
     toast() {},
     documentRef: { querySelector: () => element("auth-intro") },
   });
+  assert.deepEqual(Object.keys(feature).sort(), [
+    "attachEvents",
+    "handleAuthStateChange",
+    "restoreAuthSession",
+    "setAuthMode",
+    "showConfigError",
+  ]);
 
-  await assert.doesNotReject(feature.submitAuth({ preventDefault() {} }));
+  feature.attachEvents();
+  await assert.doesNotReject(
+    handlers.get("auth-form:submit")({ preventDefault() {} }),
+  );
   assert.equal(element("auth-submit").disabled, false);
   assert.equal(element("auth-submit").textContent, "Sign in");
   assert.match(element("auth-message").textContent, /try again/i);
@@ -488,7 +502,8 @@ test("auth session restore and sign-out report rejected requests without clearin
   loadAuthFeatures(context);
   const messages = [];
   const visible = [];
-  const element = () => ({
+  let signOutHandler;
+  const element = (id) => ({
     classList: {
       add: () => visible.push("hidden"),
       remove: () => visible.push("shown"),
@@ -496,6 +511,9 @@ test("auth session restore and sign-out report rejected requests without clearin
     },
     dataset: {},
     textContent: "",
+    addEventListener(event, handler) {
+      if (id === "sign-out" && event === "click") signOutHandler = handler;
+    },
   });
   const state = {
     user: { id: "owner-1" },
@@ -519,7 +537,8 @@ test("auth session restore and sign-out report rejected requests without clearin
     documentRef: { querySelector: () => element() },
   });
 
-  await assert.doesNotReject(feature.signOut());
+  feature.attachEvents();
+  await assert.doesNotReject(signOutHandler());
   assert.equal(state.user.id, "owner-1");
   await assert.doesNotReject(feature.restoreAuthSession());
   assert.equal(state.user.id, "owner-1");
