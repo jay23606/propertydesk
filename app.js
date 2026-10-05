@@ -182,15 +182,13 @@
       sumIncome,
       sumOperatingExpenses,
     });
-  const { closeAccount } = window.PropertyDeskAccountMaintenanceWorkflow.create(
-    {
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-    },
-  );
+  const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
+    $,
+    state,
+    toast,
+    fetchAll,
+    closeModal,
+  });
   const { depositSectionHTML, attachDepositDetailEvents } =
     window.PropertyDeskDepositDetailsWorkflow.create({
       $,

@@ -4,42 +4,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("account maintenance workflow composes account closure only", () => {
-  const passed = {};
-  const closeAccount = () => "closed";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountMaintenance: {
-        create: (options) => {
-          passed.account = options;
-          return { closeAccount };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-maintenance-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    toast() {},
-    fetchAll() {},
-    closeModal() {},
-  };
-  const workflow =
-    context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
-
-  assert.equal(passed.account.state, dependencies.state);
-  assert.equal(passed.account.closeModal, dependencies.closeModal);
-  assert.equal(workflow.closeAccount, closeAccount);
-  assert.equal("recordDepositAdjustment" in workflow, false);
-});
-
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
