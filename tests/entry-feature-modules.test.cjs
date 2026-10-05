@@ -109,6 +109,7 @@ test("account details workflow composes account, deposit, history, and maintenan
   const closeAccount = () => "closed";
   const recordDepositAdjustment = () => "adjusted";
   const depositSectionHTML = () => "deposit html";
+  const attached = [];
   const context = vm.createContext({
     window: {
       PropertyDeskAccountMaintenance: {
@@ -136,7 +137,9 @@ test("account details workflow composes account, deposit, history, and maintenan
         create: (options) => {
           created.push("deposit events");
           passed.depositEvents = options;
-          return { attachEvents: () => "deposit events attached" };
+          return {
+            attachEvents: () => attached.push("deposit events attached"),
+          };
         },
       },
       PropertyDeskAccountDetailsView: {
@@ -163,7 +166,9 @@ test("account details workflow composes account, deposit, history, and maintenan
         create: (options) => {
           created.push("account events");
           passed.accountEvents = options;
-          return { attachEvents: () => "account events attached" };
+          return {
+            attachEvents: () => attached.push("account events attached"),
+          };
         },
       },
     },
@@ -215,13 +220,15 @@ test("account details workflow composes account, deposit, history, and maintenan
   assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.depositMaintenance.fetchAll, dependencies.fetchAll);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachAccountDetailEvents",
-    "attachDepositDetailEvents",
+    "attachEvents",
     "openAccountDetails",
   ]);
   assert.equal(workflow.openAccountDetails(), "opened");
-  assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
-  assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
+  workflow.attachEvents();
+  assert.deepEqual(attached, [
+    "deposit events attached",
+    "account events attached",
+  ]);
 });
 
 test("reminder workflow composes the activity view and email preview", () => {

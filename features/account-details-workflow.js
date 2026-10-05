@@ -100,10 +100,15 @@
         openPayment,
         closeAccount,
       });
+
+    function attachEvents() {
+      attachDepositDetailEvents();
+      attachAccountDetailEvents();
+    }
+
     return {
       openAccountDetails,
-      attachAccountDetailEvents,
-      attachDepositDetailEvents,
+      attachEvents,
     };
   }
 
