@@ -29,14 +29,11 @@ test("property and account form modules expose separate APIs", () => {
   assert.deepEqual(Object.keys(property).sort(), [
     "attachEvents",
     "resetPropertyForm",
-    "saveProperty",
   ]);
   assert.deepEqual(Object.keys(account).sort(), [
     "attachEvents",
     "editAccount",
     "resetAccountForm",
-    "saveAccount",
-    "updateLoanFields",
   ]);
 });
 
@@ -125,7 +122,7 @@ test("property and account forms report rejected saves without running success a
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
   const messages = [];
-  const $ = formElements({
+  const elements = formElements({
     "property-name": "Rental house",
     "property-address": "10 Main St",
     "property-kind": "residential",
@@ -134,6 +131,15 @@ test("property and account forms report rejected saves without running success a
     "account-start": "2026-10-01",
     "account-frequency": "monthly",
   });
+  const handlers = new Map();
+  const $ = (id) => {
+    const element = elements(id);
+    if (id === "property-form" || id === "account-form")
+      element.addEventListener = (event, handler) => {
+        handlers.set(`${id}:${event}`, handler);
+      };
+    return element;
+  };
   const state = {
     workspaceOwnerId: "workspace-1",
     client: {
@@ -162,8 +168,14 @@ test("property and account forms report rejected saves without running success a
     formModel: context.window.PropertyDeskAccountFormModel,
   });
 
-  await assert.doesNotReject(property.saveProperty({ preventDefault() {} }));
-  await assert.doesNotReject(account.saveAccount({ preventDefault() {} }));
+  property.attachEvents();
+  account.attachEvents(() => {});
+  await assert.doesNotReject(
+    handlers.get("property-form:submit")({ preventDefault() {} }),
+  );
+  await assert.doesNotReject(
+    handlers.get("account-form:submit")({ preventDefault() {} }),
+  );
   assert.deepEqual(messages, [
     "Property couldn't be saved right now. Check your connection and try again.",
     "Account couldn't be saved right now. Check your connection and try again.",

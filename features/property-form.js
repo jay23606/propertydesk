@@ -52,7 +52,7 @@
       $("property-form").addEventListener("submit", saveProperty);
     }
 
-    return { resetPropertyForm, saveProperty, attachEvents };
+    return { resetPropertyForm, attachEvents };
   }
 
   window.PropertyDeskPropertyForm = Object.freeze({

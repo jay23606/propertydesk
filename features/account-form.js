@@ -14,8 +14,7 @@
       formModel,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create(context);
-    const { resetAccountForm, updateLoanFields, readValues, editAccount } =
-      formView;
+    const { resetAccountForm, readValues, editAccount } = formView;
 
     async function saveAccount(event) {
       event.preventDefault();
@@ -89,8 +88,6 @@
 
     return {
       resetAccountForm,
-      updateLoanFields,
-      saveAccount,
       editAccount,
       attachEvents,
     };

@@ -165,11 +165,8 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
-    [property, ["resetPropertyForm", "saveProperty", "attachEvents"]],
-    [
-      account,
-      ["resetAccountForm", "saveAccount", "editAccount", "attachEvents"],
-    ],
+    [property, ["resetPropertyForm", "attachEvents"]],
+    [account, ["resetAccountForm", "editAccount", "attachEvents"]],
     [
       ledger,
       [
