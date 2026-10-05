@@ -48,12 +48,14 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
   const preview = fs.readFileSync(path.join(root, 'features/reminder-preview.js'), 'utf8');
   const forms = fs.readFileSync(path.join(root, 'features/account-form.js'), 'utf8');
+  const payload = fs.readFileSync(path.join(root, 'features/account-payload.js'), 'utf8');
   const migration = fs.readFileSync(path.join(root, 'supabase/migrations/20261004210000_month_end_reminders.sql'), 'utf8');
   const worker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 
   assert.match(html, /id="account-reminder-enabled" type="checkbox"/);
   assert.doesNotMatch(html.match(/id="account-reminder-enabled"[^>]*>/)?.[0] || '', /checked/);
-  assert.match(forms, /monthly_reminder_enabled:\s*\$\("account-reminder-enabled"\)\.checked/);
+  assert.match(forms, /reminderEnabled:\s*\$\("account-reminder-enabled"\)\.checked/);
+  assert.match(payload, /monthly_reminder_enabled:\s*values\.reminderEnabled/);
   assert.match(forms, /if\s*\(\s*\$\("account-reminder-enabled"\)\.checked\s*&&\s*!partyEmails\.length\s*\)/);
   assert.match(migration, /monthly_reminder_enabled boolean not null default false/);
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);

@@ -278,8 +278,10 @@ test("property and account form workflow publishes an explicit interface", () =>
     editAccount: () => "edit account",
     attachEvents: (preview) => calls.push(["account events", preview]),
   };
+  const buildAccountPayload = () => ({ account_payload: true });
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountPayload: { build: buildAccountPayload },
       PropertyDeskPropertyForm: { create: (options) => { passed.property = options; return propertyActions; } },
       PropertyDeskAccountForm: { create: (options) => { passed.account = options; return accountActions; } },
     },
@@ -316,11 +318,12 @@ test("property and account form workflow publishes an explicit interface", () =>
     "$", "closeModal", "fetchAll", "state", "toast",
   ].sort());
   assert.deepEqual(Object.keys(passed.account).sort(), [
-    "$", "closeModal", "fetchAll", "moneyInput", "openModal",
+    "$", "buildAccountPayload", "closeModal", "fetchAll", "moneyInput", "openModal",
     "populateFormOptions", "state", "todayIso", "toast",
   ].sort());
   assert.equal(passed.property.state, dependencies.state);
   assert.equal(passed.account.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.account.buildAccountPayload, buildAccountPayload);
   const preview = () => {};
   forms.attachEvents(preview);
   assert.deepEqual(calls, ["property events", ["account events", preview]]);

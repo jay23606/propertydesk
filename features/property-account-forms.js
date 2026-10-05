@@ -13,6 +13,7 @@
     const accounts = window.PropertyDeskAccountForm.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       populateFormOptions, openModal,
+      buildAccountPayload: window.PropertyDeskAccountPayload.build,
     });
 
     function attachEvents(previewReminderEmail) {

@@ -5,7 +5,7 @@
   function createAccountForm(context) {
     const {
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      populateFormOptions, openModal,
+      populateFormOptions, openModal, buildAccountPayload,
     } = context;
 
     function resetAccountForm() {
@@ -42,46 +42,35 @@
         toast("Add at least one tenant/buyer email before enabling reminders.");
         return;
       }
-      const payload = {
-        user_id: state.workspaceOwnerId,
-        property_id: $("account-property").value,
-        account_type: type,
-        name: $("account-name").value.trim(),
-        party_name: $("account-party").value.trim() || null,
-        party_email: partyEmails.join(", ") || null,
-        party_phone: $("account-party-phone").value.trim() || null,
-        monthly_reminder_enabled: $("account-reminder-enabled").checked,
-        start_date: $("account-start").value,
-        next_due_date: $("account-next-due").value || null,
-        payment_amount: moneyInput($("account-payment").value),
-        payment_frequency: $("account-frequency").value,
-        original_principal:
-          type === "rental" ? 0 : moneyInput($("account-principal").value),
-        principal_interest_amount:
-          type === "rental" || !$("account-pi-payment").value
-            ? null
-            : moneyInput($("account-pi-payment").value),
-        escrow_amount:
-          type === "rental" ? 0 : moneyInput($("account-escrow").value),
-        balance_adjustment:
-          type === "rental"
-            ? 0
-            : moneyInput($("account-balance-adjustment").value),
-        interest_rate:
-          type === "rental" ? 0 : Number($("account-rate").value || 0),
-        term_months:
-          type === "rental" || !$("account-term").value
-            ? null
-            : Number($("account-term").value),
-        balloon_date:
-          type === "rental" ? null : $("account-balloon").value || null,
-        agreement_effective_date: $("account-effective-date").value || null,
-        agreement_change_reason:
-          $("account-change-reason").value.trim() || null,
-        late_fee: moneyInput($("account-late-fee").value),
-        grace_days: Number($("account-grace").value || 0),
-        notes: $("account-notes").value.trim() || null,
-      };
+      const payload = buildAccountPayload(
+        {
+          ownerId: state.workspaceOwnerId,
+          propertyId: $("account-property").value,
+          accountType: type,
+          name: $("account-name").value.trim(),
+          partyName: $("account-party").value.trim(),
+          partyEmails,
+          partyPhone: $("account-party-phone").value.trim(),
+          reminderEnabled: $("account-reminder-enabled").checked,
+          startDate: $("account-start").value,
+          nextDueDate: $("account-next-due").value,
+          paymentAmount: $("account-payment").value,
+          paymentFrequency: $("account-frequency").value,
+          originalPrincipal: $("account-principal").value,
+          principalInterestAmount: $("account-pi-payment").value,
+          escrowAmount: $("account-escrow").value,
+          balanceAdjustment: $("account-balance-adjustment").value,
+          interestRate: $("account-rate").value,
+          termMonths: $("account-term").value,
+          balloonDate: $("account-balloon").value,
+          agreementEffectiveDate: $("account-effective-date").value,
+          agreementChangeReason: $("account-change-reason").value.trim(),
+          lateFee: $("account-late-fee").value,
+          graceDays: $("account-grace").value,
+          notes: $("account-notes").value.trim(),
+        },
+        moneyInput,
+      );
       const query = id
         ? state.client.from("pd_accounts").update(payload).eq("id", id)
         : state.client.from("pd_accounts").insert(payload);
