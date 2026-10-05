@@ -122,7 +122,7 @@
   const {
     toggleArchiveProperty,
     attachPropertyDetailEvents,
-  } = window.PropertyDeskPropertyActionsWorkflow.create({
+  } = window.PropertyDeskPropertyDetailActionsWorkflow.create({
     $, state, toast, fetchAll, todayIso, openPropertyDetails,
     closeModal, editAccount, openPayment, openExpense, resetAccountForm,
     populateFormOptions, openModal, openAccountDetails, documentRef: document,

@@ -1215,7 +1215,7 @@ test("property details workflow connects activity summaries to the property view
   assert.equal(workflow.openPropertyDetails(), "property details");
 });
 
-test("property actions workflow composes administration and detail actions", () => {
+test("property detail actions workflow composes administration and modal actions", () => {
   const passed = {};
   const action = () => {};
   const attachCalls = [];
@@ -1242,7 +1242,7 @@ test("property actions workflow composes administration and detail actions", () 
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-actions-workflow.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-actions-workflow.js"), "utf8"),
     context,
   );
   const quickActionDependencies = {
@@ -1254,7 +1254,7 @@ test("property actions workflow composes administration and detail actions", () 
     populateFormOptions: action,
     openModal: action,
   };
-  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({
+  const workflow = context.window.PropertyDeskPropertyDetailActionsWorkflow.create({
     ...quickActionDependencies,
     documentRef: {},
   });

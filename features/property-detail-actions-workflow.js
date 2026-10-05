@@ -1,4 +1,4 @@
-/* Compose property administration and detail-modal actions. */
+/* Compose property-detail administration and modal actions. */
 (() => {
   "use strict";
 
@@ -37,5 +37,5 @@
     };
   }
 
-  window.PropertyDeskPropertyActionsWorkflow = Object.freeze({ create });
+  window.PropertyDeskPropertyDetailActionsWorkflow = Object.freeze({ create });
 })();

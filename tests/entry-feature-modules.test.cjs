@@ -85,7 +85,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Events)?\.create/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/);
-  assert.match(app, /PropertyDeskPropertyActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/);
   assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?fetchAll/);
@@ -108,7 +108,7 @@ test("app coordinator creates cross-linked property views after their actions", 
     "PropertyDeskEntryWorkflow.create(",
     "PropertyDeskAccountDetailsWorkflow.create(",
     "PropertyDeskPropertyDetailsWorkflow.create(",
-    "PropertyDeskPropertyActionsWorkflow.create(",
+    "PropertyDeskPropertyDetailActionsWorkflow.create(",
     "PropertyDeskPropertyDocumentWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
