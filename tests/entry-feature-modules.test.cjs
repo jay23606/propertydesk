@@ -90,6 +90,22 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 
+test("app coordinator creates cross-linked property views after their actions", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const order = [
+    "PropertyDeskEntryWorkflow.create(",
+    "PropertyDeskAccountDetailsWorkflow.create(",
+    "PropertyDeskPropertyDetailsWorkflow.create(",
+    "PropertyDeskPropertyActionsWorkflow.create(",
+    "PropertyDeskOverviewWorkflow.create(",
+    "PropertyDeskPropertyPortfolioWorkflow.create(",
+  ].map((marker) => app.indexOf(marker));
+
+  assert.ok(order.every((position) => position >= 0));
+  assert.deepEqual(order, [...order].sort((left, right) => left - right));
+  assert.doesNotMatch(app, /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/);
+});
+
 test("account details workflow composes account, history, deposit, and passed maintenance actions", () => {
   const created = [];
   const passed = {};

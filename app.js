@@ -53,31 +53,6 @@
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const { updateGreeting } = window.PropertyDeskProfileDisplay.create({ $, state });
-  const { renderOverview, attachOverviewEvents } =
-    window.PropertyDeskOverviewWorkflow.create({
-      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
-      unpaidDueAccrualStart, todayIso, esc, prettyKind, money, propertyAddress,
-      collectedSince, scheduledMonthlyRunRate, monthStart, isPosted, prettyType,
-      fmtDate,
-      openPropertyDetails: (...args) => openPropertyDetails(...args),
-      openPropertyPayment: (...args) => openPropertyPayment(...args),
-    });
-  const {
-    renderProperties,
-    attachPropertyViewEvents,
-    attachPropertyActionEvents,
-  } = window.PropertyDeskPropertyPortfolioWorkflow.create({
-    $, state, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
-    accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
-    propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
-    lateReminderMailto, paymentStatusInMonth,
-    openPayment: (...args) => openPayment(...args),
-    editPropertyQuickNote: (...args) => editPropertyQuickNote(...args),
-    openPropertyDetails: (...args) => openPropertyDetails(...args),
-    resetAccountForm: (...args) => resetAccountForm(...args),
-    populateFormOptions: (...args) => populateFormOptions(...args),
-    openModal: (...args) => openModal(...args),
-  });
   const { renderReports, attachReportExportEvents } = window.PropertyDeskReportWorkflow.create({
     $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
     accountBalance, todayIso, prettyType,
@@ -151,6 +126,25 @@
     $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
     closeModal, editAccount, openPayment, openExpense, resetAccountForm,
     populateFormOptions, openModal, openAccountDetails, documentRef: document,
+  });
+  const { renderOverview, attachOverviewEvents } =
+    window.PropertyDeskOverviewWorkflow.create({
+      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
+      unpaidDueAccrualStart, todayIso, esc, prettyKind, money, propertyAddress,
+      collectedSince, scheduledMonthlyRunRate, monthStart, isPosted, prettyType,
+      fmtDate, openPropertyDetails, openPropertyPayment,
+    });
+  const {
+    renderProperties,
+    attachPropertyViewEvents,
+    attachPropertyActionEvents,
+  } = window.PropertyDeskPropertyPortfolioWorkflow.create({
+    $, state, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
+    accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
+    propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
+    lateReminderMailto, paymentStatusInMonth, openPayment,
+    editPropertyQuickNote, openPropertyDetails, resetAccountForm,
+    populateFormOptions, openModal,
   });
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({

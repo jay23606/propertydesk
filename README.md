@@ -4,7 +4,7 @@ Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Au
 
 ## Browser architecture
 
-The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it connects feature workflows and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
+The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it builds feature dependencies before the workflows that consume them, passes callbacks directly, and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
 
 Shared initialization lives in `features/app-services.js`. It creates the Supabase client, workspace loader, notifications, and ledger helpers. Feature modules keep screens, forms, calculations, writes, and delegated actions focused by area:
 
