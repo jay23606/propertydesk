@@ -18,6 +18,12 @@
       accountBalance,
     } = context;
 
+    function attachEvents() {
+      $("payment-search").addEventListener("input", renderPayments);
+      $("payment-period").addEventListener("change", renderPayments);
+      $("transaction-type").addEventListener("change", renderPayments);
+    }
+
     function renderTransactionRow(record) {
       const item = record.item;
       const isExpense = record.kind === "expense";
@@ -180,7 +186,7 @@
         : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
     }
 
-    return { renderPayments, renderReports };
+    return { renderPayments, renderReports, attachEvents };
   }
 
   window.PropertyDeskTransactionViews = Object.freeze({

@@ -181,7 +181,12 @@
     return String(category || 'other').replaceAll('_', ' ');
   }
   // Feature modules receive shared state and helpers; app.js connects the workflows.
-  const { updateGreeting, renderOverview, renderProperties } =
+  const {
+    updateGreeting,
+    renderOverview,
+    renderProperties,
+    attachEvents: attachPropertyViewEvents,
+  } =
     window.PropertyDeskPropertyViews.create({
       $,
       state,
@@ -207,7 +212,11 @@
       paymentFrequencyLabel,
       paymentStatusInMonth,
     });
-  const { renderPayments, renderReports } =
+  const {
+    renderPayments,
+    renderReports,
+    attachEvents: attachTransactionViewEvents,
+  } =
     window.PropertyDeskTransactionViews.create({
       $,
       state,
@@ -429,16 +438,6 @@
     renderPayments();
     renderReports();
   }
-  function attachSearchEvents() {
-    $('property-search').addEventListener('input', renderProperties);
-    $('property-filter').addEventListener('change', renderProperties);
-    $('property-holder-filter').addEventListener('change', renderProperties);
-    $('show-archived').addEventListener('change', renderProperties);
-    $('payment-search').addEventListener('input', renderPayments);
-    $('payment-period').addEventListener('change', renderPayments);
-    $('transaction-type').addEventListener('change', renderPayments);
-  }
-
   function attachDelegatedActionEvents() {
     document.addEventListener('click', (event) => {
       const depositAdjustment = event.target.closest(
@@ -548,9 +547,10 @@
 
   function attachEvents() {
     attachNavigationEvents();
+    attachPropertyViewEvents();
+    attachTransactionViewEvents();
     attachRecordCreateActions(navigate);
     attachRecordFormEvents(previewReminderEmail);
-    attachSearchEvents();
     attachDelegatedActionEvents();
     attachPropertyEvents(toggleArchiveProperty);
     attachWorkspaceEvents();

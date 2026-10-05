@@ -53,6 +53,12 @@
         day: "numeric",
       });
     }
+    function attachEvents() {
+      $("property-search").addEventListener("input", renderProperties);
+      $("property-filter").addEventListener("change", renderProperties);
+      $("property-holder-filter").addEventListener("change", renderProperties);
+      $("show-archived").addEventListener("change", renderProperties);
+    }
     function propertyCard(property, compact = false) {
       const related = state.accounts.filter(
         (a) => a.property_id === property.id,
@@ -433,6 +439,7 @@
       propertyCard,
       renderOverview,
       renderProperties,
+      attachEvents,
       propertyAddressCell,
       renderAccounts,
     };

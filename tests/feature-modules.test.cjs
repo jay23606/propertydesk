@@ -38,6 +38,40 @@ test("property and account detail views expose focused render actions", () => {
   assert.equal(typeof feature.attachPropertyEvents, "function");
 });
 
+test("property and transaction views own their search and filter bindings", () => {
+  for (const [file, globalName, expected] of [
+    ["property-views.js", "PropertyDeskPropertyViews", [
+      "property-search:input",
+      "property-filter:change",
+      "property-holder-filter:change",
+      "show-archived:change",
+    ]],
+    ["transaction-views.js", "PropertyDeskTransactionViews", [
+      "payment-search:input",
+      "payment-period:change",
+      "transaction-type:change",
+    ]],
+  ]) {
+    const context = vm.createContext({ window: {} });
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", file), "utf8"),
+      context,
+    );
+    const handlers = new Map();
+    const feature = context.window[globalName].create({
+      $: (id) => ({
+        addEventListener: (event, handler) =>
+          handlers.set(`${id}:${event}`, handler),
+      }),
+    });
+
+    assert.equal(typeof feature.attachEvents, "function");
+    feature.attachEvents();
+    assert.deepEqual([...handlers.keys()], expected);
+    assert.ok([...handlers.values()].every((handler) => typeof handler === "function"));
+  }
+});
+
 test("property detail feature owns its editing and quick-action event bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
