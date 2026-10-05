@@ -15,6 +15,16 @@ The product should feel calm and minimal. It should make routine bookkeeping fas
 5. **Make imports reviewable.** Support manual app entry and CSV imports. Show mapped fields and validation errors before writing imported records.
 6. **Stay focused.** Avoid heavyweight enterprise dashboards, payment processing, maintenance dispatch, tenant screening, and legal automation until users ask for them. Basic property issue notes and agreement history can remain lightweight.
 
+## Privacy and operator access (priority before broad onboarding)
+
+Treat tenant/buyer contact details, property addresses, financial records, and agreement files as sensitive personal data. Separate workspaces so one customer cannot read another customer's data; only people explicitly added to the same workspace receive its full access. Property labels are never an authorization mechanism.
+
+The stronger privacy goal is that the PropertyDesk operator cannot read another customer's private records, even through database administration or service-role access. The current Supabase-backed implementation does **not** meet that goal: Supabase encrypts infrastructure storage and network traffic, and database row-level security limits app access, but account names, addresses, emails, phone numbers, notes, and financial details are stored as readable database values for authorized queries. Agreement files are in a private bucket, but are readable through authenticated access or short-lived signed links. Do not describe the current app as end-to-end encrypted or operator-blind.
+
+Before broad public onboarding, evaluate and implement client-side, per-workspace encryption with keys controlled by workspace members, including safe key sharing, recovery, rotation, import/export, and deletion. Keep server-side metadata to the minimum needed for routing and authorization. Verify with tests that a different workspace and the app operator cannot decrypt customer content. Until this is built and independently reviewed, limit outside testing to synthetic data and disclose that the hosting project operator and trusted workspace members can technically access readable data.
+
+Server-side features that need readable PII require a separate decision. Automatic email reminders are off by default, but the reminder function reads recipient email and payment status, and MailerSend receives the recipient address and message. A strict operator-blind mode cannot also provide those managed server-side reminders as currently implemented. Either keep reminders explicitly opt-in with clear provider disclosure, or move reminder execution to infrastructure and keys controlled by the customer before promising that the operator cannot access PII.
+
 ## People and use cases
 
 PropertyDesk has two distinct experiences: an owner/manager workspace and an optional tenant/buyer portal. The initial owner is a small property owner who may keep rentals, land contracts, and private notes in one portfolio. Owners may have existing records in Buildium-like software, spreadsheets, statements, or screenshots. Tenants and buyers never need to create an account to receive enabled email notices or to keep paying outside the app.
