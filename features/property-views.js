@@ -201,24 +201,38 @@
         <button type="button" class="property-row-note${note ? " has-note" : ""}" data-property-note="${esc(property.id)}" aria-label="${esc(note ? "Edit" : "Add")} quick note for ${esc(street)}" title="${esc(note || "Add a quick note")}">${note ? `<em>${esc(note)}</em>` : "<em>＋ Add note</em>"}</button>
         </td>`;
     }
-    function accountPortfolioRowHTML({ property, account, street, due, monthly, loanBalance, partyName, paymentStatus, reminderHref, recipientHint }) {
+    function accountPortfolioRowHTML({
+      property,
+      account,
+      street,
+      due,
+      monthly,
+      loanBalance,
+      partyName,
+      paymentStatus,
+      reminderHref,
+      recipientHint,
+    }) {
       const paymentClasses = {
-        none: 'payment-not-received-this-month',
-        partial: 'payment-received-this-month',
-        full: 'payment-paid-in-full-this-month',
+        none: "payment-not-received-this-month",
+        partial: "payment-received-this-month",
+        full: "payment-paid-in-full-this-month",
       };
       const paymentTitles = {
-        none: 'No payment received this month',
-        partial: 'Partial payment received this month',
-        full: 'Full scheduled amount received this month',
+        none: "No payment received this month",
+        partial: "Partial payment received this month",
+        full: "Full scheduled amount received this month",
       };
-      const paymentAmount = account.payment_frequency === 'monthly'
-        ? money(account.payment_amount)
-        : `≈ ${money(monthly)}`;
-      const frequencyHint = account.payment_frequency === 'monthly'
-        ? 'Monthly'
-        : `${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`;
-      const inactiveHint = (account.status || 'active') !== 'active' ? ' · Inactive' : '';
+      const paymentAmount =
+        account.payment_frequency === "monthly"
+          ? money(account.payment_amount)
+          : `≈ ${money(monthly)}`;
+      const frequencyHint =
+        account.payment_frequency === "monthly"
+          ? "Monthly"
+          : `${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`;
+      const inactiveHint =
+        (account.status || "active") !== "active" ? " · Inactive" : "";
 
       return `<tr>
         <td class="${paymentClasses[paymentStatus]}" title="${paymentTitles[paymentStatus]}">
@@ -232,7 +246,7 @@
         </td>
         <td>${paymentAmount}<small class="table-subtext">${frequencyHint}</small>
         </td>
-        <td>${account.account_type === 'rental' ? '—' : money(loanBalance)}</td>
+        <td>${account.account_type === "rental" ? "—" : money(loanBalance)}</td>
       </tr>`;
     }
     function renderAccounts() {
@@ -307,9 +321,8 @@
               monthStart(),
               scheduledThisMonth,
             );
-            const loanBalance = account.account_type === "rental"
-              ? 0
-              : accountBalance(account);
+            const loanBalance =
+              account.account_type === "rental" ? 0 : accountBalance(account);
             rows.push({
               hasAccount: true,
               party: partyName,
@@ -372,15 +385,20 @@
           compare(a.id, b.id),
       );
       $("accounts-table").innerHTML = rows.map((row) => row.html).join("");
-      const totals = rows.reduce((result, row) => {
-        if (!row.hasAccount) return result;
-        result.unpaidDue += row.unpaidDue;
-        result.scheduledPayment += row.scheduledPayment;
-        result.loanBalance += row.loanBalance;
-        if (row.hasLoanBalance) result.loanCount++;
-        return result;
-      }, { unpaidDue: 0, scheduledPayment: 0, loanBalance: 0, loanCount: 0 });
-      const loanBalanceTotal = totals.loanCount ? money(totals.loanBalance) : "—";
+      const totals = rows.reduce(
+        (result, row) => {
+          if (!row.hasAccount) return result;
+          result.unpaidDue += row.unpaidDue;
+          result.scheduledPayment += row.scheduledPayment;
+          result.loanBalance += row.loanBalance;
+          if (row.hasLoanBalance) result.loanCount++;
+          return result;
+        },
+        { unpaidDue: 0, scheduledPayment: 0, loanBalance: 0, loanCount: 0 },
+      );
+      const loanBalanceTotal = totals.loanCount
+        ? money(totals.loanBalance)
+        : "—";
       $("accounts-totals").innerHTML = `<tr>
         <td>
         </td>
