@@ -17,14 +17,45 @@
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
+      depositLedger,
+      moneyInput,
+      toast,
+      fetchAll,
       openModal,
       propertyAddress,
       closeModal,
       editAccount,
       openPayment,
-      closeAccount,
-      depositSectionHTML,
     } = context;
+    const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+    });
+    const { recordDepositAdjustment } =
+      window.PropertyDeskDepositMaintenance.create({
+        state,
+        moneyInput,
+        todayIso,
+        toast,
+        fetchAll,
+      });
+    const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+    });
+    const { attachEvents: attachDepositDetailEvents } =
+      window.PropertyDeskDepositDetailEvents.create({
+        $,
+        state,
+        depositSectionHTML,
+        recordDepositAdjustment,
+      });
     const { renderAccountDetails } =
       window.PropertyDeskAccountDetailsView.create({
         money,
@@ -72,6 +103,9 @@
     return {
       openAccountDetails,
       attachAccountDetailEvents,
+      closeAccount,
+      depositSectionHTML,
+      attachDepositDetailEvents,
     };
   }
 

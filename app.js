@@ -182,49 +182,34 @@
       sumIncome,
       sumOperatingExpenses,
     });
-  const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
+  const {
+    openAccountDetails,
+    attachAccountDetailEvents,
+    attachDepositDetailEvents,
+  } = window.PropertyDeskAccountDetailsWorkflow.create({
     $,
     state,
+    money,
+    fmtDate,
+    esc,
+    isPosted,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
+    amortizationSchedule,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    depositLedger,
+    moneyInput,
     toast,
     fetchAll,
+    openModal,
+    propertyAddress,
     closeModal,
+    editAccount,
+    openPayment,
   });
-  const { depositSectionHTML, attachDepositDetailEvents } =
-    window.PropertyDeskDepositDetailsWorkflow.create({
-      $,
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
-    });
-  const { openAccountDetails, attachAccountDetailEvents } =
-    window.PropertyDeskAccountDetailsWorkflow.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      isPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      openModal,
-      propertyAddress,
-      closeModal,
-      editAccount,
-      openPayment,
-      closeAccount,
-      depositSectionHTML,
-    });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailsWorkflow.create({
       $,

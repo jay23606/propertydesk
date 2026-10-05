@@ -56,7 +56,8 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
-  assert.match(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
+  assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
+  assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(
@@ -102,11 +103,42 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details workflow composes account, history, and account actions", () => {
+test("account details workflow composes account, deposit, history, and maintenance actions", () => {
   const created = [];
   const passed = {};
+  const closeAccount = () => "closed";
+  const recordDepositAdjustment = () => "adjusted";
+  const depositSectionHTML = () => "deposit html";
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountMaintenance: {
+        create: (options) => {
+          created.push("account maintenance");
+          passed.accountMaintenance = options;
+          return { closeAccount };
+        },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          created.push("deposit maintenance");
+          passed.depositMaintenance = options;
+          return { recordDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositDetails: {
+        create: (options) => {
+          created.push("deposit view");
+          passed.depositView = options;
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          created.push("deposit events");
+          passed.depositEvents = options;
+          return { attachEvents: () => "deposit events attached" };
+        },
+      },
       PropertyDeskAccountDetailsView: {
         create: (options) => {
           created.push("account view");
@@ -147,18 +179,25 @@ test("account details workflow composes account, history, and account actions", 
     $() {},
     state: {},
     money: () => 0,
+    moneyInput: Number,
     fmtDate: () => "",
     esc: String,
+    toast() {},
+    fetchAll() {},
+    depositLedger() {},
     prettyType: String,
     paymentFrequencyLabel: () => "monthly",
     closeModal() {},
-    closeAccount() {},
-    depositSectionHTML: () => "deposit html",
+    todayIso() {},
   };
   const workflow =
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, [
+    "account maintenance",
+    "deposit maintenance",
+    "deposit view",
+    "deposit events",
     "account view",
     "history",
     "account details",
@@ -166,70 +205,19 @@ test("account details workflow composes account, history, and account actions", 
   ]);
   assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
   assert.equal(passed.view.money, dependencies.money);
-  assert.equal(passed.accountEvents.closeAccount, dependencies.closeAccount);
+  assert.equal(passed.accountEvents.closeAccount, closeAccount);
+  assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
+  assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
   assert.equal(
-    passed.accountDetails.depositSectionHTML,
-    dependencies.depositSectionHTML,
+    passed.depositEvents.recordDepositAdjustment,
+    recordDepositAdjustment,
   );
+  assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
+  assert.equal(passed.depositMaintenance.fetchAll, dependencies.fetchAll);
   assert.equal(workflow.openAccountDetails(), "opened");
   assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
-});
-
-test("deposit details workflow composes ledger rendering with adjustment actions", () => {
-  const passed = {};
-  const depositSectionHTML = () => "deposit html";
-  const recordDepositAdjustment = () => "adjusted";
-  const attachEvents = () => "deposit events attached";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDepositMaintenance: {
-        create: (options) => {
-          passed.maintenance = options;
-          return { recordDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositDetails: {
-        create: (options) => {
-          passed.details = options;
-          return { depositSectionHTML };
-        },
-      },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    depositLedger() {},
-    money() {},
-    fmtDate() {},
-    esc() {},
-    moneyInput() {},
-    todayIso() {},
-    toast() {},
-    fetchAll() {},
-  };
-  const workflow =
-    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
-
-  assert.equal(passed.details.state, dependencies.state);
-  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
-  assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
-  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.equal(workflow.closeAccount(), "closed");
+  assert.equal(workflow.depositSectionHTML(), "deposit html");
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 
