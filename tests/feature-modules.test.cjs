@@ -1111,13 +1111,15 @@ test("property and transaction views own their search and filter bindings", () =
 
 test("overview routes property-card and quick-payment actions to property workflows", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "overview.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["overview.js", "overview-events.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const calls = [];
   let clickHandler;
-  const feature = context.window.PropertyDeskOverview.create({
+  const events = context.window.PropertyDeskOverviewEvents.create({
     $: () => ({
       addEventListener(name, handler) {
         if (name === "click") clickHandler = handler;
@@ -1126,7 +1128,7 @@ test("overview routes property-card and quick-payment actions to property workfl
     openPropertyDetails: (id) => calls.push(["open", id]),
     openPropertyPayment: (id) => calls.push(["payment", id]),
   });
-  feature.attachEvents();
+  events.attachEvents();
 
   for (const [selector, dataset] of [
     ["[data-property-card]", { propertyCard: "property-1" }],
@@ -1185,7 +1187,13 @@ test("profile display loads before overview and is precached", () => {
     html.indexOf("features/profile-display.js") < html.indexOf("features/overview.js"),
     "profile display should load before dashboard composition",
   );
+  assert.ok(
+    html.indexOf("features/overview.js") < html.indexOf("features/overview-events.js") &&
+      html.indexOf("features/overview-events.js") < html.indexOf("app.js"),
+    "overview actions should load after the renderer and before the app",
+  );
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
+  assert.match(worker, /'\.\/features\/overview-events\.js'/);
 });
 
 test("profile settings save the display label and refresh the shared shell", async () => {
@@ -1577,6 +1585,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
   assert.match(app, /PropertyDeskAccountDetailEvents\.create\(/);
   assert.match(app, /PropertyDeskDepositDetailEvents\.create\(/);
+  assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);

@@ -515,6 +515,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
+    await assertNoUnhandledRejections(signedInPage, "Signed-in workflows");
     console.log("PropertyDesk rendered signed-in Overview, Properties, payment entry and correction, note amortization, rental deposits, account history, transaction voiding, account closure, Reports, Workspace settings, and reminder activity without browser errors or unhandled rejections.");
   } finally {
     await browser.close();

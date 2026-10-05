@@ -67,10 +67,7 @@
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const { updateGreeting } = window.PropertyDeskProfileDisplay.create({ $, state });
-  const {
-    renderOverview,
-    attachEvents: attachOverviewEvents,
-  } = window.PropertyDeskOverview.create({
+  const { renderOverview } = window.PropertyDeskOverview.create({
     $,
     state,
     monthlyScheduledEstimate,
@@ -88,9 +85,13 @@
     isPosted,
     prettyType,
     fmtDate,
-    openPropertyDetails: (...args) => openPropertyDetails(...args),
-    openPropertyPayment: (...args) => openPropertyPayment(...args),
   });
+  const { attachEvents: attachOverviewEvents } =
+    window.PropertyDeskOverviewEvents.create({
+      $,
+      openPropertyDetails: (...args) => openPropertyDetails(...args),
+      openPropertyPayment: (...args) => openPropertyPayment(...args),
+    });
   const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
     esc,
     money,

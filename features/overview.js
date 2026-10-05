@@ -20,8 +20,6 @@
       isPosted,
       prettyType,
       fmtDate,
-      openPropertyDetails,
-      openPropertyPayment,
     } = context;
     function propertyCard(property) {
       const related = state.accounts.filter(
@@ -144,21 +142,7 @@
           .join("") ||
         '<div class="list-empty">Add your first property to build your portfolio.</div>';
     }
-    function attachEvents() {
-      $("overview-properties").addEventListener("click", (event) => {
-        const payment = event.target.closest("[data-property-payment]");
-        if (payment) {
-          event.preventDefault();
-          event.stopPropagation();
-          openPropertyPayment(payment.dataset.propertyPayment);
-          return;
-        }
-        const card = event.target.closest("[data-property-card]");
-        if (card) openPropertyDetails(card.dataset.propertyCard);
-      });
-    }
-
-    return { renderOverview, attachEvents };
+    return { renderOverview };
   }
   window.PropertyDeskOverview = Object.freeze({ create: createOverview });
 })();
