@@ -20,9 +20,16 @@
         toast("Enter a display name");
         return;
       }
-      const { data, error } = await state.client.auth.updateUser({
-        data: { display_name },
-      });
+      let data;
+      let error;
+      try {
+        ({ data, error } = await state.client.auth.updateUser({
+          data: { display_name },
+        }));
+      } catch {
+        toast("Display name couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
@@ -36,15 +43,25 @@
       event.preventDefault();
       const email = $("member-email").value.trim();
       if (!email) return;
-      const { error } = await state.client.rpc("pd_add_workspace_member", {
-        p_email: email,
-      });
+      let error;
+      try {
+        ({ error } = await state.client.rpc("pd_add_workspace_member", {
+          p_email: email,
+        }));
+      } catch {
+        toast("Workspace member couldn't be added right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
       $("member-email").value = "";
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       renderWorkspaceSettings();
       toast("Workspace member added");
     }
@@ -60,14 +77,24 @@
         )
       )
         return;
-      const { error } = await state.client.rpc("pd_remove_workspace_member", {
-        p_member_user_id: memberId,
-      });
+      let error;
+      try {
+        ({ error } = await state.client.rpc("pd_remove_workspace_member", {
+          p_member_user_id: memberId,
+        }));
+      } catch {
+        toast("Workspace member couldn't be removed right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       renderWorkspaceSettings();
       toast("Workspace access removed");
     }

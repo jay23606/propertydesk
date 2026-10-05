@@ -2081,6 +2081,49 @@ test("adding a workspace member clears the address only after successful refresh
   assert.equal(messages.at(-1), "Workspace member added");
 });
 
+test("workspace setting writes report rejected requests and retain entered values", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    context,
+  );
+  const elements = new Map([
+    ["display-name", { value: "New Label" }],
+    ["member-email", { value: " spouse@example.test " }],
+  ]);
+  const $ = (id) => elements.get(id);
+  const messages = [];
+  const state = {
+    client: {
+      auth: { updateUser: async () => { throw new Error("offline"); } },
+      rpc: async () => { throw new Error("offline"); },
+    },
+    workspaceMembers: [{ member_user_id: "member-1", display_name: "Member" }],
+    reminderLogs: [],
+    accounts: [],
+    properties: [],
+    user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+  };
+  const feature = context.window.PropertyDeskWorkspace.create({
+    $, state, esc: String, fmtDate: () => "", money: () => "",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    updateGreeting: () => assert.fail("a rejected profile save must not update the greeting"),
+    confirmAction: () => true,
+  });
+
+  await assert.doesNotReject(feature.saveProfile({ preventDefault() {} }));
+  await assert.doesNotReject(feature.addWorkspaceMember({ preventDefault() {} }));
+  await assert.doesNotReject(feature.removeWorkspaceMember("member-1"));
+  assert.equal(state.user.user_metadata.display_name, "Owner");
+  assert.equal($("member-email").value, " spouse@example.test ");
+  assert.deepEqual(messages, [
+    "Display name couldn't be saved right now. Check your connection and try again.",
+    "Workspace member couldn't be added right now. Check your connection and try again.",
+    "Workspace member couldn't be removed right now. Check your connection and try again.",
+  ]);
+});
+
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {}, document: {} });
   vm.runInContext(
