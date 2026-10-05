@@ -200,6 +200,7 @@ test("property portfolio workflow connects its model, table, and action routers"
 
 test("ledger entry workflow publishes an explicit payment and expense interface", () => {
   const calls = [];
+  const passed = {};
   const paymentActions = {
     updateAllocationPreview: () => "preview",
     prefillPaymentAmount: () => "prefill",
@@ -215,8 +216,8 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskPaymentEntryForm: { create: () => paymentActions },
-      PropertyDeskExpenseEntryForm: { create: () => expenseActions },
+      PropertyDeskPaymentEntryForm: { create: (options) => { passed.payment = options; return paymentActions; } },
+      PropertyDeskExpenseEntryForm: { create: (options) => { passed.expense = options; return expenseActions; } },
     },
   });
   vm.runInContext(
@@ -226,7 +227,12 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     ),
     context,
   );
-  const forms = context.window.PropertyDeskLedgerEntryForms.create({});
+  const dependencies = {
+    $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {},
+    closeModal() {}, fetchAll() {}, fillSelect() {}, populateFormOptions() {},
+    prettyType() {}, openModal() {}, saveCorrection() {}, unrelatedDependency() {},
+  };
+  const forms = context.window.PropertyDeskLedgerEntryForms.create(dependencies);
 
   assert.deepEqual(
     Object.keys(forms).sort(),
@@ -246,6 +252,13 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     paymentActions.updateAllocationPreview,
   );
   assert.equal(forms.openExpense, expenseActions.openExpense);
+  assert.deepEqual(Object.keys(passed.payment).sort(), [
+    "$", "closeModal", "fetchAll", "fillSelect", "moneyInput", "openModal",
+    "populateFormOptions", "prettyType", "saveCorrection", "state", "todayIso", "toast",
+  ].sort());
+  assert.deepEqual(Object.keys(passed.expense).sort(), Object.keys(passed.payment).sort());
+  assert.equal(passed.payment.saveCorrection, dependencies.saveCorrection);
+  assert.equal(passed.expense.saveCorrection, dependencies.saveCorrection);
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });

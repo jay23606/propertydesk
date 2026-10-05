@@ -3,8 +3,18 @@
   "use strict";
 
   function createLedgerEntryForms(context) {
-    const payments = window.PropertyDeskPaymentEntryForm.create(context);
-    const expenses = window.PropertyDeskExpenseEntryForm.create(context);
+    const {
+      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
+      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+    } = context;
+    const payments = window.PropertyDeskPaymentEntryForm.create({
+      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
+      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+    });
+    const expenses = window.PropertyDeskExpenseEntryForm.create({
+      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
+      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+    });
 
     function attachEvents() {
       payments.attachEvents();
