@@ -80,6 +80,7 @@
     openPropertyPayment,
     openExpense,
     attachPropertyFormEvents,
+    attachAccountFormEvents,
     attachLedgerEntryFormEvents,
     attachCreateActions,
   } = window.PropertyDeskEntryWorkflow.create({
@@ -210,7 +211,8 @@
       attachDepositDetailEvents,
       attachAccountDetailEvents,
       () => attachCreateActions(navigate),
-      () => attachPropertyFormEvents(previewReminderEmail),
+      attachPropertyFormEvents,
+      () => attachAccountFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
       () => attachPropertyDetailEvents(toggleArchiveProperty),
       attachWorkspaceEvents,

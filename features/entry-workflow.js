@@ -1,4 +1,4 @@
-/* Compose account/property forms, ledger entry forms, and their launch actions. */
+/* Compose independent property/account forms, ledger forms, and launch actions. */
 (() => {
   "use strict";
 
@@ -11,19 +11,22 @@
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
       $, state, toast, fetchAll, closeModal,
     });
-    const propertyAccountForms = window.PropertyDeskPropertyAccountForms.create({
+    const propertyForm = window.PropertyDeskPropertyForm.create({
+      $, state, toast, closeModal, fetchAll,
+    });
+    const accountForm = window.PropertyDeskAccountForm.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       populateFormOptions, openModal,
+      buildAccountPayload: window.PropertyDeskAccountPayload.build,
+      formModel: window.PropertyDeskAccountFormModel,
     });
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll, fillSelect,
       populateFormOptions, prettyType, openModal, saveCorrection,
     });
-    const {
-      resetPropertyForm,
-      resetAccountForm,
-      editAccount,
-    } = propertyAccountForms;
+    const resetPropertyForm = propertyForm.resetPropertyForm;
+    const resetAccountForm = accountForm.resetAccountForm;
+    const editAccount = accountForm.editAccount;
     const {
       updateAllocationPreview,
       openPayment,
@@ -44,7 +47,9 @@
       openPayment,
       openPropertyPayment,
       openExpense,
-      attachPropertyFormEvents: propertyAccountForms.attachEvents,
+      attachPropertyFormEvents: propertyForm.attachEvents,
+      attachAccountFormEvents: (previewReminderEmail) =>
+        accountForm.attachEvents(previewReminderEmail),
       attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
       attachCreateActions,
     };

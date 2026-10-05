@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   loadLedgerEntryForms,
-  loadPropertyAccountForms,
+  loadPropertyAndAccountForms,
   formElements,
 } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
@@ -274,77 +274,32 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
-test("property and account form workflow publishes an explicit interface", () => {
-  const calls = [];
-  const passed = {};
-  const propertyActions = {
-    resetPropertyForm: () => "reset property",
-    saveProperty: () => "save property",
-    attachEvents: () => calls.push("property events"),
-  };
-  const accountActions = {
-    resetAccountForm: () => "reset account",
-    updateLoanFields: () => "loan fields",
-    saveAccount: () => "save account",
-    editAccount: () => "edit account",
-    attachEvents: (preview) => calls.push(["account events", preview]),
-  };
-  const buildAccountPayload = () => ({ account_payload: true });
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountPayload: { build: buildAccountPayload },
-      PropertyDeskAccountFormModel: { partyEmails: () => ({ emails: [], error: "" }) },
-      PropertyDeskPropertyForm: { create: (options) => { passed.property = options; return propertyActions; } },
-      PropertyDeskAccountForm: { create: (options) => { passed.account = options; return accountActions; } },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-account-forms.js"),
-      "utf8",
-    ),
-    context,
-  );
+test("property and account form modules expose separate APIs", () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
   const dependencies = {
-    $() {}, state: {}, toast() {}, closeModal() {}, fetchAll() {},
-    moneyInput() {}, todayIso() {}, populateFormOptions() {}, openModal() {},
-    unrelatedDependency() {},
+    $: formElements(), state: {}, toast() {}, closeModal() {}, fetchAll() {},
+    moneyInput() {}, todayIso: () => "2026-10-05", populateFormOptions() {},
+    openModal() {},
   };
-  const forms = context.window.PropertyDeskPropertyAccountForms.create(dependencies);
+  const property = context.window.PropertyDeskPropertyForm.create(dependencies);
+  const account = context.window.PropertyDeskAccountForm.create({
+    ...dependencies,
+    buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
+    formModel: context.window.PropertyDeskAccountFormModel,
+  });
 
-  assert.deepEqual(
-    Object.keys(forms).sort(),
-    [
-      "attachEvents",
-      "editAccount",
-      "resetAccountForm",
-      "resetPropertyForm",
-      "saveAccount",
-      "saveProperty",
-      "updateLoanFields",
-    ].sort(),
-  );
-  assert.equal(forms.saveProperty, propertyActions.saveProperty);
-  assert.equal(forms.editAccount, accountActions.editAccount);
-  assert.deepEqual(Object.keys(passed.property).sort(), [
-    "$", "closeModal", "fetchAll", "state", "toast",
-  ].sort());
-  assert.deepEqual(Object.keys(passed.account).sort(), [
-    "$", "buildAccountPayload", "closeModal", "fetchAll", "formModel", "moneyInput", "openModal",
-    "populateFormOptions", "state", "todayIso", "toast",
-  ].sort());
-  assert.equal(passed.property.state, dependencies.state);
-  assert.equal(passed.account.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.account.buildAccountPayload, buildAccountPayload);
-  assert.equal(passed.account.formModel, context.window.PropertyDeskAccountFormModel);
-  const preview = () => {};
-  forms.attachEvents(preview);
-  assert.deepEqual(calls, ["property events", ["account events", preview]]);
+  assert.deepEqual(Object.keys(property).sort(), [
+    "attachEvents", "resetPropertyForm", "saveProperty",
+  ]);
+  assert.deepEqual(Object.keys(account).sort(), [
+    "attachEvents", "editAccount", "resetAccountForm", "saveAccount", "updateLoanFields",
+  ]);
 });
 
 test("account form view resets and populates fields without owning persistence", () => {
   const context = vm.createContext({ window: {} });
-  loadPropertyAccountForms(context);
+  loadPropertyAndAccountForms(context);
   const elements = formElements({ "account-type": "rental" });
   const toggles = [];
   const opened = [];
@@ -435,22 +390,29 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     ),
     context,
   );
-  loadPropertyAccountForms(context);
+  loadPropertyAndAccountForms(context);
   loadLedgerEntryForms(context);
-  const property = context.window.PropertyDeskPropertyAccountForms.create({});
+  const formContext = {
+    $: formElements(), state: {}, toast() {}, closeModal() {}, fetchAll() {},
+    moneyInput: Number, todayIso: () => "2026-10-05", populateFormOptions() {},
+    openModal() {},
+  };
+  const property = context.window.PropertyDeskPropertyForm.create(formContext);
+  const account = context.window.PropertyDeskAccountForm.create({
+    ...formContext,
+    buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
+    formModel: context.window.PropertyDeskAccountFormModel,
+  });
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
     [
       property,
-      [
-        "resetPropertyForm",
-        "resetAccountForm",
-        "saveProperty",
-        "saveAccount",
-        "editAccount",
-        "attachEvents",
-      ],
+      ["resetPropertyForm", "saveProperty", "attachEvents"],
+    ],
+    [
+      account,
+      ["resetAccountForm", "saveAccount", "editAccount", "attachEvents"],
     ],
     [
       ledger,
@@ -473,7 +435,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
 
 test("property and account forms report rejected saves without running success actions", async () => {
   const context = vm.createContext({ window: {} });
-  loadPropertyAccountForms(context);
+  loadPropertyAndAccountForms(context);
   const messages = [];
   const $ = formElements({
     "property-name": "Rental house",
@@ -494,20 +456,26 @@ test("property and account forms report rejected saves without running success a
       }),
     },
   };
-  const forms = context.window.PropertyDeskPropertyAccountForms.create({
+  const dependencies = {
     $,
     state,
-    moneyInput: Number,
-    todayIso: () => "2026-10-05",
     toast: (message) => messages.push(message),
     closeModal: () => assert.fail("rejected save must keep its form open"),
     fetchAll: async () => assert.fail("rejected save must not refresh"),
+  };
+  const property = context.window.PropertyDeskPropertyForm.create(dependencies);
+  const account = context.window.PropertyDeskAccountForm.create({
+    ...dependencies,
+    moneyInput: Number,
+    todayIso: () => "2026-10-05",
     populateFormOptions() {},
     openModal() {},
+    buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
+    formModel: context.window.PropertyDeskAccountFormModel,
   });
 
-  await assert.doesNotReject(forms.saveProperty({ preventDefault() {} }));
-  await assert.doesNotReject(forms.saveAccount({ preventDefault() {} }));
+  await assert.doesNotReject(property.saveProperty({ preventDefault() {} }));
+  await assert.doesNotReject(account.saveAccount({ preventDefault() {} }));
   assert.deepEqual(messages, [
     "Property couldn't be saved right now. Check your connection and try again.",
     "Account couldn't be saved right now. Check your connection and try again.",
@@ -611,7 +579,7 @@ test("payment and expense forms report rejected saves without clearing the entri
 
 test("record-entry feature owns form event bindings and category hints", () => {
   const context = vm.createContext({ window: {} });
-  loadPropertyAccountForms(context);
+  loadPropertyAndAccountForms(context);
   loadLedgerEntryForms(context);
   const handlers = new Map();
   const toggles = [];
@@ -636,12 +604,22 @@ test("record-entry feature owns form event bindings and category hints", () => {
     fillSelect() {},
     prettyType: (type) => type,
   };
-  const propertyForms =
-    context.window.PropertyDeskPropertyAccountForms.create(formContext);
+  const propertyForm = context.window.PropertyDeskPropertyForm.create({
+    ...formContext,
+    toast() {}, closeModal() {}, fetchAll() {},
+  });
+  const accountForm = context.window.PropertyDeskAccountForm.create({
+    ...formContext,
+    todayIso: () => "2026-10-05", populateFormOptions() {}, openModal() {},
+    moneyInput: Number, toast() {}, closeModal() {}, fetchAll() {},
+    buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
+    formModel: context.window.PropertyDeskAccountFormModel,
+  });
   const entryForms =
     context.window.PropertyDeskLedgerEntryForms.create(formContext);
 
-  propertyForms.attachEvents(() => {});
+  propertyForm.attachEvents();
+  accountForm.attachEvents(() => {});
   entryForms.attachEvents();
   assert.equal(typeof handlers.get("property-form:submit"), "function");
   assert.equal(typeof handlers.get("payment-form:submit"), "function");

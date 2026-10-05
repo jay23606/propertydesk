@@ -19,10 +19,19 @@ test("entry workflow shares correction saving across forms and create actions", 
       PropertyDeskTransactionCorrections: {
         create: () => ({ saveCorrection: correction }),
       },
-      PropertyDeskPropertyAccountForms: {
+      PropertyDeskAccountPayload: { build: () => ({}) },
+      PropertyDeskAccountFormModel: {},
+      PropertyDeskPropertyForm: {
         create: () => ({
-          resetPropertyForm, resetAccountForm, editAccount: () => {},
-          attachEvents: (callback) => calls.push(["property forms", callback]),
+          resetPropertyForm,
+          attachEvents: () => calls.push(["property form events"]),
+        }),
+      },
+      PropertyDeskAccountForm: {
+        create: () => ({
+          resetAccountForm,
+          editAccount: () => {},
+          attachEvents: (callback) => calls.push(["account form events", callback]),
         }),
       },
       PropertyDeskLedgerEntryForms: {
@@ -54,11 +63,13 @@ test("entry workflow shares correction saving across forms and create actions", 
   assert.equal(passed.actions.resetAccountForm, resetAccountForm);
   assert.equal(passed.actions.openPayment, openPayment);
   assert.equal(passed.actions.openExpense, openExpense);
-  workflow.attachPropertyFormEvents(preview);
+  workflow.attachPropertyFormEvents();
+  workflow.attachAccountFormEvents(preview);
   workflow.attachLedgerEntryFormEvents();
   workflow.attachCreateActions(navigate);
   assert.deepEqual(calls, [
-    ["property forms", preview], ["ledger forms"], ["create actions", navigate],
+    ["property form events"], ["account form events", preview],
+    ["ledger forms"], ["create actions", navigate],
   ]);
 });
 
@@ -86,7 +97,7 @@ test("app coordinator passes the amortization helper into account details", () =
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
   assert.doesNotMatch(app, /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/);
-  assert.doesNotMatch(app, /PropertyDesk(?:TransactionCorrections|PropertyAccountForms|LedgerEntryForms|CreateActions)\.create/);
+  assert.doesNotMatch(app, /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/);
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 

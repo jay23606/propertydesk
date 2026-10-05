@@ -35,14 +35,13 @@ function loadLedgerEntryForms(context) {
   }
 }
 
-function loadPropertyAccountForms(context) {
+function loadPropertyAndAccountForms(context) {
   for (const filename of [
     "property-form.js",
     "account-form-model.js",
     "account-payload.js",
     "account-form-view.js",
     "account-form.js",
-    "property-account-forms.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -96,4 +95,4 @@ function formElements(values = {}) {
   };
 }
 
-module.exports = { loadAuthFeatures, loadWorkspaceFeatures, loadLedgerEntryForms, loadPropertyAccountForms, loadImportFeatures, loadImportPreview, formElements };
+module.exports = { loadAuthFeatures, loadWorkspaceFeatures, loadLedgerEntryForms, loadPropertyAndAccountForms, loadImportFeatures, loadImportPreview, formElements };
