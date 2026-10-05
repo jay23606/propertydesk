@@ -35,6 +35,76 @@ test("property and account detail views expose focused render actions", () => {
   const feature = context.window.PropertyDeskDetailViews.create({});
   assert.equal(typeof feature.openPropertyDetails, "function");
   assert.equal(typeof feature.openAccountDetails, "function");
+  assert.equal(typeof feature.attachPropertyEvents, "function");
+});
+
+test("property detail feature owns its editing and quick-action event bindings", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "details.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const elements = new Map();
+  const calls = [];
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        id,
+        value: "",
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const propertyModal = getElement("property-detail-modal");
+  const feature = context.window.PropertyDeskDetailViews.create({
+    $: getElement,
+    state: {
+      selectedPropertyId: "property-1",
+      accounts: [{ id: "account-1" }],
+    },
+    closeModal: (modal) => calls.push(`close:${modal.id}`),
+    editAccount: (account) => calls.push(`edit:${account.id}`),
+    openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
+    openExpense: (propertyId) => calls.push(`expense:${propertyId}`),
+    resetAccountForm: () => calls.push("reset-account"),
+    populateFormOptions: () => calls.push("populate-options"),
+    openModal: (id) => calls.push(`open:${id}`),
+  });
+
+  feature.attachPropertyEvents(() => calls.push("archive"));
+  handlers.get("property-detail-content:click")({
+    target: {
+      closest: (selector) =>
+        selector === "[data-edit-account]"
+          ? { dataset: { editAccount: "account-1" } }
+          : null,
+    },
+    preventDefault() {},
+  });
+  handlers.get("property-detail-add-income:click")();
+  handlers.get("property-detail-add-expense:click")();
+  handlers.get("property-detail-add-account:click")();
+  handlers.get("property-archive-toggle:click")();
+
+  assert.equal(propertyModal.id, "property-detail-modal");
+  assert.equal(getElement("account-property").value, "property-1");
+  assert.deepEqual(calls, [
+    "close:property-detail-modal",
+    "edit:account-1",
+    "close:property-detail-modal",
+    "payment::property-1",
+    "close:property-detail-modal",
+    "expense:property-1",
+    "close:property-detail-modal",
+    "reset-account",
+    "populate-options",
+    "open:account-modal",
+    "archive",
+  ]);
 });
 
 test("app coordinator passes the amortization helper into account details", () => {
