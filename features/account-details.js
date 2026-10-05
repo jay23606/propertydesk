@@ -7,7 +7,7 @@
       $, state, isPosted, money, fmtDate, esc, prettyType, paymentFrequencyLabel,
       accountBalance, amortizationSchedule, amountDueSince, unpaidDueAccrualStart,
       todayIso, openModal, closeModal, editAccount, openPayment,
-      deleteAccount, propertyAddress, depositSectionHTML, renderAccountHistory,
+      closeAccount, propertyAddress, depositSectionHTML, renderAccountHistory,
     } = context;
     async function openAccountDetails(id) {
       const auditRequestId = ++state.auditRequestId;
@@ -112,7 +112,7 @@
         </div>`
             : '<div class="list-empty">No payments recorded for this account.</div>'
         }</div><div class="detail-section">
-        <button id="detail-delete" class="text-button">Close account and preserve its history</button>
+        <button id="detail-close-account" class="text-button">Close account and preserve its history</button>
         </div>`;
       $("detail-edit").addEventListener("click", () => {
         closeModal($("detail-modal"));
@@ -122,7 +122,7 @@
         closeModal($("detail-modal"));
         openPayment(a.id);
       });
-      $("detail-delete").addEventListener("click", () => deleteAccount(a));
+      $("detail-close-account").addEventListener("click", () => closeAccount(a));
       openModal("detail-modal");
     }
 

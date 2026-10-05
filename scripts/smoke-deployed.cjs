@@ -157,7 +157,7 @@ async function main() {
         openExpense() {},
         resetAccountForm() {},
         populateFormOptions() {},
-        deleteAccount() {},
+        closeAccount() {},
         propertyAddress: (property) => property.name,
       });
 

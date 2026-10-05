@@ -214,7 +214,7 @@
       openExpense,
       documentRef: document,
     });
-  const { deleteAccount: closeAccount } =
+  const { closeAccount } =
     window.PropertyDeskAccountMaintenance.create({
     $,
     state,
@@ -322,7 +322,7 @@
     closeModal,
     editAccount,
     openPayment,
-    deleteAccount: closeAccount,
+    closeAccount,
     propertyAddress,
   });
   const importPreview = window.PropertyDeskImportPreview.create({

@@ -611,6 +611,70 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
+test("account details routes the close action to account maintenance by its domain name", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-details.js"), "utf8"),
+    context,
+  );
+  const account = {
+    id: "account-1",
+    property_id: "property-1",
+    account_type: "rental",
+    name: "Rental",
+    party_name: "Tenant",
+    payment_amount: 800,
+    payment_frequency: "monthly",
+    next_due_date: "2026-11-01",
+  };
+  const handlers = {};
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        addEventListener: (event, handler) => { handlers[`${id}:${event}`] = handler; },
+        classList: { add() {}, remove() {} },
+        querySelector: () => ({ textContent: "" }),
+      });
+    }
+    return elements.get(id);
+  };
+  const closed = [];
+  const feature = context.window.PropertyDeskAccountDetails.create({
+    $,
+    state: {
+      auditRequestId: 0,
+      accounts: [account],
+      properties: [{ id: "property-1", name: "Main House" }],
+      payments: [],
+    },
+    isPosted: () => true,
+    money: (value) => `$${value}`,
+    fmtDate: () => "today",
+    esc: String,
+    prettyType: (type) => type,
+    paymentFrequencyLabel: () => "Monthly",
+    accountBalance: () => 0,
+    amortizationSchedule: () => [],
+    amountDueSince: () => 0,
+    unpaidDueAccrualStart: () => "2026-10-01",
+    todayIso: () => "2026-10-05",
+    openModal() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+    closeAccount: (value) => closed.push(value),
+    propertyAddress: (property) => property.name,
+    depositSectionHTML: () => "",
+    renderAccountHistory: async () => "",
+  });
+
+  await feature.openAccountDetails(account.id);
+  assert.match(elements.get("detail-content").innerHTML, /detail-close-account/);
+  handlers["detail-close-account:click"]();
+  assert.deepEqual(closed, [account]);
+});
+
 test("property activity details include posted and voided records without counting voids", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
