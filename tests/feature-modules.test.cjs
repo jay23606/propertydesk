@@ -47,6 +47,14 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskDetailViews\.create\(\{[\s\S]*?amortizationSchedule,/,
   );
+  assert.match(
+    app,
+    /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskLedgerActions\.create/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskLedgerActions\.create\(\{[\s\S]*?updateAllocationPreview/,
+  );
 });
 
 test("service worker caches a cloned shell response within the fetch lifetime", async () => {
@@ -72,7 +80,9 @@ test("service worker caches a cloned shell response within the fetch lifetime", 
         },
       };
     },
-    async match() { return null; },
+    async match() {
+      return null;
+    },
   };
   const context = vm.createContext({
     self,
@@ -81,15 +91,28 @@ test("service worker caches a cloned shell response within the fetch lifetime", 
     Response,
     fetch: async () => new Response("shell asset"),
   });
-  vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8"), context);
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8"),
+    context,
+  );
 
   fetchHandler({
-    request: { method: "GET", mode: "cors", url: "https://propertydesk.test/app.js" },
+    request: {
+      method: "GET",
+      mode: "cors",
+      url: "https://propertydesk.test/app.js",
+    },
     waitUntil(promise) {
-      assert.equal(eventDispatchFinished, false, "waitUntil must be called during fetch dispatch");
+      assert.equal(
+        eventDispatchFinished,
+        false,
+        "waitUntil must be called during fetch dispatch",
+      );
       waitUntilPromise = promise;
     },
-    respondWith(promise) { responsePromise = promise; },
+    respondWith(promise) {
+      responsePromise = promise;
+    },
   });
   eventDispatchFinished = true;
 
@@ -116,40 +139,47 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   };
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-views.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-views.js"),
+      "utf8",
+    ),
     context,
   );
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
     state: {
       properties: [{ id: "property-1", name: "One Oak", address: "1 Oak St" }],
-      accounts: [{
-        id: "account-1",
-        property_id: "property-1",
-        status: "active",
-        account_type: "land_contract",
-        payment_amount: 125,
-        payment_frequency: "monthly",
-        name: "Contract",
-        party_name: "Buyer",
-      }, {
-        id: "account-2",
-        property_id: "property-1",
-        status: "active",
-        account_type: "rental",
-        payment_amount: 200,
-        payment_frequency: "monthly",
-        name: "Rental",
-        party_name: "Tenant",
-      }],
+      accounts: [
+        {
+          id: "account-1",
+          property_id: "property-1",
+          status: "active",
+          account_type: "land_contract",
+          payment_amount: 125,
+          payment_frequency: "monthly",
+          name: "Contract",
+          party_name: "Buyer",
+        },
+        {
+          id: "account-2",
+          property_id: "property-1",
+          status: "active",
+          account_type: "rental",
+          payment_amount: 200,
+          payment_frequency: "monthly",
+          name: "Rental",
+          party_name: "Tenant",
+        },
+      ],
       payments: [],
       propertyHolders: [],
       workspaceMembers: [],
       user: null,
     },
-    monthlyScheduledEstimate: (accounts) => accounts.reduce((sum, account) => sum + account.payment_amount, 0),
-    accountBalance: (account) => account.id === "account-1" ? 1000 : 0,
-    amountDueSince: (accounts) => accounts[0].id === "account-1" ? 50 : 80,
+    monthlyScheduledEstimate: (accounts) =>
+      accounts.reduce((sum, account) => sum + account.payment_amount, 0),
+    accountBalance: (account) => (account.id === "account-1" ? 1000 : 0),
+    amountDueSince: (accounts) => (accounts[0].id === "account-1" ? 50 : 80),
     unpaidDueAccrualStart: () => "2026-10-01",
     todayIso: () => "2026-10-04",
     esc: (value) => String(value ?? ""),
@@ -205,7 +235,6 @@ test("record-entry module exposes property, account, and transaction workflows",
     "prefillPaymentAmount",
     "openPropertyPayment",
     "openExpense",
-    "correctTransaction",
   ]) {
     assert.equal(typeof feature[action], "function", action);
   }
@@ -214,17 +243,25 @@ test("record-entry module exposes property, account, and transaction workflows",
 test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "record-forms.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map([
     ["payment-account", { value: "" }],
     ["payment-amount", { value: "" }],
     ["payment-date", { value: "" }],
-    ["payment-form", { reset() {
-      elements.get("payment-account").value = "";
-      elements.get("payment-amount").value = "";
-    } }],
+    [
+      "payment-form",
+      {
+        reset() {
+          elements.get("payment-account").value = "";
+          elements.get("payment-amount").value = "";
+        },
+      },
+    ],
     ["payment-modal", { querySelector: () => ({ textContent: "" }) }],
     ["payment-modal-title", { textContent: "" }],
     ["payment-save-button", { textContent: "" }],
@@ -236,7 +273,9 @@ test("opening a payment for an account prefills its scheduled installment withou
   const feature = context.window.PropertyDeskRecordForms.create({
     $: (id) => elements.get(id),
     state: {
-      accounts: [{ id: "account-1", payment_amount: 647, account_type: "rental" }],
+      accounts: [
+        { id: "account-1", payment_amount: 647, account_type: "rental" },
+      ],
       pendingCorrection: null,
     },
     moneyInput: Number,
@@ -275,7 +314,10 @@ test("private document module exposes upload, delete, and open workflows", () =>
 test("document upload stores objects privately and removes an orphan after metadata failure", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "documents.js"),
+      "utf8",
+    ),
     context,
   );
   const state = {
@@ -318,14 +360,18 @@ test("document upload stores objects privately and removes an orphan after metad
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed metadata must not refresh"),
-    openPropertyDetails: () => assert.fail("failed metadata must not reopen details"),
+    openPropertyDetails: () =>
+      assert.fail("failed metadata must not reopen details"),
     makeId: () => "file-id",
   });
 
   await feature.uploadPropertyDocument(input);
 
   assert.equal(input.value, "");
-  assert.equal(state.upload.path, "workspace-1/property-1/file-id-Agreement.pdf");
+  assert.equal(
+    state.upload.path,
+    "workspace-1/property-1/file-id-Agreement.pdf",
+  );
   assert.equal(state.upload.options.contentType, "application/pdf");
   assert.equal(state.upload.options.upsert, false);
   assert.equal(state.document.user_id, "workspace-1");
@@ -337,13 +383,24 @@ test("document upload stores objects privately and removes an orphan after metad
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "exports.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "exports.js"),
+      "utf8",
+    ),
     context,
   );
   const tables = [
-    "pd_properties", "pd_accounts", "pd_agreement_versions", "pd_payments",
-    "pd_expenses", "pd_deposit_entries", "pd_documents", "pd_import_batches",
-    "pd_audit_events", "pd_workspace_members", "pd_property_holders",
+    "pd_properties",
+    "pd_accounts",
+    "pd_agreement_versions",
+    "pd_payments",
+    "pd_expenses",
+    "pd_deposit_entries",
+    "pd_documents",
+    "pd_import_batches",
+    "pd_audit_events",
+    "pd_workspace_members",
+    "pd_property_holders",
   ];
   const button = { textContent: "Export backup", disabled: false };
   const state = {
@@ -359,9 +416,17 @@ test("backup export aborts before download when a private document path escapes 
             return {
               async range() {
                 return {
-                  data: table === "pd_documents"
-                    ? [{ id: "doc-1", user_id: "workspace-1", storage_path: "other-workspace/property/file.pdf", file_name: "file.pdf" }]
-                    : [],
+                  data:
+                    table === "pd_documents"
+                      ? [
+                          {
+                            id: "doc-1",
+                            user_id: "workspace-1",
+                            storage_path: "other-workspace/property/file.pdf",
+                            file_name: "file.pdf",
+                          },
+                        ]
+                      : [],
                   error: null,
                 };
               },
@@ -374,15 +439,19 @@ test("backup export aborts before download when a private document path escapes 
   const messages = [];
   const downloads = [];
   const feature = context.window.PropertyDeskExports.create({
-    $: (id) => id === "export-all" ? button : null,
+    $: (id) => (id === "export-all" ? button : null),
     state,
-    createBackup: () => assert.fail("invalid paths must stop before backup creation"),
+    createBackup: () =>
+      assert.fail("invalid paths must stop before backup creation"),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     prettyType: (value) => value,
     accountBalance: () => 0,
     downloadBlob: (blob) => downloads.push(blob),
-    zipUtils: { createZip: () => assert.fail("invalid paths must stop before zip creation") },
+    zipUtils: {
+      createZip: () =>
+        assert.fail("invalid paths must stop before zip creation"),
+    },
   });
 
   await feature.exportAll();
@@ -414,13 +483,21 @@ test("password reset requests keep generic feedback and restore the submit contr
   const resetCalls = [];
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
-    state: { client: { auth: { async resetPasswordForEmail(...args) {
-      resetCalls.push(args);
-      return { error: { message: "account-specific failure" } };
-    } } } },
+    state: {
+      client: {
+        auth: {
+          async resetPasswordForEmail(...args) {
+            resetCalls.push(args);
+            return { error: { message: "account-specific failure" } };
+          },
+        },
+      },
+    },
     fetchAll: async () => {},
     toast() {},
-    windowRef: { location: { origin: "https://example.test", pathname: "/propertydesk/" } },
+    windowRef: {
+      location: { origin: "https://example.test", pathname: "/propertydesk/" },
+    },
     documentRef: {},
   });
 
@@ -428,32 +505,56 @@ test("password reset requests keep generic feedback and restore the submit contr
 
   assert.equal(resetCalls.length, 1);
   assert.equal(resetCalls[0][0], "owner@example.com");
-  assert.equal(resetCalls[0][1].redirectTo, "https://example.test/propertydesk/");
-  assert.equal(element("auth-message").textContent, "Unable to request a reset right now. Try again later.");
+  assert.equal(
+    resetCalls[0][1].redirectTo,
+    "https://example.test/propertydesk/",
+  );
+  assert.equal(
+    element("auth-message").textContent,
+    "Unable to request a reset right now. Try again later.",
+  );
   assert.equal(element("forgot-password").disabled, false);
 });
 
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
   const element = (id) => {
-    if (!elements.has(id)) elements.set(id, {
-      value: "",
-      innerHTML: "",
-      classList: { toggle(name, hidden) { this.lastToggle = [name, hidden]; } },
-    });
+    if (!elements.has(id))
+      elements.set(id, {
+        value: "",
+        innerHTML: "",
+        classList: {
+          toggle(name, hidden) {
+            this.lastToggle = [name, hidden];
+          },
+        },
+      });
     return elements.get(id);
   };
   const state = {
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
     workspaceOwnerId: "owner-1",
     workspaceMembers: [
-      { member_user_id: "owner-1", display_name: "<Owner>", email: "owner@example.test", is_owner: true },
-      { member_user_id: "member-1", display_name: "Member", email: "member@example.test", is_owner: false },
+      {
+        member_user_id: "owner-1",
+        display_name: "<Owner>",
+        email: "owner@example.test",
+        is_owner: true,
+      },
+      {
+        member_user_id: "member-1",
+        display_name: "Member",
+        email: "member@example.test",
+        is_owner: false,
+      },
     ],
     reminderLogs: [],
     accounts: [],
@@ -462,7 +563,18 @@ test("workspace settings render member labels and escape untrusted text", () => 
   const feature = context.window.PropertyDeskWorkspace.create({
     $: element,
     state,
-    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])),
+    esc: (value) =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char],
+      ),
     fmtDate: () => "Oct 2026",
     money: () => "$0.00",
     toast() {},
@@ -476,19 +588,29 @@ test("workspace settings render member labels and escape untrusted text", () => 
   assert.equal(element("display-name").value, "Owner");
   assert.match(element("workspace-members").innerHTML, /&lt;Owner&gt;/);
   assert.match(element("workspace-members").innerHTML, /Full workspace access/);
-  assert.deepEqual(element("member-add-form").classList.lastToggle, ["hidden", false]);
+  assert.deepEqual(element("member-add-form").classList.lastToggle, [
+    "hidden",
+    false,
+  ]);
   assert.match(element("reminder-activity").innerHTML, /Reminders are off/);
 });
 
 test("adding a workspace member clears the address only after successful refresh", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
   const element = (id) => {
-    if (!elements.has(id)) elements.set(id, { value: id === "member-email" ? " spouse@example.test " : "", classList: { toggle() {} } });
+    if (!elements.has(id))
+      elements.set(id, {
+        value: id === "member-email" ? " spouse@example.test " : "",
+        classList: { toggle() {} },
+      });
     return elements.get(id);
   };
   const calls = [];
@@ -496,8 +618,16 @@ test("adding a workspace member clears the address only after successful refresh
   const feature = context.window.PropertyDeskWorkspace.create({
     $: element,
     state: {
-      client: { async rpc(name, args) { calls.push([name, args]); return { error: null }; } },
-      workspaceMembers: [], reminderLogs: [], accounts: [], properties: [],
+      client: {
+        async rpc(name, args) {
+          calls.push([name, args]);
+          return { error: null };
+        },
+      },
+      workspaceMembers: [],
+      reminderLogs: [],
+      accounts: [],
+      properties: [],
       user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
       workspaceOwnerId: "owner-1",
     },
@@ -523,7 +653,10 @@ test("adding a workspace member clears the address only after successful refresh
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {}, document: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-management.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-management.js"),
+      "utf8",
+    ),
     context,
   );
   const updates = [];
@@ -532,7 +665,9 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   const state = {
     workspaceOwnerId: "workspace-1",
     selectedPropertyId: "property-1",
-    properties: [{ id: "property-1", address: "10 Main St", notes: "Old note" }],
+    properties: [
+      { id: "property-1", address: "10 Main St", notes: "Old note" },
+    ],
     client: {
       from(table) {
         assert.equal(table, "pd_properties");
@@ -542,10 +677,12 @@ test("property quick notes normalize whitespace and scope updates to the workspa
             return {
               eq(column, value) {
                 updates.push([column, value]);
-                return { eq: async (ownerColumn, ownerId) => {
-                  updates.push([ownerColumn, ownerId]);
-                  return { error: null };
-                } };
+                return {
+                  eq: async (ownerColumn, ownerId) => {
+                    updates.push([ownerColumn, ownerId]);
+                    return { error: null };
+                  },
+                };
               },
             };
           },
@@ -554,9 +691,12 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     },
   };
   const feature = context.window.PropertyDeskPropertyManagement.create({
-    $: () => {}, state,
+    $: () => {},
+    state,
     toast: (message) => messages.push(message),
-    fetchAll: async () => { refreshed = true; },
+    fetchAll: async () => {
+      refreshed = true;
+    },
     todayIso: () => "2026-10-04",
     streetAddress: (property) => property.address,
     openPropertyDetails() {},
@@ -577,10 +717,17 @@ test("property quick notes normalize whitespace and scope updates to the workspa
 test("ledger actions keep deposit adjustments separate and retain void audit reasons", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-actions.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-actions.js"),
+      "utf8",
+    ),
     context,
   );
-  const prompts = ["250.00", "Deposit retention per move-out inspection", "Entered in error"];
+  const prompts = [
+    "250.00",
+    "Deposit retention per move-out inspection",
+    "Entered in error",
+  ];
   const inserts = [];
   const updates = [];
   const messages = [];
@@ -605,7 +752,11 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
                     updates.push([statusColumn, status]);
                     return {
                       select() {
-                        return { async maybeSingle() { return { data: { id: "payment-1" }, error: null }; } };
+                        return {
+                          async maybeSingle() {
+                            return { data: { id: "payment-1" }, error: null };
+                          },
+                        };
                       },
                     };
                   },
@@ -637,7 +788,10 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
   assert.equal(inserts[0][0], "pd_deposit_entries");
   assert.equal(inserts[0][1].user_id, "workspace-1");
   assert.equal(inserts[0][1].amount, 250);
-  assert.equal(inserts[0][1].reason, "Deposit retention per move-out inspection");
+  assert.equal(
+    inserts[0][1].reason,
+    "Deposit retention per move-out inspection",
+  );
   assert.equal(updates[0][0], "pd_payments");
   assert.equal(updates[0][1].status, "voided");
   assert.equal(updates[0][1].voided_at, "2026-10-04T12:00:00.000Z");
@@ -646,10 +800,142 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
   assert.equal(calls.filter((call) => call === "refresh").length, 2);
 });
 
+test("transaction corrections reopen posted payments and expenses with audit reasons", () => {
+  const context = vm.createContext({
+    window: {},
+    Event: class MockEvent {
+      constructor(type) {
+        this.type = type;
+      }
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-actions.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const values = new Map();
+  const field = (id) => {
+    if (!values.has(id))
+      values.set(id, {
+        value: "",
+        textContent: "",
+        dispatchEvent(event) {
+          this.lastEvent = event.type;
+        },
+      });
+    return values.get(id);
+  };
+  const accountSelect = {
+    value: "",
+    options: [{ value: "account-1" }],
+    add(option) {
+      this.options.push(option);
+    },
+  };
+  values.set("payment-account", accountSelect);
+  values.set("payment-modal", {
+    querySelector: () => field("payment-eyebrow"),
+  });
+  values.set("expense-modal", {
+    querySelector: () => field("expense-eyebrow"),
+  });
+  values.set("payment-save-next", {
+    classList: { add: (value) => (field("save-next-class").value = value) },
+  });
+  values.set("expense-save-next", {
+    classList: {
+      add: (value) => (field("expense-save-next-class").value = value),
+    },
+  });
+
+  const state = {
+    accounts: [
+      {
+        id: "account-1",
+        name: "Land contract",
+        party_name: "Buyer",
+        account_type: "land_contract",
+      },
+    ],
+    payments: [
+      {
+        id: "payment-1",
+        status: "posted",
+        account_id: "account-1",
+        amount: 75,
+        received_date: "2026-10-02",
+        payment_method: "check",
+        income_category: "installment",
+        memo: "Receipt 14",
+      },
+    ],
+    expenses: [
+      {
+        id: "expense-1",
+        status: "posted",
+        property_id: "property-1",
+        account_id: "account-1",
+        amount: 40,
+        expense_date: "2026-10-03",
+        category: "repairs",
+        payee: "Plumber",
+        payment_method: "check",
+        memo: "Invoice 2",
+      },
+    ],
+    pendingCorrection: null,
+  };
+  const calls = [];
+  const feature = context.window.PropertyDeskLedgerActions.create({
+    $: (id) => field(id),
+    state,
+    promptAction: () => "Corrected bank posting date",
+    prettyType: () => "Land contract",
+    openPayment: () => calls.push("open-payment"),
+    openExpense: () => calls.push("open-expense"),
+    updateAllocationPreview: () => calls.push("refresh-allocation"),
+    toast: (message) => calls.push(message),
+  });
+
+  feature.correctTransaction("income", "payment-1");
+
+  assert.equal(field("payment-amount").value, 75);
+  assert.equal(field("payment-date").value, "2026-10-02");
+  assert.equal(field("payment-method").value, "check");
+  assert.equal(state.pendingCorrection.kind, "payment");
+  assert.equal(state.pendingCorrection.id, "payment-1");
+  assert.equal(state.pendingCorrection.reason, "Corrected bank posting date");
+  assert.equal(field("payment-modal-title").textContent, "Correct payment");
+  assert.equal(field("payment-eyebrow").textContent, "TRANSACTION CORRECTION");
+  assert.deepEqual(calls, ["open-payment", "refresh-allocation"]);
+
+  feature.correctTransaction("expense", "expense-1");
+
+  assert.equal(field("expense-amount").value, 40);
+  assert.equal(field("expense-date").value, "2026-10-03");
+  assert.equal(field("expense-category").value, "repairs");
+  assert.equal(field("expense-property").lastEvent, "change");
+  assert.equal(state.pendingCorrection.kind, "expense");
+  assert.equal(state.pendingCorrection.id, "expense-1");
+  assert.equal(field("expense-modal-title").textContent, "Correct expense");
+  assert.equal(field("expense-eyebrow").textContent, "TRANSACTION CORRECTION");
+  assert.deepEqual(calls, [
+    "open-payment",
+    "refresh-allocation",
+    "open-expense",
+  ]);
+});
+
 test("reminder preview uses current form values and escapes recipient-facing text", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-preview.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "reminder-preview.js"),
+      "utf8",
+    ),
     context,
   );
   const values = {
@@ -686,7 +972,18 @@ test("reminder preview uses current form values and escapes recipient-facing tex
     monthStart: () => "2026-10-01",
     propertyAddress: (property) => property.address,
     money: (value) => "USD " + Number(value).toFixed(2),
-    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])),
+    esc: (value) =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char],
+      ),
     openModal: (id) => calls.push(id),
   });
 
@@ -694,7 +991,10 @@ test("reminder preview uses current form values and escapes recipient-facing tex
 
   assert.equal(calls[0].account.payment_amount, 550);
   assert.equal(calls[0].start, "2026-10-01");
-  assert.match(values["reminder-preview-content"].innerHTML, /buyer@example\.test/);
+  assert.match(
+    values["reminder-preview-content"].innerHTML,
+    /buyer@example\.test/,
+  );
   assert.match(values["reminder-preview-content"].innerHTML, /&lt;Renter&gt;/);
   assert.match(values["reminder-preview-content"].innerHTML, /&lt;St&gt;/);
   assert.match(

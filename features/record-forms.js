@@ -405,70 +405,6 @@
       if (propertyId) $("expense-property").value = propertyId;
       openModal("expense-modal");
     }
-    function correctTransaction(kind, id) {
-      const payment =
-          kind === "income" ? state.payments.find((x) => x.id === id) : null,
-        expense =
-          kind === "expense" ? state.expenses.find((x) => x.id === id) : null,
-        item = payment || expense;
-      if (!item || item.status !== "posted") {
-        toast("Only posted transactions can be corrected");
-        return;
-      }
-      const reason = prompt(
-        `Why are you correcting this ${kind === "income" ? "income entry" : "expense"}?`,
-        "Entered in error",
-      );
-      if (reason === null) return;
-      const auditReason = reason.trim() || "Corrected by owner";
-      if (payment) {
-        openPayment();
-        const account = state.accounts.find((x) => x.id === payment.account_id),
-          select = $("payment-account");
-        if (
-          account &&
-          ![...select.options].some((option) => option.value === account.id)
-        )
-          select.add(
-            new Option(
-              `${account.party_name || account.name} — ${prettyType(account.account_type)} (closed)`,
-              account.id,
-            ),
-          );
-        select.value = payment.account_id;
-        $("payment-amount").value = payment.amount;
-        $("payment-date").value = payment.received_date;
-        $("payment-method").value = payment.payment_method;
-        $("income-category").value = payment.income_category;
-        $("payment-memo").value = payment.memo || "";
-        updateAllocationPreview();
-        state.pendingCorrection = { kind: "payment", id, reason: auditReason };
-        $("payment-modal-title").textContent = "Correct payment";
-        $("payment-modal").querySelector(".eyebrow").textContent =
-          "TRANSACTION CORRECTION";
-        $("payment-save-button").textContent = "Save correction";
-        $("payment-save-next").classList.add("hidden");
-      } else {
-        openExpense();
-        $("expense-property").value = expense.property_id;
-        $("expense-property").dispatchEvent(new Event("change"));
-        $("expense-account").value = expense.account_id || "";
-        $("expense-amount").value = expense.amount;
-        $("expense-date").value = expense.expense_date;
-        $("expense-category").value = expense.category;
-        $("expense-category").dispatchEvent(new Event("change"));
-        $("expense-payee").value = expense.payee || "";
-        $("expense-method").value = expense.payment_method;
-        $("expense-memo").value = expense.memo || "";
-        state.pendingCorrection = { kind: "expense", id, reason: auditReason };
-        $("expense-modal-title").textContent = "Correct expense";
-        $("expense-modal").querySelector(".eyebrow").textContent =
-          "TRANSACTION CORRECTION";
-        $("expense-save-button").textContent = "Save correction";
-        $("expense-save-next").classList.add("hidden");
-      }
-    }
-
     return {
       resetPropertyForm,
       resetAccountForm,
@@ -483,7 +419,6 @@
       openPayment,
       openPropertyPayment,
       openExpense,
-      correctTransaction,
     };
   }
 

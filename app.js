@@ -220,11 +220,13 @@
     resetPropertyForm, resetAccountForm, updateLoanFields, saveProperty,
     saveAccount, updateAllocationPreview, prefillPaymentAmount, savePayment, saveExpense,
     editAccount, openPayment, openPropertyPayment, openExpense,
-    correctTransaction,
   } = recordForms;
-  const { recordDepositAdjustment, deleteAccount, voidTransaction } =
+  const {
+    recordDepositAdjustment, deleteAccount, correctTransaction, voidTransaction,
+  } =
     window.PropertyDeskLedgerActions.create({
       $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
+      prettyType, openPayment, openExpense, updateAllocationPreview,
       openAccountDetails: (...args) => openAccountDetails(...args),
     });
   const { openPropertyDetails, openAccountDetails } =
