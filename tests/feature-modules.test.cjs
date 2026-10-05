@@ -824,6 +824,12 @@ test("transaction workflow composes ledger display, correction, and action routi
           return { attachEvents: () => "action events" };
         },
       },
+      PropertyDeskTransactionMaintenance: {
+        create: (options) => {
+          received.maintenance = options;
+          return { voidTransaction: () => "voided" };
+        },
+      },
     },
   });
   vm.runInContext(
@@ -831,14 +837,20 @@ test("transaction workflow composes ledger display, correction, and action routi
     context,
   );
   const updateAllocationPreview = () => {};
-  const voidTransaction = () => {};
+  const transactionDependencies = {
+    state: {}, toast() {}, fetchAll() {},
+  };
   const workflow = context.window.PropertyDeskTransactionWorkflow.create({
-    updateAllocationPreview, voidTransaction, documentRef: {},
+    updateAllocationPreview, ...transactionDependencies, documentRef: {},
   });
 
   assert.equal(received.correction.updateAllocationPreview, updateAllocationPreview);
   assert.equal(received.events.correctTransaction, correct);
-  assert.equal(received.events.voidTransaction, voidTransaction);
+  assert.equal(typeof received.events.voidTransaction, "function");
+  assert.equal(received.maintenance.state, transactionDependencies.state);
+  assert.equal(received.maintenance.toast, transactionDependencies.toast);
+  assert.equal(received.maintenance.fetchAll, transactionDependencies.fetchAll);
+  assert.equal(received.events.voidTransaction(), "voided");
   assert.equal(workflow.renderPayments(), "payments");
   assert.equal(workflow.attachTransactionViewEvents(), "view events");
   assert.equal(workflow.attachTransactionActionEvents(), "action events");
@@ -1863,8 +1875,8 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/);
   assert.match(app, /PropertyDeskPropertyActionsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:PropertyDetailEvents|Documents|PropertyQuickNote|PropertyManagement)\.create/);
-  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?voidTransaction/);
-  assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);
+  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?fetchAll/);
+  assert.doesNotMatch(app, /PropertyDeskRecordMaintenance|voidTransaction,/);
   assert.match(app, /window\.PropertyDeskEntryWorkflow\.create\(/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
@@ -1875,24 +1887,57 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 
-test("account details workflow composes account, history, and deposit views with their actions", () => {
+test("account details workflow composes account, history, deposit, and maintenance actions", () => {
   const created = [];
+  const passed = {};
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountMaintenance: {
+        create: (options) => {
+          passed.accountMaintenance = options;
+          return { closeAccount() {} };
+        },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          passed.depositMaintenance = options;
+          return { recordDepositAdjustment() {} };
+        },
+      },
       PropertyDeskDepositDetails: { create: () => { created.push("deposit"); return { depositSectionHTML: () => "deposit html" }; } },
       PropertyDeskAccountHistoryDetails: { create: () => { created.push("history"); return { renderAccountHistory: () => "history html" }; } },
       PropertyDeskAccountDetails: { create: () => { created.push("account details"); return { openAccountDetails: () => "opened" }; } },
-      PropertyDeskAccountDetailEvents: { create: () => { created.push("account events"); return { attachEvents: () => "account events attached" }; } },
-      PropertyDeskDepositDetailEvents: { create: () => { created.push("deposit events"); return { attachEvents: () => "deposit events attached" }; } },
+      PropertyDeskAccountDetailEvents: {
+        create: (options) => {
+          created.push("account events");
+          passed.accountEvents = options;
+          return { attachEvents: () => "account events attached" };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          created.push("deposit events");
+          passed.depositEvents = options;
+          return { attachEvents: () => "deposit events attached" };
+        },
+      },
     },
   });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", "account-details-workflow.js"), "utf8"),
     context,
   );
-  const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create({});
+  const dependencies = {
+    $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {}, fetchAll() {},
+    closeModal() {},
+  };
+  const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, ["deposit", "history", "account details", "account events", "deposit events"]);
+  assert.equal(passed.accountMaintenance.state, dependencies.state);
+  assert.equal(passed.depositMaintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.accountEvents.closeAccount instanceof Function, true);
+  assert.equal(passed.depositEvents.recordDepositAdjustment instanceof Function, true);
   assert.equal(workflow.openAccountDetails(), "opened");
   assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
@@ -1935,54 +1980,6 @@ test("workspace settings workflow shares reminder activity with settings and pre
   assert.equal(workflow.renderWorkspaceSettings(), "settings");
   assert.equal(workflow.attachWorkspaceEvents(), "settings events");
   assert.equal(workflow.previewReminderEmail(), "preview");
-});
-
-test("record maintenance composes account, deposit, and transaction actions", () => {
-  const calls = [];
-  const action = (name) => () => calls.push(name);
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountMaintenance: {
-        create: (dependencies) => {
-          calls.push(["account", dependencies]);
-          return { closeAccount: action("closeAccount") };
-        },
-      },
-      PropertyDeskDepositMaintenance: {
-        create: (dependencies) => {
-          calls.push(["deposit", dependencies]);
-          return { recordDepositAdjustment: action("recordDepositAdjustment") };
-        },
-      },
-      PropertyDeskTransactionMaintenance: {
-        create: (dependencies) => {
-          calls.push(["transaction", dependencies]);
-          return { voidTransaction: action("voidTransaction") };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "record-maintenance.js"), "utf8"),
-    context,
-  );
-  const dependencies = {
-    $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {},
-    fetchAll() {}, closeModal() {},
-  };
-  const actions = context.window.PropertyDeskRecordMaintenance.create(dependencies);
-
-  assert.deepEqual(Object.keys(actions).sort(), [
-    "closeAccount", "recordDepositAdjustment", "voidTransaction",
-  ]);
-  assert.deepEqual(calls.map(([name]) => name), ["account", "deposit", "transaction"]);
-  assert.equal(calls[0][1].state, dependencies.state);
-  assert.equal(calls[1][1].moneyInput, dependencies.moneyInput);
-  assert.equal(calls[2][1].fetchAll, dependencies.fetchAll);
-  actions.closeAccount();
-  actions.recordDepositAdjustment();
-  actions.voidTransaction();
-  assert.deepEqual(calls.slice(3), ["closeAccount", "recordDepositAdjustment", "voidTransaction"]);
 });
 
 test("app coordinator delegates transient notices to the notification feature", () => {

@@ -6,9 +6,12 @@
     const {
       $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
       monthStart, sumIncome, sumOperatingExpenses, toast, prettyType, openPayment,
-      openExpense, updateAllocationPreview, EventClass, OptionClass, voidTransaction,
+      openExpense, updateAllocationPreview, EventClass, OptionClass, fetchAll,
       documentRef = document,
     } = context;
+    const { voidTransaction } = window.PropertyDeskTransactionMaintenance.create({
+      state, toast, fetchAll,
+    });
     const {
       renderPayments,
       attachEvents: attachTransactionViewEvents,

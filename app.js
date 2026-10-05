@@ -126,13 +126,6 @@
     fillSelect, populateFormOptions, prettyType, openModal, documentRef: document,
   });
   const {
-    closeAccount,
-    recordDepositAdjustment,
-    voidTransaction,
-  } = window.PropertyDeskRecordMaintenance.create({
-    $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
-  });
-  const {
     renderPayments,
     attachTransactionViewEvents,
     attachTransactionActionEvents,
@@ -140,7 +133,7 @@
     $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
     monthStart, sumIncome, sumOperatingExpenses, toast, prettyType, openPayment,
     openExpense, updateAllocationPreview, EventClass: Event, OptionClass: Option,
-    voidTransaction,
+    fetchAll,
   });
   const {
     openAccountDetails,
@@ -150,7 +143,7 @@
     $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
     paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
     unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-    editAccount, openPayment, closeAccount, recordDepositAdjustment,
+    editAccount, openPayment, moneyInput, toast, fetchAll,
   });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailsWorkflow.create({

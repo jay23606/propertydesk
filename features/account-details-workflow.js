@@ -7,8 +7,14 @@
       $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
       paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
       unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-      editAccount, openPayment, closeAccount, recordDepositAdjustment,
+      editAccount, openPayment, moneyInput, toast, fetchAll,
     } = context;
+    const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
+      $, state, toast, fetchAll, closeModal,
+    });
+    const { recordDepositAdjustment } = window.PropertyDeskDepositMaintenance.create({
+      state, moneyInput, todayIso, toast, fetchAll,
+    });
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state, depositLedger, money, fmtDate, esc,
     });
