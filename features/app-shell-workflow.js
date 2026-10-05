@@ -3,7 +3,16 @@
   "use strict";
 
   function create(context) {
-    const settings = window.PropertyDeskWorkspaceSettingsWorkflow.create(context);
+    const {
+      $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
+      amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
+      dateOnly, monthStart, propertyAddress, openModal,
+    } = context;
+    const settings = window.PropertyDeskWorkspaceSettingsWorkflow.create({
+      $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
+      amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
+      dateOnly, monthStart, propertyAddress, openModal,
+    });
     const navigation = window.PropertyDeskNavigation.create({
       $: context.$,
       state: context.state,

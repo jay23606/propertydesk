@@ -50,7 +50,13 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
     context,
   );
 
-  const options = { $: () => {}, state: { view: "properties" } };
+  const options = {
+    $: () => {}, state: { view: "properties" }, esc() {}, fmtDate() {},
+    money() {}, toast() {}, fetchAll() {}, updateGreeting() {},
+    amountDueSince() {}, unpaidDueAccrualStart() {}, todayIso() {}, monthEnd() {},
+    moneyInput() {}, dateOnly() {}, monthStart() {}, propertyAddress() {},
+    openModal() {}, unrelatedDependency() {},
+  };
   const shell = context.window.PropertyDeskAppShellWorkflow.create(options);
 
   assert.deepEqual(Object.keys(shell).sort(), [
@@ -61,7 +67,14 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
     "previewReminderEmail",
   ].sort());
   assert.equal(calls[0][0], "settings");
-  assert.equal(calls[0][1], options);
+  assert.notEqual(calls[0][1], options);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "$", "amountDueSince", "dateOnly", "esc", "fetchAll", "fmtDate", "money",
+    "moneyInput", "monthEnd", "monthStart", "openModal", "propertyAddress",
+    "state", "todayIso", "toast", "unpaidDueAccrualStart", "updateGreeting",
+  ].sort());
+  assert.equal(calls[0][1].state, options.state);
+  assert.equal(calls[0][1].openModal, options.openModal);
   assert.equal(calls[1][1].renderWorkspaceSettings, handlers.renderWorkspaceSettings);
   assert.deepEqual(calls.map(([name]) => name), ["settings", "navigation", "theme"]);
   assert.equal(shell.attachWorkspaceEvents, handlers.attachWorkspaceEvents);
