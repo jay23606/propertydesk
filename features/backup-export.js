@@ -131,7 +131,7 @@
       $("export-all").addEventListener("click", exportAll);
     }
 
-    return { attachEvents, exportAll };
+    return { attachEvents };
   }
 
   window.PropertyDeskBackupExport = { create };

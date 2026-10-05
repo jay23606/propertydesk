@@ -230,7 +230,15 @@ test("backup export aborts before download when a private document path escapes 
     "pd_workspace_members",
     "pd_property_holders",
   ];
-  const button = { textContent: "Export backup", disabled: false };
+  let exportHandler;
+  const button = {
+    textContent: "Export backup",
+    disabled: false,
+    addEventListener(event, handler) {
+      assert.equal(event, "click");
+      exportHandler = handler;
+    },
+  };
   const state = {
     user: { id: "workspace-1" },
     workspaceOwnerId: "workspace-1",
@@ -282,7 +290,9 @@ test("backup export aborts before download when a private document path escapes 
     },
   });
 
-  await feature.exportAll();
+  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
+  feature.attachEvents();
+  await exportHandler();
 
   assert.equal(downloads.length, 0);
   assert.equal(button.disabled, false);
