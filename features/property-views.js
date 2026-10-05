@@ -79,7 +79,31 @@
       const parties = [
         ...new Set(active.map((a) => a.party_name).filter(Boolean)),
       ].join(", ");
-      return `<article class="property-card" data-property-card="${esc(property.id)}"><div class="property-art"><span class="property-type">${esc(prettyKind(property.property_kind))}</span><span class="property-building"></span></div><div class="property-info"><h3>${esc(property.name)}</h3><div class="property-address">${esc(propertyAddress(property))}</div>${parties ? `<div class="property-party">${esc(parties)}</div>` : ""}<div class="property-summary-grid"><div><small>Monthly payment</small><strong>${hasNonMonthly ? "≈ " : ""}${money(scheduledMonthly)}</strong></div><div><small>Loan balance</small><strong>${balance ? money(balance) : active.some((a) => a.account_type !== "rental") ? "$0.00" : "—"}</strong></div><div><small>Balance due · carries forward</small><strong>${money(amountDue)}</strong></div><button class="button primary compact property-quick-payment" type="button" data-property-payment="${esc(property.id)}">＋ Record payment</button></div></div></article>`;
+      return `<article class="property-card" data-property-card="${esc(property.id)}">
+        <div class="property-art">
+        <span class="property-type">${esc(prettyKind(property.property_kind))}</span>
+        <span class="property-building">
+        </span>
+        </div>
+        <div class="property-info">
+        <h3>${esc(property.name)}</h3>
+        <div class="property-address">${esc(propertyAddress(property))}</div>${parties ? `<div class="property-party">${esc(parties)}</div>` : ""}<div class="property-summary-grid">
+        <div>
+        <small>Monthly payment</small>
+        <strong>${hasNonMonthly ? "≈ " : ""}${money(scheduledMonthly)}</strong>
+        </div>
+        <div>
+        <small>Loan balance</small>
+        <strong>${balance ? money(balance) : active.some((a) => a.account_type !== "rental") ? "$0.00" : "—"}</strong>
+        </div>
+        <div>
+        <small>Balance due · carries forward</small>
+        <strong>${money(amountDue)}</strong>
+        </div>
+        <button class="button primary compact property-quick-payment" type="button" data-property-payment="${esc(property.id)}">＋ Record payment</button>
+        </div>
+        </div>
+        </article>`;
     }
     function renderOverview() {
       $("stat-properties").textContent = state.properties.filter(
@@ -107,7 +131,17 @@
         ? upcoming
             .map((a) => {
               const p = state.properties.find((x) => x.id === a.property_id);
-              return `<div class="list-row"><span class="round-icon">${a.account_type === "rental" ? "⌂" : "▤"}</span><div class="row-copy"><strong>${esc(a.party_name || a.name)}</strong><small>${esc(p?.name || "Property")} · ${esc(prettyType(a.account_type))}</small></div><div class="row-right"><strong>${money(a.payment_amount)}</strong><small>Due ${fmtDate(a.next_due_date, { month: "short", day: "numeric" })}</small></div></div>`;
+              return `<div class="list-row">
+        <span class="round-icon">${a.account_type === "rental" ? "⌂" : "▤"}</span>
+        <div class="row-copy">
+        <strong>${esc(a.party_name || a.name)}</strong>
+        <small>${esc(p?.name || "Property")} · ${esc(prettyType(a.account_type))}</small>
+        </div>
+        <div class="row-right">
+        <strong>${money(a.payment_amount)}</strong>
+        <small>Due ${fmtDate(a.next_due_date, { month: "short", day: "numeric" })}</small>
+        </div>
+        </div>`;
             })
             .join("")
         : '<div class="list-empty">No upcoming payments yet. Add an account to get started.</div>';
@@ -117,7 +151,17 @@
             .map((p) => {
               const a = state.accounts.find((x) => x.id === p.account_id),
                 prop = state.properties.find((x) => x.id === a?.property_id);
-              return `<div class="list-row"><span class="round-icon">↙</span><div class="row-copy"><strong>${esc(a?.party_name || a?.name || "Payment")}</strong><small>${esc(prop?.name || "Property")} · ${fmtDate(p.received_date, { month: "short", day: "numeric" })}</small></div><div class="row-right"><strong>${money(p.amount)}</strong><small>${esc(p.payment_method.replace("_", " "))}</small></div></div>`;
+              return `<div class="list-row">
+        <span class="round-icon">↙</span>
+        <div class="row-copy">
+        <strong>${esc(a?.party_name || a?.name || "Payment")}</strong>
+        <small>${esc(prop?.name || "Property")} · ${fmtDate(p.received_date, { month: "short", day: "numeric" })}</small>
+        </div>
+        <div class="row-right">
+        <strong>${money(p.amount)}</strong>
+        <small>${esc(p.payment_method.replace("_", " "))}</small>
+        </div>
+        </div>`;
             })
             .join("")
         : '<div class="list-empty">Recorded payments will appear here.</div>';
@@ -152,7 +196,10 @@
     }
     function propertyAddressCell(property, street) {
       const note = String(property.notes || "").trim();
-      return `<td><button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(street)}${property.archived_at ? " · Archived" : ""}</button><button type="button" class="property-row-note${note ? " has-note" : ""}" data-property-note="${esc(property.id)}" aria-label="${esc(note ? "Edit" : "Add")} quick note for ${esc(street)}" title="${esc(note || "Add a quick note")}">${note ? `<em>${esc(note)}</em>` : "<em>＋ Add note</em>"}</button></td>`;
+      return `<td>
+        <button class="table-action property-row-name" data-property-open="${esc(property.id)}">${esc(street)}${property.archived_at ? " · Archived" : ""}</button>
+        <button type="button" class="property-row-note${note ? " has-note" : ""}" data-property-note="${esc(property.id)}" aria-label="${esc(note ? "Edit" : "Add")} quick note for ${esc(street)}" title="${esc(note || "Add a quick note")}">${note ? `<em>${esc(note)}</em>` : "<em>＋ Add note</em>"}</button>
+        </td>`;
     }
     function accountPortfolioRowHTML({ property, account, street, due, monthly, loanBalance, partyName, paymentStatus, reminderHref, recipientHint }) {
       const paymentClasses = {
@@ -174,11 +221,17 @@
       const inactiveHint = (account.status || 'active') !== 'active' ? ' · Inactive' : '';
 
       return `<tr>
-        <td class="${paymentClasses[paymentStatus]}" title="${paymentTitles[paymentStatus]}"><button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button></td>
+        <td class="${paymentClasses[paymentStatus]}" title="${paymentTitles[paymentStatus]}">
+        <button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button>
+        </td>
         <td class="portfolio-due">${money(due)}</td>
         ${propertyAddressCell(property, street)}
-        <td><a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a><small class="table-subtext">${esc(account.name)}${inactiveHint}</small></td>
-        <td>${paymentAmount}<small class="table-subtext">${frequencyHint}</small></td>
+        <td>
+        <a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a>
+        <small class="table-subtext">${esc(account.name)}${inactiveHint}</small>
+        </td>
+        <td>${paymentAmount}<small class="table-subtext">${frequencyHint}</small>
+        </td>
         <td>${account.account_type === 'rental' ? '—' : money(loanBalance)}</td>
       </tr>`;
     }
@@ -295,7 +348,13 @@
             account: "",
             address: street,
             id: property.id,
-            html: `<tr><td><button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button></td><td class="portfolio-due">—</td>${propertyAddressCell(property, street)}<td colspan="2" class="muted">No rental or contract recorded</td><td>—</td></tr>`,
+            html: `<tr>
+        <td>
+        <button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button>
+        </td>
+        <td class="portfolio-due">—</td>${propertyAddressCell(property, street)}<td colspan="2" class="muted">No rental or contract recorded</td>
+        <td>—</td>
+        </tr>`,
           });
         }
       }
@@ -322,7 +381,25 @@
         return result;
       }, { unpaidDue: 0, scheduledPayment: 0, loanBalance: 0, loanCount: 0 });
       const loanBalanceTotal = totals.loanCount ? money(totals.loanBalance) : "—";
-      $("accounts-totals").innerHTML = `<tr><td></td><td class="portfolio-due"><strong>${money(totals.unpaidDue)}</strong></td><td></td><td><strong>Visible totals</strong></td><td><strong>${money(totals.scheduledPayment)}<small class="table-subtext">per month</small></strong></td><td><strong>${loanBalanceTotal}</strong></td></tr>`;
+      $("accounts-totals").innerHTML = `<tr>
+        <td>
+        </td>
+        <td class="portfolio-due">
+        <strong>${money(totals.unpaidDue)}</strong>
+        </td>
+        <td>
+        </td>
+        <td>
+        <strong>Visible totals</strong>
+        </td>
+        <td>
+        <strong>${money(totals.scheduledPayment)}<small class="table-subtext">per month</small>
+        </strong>
+        </td>
+        <td>
+        <strong>${loanBalanceTotal}</strong>
+        </td>
+        </tr>`;
       $("accounts-totals").classList.toggle(
         "hidden",
         !rows.some((row) => row.hasAccount),
