@@ -69,6 +69,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/workspace-members.js') < html.indexOf('features/workspace.js'));
   assert.ok(html.indexOf('features/property-management.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-view-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('app.js'));

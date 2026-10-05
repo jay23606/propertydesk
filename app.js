@@ -117,13 +117,17 @@
     monthEnd,
     lateReminderMailto,
     paymentStatusInMonth,
-    openPayment: (...args) => openPayment(...args),
-    editPropertyQuickNote: (...args) => editPropertyQuickNote(...args),
-    openPropertyDetails: (...args) => openPropertyDetails(...args),
-    resetAccountForm: (...args) => resetAccountForm(...args),
-    populateFormOptions: (...args) => populateFormOptions(...args),
-    openModal: (...args) => openModal(...args),
   });
+  const { attachEvents: attachPropertyActionEvents } =
+    window.PropertyDeskPropertyViewEvents.create({
+      $,
+      openPayment: (...args) => openPayment(...args),
+      editPropertyQuickNote: (...args) => editPropertyQuickNote(...args),
+      openPropertyDetails: (...args) => openPropertyDetails(...args),
+      resetAccountForm: (...args) => resetAccountForm(...args),
+      populateFormOptions: (...args) => populateFormOptions(...args),
+      openModal: (...args) => openModal(...args),
+    });
   const {
     renderPayments,
     attachEvents: attachTransactionViewEvents,
@@ -477,6 +481,7 @@
       attachNavigationEvents,
       attachOverviewEvents,
       attachPropertyViewEvents,
+      attachPropertyActionEvents,
       attachTransactionViewEvents,
       attachDepositDetailEvents,
       () => attachCreateActions(navigate),

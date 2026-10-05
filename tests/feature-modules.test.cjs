@@ -994,7 +994,6 @@ test("property and transaction views own their search and filter bindings", () =
       "property-filter:change",
       "property-holder-filter:change",
       "show-archived:change",
-      "accounts-table:click",
     ]],
     ["transaction-views.js", "PropertyDeskTransactionViews", [
       "payment-search:input",
@@ -1104,10 +1103,10 @@ test("profile display loads before overview and is precached", () => {
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
 });
 
-test("Properties grid routes payment, note, address, and add-account actions locally", () => {
+test("property view actions route payment, note, address, and add-account actions", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-views.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-view-events.js"), "utf8"),
     context,
   );
   const calls = [];
@@ -1124,7 +1123,7 @@ test("Properties grid routes payment, note, address, and add-account actions loc
     }
     return elements.get(id);
   };
-  const feature = context.window.PropertyDeskPropertyViews.create({
+  const feature = context.window.PropertyDeskPropertyViewEvents.create({
     $,
     openPayment: (id) => calls.push(["payment", id]),
     editPropertyQuickNote: (id) => calls.push(["note", id]),
@@ -1157,6 +1156,17 @@ test("Properties grid routes payment, note, address, and add-account actions loc
     ["populate"],
     ["modal", "account-modal"],
   ]);
+});
+
+test("property action router loads after its view and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/property-views.js") < html.indexOf("features/property-view-events.js") &&
+      html.indexOf("features/property-view-events.js") < html.indexOf("app.js"),
+    "property view should load before its action router and the app",
+  );
+  assert.match(worker, /'\.\/features\/property-view-events\.js'/);
 });
 
 test("Properties table templates escape untrusted labels and render visible totals", () => {
