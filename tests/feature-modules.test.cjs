@@ -1693,6 +1693,33 @@ test("property detail events route private document actions to document workflow
   ]);
 });
 
+test("property details workflow connects activity summaries to the property view", () => {
+  let detailContext;
+  const renderPropertyActivity = () => "activity";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyActivityDetails: {
+        create: () => ({ renderPropertyActivity }),
+      },
+      PropertyDeskPropertyDetails: {
+        create: (options) => {
+          detailContext = options;
+          return { openPropertyDetails: () => "property details" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-details-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create({});
+
+  assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
+  assert.equal(workflow.renderPropertyActivity, renderPropertyActivity);
+  assert.equal(workflow.openPropertyDetails(), "property details");
+});
+
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(

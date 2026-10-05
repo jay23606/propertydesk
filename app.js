@@ -238,29 +238,10 @@
     unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
     editAccount, openPayment, closeAccount, recordDepositAdjustment,
   });
-  const { renderPropertyActivity } =
-    window.PropertyDeskPropertyActivityDetails.create({
-      state,
-      isPosted,
-      sumIncome,
-      sumOperatingExpenses,
-      money,
-      fmtDate,
-      esc,
-    });
   const { openPropertyDetails } =
-    window.PropertyDeskPropertyDetails.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      openModal,
-      propertyAddress,
-      renderPropertyActivity,
+    window.PropertyDeskPropertyDetailsWorkflow.create({
+      $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
+      prettyType, paymentFrequencyLabel, accountBalance, openModal, propertyAddress,
     });
   const { attachEvents: attachPropertyDetailEvents } =
     window.PropertyDeskPropertyDetailEvents.create({

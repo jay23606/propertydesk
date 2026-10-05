@@ -70,6 +70,9 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-portfolio-model.js'));
   assert.ok(html.indexOf('features/property-portfolio-model.js') < html.indexOf('features/property-views.js'));
   assert.ok(html.indexOf('features/property-details.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details-workflow.js'));
+  assert.ok(html.indexOf('features/property-details.js') < html.indexOf('features/property-details-workflow.js'));
+  assert.ok(html.indexOf('features/property-details-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('app.js'));
@@ -139,6 +142,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/imports\.js'/);
   assert.match(worker, /'\.\/features\/csv-import-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-details\.js'/);
+  assert.match(worker, /'\.\/features\/property-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-activity-details\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-events\.js'/);
   assert.match(worker, /'\.\/features\/account-details\.js'/);
