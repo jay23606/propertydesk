@@ -1250,18 +1250,19 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
-  assert.match(app, /const transactionMaintenance\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
+  assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
+  assert.match(app, /const \{ voidTransaction \}\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
   assert.match(app, /window\.PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection,/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.match(app, /const \{ correctTransaction, voidTransaction \} = transactionMaintenance/);
   assert.match(
     app,
-    /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?updateAllocationPreview/,
+    /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?updateAllocationPreview/,
   );
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?fetchAll/);
 });
 
 test("app coordinator delegates transient notices to the notification feature", () => {
@@ -3336,7 +3337,7 @@ test("transaction correction failures preserve the open form and pending correct
   ]);
 });
 
-test("transaction corrections reopen posted payments and expenses with audit reasons", () => {
+test("transaction correction form reopens posted payments and expenses with audit reasons", () => {
   const context = vm.createContext({
     window: {},
     Event: class MockEvent {
@@ -3350,7 +3351,7 @@ test("transaction corrections reopen posted payments and expenses with audit rea
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
+      path.join(__dirname, "..", "features", "transaction-correction-form.js"),
       "utf8",
     ),
     context,
@@ -3428,7 +3429,7 @@ test("transaction corrections reopen posted payments and expenses with audit rea
     pendingCorrection: null,
   };
   const calls = [];
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionCorrectionForm.create({
     $: (id) => field(id),
     state,
     promptAction: () => "Corrected bank posting date",

@@ -210,16 +210,23 @@
     openExpense,
     attachEvents: attachLedgerEntryFormEvents,
   } = ledgerEntryForms;
-  const transactionMaintenance =
-    window.PropertyDeskTransactionMaintenance.create({
+  const { correctTransaction } =
+    window.PropertyDeskTransactionCorrectionForm.create({
       $,
       state,
       toast,
-      fetchAll,
       prettyType,
       openPayment,
       openExpense,
       updateAllocationPreview,
+      EventClass: Event,
+      OptionClass: Option,
+    });
+  const { voidTransaction } =
+    window.PropertyDeskTransactionMaintenance.create({
+      state,
+      toast,
+      fetchAll,
     });
   const { attachEvents: attachCreateActions } =
     window.PropertyDeskCreateActions.create({
@@ -250,7 +257,6 @@
       toast,
       fetchAll,
     });
-  const { correctTransaction, voidTransaction } = transactionMaintenance;
   const { renderPropertyActivity } =
     window.PropertyDeskPropertyActivityDetails.create({
       state,
