@@ -62,7 +62,9 @@
       const icon = button.querySelector('.theme-icon'); if (icon) icon.textContent = next === 'dark' ? '☼' : '☾';
     });
   }
-  function syncThemeButtons() { setTheme(document.documentElement.dataset.theme); }
+  function syncThemeButtons() {
+    setTheme(document.documentElement.dataset.theme);
+  }
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const prettyType = (t) => ({ rental: 'Rental', land_contract: 'Land contract', note: 'Private note' }[t] || t || 'Account');
   const prettyKind = (t) => ({ residential: 'Residential', land: 'Land', commercial: 'Commercial', other: 'Other' }[t] || t || 'Property');
@@ -87,13 +89,38 @@
   function accountBalance(account, asOf = todayIso()) {
     return scheduledLoanBalance(account, asOf);
   }
-  function paymentFrequencyLabel(f) { return ({ monthly: 'Monthly', weekly: 'Weekly', biweekly: 'Every 2 weeks', quarterly: 'Quarterly', annual: 'Annually' }[f] || 'Monthly'); }
-  function scheduledMonthlyRunRate() { return monthlyScheduledEstimate(state.accounts); }
-  function collectedSince(date) { return sumPosted(state.payments.filter(p => String(p.received_date) >= date)); }
+  function paymentFrequencyLabel(frequency) {
+    return ({
+      monthly: 'Monthly',
+      weekly: 'Weekly',
+      biweekly: 'Every 2 weeks',
+      quarterly: 'Quarterly',
+      annual: 'Annually',
+    }[frequency] || 'Monthly');
+  }
+  function scheduledMonthlyRunRate() {
+    return monthlyScheduledEstimate(state.accounts);
+  }
+  function collectedSince(date) {
+    const payments = state.payments.filter(
+      (payment) => String(payment.received_date) >= date,
+    );
+    return sumPosted(payments);
+  }
   function depositLedger(accountId) {
-    const entries=state.depositEntries.filter(row=>row.account_id===accountId);
-    const result=securityDepositBalance(entries,state.payments,state.expenses);
-    return {...result,entries};
+    const entries = state.depositEntries.filter(
+      (row) => row.account_id === accountId,
+    );
+    const result = securityDepositBalance(
+      entries,
+      state.payments,
+      state.expenses,
+    );
+    return { ...result, entries };
+  }
+  function expenseCategoryLabel(category) {
+    if (category === 'deposit_refund') return 'Security deposit refund';
+    return String(category || 'other').replaceAll('_', ' ');
   }
   function expenseCategoryLabel(category) { return category==='deposit_refund'?'Security deposit refund':String(category||'other').replaceAll('_',' '); }
 
@@ -277,13 +304,34 @@
     else resetExpenseModal();
   }
   function fillSelect(id, options, placeholder) {
-    const el=$(id); el.innerHTML=`<option value="">${esc(placeholder)}</option>`+options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('');
+    const element = $(id);
+    const optionHTML = options
+      .map((option) =>
+        `<option value="${esc(option.value)}">${esc(option.label)}</option>`,
+      )
+      .join('');
+    element.innerHTML = `<option value="">${esc(placeholder)}</option>${optionHTML}`;
   }
   function populateFormOptions() {
-    fillSelect('account-property',state.properties.map(p=>({value:p.id,label:`${p.name} — ${propertyAddress(p)}`})),'Choose a property');
-    fillSelect('payment-account',state.accounts.filter(a=>a.status==='active').map(a=>({value:a.id,label:`${a.party_name||a.name} — ${prettyType(a.account_type)}`})),'Choose an account');
-    fillSelect('expense-property',state.properties.map(p=>({value:p.id,label:`${p.name} — ${propertyAddress(p)}`})),'Choose a property');
-    fillSelect('expense-account',state.accounts.map(a=>({value:a.id,label:`${a.name} — ${prettyType(a.account_type)}`})),'Property level');
+    const propertyOptions = state.properties.map((property) => ({
+      value: property.id,
+      label: `${property.name} — ${propertyAddress(property)}`,
+    }));
+    const paymentOptions = state.accounts
+      .filter((account) => account.status === 'active')
+      .map((account) => ({
+        value: account.id,
+        label: `${account.party_name || account.name} — ${prettyType(account.account_type)}`,
+      }));
+    const expenseAccountOptions = state.accounts.map((account) => ({
+      value: account.id,
+      label: `${account.name} — ${prettyType(account.account_type)}`,
+    }));
+
+    fillSelect('account-property', propertyOptions, 'Choose a property');
+    fillSelect('payment-account', paymentOptions, 'Choose an account');
+    fillSelect('expense-property', propertyOptions, 'Choose a property');
+    fillSelect('expense-account', expenseAccountOptions, 'Property level');
   }
   function attachThemeAndNavigationEvents() {
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
