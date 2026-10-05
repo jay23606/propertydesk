@@ -88,6 +88,15 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
         payment_frequency: "monthly",
         name: "Contract",
         party_name: "Buyer",
+      }, {
+        id: "account-2",
+        property_id: "property-1",
+        status: "active",
+        account_type: "rental",
+        payment_amount: 200,
+        payment_frequency: "monthly",
+        name: "Rental",
+        party_name: "Tenant",
       }],
       payments: [],
       propertyHolders: [],
@@ -95,8 +104,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
       user: null,
     },
     monthlyScheduledEstimate: (accounts) => accounts.reduce((sum, account) => sum + account.payment_amount, 0),
-    accountBalance: () => 1000,
-    amountDueSince: () => 50,
+    accountBalance: (account) => account.id === "account-1" ? 1000 : 0,
+    amountDueSince: (accounts) => accounts[0].id === "account-1" ? 50 : 80,
     unpaidDueAccrualStart: () => "2026-10-01",
     todayIso: () => "2026-10-04",
     esc: (value) => String(value ?? ""),
@@ -120,9 +129,15 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   feature.renderProperties();
 
   const totals = getElement("accounts-totals");
-  assert.match(totals.innerHTML, /\$50\.00/);
-  assert.match(totals.innerHTML, /\$125\.00/);
+  assert.match(totals.innerHTML, /\$130\.00/);
+  assert.match(totals.innerHTML, /\$325\.00/);
   assert.match(totals.innerHTML, /\$1000\.00/);
+
+  getElement("property-filter").value = "rental";
+  feature.renderProperties();
+  assert.match(totals.innerHTML, /\$80\.00/);
+  assert.match(totals.innerHTML, /\$200\.00/);
+  assert.ok(totals.innerHTML.includes("—"));
 });
 
 test("record-entry module exposes property, account, and transaction workflows", () => {
