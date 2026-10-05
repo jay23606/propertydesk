@@ -1620,6 +1620,45 @@ test("account details workflow composes account, history, and deposit views with
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 
+test("workspace settings workflow shares reminder activity with settings and preview", () => {
+  const passed = {};
+  const reminderActivity = () => "activity";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReminderActivityView: {
+        create: () => ({ renderReminderActivity: reminderActivity }),
+      },
+      PropertyDeskWorkspace: {
+        create: (options) => {
+          passed.workspace = options;
+          return {
+            renderWorkspaceSettings: () => "settings",
+            attachEvents: () => "settings events",
+          };
+        },
+      },
+      PropertyDeskReminderPreview: {
+        create: (options) => {
+          passed.preview = options;
+          return { previewReminderEmail: () => "preview" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace-settings-workflow.js"), "utf8"),
+    context,
+  );
+  const openModal = () => {};
+  const workflow = context.window.PropertyDeskWorkspaceSettingsWorkflow.create({ openModal });
+
+  assert.equal(passed.workspace.renderReminderActivity, reminderActivity);
+  assert.equal(passed.preview.openModal, openModal);
+  assert.equal(workflow.renderWorkspaceSettings(), "settings");
+  assert.equal(workflow.attachWorkspaceEvents(), "settings events");
+  assert.equal(workflow.previewReminderEmail(), "preview");
+});
+
 test("record maintenance composes account, deposit, and transaction actions", () => {
   const calls = [];
   const action = (name) => () => calls.push(name);

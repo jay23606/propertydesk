@@ -378,41 +378,14 @@
     restoreAuthSession,
     attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
-  const { renderReminderActivity } =
-    window.PropertyDeskReminderActivityView.create({
-      $,
-      state,
-      esc,
-      fmtDate,
-      money,
-    });
   const {
     renderWorkspaceSettings,
-    attachEvents: attachWorkspaceEvents,
-  } = window.PropertyDeskWorkspace.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    updateGreeting,
-    renderReminderActivity,
-  });
-  const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-    $,
-    state,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
-    monthEnd,
-    moneyInput,
-    toast,
-    dateOnly,
-    monthStart,
-    propertyAddress,
-    money,
-    esc,
-    openModal,
+    attachWorkspaceEvents,
+    previewReminderEmail,
+  } = window.PropertyDeskWorkspaceSettingsWorkflow.create({
+    $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
+    amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
+    dateOnly, monthStart, propertyAddress, openModal,
   });
   const { navigate, attachEvents: attachNavigationEvents } =
     window.PropertyDeskNavigation.create({
