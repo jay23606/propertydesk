@@ -52,14 +52,29 @@
   function setTheme(theme, persist = false) {
     const next = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#151b17' : '#f6f7f4');
-    if (persist) { try { localStorage.setItem('propertydesk-theme', next); } catch { /* Keep the active theme for this page. */ } }
-    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+    const themeColor = next === 'dark' ? '#151b17' : '#f6f7f4';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      themeColor,
+    );
+    if (persist) {
+      try {
+        localStorage.setItem('propertydesk-theme', next);
+      } catch {
+        // Keep the active theme for this page when storage is unavailable.
+      }
+    }
+
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       const action = next === 'dark' ? 'light' : 'dark';
       button.setAttribute('aria-label', `Switch to ${action} mode`);
       button.setAttribute('aria-pressed', String(next === 'dark'));
-      const label = button.querySelector('.theme-label'); if (label) label.textContent = `${action[0].toUpperCase()}${action.slice(1)} mode`;
-      const icon = button.querySelector('.theme-icon'); if (icon) icon.textContent = next === 'dark' ? '☼' : '☾';
+      const label = button.querySelector('.theme-label');
+      if (label) {
+        label.textContent = `${action[0].toUpperCase()}${action.slice(1)} mode`;
+      }
+      const icon = button.querySelector('.theme-icon');
+      if (icon) icon.textContent = next === 'dark' ? '☼' : '☾';
     });
   }
   function syncThemeButtons() {
