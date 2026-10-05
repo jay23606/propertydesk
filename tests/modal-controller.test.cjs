@@ -1,0 +1,116 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+
+function createController() {
+  const elements = new Map();
+  const document = { body: { style: { overflow: '' } } };
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        id,
+        value: '',
+        textContent: '',
+        innerHTML: '',
+        classList: {
+          add(value) {
+            this.lastAdded = value;
+          },
+          remove(value) {
+            this.lastRemoved = value;
+          },
+        },
+        querySelector: () => getElement(`${id}-eyebrow`),
+      });
+    }
+    return elements.get(id);
+  };
+  const context = vm.createContext({ window: {}, document });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, '..', 'features', 'modal-controller.js'),
+      'utf8',
+    ),
+    context,
+  );
+  const state = {
+    properties: [{ id: 'p1', name: '<Oak>', address: '1 Oak St' }],
+    accounts: [
+      {
+        id: 'a1',
+        name: 'Lease',
+        party_name: '<Tenant>',
+        account_type: 'rental',
+        status: 'active',
+      },
+      { id: 'a2', name: 'Old lease', account_type: 'rental', status: 'closed' },
+    ],
+    pendingImport: { id: 'batch-1' },
+    pendingCorrection: { id: 'payment-1' },
+    auditRequestId: 4,
+  };
+  const controller = context.window.PropertyDeskModalController.create({
+    $: getElement,
+    state,
+    esc: (value) =>
+      String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;'),
+    propertyAddress: (property) => property.address,
+    prettyType: (type) => type,
+  });
+  return { controller, document, elements, getElement, state };
+}
+
+test('modal controller clears workflow state and resets payment forms when closing', () => {
+  const { controller, document, getElement, state } = createController();
+  const paymentModal = getElement('payment-modal');
+  controller.openModal('payment-modal');
+  assert.equal(document.body.style.overflow, 'hidden');
+  assert.equal(paymentModal.classList.lastRemoved, 'hidden');
+
+  getElement('payment-modal-title').textContent = 'Correct payment';
+  getElement('payment-save-button').textContent = 'Save correction';
+  controller.closeModal(paymentModal);
+
+  assert.equal(document.body.style.overflow, '');
+  assert.equal(paymentModal.classList.lastAdded, 'hidden');
+  assert.equal(state.pendingCorrection, null);
+  assert.equal(getElement('payment-modal-title').textContent, 'Record payment');
+  assert.equal(
+    getElement('payment-modal-eyebrow').textContent,
+    'PAYMENT ENTRY',
+  );
+  assert.equal(getElement('payment-save-button').textContent, 'Save payment');
+  assert.equal(getElement('payment-save-next').classList.lastRemoved, 'hidden');
+});
+
+test('modal controller cleans up import/detail state and escapes populated selects', () => {
+  const { controller, document, getElement, state } = createController();
+  controller.closeModal(getElement('import-preview-modal'));
+  controller.closeModal(getElement('detail-modal'));
+  assert.equal(state.pendingImport, null);
+  assert.equal(state.auditRequestId, 5);
+  assert.equal(document.body.style.overflow, '');
+
+  controller.populateFormOptions();
+  assert.match(getElement('account-property').innerHTML, /&lt;Oak&gt;/);
+  assert.match(getElement('payment-account').innerHTML, /&lt;Tenant&gt;/);
+  assert.doesNotMatch(getElement('payment-account').innerHTML, /Old lease/);
+  assert.match(getElement('expense-account').innerHTML, /Old lease/);
+});
+
+test('modal controller is loaded before app startup and precached', () => {
+  const html = fs.readFileSync(
+    path.join(__dirname, '..', 'index.html'),
+    'utf8',
+  );
+  const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+
+  assert.ok(
+    html.indexOf('features/modal-controller.js') < html.indexOf('app.js'),
+  );
+  assert.match(worker, /'\.\/features\/modal-controller\.js'/);
+  assert.match(app, /PropertyDeskModalController\.create/);
+});
