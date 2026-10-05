@@ -41,11 +41,7 @@
         voidTransaction,
       });
 
-    return {
-      voidTransaction,
-      correctTransaction,
-      attachTransactionActionEvents,
-    };
+    return { attachTransactionActionEvents };
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({ create });

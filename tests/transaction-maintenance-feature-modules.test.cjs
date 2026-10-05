@@ -70,6 +70,23 @@ test("transaction workflow connects the ledger screen with maintenance actions",
   const workflow =
     context.window.PropertyDeskTransactionWorkflow.create(dependencies);
 
+  assert.deepEqual(Object.keys(passed.maintenance).sort(), [
+    "$",
+    "EventClass",
+    "OptionClass",
+    "documentRef",
+    "fetchAll",
+    "openExpense",
+    "openPayment",
+    "prettyType",
+    "state",
+    "toast",
+    "updateAllocationPreview",
+  ]);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachEvents",
+    "renderPayments",
+  ]);
   assert.equal(passed.views.state, dependencies.state);
   assert.equal(passed.views.monthStart, dependencies.monthStart);
   assert.equal(passed.maintenance.state, dependencies.state);
@@ -145,8 +162,7 @@ test("transaction maintenance workflow composes correction and void actions", ()
   assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
-  assert.equal(workflow.correctTransaction, correctTransaction);
-  assert.equal(workflow.voidTransaction, voidTransaction);
+  assert.deepEqual(Object.keys(workflow), ["attachTransactionActionEvents"]);
   assert.equal(workflow.attachTransactionActionEvents(), "action events");
 });
 
