@@ -6,8 +6,6 @@
     $,
     documentRef = document,
     recordDepositAdjustment,
-    removeWorkspaceMember,
-    savePropertyHolders,
     openPayment,
     resetAccountForm,
     populateFormOptions,
@@ -31,15 +29,6 @@
             depositAdjustment.dataset.accountId,
             depositAdjustment.dataset.depositAdjustment,
           );
-          return;
-        }
-        const removeMember = event.target.closest("[data-remove-member]");
-        if (removeMember) {
-          removeWorkspaceMember(removeMember.dataset.removeMember);
-          return;
-        }
-        if (event.target.closest("[data-save-holders]")) {
-          savePropertyHolders();
           return;
         }
         const accountPayment = event.target.closest("[data-account-payment]");
@@ -86,12 +75,6 @@
           event.preventDefault();
           event.stopPropagation();
           openPropertyDocument(openDocument.dataset.openDocument);
-          return;
-        }
-        const accountDetail = event.target.closest("[data-detail]");
-        if (accountDetail) {
-          closeModal($("property-detail-modal"));
-          openAccountDetails(accountDetail.dataset.detail);
           return;
         }
         const propertyCard = event.target.closest("[data-property-card]");

@@ -265,6 +265,8 @@
       resetAccountForm,
       populateFormOptions,
       openModal,
+      savePropertyHolders: () => savePropertyHolders(),
+      openAccountDetails: (...args) => openAccountDetails(...args),
     });
   const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
     state,
@@ -408,8 +410,6 @@
     window.PropertyDeskActionRouter.create({
       $,
       recordDepositAdjustment,
-      removeWorkspaceMember,
-      savePropertyHolders,
       openPayment,
       resetAccountForm,
       populateFormOptions,

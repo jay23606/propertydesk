@@ -155,6 +155,12 @@
     function attachEvents() {
       $("display-name-form").addEventListener("submit", saveProfile);
       $("member-add-form").addEventListener("submit", addWorkspaceMember);
+      $("workspace-members").addEventListener("click", (event) => {
+        const removeButton = event.target.closest("[data-remove-member]");
+        if (removeButton) {
+          removeWorkspaceMember(removeButton.dataset.removeMember);
+        }
+      });
     }
 
     return {

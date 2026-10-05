@@ -12,18 +12,31 @@
     resetAccountForm,
     populateFormOptions,
     openModal,
+    savePropertyHolders,
+    openAccountDetails,
   }) {
     function attachEvents(toggleArchiveProperty) {
       $("property-detail-content").addEventListener("click", (event) => {
         const button = event.target.closest("[data-edit-account]");
-        if (!button) return;
-        const account = state.accounts.find(
-          (item) => item.id === button.dataset.editAccount,
-        );
-        if (!account) return;
-        event.preventDefault();
-        closeModal($("property-detail-modal"));
-        editAccount(account);
+        if (button) {
+          const account = state.accounts.find(
+            (item) => item.id === button.dataset.editAccount,
+          );
+          if (!account) return;
+          event.preventDefault();
+          closeModal($("property-detail-modal"));
+          editAccount(account);
+          return;
+        }
+        if (event.target.closest("[data-save-holders]")) {
+          savePropertyHolders();
+          return;
+        }
+        const accountDetail = event.target.closest("[data-detail]");
+        if (accountDetail) {
+          closeModal($("property-detail-modal"));
+          openAccountDetails(accountDetail.dataset.detail);
+        }
       });
 
       $("property-detail-add-income").addEventListener("click", () => {

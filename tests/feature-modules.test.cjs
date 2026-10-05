@@ -789,7 +789,7 @@ test("delegated action router preserves action routing and event propagation", (
   const calls = [];
   const propertyField = { value: "" };
   const callbacks = [
-    "recordDepositAdjustment", "removeWorkspaceMember", "savePropertyHolders",
+    "recordDepositAdjustment",
     "openPayment", "resetAccountForm", "populateFormOptions", "openModal",
     "editPropertyQuickNote", "openPropertyDetails", "openPropertyPayment",
     "deletePropertyDocument", "openPropertyDocument", "closeModal", "openAccountDetails",
@@ -823,8 +823,6 @@ test("delegated action router preserves action routing and event propagation", (
   dispatchClick("[data-deposit-adjustment]", {
     accountId: "rental-1", depositAdjustment: "retained",
   });
-  dispatchClick("[data-remove-member]", { removeMember: "member-1" });
-  dispatchClick("[data-save-holders]");
   assert.deepEqual(
     dispatchClick(
       "[data-account-payment]",
@@ -839,7 +837,6 @@ test("delegated action router preserves action routing and event propagation", (
   dispatchClick("[data-property-payment]", { propertyPayment: "property-1" });
   dispatchClick("[data-delete-document]", { deleteDocument: "doc-1" });
   dispatchClick("[data-open-document]", { openDocument: "doc-1" });
-  dispatchClick("[data-detail]", { detail: "account-1" });
   dispatchClick("[data-property-card]", { propertyCard: "property-2" });
   const file = { matches: (selector) => selector === "[data-property-document]" };
   listeners.get("change")({ target: file });
@@ -847,8 +844,6 @@ test("delegated action router preserves action routing and event propagation", (
   assert.equal(propertyField.value, "property-1");
   assert.deepEqual(calls, [
     ["recordDepositAdjustment", "rental-1", "retained"],
-    ["removeWorkspaceMember", "member-1"],
-    ["savePropertyHolders"],
     ["openPayment", "account-1"],
     ["resetAccountForm"],
     ["populateFormOptions"],
@@ -858,8 +853,6 @@ test("delegated action router preserves action routing and event propagation", (
     ["openPropertyPayment", "property-1"],
     ["deletePropertyDocument", "doc-1"],
     ["openPropertyDocument", "doc-1"],
-    ["closeModal", { id: "property-detail-modal" }],
-    ["openAccountDetails", "account-1"],
     ["openPropertyDetails", "property-2"],
     ["uploadPropertyDocument", file],
   ]);
@@ -1037,17 +1030,27 @@ test("property detail events own editing and quick-action bindings", () => {
     resetAccountForm: () => calls.push("reset-account"),
     populateFormOptions: () => calls.push("populate-options"),
     openModal: (id) => calls.push(`open:${id}`),
+    savePropertyHolders: () => calls.push("save-holders"),
+    openAccountDetails: (id) => calls.push(`open-account:${id}`),
   });
 
   feature.attachEvents(() => calls.push("archive"));
   handlers.get("property-detail-content:click")({
     target: {
       closest: (selector) =>
-        selector === "[data-edit-account]"
-          ? { dataset: { editAccount: "account-1" } }
-          : null,
+        ({
+          "[data-edit-account]": { dataset: { editAccount: "account-1" } },
+          "[data-save-holders]": { dataset: {} },
+          "[data-detail]": { dataset: { detail: "account-1" } },
+        })[selector] || null,
     },
     preventDefault() {},
+  });
+  handlers.get("property-detail-content:click")({
+    target: { closest: (selector) => selector === "[data-save-holders]" ? { dataset: {} } : null },
+  });
+  handlers.get("property-detail-content:click")({
+    target: { closest: (selector) => selector === "[data-detail]" ? { dataset: { detail: "account-1" } } : null },
   });
   handlers.get("property-detail-add-income:click")();
   handlers.get("property-detail-add-expense:click")();
@@ -1059,6 +1062,9 @@ test("property detail events own editing and quick-action bindings", () => {
   assert.deepEqual(calls, [
     "close:property-detail-modal",
     "edit:account-1",
+    "save-holders",
+    "close:property-detail-modal",
+    "open-account:account-1",
     "close:property-detail-modal",
     "payment::property-1",
     "close:property-detail-modal",
@@ -2530,6 +2536,7 @@ test("workspace feature owns profile and member form bindings", () => {
 
   assert.equal(typeof handlers.get("display-name-form:submit"), "function");
   assert.equal(typeof handlers.get("member-add-form:submit"), "function");
+  assert.equal(typeof handlers.get("workspace-members:click"), "function");
 });
 
 test("adding a workspace member clears the address only after successful refresh", async () => {
