@@ -697,6 +697,14 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   assert.match(values["reminder-preview-content"].innerHTML, /buyer@example\.test/);
   assert.match(values["reminder-preview-content"].innerHTML, /&lt;Renter&gt;/);
   assert.match(values["reminder-preview-content"].innerHTML, /&lt;St&gt;/);
+  assert.match(
+    values["reminder-preview-content"].innerHTML,
+    /Hello &lt;Renter&gt;,<br><br>Our records show no rent or installment payment recorded for October 2026\./,
+  );
+  assert.match(
+    values["reminder-preview-content"].innerHTML,
+    /Unpaid due as of 2026-10-31: USD 550\.00<br>Property: 10 Main &lt;St&gt;/,
+  );
   assert.equal(calls.at(-1), "reminder-preview-modal");
 });
 

@@ -38,12 +38,25 @@
         monthEnd(),
       );
       const label = dateOnly(monthStart()).toLocaleDateString(undefined, {
-        month: "long", year: "numeric",
+        month: "long",
+        year: "numeric",
       });
       const address = propertyAddress(property);
       const name = account.party_name || "there";
       const subject = `Payment reminder for ${property.address} · ${label}`;
-      const body = `Hello ${name},\n\nOur records show no rent or installment payment recorded for ${label}.\n\nUnpaid due as of ${monthEnd()}: ${money(amount)}\nProperty: ${address}\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nPropertyDesk`;
+      const body = [
+        `Hello ${name},`,
+        "",
+        `Our records show no rent or installment payment recorded for ${label}.`,
+        "",
+        `Unpaid due as of ${monthEnd()}: ${money(amount)}`,
+        `Property: ${address}`,
+        "",
+        "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
+        "",
+        "Thank you,",
+        "PropertyDesk",
+      ].join("\n");
       $("reminder-preview-content").innerHTML = `
         <div class="reminder-preview-meta">
           <div><small>To</small><strong>${esc(recipients.join(", ") || "No recipient email saved")}</strong></div>
