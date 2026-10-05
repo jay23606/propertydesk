@@ -110,6 +110,25 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
   assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
+test("app state starts in Properties with fresh workspace collections", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "app-state.js"), "utf8"),
+    context,
+  );
+  const first = context.window.PropertyDeskAppState.create();
+  const second = context.window.PropertyDeskAppState.create();
+
+  assert.equal(first.view, "properties");
+  assert.equal(first.client, null);
+  assert.equal(first.user, null);
+  assert.equal(first.properties.length, 0);
+  assert.equal(first.accounts.length, 0);
+  assert.equal(first.payments.length, 0);
+  first.properties.push({ id: "one" });
+  assert.equal(second.properties.length, 0);
+});
+
 test("notification feature replaces its timer and hides transient feedback", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

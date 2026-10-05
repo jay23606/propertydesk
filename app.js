@@ -39,30 +39,7 @@
   const configured = Boolean(
     config.supabaseUrl && config.supabaseAnonKey && window.supabase,
   );
-  const state = {
-    client: null,
-    user: null,
-    workspaceOwnerId: null,
-    workspaceMembers: [],
-    propertyHolders: [],
-    depositEntries: [],
-    reminderLogs: [],
-    view: 'properties',
-    properties: [],
-    accounts: [],
-    payments: [],
-    expenses: [],
-    documents: [],
-    agreementVersions: [],
-    importBatches: [],
-    pendingImport: null,
-    pendingCorrection: null,
-    editingProperty: null,
-    editingAccount: null,
-    selectedPropertyId: null,
-    auditRequestId: 0,
-    passwordRecoveryInProgress: false,
-  };
+  const state = window.PropertyDeskAppState.create();
   const { toast } = window.PropertyDeskNotifications.create({ $ });
   const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
     state,
