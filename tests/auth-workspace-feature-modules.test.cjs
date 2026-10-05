@@ -1004,12 +1004,12 @@ test("property holder and archive workflows report rejected writes without runni
   ]);
 });
 
-test("quick note feature loads before app startup and is precached", () => {
+test("quick note feature loads before the portfolio workflow and is precached", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
-    html.indexOf("features/property-quick-note.js") < html.indexOf("app.js"),
-    "property quick note should load before the app coordinator",
+    html.indexOf("features/property-quick-note.js") < html.indexOf("features/property-portfolio-workflow.js"),
+    "property quick note should load before the portfolio coordinator",
   );
   assert.match(worker, /'\.\/features\/property-quick-note\.js'/);
 });

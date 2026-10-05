@@ -1221,9 +1221,6 @@ test("property actions workflow composes administration and detail actions", () 
   const attachCalls = [];
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyQuickNote: {
-        create: () => ({ editPropertyQuickNote: action }),
-      },
       PropertyDeskPropertyHolderManagement: {
         create: () => ({ savePropertyHolders: action }),
       },
@@ -1265,7 +1262,7 @@ test("property actions workflow composes administration and detail actions", () 
   assert.equal(passed.events.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
-  assert.equal(workflow.editPropertyQuickNote, action);
+  assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
   workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty);
   assert.deepEqual(attachCalls, ["content", workflow.toggleArchiveProperty]);
 });

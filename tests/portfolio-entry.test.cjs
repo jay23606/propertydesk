@@ -128,8 +128,15 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
 test("property portfolio workflow connects its model, table, and action routers", () => {
   const passed = {};
   const action = () => {};
+  const state = {};
   const context = vm.createContext({
     window: {
+      PropertyDeskPropertyQuickNote: {
+        create: (options) => {
+          passed.quickNoteOptions = options;
+          return { editPropertyQuickNote: action };
+        },
+      },
       PropertyDeskPropertyPortfolioTable: {
         create: (options) => {
           passed.tableOptions = options;
@@ -167,6 +174,9 @@ test("property portfolio workflow connects its model, table, and action routers"
     context,
   );
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
+    state,
+    toast: action,
+    fetchAll: action,
     esc: action,
     money: action,
     paymentFrequencyLabel: action,
@@ -183,7 +193,6 @@ test("property portfolio workflow connects its model, table, and action routers"
     lateReminderMailto: action,
     paymentStatusInMonth: action,
     openPayment: action,
-    editPropertyQuickNote: action,
     openPropertyDetails: action,
     resetAccountForm: action,
     populateFormOptions: action,
@@ -192,7 +201,12 @@ test("property portfolio workflow connects its model, table, and action routers"
 
   assert.equal(passed.viewOptions.portfolioTable, "table");
   assert.equal(passed.viewOptions.portfolioModel, "model");
+  assert.equal(passed.quickNoteOptions.state, state);
+  assert.equal(passed.quickNoteOptions.toast, action);
+  assert.equal(passed.quickNoteOptions.fetchAll, action);
+  assert.equal(passed.quickNoteOptions.streetAddress, action);
   assert.equal(passed.actionOptions.openPayment, action);
+  assert.equal(passed.actionOptions.editPropertyQuickNote, action);
   assert.equal(workflow.renderProperties(), "properties");
   assert.equal(workflow.attachPropertyViewEvents(), "filters");
   assert.equal(workflow.attachPropertyActionEvents(), "actions");

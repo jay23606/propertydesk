@@ -120,11 +120,10 @@
       prettyType, paymentFrequencyLabel, accountBalance, openModal, propertyAddress,
     });
   const {
-    editPropertyQuickNote,
     toggleArchiveProperty,
     attachPropertyDetailEvents,
   } = window.PropertyDeskPropertyActionsWorkflow.create({
-    $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+    $, state, toast, fetchAll, todayIso, openPropertyDetails,
     closeModal, editAccount, openPayment, openExpense, resetAccountForm,
     populateFormOptions, openModal, openAccountDetails, documentRef: document,
   });
@@ -144,11 +143,11 @@
     attachPropertyViewEvents,
     attachPropertyActionEvents,
   } = window.PropertyDeskPropertyPortfolioWorkflow.create({
-    $, state, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
+    $, state, toast, fetchAll, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
     accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
     propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
     lateReminderMailto, paymentStatusInMonth, openPayment,
-    editPropertyQuickNote, openPropertyDetails, resetAccountForm,
+    openPropertyDetails, resetAccountForm,
     populateFormOptions, openModal,
   });
   const { attachEvents: attachCsvImportEvents } =

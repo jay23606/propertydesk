@@ -8,9 +8,15 @@
       accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
       propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
       lateReminderMailto, paymentStatusInMonth, openPayment,
-      editPropertyQuickNote, openPropertyDetails, resetAccountForm,
+      openPropertyDetails, resetAccountForm,
       populateFormOptions, openModal,
     } = context;
+    const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
+      state: context.state,
+      toast: context.toast,
+      fetchAll: context.fetchAll,
+      streetAddress,
+    });
     const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
       esc, money, paymentFrequencyLabel,
     });

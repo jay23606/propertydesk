@@ -4,13 +4,10 @@
 
   function create(context) {
     const {
-      $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+      $, state, toast, fetchAll, todayIso, openPropertyDetails,
       closeModal, editAccount, openPayment, openExpense, resetAccountForm,
       populateFormOptions, openModal, openAccountDetails, documentRef = document,
     } = context;
-    const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
-      state, toast, fetchAll, streetAddress,
-    });
     const { savePropertyHolders } =
       window.PropertyDeskPropertyHolderManagement.create({
         state, toast, fetchAll, openPropertyDetails, documentRef,
@@ -35,7 +32,6 @@
     }
 
     return {
-      editPropertyQuickNote,
       toggleArchiveProperty,
       attachPropertyDetailEvents,
     };
