@@ -141,6 +141,10 @@ test("workspace feature owns profile and member form bindings", () => {
 
   feature.attachEvents();
 
+  assert.deepEqual(Object.keys(feature).sort(), [
+    "attachEvents",
+    "renderWorkspaceSettings",
+  ]);
   assert.equal(typeof handlers.get("display-name-form:submit"), "function");
   assert.equal(typeof handlers.get("member-add-form:submit"), "function");
   assert.equal(typeof handlers.get("workspace-members:click"), "function");
@@ -160,7 +164,7 @@ test("adding a workspace member clears the address only after successful refresh
   };
   const calls = [];
   const messages = [];
-  const feature = context.window.PropertyDeskWorkspace.create({
+  const feature = context.window.PropertyDeskWorkspaceMembers.create({
     $: element,
     state: {
       client: {
@@ -174,10 +178,9 @@ test("adding a workspace member clears the address only after successful refresh
       workspaceOwnerId: "owner-1",
     },
     esc: String,
-    renderReminderActivity: () => calls.push(["render-reminders"]),
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
-    updateGreeting() {},
+    refreshWorkspaceSettings: () => calls.push(["render-reminders"]),
   });
 
   await feature.addWorkspaceMember({ preventDefault() {} });
@@ -187,7 +190,6 @@ test("adding a workspace member clears the address only after successful refresh
   assert.equal(calls[0][1].p_email, "spouse@example.test");
   assert.equal(calls[1][0], "refresh");
   assert.equal(calls[2][0], "render-reminders");
-  assert.equal(element("display-name").value, "Owner");
   assert.equal(element("member-email").value, "");
   assert.equal(messages.at(-1), "Workspace member added");
 });
@@ -218,7 +220,7 @@ test("workspace setting writes report rejected requests and retain entered value
     properties: [],
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
   };
-  const feature = context.window.PropertyDeskWorkspace.create({
+  const feature = context.window.PropertyDeskWorkspaceMembers.create({
     $,
     state,
     esc: String,

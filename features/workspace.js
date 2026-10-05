@@ -40,8 +40,6 @@
     }
 
     return {
-      addWorkspaceMember: members.addWorkspaceMember,
-      removeWorkspaceMember: members.removeWorkspaceMember,
       renderWorkspaceSettings,
       attachEvents,
     };
