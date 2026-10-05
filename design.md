@@ -169,7 +169,7 @@ Ship PropertyDesk as an installable PWA for phone and desktop use. The web app m
 
 ## Source and module architecture
 
-Keep the app build-free and compatible with GitHub Pages. Place cohesive browser features such as portfolio, transaction, detail, private document, backup/export, sign-in/recovery, workspace settings, property administration, ledger actions, and property/account/transaction entry and CSV-import workflows in small files under `features/`; keep reusable calculations and validation in their existing helper modules. `app.js` owns shared session state and connects feature modules to Supabase and the page. Load every feature before `app.js` and include it in the service-worker shell cache. When a feature changes, update its focused tests and preserve the product workflows above.
+Keep the app build-free and compatible with GitHub Pages. Place cohesive browser features such as portfolio, transaction, detail, private document, backup/export, sign-in/recovery, workspace settings, property administration, ledger actions, reminder preview, and property/account/transaction entry and CSV-import workflows in small files under `features/`; keep reusable calculations and validation in their existing helper modules. `app.js` owns shared session state and connects feature modules to Supabase and the page. Load every feature before `app.js` and include it in the service-worker shell cache. When a feature changes, update its focused tests and preserve the product workflows above.
 
 ## Transactional email
 

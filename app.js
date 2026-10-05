@@ -73,7 +73,7 @@
   });
   const {
     resetPropertyForm, resetAccountForm, updateLoanFields, saveProperty,
-    saveAccount, updateAllocationPreview, savePayment, saveExpense,
+    saveAccount, updateAllocationPreview, prefillPaymentAmount, savePayment, saveExpense,
     editAccount, openPayment, openPropertyPayment, openExpense,
     correctTransaction,
   } = recordForms;
@@ -112,6 +112,10 @@
     saveProfile, addWorkspaceMember, removeWorkspaceMember, renderWorkspaceSettings,
   } = window.PropertyDeskWorkspace.create({
     $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
+  });
+  const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
+    $, state, amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd,
+    moneyInput, toast, dateOnly, monthStart, propertyAddress, money, esc, openModal,
   });
   const { editPropertyQuickNote, savePropertyHolders, toggleArchiveProperty } =
     window.PropertyDeskPropertyManagement.create({
@@ -159,18 +163,6 @@
   function scheduleFor(account) {
     return amortizationSchedule(account.original_principal,account.interest_rate,account.term_months,account.start_date,account.principal_interest_amount);
   }
-  function previewReminderEmail(){
-    const property=state.properties.find(item=>item.id===$('account-property').value);
-    if(!property){toast('Choose a property to preview its reminder');return;}
-    const account={id:$('account-id').value||'preview',property_id:property.id,account_type:$('account-type').value,name:$('account-name').value.trim()||'Account',party_name:$('account-party').value.trim()||null,start_date:$('account-start').value||todayIso(),next_due_date:$('account-next-due').value||null,payment_amount:moneyInput($('account-payment').value),payment_frequency:$('account-frequency').value,status:'active'};
-    const recipients=$('account-party-email').value.split(/[;,]/).map(email=>email.trim()).filter(Boolean);
-    const amount=amountDueSince([account],state.payments,unpaidDueAccrualStart(account),monthEnd());
-    const label=dateOnly(monthStart()).toLocaleDateString(undefined,{month:'long',year:'numeric'}),address=propertyAddress(property),name=account.party_name||'there';
-    const subject=`Payment reminder for ${property.address} · ${label}`;
-    const body=`Hello ${name},\n\nOur records show no rent or installment payment recorded for ${label}.\n\nUnpaid due as of ${monthEnd()}: ${money(amount)}\nProperty: ${address}\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nPropertyDesk`;
-    $('reminder-preview-content').innerHTML=`<div class="reminder-preview-meta"><div><small>To</small><strong>${esc(recipients.join(', ')||'No recipient email saved')}</strong></div><div><small>Subject</small><strong>${esc(subject)}</strong></div><div><small>Schedule</small><strong>Last day of ${esc(label)}, only when no rent or installment payment is recorded that month</strong></div></div><div class="reminder-preview-body">${esc(body).replaceAll('\n','<br>')}</div><p class="field-hint">Preview only. No email is sent from this window. Each saved address receives an individual copy. Estimated loan balance is not included.</p>`;
-    openModal('reminder-preview-modal');
-  }
   function attachEvents() {
     document.querySelectorAll('[data-theme-toggle]').forEach(button=>button.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true)));
     syncThemeButtons();
@@ -183,7 +175,7 @@
     document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>closeModal(x.closest('.modal'))));
     $('property-form').addEventListener('submit',saveProperty); $('account-form').addEventListener('submit',saveAccount); $('account-reminder-preview').addEventListener('click',previewReminderEmail); $('payment-form').addEventListener('submit',savePayment); $('expense-form').addEventListener('submit',saveExpense);
     $('property-detail-content').addEventListener('click',event=>{const button=event.target.closest('[data-edit-account]');if(!button)return;const account=state.accounts.find(item=>item.id===button.dataset.editAccount);if(!account)return;event.preventDefault();closeModal($('property-detail-modal'));editAccount(account);});
-    $('account-type').addEventListener('change',updateLoanFields); $('payment-account').addEventListener('change',updateAllocationPreview); $('payment-amount').addEventListener('input',updateAllocationPreview); $('payment-date').addEventListener('change',updateAllocationPreview);
+    $('account-type').addEventListener('change',updateLoanFields); $('payment-account').addEventListener('change',()=>{prefillPaymentAmount();updateAllocationPreview();}); $('payment-amount').addEventListener('input',updateAllocationPreview); $('payment-date').addEventListener('change',updateAllocationPreview);
     $('expense-property').addEventListener('change',()=>{const pid=$('expense-property').value,related=state.accounts.filter(a=>a.property_id===pid);fillSelect('expense-account',related.map(a=>({value:a.id,label:`${a.name} — ${prettyType(a.account_type)}`})),'Property level');});
     $('expense-category').addEventListener('change',()=>{$('deposit-refund-hint').classList.toggle('hidden',$('expense-category').value!=='deposit_refund');});
     $('property-search').addEventListener('input',renderProperties); $('property-filter').addEventListener('change',renderProperties); $('property-holder-filter').addEventListener('change',renderProperties); $('show-archived').addEventListener('change',renderProperties); $('payment-search').addEventListener('input',renderPayments); $('payment-period').addEventListener('change',renderPayments); $('transaction-type').addEventListener('change',renderPayments);

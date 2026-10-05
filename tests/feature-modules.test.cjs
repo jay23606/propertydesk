@@ -55,12 +55,56 @@ test("record-entry module exposes property, account, and transaction workflows",
     "saveExpense",
     "editAccount",
     "openPayment",
+    "prefillPaymentAmount",
     "openPropertyPayment",
     "openExpense",
     "correctTransaction",
   ]) {
     assert.equal(typeof feature[action], "function", action);
   }
+});
+
+test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
+    context,
+  );
+  const elements = new Map([
+    ["payment-account", { value: "" }],
+    ["payment-amount", { value: "" }],
+    ["payment-date", { value: "" }],
+    ["payment-form", { reset() {
+      elements.get("payment-account").value = "";
+      elements.get("payment-amount").value = "";
+    } }],
+    ["payment-modal", { querySelector: () => ({ textContent: "" }) }],
+    ["payment-modal-title", { textContent: "" }],
+    ["payment-save-button", { textContent: "" }],
+    ["payment-save-next", { classList: { remove() {} } }],
+    ["allocation-preview", { innerHTML: "" }],
+    ["income-category-wrap", { classList: { toggle() {} } }],
+  ]);
+  elements.get("payment-account").value = "account-1";
+  const feature = context.window.PropertyDeskRecordForms.create({
+    $: (id) => elements.get(id),
+    state: {
+      accounts: [{ id: "account-1", payment_amount: 647, account_type: "rental" }],
+      pendingCorrection: null,
+    },
+    moneyInput: Number,
+    populateFormOptions() {},
+    fillSelect() {},
+    prettyType: (value) => value,
+    todayIso: () => "2026-10-04",
+    openModal() {},
+  });
+
+  feature.openPayment("account-1");
+  assert.equal(elements.get("payment-amount").value, 647);
+  elements.get("payment-amount").value = "300";
+  assert.equal(feature.prefillPaymentAmount(), false);
+  assert.equal(elements.get("payment-amount").value, "300");
 });
 
 test("private document module exposes upload, delete, and open workflows", () => {
@@ -453,6 +497,60 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
   assert.equal(updates[0][1].void_reason, "Entered in error");
   assert.equal(messages.at(-1), "Transaction voided; original entry preserved");
   assert.equal(calls.filter((call) => call === "refresh").length, 2);
+});
+
+test("reminder preview uses current form values and escapes recipient-facing text", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-preview.js"), "utf8"),
+    context,
+  );
+  const values = {
+    "account-property": { value: "property-1" },
+    "account-id": { value: "" },
+    "account-type": { value: "land_contract" },
+    "account-name": { value: "Installment" },
+    "account-party": { value: "<Renter>" },
+    "account-start": { value: "" },
+    "account-next-due": { value: "" },
+    "account-payment": { value: "550" },
+    "account-frequency": { value: "monthly" },
+    "account-party-email": { value: "buyer@example.test" },
+    "reminder-preview-content": { innerHTML: "" },
+  };
+  const state = {
+    properties: [{ id: "property-1", address: "10 Main <St>" }],
+    payments: [],
+  };
+  const calls = [];
+  const feature = context.window.PropertyDeskReminderPreview.create({
+    $: (id) => values[id],
+    state,
+    amountDueSince: (accounts, payments, start, end) => {
+      calls.push({ account: accounts[0], payments, start, end });
+      return 550;
+    },
+    unpaidDueAccrualStart: () => "2026-10-01",
+    todayIso: () => "2026-10-04",
+    monthEnd: () => "2026-10-31",
+    moneyInput: Number,
+    toast: (message) => calls.push(message),
+    dateOnly: () => ({ toLocaleDateString: () => "October 2026" }),
+    monthStart: () => "2026-10-01",
+    propertyAddress: (property) => property.address,
+    money: (value) => "USD " + Number(value).toFixed(2),
+    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])),
+    openModal: (id) => calls.push(id),
+  });
+
+  feature.previewReminderEmail();
+
+  assert.equal(calls[0].account.payment_amount, 550);
+  assert.equal(calls[0].start, "2026-10-01");
+  assert.match(values["reminder-preview-content"].innerHTML, /buyer@example\.test/);
+  assert.match(values["reminder-preview-content"].innerHTML, /&lt;Renter&gt;/);
+  assert.match(values["reminder-preview-content"].innerHTML, /&lt;St&gt;/);
+  assert.equal(calls.at(-1), "reminder-preview-modal");
 });
 
 test("recording a loan payment does not invent principal or interest splits", async () => {

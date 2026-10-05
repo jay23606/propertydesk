@@ -46,6 +46,7 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   const root = path.join(__dirname, '..');
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const preview = fs.readFileSync(path.join(root, 'features/reminder-preview.js'), 'utf8');
   const forms = fs.readFileSync(path.join(root, 'features/record-forms.js'), 'utf8');
   const migration = fs.readFileSync(path.join(root, 'supabase/migrations/20261004210000_month_end_reminders.sql'), 'utf8');
   const worker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
@@ -56,6 +57,7 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   assert.match(forms, /if\s*\(\s*\$\("account-reminder-enabled"\)\.checked\s*&&\s*!partyEmails\.length\s*\)/);
   assert.match(migration, /monthly_reminder_enabled boolean not null default false/);
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
-  assert.match(app, /function previewReminderEmail\(\)[\s\S]*?openModal\('reminder-preview-modal'\)/);
+  assert.match(app, /PropertyDeskReminderPreview\.create/);
+  assert.match(preview, /function previewReminderEmail\(\)[\s\S]*?openModal\("reminder-preview-modal"\)/);
   assert.match(worker, /'\.\/reminders\.css'/);
 });

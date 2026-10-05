@@ -22,6 +22,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-management.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/ledger-actions.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/reminder-preview.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
@@ -35,6 +36,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/workspace\.js'/);
   assert.match(worker, /'\.\/features\/property-management\.js'/);
   assert.match(worker, /'\.\/features\/ledger-actions\.js'/);
+  assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(app, /attachImportEvents\(\)/);
 });
 

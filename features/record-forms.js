@@ -154,6 +154,15 @@
       $("allocation-preview").innerHTML =
         '<p class="allocation-note">Payment history only. The estimated loan balance assumes every scheduled installment was paid on time; recorded receipts affect Unpaid Due, not this estimate.</p>';
     }
+    function prefillPaymentAmount() {
+      const amountInput = $("payment-amount");
+      if (amountInput.value) return false;
+      const account = state.accounts.find((item) => item.id === $("payment-account").value);
+      const scheduledAmount = Number(account?.payment_amount || 0);
+      if (!Number.isFinite(scheduledAmount) || scheduledAmount <= 0) return false;
+      amountInput.value = account.payment_amount;
+      return true;
+    }
     async function savePayment(event) {
       event.preventDefault();
       const addAnother = event.submitter?.id === "payment-save-next",
@@ -365,6 +374,7 @@
       $("payment-save-next").classList.remove("hidden");
       $("payment-date").value = todayIso();
       if (accountId) $("payment-account").value = accountId;
+      prefillPaymentAmount();
       updateAllocationPreview();
       openModal("payment-modal");
     }
@@ -463,6 +473,7 @@
       saveProperty,
       saveAccount,
       updateAllocationPreview,
+      prefillPaymentAmount,
       savePayment,
       saveExpense,
       editAccount,
