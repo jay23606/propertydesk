@@ -13,20 +13,19 @@ function parts(href) {
 
 test("late reminder link addresses the saved party and fills the requested subject and body", () => {
   const href = lateReminderMailto({
-    email: "buyer@example.com",
-    address: "117 W Girard St, Mount Carmel, PA 17851",
+    email: "buyer@example.test",
+    address: "1 Sample Street",
     unpaidDue: "$550.00",
     senderName: "Property Manager",
-    recipientName: "Casey Buyer",
+    recipientName: "Test Buyer",
     month: "October 2026",
     asOf: "2026-10-31",
   });
 
   assert.deepEqual(parts(href), {
-    recipients: "buyer@example.com",
-    subject:
-      "Payment reminder for 117 W Girard St, Mount Carmel, PA 17851 · October 2026",
-    body: "Hello Casey Buyer,\n\nOur records show no rent or installment payment recorded for October 2026.\n\nUnpaid due as of 2026-10-31: $550.00\nProperty: 117 W Girard St, Mount Carmel, PA 17851\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nProperty Manager",
+    recipients: "buyer@example.test",
+    subject: "Payment reminder for 1 Sample Street · October 2026",
+    body: "Hello Test Buyer,\n\nOur records show no rent or installment payment recorded for October 2026.\n\nUnpaid due as of 2026-10-31: $550.00\nProperty: 1 Sample Street\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nProperty Manager",
   });
 });
 
