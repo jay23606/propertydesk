@@ -15,6 +15,7 @@
     const expenses = window.PropertyDeskExpenseEntryForm.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      buildExpensePayload: window.PropertyDeskExpensePayload.build,
     });
 
     function attachEvents() {

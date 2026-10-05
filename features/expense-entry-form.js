@@ -6,6 +6,7 @@
     const {
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      buildExpensePayload,
     } = context;
 
     async function saveExpense(event) {
@@ -22,18 +23,17 @@
         return;
       }
 
-      const payload = {
-        user_id: state.workspaceOwnerId,
-        property_id: propertyId,
-        account_id: accountId || null,
+      const payload = buildExpensePayload({
+        ownerId: state.workspaceOwnerId,
+        propertyId,
+        accountId,
         amount: moneyInput($("expense-amount").value),
-        expense_date: $("expense-date").value,
+        expenseDate: $("expense-date").value,
         category,
-        payee: payee || null,
-        payment_method: method,
-        memo: $("expense-memo").value.trim() || null,
-        source_type: "manual",
-      };
+        payee,
+        paymentMethod: method,
+        memo: $("expense-memo").value.trim(),
+      });
       if (state.pendingCorrection?.kind === "expense") {
         await saveCorrection("expense", {
           property_id: payload.property_id,
