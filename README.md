@@ -2,7 +2,7 @@
 
 Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
-The browser code stays build-free. Reusable ledger, import, email, backup, and workspace-scoped data helpers live in separate files; portfolio, transaction, detail, private document, export/backup, sign-in/recovery, workspace, property-management, ledger actions, modal lifecycle, theme/navigation, reminder preview, and record-entry/CSV-import workflows are grouped under `features/`; `app.js` coordinates shared state and user actions.
+The browser code stays build-free. Reusable ledger, import, email, backup, and workspace-scoped data helpers live in separate files; portfolio, transaction, detail, private document, export/backup, sign-in/recovery, workspace, property-management, ledger actions, modal lifecycle, theme/navigation, reminder preview, record-entry/CSV-import, and app-lifecycle workflows are grouped under `features/`. `app.js` creates the shared state and connects the features; `features/app-lifecycle.js` coordinates rendering, event binding, and startup.
 
 The app is installable as a PWA when served over HTTPS. Dark mode is the default, with a light/dark toggle remembered on the device. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
@@ -59,4 +59,4 @@ These live database checks do not replace periodic independent security review.
 
 ## Post-deploy smoke check
 
-When a file listed in `sw.js` under `SHELL_FILES` changes, increment `CACHE_NAME` so installed PWAs replace their cached shell. After the GitHub Pages workflow succeeds, reload the live app and confirm sign-in completes without console errors. In Properties, verify the visible totals row updates with the current search/filter; open a property and then a land-contract or note account to confirm its amortization schedule renders. Open Record payment, choose an account, and confirm Amount received starts at its scheduled monthly payment. Check the browser console for service-worker lifecycle or cache errors as well as app errors. Keep the deploy unverified until these checks pass.
+When a file listed in `sw.js` under `SHELL_FILES` changes, increment `CACHE_NAME` so installed PWAs replace their cached shell. GitHub Actions runs the unit suite and a Chromium smoke test on the candidate before publishing, then opens the deployed app in Chromium with a signed-in synthetic workspace and checks that a note's amortization schedule renders without page, console, or service-worker errors. Keep a deploy unverified until both jobs pass. For a broader manual check, reload the live app, verify the Properties totals respond to search/filter changes, open a property and account, and confirm Record payment starts with the scheduled monthly payment.
