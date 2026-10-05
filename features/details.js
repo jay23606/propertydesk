@@ -116,12 +116,18 @@
         <div class="detail-section">
         <h3>Account holders</h3>
         <p class="field-hint">Labels for sorting only. Workspace members can access every property.</p>
-        <div class="holder-choices">${state.workspaceMembers.map((m) => `<label>
-        <input type="checkbox" data-holder-choice value="${esc(m.member_user_id)}" ${state.propertyHolders.some((h) => h.property_id === id && h.member_user_id === m.member_user_id) ? "checked" : ""}> ${esc(m.display_name || m.email)}</label>`).join("")}</div>
+        <div class="holder-choices">${state.workspaceMembers
+          .map(
+            (m) => `<label>
+        <input type="checkbox" data-holder-choice value="${esc(m.member_user_id)}" ${state.propertyHolders.some((h) => h.property_id === id && h.member_user_id === m.member_user_id) ? "checked" : ""}> ${esc(m.display_name || m.email)}</label>`,
+          )
+          .join("")}</div>
         <button class="button secondary compact" type="button" data-save-holders>Save labels</button>
         </div>
         <div class="detail-section">
-        <h3>Accounts at this property</h3>${accounts.length ? `<div class="table-wrap property-detail-table property-account-table">
+        <h3>Accounts at this property</h3>${
+          accounts.length
+            ? `<div class="table-wrap property-detail-table property-account-table">
         <table>
         <thead>
         <tr>
@@ -133,7 +139,9 @@
         </th>
         </tr>
         </thead>
-        <tbody>${accounts.map((a) => `<tr>
+        <tbody>${accounts
+          .map(
+            (a) => `<tr>
         <td>
         <button type="button" class="table-action account-edit-link" data-edit-account="${esc(a.id)}" aria-label="Edit ${esc(a.name)}">${esc(a.name)}</button>
         <br>
@@ -147,25 +155,39 @@
         <td>
         <button class="table-action" data-detail="${esc(a.id)}">Open</button>
         </td>
-        </tr>`).join("")}</tbody>
+        </tr>`,
+          )
+          .join("")}</tbody>
         </table>
-        </div>` : '<p class="list-empty">No accounts yet. Add a rental, land contract, or private note.</p>'}</div>
+        </div>`
+            : '<p class="list-empty">No accounts yet. Add a rental, land contract, or private note.</p>'
+        }</div>
         <div class="detail-section">
         <h3>Agreements and documents</h3>
         <p class="field-hint">Files are private to your workspace. Select an agreement name to open or download it in your browser. PDFs, DOCX, and JPEG agreements up to 15 MB are supported.</p>
         <label class="button secondary file-button">↑ Upload agreement<input type="file" data-property-document accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,image/jpeg,.jpg,.jpeg">
         </label>
-        <div class="document-list">${propertyDocs.length ? propertyDocs.map((doc) => `<div class="document-row">
+        <div class="document-list">${
+          propertyDocs.length
+            ? propertyDocs
+                .map(
+                  (doc) => `<div class="document-row">
         <span>▤</span>
         <div>
         <a class="document-name-link" href="#" data-open-document="${esc(doc.id)}">${esc(doc.file_name)}</a>
         <small>${esc(doc.content_type || "Document")} · ${fmtDate(String(doc.created_at || "").slice(0, 10))}</small>
         </div>
         <button type="button" class="button secondary compact document-delete" data-delete-document="${esc(doc.id)}" aria-label="Delete ${esc(doc.file_name)}">Delete</button>
-        </div>`).join("") : '<p class="list-empty">No agreement files attached yet.</p>'}</div>
+        </div>`,
+                )
+                .join("")
+            : '<p class="list-empty">No agreement files attached yet.</p>'
+        }</div>
         </div>
         <div class="detail-section">
-        <h3>Recent activity</h3>${transactions.length ? `<div class="table-wrap property-detail-table">
+        <h3>Recent activity</h3>${
+          transactions.length
+            ? `<div class="table-wrap property-detail-table">
         <table>
         <thead>
         <tr>
@@ -175,15 +197,27 @@
         <th>AMOUNT</th>
         </tr>
         </thead>
-        <tbody>${transactions.map((x) => `<tr class="${x.status === "voided" ? "transaction-voided" : ""}">
+        <tbody>${transactions
+          .map(
+            (
+              x,
+            ) => `<tr class="${x.status === "voided" ? "transaction-voided" : ""}">
         <td>${fmtDate(x.date)}</td>
         <td>${esc(x.kind)}</td>
-        <td>${esc(x.label)}${x.memo ? `<br>
-        <span class="muted">${esc(x.memo)}</span>` : ""}</td>
+        <td>${esc(x.label)}${
+          x.memo
+            ? `<br>
+        <span class="muted">${esc(x.memo)}</span>`
+            : ""
+        }</td>
         <td class="${x.amount < 0 ? "negative-amount" : ""}">${x.amount < 0 ? "−" : ""}${money(Math.abs(x.amount))}</td>
-        </tr>`).join("")}</tbody>
+        </tr>`,
+          )
+          .join("")}</tbody>
         </table>
-        </div>` : '<p class="list-empty">Recorded income and expenses will appear here.</p>'}</div>`;
+        </div>`
+            : '<p class="list-empty">Recorded income and expenses will appear here.</p>'
+        }</div>`;
       $("property-archive-toggle").textContent = property.archived_at
         ? "Restore property"
         : "Archive property";
@@ -238,7 +272,9 @@
         </div>
         <p class="field-hint">Deposit funds are tracked separately from rent and operating expenses. Retention is a liability adjustment; review its tax treatment separately.</p>
         <div class="portfolio-row-actions">
-        <button type="button" class="button secondary compact" data-deposit-adjustment="retained" data-account-id="${esc(account.id)}">Record amount retained</button>${totals.retained > totals.restored ? `<button type="button" class="button secondary compact" data-deposit-adjustment="restored" data-account-id="${esc(account.id)}">Reverse retention</button>` : ""}</div>${rows ? `<div class="table-wrap property-detail-table">
+        <button type="button" class="button secondary compact" data-deposit-adjustment="retained" data-account-id="${esc(account.id)}">Record amount retained</button>${totals.retained > totals.restored ? `<button type="button" class="button secondary compact" data-deposit-adjustment="restored" data-account-id="${esc(account.id)}">Reverse retention</button>` : ""}</div>${
+          rows
+            ? `<div class="table-wrap property-detail-table">
         <table>
         <thead>
         <tr>
@@ -250,7 +286,9 @@
         </thead>
         <tbody>${rows}</tbody>
         </table>
-        </div>` : '<p class="list-empty">Security deposit receipts, refunds, and adjustments will appear here.</p>'}</div>`;
+        </div>`
+            : '<p class="list-empty">Security deposit receipts, refunds, and adjustments will appear here.</p>'
+        }</div>`;
     }
     async function openAccountDetails(id) {
       const auditRequestId = ++state.auditRequestId;
@@ -258,13 +296,16 @@
       if (!a) return;
       const p = state.properties.find((x) => x.id === a.property_id);
       const payments = state.payments.filter((x) => x.account_id === id);
-      const schedule = a.account_type === "rental" ? [] : amortizationSchedule(
-        a.original_principal,
-        a.interest_rate,
-        a.term_months,
-        a.start_date,
-        a.principal_interest_amount,
-      );
+      const schedule =
+        a.account_type === "rental"
+          ? []
+          : amortizationSchedule(
+              a.original_principal,
+              a.interest_rate,
+              a.term_months,
+              a.start_date,
+              a.principal_interest_amount,
+            );
       const auditIds = [
         a.id,
         ...payments.slice(0, 50).map((payment) => payment.id),
@@ -299,13 +340,17 @@
         <th>Balance</th>
         </tr>
         </thead>
-        <tbody>${schedule.map((s) => `<tr>
+        <tbody>${schedule
+          .map(
+            (s) => `<tr>
         <td>${s.i} · ${fmtDate(s.date, { month: "short", year: "2-digit" })}</td>
         <td>${money(s.payment)}</td>
         <td>${money(s.principal)}</td>
         <td>${money(s.interest)}</td>
         <td>${money(s.balance)}</td>
-        </tr>`).join("")}</tbody>
+        </tr>`,
+          )
+          .join("")}</tbody>
         </table>
         </div>
         <p class="field-hint">Estimate uses explicit P&I when set; otherwise it derives P&I from principal, rate and term. Taxes/insurance escrow is excluded. The on-time estimate follows this schedule through the selected date regardless of receipts recorded. The owner adjustment changes the displayed balance without rewriting historical schedule rows.</p>
@@ -316,58 +361,59 @@
       );
       const versionsHTML = `<div class="detail-section">
         <h3>Prior agreement terms</h3>${
-        accountVersions.length
-          ? `<div class="audit-list">${accountVersions
-              .map((v) => {
-                const t = v.terms || {};
-                return `<div class="audit-row">
+          accountVersions.length
+            ? `<div class="audit-list">${accountVersions
+                .map((v) => {
+                  const t = v.terms || {};
+                  return `<div class="audit-row">
         <div>
         <strong>${esc(v.reason || "Terms updated")}</strong>
         <small>${fmtDate(v.effective_from)} – ${fmtDate(v.replaced_on)} · ${money(t.payment_amount)} scheduled · ${money(t.original_principal)} principal · ${Number(t.interest_rate || 0)}% · ${Number(t.term_months || 0)} months</small>${t.party_name ? `<small>${esc(t.party_name)}</small>` : ""}</div>
         <time datetime="${esc(v.created_at)}">${fmtDate(String(v.created_at || "").slice(0, 10))}</time>
         </div>`;
-              })
-              .join("")}</div>`
-          : '<p class="list-empty">Amendments and prior terms will appear here when recorded.</p>'
-      }</div>`;
+                })
+                .join("")}</div>`
+            : '<p class="list-empty">Amendments and prior terms will appear here when recorded.</p>'
+        }</div>`;
       const auditHTML = `<div class="detail-section">
         <h3>Change history</h3>
         <p class="field-hint">Latest account and payment events. Original entries remain available after a void.</p>${
-        history.length
-          ? `<div class="audit-list">${history
-              .map((event) => {
-                const target =
-                    event.entity_type === "pd_accounts" ? "Account" : "Payment",
-                  action =
-                    event.action === "created"
-                      ? "Created"
-                      : event.action === "updated"
-                        ? "Updated"
-                        : event.action === "voided"
-                          ? "Voided"
-                          : event.action === "deleted"
-                            ? "Deleted"
-                            : "Recorded",
-                  reason =
-                    event.action === "voided"
-                      ? state.payments.find(
-                          (payment) => payment.id === event.entity_id,
-                        )?.void_reason
-                      : "";
-                return `<div class="audit-row">
+          history.length
+            ? `<div class="audit-list">${history
+                .map((event) => {
+                  const target =
+                      event.entity_type === "pd_accounts"
+                        ? "Account"
+                        : "Payment",
+                    action =
+                      event.action === "created"
+                        ? "Created"
+                        : event.action === "updated"
+                          ? "Updated"
+                          : event.action === "voided"
+                            ? "Voided"
+                            : event.action === "deleted"
+                              ? "Deleted"
+                              : "Recorded",
+                    reason =
+                      event.action === "voided"
+                        ? state.payments.find(
+                            (payment) => payment.id === event.entity_id,
+                          )?.void_reason
+                        : "";
+                  return `<div class="audit-row">
         <div>
         <strong>${action} ${target.toLowerCase()}</strong>${reason ? `<small>Reason: ${esc(reason)}</small>` : ""}</div>
         <time datetime="${esc(event.created_at)}">${esc(new Date(event.created_at).toLocaleString())}</time>
         </div>`;
-              })
-              .join("")}</div>`
-          : auditError
-            ? '<p class="list-empty">Change history is temporarily unavailable.</p>'
-            : '<p class="list-empty">No changes recorded yet.</p>'
-      }</div>`;
+                })
+                .join("")}</div>`
+            : auditError
+              ? '<p class="list-empty">Change history is temporarily unavailable.</p>'
+              : '<p class="list-empty">No changes recorded yet.</p>'
+        }</div>`;
       const postedPayments = payments.filter(isPosted);
-      $("detail-content").innerHTML =
-        `<div class="detail-kpis">
+      $("detail-content").innerHTML = `<div class="detail-kpis">
         <div class="detail-kpi">
         <small>Property</small>
         <strong>${esc(p?.name || "—")}</strong>
@@ -392,7 +438,9 @@
         <button id="detail-record" class="button primary compact">Record payment</button>
         </div>
         </div>${depositSectionHTML(a)}${scheduleHTML}${versionsHTML}<div class="detail-section">
-        <h3>Payment history (${payments.length})</h3>${payments.length ? `<div class="schedule-table">
+        <h3>Payment history (${payments.length})</h3>${
+          payments.length
+            ? `<div class="schedule-table">
         <table>
         <thead>
         <tr>
@@ -402,14 +450,22 @@
         <th>Memo</th>
         </tr>
         </thead>
-        <tbody>${payments.map((x) => `<tr class="${x.status === "voided" ? "transaction-voided" : ""}">
+        <tbody>${payments
+          .map(
+            (
+              x,
+            ) => `<tr class="${x.status === "voided" ? "transaction-voided" : ""}">
         <td>${fmtDate(x.received_date)}</td>
         <td>${money(x.amount)}</td>
         <td>${x.status === "voided" ? "Voided" : "Posted"}</td>
         <td>${esc(x.memo || "—")}</td>
-        </tr>`).join("")}</tbody>
+        </tr>`,
+          )
+          .join("")}</tbody>
         </table>
-        </div>` : '<div class="list-empty">No payments recorded for this account.</div>'}</div>${auditHTML}<div class="detail-section">
+        </div>`
+            : '<div class="list-empty">No payments recorded for this account.</div>'
+        }</div>${auditHTML}<div class="detail-section">
         <button id="detail-delete" class="text-button">Close account and preserve its history</button>
         </div>`;
       $("detail-edit").addEventListener("click", () => {
