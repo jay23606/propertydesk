@@ -587,7 +587,7 @@ test("theme controller loads before app startup and is precached", () => {
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(html.indexOf("features/theme-controller.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/theme-controller\.js'/);
-  assert.match(fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"), /PropertyDeskTheme\.create/);
+  assert.match(fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"), /PropertyDeskAppShellWorkflow\.create/);
 });
 
 test("workspace settings render member labels and escape untrusted text", () => {

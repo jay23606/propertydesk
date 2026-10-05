@@ -172,22 +172,16 @@
     attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
   const {
-    renderWorkspaceSettings,
+    navigate,
     attachWorkspaceEvents,
+    attachNavigationEvents,
+    attachThemeEvents,
     previewReminderEmail,
-  } = window.PropertyDeskWorkspaceSettingsWorkflow.create({
+  } = window.PropertyDeskAppShellWorkflow.create({
     $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
     amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd, moneyInput,
     dateOnly, monthStart, propertyAddress, openModal,
   });
-  const { navigate, attachEvents: attachNavigationEvents } =
-    window.PropertyDeskNavigation.create({
-      $,
-      state,
-      renderWorkspaceSettings,
-    });
-  const { attachEvents: attachThemeEvents } =
-    window.PropertyDeskTheme.create();
   appLifecycle = window.PropertyDeskAppLifecycle.create({
     $, state, backend, todayIso,
     registerShell: () => window.PropertyDeskPwa.registerShell(),

@@ -57,7 +57,7 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   assert.match(forms, /if\s*\(\s*\$\("account-reminder-enabled"\)\.checked\s*&&\s*!partyEmails\.length\s*\)/);
   assert.match(migration, /monthly_reminder_enabled boolean not null default false/);
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
-  assert.match(app, /PropertyDeskWorkspaceSettingsWorkflow\.create/);
+  assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.match(preview, /function previewReminderEmail\(\)[\s\S]*?openModal\("reminder-preview-modal"\)/);
   assert.match(worker, /'\.\/reminders\.css'/);
 });
