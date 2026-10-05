@@ -5,7 +5,7 @@
   function createExpenseEntryForm(context) {
     const {
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      fillSelect, populateFormOptions, prettyType, openModal,
+      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
     } = context;
 
     async function saveExpense(event) {
@@ -35,38 +35,16 @@
         source_type: "manual",
       };
       if (state.pendingCorrection?.kind === "expense") {
-        let error;
-        try {
-          ({ error } = await state.client.rpc("pd_correct_transaction", {
-            p_kind: "expense",
-            p_transaction_id: state.pendingCorrection.id,
-            p_correction: {
-              property_id: payload.property_id,
-              account_id: payload.account_id,
-              amount: payload.amount,
-              expense_date: payload.expense_date,
-              category: payload.category,
-              payee: payload.payee,
-              payment_method: payload.payment_method,
-              memo: payload.memo,
-            },
-            p_reason: state.pendingCorrection.reason,
-          }));
-        } catch {
-          toast("Correction failed; original entry is unchanged. Check your connection and try again.");
-          return;
-        }
-        if (error) {
-          toast(`Correction failed; original entry is unchanged. ${error.message}`);
-          return;
-        }
-        closeModal($("expense-modal"));
-        try {
-          await fetchAll();
-        } catch {
-          return;
-        }
-        toast("Expense corrected; original kept in history");
+        await saveCorrection("expense", {
+          property_id: payload.property_id,
+          account_id: payload.account_id,
+          amount: payload.amount,
+          expense_date: payload.expense_date,
+          category: payload.category,
+          payee: payload.payee,
+          payment_method: payload.payment_method,
+          memo: payload.memo,
+        });
         return;
       }
 

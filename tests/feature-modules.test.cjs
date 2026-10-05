@@ -1235,10 +1235,13 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
-  assert.match(
-    app,
-    /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskTransactionMaintenance\.create/,
-  );
+  assert.match(app, /transactionMaintenance\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
+  assert.match(app, /saveCorrection:\s*\(\.\.\.args\)\s*=>\s*transactionMaintenance\.saveCorrection/);
+  for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
+    const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
+    assert.doesNotMatch(source, /pd_correct_transaction/);
+  }
+  assert.match(app, /const \{ correctTransaction, voidTransaction \} = transactionMaintenance/);
   assert.match(
     app,
     /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?updateAllocationPreview/,
@@ -1547,6 +1550,7 @@ test("payment and expense forms report rejected saves without clearing the entri
       rpc: async () => { throw new Error("offline"); },
     },
   };
+  const corrections = [];
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
     $,
     state,
@@ -1559,6 +1563,7 @@ test("payment and expense forms report rejected saves without clearing the entri
     populateFormOptions() {},
     prettyType: (type) => type,
     openModal() {},
+    saveCorrection: (...args) => corrections.push(args),
   });
 
   await assert.doesNotReject(forms.savePayment({ preventDefault() {} }));
@@ -1570,8 +1575,31 @@ test("payment and expense forms report rejected saves without clearing the entri
   assert.deepEqual(messages, [
     "Payment couldn't be saved right now. Check your connection and try again.",
     "Expense couldn't be saved right now. Check your connection and try again.",
-    "Correction failed; original entry is unchanged. Check your connection and try again.",
-    "Correction failed; original entry is unchanged. Check your connection and try again.",
+  ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(corrections)), [
+    ["payment", {
+      account_id: "rental-1",
+      amount: 500,
+      received_date: "2026-10-05",
+      payment_method: "check",
+      income_category: "rent",
+      principal_amount: 0,
+      interest_amount: 0,
+      fee_amount: 0,
+      escrow_amount: 0,
+      unapplied_amount: 0,
+      memo: "October",
+    }],
+    ["expense", {
+      property_id: "property-1",
+      account_id: null,
+      amount: 100,
+      expense_date: "2026-10-05",
+      category: "repair",
+      payee: null,
+      payment_method: "check",
+      memo: "Plumbing repair",
+    }],
   ]);
 });
 
@@ -3205,6 +3233,103 @@ test("transaction maintenance reports rejected void requests without refreshing"
   await assert.doesNotReject(feature.voidTransaction("income", "payment-1"));
   assert.deepEqual(messages, [
     "Transaction couldn't be voided right now. Please try again.",
+  ]);
+});
+
+test("transaction maintenance saves payment and expense corrections with their audit reasons", async () => {
+  const context = vm.createContext({
+    window: {},
+    Event: class MockEvent {},
+    Option: class MockOption {},
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    context,
+  );
+  const rpcCalls = [];
+  const events = [];
+  const state = {
+    pendingCorrection: { kind: "payment", id: "payment-1", reason: "Bank statement" },
+    client: {
+      async rpc(name, args) {
+        rpcCalls.push([name, args]);
+        return { error: null };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    $: (id) => ({ id }),
+    state,
+    closeModal: (modal) => events.push(["close", modal.id]),
+    fetchAll: async () => events.push("refresh"),
+    toast: (message) => events.push(["toast", message]),
+  });
+
+  assert.equal(await feature.saveCorrection("payment", { amount: 75 }), true);
+  state.pendingCorrection = {
+    kind: "expense",
+    id: "expense-1",
+    reason: "Duplicate receipt",
+  };
+  assert.equal(await feature.saveCorrection("expense", { amount: 40 }), true);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls)), [
+    ["pd_correct_transaction", {
+      p_kind: "payment",
+      p_transaction_id: "payment-1",
+      p_correction: { amount: 75 },
+      p_reason: "Bank statement",
+    }],
+    ["pd_correct_transaction", {
+      p_kind: "expense",
+      p_transaction_id: "expense-1",
+      p_correction: { amount: 40 },
+      p_reason: "Duplicate receipt",
+    }],
+  ]);
+  assert.deepEqual(events, [
+    ["close", "payment-modal"],
+    "refresh",
+    ["toast", "Payment corrected; original kept in history"],
+    ["close", "expense-modal"],
+    "refresh",
+    ["toast", "Expense corrected; original kept in history"],
+  ]);
+});
+
+test("transaction correction failures preserve the open form and pending correction", async () => {
+  const context = vm.createContext({
+    window: {},
+    Event: class MockEvent {},
+    Option: class MockOption {},
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    context,
+  );
+  const messages = [];
+  let closes = 0;
+  let refreshes = 0;
+  const state = {
+    pendingCorrection: { kind: "payment", id: "payment-1", reason: "Fix date" },
+    client: { rpc: async () => { throw new Error("offline"); } },
+  };
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    $: (id) => ({ id }),
+    state,
+    closeModal: () => { closes += 1; },
+    fetchAll: async () => { refreshes += 1; },
+    toast: (message) => messages.push(message),
+  });
+
+  assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
+  assert.equal(await feature.saveCorrection("expense", { amount: 75 }), false);
+  assert.equal(state.pendingCorrection.id, "payment-1");
+  assert.equal(closes, 0);
+  assert.equal(refreshes, 0);
+  assert.deepEqual(messages, [
+    "Correction failed; original entry is unchanged. Check your connection and try again.",
+    "This correction is no longer available.",
   ]);
 });
 

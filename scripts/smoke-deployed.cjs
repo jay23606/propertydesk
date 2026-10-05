@@ -267,6 +267,7 @@ async function main() {
         };
         return query;
       }
+      window.__smokeRpcCalls = [];
       window.supabase = {
         createClient: () => ({
           auth: {
@@ -285,10 +286,13 @@ async function main() {
               error: null,
             }),
           },
-          rpc: async (name) => ({
-            data: name === "pd_workspace_id" ? "smoke-workspace" : [],
-            error: null,
-          }),
+          rpc: async (name, args) => {
+            window.__smokeRpcCalls.push({ name, args });
+            return {
+              data: name === "pd_workspace_id" ? "smoke-workspace" : [],
+              error: null,
+            };
+          },
           from: queryFor,
         }),
       };
@@ -397,8 +401,17 @@ async function main() {
         await signedInPage.locator("#payment-amount").inputValue() !== "800") {
       throw new Error("The Transactions view did not open the selected payment in correction mode.");
     }
-    await signedInPage.locator('#payment-modal button[data-close]').first().click();
+    await signedInPage.locator("#payment-save-button").click();
     await signedInPage.locator("#payment-modal.hidden").waitFor({ state: "hidden" });
+    const correctionSaved = await signedInPage.evaluate(() =>
+      window.__smokeRpcCalls.some((call) =>
+        call.name === "pd_correct_transaction" &&
+        call.args.p_kind === "payment" &&
+        call.args.p_transaction_id === "smoke-payment"),
+    );
+    if (!correctionSaved) {
+      throw new Error("Saving the payment correction did not reach transaction maintenance.");
+    }
     await signedInPage.locator('.nav-link[data-view="reports"]').click();
     const reportPage = await signedInPage.locator("#page-reports").innerText();
     for (const expected of ["$800.00", "$25.00", "$775.00", "Import history"]) {
