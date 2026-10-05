@@ -9,6 +9,21 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function captureFormSubmissions(getElement, formIds) {
+  const handlers = new Map();
+  const $ = (id) => {
+    const element = getElement(id);
+    if (typeof element.addEventListener !== "function")
+      element.addEventListener = () => {};
+    if (formIds.includes(id))
+      element.addEventListener = (event, handler) => {
+        if (event === "submit") handlers.set(`${id}:${event}`, handler);
+      };
+    return element;
+  };
+  return { $, handlers };
+}
+
 test("ledger entry workflow publishes an explicit payment and expense interface", () => {
   const calls = [];
   const passed = {};
@@ -16,14 +31,11 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   const buildExpensePayload = () => ({ expense_payload: true });
   const paymentActions = {
     updateAllocationPreview: () => "preview",
-    prefillPaymentAmount: () => "prefill",
-    savePayment: () => "payment",
     openPayment: () => "open payment",
     openPropertyPayment: () => "open property payment",
     attachEvents: () => calls.push("payment events"),
   };
   const expenseActions = {
-    saveExpense: () => "expense",
     openExpense: () => "open expense",
     attachEvents: () => calls.push("expense events"),
   };
@@ -79,9 +91,6 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "openExpense",
       "openPayment",
       "openPropertyPayment",
-      "prefillPaymentAmount",
-      "saveExpense",
-      "savePayment",
       "updateAllocationPreview",
     ].sort(),
   );
@@ -169,15 +178,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     [account, ["resetAccountForm", "editAccount", "attachEvents"]],
     [
       ledger,
-      [
-        "savePayment",
-        "saveExpense",
-        "openPayment",
-        "prefillPaymentAmount",
-        "openPropertyPayment",
-        "openExpense",
-        "attachEvents",
-      ],
+      ["openPayment", "openPropertyPayment", "openExpense", "attachEvents"],
     ],
     [actions, ["attachEvents"]],
   ]) {
@@ -204,7 +205,10 @@ test("payment and expense forms report rejected saves without clearing the entri
     "expense-method": "check",
     "expense-memo": "Plumbing repair",
   };
-  const $ = formElements(values);
+  const { $, handlers } = captureFormSubmissions(formElements(values), [
+    "payment-form",
+    "expense-form",
+  ]);
   const state = {
     workspaceOwnerId: "workspace-1",
     accounts: [
@@ -238,12 +242,21 @@ test("payment and expense forms report rejected saves without clearing the entri
     saveCorrection: (...args) => corrections.push(args),
   });
 
-  await assert.doesNotReject(forms.savePayment({ preventDefault() {} }));
-  await assert.doesNotReject(forms.saveExpense({ preventDefault() {} }));
+  forms.attachEvents();
+  await assert.doesNotReject(
+    handlers.get("payment-form:submit")({ preventDefault() {} }),
+  );
+  await assert.doesNotReject(
+    handlers.get("expense-form:submit")({ preventDefault() {} }),
+  );
   state.pendingCorrection = { kind: "payment", id: "payment-1", reason: "fix" };
-  await assert.doesNotReject(forms.savePayment({ preventDefault() {} }));
+  await assert.doesNotReject(
+    handlers.get("payment-form:submit")({ preventDefault() {} }),
+  );
   state.pendingCorrection = { kind: "expense", id: "expense-1", reason: "fix" };
-  await assert.doesNotReject(forms.saveExpense({ preventDefault() {} }));
+  await assert.doesNotReject(
+    handlers.get("expense-form:submit")({ preventDefault() {} }),
+  );
   assert.deepEqual(messages, [
     "Payment couldn't be saved right now. Check your connection and try again.",
     "Expense couldn't be saved right now. Check your connection and try again.",
@@ -384,8 +397,9 @@ test("expense entry saves a property-level contractor expense through the expens
       },
     },
   };
+  const captured = captureFormSubmissions(element, ["expense-form"]);
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
-    $: element,
+    $: captured.$,
     state,
     moneyInput: Number,
     todayIso: () => "2026-10-05",
@@ -398,7 +412,8 @@ test("expense entry saves a property-level contractor expense through the expens
     openModal() {},
   });
 
-  await forms.saveExpense({ preventDefault() {} });
+  forms.attachEvents();
+  await captured.handlers.get("expense-form:submit")({ preventDefault() {} });
 
   assert.deepEqual(JSON.parse(JSON.stringify(state.savedExpense)), {
     user_id: "workspace-1",
@@ -423,8 +438,12 @@ test("expense entry requires a rental account before recording a deposit refund"
     "expense-category": "deposit_refund",
   };
   const calls = [];
+  const captured = captureFormSubmissions(
+    (id) => ({ value: values[id] || "" }),
+    ["expense-form"],
+  );
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
-    $: (id) => ({ value: values[id] || "" }),
+    $: captured.$,
     state: {
       accounts: [{ id: "loan-account", account_type: "note" }],
       pendingCorrection: null,
@@ -445,7 +464,8 @@ test("expense entry requires a rental account before recording a deposit refund"
     openModal() {},
   });
 
-  await forms.saveExpense({ preventDefault() {} });
+  forms.attachEvents();
+  await captured.handlers.get("expense-form:submit")({ preventDefault() {} });
   assert.deepEqual(calls, [
     "Choose a rental account for a security deposit refund",
   ]);
@@ -534,7 +554,14 @@ test("record-entry feature owns create actions and handles empty workspace state
 
 test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {
   const context = vm.createContext({ window: {} });
-  loadLedgerEntryForms(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "payment-entry-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const handlers = new Map();
   const elements = new Map([
     ["payment-account", { value: "" }],
     ["payment-amount", { value: "" }],
@@ -556,26 +583,34 @@ test("opening a payment for an account prefills its scheduled installment withou
     ["income-category-wrap", { classList: { toggle() {} } }],
   ]);
   elements.get("payment-account").value = "account-1";
-  const feature = context.window.PropertyDeskLedgerEntryForms.create({
-    $: (id) => elements.get(id),
-    state: {
-      accounts: [
-        { id: "account-1", payment_amount: 647, account_type: "rental" },
-      ],
-      pendingCorrection: null,
+  const state = {
+    accounts: [
+      { id: "account-1", payment_amount: 647, account_type: "rental" },
+    ],
+    pendingCorrection: null,
+  };
+  const feature = context.window.PropertyDeskPaymentEntryView.create({
+    $: (id) => {
+      const element = elements.get(id);
+      element.addEventListener = (event, handler) =>
+        handlers.set(`${id}:${event}`, handler);
+      return element;
     },
+    state,
     moneyInput: Number,
+    todayIso: () => "2026-10-04",
     populateFormOptions() {},
     fillSelect() {},
     prettyType: (value) => value,
-    todayIso: () => "2026-10-04",
     openModal() {},
+    toast() {},
   });
 
+  feature.attachEvents();
   feature.openPayment("account-1");
   assert.equal(elements.get("payment-amount").value, 647);
   elements.get("payment-amount").value = "300";
-  assert.equal(feature.prefillPaymentAmount(), false);
+  handlers.get("payment-account:change")();
   assert.equal(elements.get("payment-amount").value, "300");
 });
 
@@ -584,12 +619,16 @@ test("recording a loan payment does not invent principal or interest splits", as
   loadLedgerEntryForms(context);
 
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
         classList: { add() {}, remove() {}, toggle() {} },
         focus() {},
         reset() {},
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
         value: "",
       });
     }
@@ -630,7 +669,8 @@ test("recording a loan payment does not invent principal or interest splits", as
     openModal() {},
   });
 
-  await feature.savePayment({ preventDefault() {} });
+  feature.attachEvents();
+  await handlers.get("payment-form:submit")({ preventDefault() {} });
 
   assert.equal(state.savedPayment.amount, 550);
   assert.equal(state.savedPayment.income_category, "installment");

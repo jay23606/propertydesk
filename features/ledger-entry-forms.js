@@ -53,14 +53,11 @@
       expenses.attachEvents();
     }
 
-    // Keep the combined API explicit so either form cannot shadow the other.
+    // Keep only app-level actions; submit handlers stay inside their forms.
     return {
       updateAllocationPreview: payments.updateAllocationPreview,
-      prefillPaymentAmount: payments.prefillPaymentAmount,
-      savePayment: payments.savePayment,
       openPayment: payments.openPayment,
       openPropertyPayment: payments.openPropertyPayment,
-      saveExpense: expenses.saveExpense,
       openExpense: expenses.openExpense,
       attachEvents,
     };
