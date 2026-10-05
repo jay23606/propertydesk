@@ -201,6 +201,7 @@ test("property portfolio workflow connects its model, table, and action routers"
 test("ledger entry workflow publishes an explicit payment and expense interface", () => {
   const calls = [];
   const passed = {};
+  const buildPaymentPayload = () => ({ payment_payload: true });
   const paymentActions = {
     updateAllocationPreview: () => "preview",
     prefillPaymentAmount: () => "prefill",
@@ -216,6 +217,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   };
   const context = vm.createContext({
     window: {
+      PropertyDeskPaymentPayload: { build: buildPaymentPayload },
       PropertyDeskPaymentEntryForm: { create: (options) => { passed.payment = options; return paymentActions; } },
       PropertyDeskExpenseEntryForm: { create: (options) => { passed.expense = options; return expenseActions; } },
     },
@@ -253,12 +255,16 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   );
   assert.equal(forms.openExpense, expenseActions.openExpense);
   assert.deepEqual(Object.keys(passed.payment).sort(), [
+    "$", "buildPaymentPayload", "closeModal", "fetchAll", "fillSelect", "moneyInput", "openModal",
+    "populateFormOptions", "prettyType", "saveCorrection", "state", "todayIso", "toast",
+  ].sort());
+  assert.deepEqual(Object.keys(passed.expense).sort(), [
     "$", "closeModal", "fetchAll", "fillSelect", "moneyInput", "openModal",
     "populateFormOptions", "prettyType", "saveCorrection", "state", "todayIso", "toast",
   ].sort());
-  assert.deepEqual(Object.keys(passed.expense).sort(), Object.keys(passed.payment).sort());
   assert.equal(passed.payment.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.expense.saveCorrection, dependencies.saveCorrection);
+  assert.equal(passed.payment.buildPaymentPayload, buildPaymentPayload);
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });

@@ -6,6 +6,7 @@
     const {
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      buildPaymentPayload,
     } = context;
 
     function updateAllocationPreview() {
@@ -48,28 +49,15 @@
       const amount = moneyInput($("payment-amount").value);
       if (!account || !amount) return;
 
-      // Receipt history does not estimate a loan payoff allocation. Keep the legacy
-      // database constraint satisfied by recording loan receipts as unapplied.
-      const allocation = account.account_type === "rental"
-        ? { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: 0 }
-        : { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: amount };
-      const payload = {
-        user_id: state.workspaceOwnerId,
-        account_id: account.id,
+      const payload = buildPaymentPayload({
+        ownerId: state.workspaceOwnerId,
+        account,
         amount,
-        received_date: $("payment-date").value,
-        payment_method: $("payment-method").value,
-        income_category: account.account_type === "rental"
-          ? $("income-category").value
-          : "installment",
-        principal_amount: allocation.principal,
-        interest_amount: allocation.interest,
-        fee_amount: allocation.fee,
-        escrow_amount: allocation.escrow,
-        unapplied_amount: allocation.unapplied,
-        memo: $("payment-memo").value.trim() || null,
-        source_type: "manual",
-      };
+        receivedDate: $("payment-date").value,
+        paymentMethod: $("payment-method").value,
+        incomeCategory: $("income-category").value,
+        memo: $("payment-memo").value.trim(),
+      });
 
       if (state.pendingCorrection?.kind === "payment") {
         await saveCorrection("payment", {
