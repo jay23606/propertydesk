@@ -354,7 +354,7 @@ async function main() {
     assertNoBrowserErrors(signedInPageErrors, signedInConsoleErrors, "Signed-in startup");
     try {
       await signedInPage
-        .locator('#accounts-table [data-property-open="smoke-property"]')
+        .locator('#properties-table [data-property-open="smoke-property"]')
         .first()
         .waitFor({ state: "visible", timeout: 10000 });
     } catch (error) {
@@ -377,7 +377,7 @@ async function main() {
     await signedInPage.locator('#payment-modal button[data-close]').first().click();
     await signedInPage.locator('.nav-link[data-view="properties"]').click();
     await signedInPage
-      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .locator('#properties-table [data-property-open="smoke-property"]')
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
@@ -389,7 +389,7 @@ async function main() {
       .locator("#property-detail-modal.hidden")
       .waitFor({ state: "hidden" });
     await signedInPage
-      .locator('#accounts-table [data-account-payment="smoke-account"]')
+      .locator('#properties-table [data-account-payment="smoke-account"]')
       .click();
     await signedInPage.locator("#payment-modal:not(.hidden)").waitFor();
     if (await signedInPage.locator("#payment-amount").inputValue() !== "53.68") {
@@ -406,7 +406,7 @@ async function main() {
       .locator("#payment-modal.hidden")
       .waitFor({ state: "hidden" });
     await signedInPage
-      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .locator('#properties-table [data-property-open="smoke-property"]')
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
@@ -426,7 +426,7 @@ async function main() {
     }
     await signedInPage.locator('#detail-modal button[data-close]').click();
     await signedInPage
-      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .locator('#properties-table [data-property-open="smoke-property"]')
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
@@ -511,7 +511,7 @@ async function main() {
     }
     await signedInPage.locator('.nav-link[data-view="properties"]').click();
     await signedInPage
-      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .locator('#properties-table [data-property-open="smoke-property"]')
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();

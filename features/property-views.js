@@ -27,19 +27,19 @@
       )
         ? current
         : "all";
-      renderAccounts();
+      renderPropertyRows();
       $("property-nav-count").textContent = state.properties.filter(
         (p) => !p.archived_at,
       ).length;
     }
-    function renderAccounts() {
+    function renderPropertyRows() {
       const rows = portfolioModel.buildRows({
         query: $("property-search").value.trim().toLowerCase(),
         type: $("property-filter").value,
         holderId: $("property-holder-filter").value,
         showArchived: $("show-archived").checked,
       });
-      $("accounts-table").innerHTML = rows
+      $("properties-table").innerHTML = rows
         .map((row) =>
           row.hasAccount
             ? portfolioTable.accountRowHTML({
@@ -58,21 +58,21 @@
         )
         .join("");
       const totals = portfolioModel.totalsFor(rows);
-      $("accounts-totals").innerHTML = portfolioTable.totalsRowHTML(totals);
-      $("accounts-totals").classList.toggle(
+      $("properties-totals").innerHTML = portfolioTable.totalsRowHTML(totals);
+      $("properties-totals").classList.toggle(
         "hidden",
         !rows.some((row) => row.hasAccount),
       );
-      $("accounts-empty").classList.toggle("hidden", rows.length > 0);
+      $("properties-empty").classList.toggle("hidden", rows.length > 0);
       if (!rows.length)
-        $("accounts-empty").textContent =
+        $("properties-empty").textContent =
           "No matching active properties. Use “Show inactive / archived” to include inactive records.";
     }
 
     return {
       renderProperties,
       attachEvents,
-      renderAccounts,
+      renderPropertyRows,
     };
   }
 

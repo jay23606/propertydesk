@@ -1244,7 +1244,7 @@ test("property view actions route payment, note, address, and add-account action
       elements.set(id, {
         value: "",
         addEventListener(name, handler) {
-          if (id === "accounts-table" && name === "click") clickHandler = handler;
+          if (id === "properties-table" && name === "click") clickHandler = handler;
         },
       });
     }
@@ -1820,8 +1820,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
 
   feature.renderProperties();
 
-  const totals = getElement("accounts-totals");
-  const tableRows = getElement("accounts-table").innerHTML;
+  const totals = getElement("properties-totals");
+  const tableRows = getElement("properties-table").innerHTML;
   assert.ok(tableRows.indexOf("Buyer") < tableRows.indexOf("Tenant"));
   assert.match(totals.innerHTML, /\$130\.00/);
   assert.match(totals.innerHTML, /\$325\.00/);

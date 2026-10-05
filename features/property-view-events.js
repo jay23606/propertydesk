@@ -12,7 +12,7 @@
     openModal,
   }) {
     function attachEvents() {
-      $("accounts-table").addEventListener("click", (event) => {
+      $("properties-table").addEventListener("click", (event) => {
         const payment = event.target.closest("[data-account-payment]");
         if (payment) {
           event.preventDefault();
