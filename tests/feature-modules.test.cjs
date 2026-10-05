@@ -242,6 +242,58 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   assert.deepEqual(opened, ["import-preview-modal"]);
 });
 
+test("an unconfirmed import disables retry and directs the owner to verify the receipt", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const handlers = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        checked: false,
+        disabled: false,
+        textContent: "",
+        innerHTML: "",
+        classList: { toggle() {} },
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const state = { pendingImport: null };
+  const closed = [];
+  const preview = context.window.PropertyDeskImportPreview.create({
+    $,
+    state,
+    selectImportRows: (rows) => rows,
+    esc: String,
+    openModal() {},
+    closeModal: (id) => closed.push(id),
+  });
+  preview.stageImport(
+    "Review payment import",
+    [{ id: "row-1" }],
+    async () => { throw new Error("workspace refresh failed"); },
+    "",
+    { total: 1 },
+  );
+  preview.attachEvents();
+
+  await assert.doesNotReject(handlers.get("import-commit:click")());
+
+  assert.match($("import-preview-summary").textContent, /status couldn't be confirmed/i);
+  assert.match($("import-preview-summary").textContent, /Reports import history/i);
+  assert.equal($("import-commit").disabled, true);
+  assert.equal($("import-commit").textContent, "Reload to check status");
+  assert.equal(state.pendingImport.commitUnconfirmed, true);
+  assert.deepEqual(closed, []);
+});
+
 test("shared app utilities preserve formatting, addresses, labels, and money input", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

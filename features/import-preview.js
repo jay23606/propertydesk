@@ -134,10 +134,12 @@
         $("import-include-duplicates").checked,
       );
       const count = selected.length;
-      $("import-commit").textContent = count
-        ? `Import ${count} row${count === 1 ? "" : "s"}`
-        : "No valid rows to import";
-      $("import-commit").disabled = count === 0;
+      $("import-commit").textContent = pending?.commitUnconfirmed
+        ? "Reload to check status"
+        : count
+          ? `Import ${count} row${count === 1 ? "" : "s"}`
+          : "No valid rows to import";
+      $("import-commit").disabled = count === 0 || Boolean(pending?.commitUnconfirmed);
     }
 
     function attachEvents() {
@@ -185,8 +187,9 @@
           state.pendingImport = null;
           closeModal("import-preview-modal");
         } catch (error) {
+          pending.commitUnconfirmed = true;
           $("import-preview-summary").textContent =
-            `Import failed; no rows were committed. ${error.message}`;
+            `Import status couldn't be confirmed. Reload the workspace and check Reports import history before retrying. ${error.message}`;
           updateImportCommitButton();
         } finally {
           updateImportCommitButton();
