@@ -1,6 +1,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { amountDueSince, amortizationSchedule, createBackup, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = require('../ledger-utils.js');
+const { createBackup } = require('../backup-utils.js');
+const ledgerUtils = require('../ledger-utils.js');
+const { amountDueSince, amortizationSchedule, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = ledgerUtils;
+
+test('backup manifest generation stays separate from ledger calculations', () => {
+  assert.equal(typeof createBackup, 'function');
+  assert.equal(Object.hasOwn(ledgerUtils, 'createBackup'), false);
+});
 
 test('payment-month highlighting recognizes any posted installment or rent receipt in the selected month', () => {
   const receipts = [

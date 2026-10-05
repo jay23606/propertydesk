@@ -10,7 +10,6 @@
   const {
     amortizationSchedule,
     amountDueSince,
-    createBackup,
     isPosted,
     monthlyScheduledEstimate,
     paymentStatusInMonth,
@@ -21,6 +20,7 @@
     sumPosted,
     unpaidDueAccrualStart,
   } = window.PropertyDeskLedgerUtils;
+  const { createBackup } = window.PropertyDeskBackupUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const {
     money,
