@@ -955,18 +955,12 @@ test("transaction action router routes correction and void actions to maintenanc
 
 test("report views summarize the current-year ledger and escape import history", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "ledger-schedule-utils.js"), "utf8"),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "ledger-utils.js"), "utf8"),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "report-views.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["report-model.js", "report-views.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const year = new Date().getFullYear();
   const elements = new Map();
   const $ = (id) => {
@@ -974,9 +968,7 @@ test("report views summarize the current-year ledger and escape import history",
     return elements.get(id);
   };
   const esc = (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  const feature = context.window.PropertyDeskReportViews.create({
-    $,
-    state: {
+  const state = {
       payments: [
         { amount: 600, received_date: `${year}-02-01`, income_category: "rent", status: "posted" },
         { amount: 900, received_date: `${year}-03-01`, income_category: "deposit", status: "posted" },
@@ -1001,16 +993,29 @@ test("report views summarize the current-year ledger and escape import history",
         rows_total: 3,
         status: "completed",
       }],
-    },
-    dateOnly: (date) => date ? new Date(`${date}T12:00:00`) : null,
+  };
+  const dateOnly = (date) => date ? new Date(`${date}T12:00:00`) : null;
+  const accountBalance = (account) => account.id === "rental" ? 0 : account.id === "note" ? 1200 : 800;
+  const reportModel = context.window.PropertyDeskReportModel.create({
+    state,
+    dateOnly,
+    sumIncome: (rows) => rows.reduce((total, payment) => payment.status === "posted" && payment.income_category !== "deposit" ? total + Number(payment.amount || 0) : total, 0),
+    sumOperatingExpenses: (rows) => rows.reduce((total, expense) => expense.status === "posted" && expense.category !== "deposit_refund" ? total + Number(expense.amount || 0) : total, 0),
+    accountBalance,
+  });
+  const feature = context.window.PropertyDeskReportViews.create({
+    $,
     esc,
     money: (amount) => `$${Number(amount).toFixed(2)}`,
-    ...context.PropertyDeskLedgerUtils,
-    accountBalance: (account) => account.id === "rental" ? 0 : account.id === "note" ? 1200 : 800,
+    buildReportModel: reportModel.buildReportModel,
   });
 
+  const model = reportModel.buildReportModel(year);
   feature.renderReports();
 
+  assert.equal(model.income, 600);
+  assert.equal(model.costs, 100);
+  assert.equal(model.principal, 2000);
   assert.equal($("report-ytd").textContent, "$600.00");
   assert.equal($("report-expenses-ytd").textContent, "$100.00");
   assert.equal($("report-net-ytd").textContent, "$500.00");

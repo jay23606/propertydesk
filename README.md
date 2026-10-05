@@ -13,7 +13,7 @@ Shared initialization lives in `features/app-services.js`. It creates the Supaba
 - Account and deposit maintenance: `account-maintenance-workflow.js` composes account closure and deposit adjustments for the account detail view.
 - Account details: `account-details.js` prepares the selected account and estimates; `account-details-view.js` renders them. `account-history-model.js` loads and maps prior terms and audit events for `account-history-view.js`.
 - Transaction history and maintenance: `transaction-list-model.js` filters and associates rows, `transaction-row-view.js` renders them, and `transaction-views.js` updates the ledger screen. `transaction-maintenance-workflow.js` composes audited corrections and voids.
-- Imports and exports: `csv-import-workflow.js`, `report-workflow.js`, and `backup-utils.js` for the versioned private backup manifest.
+- Reports, imports, and exports: `report-model.js` separates report totals from `report-views.js`; `csv-import-workflow.js` coordinates imports, while `report-workflow.js` connects reports and account export. `backup-utils.js` maintains the versioned private backup manifest.
 - Workspace shell: `app-shell-workflow.js` connects workspace settings, navigation, and theme controls; `workspace-settings-workflow.js` composes the settings view and reminder preview, while authentication screens, forms, recovery, and sessions remain in focused modules.
 
 The module scripts are loaded by `index.html` and listed in the service worker shell. Keep the shell list in sync when adding or removing a browser module; increment the shell cache version when a cached file changes.

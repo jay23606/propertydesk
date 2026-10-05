@@ -420,6 +420,12 @@ test("report workflow composes portfolio rendering and account export actions", 
   const passed = {};
   const context = vm.createContext({
     window: {
+      PropertyDeskReportModel: {
+        create: (options) => {
+          passed.model = options;
+          return { buildReportModel: () => ({ income: 0 }) };
+        },
+      },
       PropertyDeskReportViews: {
         create: (options) => {
           passed.view = options;
@@ -442,11 +448,17 @@ test("report workflow composes portfolio rendering and account export actions", 
     context,
   );
   const accountBalance = () => 0;
+  const dateOnly = () => null;
+  const sumIncome = () => 0;
+  const sumOperatingExpenses = () => 0;
+  const state = {};
   const workflow = context.window.PropertyDeskReportWorkflow.create({
-    accountBalance,
+    state, dateOnly, sumIncome, sumOperatingExpenses, accountBalance,
   });
 
-  assert.equal(passed.view.accountBalance, accountBalance);
+  assert.equal(passed.model.accountBalance, accountBalance);
+  assert.equal(passed.model.state, state);
+  assert.equal(typeof passed.view.buildReportModel, "function");
   assert.equal(passed.export.accountBalance, accountBalance);
   assert.equal(workflow.renderReports(), "reports");
   assert.equal(workflow.attachReportExportEvents(), "export events");

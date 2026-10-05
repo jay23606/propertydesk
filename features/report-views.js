@@ -1,16 +1,12 @@
-/* Portfolio-level financial and import-history reports. */
+/* Render report summaries and import history from prepared report data. */
 (() => {
   "use strict";
 
   function createReportViews({
     $,
-    state,
-    dateOnly,
     esc,
     money,
-    sumIncome,
-    sumOperatingExpenses,
-    accountBalance,
+    buildReportModel,
   }) {
     function renderImportBatchRow(batch) {
       return `<tr>
@@ -23,36 +19,18 @@
     }
 
     function renderReports() {
-      const year = new Date().getFullYear();
-      const income = sumIncome(
-        state.payments.filter(
-          (payment) => dateOnly(payment.received_date)?.getFullYear() === year,
-        ),
-      );
-      const costs = sumOperatingExpenses(
-        state.expenses.filter(
-          (expense) => dateOnly(expense.expense_date)?.getFullYear() === year,
-        ),
-      );
-
-      $("report-ytd").textContent = money(income);
-      $("report-expenses-ytd").textContent = money(costs);
-      $("report-net-ytd").textContent = money(income - costs);
-      $("report-principal").textContent = money(
-        state.accounts
-          .filter((account) => account.account_type !== "rental")
-          .reduce((sum, account) => sum + accountBalance(account), 0),
-      );
+      const report = buildReportModel();
+      $("report-ytd").textContent = money(report.income);
+      $("report-expenses-ytd").textContent = money(report.costs);
+      $("report-net-ytd").textContent = money(report.netCashFlow);
+      $("report-principal").textContent = money(report.principal);
 
       const labels = [
         ["rental", "Rentals"],
         ["land_contract", "Land contracts"],
         ["note", "Private notes"],
       ];
-      const counts = labels.map(
-        ([type]) =>
-          state.accounts.filter((account) => account.account_type === type).length,
-      );
+      const counts = labels.map(([type]) => report.accountCounts[type]);
       const max = Math.max(1, ...counts);
       $("account-breakdown").innerHTML = labels
         .map(
@@ -60,8 +38,8 @@
             `<div class="breakdown-row"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(counts[index] / max) * 100}%"></div></div><strong>${counts[index]}</strong></div>`,
         )
         .join("");
-      $("import-history").innerHTML = state.importBatches.length
-        ? state.importBatches.map(renderImportBatchRow).join("")
+      $("import-history").innerHTML = report.importBatches.length
+        ? report.importBatches.map(renderImportBatchRow).join("")
         : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
     }
 

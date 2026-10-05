@@ -7,9 +7,11 @@
       $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
       accountBalance, todayIso, prettyType,
     } = context;
+    const { buildReportModel } = window.PropertyDeskReportModel.create({
+      state, dateOnly, sumIncome, sumOperatingExpenses, accountBalance,
+    });
     const { renderReports } = window.PropertyDeskReportViews.create({
-      $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
-      accountBalance,
+      $, esc, money, buildReportModel,
     });
     const { attachEvents: attachReportExportEvents } =
       window.PropertyDeskReportExport.create({
