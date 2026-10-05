@@ -2,6 +2,8 @@
 
 Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
+The source code is licensed under the [MIT License](LICENSE).
+
 ## Browser architecture
 
 The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it builds feature dependencies before the workflows that consume them, passes callbacks directly, and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
