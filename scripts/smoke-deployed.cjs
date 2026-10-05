@@ -179,9 +179,21 @@ async function main() {
         status: "active",
         next_due_date: "2026-10-01",
       };
+      const rental = {
+        id: "smoke-rental",
+        property_id: property.id,
+        name: "Browser smoke-test rental",
+        party_name: "Smoke Test Tenant",
+        account_type: "rental",
+        payment_amount: 800,
+        payment_frequency: "monthly",
+        start_date: "2025-01-01",
+        status: "active",
+        next_due_date: "2026-10-01",
+      };
       const rows = {
         pd_properties: [property],
-        pd_accounts: [account],
+        pd_accounts: [account, rental],
         pd_payments: [],
         pd_expenses: [],
         pd_import_batches: [],
@@ -235,9 +247,11 @@ async function main() {
     await reloadThroughServiceWorker(signedInPage);
     await signedInPage
       .locator('#accounts-table [data-property-open="smoke-property"]')
+      .first()
       .waitFor({ state: "visible", timeout: 30000 });
     await signedInPage
       .locator('#accounts-table [data-property-open="smoke-property"]')
+      .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
     await signedInPage
@@ -247,6 +261,23 @@ async function main() {
     const signedInDetail = await signedInPage.locator("#detail-content").innerText();
     if (!signedInDetail.includes("Estimated amortization schedule")) {
       throw new Error("The signed-in app did not open the smoke note schedule through the Properties UI.");
+    }
+    await signedInPage.locator('#detail-modal button[data-close]').click();
+    await signedInPage
+      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .first()
+      .click();
+    await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    await signedInPage
+      .locator('#property-detail-content [data-detail="smoke-rental"]')
+      .click();
+    await signedInPage.locator("#detail-modal:not(.hidden)").waitFor();
+    const signedInRentalDetail = await signedInPage.locator("#detail-content").innerText();
+    if (!signedInRentalDetail.includes("Security deposit ledger")) {
+      throw new Error("The signed-in app did not render the rental deposit ledger through the Properties UI.");
+    }
+    if (!signedInRentalDetail.includes("Prior agreement terms") || !signedInRentalDetail.includes("Change history")) {
+      throw new Error("The signed-in app did not render account history through the Properties UI.");
     }
     if (signedInPageErrors.length || signedInConsoleErrors.length) {
       throw new Error(
@@ -259,7 +290,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("Deployed PropertyDesk loaded and rendered a note amortization detail in the signed-in app without browser errors.");
+    console.log("Deployed PropertyDesk rendered note, rental deposit, and account history details in the signed-in app without browser errors.");
   } finally {
     await browser.close();
   }
