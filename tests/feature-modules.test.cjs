@@ -42,6 +42,8 @@ function loadPropertyAccountForms(context) {
 function loadImportFeatures(context) {
   for (const filename of [
     "account-import.js",
+    "payment-import.js",
+    "expense-import.js",
     "transaction-imports.js",
     "imports.js",
   ]) {
@@ -190,6 +192,97 @@ test("CSV import feature loads as an isolated browser module", () => {
     "payment-import-file:change",
     "expense-import-file:change",
   ]);
+});
+
+test("payment and expense CSV importers save their own validated transaction payloads", async () => {
+  const context = vm.createContext({ window: {} });
+  loadImportFeatures(context);
+  const property = {
+    id: "property-1",
+    name: "Main House",
+    address: "10 Main St",
+  };
+  const account = {
+    id: "account-1",
+    property_id: property.id,
+    name: "Monthly rent",
+  };
+  const state = {
+    properties: [property],
+    accounts: [account],
+    expenses: [],
+    payments: [],
+    client: {
+      async rpc(name, args) {
+        calls.push({ name, args });
+        return { data: { rows_accepted: 1 }, error: null };
+      },
+    },
+  };
+  const calls = [];
+  const staged = [];
+  const feature = context.window.PropertyDeskTransactionImports.create({
+    $: formElements(),
+    state,
+    stageImport: (title, rows, commit, note, report) =>
+      staged.push({ title, rows, commit, note, report }),
+    parseCSV: (content) => JSON.parse(content),
+    validateExpenseRows: (rows) => ({ valid: rows, total: rows.length, errors: [] }),
+    validatePaymentRows: (rows) => ({ valid: rows, total: rows.length, errors: [] }),
+    fetchAll: async () => {},
+    toast() {},
+  });
+  const expense = {
+    property_name: property.name,
+    property_address: property.address,
+    account_name: account.name,
+    expense_date: "2026-10-04",
+    amount: 45,
+    category: "repairs",
+    payee: "Plumber",
+    payment_method: "check",
+    memo: "Leak repair",
+  };
+  await feature.importExpenses({
+    name: "expenses.csv",
+    text: async () => JSON.stringify([expense]),
+  });
+  await staged[0].commit(staged[0].rows, { total: 1 });
+  assert.equal(staged[0].title, "Review expense import");
+  assert.equal(calls[0].name, "pd_import_propertydesk_transactions");
+  assert.equal(calls[0].args.p_kind, "expenses");
+  assert.equal(calls[0].args.p_rows[0].property_id, property.id);
+  assert.equal(calls[0].args.p_rows[0].account_id, account.id);
+  assert.equal(calls[0].args.p_rows[0].amount, 45);
+  assert.equal(calls[0].args.p_source_name, "expenses.csv");
+
+  const payment = {
+    property_name: property.name,
+    property_address: property.address,
+    account_name: account.name,
+    received_date: "2026-10-05",
+    amount: 825,
+    income_category: "rent",
+    payment_method: "cash",
+    principal_amount: 0,
+    interest_amount: 0,
+    fee_amount: 0,
+    escrow_amount: 0,
+    unapplied_amount: 0,
+    memo: "October rent",
+  };
+  await feature.importPayments({
+    name: "payments.csv",
+    text: async () => JSON.stringify([payment]),
+  });
+  await staged[1].commit(staged[1].rows, { total: 1 });
+  assert.equal(staged[1].title, "Review payment import");
+  assert.equal(calls[1].name, "pd_import_propertydesk_transactions");
+  assert.equal(calls[1].args.p_kind, "payments");
+  assert.equal(calls[1].args.p_rows[0].account_id, account.id);
+  assert.equal(calls[1].args.p_rows[0].amount, 825);
+  assert.equal(calls[1].args.p_rows[0].received_date, "2026-10-05");
+  assert.equal(calls[1].args.p_source_name, "payments.csv");
 });
 
 test("CSV import preview escapes staged data and excludes possible duplicates by default", () => {
