@@ -65,10 +65,16 @@
       $("auth-submit").disabled = true;
       $("auth-submit").textContent = "Please wait…";
       let result;
-      if (signup) result = await state.client.auth.signUp({ email, password });
-      else result = await state.client.auth.signInWithPassword({ email, password });
-      $("auth-submit").disabled = false;
-      $("auth-submit").textContent = signup ? "Create account" : "Sign in";
+      try {
+        if (signup) result = await state.client.auth.signUp({ email, password });
+        else result = await state.client.auth.signInWithPassword({ email, password });
+      } catch {
+        $("auth-message").textContent = "Unable to connect right now. Please try again.";
+        return;
+      } finally {
+        $("auth-submit").disabled = false;
+        $("auth-submit").textContent = signup ? "Create account" : "Sign in";
+      }
       if (result.error) {
         $("auth-message").textContent = result.error.message;
         return;

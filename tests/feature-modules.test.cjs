@@ -1390,6 +1390,48 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   assert.equal(element("auth-form").dataset.mode, "signin");
 });
 
+test("auth feature restores login controls when the auth request rejects", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  loadAuthFeatures(context);
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        value: id === "auth-email" ? "owner@example.com" : "secret",
+        textContent: "",
+        disabled: false,
+        autocomplete: "",
+        dataset: { mode: "signin" },
+        classList: { add() {}, remove() {}, toggle() {} },
+      });
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state: {
+      user: null,
+      passwordRecoveryInProgress: false,
+      client: {
+        auth: {
+          async signInWithPassword() {
+            throw new Error("network unavailable");
+          },
+        },
+      },
+    },
+    fetchAll: async () => {},
+    toast() {},
+    documentRef: { querySelector: () => element("auth-intro") },
+  });
+
+  await assert.doesNotReject(
+    feature.submitAuth({ preventDefault() {} }),
+  );
+  assert.equal(element("auth-submit").disabled, false);
+  assert.equal(element("auth-submit").textContent, "Sign in");
+  assert.match(element("auth-message").textContent, /try again/i);
+});
+
 test("navigation owns theme toggles, page routing, and modal close shortcuts", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
