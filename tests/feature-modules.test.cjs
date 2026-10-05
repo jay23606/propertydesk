@@ -5,7 +5,7 @@ const vm = require("node:vm");
 const test = require("node:test");
 
 function loadAuthFeatures(context) {
-  for (const filename of ["auth-recovery.js", "auth-session.js", "auth.js"]) {
+  for (const filename of ["auth-recovery.js", "auth-session.js", "auth-form.js", "auth.js"]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -2851,6 +2851,64 @@ test("auth feature restores login controls when the auth request rejects", async
   assert.equal(element("auth-submit").disabled, false);
   assert.equal(element("auth-submit").textContent, "Sign in");
   assert.match(element("auth-message").textContent, /try again/i);
+});
+
+test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to verify", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "auth-form.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        value: id === "auth-email" ? "owner@example.com" : "secret",
+        textContent: "",
+        disabled: false,
+        autocomplete: "",
+        dataset: { mode: "signin" },
+        classList: { add() {}, remove() {}, toggle() {} },
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+      });
+    return elements.get(id);
+  };
+  const state = {
+    user: null,
+    client: {
+      auth: {
+        async signInWithPassword(credentials) {
+          assert.equal(credentials.email, "owner@example.com");
+          assert.equal(credentials.password, "secret");
+          return { data: { user: { id: "owner-1" } }, error: null };
+        },
+        async signUp() {
+          return { data: { user: { id: "owner-2" }, session: null }, error: null };
+        },
+      },
+    },
+  };
+  let workspaceStarts = 0;
+  const form = context.window.PropertyDeskAuthForm.create({
+    $: element,
+    state,
+    startWorkspace: async () => { workspaceStarts += 1; },
+    documentRef: { querySelector: () => element("auth-intro") },
+  });
+  form.attachEvents();
+
+  await handlers.get("auth-form:submit")({ preventDefault() {} });
+  assert.equal(state.user.id, "owner-1");
+  assert.equal(workspaceStarts, 1);
+  assert.equal(element("auth-submit").disabled, false);
+
+  form.setAuthMode(true);
+  await handlers.get("auth-form:submit")({ preventDefault() {} });
+  assert.match(element("auth-message").textContent, /confirm your account/i);
+  assert.equal(workspaceStarts, 1);
 });
 
 test("auth session restore and sign-out report rejected requests without clearing user state", async () => {

@@ -77,6 +77,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/auth-recovery.js') < html.indexOf('features/auth.js'));
   assert.ok(html.indexOf('features/auth-recovery.js') < html.indexOf('features/auth-session.js'));
   assert.ok(html.indexOf('features/auth-session.js') < html.indexOf('features/auth.js'));
+  assert.ok(html.indexOf('features/auth-form.js') < html.indexOf('features/auth.js'));
   assert.ok(html.indexOf('features/auth.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/profile-settings.js') < html.indexOf('features/workspace.js'));
   assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
@@ -125,6 +126,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/exports\.js'/);
   assert.match(worker, /'\.\/features\/auth-recovery\.js'/);
   assert.match(worker, /'\.\/features\/auth-session\.js'/);
+  assert.match(worker, /'\.\/features\/auth-form\.js'/);
   assert.match(worker, /'\.\/features\/auth\.js'/);
   assert.match(worker, /'\.\/features\/workspace\.js'/);
   assert.match(worker, /'\.\/features\/property-management\.js'/);
