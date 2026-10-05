@@ -37,6 +37,75 @@ test("property and account detail views expose focused render actions", () => {
   assert.equal(typeof feature.openAccountDetails, "function");
 });
 
+test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
+  const elements = new Map();
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: id === "property-filter" ? "all" : "",
+        checked: false,
+        innerHTML: "",
+        textContent: "",
+        classList: { toggle() {} },
+      });
+    }
+    return elements.get(id);
+  };
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-views.js"), "utf8"),
+    context,
+  );
+  const feature = context.window.PropertyDeskPropertyViews.create({
+    $: getElement,
+    state: {
+      properties: [{ id: "property-1", name: "One Oak", address: "1 Oak St" }],
+      accounts: [{
+        id: "account-1",
+        property_id: "property-1",
+        status: "active",
+        account_type: "land_contract",
+        payment_amount: 125,
+        payment_frequency: "monthly",
+        name: "Contract",
+        party_name: "Buyer",
+      }],
+      payments: [],
+      propertyHolders: [],
+      workspaceMembers: [],
+      user: null,
+    },
+    monthlyScheduledEstimate: (accounts) => accounts.reduce((sum, account) => sum + account.payment_amount, 0),
+    accountBalance: () => 1000,
+    amountDueSince: () => 50,
+    unpaidDueAccrualStart: () => "2026-10-01",
+    todayIso: () => "2026-10-04",
+    esc: (value) => String(value ?? ""),
+    prettyKind: (value) => value,
+    money: (value) => `$${Number(value).toFixed(2)}`,
+    propertyAddress: (property) => property.address,
+    collectedSince: () => 0,
+    scheduledMonthlyRunRate: () => 0,
+    monthStart: () => "2026-10-01",
+    isPosted: () => true,
+    prettyType: (value) => value,
+    fmtDate: () => "",
+    streetAddress: (property) => property.address,
+    dateOnly: (value) => new Date(`${value}T12:00:00`),
+    monthEnd: () => "2026-10-31",
+    lateReminderMailto: () => "mailto:buyer@example.com",
+    paymentFrequencyLabel: () => "Monthly",
+    paymentStatusInMonth: () => "none",
+  });
+
+  feature.renderProperties();
+
+  const totals = getElement("accounts-totals");
+  assert.match(totals.innerHTML, /\$50\.00/);
+  assert.match(totals.innerHTML, /\$125\.00/);
+  assert.match(totals.innerHTML, /\$1000\.00/);
+});
+
 test("record-entry module exposes property, account, and transaction workflows", () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
