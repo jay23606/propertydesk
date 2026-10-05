@@ -5,8 +5,7 @@
   function createPropertyDetails(context) {
     const {
       $, state, money, fmtDate, esc,
-      prettyType, paymentFrequencyLabel, accountBalance, openModal, closeModal,
-      editAccount, openPayment, openExpense, resetAccountForm, populateFormOptions,
+      prettyType, paymentFrequencyLabel, accountBalance, openModal,
       propertyAddress, renderPropertyActivity,
     } = context;
 
@@ -121,47 +120,7 @@
       openModal("property-detail-modal");
     }
 
-    function attachPropertyEvents(toggleArchiveProperty) {
-      $("property-detail-content").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-edit-account]");
-        if (!button) return;
-        const account = state.accounts.find(
-          (item) => item.id === button.dataset.editAccount,
-        );
-        if (!account) return;
-        event.preventDefault();
-        closeModal($("property-detail-modal"));
-        editAccount(account);
-      });
-
-      $("property-detail-add-income").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        openPayment(null, propertyId);
-      });
-      $("property-detail-add-expense").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        openExpense(propertyId);
-      });
-      $("property-detail-add-account").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        resetAccountForm();
-        populateFormOptions();
-        $("account-property").value = propertyId;
-        openModal("account-modal");
-      });
-      $("property-archive-toggle").addEventListener(
-        "click",
-        toggleArchiveProperty,
-      );
-    }
-
-    return { openPropertyDetails, attachPropertyEvents };
+    return { openPropertyDetails };
   }
 
   window.PropertyDeskPropertyDetails = Object.freeze({ create: createPropertyDetails });

@@ -230,13 +230,10 @@
       fmtDate,
       esc,
     });
-  const { openPropertyDetails, attachPropertyEvents } =
+  const { openPropertyDetails } =
     window.PropertyDeskPropertyDetails.create({
       $,
       state,
-      isPosted,
-      sumIncome,
-      sumOperatingExpenses,
       money,
       fmtDate,
       esc,
@@ -244,13 +241,20 @@
       paymentFrequencyLabel,
       accountBalance,
       openModal,
+      propertyAddress,
+      renderPropertyActivity,
+    });
+  const { attachEvents: attachPropertyDetailEvents } =
+    window.PropertyDeskPropertyDetailEvents.create({
+      $,
+      state,
       closeModal,
       editAccount,
       openPayment,
+      openExpense,
       resetAccountForm,
       populateFormOptions,
-      propertyAddress,
-      renderPropertyActivity,
+      openModal,
     });
   const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
     state,
@@ -431,7 +435,7 @@
       () => attachPropertyFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
       attachActionRouterEvents,
-      () => attachPropertyEvents(toggleArchiveProperty),
+      () => attachPropertyDetailEvents(toggleArchiveProperty),
       attachWorkspaceEvents,
       attachAuthEvents,
       attachImportPreviewEvents,

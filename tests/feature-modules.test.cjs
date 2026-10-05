@@ -562,7 +562,6 @@ test("property and account detail modules expose separate workflows", () => {
   const property = context.window.PropertyDeskPropertyDetails.create({});
   const account = context.window.PropertyDeskAccountDetails.create({});
   assert.equal(typeof property.openPropertyDetails, "function");
-  assert.equal(typeof property.attachPropertyEvents, "function");
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
@@ -859,10 +858,10 @@ test("property and transaction views own their search and filter bindings", () =
   }
 });
 
-test("property detail feature owns its editing and quick-action event bindings", () => {
+test("property detail events own editing and quick-action bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-details.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-events.js"), "utf8"),
     context,
   );
   const handlers = new Map();
@@ -881,7 +880,7 @@ test("property detail feature owns its editing and quick-action event bindings",
     return elements.get(id);
   };
   const propertyModal = getElement("property-detail-modal");
-  const feature = context.window.PropertyDeskPropertyDetails.create({
+  const feature = context.window.PropertyDeskPropertyDetailEvents.create({
     $: getElement,
     state: {
       selectedPropertyId: "property-1",
@@ -896,7 +895,7 @@ test("property detail feature owns its editing and quick-action event bindings",
     openModal: (id) => calls.push(`open:${id}`),
   });
 
-  feature.attachPropertyEvents(() => calls.push("archive"));
+  feature.attachEvents(() => calls.push("archive"));
   handlers.get("property-detail-content:click")({
     target: {
       closest: (selector) =>
