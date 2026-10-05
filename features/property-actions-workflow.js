@@ -1,4 +1,4 @@
-/* Compose property notes, holders, documents, and detail-modal actions. */
+/* Compose property administration and detail-modal actions. */
 (() => {
   "use strict";
 
@@ -18,22 +18,10 @@
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create({
       state, toast, fetchAll, todayIso, openPropertyDetails,
     });
-    const {
-      uploadPropertyDocument,
-      deletePropertyDocument,
-      openPropertyDocument,
-    } = window.PropertyDeskDocuments.create({
-      state, toast, fetchAll, openPropertyDetails,
-      repository: window.PropertyDeskDocumentRepository.create(state.client),
-    });
     const { attachEvents: attachPropertyDetailContentEvents } =
       window.PropertyDeskPropertyDetailEvents.create({
         $, state, closeModal, editAccount, savePropertyHolders,
         openAccountDetails,
-      });
-    const { attachEvents: attachPropertyDetailDocumentEvents } =
-      window.PropertyDeskPropertyDetailDocumentEvents.create({
-        $, deletePropertyDocument, openPropertyDocument, uploadPropertyDocument,
       });
     const { attachEvents: attachPropertyQuickActions } =
       window.PropertyDeskPropertyDetailQuickActions.create({
@@ -43,17 +31,12 @@
 
     function attachPropertyDetailEvents(toggleArchiveProperty) {
       attachPropertyDetailContentEvents();
-      attachPropertyDetailDocumentEvents();
       attachPropertyQuickActions(toggleArchiveProperty);
     }
 
     return {
       editPropertyQuickNote,
-      savePropertyHolders,
       toggleArchiveProperty,
-      uploadPropertyDocument,
-      deletePropertyDocument,
-      openPropertyDocument,
       attachPropertyDetailEvents,
     };
   }

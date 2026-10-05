@@ -109,15 +109,16 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/property-details-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-detail-document-events.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-detail-document-events.js') < html.indexOf('features/property-document-workflow.js'));
   assert.ok(html.indexOf('features/property-detail-quick-actions.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/document-repository.js') < html.indexOf('features/documents.js'));
-  assert.ok(html.indexOf('features/documents.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/documents.js') < html.indexOf('features/property-document-workflow.js'));
   assert.ok(html.indexOf('features/property-holder-management.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-archive.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-actions-workflow.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-document-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details-view.js') < html.indexOf('features/account-details.js'));
   assert.ok(html.indexOf('features/account-history-model.js') < html.indexOf('features/account-history-details.js'));
@@ -221,6 +222,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-maintenance-workflow\.js'/);
   assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(worker, /'\.\/features\/property-actions-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/property-document-workflow\.js'/);
   assert.match(worker, /'\.\/features\/exports\.js'/);
   assert.match(worker, /'\.\/features\/auth-recovery\.js'/);
   assert.match(worker, /'\.\/features\/auth-session\.js'/);

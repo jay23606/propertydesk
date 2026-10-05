@@ -1215,7 +1215,7 @@ test("property details workflow connects activity summaries to the property view
   assert.equal(workflow.openPropertyDetails(), "property details");
 });
 
-test("property actions workflow composes holder, document, and detail event behavior", () => {
+test("property actions workflow composes administration and detail actions", () => {
   const passed = {};
   const action = () => {};
   const attachCalls = [];
@@ -1230,22 +1230,10 @@ test("property actions workflow composes holder, document, and detail event beha
       PropertyDeskPropertyArchive: {
         create: () => ({ toggleArchiveProperty: action }),
       },
-      PropertyDeskDocuments: {
-        create: (options) => { passed.documents = options; return { uploadPropertyDocument: action, deletePropertyDocument: action, openPropertyDocument: action }; },
-      },
-      PropertyDeskDocumentRepository: {
-        create: (client) => { passed.repositoryClient = client; return { mocked: true }; },
-      },
       PropertyDeskPropertyDetailEvents: {
         create: (options) => {
           passed.events = options;
           return { attachEvents: () => attachCalls.push("content") };
-        },
-      },
-      PropertyDeskPropertyDetailDocumentEvents: {
-        create: (options) => {
-          passed.documentEvents = options;
-          return { attachEvents: () => attachCalls.push("documents") };
         },
       },
       PropertyDeskPropertyDetailQuickActions: {
@@ -1260,9 +1248,8 @@ test("property actions workflow composes holder, document, and detail event beha
     fs.readFileSync(path.join(__dirname, "..", "features", "property-actions-workflow.js"), "utf8"),
     context,
   );
-  const state = { client: {} };
   const quickActionDependencies = {
-    state,
+    state: {},
     closeModal: action,
     openPayment: action,
     openExpense: action,
@@ -1276,14 +1263,61 @@ test("property actions workflow composes holder, document, and detail event beha
   });
 
   assert.equal(passed.events.savePropertyHolders, action);
-  assert.equal(passed.documentEvents.deletePropertyDocument, action);
-  assert.equal(passed.documentEvents.openPropertyDocument, action);
-  assert.equal(passed.documentEvents.uploadPropertyDocument, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
-  assert.equal(passed.documents.repository.mocked, true);
-  assert.equal(passed.repositoryClient, state.client);
   assert.equal(workflow.editPropertyQuickNote, action);
   workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty);
-  assert.deepEqual(attachCalls, ["content", "documents", workflow.toggleArchiveProperty]);
+  assert.deepEqual(attachCalls, ["content", workflow.toggleArchiveProperty]);
+});
+
+test("property document workflow composes private file actions and event routing", () => {
+  const passed = {};
+  const action = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDocuments: {
+        create: (options) => {
+          passed.documents = options;
+          return {
+            uploadPropertyDocument: action,
+            deletePropertyDocument: action,
+            openPropertyDocument: action,
+          };
+        },
+      },
+      PropertyDeskDocumentRepository: {
+        create: (clientSource) => {
+          passed.clientSource = clientSource;
+          return {};
+        },
+      },
+      PropertyDeskPropertyDetailDocumentEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: action };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-document-workflow.js"), "utf8"),
+    context,
+  );
+  const state = { client: null };
+  const attach = context.window.PropertyDeskPropertyDocumentWorkflow.create({
+    $: action,
+    state,
+    toast: action,
+    fetchAll: action,
+    openPropertyDetails: action,
+  }).attachPropertyDocumentEvents;
+
+  assert.equal(typeof attach, "function");
+  assert.equal(passed.clientSource(), null);
+  const client = {};
+  state.client = client;
+  assert.equal(passed.clientSource(), client);
+  assert.equal(passed.events.uploadPropertyDocument, action);
+  assert.equal(passed.events.deletePropertyDocument, action);
+  assert.equal(passed.events.openPropertyDocument, action);
 });

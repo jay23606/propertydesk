@@ -11,7 +11,7 @@
       confirm = (message) => window.confirm(message),
       openWindow = (...args) => window.open(...args),
       makeId = () => crypto.randomUUID(),
-      repository = window.PropertyDeskDocumentRepository.create(state.client),
+      repository = window.PropertyDeskDocumentRepository.create(() => state.client),
     } = context;
 
     async function uploadPropertyDocument(input) {

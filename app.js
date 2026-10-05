@@ -128,6 +128,10 @@
     closeModal, editAccount, openPayment, openExpense, resetAccountForm,
     populateFormOptions, openModal, openAccountDetails, documentRef: document,
   });
+  const { attachPropertyDocumentEvents } =
+    window.PropertyDeskPropertyDocumentWorkflow.create({
+      $, state, toast, fetchAll, openPropertyDetails,
+    });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({
       $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
@@ -215,6 +219,7 @@
       () => attachAccountFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
       () => attachPropertyDetailEvents(toggleArchiveProperty),
+      attachPropertyDocumentEvents,
       attachWorkspaceEvents,
       attachAuthEvents,
       attachCsvImportEvents,

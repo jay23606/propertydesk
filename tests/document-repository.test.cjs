@@ -82,3 +82,32 @@ test("document repository centralizes private storage and workspace-scoped metad
   );
   assert.ok(calls.some((call) => call[0] === "sign" && call[2] === 60));
 });
+
+test("document repository resolves the client lazily after workspace sign-in", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "document-repository.js"), "utf8"),
+    context,
+  );
+  let client = null;
+  const repository = context.window.PropertyDeskDocumentRepository.create(
+    () => client,
+  );
+
+  assert.throws(
+    () => repository.upload("owner/property/file.pdf", {}, "application/pdf"),
+    /unavailable until sign-in/,
+  );
+  const calls = [];
+  client = {
+    storage: {
+      from(bucket) {
+        calls.push(bucket);
+        return { upload: async () => ({ error: null }) };
+      },
+    },
+  };
+
+  await repository.upload("owner/property/file.pdf", {}, "application/pdf");
+  assert.deepEqual(calls, ["pd-private-agreements"]);
+});
