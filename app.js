@@ -123,6 +123,9 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
+      correctTransaction: (...args) => correctTransaction(...args),
+      voidTransaction: (...args) => voidTransaction(...args),
+      documentRef: document,
     });
   const { renderReports } = window.PropertyDeskReportViews.create({
     $,
@@ -416,8 +419,6 @@
       openPropertyPayment,
       deletePropertyDocument,
       openPropertyDocument,
-      correctTransaction,
-      voidTransaction,
       closeModal,
       openAccountDetails,
       uploadPropertyDocument,

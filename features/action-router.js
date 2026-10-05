@@ -17,8 +17,6 @@
     openPropertyPayment,
     deletePropertyDocument,
     openPropertyDocument,
-    correctTransaction,
-    voidTransaction,
     closeModal,
     openAccountDetails,
     uploadPropertyDocument,
@@ -88,16 +86,6 @@
           event.preventDefault();
           event.stopPropagation();
           openPropertyDocument(openDocument.dataset.openDocument);
-          return;
-        }
-        const correction = event.target.closest("[data-correct-transaction]");
-        if (correction) {
-          correctTransaction(correction.dataset.kind, correction.dataset.id);
-          return;
-        }
-        const voidButton = event.target.closest("[data-void-transaction]");
-        if (voidButton) {
-          voidTransaction(voidButton.dataset.kind, voidButton.dataset.id);
           return;
         }
         const accountDetail = event.target.closest("[data-detail]");

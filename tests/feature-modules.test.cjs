@@ -792,8 +792,7 @@ test("delegated action router preserves action routing and event propagation", (
     "recordDepositAdjustment", "removeWorkspaceMember", "savePropertyHolders",
     "openPayment", "resetAccountForm", "populateFormOptions", "openModal",
     "editPropertyQuickNote", "openPropertyDetails", "openPropertyPayment",
-    "deletePropertyDocument", "openPropertyDocument", "correctTransaction",
-    "voidTransaction", "closeModal", "openAccountDetails",
+    "deletePropertyDocument", "openPropertyDocument", "closeModal", "openAccountDetails",
     "uploadPropertyDocument",
   ];
   const contextValues = Object.fromEntries(
@@ -840,8 +839,6 @@ test("delegated action router preserves action routing and event propagation", (
   dispatchClick("[data-property-payment]", { propertyPayment: "property-1" });
   dispatchClick("[data-delete-document]", { deleteDocument: "doc-1" });
   dispatchClick("[data-open-document]", { openDocument: "doc-1" });
-  dispatchClick("[data-correct-transaction]", { kind: "income", id: "pay-1" });
-  dispatchClick("[data-void-transaction]", { kind: "expense", id: "exp-1" });
   dispatchClick("[data-detail]", { detail: "account-1" });
   dispatchClick("[data-property-card]", { propertyCard: "property-2" });
   const file = { matches: (selector) => selector === "[data-property-document]" };
@@ -861,8 +858,6 @@ test("delegated action router preserves action routing and event propagation", (
     ["openPropertyPayment", "property-1"],
     ["deletePropertyDocument", "doc-1"],
     ["openPropertyDocument", "doc-1"],
-    ["correctTransaction", "income", "pay-1"],
-    ["voidTransaction", "expense", "exp-1"],
     ["closeModal", { id: "property-detail-modal" }],
     ["openAccountDetails", "account-1"],
     ["openPropertyDetails", "property-2"],
@@ -895,6 +890,9 @@ test("property and transaction views own their search and filter bindings", () =
         addEventListener: (event, handler) =>
           handlers.set(`${id}:${event}`, handler),
       }),
+      documentRef: { addEventListener() {} },
+      correctTransaction() {},
+      voidTransaction() {},
     });
 
     assert.equal(typeof feature.attachEvents, "function");
@@ -902,6 +900,41 @@ test("property and transaction views own their search and filter bindings", () =
     assert.deepEqual([...handlers.keys()], expected);
     assert.ok([...handlers.values()].every((handler) => typeof handler === "function"));
   }
+});
+
+test("transaction view routes correction and void actions to maintenance", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-views.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  let clickHandler;
+  const feature = context.window.PropertyDeskTransactionViews.create({
+    $: () => ({ addEventListener() {} }),
+    documentRef: {
+      addEventListener(name, handler) {
+        if (name === "click") clickHandler = handler;
+      },
+    },
+    correctTransaction: (...args) => calls.push(["correct", ...args]),
+    voidTransaction: (...args) => calls.push(["void", ...args]),
+  });
+  feature.attachEvents();
+
+  for (const [selector, dataset] of [
+    ["[data-correct-transaction]", { kind: "income", id: "payment-1" }],
+    ["[data-void-transaction]", { kind: "expense", id: "expense-1" }],
+  ]) {
+    clickHandler({
+      target: { closest: (value) => value === selector ? { dataset } : null },
+    });
+  }
+
+  assert.deepEqual(calls, [
+    ["correct", "income", "payment-1"],
+    ["void", "expense", "expense-1"],
+  ]);
 });
 
 test("report views summarize the current-year ledger and escape import history", () => {
