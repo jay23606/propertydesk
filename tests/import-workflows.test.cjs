@@ -10,6 +10,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/imports.js'));
   assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-views.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-views.js') < html.indexOf('app.js'));
@@ -36,6 +37,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/reminder-preview.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
+  assert.match(worker, /'\.\/features\/import-preview\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
   assert.match(worker, /'\.\/features\/app-utils\.js'/);

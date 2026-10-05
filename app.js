@@ -271,17 +271,24 @@
     deleteAccount: closeAccount,
     propertyAddress,
   });
+  const importPreview = window.PropertyDeskImportPreview.create({
+    $,
+    state,
+    selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
+    esc,
+    openModal,
+    closeModal,
+    toast,
+  });
+  const { stageImport, attachEvents: attachImportPreviewEvents } = importPreview;
   const { attachEvents: attachImportEvents } =
     window.PropertyDeskImportFeature.create({
       $,
       state,
+      stageImport,
       parseCSV: window.PropertyDeskImportUtils.parseCSV,
-      selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
       ...window.PropertyDeskImportWorkflows,
-      esc,
       todayIso,
-      openModal,
-      closeModal,
       fetchAll,
       toast,
     });
@@ -400,6 +407,7 @@
     attachPropertyEvents(toggleArchiveProperty);
     attachWorkspaceEvents();
     attachAuthEvents();
+    attachImportPreviewEvents();
     attachImportEvents();
     attachExportEvents();
   }

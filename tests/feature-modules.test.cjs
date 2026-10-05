@@ -9,6 +9,10 @@ test("CSV import feature loads as an isolated browser module", () => {
   const context = vm.createContext({
     window: { PropertyDeskImportWorkflows: validators },
   });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
+    context,
+  );
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "imports.js"),
     "utf8",
@@ -17,11 +21,65 @@ test("CSV import feature loads as an isolated browser module", () => {
   vm.runInContext(source, context);
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
-  const feature = context.window.PropertyDeskImportFeature.create({});
+  const preview = context.window.PropertyDeskImportPreview.create({});
+  const feature = context.window.PropertyDeskImportFeature.create({
+    stageImport: preview.stageImport,
+  });
   assert.equal(typeof feature.attachEvents, "function");
   assert.equal(typeof feature.importAccounts, "function");
   assert.equal(typeof feature.importExpenses, "function");
   assert.equal(typeof feature.importPayments, "function");
+  assert.equal(typeof preview.attachEvents, "function");
+});
+
+test("CSV import preview escapes staged data and excludes possible duplicates by default", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        checked: false,
+        disabled: false,
+        textContent: "",
+        innerHTML: "",
+        classList: { toggle() {} },
+      });
+    }
+    return elements.get(id);
+  };
+  const state = { pendingImport: null };
+  const opened = [];
+  const preview = context.window.PropertyDeskImportPreview.create({
+    $: getElement,
+    state,
+    selectImportRows: (rows, includeDuplicates) =>
+      rows.filter((row) => includeDuplicates || !row._possible_duplicate),
+    esc: (value) => String(value ?? "").replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    openModal: (id) => opened.push(id),
+  });
+
+  preview.stageImport(
+    "Review payment import",
+    [
+      { property_name: "<Oak House>" },
+      { property_name: "Possible match", _possible_duplicate: true },
+    ],
+    async () => {},
+    "",
+    { total: 2 },
+  );
+
+  assert.equal(state.pendingImport.title, "Review payment import");
+  assert.equal(getElement("import-preview-title").textContent, "Review payment import");
+  assert.match(getElement("import-preview-summary").textContent, /2 CSV rows · 2 valid · 1 possible duplicate/);
+  assert.match(getElement("import-preview-body").innerHTML, /&lt;Oak House&gt;/);
+  assert.equal(getElement("import-commit").textContent, "Import 1 row");
+  assert.equal(getElement("import-commit").disabled, false);
+  assert.deepEqual(opened, ["import-preview-modal"]);
 });
 
 test("shared app utilities preserve formatting, addresses, labels, and money input", () => {
@@ -2017,9 +2075,11 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
   };
   const feature = context.window.PropertyDeskImportFeature.create({
     $: element,
-    state,
-    parseCSV: () => [{}],
-    selectImportRows: (rows) => rows,
+      state,
+      stageImport(title, rows, commit, note, report) {
+        state.pendingImport = { title, rows, commit, note, ...report };
+      },
+      parseCSV: () => [{}],
     validateAccountRows: () => ({
       valid: [{ account_name: "Test" }],
       errors: [],
