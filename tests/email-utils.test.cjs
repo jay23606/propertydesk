@@ -41,11 +41,14 @@ test('the app renders the account holder as a mailto link instead of an account-
   const fs = require('node:fs');
   const path = require('node:path');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const views = fs.readFileSync(path.join(__dirname, '..', 'features', 'property-views.js'), 'utf8');
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 
-  assert.match(app, /href="\$\{esc\(reminderHref\)\}"/);
-  assert.doesNotMatch(app, /class="table-action" data-detail="\$\{esc\(account\.id\)\}">${esc\(account\.party_name/);
+  assert.match(views, /href="\$\{esc\(reminderHref\)\}"/);
+  assert.doesNotMatch(views, /class="table-action" data-detail="\$\{esc\(account\.id\)\}">${esc\(account\.party_name/);
   assert.ok(html.indexOf('email-utils.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-views.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/email-utils\.js'/);
+  assert.match(worker, /'\.\/features\/property-views\.js'/);
 });
