@@ -267,6 +267,14 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/property-details-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/property-detail-quick-actions.js") <
+      html.indexOf("features/property-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-document-workflow.js") <
+      html.indexOf("features/property-details-workflow.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-details-workflow.js") <
       html.indexOf("app.js"),
   );

@@ -1,4 +1,4 @@
-/* Compose property activity summaries with the property details view. */
+/* Compose the property details view with its actions and private documents. */
 (() => {
   "use strict";
 
@@ -52,7 +52,26 @@
       propertyDetailsHTML,
     });
 
-    return { renderPropertyActivity, openPropertyDetails };
+    const { attachPropertyDetailEvents } =
+      window.PropertyDeskPropertyDetailActionsWorkflow.create({
+        ...context,
+        openPropertyDetails,
+      });
+    const { attachPropertyDocumentEvents } =
+      window.PropertyDeskPropertyDocumentWorkflow.create({
+        $,
+        state,
+        toast: context.toast,
+        fetchAll: context.fetchAll,
+        openPropertyDetails,
+      });
+
+    return {
+      renderPropertyActivity,
+      openPropertyDetails,
+      attachPropertyDetailEvents,
+      attachPropertyDocumentEvents,
+    };
   }
 
   window.PropertyDeskPropertyDetailsWorkflow = Object.freeze({ create });

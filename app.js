@@ -205,48 +205,36 @@
     editAccount,
     openPayment,
   });
-  const { openPropertyDetails } =
-    window.PropertyDeskPropertyDetailsWorkflow.create({
-      $,
-      state,
-      isPosted,
-      sumIncome,
-      sumOperatingExpenses,
-      money,
-      fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      openModal,
-      propertyAddress,
-    });
-  const { attachPropertyDetailEvents } =
-    window.PropertyDeskPropertyDetailActionsWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      todayIso,
-      openPropertyDetails,
-      closeModal,
-      editAccount,
-      openPayment,
-      openExpense,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
-      openAccountDetails,
-      documentRef: document,
-    });
-  const { attachPropertyDocumentEvents } =
-    window.PropertyDeskPropertyDocumentWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      openPropertyDetails,
-    });
+  const {
+    openPropertyDetails,
+    attachPropertyDetailEvents,
+    attachPropertyDocumentEvents,
+  } = window.PropertyDeskPropertyDetailsWorkflow.create({
+    $,
+    state,
+    isPosted,
+    sumIncome,
+    sumOperatingExpenses,
+    money,
+    fmtDate,
+    esc,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
+    openModal,
+    propertyAddress,
+    toast,
+    fetchAll,
+    todayIso,
+    closeModal,
+    editAccount,
+    openPayment,
+    openExpense,
+    resetAccountForm,
+    populateFormOptions,
+    openAccountDetails,
+    documentRef: document,
+  });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({
       $,

@@ -565,6 +565,10 @@ test("property details workflow connects activity summaries to the property view
   let viewContext;
   const renderPropertyActivity = () => "activity";
   const propertyDetailsHTML = () => "property details html";
+  const attachPropertyDetailEvents = () => "detail events";
+  const attachPropertyDocumentEvents = () => "document events";
+  let detailActionsContext;
+  let documentContext;
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDetailsView: {
@@ -580,6 +584,18 @@ test("property details workflow connects activity summaries to the property view
         create: (options) => {
           detailContext = options;
           return { openPropertyDetails: () => "property details" };
+        },
+      },
+      PropertyDeskPropertyDetailActionsWorkflow: {
+        create: (options) => {
+          detailActionsContext = options;
+          return { attachPropertyDetailEvents };
+        },
+      },
+      PropertyDeskPropertyDocumentWorkflow: {
+        create: (options) => {
+          documentContext = options;
+          return { attachPropertyDocumentEvents };
         },
       },
     },
@@ -612,6 +628,19 @@ test("property details workflow connects activity summaries to the property view
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.openPropertyDetails(), "property details");
+  assert.equal(
+    detailActionsContext.openPropertyDetails,
+    workflow.openPropertyDetails,
+  );
+  assert.equal(
+    documentContext.openPropertyDetails,
+    workflow.openPropertyDetails,
+  );
+  assert.equal(workflow.attachPropertyDetailEvents, attachPropertyDetailEvents);
+  assert.equal(
+    workflow.attachPropertyDocumentEvents,
+    attachPropertyDocumentEvents,
+  );
 });
 
 test("property detail actions workflow composes administration and modal actions", () => {
