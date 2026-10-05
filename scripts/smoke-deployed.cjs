@@ -306,6 +306,21 @@ async function main() {
       const body = await signedInPage.locator("body").innerText();
       throw new Error(`Synthetic Properties row did not appear. Page text: ${body.slice(-2500)}. ${error.message}`);
     }
+    await signedInPage.locator('.nav-link[data-view="overview"]').click();
+    await signedInPage
+      .locator('#overview-properties [data-property-card="smoke-property"]')
+      .click();
+    await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    await signedInPage
+      .locator('#property-detail-modal button[data-close]')
+      .first()
+      .click();
+    await signedInPage
+      .locator('#overview-properties [data-property-payment="smoke-property"]')
+      .click();
+    await signedInPage.locator("#payment-modal:not(.hidden)").waitFor();
+    await signedInPage.locator('#payment-modal button[data-close]').first().click();
+    await signedInPage.locator('.nav-link[data-view="properties"]').click();
     await signedInPage
       .locator('#accounts-table [data-property-open="smoke-property"]')
       .first()
@@ -402,7 +417,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered signed-in Properties, payment entry and correction, note amortization, rental deposits, account history, and Reports without browser errors or unhandled rejections.");
+    console.log("PropertyDesk rendered signed-in Overview and Properties actions, payment entry and correction, note amortization, rental deposits, account history, and Reports without browser errors or unhandled rejections.");
   } finally {
     await browser.close();
   }

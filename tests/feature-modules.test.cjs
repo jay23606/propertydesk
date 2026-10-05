@@ -694,6 +694,33 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   assert.match(html, /data-deposit-adjustment="retained"/);
 });
 
+test("deposit details routes adjustment actions to deposit maintenance", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  let clickHandler;
+  const feature = context.window.PropertyDeskDepositDetails.create({
+    $: () => ({
+      addEventListener(name, handler) {
+        if (name === "click") clickHandler = handler;
+      },
+    }),
+    recordDepositAdjustment: (...args) => calls.push(args),
+  });
+  feature.attachEvents();
+  clickHandler({
+    target: {
+      closest: (selector) => selector === "[data-deposit-adjustment]"
+        ? { dataset: { accountId: "rental-1", depositAdjustment: "retained" } }
+        : null,
+    },
+  });
+  assert.deepEqual(calls, [["rental-1", "retained"]]);
+});
+
 test("account history renders scoped prior terms and escaped void reasons", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -779,85 +806,6 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   assert.match(unavailableHTML, /Prior agreement terms/);
 });
 
-test("delegated action router preserves action routing and event propagation", () => {
-  const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "action-router.js"), "utf8"),
-    context,
-  );
-  const listeners = new Map();
-  const calls = [];
-  const propertyField = { value: "" };
-  const callbacks = [
-    "recordDepositAdjustment",
-    "openPayment", "resetAccountForm", "populateFormOptions", "openModal",
-    "editPropertyQuickNote", "openPropertyDetails", "openPropertyPayment",
-    "deletePropertyDocument", "openPropertyDocument", "closeModal", "openAccountDetails",
-    "uploadPropertyDocument",
-  ];
-  const contextValues = Object.fromEntries(
-    callbacks.map((name) => [name, (...args) => calls.push([name, ...args])]),
-  );
-  const feature = context.window.PropertyDeskActionRouter.create({
-    ...contextValues,
-    $: (id) => id === "account-property" ? propertyField : { id },
-    documentRef: {
-      addEventListener: (name, handler) => listeners.set(name, handler),
-    },
-  });
-  feature.attachEvents();
-
-  function dispatchClick(selector, dataset, otherActions = {}) {
-    let prevented = 0;
-    let stopped = 0;
-    const actions = new Map(Object.entries(otherActions));
-    actions.set(selector, { dataset });
-    listeners.get("click")({
-      target: { closest: (value) => actions.get(value) || null },
-      preventDefault: () => { prevented += 1; },
-      stopPropagation: () => { stopped += 1; },
-    });
-    return { prevented, stopped };
-  }
-
-  dispatchClick("[data-deposit-adjustment]", {
-    accountId: "rental-1", depositAdjustment: "retained",
-  });
-  assert.deepEqual(
-    dispatchClick(
-      "[data-account-payment]",
-      { accountPayment: "account-1" },
-      { "[data-property-card]": { dataset: { propertyCard: "should-not-open" } } },
-    ),
-    { prevented: 1, stopped: 1 },
-  );
-  dispatchClick("[data-property-account]", { propertyAccount: "property-1" });
-  dispatchClick("[data-property-note]", { propertyNote: "property-1" });
-  dispatchClick("[data-property-open]", { propertyOpen: "property-1" });
-  dispatchClick("[data-property-payment]", { propertyPayment: "property-1" });
-  dispatchClick("[data-delete-document]", { deleteDocument: "doc-1" });
-  dispatchClick("[data-open-document]", { openDocument: "doc-1" });
-  dispatchClick("[data-property-card]", { propertyCard: "property-2" });
-  const file = { matches: (selector) => selector === "[data-property-document]" };
-  listeners.get("change")({ target: file });
-
-  assert.equal(propertyField.value, "property-1");
-  assert.deepEqual(calls, [
-    ["recordDepositAdjustment", "rental-1", "retained"],
-    ["openPayment", "account-1"],
-    ["resetAccountForm"],
-    ["populateFormOptions"],
-    ["openModal", "account-modal"],
-    ["editPropertyQuickNote", "property-1"],
-    ["openPropertyDetails", "property-1"],
-    ["openPropertyPayment", "property-1"],
-    ["deletePropertyDocument", "doc-1"],
-    ["openPropertyDocument", "doc-1"],
-    ["openPropertyDetails", "property-2"],
-    ["uploadPropertyDocument", file],
-  ]);
-});
-
 test("property and transaction views own their search and filter bindings", () => {
   for (const [file, globalName, expected] of [
     ["property-views.js", "PropertyDeskPropertyViews", [
@@ -865,6 +813,7 @@ test("property and transaction views own their search and filter bindings", () =
       "property-filter:change",
       "property-holder-filter:change",
       "show-archived:change",
+      "accounts-table:click",
     ]],
     ["transaction-views.js", "PropertyDeskTransactionViews", [
       "payment-search:input",
@@ -893,6 +842,94 @@ test("property and transaction views own their search and filter bindings", () =
     assert.deepEqual([...handlers.keys()], expected);
     assert.ok([...handlers.values()].every((handler) => typeof handler === "function"));
   }
+});
+
+test("overview routes property-card and quick-payment actions to property workflows", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "overview.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  let clickHandler;
+  const feature = context.window.PropertyDeskOverview.create({
+    $: () => ({
+      addEventListener(name, handler) {
+        if (name === "click") clickHandler = handler;
+      },
+    }),
+    openPropertyDetails: (id) => calls.push(["open", id]),
+    openPropertyPayment: (id) => calls.push(["payment", id]),
+  });
+  feature.attachEvents();
+
+  for (const [selector, dataset] of [
+    ["[data-property-card]", { propertyCard: "property-1" }],
+    ["[data-property-payment]", { propertyPayment: "property-2" }],
+  ]) {
+    clickHandler({
+      target: { closest: (value) => value === selector ? { dataset } : null },
+      preventDefault() {},
+      stopPropagation() {},
+    });
+  }
+
+  assert.deepEqual(calls, [["open", "property-1"], ["payment", "property-2"]]);
+});
+
+test("Properties grid routes payment, note, address, and add-account actions locally", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-views.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  let clickHandler;
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: "",
+        addEventListener(name, handler) {
+          if (id === "accounts-table" && name === "click") clickHandler = handler;
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskPropertyViews.create({
+    $,
+    openPayment: (id) => calls.push(["payment", id]),
+    editPropertyQuickNote: (id) => calls.push(["note", id]),
+    openPropertyDetails: (id) => calls.push(["open", id]),
+    resetAccountForm: () => calls.push(["reset"]),
+    populateFormOptions: () => calls.push(["populate"]),
+    openModal: (id) => calls.push(["modal", id]),
+  });
+  feature.attachEvents();
+
+  for (const [selector, dataset] of [
+    ["[data-account-payment]", { accountPayment: "account-1" }],
+    ["[data-property-note]", { propertyNote: "property-1" }],
+    ["[data-property-open]", { propertyOpen: "property-2" }],
+    ["[data-property-account]", { propertyAccount: "property-3" }],
+  ]) {
+    clickHandler({
+      target: { closest: (value) => value === selector ? { dataset } : null },
+      preventDefault() {},
+      stopPropagation() {},
+    });
+  }
+
+  assert.equal($("account-property").value, "property-3");
+  assert.deepEqual(calls, [
+    ["payment", "account-1"],
+    ["note", "property-1"],
+    ["open", "property-2"],
+    ["reset"],
+    ["populate"],
+    ["modal", "account-modal"],
+  ]);
 });
 
 test("transaction view routes correction and void actions to maintenance", () => {
@@ -1074,6 +1111,50 @@ test("property detail events own editing and quick-action bindings", () => {
     "populate-options",
     "open:account-modal",
     "archive",
+  ]);
+});
+
+test("property detail events route private document actions to document workflows", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-events.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  const handlers = new Map();
+  const feature = context.window.PropertyDeskPropertyDetailEvents.create({
+    $: (id) => ({
+      addEventListener(name, handler) {
+        handlers.set(`${id}:${name}`, handler);
+      },
+    }),
+    state: { accounts: [] },
+    closeModal() {}, editAccount() {}, openPayment() {}, openExpense() {},
+    resetAccountForm() {}, populateFormOptions() {}, openModal() {},
+    savePropertyHolders() {}, openAccountDetails() {},
+    openPropertyDocument: (id) => calls.push(["open", id]),
+    deletePropertyDocument: (id) => calls.push(["delete", id]),
+    uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
+  });
+  feature.attachEvents(() => {});
+
+  for (const [selector, dataset] of [
+    ["[data-open-document]", { openDocument: "document-1" }],
+    ["[data-delete-document]", { deleteDocument: "document-2" }],
+  ]) {
+    handlers.get("property-detail-content:click")({
+      target: { closest: (value) => value === selector ? { dataset } : null },
+      preventDefault() {},
+      stopPropagation() {},
+    });
+  }
+  const input = { id: "agreement-input", matches: (selector) => selector === "[data-property-document]" };
+  handlers.get("property-detail-content:change")({ target: input });
+
+  assert.deepEqual(calls, [
+    ["open", "document-1"],
+    ["delete", "document-2"],
+    ["upload", "agreement-input"],
   ]);
 });
 

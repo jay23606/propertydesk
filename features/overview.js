@@ -2,7 +2,27 @@
 (() => {
   "use strict";
   function createOverview(context) {
-    const { $, state, monthlyScheduledEstimate, accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso, esc, prettyKind, money, propertyAddress, collectedSince, scheduledMonthlyRunRate, monthStart, isPosted, prettyType, fmtDate } = context;
+    const {
+      $,
+      state,
+      monthlyScheduledEstimate,
+      accountBalance,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      esc,
+      prettyKind,
+      money,
+      propertyAddress,
+      collectedSince,
+      scheduledMonthlyRunRate,
+      monthStart,
+      isPosted,
+      prettyType,
+      fmtDate,
+      openPropertyDetails,
+      openPropertyPayment,
+    } = context;
     function updateGreeting() {
       const hour = new Date().getHours();
       const greeting =
@@ -149,7 +169,21 @@
           .join("") ||
         '<div class="list-empty">Add your first property to build your portfolio.</div>';
     }
-    return { updateGreeting, renderOverview };
+    function attachEvents() {
+      $("overview-properties").addEventListener("click", (event) => {
+        const payment = event.target.closest("[data-property-payment]");
+        if (payment) {
+          event.preventDefault();
+          event.stopPropagation();
+          openPropertyPayment(payment.dataset.propertyPayment);
+          return;
+        }
+        const card = event.target.closest("[data-property-card]");
+        if (card) openPropertyDetails(card.dataset.propertyCard);
+      });
+    }
+
+    return { updateGreeting, renderOverview, attachEvents };
   }
   window.PropertyDeskOverview = Object.freeze({ create: createOverview });
 })();

@@ -66,7 +66,11 @@
     securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
-  const { updateGreeting, renderOverview } = window.PropertyDeskOverview.create({
+  const {
+    updateGreeting,
+    renderOverview,
+    attachEvents: attachOverviewEvents,
+  } = window.PropertyDeskOverview.create({
     $,
     state,
     monthlyScheduledEstimate,
@@ -84,29 +88,37 @@
     isPosted,
     prettyType,
     fmtDate,
+    openPropertyDetails: (...args) => openPropertyDetails(...args),
+    openPropertyPayment: (...args) => openPropertyPayment(...args),
   });
   const {
     renderProperties,
     attachEvents: attachPropertyViewEvents,
   } = window.PropertyDeskPropertyViews.create({
-      $,
-      state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      esc,
-      money,
-      propertyAddress,
-      monthStart,
-      streetAddress,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentFrequencyLabel,
-      paymentStatusInMonth,
-    });
+    $,
+    state,
+    monthlyScheduledEstimate,
+    accountBalance,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    esc,
+    money,
+    propertyAddress,
+    monthStart,
+    streetAddress,
+    dateOnly,
+    monthEnd,
+    lateReminderMailto,
+    paymentFrequencyLabel,
+    paymentStatusInMonth,
+    openPayment: (...args) => openPayment(...args),
+    editPropertyQuickNote: (...args) => editPropertyQuickNote(...args),
+    openPropertyDetails: (...args) => openPropertyDetails(...args),
+    resetAccountForm: (...args) => resetAccountForm(...args),
+    populateFormOptions: (...args) => populateFormOptions(...args),
+    openModal: (...args) => openModal(...args),
+  });
   const {
     renderPayments,
     attachEvents: attachTransactionViewEvents,
@@ -267,13 +279,21 @@
       openModal,
       savePropertyHolders: () => savePropertyHolders(),
       openAccountDetails: (...args) => openAccountDetails(...args),
+      deletePropertyDocument: (...args) => deletePropertyDocument(...args),
+      openPropertyDocument: (...args) => openPropertyDocument(...args),
+      uploadPropertyDocument: (...args) => uploadPropertyDocument(...args),
     });
-  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+  const {
+    depositSectionHTML,
+    attachEvents: attachDepositDetailEvents,
+  } = window.PropertyDeskDepositDetails.create({
+    $,
     state,
     depositLedger,
     money,
     fmtDate,
     esc,
+    recordDepositAdjustment,
   });
   const { renderAccountHistory } =
     window.PropertyDeskAccountHistoryDetails.create({
@@ -406,24 +426,6 @@
       streetAddress,
       openPropertyDetails,
     });
-  const { attachEvents: attachActionRouterEvents } =
-    window.PropertyDeskActionRouter.create({
-      $,
-      recordDepositAdjustment,
-      openPayment,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
-      editPropertyQuickNote,
-      openPropertyDetails,
-      openPropertyPayment,
-      deletePropertyDocument,
-      openPropertyDocument,
-      closeModal,
-      openAccountDetails,
-      uploadPropertyDocument,
-    });
-
   appLifecycle = window.PropertyDeskAppLifecycle.create({
     $, state, backend, todayIso,
     registerShell: () => window.PropertyDeskPwa.registerShell(),
@@ -443,12 +445,13 @@
     eventBinders: [
       attachModalEvents,
       attachNavigationEvents,
+      attachOverviewEvents,
       attachPropertyViewEvents,
       attachTransactionViewEvents,
+      attachDepositDetailEvents,
       () => attachCreateActions(navigate),
       () => attachPropertyFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
-      attachActionRouterEvents,
       () => attachPropertyDetailEvents(toggleArchiveProperty),
       attachWorkspaceEvents,
       attachAuthEvents,

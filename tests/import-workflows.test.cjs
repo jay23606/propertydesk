@@ -64,7 +64,6 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/auth.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-management.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/action-router.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('app.js'));
@@ -105,7 +104,6 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/auth\.js'/);
   assert.match(worker, /'\.\/features\/workspace\.js'/);
   assert.match(worker, /'\.\/features\/property-management\.js'/);
-  assert.match(worker, /'\.\/features\/action-router\.js'/);
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/deposit-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
