@@ -3,11 +3,21 @@
   "use strict";
 
   function create(context) {
-    const { openPropertyDetails, openPropertyPayment, ...viewContext } = context;
-    const { renderOverview } = window.PropertyDeskOverview.create(viewContext);
+    const {
+      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
+      unpaidDueAccrualStart, todayIso, esc, prettyKind, money,
+      propertyAddress, collectedSince, scheduledMonthlyRunRate, monthStart,
+      isPosted, prettyType, fmtDate, openPropertyDetails, openPropertyPayment,
+    } = context;
+    const { renderOverview } = window.PropertyDeskOverview.create({
+      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
+      unpaidDueAccrualStart, todayIso, esc, prettyKind, money,
+      propertyAddress, collectedSince, scheduledMonthlyRunRate, monthStart,
+      isPosted, prettyType, fmtDate,
+    });
     const { attachEvents: attachOverviewEvents } =
       window.PropertyDeskOverviewEvents.create({
-        $: context.$, openPropertyDetails, openPropertyPayment,
+        $, openPropertyDetails, openPropertyPayment,
       });
 
     return { renderOverview, attachOverviewEvents };

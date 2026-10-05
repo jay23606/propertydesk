@@ -388,6 +388,25 @@ test("overview routes property-card and quick-payment actions to property workfl
 
 test("overview workflow composes dashboard rendering with property actions", () => {
   const received = {};
+  const viewContext = {
+    $: () => {},
+    state: {},
+    monthlyScheduledEstimate: () => 0,
+    accountBalance: () => 0,
+    amountDueSince: () => 0,
+    unpaidDueAccrualStart: () => "2026-10-01",
+    todayIso: () => "2026-10-05",
+    esc: String,
+    prettyKind: String,
+    money: String,
+    propertyAddress: String,
+    collectedSince: () => 0,
+    scheduledMonthlyRunRate: () => 0,
+    monthStart: () => "2026-10-01",
+    isPosted: () => true,
+    prettyType: String,
+    fmtDate: String,
+  };
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
   const context = vm.createContext({
@@ -411,10 +430,13 @@ test("overview workflow composes dashboard rendering with property actions", () 
     context,
   );
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
-    state: {}, openPropertyDetails, openPropertyPayment,
+    ...viewContext, openPropertyDetails, openPropertyPayment,
   });
 
-  assert.ok(received.view.state);
+  assert.deepEqual(Object.keys(received.view).sort(), Object.keys(viewContext).sort());
+  for (const [key, value] of Object.entries(viewContext)) {
+    assert.equal(received.view[key], value);
+  }
   assert.equal(received.events.openPropertyDetails, openPropertyDetails);
   assert.equal(received.events.openPropertyPayment, openPropertyPayment);
   assert.equal(workflow.renderOverview(), "overview");
