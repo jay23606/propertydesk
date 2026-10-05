@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v54';
+const CACHE_NAME = 'propertydesk-shell-v55';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const SHELL_FILES = [
   './import-utils.js',
   './import-workflows.js',
   './email-utils.js',
+  './workspace-data.js',
   './ledger-utils.js',
   './zip-utils.js',
   './features/property-views.js',
@@ -77,8 +78,9 @@ self.addEventListener('fetch', (event) => {
   }
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetchAndCache(request, './index.html')
-        .catch(() => caches.match('./index.html')),
+      fetchAndCache(request, './index.html').catch(() =>
+        caches.match('./index.html'),
+      ),
     );
     return;
   }

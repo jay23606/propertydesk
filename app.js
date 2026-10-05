@@ -18,8 +18,11 @@
     unpaidDueAccrualStart,
   } = window.PropertyDeskLedgerUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
+  const workspaceData = window.PropertyDeskWorkspaceData.create();
   const config = window.PROPERTYDESK_CONFIG || {};
-  const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
+  const configured = Boolean(
+    config.supabaseUrl && config.supabaseAnonKey && window.supabase,
+  );
   const state = {
     client: null,
     user: null,
@@ -53,8 +56,7 @@
       maximumFractionDigits: 2,
     }).format(amount);
   };
-  const dateOnly = (value) =>
-    value ? new Date(`${value}T12:00:00`) : null;
+  const dateOnly = (value) => (value ? new Date(`${value}T12:00:00`) : null);
   const fmtDate = (
     value,
     options = { month: 'short', day: 'numeric', year: 'numeric' },
@@ -72,10 +74,9 @@
     const next = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     const themeColor = next === 'dark' ? '#151b17' : '#f6f7f4';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute(
-      'content',
-      themeColor,
-    );
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', themeColor);
     if (persist) {
       try {
         localStorage.setItem('propertydesk-theme', next);
@@ -107,19 +108,28 @@
       '"': '&quot;',
       "'": '&#39;',
     };
-    return String(value ?? '').replace(/[&<>"']/g, (character) => htmlEntities[character]);
+    return String(value ?? '').replace(
+      /[&<>"']/g,
+      (character) => htmlEntities[character],
+    );
   };
-  const prettyType = (type) => ({
-    rental: 'Rental',
-    land_contract: 'Land contract',
-    note: 'Private note',
-  }[type] || type || 'Account');
-  const prettyKind = (kind) => ({
-    residential: 'Residential',
-    land: 'Land',
-    commercial: 'Commercial',
-    other: 'Other',
-  }[kind] || kind || 'Property');
+  const prettyType = (type) =>
+    ({
+      rental: 'Rental',
+      land_contract: 'Land contract',
+      note: 'Private note',
+    })[type] ||
+    type ||
+    'Account';
+  const prettyKind = (kind) =>
+    ({
+      residential: 'Residential',
+      land: 'Land',
+      commercial: 'Commercial',
+      other: 'Other',
+    })[kind] ||
+    kind ||
+    'Property';
   const monthStart = () => {
     const date = new Date();
     date.setDate(1);
@@ -140,7 +150,9 @@
   const propertyAddress = (property) =>
     [property.address, location(property)].filter(Boolean).join(', ');
   const streetAddress = (property) =>
-    String(property.address || property.name || '').split(',')[0].trim();
+    String(property.address || property.name || '')
+      .split(',')[0]
+      .trim();
 
   function toast(message) {
     const element = $('toast');
@@ -201,72 +213,201 @@
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const { updateGreeting, renderOverview, renderProperties } =
     window.PropertyDeskPropertyViews.create({
-      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
-      unpaidDueAccrualStart, todayIso, esc, prettyKind, money, propertyAddress,
-      collectedSince, scheduledMonthlyRunRate, monthStart, isPosted, prettyType,
-      fmtDate, streetAddress, dateOnly, monthEnd, lateReminderMailto,
-      paymentFrequencyLabel, paymentStatusInMonth,
+      $,
+      state,
+      monthlyScheduledEstimate,
+      accountBalance,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      esc,
+      prettyKind,
+      money,
+      propertyAddress,
+      collectedSince,
+      scheduledMonthlyRunRate,
+      monthStart,
+      isPosted,
+      prettyType,
+      fmtDate,
+      streetAddress,
+      dateOnly,
+      monthEnd,
+      lateReminderMailto,
+      paymentFrequencyLabel,
+      paymentStatusInMonth,
     });
   const { renderPayments, renderReports } =
     window.PropertyDeskTransactionViews.create({
-      $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-      monthStart, sumIncome, sumOperatingExpenses, accountBalance,
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+      accountBalance,
     });
   const recordForms = window.PropertyDeskRecordForms.create({
-    $, state, moneyInput, todayIso, toast, closeModal, fetchAll, fillSelect,
-    populateFormOptions, prettyType, openModal,
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
   });
   const {
-    resetPropertyForm, resetAccountForm, updateLoanFields, saveProperty,
-    saveAccount, updateAllocationPreview, prefillPaymentAmount, savePayment, saveExpense,
-    editAccount, openPayment, openPropertyPayment, openExpense,
+    resetPropertyForm,
+    resetAccountForm,
+    updateLoanFields,
+    saveProperty,
+    saveAccount,
+    updateAllocationPreview,
+    prefillPaymentAmount,
+    savePayment,
+    saveExpense,
+    editAccount,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
   } = recordForms;
   const {
-    recordDepositAdjustment, deleteAccount, correctTransaction, voidTransaction,
-  } =
-    window.PropertyDeskLedgerActions.create({
-      $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
-      prettyType, openPayment, openExpense, updateAllocationPreview,
-      openAccountDetails: (...args) => openAccountDetails(...args),
-    });
+    recordDepositAdjustment,
+    deleteAccount,
+    correctTransaction,
+    voidTransaction,
+  } = window.PropertyDeskLedgerActions.create({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    fetchAll,
+    closeModal,
+    prettyType,
+    openPayment,
+    openExpense,
+    updateAllocationPreview,
+    openAccountDetails: (...args) => openAccountDetails(...args),
+  });
   const { openPropertyDetails, openAccountDetails } =
     window.PropertyDeskDetailViews.create({
-      $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
-      prettyType, paymentFrequencyLabel, accountBalance, amortizationSchedule,
-      amountDueSince, unpaidDueAccrualStart, todayIso, depositLedger, openModal,
-      closeModal, editAccount, openPayment, deleteAccount, propertyAddress,
+      $,
+      state,
+      isPosted,
+      sumIncome,
+      sumOperatingExpenses,
+      money,
+      fmtDate,
+      esc,
+      prettyType,
+      paymentFrequencyLabel,
+      accountBalance,
+      amortizationSchedule,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      depositLedger,
+      openModal,
+      closeModal,
+      editAccount,
+      openPayment,
+      deleteAccount,
+      propertyAddress,
     });
   const { attachEvents: attachImportEvents } =
     window.PropertyDeskImportFeature.create({
-      $, state,
+      $,
+      state,
       parseCSV: window.PropertyDeskImportUtils.parseCSV,
       selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
       ...window.PropertyDeskImportWorkflows,
-      esc, todayIso, openModal, closeModal, fetchAll, toast,
+      esc,
+      todayIso,
+      openModal,
+      closeModal,
+      fetchAll,
+      toast,
     });
-  const { uploadPropertyDocument, deletePropertyDocument, openPropertyDocument } =
-    window.PropertyDeskDocuments.create({
-      state, toast, fetchAll, openPropertyDetails,
-    });
+  const {
+    uploadPropertyDocument,
+    deletePropertyDocument,
+    openPropertyDocument,
+  } = window.PropertyDeskDocuments.create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+  });
   const { exportAll, exportReport } = window.PropertyDeskExports.create({
-    $, state, createBackup, todayIso, toast, prettyType, accountBalance,
+    $,
+    state,
+    createBackup,
+    todayIso,
+    toast,
+    prettyType,
+    accountBalance,
   });
   const {
-    showAuth, showApp, showConfigError, setAuthMode, showPasswordReset,
-    requestPasswordReset, submitPasswordReset, submitAuth, startWorkspace,
+    showAuth,
+    showApp,
+    showConfigError,
+    setAuthMode,
+    showPasswordReset,
+    requestPasswordReset,
+    submitPasswordReset,
+    submitAuth,
+    startWorkspace,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
   const {
-    saveProfile, addWorkspaceMember, removeWorkspaceMember, renderWorkspaceSettings,
+    saveProfile,
+    addWorkspaceMember,
+    removeWorkspaceMember,
+    renderWorkspaceSettings,
   } = window.PropertyDeskWorkspace.create({
-    $, state, esc, fmtDate, money, toast, fetchAll, updateGreeting,
+    $,
+    state,
+    esc,
+    fmtDate,
+    money,
+    toast,
+    fetchAll,
+    updateGreeting,
   });
   const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-    $, state, amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd,
-    moneyInput, toast, dateOnly, monthStart, propertyAddress, money, esc, openModal,
+    $,
+    state,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    monthEnd,
+    moneyInput,
+    toast,
+    dateOnly,
+    monthStart,
+    propertyAddress,
+    money,
+    esc,
+    openModal,
   });
   const { editPropertyQuickNote, savePropertyHolders, toggleArchiveProperty } =
     window.PropertyDeskPropertyManagement.create({
-      $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+      $,
+      state,
+      toast,
+      fetchAll,
+      todayIso,
+      streetAddress,
+      openPropertyDetails,
     });
 
   async function fetchAll() {
@@ -278,59 +419,15 @@
       throw error;
     }
     state.workspaceOwnerId = workspaceId;
-
-    const [properties, accounts, payments, expenses, importBatches, documents,
-      agreementVersions, propertyHolders, workspaceMembers, depositEntries, reminderLogs] =
-      await Promise.all([
-        state.client.from('pd_properties').select('*')
-          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
-        state.client.from('pd_accounts').select('*')
-          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
-        state.client.from('pd_payments').select('*')
-          .eq('user_id', workspaceId)
-          .order('received_date', { ascending: false })
-          .order('recorded_at', { ascending: false }),
-        state.client.from('pd_expenses').select('*')
-          .eq('user_id', workspaceId)
-          .order('expense_date', { ascending: false })
-          .order('recorded_at', { ascending: false }),
-        state.client.from('pd_import_batches').select('*')
-          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
-        state.client.from('pd_documents').select('*')
-          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
-        state.client.from('pd_agreement_versions').select('*')
-          .eq('user_id', workspaceId).order('replaced_on', { ascending: false }),
-        state.client.from('pd_property_holders').select('*').eq('user_id', workspaceId),
-        state.client.rpc('pd_list_workspace_members'),
-        state.client.from('pd_deposit_entries').select('*')
-          .eq('user_id', workspaceId)
-          .order('movement_date', { ascending: false })
-          .order('created_at', { ascending: false }),
-        state.client.from('pd_reminder_logs').select('*')
-          .eq('user_id', workspaceId)
-          .order('attempted_at', { ascending: false })
-          .limit(300),
-      ]);
-    const results = [properties, accounts, payments, expenses, importBatches,
-      documents, agreementVersions, propertyHolders, workspaceMembers,
-      depositEntries, reminderLogs];
-    const failedResult = results.find((result) => result.error);
-    if (failedResult) {
-      toast(failedResult.error.message);
-      throw failedResult.error;
+    try {
+      Object.assign(
+        state,
+        await workspaceData.loadWorkspaceRecords(state.client, workspaceId),
+      );
+    } catch (error) {
+      toast(error?.message || 'Could not load this workspace');
+      throw error;
     }
-
-    state.properties = properties.data || [];
-    state.accounts = accounts.data || [];
-    state.payments = payments.data || [];
-    state.expenses = expenses.data || [];
-    state.importBatches = importBatches.data || [];
-    state.documents = documents.data || [];
-    state.agreementVersions = agreementVersions.data || [];
-    state.propertyHolders = propertyHolders.data || [];
-    state.workspaceMembers = workspaceMembers.data || [];
-    state.depositEntries = depositEntries.data || [];
-    state.reminderLogs = reminderLogs.data || [];
     render();
   }
   function render() {
@@ -363,7 +460,8 @@
   }
   function resetExpenseModal() {
     $('expense-modal-title').textContent = 'Record expense';
-    $('expense-modal').querySelector('.eyebrow').textContent = 'PROPERTY EXPENSE';
+    $('expense-modal').querySelector('.eyebrow').textContent =
+      'PROPERTY EXPENSE';
     $('expense-save-button').textContent = 'Save expense';
     $('expense-save-next').classList.remove('hidden');
   }
@@ -382,8 +480,9 @@
   function fillSelect(id, options, placeholder) {
     const element = $(id);
     const optionHTML = options
-      .map((option) =>
-        `<option value="${esc(option.value)}">${esc(option.label)}</option>`,
+      .map(
+        (option) =>
+          `<option value="${esc(option.value)}">${esc(option.label)}</option>`,
       )
       .join('');
     element.innerHTML = `<option value="">${esc(placeholder)}</option>${optionHTML}`;
@@ -412,7 +511,10 @@
   function attachThemeAndNavigationEvents() {
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       button.addEventListener('click', () =>
-        setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true),
+        setTheme(
+          document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark',
+          true,
+        ),
       );
     });
     syncThemeButtons();
@@ -427,29 +529,35 @@
       link.addEventListener('click', () => navigate(link.dataset.goto));
     });
     document.querySelectorAll('[data-close]').forEach((button) => {
-      button.addEventListener('click', () => closeModal(button.closest('.modal')));
+      button.addEventListener('click', () =>
+        closeModal(button.closest('.modal')),
+      );
     });
   }
 
   function attachCreateActions() {
-    document.querySelectorAll('[data-open="property-modal"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        resetPropertyForm();
-        openModal('property-modal');
+    document
+      .querySelectorAll('[data-open="property-modal"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          resetPropertyForm();
+          openModal('property-modal');
+        });
       });
-    });
-    document.querySelectorAll('[data-open="account-modal"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        if (!state.properties.length) {
-          toast('Add a property before creating an account');
-          navigate('properties');
-          return;
-        }
-        resetAccountForm();
-        populateFormOptions();
-        openModal('account-modal');
+    document
+      .querySelectorAll('[data-open="account-modal"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!state.properties.length) {
+            toast('Add a property before creating an account');
+            navigate('properties');
+            return;
+          }
+          resetAccountForm();
+          populateFormOptions();
+          openModal('account-modal');
+        });
       });
-    });
 
     const openPayments = () => {
       if (!state.accounts.length) {
@@ -459,26 +567,33 @@
       }
       openPayment();
     };
-    document.querySelectorAll('[data-open="payment-modal"]').forEach((button) => {
-      button.addEventListener('click', openPayments);
-    });
-    $('quick-payment').addEventListener('click', openPayments);
-    document.querySelectorAll('[data-open="expense-modal"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        if (!state.properties.length) {
-          toast('Add a property before recording an expense');
-          navigate('properties');
-          return;
-        }
-        openExpense();
+    document
+      .querySelectorAll('[data-open="payment-modal"]')
+      .forEach((button) => {
+        button.addEventListener('click', openPayments);
       });
-    });
+    $('quick-payment').addEventListener('click', openPayments);
+    document
+      .querySelectorAll('[data-open="expense-modal"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!state.properties.length) {
+            toast('Add a property before recording an expense');
+            navigate('properties');
+            return;
+          }
+          openExpense();
+        });
+      });
   }
 
   function attachFormEvents() {
     $('property-form').addEventListener('submit', saveProperty);
     $('account-form').addEventListener('submit', saveAccount);
-    $('account-reminder-preview').addEventListener('click', previewReminderEmail);
+    $('account-reminder-preview').addEventListener(
+      'click',
+      previewReminderEmail,
+    );
     $('payment-form').addEventListener('submit', savePayment);
     $('expense-form').addEventListener('submit', saveExpense);
     $('account-type').addEventListener('change', updateLoanFields);
@@ -490,7 +605,9 @@
     $('payment-date').addEventListener('change', updateAllocationPreview);
     $('expense-property').addEventListener('change', () => {
       const propertyId = $('expense-property').value;
-      const relatedAccounts = state.accounts.filter((account) => account.property_id === propertyId);
+      const relatedAccounts = state.accounts.filter(
+        (account) => account.property_id === propertyId,
+      );
       fillSelect(
         'expense-account',
         relatedAccounts.map((account) => ({
@@ -520,9 +637,14 @@
 
   function attachDelegatedActionEvents() {
     document.addEventListener('click', (event) => {
-      const depositAdjustment = event.target.closest('[data-deposit-adjustment]');
+      const depositAdjustment = event.target.closest(
+        '[data-deposit-adjustment]',
+      );
       if (depositAdjustment) {
-        recordDepositAdjustment(depositAdjustment.dataset.accountId, depositAdjustment.dataset.depositAdjustment);
+        recordDepositAdjustment(
+          depositAdjustment.dataset.accountId,
+          depositAdjustment.dataset.depositAdjustment,
+        );
         return;
       }
       const removeMember = event.target.closest('[data-remove-member]');
@@ -601,7 +723,8 @@
     });
 
     document.addEventListener('change', (event) => {
-      if (event.target.matches('[data-property-document]')) uploadPropertyDocument(event.target);
+      if (event.target.matches('[data-property-document]'))
+        uploadPropertyDocument(event.target);
     });
   }
 
@@ -609,7 +732,9 @@
     $('property-detail-content').addEventListener('click', (event) => {
       const button = event.target.closest('[data-edit-account]');
       if (!button) return;
-      const account = state.accounts.find((item) => item.id === button.dataset.editAccount);
+      const account = state.accounts.find(
+        (item) => item.id === button.dataset.editAccount,
+      );
       if (!account) return;
       event.preventDefault();
       closeModal($('property-detail-modal'));
@@ -637,7 +762,10 @@
       $('account-property').value = propertyId;
       openModal('account-modal');
     });
-    $('property-archive-toggle').addEventListener('click', toggleArchiveProperty);
+    $('property-archive-toggle').addEventListener(
+      'click',
+      toggleArchiveProperty,
+    );
   }
 
   function attachWorkspaceAndAuthEvents() {
@@ -695,10 +823,19 @@
     attachKeyboardEvents();
   }
   function setupServiceWorker() {
-    if (!('serviceWorker' in navigator) || !window.location.protocol.startsWith('http')) return;
-    navigator.serviceWorker.register('./sw.js').catch((error) =>
-      console.warn('PropertyDesk shell cache could not be registered:', error),
-    );
+    if (
+      !('serviceWorker' in navigator) ||
+      !window.location.protocol.startsWith('http')
+    )
+      return;
+    navigator.serviceWorker
+      .register('./sw.js')
+      .catch((error) =>
+        console.warn(
+          'PropertyDesk shell cache could not be registered:',
+          error,
+        ),
+      );
   }
   function handleAuthStateChange(event, session) {
     if (event === 'SIGNED_OUT') {
@@ -717,15 +854,22 @@
 
     const previousUserId = state.user?.id;
     state.user = session.user;
-    const signedIntoNewUser = event === 'SIGNED_IN' && previousUserId !== session.user.id;
-    if (signedIntoNewUser && !state.passwordRecoveryInProgress) startWorkspace();
+    const signedIntoNewUser =
+      event === 'SIGNED_IN' && previousUserId !== session.user.id;
+    if (signedIntoNewUser && !state.passwordRecoveryInProgress)
+      startWorkspace();
   }
   function isPasswordRecoverySession(session) {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    return params.get('type') === 'recovery' && params.get('access_token') === session?.access_token;
+    return (
+      params.get('type') === 'recovery' &&
+      params.get('access_token') === session?.access_token
+    );
   }
   async function restoreAuthSession() {
-    const { data: { session } } = await state.client.auth.getSession();
+    const {
+      data: { session },
+    } = await state.client.auth.getSession();
     if (!session?.user) {
       showAuth();
       return;
@@ -750,10 +894,16 @@
     state.client = window.supabase.createClient(
       config.supabaseUrl,
       config.supabaseAnonKey,
-      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } },
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+      },
     );
     state.client.auth.onAuthStateChange(handleAuthStateChange);
     await restoreAuthSession();
   }
-  document.addEventListener('DOMContentLoaded',init);
+  document.addEventListener('DOMContentLoaded', init);
 })();
