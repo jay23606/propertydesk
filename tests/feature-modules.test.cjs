@@ -57,6 +57,97 @@ test("property and account detail views expose focused render actions", () => {
   assert.equal(typeof feature.attachPropertyEvents, "function");
 });
 
+test("delegated action router preserves action routing and event propagation", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "action-router.js"), "utf8"),
+    context,
+  );
+  const listeners = new Map();
+  const calls = [];
+  const propertyField = { value: "" };
+  const callbacks = [
+    "recordDepositAdjustment", "removeWorkspaceMember", "savePropertyHolders",
+    "openPayment", "resetAccountForm", "populateFormOptions", "openModal",
+    "editPropertyQuickNote", "openPropertyDetails", "openPropertyPayment",
+    "deletePropertyDocument", "openPropertyDocument", "correctTransaction",
+    "voidTransaction", "closeModal", "openAccountDetails",
+    "uploadPropertyDocument",
+  ];
+  const contextValues = Object.fromEntries(
+    callbacks.map((name) => [name, (...args) => calls.push([name, ...args])]),
+  );
+  const feature = context.window.PropertyDeskActionRouter.create({
+    ...contextValues,
+    $: (id) => id === "account-property" ? propertyField : { id },
+    documentRef: {
+      addEventListener: (name, handler) => listeners.set(name, handler),
+    },
+  });
+  feature.attachEvents();
+
+  function dispatchClick(selector, dataset, otherActions = {}) {
+    let prevented = 0;
+    let stopped = 0;
+    const actions = new Map(Object.entries(otherActions));
+    actions.set(selector, { dataset });
+    listeners.get("click")({
+      target: { closest: (value) => actions.get(value) || null },
+      preventDefault: () => { prevented += 1; },
+      stopPropagation: () => { stopped += 1; },
+    });
+    return { prevented, stopped };
+  }
+
+  dispatchClick("[data-deposit-adjustment]", {
+    accountId: "rental-1", depositAdjustment: "retained",
+  });
+  dispatchClick("[data-remove-member]", { removeMember: "member-1" });
+  dispatchClick("[data-save-holders]");
+  assert.deepEqual(
+    dispatchClick(
+      "[data-account-payment]",
+      { accountPayment: "account-1" },
+      { "[data-property-card]": { dataset: { propertyCard: "should-not-open" } } },
+    ),
+    { prevented: 1, stopped: 1 },
+  );
+  dispatchClick("[data-property-account]", { propertyAccount: "property-1" });
+  dispatchClick("[data-property-note]", { propertyNote: "property-1" });
+  dispatchClick("[data-property-open]", { propertyOpen: "property-1" });
+  dispatchClick("[data-property-payment]", { propertyPayment: "property-1" });
+  dispatchClick("[data-delete-document]", { deleteDocument: "doc-1" });
+  dispatchClick("[data-open-document]", { openDocument: "doc-1" });
+  dispatchClick("[data-correct-transaction]", { kind: "income", id: "pay-1" });
+  dispatchClick("[data-void-transaction]", { kind: "expense", id: "exp-1" });
+  dispatchClick("[data-detail]", { detail: "account-1" });
+  dispatchClick("[data-property-card]", { propertyCard: "property-2" });
+  const file = { matches: (selector) => selector === "[data-property-document]" };
+  listeners.get("change")({ target: file });
+
+  assert.equal(propertyField.value, "property-1");
+  assert.deepEqual(calls, [
+    ["recordDepositAdjustment", "rental-1", "retained"],
+    ["removeWorkspaceMember", "member-1"],
+    ["savePropertyHolders"],
+    ["openPayment", "account-1"],
+    ["resetAccountForm"],
+    ["populateFormOptions"],
+    ["openModal", "account-modal"],
+    ["editPropertyQuickNote", "property-1"],
+    ["openPropertyDetails", "property-1"],
+    ["openPropertyPayment", "property-1"],
+    ["deletePropertyDocument", "doc-1"],
+    ["openPropertyDocument", "doc-1"],
+    ["correctTransaction", "income", "pay-1"],
+    ["voidTransaction", "expense", "exp-1"],
+    ["closeModal", { id: "property-detail-modal" }],
+    ["openAccountDetails", "account-1"],
+    ["openPropertyDetails", "property-2"],
+    ["uploadPropertyDocument", file],
+  ]);
+});
+
 test("property and transaction views own their search and filter bindings", () => {
   for (const [file, globalName, expected] of [
     ["property-views.js", "PropertyDeskPropertyViews", [
