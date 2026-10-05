@@ -14,7 +14,7 @@ function loadAuthFeatures(context) {
 }
 
 function loadWorkspaceFeatures(context) {
-  for (const filename of ["workspace-members.js", "workspace.js"]) {
+  for (const filename of ["profile-settings.js", "workspace-members.js", "workspace.js"]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -1186,6 +1186,40 @@ test("profile display loads before overview and is precached", () => {
     "profile display should load before dashboard composition",
   );
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
+});
+
+test("profile settings save the display label and refresh the shared shell", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "profile-settings.js"), "utf8"),
+    context,
+  );
+  const messages = [];
+  const calls = [];
+  const state = {
+    user: { id: "owner-1", user_metadata: { display_name: "Old label" } },
+    client: {
+      auth: {
+        updateUser: async (payload) => {
+          calls.push(payload);
+          return { data: { user: { id: "owner-1", user_metadata: payload.data } }, error: null };
+        },
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskProfileSettings.create({
+    $: () => ({ value: "  Property Manager  " }),
+    state,
+    toast: (message) => messages.push(message),
+    updateGreeting: () => calls.push("refresh-greeting"),
+  });
+
+  await feature.saveProfile({ preventDefault() {} });
+
+  assert.equal(calls[0].data.display_name, "Property Manager");
+  assert.equal(calls[1], "refresh-greeting");
+  assert.equal(state.user.user_metadata.display_name, "Property Manager");
+  assert.deepEqual(messages, ["Display name saved"]);
 });
 
 test("property view actions route payment, note, address, and add-account actions", () => {
@@ -3135,8 +3169,12 @@ test("workspace setting writes report rejected requests and retain entered value
     updateGreeting: () => assert.fail("a rejected profile save must not update the greeting"),
     confirmAction: () => true,
   });
+  const profile = context.window.PropertyDeskProfileSettings.create({
+    $, state, toast: (message) => messages.push(message),
+    updateGreeting: () => assert.fail("a rejected profile save must not update the greeting"),
+  });
 
-  await assert.doesNotReject(feature.saveProfile({ preventDefault() {} }));
+  await assert.doesNotReject(profile.saveProfile({ preventDefault() {} }));
   await assert.doesNotReject(feature.addWorkspaceMember({ preventDefault() {} }));
   await assert.doesNotReject(feature.removeWorkspaceMember("member-1"));
   assert.equal(state.user.user_metadata.display_name, "Owner");
