@@ -4,8 +4,13 @@
 
   function create(context) {
     const {
-      $, state, depositLedger, money, fmtDate, esc, recordDepositAdjustment,
+      $, state, depositLedger, money, fmtDate, esc, moneyInput, todayIso,
+      toast, fetchAll,
     } = context;
+    const { recordDepositAdjustment } =
+      window.PropertyDeskDepositMaintenance.create({
+        state, moneyInput, todayIso, toast, fetchAll,
+      });
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state, depositLedger, money, fmtDate, esc,
     });

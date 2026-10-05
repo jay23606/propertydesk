@@ -5,17 +5,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("account maintenance workflow composes account closure and deposit actions", () => {
+test("account maintenance workflow composes account closure only", () => {
   const passed = {};
   const closeAccount = () => "closed";
-  const recordDepositAdjustment = () => "adjusted";
   const context = vm.createContext({
     window: {
       PropertyDeskAccountMaintenance: {
         create: (options) => { passed.account = options; return { closeAccount }; },
-      },
-      PropertyDeskDepositMaintenance: {
-        create: (options) => { passed.deposit = options; return { recordDepositAdjustment }; },
       },
     },
   });
@@ -23,15 +19,13 @@ test("account maintenance workflow composes account closure and deposit actions"
     fs.readFileSync(path.join(__dirname, "..", "features", "account-maintenance-workflow.js"), "utf8"),
     context,
   );
-  const dependencies = { $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {}, fetchAll() {}, closeModal() {} };
+  const dependencies = { $() {}, state: {}, toast() {}, fetchAll() {}, closeModal() {} };
   const workflow = context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
 
   assert.equal(passed.account.state, dependencies.state);
   assert.equal(passed.account.closeModal, dependencies.closeModal);
-  assert.equal(passed.deposit.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.deposit.todayIso, dependencies.todayIso);
   assert.equal(workflow.closeAccount, closeAccount);
-  assert.equal(workflow.recordDepositAdjustment, recordDepositAdjustment);
+  assert.equal("recordDepositAdjustment" in workflow, false);
 });
 
 test("transaction maintenance workflow composes correction and void actions", () => {

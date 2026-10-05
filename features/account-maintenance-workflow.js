@@ -1,10 +1,9 @@
-/* Compose account and security-deposit maintenance actions. */
+/* Compose account closure without pulling in rental deposit behavior. */
 (() => {
   "use strict";
 
   function create(context) {
-    const { $, state, moneyInput, todayIso, toast, fetchAll, closeModal } =
-      context;
+    const { $, state, toast, fetchAll, closeModal } = context;
     const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
       $,
       state,
@@ -12,16 +11,7 @@
       fetchAll,
       closeModal,
     });
-    const { recordDepositAdjustment } =
-      window.PropertyDeskDepositMaintenance.create({
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        fetchAll,
-      });
-
-    return { closeAccount, recordDepositAdjustment };
+    return { closeAccount };
   }
 
   window.PropertyDeskAccountMaintenanceWorkflow = Object.freeze({ create });

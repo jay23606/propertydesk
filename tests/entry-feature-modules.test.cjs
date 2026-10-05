@@ -172,9 +172,16 @@ test("account details workflow composes account, history, and account actions", 
 test("deposit details workflow composes ledger rendering with adjustment actions", () => {
   const passed = {};
   const depositSectionHTML = () => "deposit html";
+  const recordDepositAdjustment = () => "adjusted";
   const attachEvents = () => "deposit events attached";
   const context = vm.createContext({
     window: {
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          passed.maintenance = options;
+          return { recordDepositAdjustment };
+        },
+      },
       PropertyDeskDepositDetails: {
         create: (options) => {
           passed.details = options;
@@ -195,12 +202,14 @@ test("deposit details workflow composes ledger rendering with adjustment actions
   );
   const dependencies = {
     $() {}, state: {}, depositLedger() {}, money() {}, fmtDate() {}, esc() {},
-    recordDepositAdjustment() {},
+    moneyInput() {}, todayIso() {}, toast() {}, fetchAll() {},
   };
   const workflow = context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
 
   assert.equal(passed.details.state, dependencies.state);
-  assert.equal(passed.events.recordDepositAdjustment, dependencies.recordDepositAdjustment);
+  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
   assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
   assert.equal(workflow.depositSectionHTML, depositSectionHTML);
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");

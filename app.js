@@ -100,13 +100,14 @@
     $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
     monthStart, sumIncome, sumOperatingExpenses,
   });
-  const { closeAccount, recordDepositAdjustment } =
+  const { closeAccount } =
     window.PropertyDeskAccountMaintenanceWorkflow.create({
-      $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
+      $, state, toast, fetchAll, closeModal,
     });
   const { depositSectionHTML, attachDepositDetailEvents } =
     window.PropertyDeskDepositDetailsWorkflow.create({
-      $, state, depositLedger, money, fmtDate, esc, recordDepositAdjustment,
+      $, state, depositLedger, money, fmtDate, esc, moneyInput, todayIso,
+      toast, fetchAll,
     });
   const {
     openAccountDetails,
