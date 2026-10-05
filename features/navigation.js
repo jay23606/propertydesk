@@ -70,6 +70,10 @@
           navigate(link.dataset.view);
         });
       });
+      $('user-menu').addEventListener('click', () => {
+        renderWorkspaceSettings();
+        navigate('workspace');
+      });
       documentRef.querySelectorAll('[data-goto]').forEach((link) => {
         link.addEventListener('click', () => navigate(link.dataset.goto));
       });

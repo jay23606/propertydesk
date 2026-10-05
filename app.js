@@ -339,23 +339,16 @@
     accountBalance,
   });
   const {
-    showAuth,
-    showApp,
     showConfigError,
     setAuthMode,
-    showPasswordReset,
-    requestPasswordReset,
-    submitPasswordReset,
-    submitAuth,
-    startWorkspace,
     handleAuthStateChange,
     restoreAuthSession,
+    attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
   const {
-    saveProfile,
-    addWorkspaceMember,
     removeWorkspaceMember,
     renderWorkspaceSettings,
+    attachEvents: attachWorkspaceEvents,
   } = window.PropertyDeskWorkspace.create({
     $,
     state,
@@ -530,35 +523,6 @@
     });
   }
 
-  function attachWorkspaceAndAuthEvents() {
-    $('display-name-form').addEventListener('submit', saveProfile);
-    $('member-add-form').addEventListener('submit', addWorkspaceMember);
-    $('user-menu').addEventListener('click', () => {
-      renderWorkspaceSettings();
-      navigate('workspace');
-    });
-    $('sign-out').addEventListener('click', async () => {
-      await state.client.auth.signOut();
-      state.user = null;
-      state.properties = [];
-      state.accounts = [];
-      state.payments = [];
-      showAuth();
-      setAuthMode(false);
-    });
-    $('auth-toggle').addEventListener('click', () =>
-      setAuthMode($('auth-form').dataset.mode !== 'signup'),
-    );
-    $('auth-form').addEventListener('submit', submitAuth);
-    $('forgot-password').addEventListener('click', requestPasswordReset);
-    $('password-reset-form').addEventListener('submit', submitPasswordReset);
-    $('reset-password-cancel').addEventListener('click', () => {
-      state.passwordRecoveryInProgress = false;
-      setAuthMode(false);
-      showAuth();
-    });
-  }
-
   function attachImportAndExportEvents() {
     attachImportEvents();
     $('export-all').addEventListener('click', exportAll);
@@ -580,7 +544,8 @@
     attachSearchEvents();
     attachDelegatedActionEvents();
     attachPropertyEvents(toggleArchiveProperty);
-    attachWorkspaceAndAuthEvents();
+    attachWorkspaceEvents();
+    attachAuthEvents();
     attachImportAndExportEvents();
     attachKeyboardEvents();
   }

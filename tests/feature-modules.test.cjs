@@ -824,6 +824,66 @@ test("auth session restoration and state changes stay inside the auth feature", 
   assert.deepEqual(calls, ["fetch-workspace"]);
 });
 
+test("auth feature owns login controls and clears workspace data on sign-out", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        textContent: "",
+        autocomplete: "",
+        dataset: { mode: "signup" },
+        classList: { add() {}, remove() {}, toggle() {} },
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+      });
+    return elements.get(id);
+  };
+  let signOutCalls = 0;
+  const state = {
+    user: { id: "owner-1" },
+    properties: [{ id: "property-1" }],
+    accounts: [{ id: "account-1" }],
+    payments: [{ id: "payment-1" }],
+    passwordRecoveryInProgress: true,
+    client: { auth: { async signOut() { signOutCalls += 1; } } },
+  };
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state,
+    fetchAll: async () => {},
+    toast() {},
+    documentRef: { querySelector: () => element("auth-intro") },
+  });
+
+  feature.attachEvents();
+  for (const key of [
+    "sign-out:click",
+    "auth-toggle:click",
+    "auth-form:submit",
+    "forgot-password:click",
+    "password-reset-form:submit",
+    "reset-password-cancel:click",
+  ]) {
+    assert.equal(typeof handlers.get(key), "function", key);
+  }
+
+  await handlers.get("sign-out:click")();
+  assert.equal(signOutCalls, 1);
+  assert.equal(state.user, null);
+  assert.equal(state.properties.length, 0);
+  assert.equal(state.accounts.length, 0);
+  assert.equal(state.payments.length, 0);
+  assert.equal(state.passwordRecoveryInProgress, false);
+  assert.equal(element("auth-form").dataset.mode, "signin");
+});
+
 test("navigation owns theme toggles, page routing, and modal close shortcuts", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -872,6 +932,7 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
   const workspaceLink = makeElement("workspace-link", { view: "workspace" });
   const gotoLink = makeElement("goto-link", { goto: "reports" });
   const closeButton = makeElement("close-button");
+  const userMenu = makeElement("user-menu");
   const modal = { id: "test-modal" };
   const selectors = {
     "[data-theme-toggle]": [toggle],
@@ -890,7 +951,8 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
   const state = { view: "properties" };
   const crumb = { textContent: "" };
   const feature = context.window.PropertyDeskNavigation.create({
-    $: (id) => (id === "page-crumb" ? crumb : null),
+    $: (id) =>
+      id === "page-crumb" ? crumb : id === "user-menu" ? userMenu : null,
     state,
     renderWorkspaceSettings: () => routes.push("workspace-settings"),
     closeModal: (element) => routes.push(`close:${element.id}`),
@@ -921,6 +983,9 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
 
   handlers.get("goto-link:click")();
   assert.equal(state.view, "reports");
+  handlers.get("user-menu:click")();
+  assert.equal(state.view, "workspace");
+  assert.deepEqual(routes.slice(-2), ["workspace-settings", "scroll"]);
   handlers.get("close-button:click")();
   assert.equal(routes.at(-1), "close:test-modal");
 });
@@ -1012,6 +1077,27 @@ test("workspace settings render member labels and escape untrusted text", () => 
     false,
   ]);
   assert.match(element("reminder-activity").innerHTML, /Reminders are off/);
+});
+
+test("workspace feature owns profile and member form bindings", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const feature = context.window.PropertyDeskWorkspace.create({
+    $: (id) => ({
+      addEventListener(event, handler) {
+        handlers.set(`${id}:${event}`, handler);
+      },
+    }),
+  });
+
+  feature.attachEvents();
+
+  assert.equal(typeof handlers.get("display-name-form:submit"), "function");
+  assert.equal(typeof handlers.get("member-add-form:submit"), "function");
 });
 
 test("adding a workspace member clears the address only after successful refresh", async () => {

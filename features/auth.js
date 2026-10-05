@@ -131,6 +131,32 @@
       }
     }
 
+    async function signOut() {
+      await state.client.auth.signOut();
+      state.user = null;
+      state.passwordRecoveryInProgress = false;
+      state.properties = [];
+      state.accounts = [];
+      state.payments = [];
+      showAuth();
+      setAuthMode(false);
+    }
+
+    function attachEvents() {
+      $('sign-out').addEventListener('click', signOut);
+      $('auth-toggle').addEventListener('click', () =>
+        setAuthMode($('auth-form').dataset.mode !== 'signup'),
+      );
+      $('auth-form').addEventListener('submit', submitAuth);
+      $('forgot-password').addEventListener('click', requestPasswordReset);
+      $('password-reset-form').addEventListener('submit', submitPasswordReset);
+      $('reset-password-cancel').addEventListener('click', () => {
+        state.passwordRecoveryInProgress = false;
+        setAuthMode(false);
+        showAuth();
+      });
+    }
+
     function handleAuthStateChange(event, session) {
       if (event === 'SIGNED_OUT') {
         state.user = null;
@@ -190,6 +216,8 @@
       startWorkspace,
       handleAuthStateChange,
       restoreAuthSession,
+      signOut,
+      attachEvents,
     };
   }
 

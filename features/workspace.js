@@ -125,11 +125,17 @@
         : '<tr><td colspan="6" class="muted">Reminder attempts will appear here. Reminders are off until you enable them in an account.</td></tr>';
     }
 
+    function attachEvents() {
+      $("display-name-form").addEventListener("submit", saveProfile);
+      $("member-add-form").addEventListener("submit", addWorkspaceMember);
+    }
+
     return {
       saveProfile,
       addWorkspaceMember,
       removeWorkspaceMember,
       renderWorkspaceSettings,
+      attachEvents,
     };
   }
 
