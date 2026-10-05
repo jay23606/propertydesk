@@ -218,8 +218,10 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskPaymentPayload: { build: buildPaymentPayload },
-      PropertyDeskExpensePayload: { build: buildExpensePayload },
+      PropertyDeskTransactionPayloads: {
+        buildPayment: buildPaymentPayload,
+        buildExpense: buildExpensePayload,
+      },
       PropertyDeskPaymentEntryForm: { create: (options) => { passed.payment = options; return paymentActions; } },
       PropertyDeskExpenseEntryForm: { create: (options) => { passed.expense = options; return expenseActions; } },
     },

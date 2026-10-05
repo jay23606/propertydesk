@@ -10,12 +10,12 @@
     const payments = window.PropertyDeskPaymentEntryForm.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
-      buildPaymentPayload: window.PropertyDeskPaymentPayload.build,
+      buildPaymentPayload: window.PropertyDeskTransactionPayloads.buildPayment,
     });
     const expenses = window.PropertyDeskExpenseEntryForm.create({
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
-      buildExpensePayload: window.PropertyDeskExpensePayload.build,
+      buildExpensePayload: window.PropertyDeskTransactionPayloads.buildExpense,
     });
 
     function attachEvents() {

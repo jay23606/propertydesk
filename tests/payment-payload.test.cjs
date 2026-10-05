@@ -8,12 +8,12 @@ function loadBuilder() {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "payment-payload.js"),
+      path.join(__dirname, "..", "features", "transaction-payloads.js"),
       "utf8",
     ),
     context,
   );
-  return context.window.PropertyDeskPaymentPayload.build;
+  return context.window.PropertyDeskTransactionPayloads.buildPayment;
 }
 
 test("manual loan receipts stay unapplied with no estimated allocation", () => {

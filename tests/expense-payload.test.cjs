@@ -4,16 +4,20 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("expense payload normalizes property-only records and optional fields", () => {
+function loadBuilder() {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "expense-payload.js"),
+      path.join(__dirname, "..", "features", "transaction-payloads.js"),
       "utf8",
     ),
     context,
   );
-  const payload = context.window.PropertyDeskExpensePayload.build({
+  return context.window.PropertyDeskTransactionPayloads.buildExpense;
+}
+
+test("expense payload normalizes property-only records and optional fields", () => {
+  const payload = loadBuilder()({
     ownerId: "workspace-1",
     propertyId: "property-1",
     accountId: "",
@@ -40,15 +44,7 @@ test("expense payload normalizes property-only records and optional fields", () 
 });
 
 test("expense payload preserves linked rental deposit-refund records", () => {
-  const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "expense-payload.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const payload = context.window.PropertyDeskExpensePayload.build({
+  const payload = loadBuilder()({
     ownerId: "workspace-1",
     propertyId: "property-1",
     accountId: "rental-1",
