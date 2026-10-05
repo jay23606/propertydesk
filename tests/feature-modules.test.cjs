@@ -123,6 +123,56 @@ test("service worker caches a cloned shell response within the fetch lifetime", 
   assert.equal(cachedKey, "https://propertydesk.test/app.js");
 });
 
+test("service worker falls back to the cached app shell for offline navigation", async () => {
+  let fetchHandler;
+  let responsePromise;
+  let matchedKey;
+  const self = {
+    registration: { scope: "https://propertydesk.test/" },
+    location: { origin: "https://propertydesk.test" },
+    addEventListener(type, handler) {
+      if (type === "fetch") fetchHandler = handler;
+    },
+  };
+  const caches = {
+    async open() {
+      return { async put() {} };
+    },
+    async match(key) {
+      matchedKey = key;
+      return new Response("cached offline app shell");
+    },
+  };
+  const context = vm.createContext({
+    self,
+    caches,
+    URL,
+    Response,
+    fetch: async () => {
+      throw new Error("offline");
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8"),
+    context,
+  );
+
+  fetchHandler({
+    request: {
+      method: "GET",
+      mode: "navigate",
+      url: "https://propertydesk.test/",
+    },
+    respondWith(promise) {
+      responsePromise = promise;
+    },
+  });
+
+  const response = await responsePromise;
+  assert.equal(matchedKey, "./index.html");
+  assert.equal(await response.text(), "cached offline app shell");
+});
+
 test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
   const elements = new Map();
   const getElement = (id) => {
