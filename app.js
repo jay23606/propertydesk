@@ -84,13 +84,29 @@
     securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
+  const { updateGreeting, renderOverview } = window.PropertyDeskOverview.create({
+    $,
+    state,
+    monthlyScheduledEstimate,
+    accountBalance,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    esc,
+    prettyKind,
+    money,
+    propertyAddress,
+    collectedSince,
+    scheduledMonthlyRunRate,
+    monthStart,
+    isPosted,
+    prettyType,
+    fmtDate,
+  });
   const {
-    updateGreeting,
-    renderOverview,
     renderProperties,
     attachEvents: attachPropertyViewEvents,
-  } =
-    window.PropertyDeskPropertyViews.create({
+  } = window.PropertyDeskPropertyViews.create({
       $,
       state,
       monthlyScheduledEstimate,
@@ -99,15 +115,9 @@
       unpaidDueAccrualStart,
       todayIso,
       esc,
-      prettyKind,
       money,
       propertyAddress,
-      collectedSince,
-      scheduledMonthlyRunRate,
       monthStart,
-      isPosted,
-      prettyType,
-      fmtDate,
       streetAddress,
       dateOnly,
       monthEnd,
