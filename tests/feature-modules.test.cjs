@@ -4,6 +4,15 @@ const path = require("node:path");
 const vm = require("node:vm");
 const test = require("node:test");
 
+function loadAuthFeatures(context) {
+  for (const filename of ["auth-recovery.js", "auth.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 test("CSV import feature loads as an isolated browser module", () => {
   const validators = Object.freeze({ validateAccountRows() {} });
   const context = vm.createContext({
@@ -1153,10 +1162,7 @@ test("backup export aborts before download when a private document path escapes 
 
 test("password reset requests keep generic feedback and restore the submit control", async () => {
   const context = vm.createContext({ window: {}, document: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
-    context,
-  );
+  loadAuthFeatures(context);
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id)) {
@@ -1170,7 +1176,7 @@ test("password reset requests keep generic feedback and restore the submit contr
     return elements.get(id);
   };
   const resetCalls = [];
-  const feature = context.window.PropertyDeskAuth.create({
+  const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
     state: {
       client: {
@@ -1184,6 +1190,9 @@ test("password reset requests keep generic feedback and restore the submit contr
     },
     fetchAll: async () => {},
     toast() {},
+    setAuthMode() {},
+    startWorkspace: async () => {},
+    showAuth() {},
     windowRef: {
       location: { origin: "https://example.test", pathname: "/propertydesk/" },
     },
@@ -1205,12 +1214,64 @@ test("password reset requests keep generic feedback and restore the submit contr
   assert.equal(element("forgot-password").disabled, false);
 });
 
+test("password recovery saves the new password before resuming workspace access", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  loadAuthFeatures(context);
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: "",
+        disabled: false,
+        textContent: "",
+      });
+    }
+    return elements.get(id);
+  };
+  element("reset-password").value = "new-password-value";
+  element("reset-password-confirm").value = "new-password-value";
+  const calls = [];
+  const state = {
+    user: { id: "old-user" },
+    passwordRecoveryInProgress: true,
+    client: {
+      auth: {
+        async updateUser(payload) {
+          calls.push(["update", payload]);
+          return { data: { user: { id: "updated-user" } }, error: null };
+        },
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskAuthRecovery.create({
+    $: element,
+    state,
+    toast: (message) => calls.push(["toast", message]),
+    setAuthMode: (signup) => calls.push(["auth-mode", signup]),
+    startWorkspace: async () => calls.push(["workspace"]),
+    showAuth() {},
+    windowRef: {
+      location: { pathname: "/propertydesk/", search: "?from=reset" },
+      history: { replaceState: (...args) => calls.push(["history", ...args]) },
+    },
+  });
+
+  await feature.submitPasswordReset({ preventDefault() {} });
+
+  assert.equal(calls[0][0], "update");
+  assert.equal(calls[0][1].password, "new-password-value");
+  assert.deepEqual(calls.at(-3), ["auth-mode", false]);
+  assert.deepEqual(calls.at(-2), ["workspace"]);
+  assert.deepEqual(calls.at(-1), ["toast", "Password updated"]);
+  assert.equal(state.user.id, "updated-user");
+  assert.equal(state.passwordRecoveryInProgress, false);
+  assert.equal(element("reset-password-submit").disabled, false);
+  assert.equal(element("reset-password-submit").textContent, "Update password");
+});
+
 test("auth session restoration and state changes stay inside the auth feature", async () => {
   const context = vm.createContext({ window: {}, URLSearchParams });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
-    context,
-  );
+  loadAuthFeatures(context);
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id))
@@ -1274,10 +1335,7 @@ test("auth session restoration and state changes stay inside the auth feature", 
 
 test("auth feature owns login controls and clears workspace data on sign-out", async () => {
   const context = vm.createContext({ window: {}, document: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
-    context,
-  );
+  loadAuthFeatures(context);
   const handlers = new Map();
   const elements = new Map();
   const element = (id) => {

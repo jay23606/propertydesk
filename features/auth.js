@@ -1,4 +1,4 @@
-/* PropertyDesk sign-in, account recovery, and workspace entry workflows. */
+/* PropertyDesk sign-in, session, and workspace entry workflows. */
 (() => {
   "use strict";
 
@@ -7,6 +7,21 @@
       $("auth-view").classList.remove("hidden");
       $("app-view").classList.add("hidden");
     }
+
+    const {
+      showPasswordReset,
+      isPasswordRecoverySession,
+      attachEvents: attachRecoveryEvents,
+    } = window.PropertyDeskAuthRecovery.create({
+      $,
+      state,
+      toast,
+      setAuthMode,
+      startWorkspace,
+      showAuth,
+      windowRef,
+      documentRef,
+    });
 
     function showApp() {
       $("auth-view").classList.add("hidden");
@@ -40,59 +55,6 @@
       $("auth-password").autocomplete = signup ? "new-password" : "current-password";
       $("auth-toggle").textContent = signup ? "Already have an account? Sign in" : "Create an account";
       $("auth-message").textContent = "";
-    }
-
-    function showPasswordReset() {
-      state.passwordRecoveryInProgress = true;
-      $("auth-title").textContent = "Choose a new password";
-      documentRef.querySelector(".auth-intro").textContent = "Your reset link is verified. Set a new password for your private workspace.";
-      $("auth-form").classList.add("hidden");
-      $("password-reset-form").classList.remove("hidden");
-      $("forgot-password").classList.add("hidden");
-      $("auth-toggle").classList.add("hidden");
-      $("auth-message").textContent = "";
-      showAuth();
-    }
-
-    async function requestPasswordReset() {
-      const email = $("auth-email").value.trim();
-      if (!$("auth-email").reportValidity()) return;
-      $("forgot-password").disabled = true;
-      try {
-        const redirectTo = `${windowRef.location.origin}${windowRef.location.pathname}`;
-        const { error } = await state.client.auth.resetPasswordForEmail(email, { redirectTo });
-        $("auth-message").textContent = error
-          ? "Unable to request a reset right now. Try again later."
-          : "If that email has a PropertyDesk account, a reset link is on its way.";
-      } catch {
-        $("auth-message").textContent = "Unable to request a reset right now. Try again later.";
-      } finally {
-        $("forgot-password").disabled = false;
-      }
-    }
-
-    async function submitPasswordReset(event) {
-      event.preventDefault();
-      const password = $("reset-password").value;
-      if (password !== $("reset-password-confirm").value) {
-        $("auth-message").textContent = "Those passwords do not match.";
-        return;
-      }
-      $("reset-password-submit").disabled = true;
-      $("reset-password-submit").textContent = "Updating…";
-      const { data, error } = await state.client.auth.updateUser({ password });
-      $("reset-password-submit").disabled = false;
-      $("reset-password-submit").textContent = "Update password";
-      if (error) {
-        $("auth-message").textContent = error.message;
-        return;
-      }
-      state.user = data.user || state.user;
-      state.passwordRecoveryInProgress = false;
-      windowRef.history.replaceState(null, "", `${windowRef.location.pathname}${windowRef.location.search}`);
-      setAuthMode(false);
-      await startWorkspace();
-      toast("Password updated");
     }
 
     async function submitAuth(event) {
@@ -143,18 +105,12 @@
     }
 
     function attachEvents() {
-      $('sign-out').addEventListener('click', signOut);
-      $('auth-toggle').addEventListener('click', () =>
-        setAuthMode($('auth-form').dataset.mode !== 'signup'),
+      $("sign-out").addEventListener("click", signOut);
+      $("auth-toggle").addEventListener("click", () =>
+        setAuthMode($("auth-form").dataset.mode !== "signup"),
       );
-      $('auth-form').addEventListener('submit', submitAuth);
-      $('forgot-password').addEventListener('click', requestPasswordReset);
-      $('password-reset-form').addEventListener('submit', submitPasswordReset);
-      $('reset-password-cancel').addEventListener('click', () => {
-        state.passwordRecoveryInProgress = false;
-        setAuthMode(false);
-        showAuth();
-      });
+      $("auth-form").addEventListener("submit", submitAuth);
+      attachRecoveryEvents();
     }
 
     function handleAuthStateChange(event, session) {
@@ -180,16 +136,6 @@
         startWorkspace();
     }
 
-    function isPasswordRecoverySession(session) {
-      const params = new URLSearchParams(
-        windowRef.location.hash.replace(/^#/, ''),
-      );
-      return (
-        params.get('type') === 'recovery' &&
-        params.get('access_token') === session?.access_token
-      );
-    }
-
     async function restoreAuthSession() {
       const {
         data: { session },
@@ -209,9 +155,6 @@
       showApp,
       showConfigError,
       setAuthMode,
-      showPasswordReset,
-      requestPasswordReset,
-      submitPasswordReset,
       submitAuth,
       startWorkspace,
       handleAuthStateChange,
