@@ -4,9 +4,9 @@
 
   function create({
     $, state, closeModal, openPayment, openExpense, resetAccountForm,
-    populateFormOptions, openModal,
+    populateFormOptions, openModal, toggleArchiveProperty,
   }) {
-    function attachEvents(toggleArchiveProperty) {
+    function attachEvents() {
       $("property-detail-add-income").addEventListener("click", () => {
         const propertyId = state.selectedPropertyId;
         if (!propertyId) return;

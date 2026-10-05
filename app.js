@@ -119,14 +119,12 @@
       $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
       prettyType, paymentFrequencyLabel, accountBalance, openModal, propertyAddress,
     });
-  const {
-    toggleArchiveProperty,
-    attachPropertyDetailEvents,
-  } = window.PropertyDeskPropertyDetailActionsWorkflow.create({
-    $, state, toast, fetchAll, todayIso, openPropertyDetails,
-    closeModal, editAccount, openPayment, openExpense, resetAccountForm,
-    populateFormOptions, openModal, openAccountDetails, documentRef: document,
-  });
+  const { attachPropertyDetailEvents } =
+    window.PropertyDeskPropertyDetailActionsWorkflow.create({
+      $, state, toast, fetchAll, todayIso, openPropertyDetails,
+      closeModal, editAccount, openPayment, openExpense, resetAccountForm,
+      populateFormOptions, openModal, openAccountDetails, documentRef: document,
+    });
   const { attachPropertyDocumentEvents } =
     window.PropertyDeskPropertyDocumentWorkflow.create({
       $, state, toast, fetchAll, openPropertyDetails,
@@ -217,7 +215,7 @@
       attachPropertyFormEvents,
       () => attachAccountFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
-      () => attachPropertyDetailEvents(toggleArchiveProperty),
+      attachPropertyDetailEvents,
       attachPropertyDocumentEvents,
       attachWorkspaceEvents,
       attachAuthEvents,

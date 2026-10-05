@@ -23,18 +23,15 @@
     const { attachEvents: attachPropertyQuickActions } =
       window.PropertyDeskPropertyDetailQuickActions.create({
         $, state, closeModal, openPayment, openExpense, resetAccountForm,
-        populateFormOptions, openModal,
+        populateFormOptions, openModal, toggleArchiveProperty,
       });
 
-    function attachPropertyDetailEvents(toggleArchiveProperty) {
+    function attachPropertyDetailEvents() {
       attachPropertyDetailContentEvents();
-      attachPropertyQuickActions(toggleArchiveProperty);
+      attachPropertyQuickActions();
     }
 
-    return {
-      toggleArchiveProperty,
-      attachPropertyDetailEvents,
-    };
+    return { attachPropertyDetailEvents };
   }
 
   window.PropertyDeskPropertyDetailActionsWorkflow = Object.freeze({ create });

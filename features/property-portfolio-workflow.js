@@ -4,7 +4,7 @@
 
   function create(context) {
     const {
-      $, state, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
+      $, state, toast, fetchAll, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
       accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
       propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
       lateReminderMailto, paymentStatusInMonth, openPayment,
@@ -12,9 +12,9 @@
       populateFormOptions, openModal,
     } = context;
     const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
-      state: context.state,
-      toast: context.toast,
-      fetchAll: context.fetchAll,
+      state,
+      toast,
+      fetchAll,
       streetAddress,
     });
     const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({

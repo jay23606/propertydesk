@@ -1078,10 +1078,11 @@ test("property detail events own editing and quick-action bindings", () => {
     resetAccountForm: () => calls.push("reset-account"),
     populateFormOptions: () => calls.push("populate-options"),
     openModal: (id) => calls.push(`open:${id}`),
+    toggleArchiveProperty: () => calls.push("archive"),
   });
 
   feature.attachEvents();
-  quickActions.attachEvents(() => calls.push("archive"));
+  quickActions.attachEvents();
   handlers.get("property-detail-content:click")({
     target: {
       closest: (selector) =>
@@ -1236,7 +1237,7 @@ test("property detail actions workflow composes administration and modal actions
       PropertyDeskPropertyDetailQuickActions: {
         create: (options) => {
           passed.quickActions = options;
-          return { attachEvents: (toggleArchiveProperty) => attachCalls.push(toggleArchiveProperty) };
+          return { attachEvents: () => attachCalls.push(passed.quickActions.toggleArchiveProperty) };
         },
       },
     },
@@ -1262,9 +1263,10 @@ test("property detail actions workflow composes administration and modal actions
   assert.equal(passed.events.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
+  assert.equal(passed.quickActions.toggleArchiveProperty, action);
   assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
-  workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty);
-  assert.deepEqual(attachCalls, ["content", workflow.toggleArchiveProperty]);
+  workflow.attachPropertyDetailEvents();
+  assert.deepEqual(attachCalls, ["content", action]);
 });
 
 test("property document workflow composes private file actions and event routing", () => {
