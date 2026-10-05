@@ -23,31 +23,6 @@
       openPropertyDetails,
       openPropertyPayment,
     } = context;
-    function updateGreeting() {
-      const hour = new Date().getHours();
-      const greeting =
-        hour < 12
-          ? "Good morning"
-          : hour < 18
-            ? "Good afternoon"
-            : "Good evening";
-      const displayName =
-        state.user?.user_metadata?.display_name ||
-        state.user?.email?.split("@")[0] ||
-        "there";
-      $("greeting-name").textContent = `, ${displayName}`;
-      $("page-overview").querySelector("h1").firstChild.textContent =
-        `${greeting}`;
-      $("user-email").textContent = displayName;
-      $("avatar-initial").textContent = displayName.charAt(0).toUpperCase();
-      $("user-menu").textContent = displayName.charAt(0).toUpperCase();
-      $("today-label").textContent = new Date().toLocaleDateString(undefined, {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      });
-    }
-
     function propertyCard(property) {
       const related = state.accounts.filter(
         (a) => a.property_id === property.id,
@@ -183,7 +158,7 @@
       });
     }
 
-    return { updateGreeting, renderOverview, attachEvents };
+    return { renderOverview, attachEvents };
   }
   window.PropertyDeskOverview = Object.freeze({ create: createOverview });
 })();

@@ -66,8 +66,8 @@
     securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
+  const { updateGreeting } = window.PropertyDeskProfileDisplay.create({ $, state });
   const {
-    updateGreeting,
     renderOverview,
     attachEvents: attachOverviewEvents,
   } = window.PropertyDeskOverview.create({

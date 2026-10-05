@@ -1058,6 +1058,52 @@ test("overview routes property-card and quick-payment actions to property workfl
   assert.deepEqual(calls, [["open", "property-1"], ["payment", "property-2"]]);
 });
 
+test("profile display updates the shared app shell from the current workspace user", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "profile-display.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const heading = { firstChild: { textContent: "" } };
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        textContent: "",
+        querySelector: () => heading,
+      });
+    }
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskProfileDisplay.create({
+    $,
+    state: { user: { email: "owner@example.test", user_metadata: { display_name: "Workspace Owner" } } },
+    now: () => ({
+      getHours: () => 14,
+      toLocaleDateString: () => "Mon, Oct 5",
+    }),
+  });
+
+  feature.updateGreeting();
+
+  assert.equal(heading.firstChild.textContent, "Good afternoon");
+  assert.equal($("greeting-name").textContent, ", Workspace Owner");
+  assert.equal($("user-email").textContent, "Workspace Owner");
+  assert.equal($("avatar-initial").textContent, "W");
+  assert.equal($("user-menu").textContent, "W");
+  assert.equal($("today-label").textContent, "Mon, Oct 5");
+});
+
+test("profile display loads before overview and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/profile-display.js") < html.indexOf("features/overview.js"),
+    "profile display should load before dashboard composition",
+  );
+  assert.match(worker, /'\.\/features\/profile-display\.js'/);
+});
+
 test("Properties grid routes payment, note, address, and add-account actions locally", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
