@@ -3,8 +3,17 @@
   "use strict";
 
   function createPropertyAccountForms(context) {
-    const properties = window.PropertyDeskPropertyForm.create(context);
-    const accounts = window.PropertyDeskAccountForm.create(context);
+    const {
+      $, state, toast, closeModal, fetchAll, moneyInput, todayIso,
+      populateFormOptions, openModal,
+    } = context;
+    const properties = window.PropertyDeskPropertyForm.create({
+      $, state, toast, closeModal, fetchAll,
+    });
+    const accounts = window.PropertyDeskAccountForm.create({
+      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
+      populateFormOptions, openModal,
+    });
 
     function attachEvents(previewReminderEmail) {
       properties.attachEvents();

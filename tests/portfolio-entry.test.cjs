@@ -252,6 +252,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
 
 test("property and account form workflow publishes an explicit interface", () => {
   const calls = [];
+  const passed = {};
   const propertyActions = {
     resetPropertyForm: () => "reset property",
     saveProperty: () => "save property",
@@ -266,8 +267,8 @@ test("property and account form workflow publishes an explicit interface", () =>
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyForm: { create: () => propertyActions },
-      PropertyDeskAccountForm: { create: () => accountActions },
+      PropertyDeskPropertyForm: { create: (options) => { passed.property = options; return propertyActions; } },
+      PropertyDeskAccountForm: { create: (options) => { passed.account = options; return accountActions; } },
     },
   });
   vm.runInContext(
@@ -277,7 +278,12 @@ test("property and account form workflow publishes an explicit interface", () =>
     ),
     context,
   );
-  const forms = context.window.PropertyDeskPropertyAccountForms.create({});
+  const dependencies = {
+    $() {}, state: {}, toast() {}, closeModal() {}, fetchAll() {},
+    moneyInput() {}, todayIso() {}, populateFormOptions() {}, openModal() {},
+    unrelatedDependency() {},
+  };
+  const forms = context.window.PropertyDeskPropertyAccountForms.create(dependencies);
 
   assert.deepEqual(
     Object.keys(forms).sort(),
@@ -293,6 +299,15 @@ test("property and account form workflow publishes an explicit interface", () =>
   );
   assert.equal(forms.saveProperty, propertyActions.saveProperty);
   assert.equal(forms.editAccount, accountActions.editAccount);
+  assert.deepEqual(Object.keys(passed.property).sort(), [
+    "$", "closeModal", "fetchAll", "state", "toast",
+  ].sort());
+  assert.deepEqual(Object.keys(passed.account).sort(), [
+    "$", "closeModal", "fetchAll", "moneyInput", "openModal",
+    "populateFormOptions", "state", "todayIso", "toast",
+  ].sort());
+  assert.equal(passed.property.state, dependencies.state);
+  assert.equal(passed.account.moneyInput, dependencies.moneyInput);
   const preview = () => {};
   forms.attachEvents(preview);
   assert.deepEqual(calls, ["property events", ["account events", preview]]);
