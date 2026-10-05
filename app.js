@@ -364,27 +364,12 @@
     attachImportEvents();
     attachExportEvents();
   }
-  function setupServiceWorker() {
-    if (
-      !('serviceWorker' in navigator) ||
-      !window.location.protocol.startsWith('http')
-    )
-      return;
-    navigator.serviceWorker
-      .register('./sw.js')
-      .catch((error) =>
-        console.warn(
-          'PropertyDesk shell cache could not be registered:',
-          error,
-        ),
-      );
-  }
   async function init() {
     attachEvents();
     $('payment-date').value = todayIso();
     $('account-start').value = todayIso();
     setAuthMode(false);
-    setupServiceWorker();
+    window.PropertyDeskPwa.registerShell();
 
     if (!configured) {
       showConfigError();

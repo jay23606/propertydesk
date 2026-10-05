@@ -103,6 +103,55 @@ test("notification feature replaces its timer and hides transient feedback", () 
   assert.equal(classes.has("show"), false);
 });
 
+test("PWA registration runs only in a web context and reports registration failures", async () => {
+  const context = vm.createContext({ window: {}, navigator: {}, console });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "pwa-registration.js"), "utf8"),
+    context,
+  );
+  const registerShell = context.window.PropertyDeskPwa.registerShell;
+  const registrations = [];
+  const warnings = [];
+  const serviceWorker = {
+    register(pathname) {
+      registrations.push(pathname);
+      return Promise.resolve();
+    },
+  };
+
+  registerShell({
+    navigatorRef: {},
+    windowRef: { location: { protocol: "https:" } },
+    logger: { warn: (...args) => warnings.push(args) },
+  });
+  registerShell({
+    navigatorRef: { serviceWorker },
+    windowRef: { location: { protocol: "file:" } },
+    logger: { warn: (...args) => warnings.push(args) },
+  });
+  registerShell({
+    navigatorRef: { serviceWorker },
+    windowRef: { location: { protocol: "https:" } },
+    logger: { warn: (...args) => warnings.push(args) },
+  });
+  assert.deepEqual(registrations, ["./sw.js"]);
+
+  const failure = new Error("Registration failed");
+  registerShell({
+    navigatorRef: {
+      serviceWorker: { register: () => Promise.reject(failure) },
+    },
+    windowRef: { location: { protocol: "https:" } },
+    logger: { warn: (...args) => warnings.push(args) },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(warnings.length, 1);
+  assert.deepEqual(warnings[0], [
+    "PropertyDesk shell cache could not be registered:",
+    failure,
+  ]);
+});
+
 test("ledger context scopes balance, collections, and deposits to workspace state", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
