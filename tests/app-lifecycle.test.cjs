@@ -49,6 +49,7 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
     eventBinders: [() => calls.push("modals"), () => calls.push("navigation")],
   });
 
+  assert.deepEqual(Object.keys(lifecycle).sort(), ["initialize", "render"]);
   lifecycle.render();
   await lifecycle.initialize();
 
