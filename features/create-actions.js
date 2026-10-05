@@ -4,7 +4,7 @@
 
   function createActions(context) {
     const {
-      $, state, todayIso, toast, resetPropertyForm, resetAccountForm,
+      $, state, toast, resetPropertyForm, resetAccountForm,
       populateFormOptions, openModal, openPayment, openExpense, documentRef,
     } = context;
 

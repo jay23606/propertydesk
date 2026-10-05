@@ -190,7 +190,6 @@
     window.PropertyDeskCreateActions.create({
       $,
       state,
-      todayIso,
       toast,
       resetPropertyForm,
       resetAccountForm,

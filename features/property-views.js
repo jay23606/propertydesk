@@ -14,8 +14,6 @@
       esc,
       money,
       propertyAddress,
-      collectedSince,
-      scheduledMonthlyRunRate,
       monthStart,
       streetAddress,
       dateOnly,
