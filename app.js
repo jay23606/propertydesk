@@ -63,7 +63,14 @@
     const el = $('toast'); el.textContent = message; el.classList.add('show');
     clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
   }
-  function moneyInput(value) { const raw=String(value??'').trim(),negative=/^\(.*\)$/.test(raw),normalized=raw.replace(/[,$\s()]/g,'');const n=Number(normalized)*(negative?-1:1);return Number.isFinite(n)?Math.round((n+Number.EPSILON)*100)/100:0; }
+  function moneyInput(value) {
+    const raw = String(value ?? '').trim();
+    const negative = /^\(.*\)$/.test(raw);
+    const normalized = raw.replace(/[,$\s()]/g, '');
+    const amount = Number(normalized) * (negative ? -1 : 1);
+    if (!Number.isFinite(amount)) return 0;
+    return Math.round((amount + Number.EPSILON) * 100) / 100;
+  }
   function accountBalance(account, asOf = todayIso()) {
     return scheduledLoanBalance(account, asOf);
   }
@@ -210,12 +217,28 @@
     state.reminderLogs = reminderLogs.data || [];
     render();
   }
-  function render() { updateGreeting(); renderOverview(); renderProperties(); renderPayments(); renderReports(); }
-  function navigate(view) {
-    state.view=view; document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===`page-${view}`)); document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
-    $('page-crumb').textContent=view.charAt(0).toUpperCase()+view.slice(1); window.scrollTo({top:0,behavior:'smooth'});
+  function render() {
+    updateGreeting();
+    renderOverview();
+    renderProperties();
+    renderPayments();
+    renderReports();
   }
-  function openModal(id) { $(id).classList.remove('hidden'); document.body.style.overflow='hidden'; }
+  function navigate(view) {
+    state.view = view;
+    document.querySelectorAll('.page').forEach((page) => {
+      page.classList.toggle('active', page.id === 'page-' + view);
+    });
+    document.querySelectorAll('.nav-link').forEach((link) => {
+      link.classList.toggle('active', link.dataset.view === view);
+    });
+    $('page-crumb').textContent = view.charAt(0).toUpperCase() + view.slice(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function openModal(id) {
+    $(id).classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
   function resetPaymentModal() {
     $('payment-modal-title').textContent = 'Record payment';
     $('payment-modal').querySelector('.eyebrow').textContent = 'PAYMENT ENTRY';
