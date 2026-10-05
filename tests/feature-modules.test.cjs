@@ -383,6 +383,78 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
+test("ledger actions keep deposit adjustments separate and retain void audit reasons", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-actions.js"), "utf8"),
+    context,
+  );
+  const prompts = ["250.00", "Deposit retention per move-out inspection", "Entered in error"];
+  const inserts = [];
+  const updates = [];
+  const messages = [];
+  const calls = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+    client: {
+      from(table) {
+        return {
+          async insert(payload) {
+            inserts.push([table, payload]);
+            return { error: null };
+          },
+          update(payload) {
+            updates.push([table, payload]);
+            return {
+              eq(column, value) {
+                updates.push([column, value]);
+                return {
+                  eq(statusColumn, status) {
+                    updates.push([statusColumn, status]);
+                    return {
+                      select() {
+                        return { async maybeSingle() { return { data: { id: "payment-1" }, error: null }; } };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskLedgerActions.create({
+    $: (id) => ({ id }),
+    state,
+    moneyInput: Number,
+    todayIso: () => "2026-10-04",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => calls.push("refresh"),
+    closeModal: (modal) => calls.push(["close", modal.id]),
+    openAccountDetails: async (id) => calls.push(["open-account", id]),
+    confirmAction: () => true,
+    promptAction: () => prompts.shift(),
+    timestamp: () => "2026-10-04T12:00:00.000Z",
+  });
+
+  await feature.recordDepositAdjustment("rental-1", "retained");
+  await feature.voidTransaction("income", "payment-1");
+
+  assert.equal(inserts[0][0], "pd_deposit_entries");
+  assert.equal(inserts[0][1].user_id, "workspace-1");
+  assert.equal(inserts[0][1].amount, 250);
+  assert.equal(inserts[0][1].reason, "Deposit retention per move-out inspection");
+  assert.equal(updates[0][0], "pd_payments");
+  assert.equal(updates[0][1].status, "voided");
+  assert.equal(updates[0][1].voided_at, "2026-10-04T12:00:00.000Z");
+  assert.equal(updates[0][1].void_reason, "Entered in error");
+  assert.equal(messages.at(-1), "Transaction voided; original entry preserved");
+  assert.equal(calls.filter((call) => call === "refresh").length, 2);
+});
+
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
