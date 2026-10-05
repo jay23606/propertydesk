@@ -45,9 +45,17 @@
       }
       $("reset-password-submit").disabled = true;
       $("reset-password-submit").textContent = "Updating…";
-      const { data, error } = await state.client.auth.updateUser({ password });
-      $("reset-password-submit").disabled = false;
-      $("reset-password-submit").textContent = "Update password";
+      let result;
+      try {
+        result = await state.client.auth.updateUser({ password });
+      } catch {
+        $("auth-message").textContent = "Unable to update your password right now. Try again.";
+        return;
+      } finally {
+        $("reset-password-submit").disabled = false;
+        $("reset-password-submit").textContent = "Update password";
+      }
+      const { data, error } = result;
       if (error) {
         $("auth-message").textContent = error.message;
         return;

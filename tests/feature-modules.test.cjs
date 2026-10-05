@@ -1269,6 +1269,48 @@ test("password recovery saves the new password before resuming workspace access"
   assert.equal(element("reset-password-submit").textContent, "Update password");
 });
 
+test("password recovery restores its submit control when the auth request rejects", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  loadAuthFeatures(context);
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        value: "new-password-value",
+        disabled: false,
+        textContent: "",
+      });
+    return elements.get(id);
+  };
+  element("reset-password-confirm").value = "new-password-value";
+  const feature = context.window.PropertyDeskAuthRecovery.create({
+    $: element,
+    state: {
+      user: { id: "owner-1" },
+      passwordRecoveryInProgress: true,
+      client: {
+        auth: {
+          async updateUser() {
+            throw new Error("network unavailable");
+          },
+        },
+      },
+    },
+    toast() {},
+    setAuthMode() {},
+    startWorkspace: async () => {},
+    showAuth() {},
+    windowRef: { location: { pathname: "/propertydesk/", search: "" } },
+  });
+
+  await assert.doesNotReject(
+    feature.submitPasswordReset({ preventDefault() {} }),
+  );
+  assert.equal(element("reset-password-submit").disabled, false);
+  assert.equal(element("reset-password-submit").textContent, "Update password");
+  assert.match(element("auth-message").textContent, /try again/i);
+});
+
 test("auth session restoration and state changes stay inside the auth feature", async () => {
   const context = vm.createContext({ window: {}, URLSearchParams });
   loadAuthFeatures(context);
