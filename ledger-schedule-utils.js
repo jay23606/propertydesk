@@ -242,7 +242,7 @@
         balance = cents(Math.max(0, balance - principalPart));
         rows.push({
           i,
-          date: dueDate(i),
+          date: dueDate(i - 1),
           payment: cents(interest + principalPart),
           principal: principalPart,
           interest,

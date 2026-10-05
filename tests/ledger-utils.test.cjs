@@ -206,9 +206,9 @@ test('future next-due dates retain the month-end anchor when backfilling prior i
 
 test('scheduled loan balance follows amortization and accepts positive or negative owner adjustments', () => {
   const account = { account_type: 'land_contract', original_principal: 1000, interest_rate: 0, term_months: 4, start_date: '2025-12-01' };
-  assert.equal(scheduledLoanBalance(account, '2026-02-01'), 500);
-  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: 125 }, '2026-02-01'), 625);
-  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -125 }, '2026-02-01'), 375);
+  assert.equal(scheduledLoanBalance(account, '2026-02-01'), 250);
+  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: 125 }, '2026-02-01'), 375);
+  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -125 }, '2026-02-01'), 125);
 });
 
 test('on-time land-contract schedule provides the hypothetical balance independently of payments received', () => {
@@ -219,11 +219,11 @@ test('on-time land-contract schedule provides the hypothetical balance independe
   };
   const schedule = amortizationSchedule(account.original_principal, account.interest_rate,
     account.term_months, account.start_date, account.principal_interest_amount);
-  assert.equal(schedule[0].date, '2025-06-01');
+  assert.equal(schedule[0].date, '2025-05-01');
   assert.equal(schedule[0].payment, 400);
   const hypothetical = scheduledLoanBalance(account, '2026-10-03');
-  assert.equal(hypothetical, 48476.48);
-  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -250 }, '2026-10-03'), 48226.48);
+  assert.equal(hypothetical, 48443.54);
+  assert.equal(scheduledLoanBalance({ ...account, balance_adjustment: -250 }, '2026-10-03'), 48193.54);
   const received = [{ account_id: account.id, amount: 1000, received_date: '2026-04-01', income_category: 'installment' }];
   assert.equal(amountDueSince([account], [], '2026-01-01', '2026-10-03'), 5500);
   assert.equal(amountDueSince([account], received, '2026-01-01', '2026-10-03'), 4500);
@@ -249,7 +249,32 @@ test('contractual P&I can be estimated separately from escrow-inclusive installm
 
 test('amortization due dates preserve month-end dates without overflowing', () => {
   const schedule = amortizationSchedule(1000, 0, 2, '2024-01-31');
-  assert.deepEqual(schedule.map(row => row.date), ['2024-02-29', '2024-03-31']);
+  assert.deepEqual(schedule.map(row => row.date), ['2024-01-31', '2024-02-29']);
+});
+
+test('amortization begins on the saved first-payment date', () => {
+  const account = {
+    account_type: 'land_contract',
+    original_principal: 65000,
+    interest_rate: 10.6113,
+    term_months: 360,
+    start_date: '2026-10-01',
+    principal_interest_amount: 600,
+  };
+  const schedule = amortizationSchedule(
+    account.original_principal,
+    account.interest_rate,
+    account.term_months,
+    account.start_date,
+    account.principal_interest_amount,
+  );
+
+  assert.equal(schedule[0].date, '2026-10-01');
+  assert.equal(schedule[0].interest, 574.78);
+  assert.equal(schedule[0].principal, 25.22);
+  assert.equal(schedule[0].balance, 64974.78);
+  assert.equal(scheduledLoanBalance(account, '2026-09-30'), 65000);
+  assert.equal(scheduledLoanBalance(account, '2026-10-01'), 64974.78);
 });
 
 test('backup manifest identifies its version and counts every supported table', () => {
