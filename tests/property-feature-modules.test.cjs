@@ -910,8 +910,11 @@ test("property actions workflow composes holder, document, and detail event beha
       PropertyDeskPropertyQuickNote: {
         create: () => ({ editPropertyQuickNote: action }),
       },
-      PropertyDeskPropertyManagement: {
-        create: () => ({ savePropertyHolders: action, toggleArchiveProperty: action }),
+      PropertyDeskPropertyHolderManagement: {
+        create: () => ({ savePropertyHolders: action }),
+      },
+      PropertyDeskPropertyArchive: {
+        create: () => ({ toggleArchiveProperty: action }),
       },
       PropertyDeskDocuments: {
         create: () => ({ uploadPropertyDocument: action, deletePropertyDocument: action, openPropertyDocument: action }),

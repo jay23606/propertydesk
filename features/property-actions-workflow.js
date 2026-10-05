@@ -11,10 +11,13 @@
     const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
       state, toast, fetchAll, streetAddress,
     });
-    const { savePropertyHolders, toggleArchiveProperty } =
-      window.PropertyDeskPropertyManagement.create({
-        state, toast, fetchAll, todayIso, openPropertyDetails, documentRef,
+    const { savePropertyHolders } =
+      window.PropertyDeskPropertyHolderManagement.create({
+        state, toast, fetchAll, openPropertyDetails, documentRef,
       });
+    const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create({
+      state, toast, fetchAll, todayIso, openPropertyDetails,
+    });
     const {
       uploadPropertyDocument,
       deletePropertyDocument,

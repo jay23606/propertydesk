@@ -1,16 +1,14 @@
-/* PropertyDesk member labels and property archive workflows. */
+/* Save account-holder labels for a property. */
 (() => {
   "use strict";
 
-  function create({
-    state, toast, fetchAll, todayIso, openPropertyDetails,
-    documentRef = document,
-  }) {
+  function create({ state, toast, fetchAll, openPropertyDetails, documentRef = document }) {
     async function savePropertyHolders() {
       const id = state.selectedPropertyId;
       const selected = [...documentRef.querySelectorAll("[data-holder-choice]:checked")]
         .map((input) => input.value);
       if (!id) return;
+
       let deleteError;
       try {
         ({ error: deleteError } = await state.client.from("pd_property_holders")
@@ -59,36 +57,8 @@
       toast("Account-holder labels saved");
     }
 
-    async function toggleArchiveProperty() {
-      const id = state.selectedPropertyId;
-      const property = state.properties.find((item) => item.id === id);
-      if (!property) return;
-      const archived_at = property.archived_at ? null : todayIso();
-      let error;
-      try {
-        ({ error } = await state.client.from("pd_properties")
-          .update({ archived_at })
-          .eq("id", id)
-          .eq("user_id", state.workspaceOwnerId));
-      } catch {
-        toast("Property status couldn't be updated right now. Check your connection and try again.");
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      openPropertyDetails(id);
-      toast(archived_at ? "Property archived" : "Property restored");
-    }
-
-    return { savePropertyHolders, toggleArchiveProperty };
+    return { savePropertyHolders };
   }
 
-  window.PropertyDeskPropertyManagement = { create };
+  window.PropertyDeskPropertyHolderManagement = Object.freeze({ create });
 })();

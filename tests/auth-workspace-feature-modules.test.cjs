@@ -946,15 +946,14 @@ test("property quick notes enforce the character limit before writing", async ()
   assert.deepEqual(messages, ["Quick notes are limited to 140 characters."]);
 });
 
-test("property administration workflows report rejected writes without running success actions", async () => {
+test("property holder and archive workflows report rejected writes without running success actions", async () => {
   const context = vm.createContext({ window: {}, document: { querySelectorAll: () => [] } });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-management.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const source of ["property-holder-management.js", "property-archive.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
   const messages = [];
   const rejectingQuery = () => {
     let filters = 0;
@@ -983,8 +982,13 @@ test("property administration workflows report rejected writes without running s
       },
     },
   };
-  const feature = context.window.PropertyDeskPropertyManagement.create({
-    $() {},
+  const holderManagement = context.window.PropertyDeskPropertyHolderManagement.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("a rejected write must not refresh"),
+    openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
+  });
+  const archive = context.window.PropertyDeskPropertyArchive.create({
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected write must not refresh"),
@@ -992,8 +996,8 @@ test("property administration workflows report rejected writes without running s
     openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
   });
 
-  await assert.doesNotReject(feature.savePropertyHolders());
-  await assert.doesNotReject(feature.toggleArchiveProperty());
+  await assert.doesNotReject(holderManagement.savePropertyHolders());
+  await assert.doesNotReject(archive.toggleArchiveProperty());
   assert.deepEqual(messages, [
     "Account-holder labels couldn't be saved right now. Check your connection and try again.",
     "Property status couldn't be updated right now. Check your connection and try again.",

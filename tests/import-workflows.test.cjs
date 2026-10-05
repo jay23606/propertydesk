@@ -102,7 +102,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/documents.js') < html.indexOf('features/property-actions-workflow.js'));
-  assert.ok(html.indexOf('features/property-management.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-holder-management.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-archive.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('features/property-actions-workflow.js'));
   assert.ok(html.indexOf('features/property-actions-workflow.js') < html.indexOf('app.js'));
@@ -128,7 +129,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/profile-settings.js') < html.indexOf('features/workspace.js'));
   assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/workspace-members.js') < html.indexOf('features/workspace.js'));
-  assert.ok(html.indexOf('features/property-management.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-holder-management.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-archive.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-view-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-view-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('app.js'));
@@ -152,6 +154,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-imports\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/property-portfolio-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/property-holder-management\.js'/);
+  assert.match(worker, /'\.\/features\/property-archive\.js'/);
   assert.match(worker, /'\.\/features\/overview\.js'/);
   assert.match(worker, /'\.\/features\/app-state\.js'/);
   assert.match(worker, /'\.\/features\/app-lifecycle\.js'/);
@@ -191,7 +195,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/auth-form\.js'/);
   assert.match(worker, /'\.\/features\/auth\.js'/);
   assert.match(worker, /'\.\/features\/workspace\.js'/);
-  assert.match(worker, /'\.\/features\/property-management\.js'/);
+  assert.match(worker, /'\.\/features\/property-holder-management\.js'/);
+  assert.match(worker, /'\.\/features\/property-archive\.js'/);
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/deposit-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
