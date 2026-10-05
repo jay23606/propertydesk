@@ -10,7 +10,8 @@ Shared initialization lives in `features/app-services.js`. It creates the Supaba
 
 - Properties: `property-portfolio-workflow.js`, `property-details-workflow.js`, and `property-actions-workflow.js`.
 - Receipts and expenses: `entry-workflow.js`, with separate payment and expense forms.
-- Account details and transaction history: `account-details-workflow.js` and `transaction-workflow.js`.
+- Account and deposit maintenance: `account-maintenance-workflow.js` composes account closure and deposit adjustments for the account detail view.
+- Transaction history and maintenance: `transaction-workflow.js` handles the ledger view, while `transaction-maintenance-workflow.js` composes audited corrections and voids.
 - Imports and exports: `csv-import-workflow.js`, `report-workflow.js`, and the private backup module.
 - Workspace settings, authentication, and reminders: `workspace-settings-workflow.js` and the related focused modules.
 

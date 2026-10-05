@@ -111,16 +111,23 @@
     $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
     fillSelect, populateFormOptions, prettyType, openModal, documentRef: document,
   });
+  const { correctTransaction, voidTransaction } =
+    window.PropertyDeskTransactionMaintenanceWorkflow.create({
+      $, state, toast, fetchAll, prettyType, openPayment, openExpense,
+      updateAllocationPreview, EventClass: Event, OptionClass: Option,
+    });
   const {
     renderPayments,
     attachTransactionViewEvents,
     attachTransactionActionEvents,
   } = window.PropertyDeskTransactionWorkflow.create({
     $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-    monthStart, sumIncome, sumOperatingExpenses, toast, prettyType, openPayment,
-    openExpense, updateAllocationPreview, EventClass: Event, OptionClass: Option,
-    fetchAll,
+    monthStart, sumIncome, sumOperatingExpenses, correctTransaction, voidTransaction,
   });
+  const { closeAccount, recordDepositAdjustment } =
+    window.PropertyDeskAccountMaintenanceWorkflow.create({
+      $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
+    });
   const {
     openAccountDetails,
     attachAccountDetailEvents,
@@ -129,7 +136,7 @@
     $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
     paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
     unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-    editAccount, openPayment, moneyInput, toast, fetchAll,
+    editAccount, openPayment, closeAccount, recordDepositAdjustment,
   });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailsWorkflow.create({

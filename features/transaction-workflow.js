@@ -5,13 +5,9 @@
   function create(context) {
     const {
       $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-      monthStart, sumIncome, sumOperatingExpenses, toast, prettyType, openPayment,
-      openExpense, updateAllocationPreview, EventClass, OptionClass, fetchAll,
-      documentRef = document,
+      monthStart, sumIncome, sumOperatingExpenses, correctTransaction,
+      voidTransaction, documentRef = document,
     } = context;
-    const { voidTransaction } = window.PropertyDeskTransactionMaintenance.create({
-      state, toast, fetchAll,
-    });
     const {
       renderPayments,
       attachEvents: attachTransactionViewEvents,
@@ -19,11 +15,6 @@
       $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
       monthStart, sumIncome, sumOperatingExpenses,
     });
-    const { correctTransaction } =
-      window.PropertyDeskTransactionCorrectionForm.create({
-        $, state, toast, prettyType, openPayment, openExpense,
-        updateAllocationPreview, EventClass, OptionClass,
-      });
     const { attachEvents: attachTransactionActionEvents } =
       window.PropertyDeskTransactionViewEvents.create({
         documentRef, correctTransaction, voidTransaction,

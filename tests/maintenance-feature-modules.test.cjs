@@ -5,6 +5,67 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("account maintenance workflow composes account closure and deposit actions", () => {
+  const passed = {};
+  const closeAccount = () => "closed";
+  const recordDepositAdjustment = () => "adjusted";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountMaintenance: {
+        create: (options) => { passed.account = options; return { closeAccount }; },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (options) => { passed.deposit = options; return { recordDepositAdjustment }; },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-maintenance-workflow.js"), "utf8"),
+    context,
+  );
+  const dependencies = { $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {}, fetchAll() {}, closeModal() {} };
+  const workflow = context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
+
+  assert.equal(passed.account.state, dependencies.state);
+  assert.equal(passed.account.closeModal, dependencies.closeModal);
+  assert.equal(passed.deposit.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.deposit.todayIso, dependencies.todayIso);
+  assert.equal(workflow.closeAccount, closeAccount);
+  assert.equal(workflow.recordDepositAdjustment, recordDepositAdjustment);
+});
+
+test("transaction maintenance workflow composes correction and void actions", () => {
+  const passed = {};
+  const correctTransaction = () => "corrected";
+  const voidTransaction = () => "voided";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionMaintenance: {
+        create: (options) => { passed.void = options; return { voidTransaction }; },
+      },
+      PropertyDeskTransactionCorrectionForm: {
+        create: (options) => { passed.correction = options; return { correctTransaction }; },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance-workflow.js"), "utf8"),
+    context,
+  );
+  const dependencies = {
+    $() {}, state: {}, toast() {}, fetchAll() {}, prettyType() {}, openPayment() {},
+    openExpense() {}, updateAllocationPreview() {}, EventClass: class {}, OptionClass: class {},
+  };
+  const workflow = context.window.PropertyDeskTransactionMaintenanceWorkflow.create(dependencies);
+
+  assert.equal(passed.void.state, dependencies.state);
+  assert.equal(passed.void.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.correction.updateAllocationPreview, dependencies.updateAllocationPreview);
+  assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
+  assert.equal(workflow.correctTransaction, correctTransaction);
+  assert.equal(workflow.voidTransaction, voidTransaction);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

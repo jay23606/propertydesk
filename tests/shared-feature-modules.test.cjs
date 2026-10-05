@@ -364,7 +364,7 @@ test("report workflow composes portfolio rendering and account export actions", 
   assert.equal(workflow.attachReportExportEvents(), "export events");
 });
 
-test("transaction workflow composes ledger display, correction, and action routing", () => {
+test("transaction workflow composes ledger display and passed maintenance actions", () => {
   const received = {};
   const correct = () => "correct";
   const context = vm.createContext({
@@ -375,22 +375,10 @@ test("transaction workflow composes ledger display, correction, and action routi
           return { renderPayments: () => "payments", attachEvents: () => "view events" };
         },
       },
-      PropertyDeskTransactionCorrectionForm: {
-        create: (options) => {
-          received.correction = options;
-          return { correctTransaction: correct };
-        },
-      },
       PropertyDeskTransactionViewEvents: {
         create: (options) => {
           received.events = options;
           return { attachEvents: () => "action events" };
-        },
-      },
-      PropertyDeskTransactionMaintenance: {
-        create: (options) => {
-          received.maintenance = options;
-          return { voidTransaction: () => "voided" };
         },
       },
     },
@@ -400,19 +388,14 @@ test("transaction workflow composes ledger display, correction, and action routi
     context,
   );
   const updateAllocationPreview = () => {};
-  const transactionDependencies = {
-    state: {}, toast() {}, fetchAll() {},
-  };
+  const voidTransaction = () => "voided";
+  const transactionDependencies = { state: {}, correctTransaction: correct, voidTransaction };
   const workflow = context.window.PropertyDeskTransactionWorkflow.create({
     updateAllocationPreview, ...transactionDependencies, documentRef: {},
   });
 
-  assert.equal(received.correction.updateAllocationPreview, updateAllocationPreview);
   assert.equal(received.events.correctTransaction, correct);
-  assert.equal(typeof received.events.voidTransaction, "function");
-  assert.equal(received.maintenance.state, transactionDependencies.state);
-  assert.equal(received.maintenance.toast, transactionDependencies.toast);
-  assert.equal(received.maintenance.fetchAll, transactionDependencies.fetchAll);
+  assert.equal(received.events.voidTransaction, voidTransaction);
   assert.equal(received.events.voidTransaction(), "voided");
   assert.equal(workflow.renderPayments(), "payments");
   assert.equal(workflow.attachTransactionViewEvents(), "view events");
