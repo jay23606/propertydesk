@@ -509,6 +509,17 @@ test("property and transaction views own their search and filter bindings", () =
     ]],
   ]) {
     const context = vm.createContext({ window: {} });
+    if (file === "transaction-views.js") {
+      for (const dependency of [
+        "transaction-list-model.js",
+        "transaction-row-view.js",
+      ]) {
+        vm.runInContext(
+          fs.readFileSync(path.join(__dirname, "..", "features", dependency), "utf8"),
+          context,
+        );
+      }
+    }
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", file), "utf8"),
       context,

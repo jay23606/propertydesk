@@ -1,21 +1,20 @@
-/* PropertyDesk payment and expense transaction views. */
+/* Coordinate transaction filters, summary totals, and view rendering. */
 (() => {
   "use strict";
 
   function createTransactionViews(context) {
     const {
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
+      $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
+      monthStart, sumIncome, sumOperatingExpenses,
     } = context;
+    const { buildTransactionList } =
+      window.PropertyDeskTransactionListModel.create({
+        state, dateOnly, expenseCategoryLabel, isPosted, monthStart,
+        sumIncome, sumOperatingExpenses,
+      });
+    const { transactionRowHTML } = window.PropertyDeskTransactionRowView.create({
+      esc, money, fmtDate,
+    });
 
     function attachEvents() {
       $("payment-search").addEventListener("input", renderPayments);
@@ -23,109 +22,24 @@
       $("transaction-type").addEventListener("change", renderPayments);
     }
 
-    function renderTransactionRow(record) {
-      const item = record.item;
-      const isExpense = record.kind === "expense";
-      const isVoided = item.status === "voided";
-      const account = state.accounts.find((row) => row.id === item.account_id);
-      const property = isExpense
-        ? state.properties.find((row) => row.id === item.property_id)
-        : state.properties.find((row) => row.id === account?.property_id);
-      const correctionOf = isExpense
-        ? item.correction_of_expense_id
-        : item.correction_of_payment_id;
-      const transactionType = isExpense
-        ? "Expense"
-        : item.income_category === "deposit"
-          ? "Security deposit"
-          : "Income";
-      const detailsType = isExpense
-        ? expenseCategoryLabel(item.category)
-        : account?.account_type === "rental"
-          ? item.income_category
-          : "Installment receipt";
-      const paymentMethod = isExpense
-        ? item.payee || item.payment_method
-        : item.payment_method.replace("_", " ");
-      const actionButtons = isVoided
-        ? '<span class="muted">Voided</span>'
-        : `<button type="button" class="text-button" data-correct-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Correct</button> <button type="button" class="text-button" data-void-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Void</button>`;
-
-      return `<tr class='${isVoided ? "transaction-voided" : ""}'>
-        <td>${fmtDate(record.date)}</td>
-        <td><span class='${isExpense ? "expense-pill" : "status-pill"}'>${transactionType}${isVoided ? " · voided" : ""}</span></td>
-        <td><strong>${esc(property?.name || "—")}</strong><br>${esc(account?.party_name || account?.name || "Property")}</td>
-        <td>${esc(detailsType)}</td>
-        <td><strong>${isExpense ? "−" : ""}${money(record.amount)}</strong></td>
-        <td>${esc(paymentMethod)}</td>
-        <td>${esc(item.memo || "—")}${item.void_reason ? `<small class='table-subtext'>${esc(item.void_reason)}</small>` : ""}${correctionOf ? '<small class="table-subtext">Corrected replacement</small>' : ""}</td>
-        <td>${actionButtons}</td>
-      </tr>`;
-    }
-
     function renderPayments() {
-      const period = $("payment-period").value,
-        q = $("payment-search").value.trim().toLowerCase(),
-        now = new Date(),
-        type = $("transaction-type").value;
-      const rows = [
-        ...state.payments.map((item) => ({
-          kind: "income",
-          date: item.received_date,
-          amount: Number(item.amount),
-          item,
-        })),
-        ...state.expenses.map((item) => ({
-          kind: "expense",
-          date: item.expense_date,
-          amount: Number(item.amount),
-          item,
-        })),
-      ]
-        .filter(
-          (x) =>
-            (type === "all" || type === x.kind) &&
-            (period === "all" ||
-              (period === "month" &&
-                dateOnly(x.date)?.getMonth() === now.getMonth() &&
-                dateOnly(x.date)?.getFullYear() === now.getFullYear()) ||
-              (period === "year" &&
-                dateOnly(x.date)?.getFullYear() === now.getFullYear())),
-        )
-        .filter((x) => {
-          const a = state.accounts.find((z) => z.id === x.item.account_id),
-            p =
-              x.kind === "expense"
-                ? state.properties.find((z) => z.id === x.item.property_id)
-                : state.properties.find((z) => z.id === a?.property_id);
-          return (
-            !q ||
-            `${a?.name || ""} ${a?.party_name || ""} ${p?.name || ""} ${x.item.memo || ""} ${x.item.payee || ""}`
-              .toLowerCase()
-              .includes(q)
-          );
-        })
-        .sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      $("payments-table").innerHTML = rows
-        .map((x) => {
-          return renderTransactionRow(x);
-        })
+      const result = buildTransactionList({
+        period: $("payment-period").value,
+        query: $("payment-search").value,
+        type: $("transaction-type").value,
+      });
+      $("payments-table").innerHTML = result.rows
+        .map(transactionRowHTML)
         .join("");
-      $("payments-empty").classList.toggle("hidden", rows.length > 0);
-      if (!rows.length)
+      $("payments-empty").classList.toggle("hidden", result.rows.length > 0);
+      if (!result.rows.length) {
         $("payments-empty").textContent = "No transactions match this view.";
-      const monthPayments = state.payments.filter(
-          (p) => isPosted(p) && String(p.received_date) >= monthStart(),
-        ),
-        monthExpenses = state.expenses.filter(
-          (x) => String(x.expense_date) >= monthStart() && isPosted(x),
-        ),
-        income = sumIncome(monthPayments),
-        expenses = sumOperatingExpenses(monthExpenses);
-      $("payments-collected").textContent = money(income);
-      $("expenses-total").textContent = money(expenses);
-      $("net-cash-flow").textContent = money(income - expenses);
+      }
+      $("payments-collected").textContent = money(result.totals.collected);
+      $("expenses-total").textContent = money(result.totals.expenses);
+      $("net-cash-flow").textContent = money(result.totals.netCashFlow);
     }
+
     return { renderPayments, attachEvents };
   }
 
