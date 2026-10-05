@@ -83,3 +83,29 @@ test('record loading failures show feedback, rethrow, and skip rendering', async
   assert.equal(state.workspaceOwnerId, 'workspace-1');
   assert.deepEqual(calls, [['toast', 'Records unavailable']]);
 });
+
+test('workspace render failures are logged, shown to the user, and rethrown', async () => {
+  const failure = new Error('missing amortization helper');
+  const calls = [];
+  const context = vm.createContext({
+    window: { console: { error: (...args) => calls.push(['error', ...args]) } },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, '..', 'features', 'workspace-refresh.js'), 'utf8'),
+    context,
+  );
+  const refresh = context.window.PropertyDeskWorkspaceRefresh.create({
+    state: {
+      client: { rpc: async () => ({ data: 'workspace-1', error: null }) },
+    },
+    workspaceData: { loadWorkspaceRecords: async () => ({ properties: [] }) },
+    toast: (message) => calls.push(['toast', message]),
+    render: () => { throw failure; },
+  });
+
+  await assert.rejects(() => refresh.fetchAll(), (error) => error === failure);
+  assert.deepEqual(calls, [
+    ['error', 'PropertyDesk failed to render workspace data.', failure],
+    ['toast', 'Workspace data loaded but could not be displayed. Reload and try again.'],
+  ]);
+});

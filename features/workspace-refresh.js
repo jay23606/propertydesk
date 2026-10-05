@@ -22,7 +22,13 @@
         toast(error?.message || 'Could not load this workspace');
         throw error;
       }
-      render();
+      try {
+        render();
+      } catch (error) {
+        window.console?.error("PropertyDesk failed to render workspace data.", error);
+        toast("Workspace data loaded but could not be displayed. Reload and try again.");
+        throw error;
+      }
     }
 
     return { fetchAll };
