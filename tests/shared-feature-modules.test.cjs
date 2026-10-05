@@ -394,7 +394,7 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
 
 test("backup and report exports own separate button bindings", () => {
   for (const [file, globalName, expected] of [
-    ["exports.js", "PropertyDeskExports", ["export-all:click"]],
+    ["backup-export.js", "PropertyDeskBackupExport", ["export-all:click"]],
     ["report-export.js", "PropertyDeskReportExport", ["export-report:click"]],
   ]) {
     const context = vm.createContext({ window: {} });

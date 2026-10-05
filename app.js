@@ -341,7 +341,7 @@
       fetchAll,
     });
   const { attachEvents: attachExportEvents } =
-    window.PropertyDeskExports.create({
+    window.PropertyDeskBackupExport.create({
       $,
       state,
       createBackup,

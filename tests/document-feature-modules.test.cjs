@@ -212,7 +212,7 @@ test("backup export aborts before download when a private document path escapes 
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "exports.js"),
+      path.join(__dirname, "..", "features", "backup-export.js"),
       "utf8",
     ),
     context,
@@ -266,7 +266,7 @@ test("backup export aborts before download when a private document path escapes 
   };
   const messages = [];
   const downloads = [];
-  const feature = context.window.PropertyDeskExports.create({
+  const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
     createBackup: () =>

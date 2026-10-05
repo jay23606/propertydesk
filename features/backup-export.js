@@ -134,5 +134,5 @@
     return { attachEvents, exportAll };
   }
 
-  window.PropertyDeskExports = { create };
+  window.PropertyDeskBackupExport = { create };
 })();
