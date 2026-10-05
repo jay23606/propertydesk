@@ -1767,9 +1767,8 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/);
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Events)?\.create/);
-  assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
-  assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
+  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/);
   assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?voidTransaction/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
   assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);
@@ -2120,6 +2119,53 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.match(totals.innerHTML, /\$80\.00/);
   assert.match(totals.innerHTML, /\$200\.00/);
   assert.ok(totals.innerHTML.includes("—"));
+});
+
+test("property portfolio workflow connects its model, table, and action routers", () => {
+  const passed = {};
+  const action = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyPortfolioTable: {
+        create: (options) => { passed.tableOptions = options; return "table"; },
+      },
+      PropertyDeskPropertyPortfolioModel: {
+        create: (options) => { passed.modelOptions = options; return "model"; },
+      },
+      PropertyDeskPropertyViews: {
+        create: (options) => {
+          passed.viewOptions = options;
+          return { renderProperties: () => "properties", attachEvents: () => "filters" };
+        },
+      },
+      PropertyDeskPropertyViewEvents: {
+        create: (options) => {
+          passed.actionOptions = options;
+          return { attachEvents: () => "actions" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
+    esc: action, money: action, paymentFrequencyLabel: action,
+    monthlyScheduledEstimate: action, accountBalance: action, amountDueSince: action,
+    unpaidDueAccrualStart: action, todayIso: action, propertyAddress: action,
+    monthStart: action, streetAddress: action, dateOnly: action, monthEnd: action,
+    lateReminderMailto: action, paymentStatusInMonth: action, openPayment: action,
+    editPropertyQuickNote: action, openPropertyDetails: action,
+    resetAccountForm: action, populateFormOptions: action, openModal: action,
+  });
+
+  assert.equal(passed.viewOptions.portfolioTable, "table");
+  assert.equal(passed.viewOptions.portfolioModel, "model");
+  assert.equal(passed.actionOptions.openPayment, action);
+  assert.equal(workflow.renderProperties(), "properties");
+  assert.equal(workflow.attachPropertyViewEvents(), "filters");
+  assert.equal(workflow.attachPropertyActionEvents(), "actions");
 });
 
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
