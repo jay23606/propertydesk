@@ -663,40 +663,38 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.ok(totals.innerHTML.includes("—"));
 });
 
-test("record-entry module exposes property, account, and transaction workflows", () => {
+test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "record-forms.js"),
-    "utf8",
-  );
-  vm.runInContext(source, context);
-
-  const feature = context.window.PropertyDeskRecordForms.create({});
-  for (const action of [
-    "resetPropertyForm",
-    "resetAccountForm",
-    "saveProperty",
-    "saveAccount",
-    "savePayment",
-    "saveExpense",
-    "editAccount",
-    "openPayment",
-    "prefillPaymentAmount",
-    "openPropertyPayment",
-    "openExpense",
-    "attachEvents",
-    "attachCreateActions",
+  for (const filename of [
+    "property-account-forms.js",
+    "ledger-entry-forms.js",
+    "create-actions.js",
   ]) {
-    assert.equal(typeof feature[action], "function", action);
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const property = context.window.PropertyDeskPropertyAccountForms.create({});
+  const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
+  const actions = context.window.PropertyDeskCreateActions.create({});
+  for (const [feature, names] of [
+    [property, ["resetPropertyForm", "resetAccountForm", "saveProperty", "saveAccount", "editAccount", "attachEvents"]],
+    [ledger, ["savePayment", "saveExpense", "openPayment", "prefillPaymentAmount", "openPropertyPayment", "openExpense", "attachEvents"]],
+    [actions, ["attachEvents"]],
+  ]) {
+    for (const name of names) assert.equal(typeof feature[name], "function", name);
   }
 });
 
 test("record-entry feature owns form event bindings and category hints", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["property-account-forms.js", "ledger-entry-forms.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const handlers = new Map();
   const toggles = [];
   const elements = new Map();
@@ -714,14 +712,17 @@ test("record-entry feature owns form event bindings and category hints", () => {
     }
     return elements.get(id);
   };
-  const feature = context.window.PropertyDeskRecordForms.create({
+  const formContext = {
     $: getElement,
     state: { accounts: [] },
     fillSelect() {},
     prettyType: (type) => type,
-  });
+  };
+  const propertyForms = context.window.PropertyDeskPropertyAccountForms.create(formContext);
+  const entryForms = context.window.PropertyDeskLedgerEntryForms.create(formContext);
 
-  feature.attachEvents(() => {});
+  propertyForms.attachEvents(() => {});
+  entryForms.attachEvents();
   assert.equal(typeof handlers.get("property-form:submit"), "function");
   assert.equal(typeof handlers.get("payment-form:submit"), "function");
   handlers.get("account-type:change")();
@@ -735,7 +736,7 @@ test("record-entry feature owns form event bindings and category hints", () => {
 test("record-entry feature owns create actions and handles empty workspace states", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "create-actions.js"), "utf8"),
     context,
   );
   const handlers = new Map();
@@ -767,9 +768,11 @@ test("record-entry feature owns create actions and handles empty workspace state
     '[data-open="expense-modal"]': [button("expense")],
   };
   const state = { properties: [], accounts: [] };
-  const feature = context.window.PropertyDeskRecordForms.create({
+  const feature = context.window.PropertyDeskCreateActions.create({
     $: getElement,
     state,
+    resetPropertyForm: () => getElement("property-form").reset(),
+    resetAccountForm: () => getElement("account-form").reset(),
     documentRef: { querySelectorAll: (selector) => selectors[selector] || [] },
     todayIso: () => "2026-10-04",
     toast: (message) => calls.push(`toast:${message}`),
@@ -780,7 +783,7 @@ test("record-entry feature owns create actions and handles empty workspace state
   });
   const navigate = (view) => calls.push(`navigate:${view}`);
 
-  feature.attachCreateActions(navigate);
+  feature.attachEvents(navigate);
   handlers.get("account:click")();
   handlers.get("payment:click")();
   handlers.get("expense:click")();
@@ -804,9 +807,7 @@ test("record-entry feature owns create actions and handles empty workspace state
     "reset:account-form",
     "populate-options",
     "open:account-modal",
-    "populate-options",
-    "reset:expense-form",
-    "open:expense-modal",
+    "open-expense",
   ]);
 });
 
@@ -814,7 +815,7 @@ test("opening a payment for an account prefills its scheduled installment withou
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "record-forms.js"),
+      path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
       "utf8",
     ),
     context,
@@ -840,7 +841,7 @@ test("opening a payment for an account prefills its scheduled installment withou
     ["income-category-wrap", { classList: { toggle() {} } }],
   ]);
   elements.get("payment-account").value = "account-1";
-  const feature = context.window.PropertyDeskRecordForms.create({
+  const feature = context.window.PropertyDeskLedgerEntryForms.create({
     $: (id) => elements.get(id),
     state: {
       accounts: [
@@ -1927,7 +1928,7 @@ test("reminder preview uses current form values and escapes recipient-facing tex
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "record-forms.js"),
+    path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
     "utf8",
   );
   vm.runInContext(source, context);
@@ -1964,7 +1965,7 @@ test("recording a loan payment does not invent principal or interest splits", as
       },
     },
   };
-  const feature = context.window.PropertyDeskRecordForms.create({
+  const feature = context.window.PropertyDeskLedgerEntryForms.create({
     $: element,
     state,
     moneyInput: (value) => Number(value),

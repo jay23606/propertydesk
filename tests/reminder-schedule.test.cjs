@@ -47,7 +47,7 @@ test('reminder controls remain off by default and the preview stylesheet is in t
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
   const preview = fs.readFileSync(path.join(root, 'features/reminder-preview.js'), 'utf8');
-  const forms = fs.readFileSync(path.join(root, 'features/record-forms.js'), 'utf8');
+  const forms = fs.readFileSync(path.join(root, 'features/property-account-forms.js'), 'utf8');
   const migration = fs.readFileSync(path.join(root, 'supabase/migrations/20261004210000_month_end_reminders.sql'), 'utf8');
   const worker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 

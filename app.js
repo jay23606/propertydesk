@@ -149,7 +149,18 @@
       prettyType,
       documentRef: document,
     });
-  const recordForms = window.PropertyDeskRecordForms.create({
+  const propertyAccountForms = window.PropertyDeskPropertyAccountForms.create({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    populateFormOptions,
+    openModal,
+  });
+  const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
     $,
     state,
     moneyInput,
@@ -165,14 +176,30 @@
   const {
     resetPropertyForm,
     resetAccountForm,
-    updateAllocationPreview,
     editAccount,
+    attachEvents: attachPropertyFormEvents,
+  } = propertyAccountForms;
+  const {
+    updateAllocationPreview,
     openPayment,
     openPropertyPayment,
     openExpense,
-    attachEvents: attachRecordFormEvents,
-    attachCreateActions: attachRecordCreateActions,
-  } = recordForms;
+    attachEvents: attachLedgerEntryFormEvents,
+  } = ledgerEntryForms;
+  const { attachEvents: attachCreateActions } =
+    window.PropertyDeskCreateActions.create({
+      $,
+      state,
+      todayIso,
+      toast,
+      resetPropertyForm,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      openPayment,
+      openExpense,
+      documentRef: document,
+    });
   const { deleteAccount: closeAccount } =
     window.PropertyDeskAccountMaintenance.create({
     $,
@@ -366,8 +393,9 @@
     attachNavigationEvents();
     attachPropertyViewEvents();
     attachTransactionViewEvents();
-    attachRecordCreateActions(navigate);
-    attachRecordFormEvents(previewReminderEmail);
+    attachCreateActions(navigate);
+    attachPropertyFormEvents(previewReminderEmail);
+    attachLedgerEntryFormEvents();
     attachActionRouterEvents();
     attachPropertyEvents(toggleArchiveProperty);
     attachWorkspaceEvents();

@@ -22,6 +22,15 @@ async function main() {
   });
 
   try {
+    await page.route("**/config.js", (route) =>
+      route.fulfill({
+        contentType: "text/javascript",
+        body: "window.PROPERTYDESK_CONFIG = {};",
+      }),
+    );
+    await page.route("**/@supabase/supabase-js@2*", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "" }),
+    );
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
     await page.locator("#auth-title").waitFor({ state: "visible", timeout: 30000 });
 
