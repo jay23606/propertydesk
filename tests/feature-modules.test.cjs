@@ -119,11 +119,11 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskLedgerActions\.create/,
+    /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskTransactionMaintenance\.create/,
   );
   assert.match(
     app,
-    /PropertyDeskLedgerActions\.create\(\{[\s\S]*?updateAllocationPreview/,
+    /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?updateAllocationPreview/,
   );
 });
 
@@ -1219,7 +1219,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
-test("ledger actions keep deposit adjustments separate and retain void audit reasons", async () => {
+test("account ledger actions retain deposit audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -1228,13 +1228,8 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
     ),
     context,
   );
-  const prompts = [
-    "250.00",
-    "Deposit retention per move-out inspection",
-    "Entered in error",
-  ];
+  const prompts = ["250.00", "Deposit retention per move-out inspection"];
   const inserts = [];
-  const updates = [];
   const messages = [];
   const calls = [];
   const state = {
@@ -1247,6 +1242,56 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
             inserts.push([table, payload]);
             return { error: null };
           },
+        };
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskLedgerActions.create({
+    $: (id) => ({ id }),
+    state,
+    moneyInput: Number,
+    todayIso: () => "2026-10-04",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => calls.push("refresh"),
+    closeModal: (modal) => calls.push(["close", modal.id]),
+    openAccountDetails: async (id) => calls.push(["open-account", id]),
+    confirmAction: () => true,
+    promptAction: () => prompts.shift(),
+  });
+
+  await feature.recordDepositAdjustment("rental-1", "retained");
+
+  assert.equal(inserts[0][0], "pd_deposit_entries");
+  assert.equal(inserts[0][1].user_id, "workspace-1");
+  assert.equal(inserts[0][1].amount, 250);
+  assert.equal(
+    inserts[0][1].reason,
+    "Deposit retention per move-out inspection",
+  );
+  assert.equal(messages.at(-1), "Deposit retention recorded");
+  assert.equal(calls.filter((call) => call === "refresh").length, 1);
+});
+
+test("transaction maintenance voids a posted row with an audit reason", async () => {
+  const context = vm.createContext({
+    window: {},
+    Event: class MockEvent {},
+    Option: class MockOption {},
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const updates = [];
+  const messages = [];
+  let refreshes = 0;
+  const state = {
+    client: {
+      from(table) {
+        return {
           update(payload) {
             updates.push([table, payload]);
             return {
@@ -1273,36 +1318,24 @@ test("ledger actions keep deposit adjustments separate and retain void audit rea
       },
     },
   };
-  const feature = context.window.PropertyDeskLedgerActions.create({
-    $: (id) => ({ id }),
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    $() {},
     state,
-    moneyInput: Number,
-    todayIso: () => "2026-10-04",
-    toast: (message) => messages.push(message),
-    fetchAll: async () => calls.push("refresh"),
-    closeModal: (modal) => calls.push(["close", modal.id]),
-    openAccountDetails: async (id) => calls.push(["open-account", id]),
     confirmAction: () => true,
-    promptAction: () => prompts.shift(),
+    promptAction: () => "Entered in error",
     timestamp: () => "2026-10-04T12:00:00.000Z",
+    fetchAll: async () => { refreshes += 1; },
+    toast: (message) => messages.push(message),
   });
 
-  await feature.recordDepositAdjustment("rental-1", "retained");
   await feature.voidTransaction("income", "payment-1");
 
-  assert.equal(inserts[0][0], "pd_deposit_entries");
-  assert.equal(inserts[0][1].user_id, "workspace-1");
-  assert.equal(inserts[0][1].amount, 250);
-  assert.equal(
-    inserts[0][1].reason,
-    "Deposit retention per move-out inspection",
-  );
   assert.equal(updates[0][0], "pd_payments");
   assert.equal(updates[0][1].status, "voided");
   assert.equal(updates[0][1].voided_at, "2026-10-04T12:00:00.000Z");
   assert.equal(updates[0][1].void_reason, "Entered in error");
   assert.equal(messages.at(-1), "Transaction voided; original entry preserved");
-  assert.equal(calls.filter((call) => call === "refresh").length, 2);
+  assert.equal(refreshes, 1);
 });
 
 test("transaction corrections reopen posted payments and expenses with audit reasons", () => {
@@ -1313,10 +1346,13 @@ test("transaction corrections reopen posted payments and expenses with audit rea
         this.type = type;
       }
     },
+    Option: class MockOption {
+      constructor(text, value) { this.text = text; this.value = value; }
+    },
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "ledger-actions.js"),
+      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
       "utf8",
     ),
     context,
@@ -1394,7 +1430,7 @@ test("transaction corrections reopen posted payments and expenses with audit rea
     pendingCorrection: null,
   };
   const calls = [];
-  const feature = context.window.PropertyDeskLedgerActions.create({
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
     $: (id) => field(id),
     state,
     promptAction: () => "Corrected bank posting date",

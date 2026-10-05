@@ -257,8 +257,6 @@
   const {
     recordDepositAdjustment,
     deleteAccount,
-    correctTransaction,
-    voidTransaction,
   } = window.PropertyDeskLedgerActions.create({
     $,
     state,
@@ -267,12 +265,19 @@
     toast,
     fetchAll,
     closeModal,
-    prettyType,
-    openPayment,
-    openExpense,
-    updateAllocationPreview,
     openAccountDetails: (...args) => openAccountDetails(...args),
   });
+  const { correctTransaction, voidTransaction } =
+    window.PropertyDeskTransactionMaintenance.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      prettyType,
+      openPayment,
+      openExpense,
+      updateAllocationPreview,
+    });
   const {
     openPropertyDetails,
     openAccountDetails,
