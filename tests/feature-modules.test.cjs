@@ -752,6 +752,49 @@ test("report workflow composes portfolio rendering and account export actions", 
   assert.equal(workflow.attachReportExportEvents(), "export events");
 });
 
+test("transaction workflow composes ledger display, correction, and action routing", () => {
+  const received = {};
+  const correct = () => "correct";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionViews: {
+        create: (options) => {
+          received.views = options;
+          return { renderPayments: () => "payments", attachEvents: () => "view events" };
+        },
+      },
+      PropertyDeskTransactionCorrectionForm: {
+        create: (options) => {
+          received.correction = options;
+          return { correctTransaction: correct };
+        },
+      },
+      PropertyDeskTransactionViewEvents: {
+        create: (options) => {
+          received.events = options;
+          return { attachEvents: () => "action events" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-workflow.js"), "utf8"),
+    context,
+  );
+  const updateAllocationPreview = () => {};
+  const voidTransaction = () => {};
+  const workflow = context.window.PropertyDeskTransactionWorkflow.create({
+    updateAllocationPreview, voidTransaction, documentRef: {},
+  });
+
+  assert.equal(received.correction.updateAllocationPreview, updateAllocationPreview);
+  assert.equal(received.events.correctTransaction, correct);
+  assert.equal(received.events.voidTransaction, voidTransaction);
+  assert.equal(workflow.renderPayments(), "payments");
+  assert.equal(workflow.attachTransactionViewEvents(), "view events");
+  assert.equal(workflow.attachTransactionActionEvents(), "action events");
+});
+
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(
@@ -1613,7 +1656,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
-  assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
+  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?voidTransaction/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
   assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);
   assert.match(app, /window\.PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection,/);
@@ -1621,10 +1664,7 @@ test("app coordinator passes the amortization helper into account details", () =
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.match(
-    app,
-    /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?updateAllocationPreview/,
-  );
+  assert.doesNotMatch(app, /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/);
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 

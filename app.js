@@ -133,29 +133,6 @@
       populateFormOptions: (...args) => populateFormOptions(...args),
       openModal: (...args) => openModal(...args),
     });
-  const {
-    renderPayments,
-    attachEvents: attachTransactionViewEvents,
-  } =
-    window.PropertyDeskTransactionViews.create({
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    });
-  const { attachEvents: attachTransactionActionEvents } =
-    window.PropertyDeskTransactionViewEvents.create({
-      documentRef: document,
-      correctTransaction: (...args) => correctTransaction(...args),
-      voidTransaction: (...args) => voidTransaction(...args),
-    });
   const { renderReports, attachReportExportEvents } = window.PropertyDeskReportWorkflow.create({
     $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
     accountBalance, todayIso, prettyType,
@@ -228,18 +205,16 @@
     openExpense,
     attachEvents: attachLedgerEntryFormEvents,
   } = ledgerEntryForms;
-  const { correctTransaction } =
-    window.PropertyDeskTransactionCorrectionForm.create({
-      $,
-      state,
-      toast,
-      prettyType,
-      openPayment,
-      openExpense,
-      updateAllocationPreview,
-      EventClass: Event,
-      OptionClass: Option,
-    });
+  const {
+    renderPayments,
+    attachTransactionViewEvents,
+    attachTransactionActionEvents,
+  } = window.PropertyDeskTransactionWorkflow.create({
+    $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
+    monthStart, sumIncome, sumOperatingExpenses, toast, prettyType, openPayment,
+    openExpense, updateAllocationPreview, EventClass: Event, OptionClass: Option,
+    voidTransaction,
+  });
   const { attachEvents: attachCreateActions } =
     window.PropertyDeskCreateActions.create({
       $,
