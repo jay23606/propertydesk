@@ -246,17 +246,12 @@
   const {
     resetPropertyForm,
     resetAccountForm,
-    updateLoanFields,
-    saveProperty,
-    saveAccount,
     updateAllocationPreview,
-    prefillPaymentAmount,
-    savePayment,
-    saveExpense,
     editAccount,
     openPayment,
     openPropertyPayment,
     openExpense,
+    attachEvents: attachRecordFormEvents,
   } = recordForms;
   const {
     recordDepositAdjustment,
@@ -476,44 +471,6 @@
       });
   }
 
-  function attachFormEvents() {
-    $('property-form').addEventListener('submit', saveProperty);
-    $('account-form').addEventListener('submit', saveAccount);
-    $('account-reminder-preview').addEventListener(
-      'click',
-      previewReminderEmail,
-    );
-    $('payment-form').addEventListener('submit', savePayment);
-    $('expense-form').addEventListener('submit', saveExpense);
-    $('account-type').addEventListener('change', updateLoanFields);
-    $('payment-account').addEventListener('change', () => {
-      prefillPaymentAmount();
-      updateAllocationPreview();
-    });
-    $('payment-amount').addEventListener('input', updateAllocationPreview);
-    $('payment-date').addEventListener('change', updateAllocationPreview);
-    $('expense-property').addEventListener('change', () => {
-      const propertyId = $('expense-property').value;
-      const relatedAccounts = state.accounts.filter(
-        (account) => account.property_id === propertyId,
-      );
-      fillSelect(
-        'expense-account',
-        relatedAccounts.map((account) => ({
-          value: account.id,
-          label: `${account.name} — ${prettyType(account.account_type)}`,
-        })),
-        'Property level',
-      );
-    });
-    $('expense-category').addEventListener('change', () => {
-      $('deposit-refund-hint').classList.toggle(
-        'hidden',
-        $('expense-category').value !== 'deposit_refund',
-      );
-    });
-  }
-
   function attachSearchEvents() {
     $('property-search').addEventListener('input', renderProperties);
     $('property-filter').addEventListener('change', renderProperties);
@@ -703,7 +660,7 @@
   function attachEvents() {
     attachNavigationEvents();
     attachCreateActions();
-    attachFormEvents();
+    attachRecordFormEvents(previewReminderEmail);
     attachSearchEvents();
     attachDelegatedActionEvents();
     attachPropertyDetailEvents();

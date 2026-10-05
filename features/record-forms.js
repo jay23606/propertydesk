@@ -405,6 +405,45 @@
       if (propertyId) $("expense-property").value = propertyId;
       openModal("expense-modal");
     }
+
+    function attachEvents(previewReminderEmail) {
+      $("property-form").addEventListener("submit", saveProperty);
+      $("account-form").addEventListener("submit", saveAccount);
+      $("account-reminder-preview").addEventListener(
+        "click",
+        previewReminderEmail,
+      );
+      $("payment-form").addEventListener("submit", savePayment);
+      $("expense-form").addEventListener("submit", saveExpense);
+      $("account-type").addEventListener("change", updateLoanFields);
+      $("payment-account").addEventListener("change", () => {
+        prefillPaymentAmount();
+        updateAllocationPreview();
+      });
+      $("payment-amount").addEventListener("input", updateAllocationPreview);
+      $("payment-date").addEventListener("change", updateAllocationPreview);
+      $("expense-property").addEventListener("change", () => {
+        const propertyId = $("expense-property").value;
+        const relatedAccounts = state.accounts.filter(
+          (account) => account.property_id === propertyId,
+        );
+        fillSelect(
+          "expense-account",
+          relatedAccounts.map((account) => ({
+            value: account.id,
+            label: `${account.name} — ${prettyType(account.account_type)}`,
+          })),
+          "Property level",
+        );
+      });
+      $("expense-category").addEventListener("change", () => {
+        $("deposit-refund-hint").classList.toggle(
+          "hidden",
+          $("expense-category").value !== "deposit_refund",
+        );
+      });
+    }
+
     return {
       resetPropertyForm,
       resetAccountForm,
@@ -419,6 +458,7 @@
       openPayment,
       openPropertyPayment,
       openExpense,
+      attachEvents,
     };
   }
 

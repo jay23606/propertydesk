@@ -285,9 +285,51 @@ test("record-entry module exposes property, account, and transaction workflows",
     "prefillPaymentAmount",
     "openPropertyPayment",
     "openExpense",
+    "attachEvents",
   ]) {
     assert.equal(typeof feature[action], "function", action);
   }
+});
+
+test("record-entry feature owns form event bindings and category hints", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const toggles = [];
+  const elements = new Map();
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: id === "account-type" ? "rental" : "deposit_refund",
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+        classList: {
+          toggle: (...args) => toggles.push([id, ...args]),
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskRecordForms.create({
+    $: getElement,
+    state: { accounts: [] },
+    fillSelect() {},
+    prettyType: (type) => type,
+  });
+
+  feature.attachEvents(() => {});
+  assert.equal(typeof handlers.get("property-form:submit"), "function");
+  assert.equal(typeof handlers.get("payment-form:submit"), "function");
+  handlers.get("account-type:change")();
+  handlers.get("expense-category:change")();
+  assert.deepEqual(toggles, [
+    ["loan-fields", "hidden", true],
+    ["deposit-refund-hint", "hidden", false],
+  ]);
 });
 
 test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {
