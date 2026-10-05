@@ -19,6 +19,80 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
+test("opening a property delegates modal markup and preserves scoped details", () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of ["property-details-view.js", "property-details.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const property = { id: "property-1", name: "<Oak House>", archived_at: null };
+  const account = {
+    id: "account-1", property_id: property.id, account_type: "note",
+    status: "active", name: "<Private Note>", party_name: "Buyer",
+    payment_amount: 500, payment_frequency: "monthly",
+  };
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, { textContent: "", innerHTML: "", disabled: false });
+    }
+    return elements.get(id);
+  };
+  const opened = [];
+  const activityCalls = [];
+  const detailsView = context.window.PropertyDeskPropertyDetailsView.create({
+    money: (value) => `$${Number(value).toFixed(2)}`,
+    fmtDate: (value) => value,
+    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[char]),
+    prettyType: (value) => value,
+    paymentFrequencyLabel: () => "Monthly",
+    accountBalance: () => 9000,
+  });
+  const feature = context.window.PropertyDeskPropertyDetails.create({
+    $, state: {
+      auditRequestId: 0,
+      selectedPropertyId: null,
+      properties: [property],
+      accounts: [account, { id: "elsewhere", property_id: "property-2" }],
+      documents: [
+        { id: "doc-1", property_id: property.id, file_name: "<agreement>.pdf", created_at: "2026-10-01", content_type: "application/pdf" },
+        { id: "other-doc", property_id: "property-2", file_name: "other.pdf" },
+      ],
+      workspaceMembers: [{ member_user_id: "member-1", display_name: "<Manager>" }],
+      propertyHolders: [{ property_id: property.id, member_user_id: "member-1" }],
+    },
+    openModal: (id) => opened.push(id),
+    propertyAddress: () => "Oak House address",
+    renderPropertyActivity: (...args) => {
+      activityCalls.push(args);
+      return { incomeTotal: 600, expenseTotal: 75, html: "<section>Recent activity</section>" };
+    },
+    propertyDetailsHTML: detailsView.propertyDetailsHTML,
+  });
+
+  feature.openPropertyDetails(property.id);
+
+  assert.equal(activityCalls.length, 1);
+  assert.equal(activityCalls[0][0], property.id);
+  assert.deepEqual(activityCalls[0][1], [account]);
+  assert.equal(elements.get("property-detail-title").textContent, property.name);
+  assert.equal(elements.get("property-detail-address").textContent, "Oak House address");
+  assert.equal(elements.get("property-detail-add-income").disabled, false);
+  assert.equal(elements.get("property-archive-toggle").textContent, "Archive property");
+  const html = elements.get("property-detail-content").innerHTML;
+  assert.match(html, /&lt;Private Note&gt;/);
+  assert.match(html, /&lt;Manager&gt;/);
+  assert.match(html, /&lt;agreement&gt;\.pdf/);
+  assert.match(html, /\$600\.00/);
+  assert.match(html, /Recent activity/);
+  assert.doesNotMatch(html, /other\.pdf/);
+  assert.deepEqual(opened, ["property-detail-modal"]);
+});
+
 test("account details render action targets without owning action listeners", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -1004,9 +1078,17 @@ test("property detail events route private document actions to document workflow
 
 test("property details workflow connects activity summaries to the property view", () => {
   let detailContext;
+  let viewContext;
   const renderPropertyActivity = () => "activity";
+  const propertyDetailsHTML = () => "property details html";
   const context = vm.createContext({
     window: {
+      PropertyDeskPropertyDetailsView: {
+        create: (options) => {
+          viewContext = options;
+          return { propertyDetailsHTML };
+        },
+      },
       PropertyDeskPropertyActivityDetails: {
         create: () => ({ renderPropertyActivity }),
       },
@@ -1022,8 +1104,14 @@ test("property details workflow connects activity summaries to the property view
     fs.readFileSync(path.join(__dirname, "..", "features", "property-details-workflow.js"), "utf8"),
     context,
   );
-  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create({});
+  const detailsDependencies = {
+    money() {}, fmtDate() {}, esc() {}, prettyType() {},
+    paymentFrequencyLabel() {}, accountBalance() {},
+  };
+  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create(detailsDependencies);
 
+  assert.deepEqual(Object.keys(viewContext).sort(), Object.keys(detailsDependencies).sort());
+  assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.openPropertyDetails(), "property details");
