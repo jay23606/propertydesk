@@ -255,19 +255,44 @@ async function main() {
         pd_reminder_logs: [],
         pd_audit_events: [],
       };
+      window.__smokeRows = rows;
       function queryFor(table) {
-        const result = { data: rows[table] || [], error: null };
+      const result = { data: rows[table] || [], error: null };
+        const filters = [];
+        let updatePayload = null;
+        const matchingRows = () => (rows[table] || []).filter((row) =>
+          filters.every(([column, value]) => row[column] === value),
+        );
+        const applyUpdate = () => {
+          const matches = matchingRows();
+          for (const row of matches) Object.assign(row, updatePayload);
+          return matches;
+        };
         const query = {
           select: () => query,
           insert: async (payload) => {
             rows[table].push({ id: `smoke-${table}-${rows[table].length + 1}`, ...payload });
             return { error: null };
           },
-          eq: () => query,
+          update: (payload) => {
+            updatePayload = payload;
+            return query;
+          },
+          eq: (column, value) => {
+            filters.push([column, value]);
+            return query;
+          },
           order: () => query,
           in: () => query,
+          maybeSingle: async () => {
+            const row = updatePayload ? applyUpdate()[0] : matchingRows()[0];
+            return { data: row ? { id: row.id } : null, error: null };
+          },
           limit: () => Promise.resolve(result),
-          then: (resolve, reject) => Promise.resolve(result).then(resolve, reject),
+          then: (resolve, reject) => {
+            if (updatePayload) applyUpdate();
+            return Promise.resolve(result).then(resolve, reject);
+          },
         };
         return query;
       }
@@ -442,6 +467,43 @@ async function main() {
         !workspacePage.includes("Reminder attempts will appear here")) {
       throw new Error("Workspace settings did not render reminder delivery activity.");
     }
+    await signedInPage.locator('.nav-link[data-view="payments"]').click();
+    const handleVoidDialogs = (dialog) => {
+      if (dialog.type() === "confirm") {
+        void dialog.accept();
+      } else {
+        void dialog.accept("Smoke-test void");
+      }
+    };
+    signedInPage.on("dialog", handleVoidDialogs);
+    await signedInPage
+      .locator('#payments-table [data-void-transaction][data-id="smoke-expense"]')
+      .click();
+    await signedInPage.getByText("Transaction voided; original entry preserved").waitFor();
+    signedInPage.off("dialog", handleVoidDialogs);
+    const expenseVoided = await signedInPage.evaluate(() =>
+      window.__smokeRows.pd_expenses.find((row) => row.id === "smoke-expense")?.status === "voided",
+    );
+    if (!expenseVoided) {
+      throw new Error("Voiding an expense did not reach transaction maintenance.");
+    }
+    await signedInPage.locator('.nav-link[data-view="properties"]').click();
+    await signedInPage
+      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .first()
+      .click();
+    await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    await signedInPage.locator('#property-detail-content [data-detail="smoke-account"]').click();
+    await signedInPage.locator("#detail-modal:not(.hidden)").waitFor();
+    signedInPage.once("dialog", (dialog) => dialog.accept());
+    await signedInPage.locator("#detail-close-account").click();
+    await signedInPage.getByText("Account closed").waitFor();
+    const accountClosed = await signedInPage.evaluate(() =>
+      window.__smokeRows.pd_accounts.find((row) => row.id === "smoke-account")?.status === "closed",
+    );
+    if (!accountClosed) {
+      throw new Error("Closing an account did not reach account maintenance.");
+    }
     if (signedInPageErrors.length || signedInConsoleErrors.length) {
       throw new Error(
         `Signed-in app browser errors: ${[...signedInPageErrors, ...signedInConsoleErrors].join(" | ")}`,
@@ -453,7 +515,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered signed-in Overview, Properties, payment entry and correction, note amortization, rental deposits, account history, Reports, Workspace settings, and reminder activity without browser errors or unhandled rejections.");
+    console.log("PropertyDesk rendered signed-in Overview, Properties, payment entry and correction, note amortization, rental deposits, account history, transaction voiding, account closure, Reports, Workspace settings, and reminder activity without browser errors or unhandled rejections.");
   } finally {
     await browser.close();
   }
