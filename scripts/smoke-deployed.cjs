@@ -203,8 +203,25 @@ async function main() {
       const rows = {
         pd_properties: [property],
         pd_accounts: [account, rental],
-        pd_payments: [],
-        pd_expenses: [],
+        pd_payments: [{
+          id: "smoke-payment",
+          account_id: rental.id,
+          amount: 800,
+          received_date: "2026-10-04",
+          payment_method: "manual",
+          income_category: "rent",
+          status: "posted",
+          memo: "October smoke payment",
+        }],
+        pd_expenses: [{
+          id: "smoke-expense",
+          property_id: property.id,
+          amount: 25,
+          expense_date: "2026-10-03",
+          category: "repair",
+          status: "posted",
+          payee: "Smoke-test repair",
+        }],
         pd_import_batches: [],
         pd_documents: [],
         pd_agreement_versions: [],
@@ -271,7 +288,8 @@ async function main() {
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
     const propertyDetail = await signedInPage.locator("#property-detail-content").innerText();
     if (!propertyDetail.includes("Recent activity") ||
-        !propertyDetail.includes("Recorded income and expenses will appear here.")) {
+        !propertyDetail.includes("October smoke payment") ||
+        !propertyDetail.includes("Smoke-test repair")) {
       throw new Error("The signed-in app did not render property activity in the Properties details view.");
     }
     await signedInPage
