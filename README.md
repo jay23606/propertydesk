@@ -47,7 +47,7 @@ PropertyDesk is a recordkeeping tool and does not collect payments. Loan allocat
 
 ## Local checks
 
-With Node.js installed, run `npm test` from this directory. Tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
+With Node.js installed, run `npm run lint` and `npm test` from this directory. The lint check catches undefined names in browser code; the tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
 
 - `supabase db query --linked --file supabase/tests/workspace_security.sql` checks workspace row-level security.
 - `supabase db query --linked --file supabase/tests/payment_allocation_integrity.sql` checks legacy allocation constraints.
@@ -59,4 +59,4 @@ These live database checks do not replace periodic independent security review.
 
 ## Post-deploy smoke check
 
-When a file listed in `sw.js` under `SHELL_FILES` changes, increment `CACHE_NAME` so installed PWAs replace their cached shell. GitHub Actions runs the unit suite and a Chromium smoke test on the candidate before publishing, then opens the deployed app in Chromium with a signed-in synthetic workspace and checks note amortization, rental deposit details, and account history without page, console, or service-worker errors. Keep a deploy unverified until both jobs pass. For a broader manual check, reload the live app, verify the Properties totals respond to search/filter changes, open a property and account, and confirm Record payment starts with the scheduled monthly payment.
+When a file listed in `sw.js` under `SHELL_FILES` changes, increment `CACHE_NAME` so installed PWAs replace their cached shell. GitHub Actions runs lint, the unit suite, and a Chromium smoke test on the candidate before publishing, then opens the deployed app in Chromium with a signed-in synthetic workspace and checks note amortization, rental deposit details, and account history without page, console, or service-worker errors. Keep a deploy unverified until all checks pass. For a broader manual check, reload the live app, verify the Properties totals respond to search/filter changes, open a property and account, and confirm Record payment starts with the scheduled monthly payment.
