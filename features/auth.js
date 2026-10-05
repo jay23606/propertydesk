@@ -100,7 +100,17 @@
     }
 
     async function signOut() {
-      await state.client.auth.signOut();
+      try {
+        const result = await state.client.auth.signOut();
+        const error = result?.error;
+        if (error) {
+          toast(error.message);
+          return;
+        }
+      } catch {
+        toast("Unable to sign out right now. Check your connection and try again.");
+        return;
+      }
       state.user = null;
       state.passwordRecoveryInProgress = false;
       state.properties = [];
@@ -143,9 +153,16 @@
     }
 
     async function restoreAuthSession() {
-      const {
-        data: { session },
-      } = await state.client.auth.getSession();
+      let session;
+      try {
+        const { data, error } = await state.client.auth.getSession();
+        if (error) throw error;
+        session = data?.session;
+      } catch {
+        showAuth();
+        toast("Unable to restore your session right now. Check your connection and try again.");
+        return;
+      }
       if (!session?.user) {
         showAuth();
         return;

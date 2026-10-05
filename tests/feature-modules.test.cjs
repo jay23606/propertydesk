@@ -1867,6 +1867,49 @@ test("auth feature restores login controls when the auth request rejects", async
   assert.match(element("auth-message").textContent, /try again/i);
 });
 
+test("auth session restore and sign-out report rejected requests without clearing user state", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  loadAuthFeatures(context);
+  const messages = [];
+  const visible = [];
+  const element = () => ({
+    classList: {
+      add: () => visible.push("hidden"),
+      remove: () => visible.push("shown"),
+      toggle() {},
+    },
+    dataset: {},
+    textContent: "",
+  });
+  const state = {
+    user: { id: "owner-1" },
+    passwordRecoveryInProgress: false,
+    client: {
+      auth: {
+        signOut: async () => { throw new Error("offline"); },
+        getSession: async () => { throw new Error("offline"); },
+      },
+    },
+  };
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state,
+    fetchAll: async () => assert.fail("session failure must not load records"),
+    toast: (message) => messages.push(message),
+    documentRef: { querySelector: () => element() },
+  });
+
+  await assert.doesNotReject(feature.signOut());
+  assert.equal(state.user.id, "owner-1");
+  await assert.doesNotReject(feature.restoreAuthSession());
+  assert.equal(state.user.id, "owner-1");
+  assert.ok(visible.includes("shown"));
+  assert.deepEqual(messages, [
+    "Unable to sign out right now. Check your connection and try again.",
+    "Unable to restore your session right now. Check your connection and try again.",
+  ]);
+});
+
 test("navigation owns theme toggles, page routing, and modal close shortcuts", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
