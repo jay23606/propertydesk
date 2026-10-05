@@ -3005,10 +3005,10 @@ test("workspace setting writes report rejected requests and retain entered value
 });
 
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
-  const context = vm.createContext({ window: {}, document: {} });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-management.js"),
+      path.join(__dirname, "..", "features", "property-quick-note.js"),
       "utf8",
     ),
     context,
@@ -3044,16 +3044,13 @@ test("property quick notes normalize whitespace and scope updates to the workspa
       },
     },
   };
-  const feature = context.window.PropertyDeskPropertyManagement.create({
-    $: () => {},
+  const feature = context.window.PropertyDeskPropertyQuickNote.create({
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       refreshed = true;
     },
-    todayIso: () => "2026-10-04",
     streetAddress: (property) => property.address,
-    openPropertyDetails() {},
     promptAction: () => "  Follow-up\n needed   soon ",
   });
 
@@ -3068,7 +3065,33 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
-test("property management workflows report rejected writes without running success actions", async () => {
+test("property quick notes enforce the character limit before writing", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-quick-note.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  const state = {
+    properties: [{ id: "property-1", address: "10 Main St" }],
+    client: { from: () => assert.fail("an overlong note must not write") },
+  };
+  const feature = context.window.PropertyDeskPropertyQuickNote.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("an overlong note must not refresh"),
+    streetAddress: (property) => property.address,
+    promptAction: () => "x".repeat(141),
+  });
+
+  await assert.doesNotReject(feature.editPropertyQuickNote("property-1"));
+  assert.deepEqual(messages, ["Quick notes are limited to 140 characters."]);
+});
+
+test("property administration workflows report rejected writes without running success actions", async () => {
   const context = vm.createContext({ window: {}, document: { querySelectorAll: () => [] } });
   vm.runInContext(
     fs.readFileSync(
@@ -3111,19 +3134,25 @@ test("property management workflows report rejected writes without running succe
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected write must not refresh"),
     todayIso: () => "2026-10-05",
-    streetAddress: (property) => property.address,
     openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
-    promptAction: () => "Keep this note",
   });
 
-  await assert.doesNotReject(feature.editPropertyQuickNote("property-1"));
   await assert.doesNotReject(feature.savePropertyHolders());
   await assert.doesNotReject(feature.toggleArchiveProperty());
   assert.deepEqual(messages, [
-    "Property note couldn't be saved right now. Check your connection and try again.",
     "Account-holder labels couldn't be saved right now. Check your connection and try again.",
     "Property status couldn't be updated right now. Check your connection and try again.",
   ]);
+});
+
+test("quick note feature loads before app startup and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/property-quick-note.js") < html.indexOf("app.js"),
+    "property quick note should load before the app coordinator",
+  );
+  assert.match(worker, /'\.\/features\/property-quick-note\.js'/);
 });
 
 test("deposit maintenance retains adjustment audit details", async () => {

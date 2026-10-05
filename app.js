@@ -442,13 +442,18 @@
       renderWorkspaceSettings,
       closeModal,
     });
-  const { editPropertyQuickNote, savePropertyHolders, toggleArchiveProperty } =
+  const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
+    state,
+    toast,
+    fetchAll,
+    streetAddress,
+  });
+  const { savePropertyHolders, toggleArchiveProperty } =
     window.PropertyDeskPropertyManagement.create({
       state,
       toast,
       fetchAll,
       todayIso,
-      streetAddress,
       openPropertyDetails,
     });
   appLifecycle = window.PropertyDeskAppLifecycle.create({

@@ -1,47 +1,11 @@
-/* PropertyDesk property notes, member labels, and archive workflows. */
+/* PropertyDesk member labels and property archive workflows. */
 (() => {
   "use strict";
 
   function create({
-    state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+    state, toast, fetchAll, todayIso, openPropertyDetails,
     documentRef = document,
-    promptAction = (message, initialValue) => window.prompt(message, initialValue),
   }) {
-    async function editPropertyQuickNote(id) {
-      const property = state.properties.find((item) => item.id === id);
-      if (!property) return;
-      const entered = promptAction(
-        `Quick note shown under ${streetAddress(property)} (140 characters max):`,
-        property.notes || "",
-      );
-      if (entered === null) return;
-      const note = entered.replace(/\s+/g, " ").trim();
-      if (note.length > 140) {
-        toast("Quick notes are limited to 140 characters.");
-        return;
-      }
-      let error;
-      try {
-        ({ error } = await state.client.from("pd_properties")
-          .update({ notes: note || null })
-          .eq("id", id)
-          .eq("user_id", state.workspaceOwnerId));
-      } catch {
-        toast("Property note couldn't be saved right now. Check your connection and try again.");
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast(note ? "Property note saved" : "Property note removed");
-    }
-
     async function savePropertyHolders() {
       const id = state.selectedPropertyId;
       const selected = [...documentRef.querySelectorAll("[data-holder-choice]:checked")]
@@ -123,7 +87,7 @@
       toast(archived_at ? "Property archived" : "Property restored");
     }
 
-    return { editPropertyQuickNote, savePropertyHolders, toggleArchiveProperty };
+    return { savePropertyHolders, toggleArchiveProperty };
   }
 
   window.PropertyDeskPropertyManagement = { create };
