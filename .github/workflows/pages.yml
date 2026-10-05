@@ -18,7 +18,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
       - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: Serve candidate files for browser smoke check
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/propertydesk-http.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            if curl --silent --fail http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:4173/ >/dev/null
+      - name: Check candidate account-detail workflow in Chromium
+        run: npm run smoke:deployed -- http://127.0.0.1:4173/
       - name: Check deployment configuration
         id: config
         env:
@@ -46,6 +63,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -63,3 +82,21 @@ jobs:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  runtime-smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Check the deployed app in Chromium
+        run: npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"
