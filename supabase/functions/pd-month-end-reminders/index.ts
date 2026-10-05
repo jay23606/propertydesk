@@ -1,10 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { calculateUnpaidDue, hasQualifyingPaymentInMonth, isLastCalendarDayInNewYork, monthWindowInNewYork, parseReminderRecipients, TRACKING_START } from "../_shared/reminder-schedule.mjs";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-propertydesk-cron-secret",
-};
 const FROM_EMAIL = Deno.env.get("MAILERSEND_FROM_EMAIL") ?? "notifications@propertydesk.dynv6.net";
 const FROM_NAME = "PropertyDesk";
 
@@ -42,7 +38,7 @@ async function claimLog(db: ReturnType<typeof createClient>, row: Record<string,
   const key = {
     account_id: row.account_id,
     reminder_month: row.reminder_month,
-    recipient_email: row.recipient_email,
+    recipient_index: row.recipient_index,
   };
   const { data: retry } = await db.from("pd_reminder_logs").update({
     status: "sending", reason: null, unpaid_due: row.unpaid_due, provider_message_id: null,
@@ -61,30 +57,32 @@ async function saveResult(db: ReturnType<typeof createClient>, id: string, value
 }
 
 Deno.serve(async (request) => {
-  if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405, headers: corsHeaders });
+  // This job is invoked by pg_cron, not by browser code. Do not expose a
+  // wildcard CORS policy for an endpoint guarded by a server-side secret.
+  if (request.method === "OPTIONS") return new Response(null, { status: 204 });
+  if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
   const expectedSecret = Deno.env.get("PD_REMINDER_CRON_SECRET");
   if (!expectedSecret || request.headers.get("x-propertydesk-cron-secret") !== expectedSecret) {
-    return Response.json({ error: "Unauthorized" }, { status: 401, headers: corsHeaders });
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const now = new Date();
-  if (!isLastCalendarDayInNewYork(now)) return Response.json({ ok: true, skipped: "not_last_day_of_month" }, { headers: corsHeaders });
+  if (!isLastCalendarDayInNewYork(now)) return Response.json({ ok: true, skipped: "not_last_day_of_month" });
   const { monthStart, monthEnd } = monthWindowInNewYork(now);
   const reminderMonth = monthStart;
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const mailerSendToken = Deno.env.get("MAILERSEND_API_TOKEN");
   if (!supabaseUrl || !serviceRoleKey || !mailerSendToken) {
-    return Response.json({ error: "Reminder service is not configured" }, { status: 500, headers: corsHeaders });
+    return Response.json({ error: "Reminder service is not configured" }, { status: 500 });
   }
   const db = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: accounts, error: accountsError } = await db.from("pd_accounts")
     .select("id,user_id,property_id,account_type,name,party_name,party_email,start_date,next_due_date,payment_amount,payment_frequency,status")
     .eq("monthly_reminder_enabled", true).eq("status", "active");
-  if (accountsError) return Response.json({ error: "Could not load enabled reminder accounts" }, { status: 500, headers: corsHeaders });
+  if (accountsError) return Response.json({ error: "Could not load enabled reminder accounts" }, { status: 500 });
   const enabled = (accounts ?? []) as Account[];
-  if (!enabled.length) return Response.json({ ok: true, month: reminderMonth, processed: 0 }, { headers: corsHeaders });
+  if (!enabled.length) return Response.json({ ok: true, month: reminderMonth, processed: 0 });
 
   const ids = enabled.map((account) => account.id);
   const propertyIds = [...new Set(enabled.map((account) => account.property_id))];
@@ -93,7 +91,7 @@ Deno.serve(async (request) => {
       .in("account_id", ids).gte("received_date", TRACKING_START).lte("received_date", monthEnd).eq("status", "posted"),
     db.from("pd_properties").select("id,name,address,city,state,postal_code").in("id", propertyIds),
   ]);
-  if (paymentResult.error || propertyResult.error) return Response.json({ error: "Could not load reminder records" }, { status: 500, headers: corsHeaders });
+  if (paymentResult.error || propertyResult.error) return Response.json({ error: "Could not load reminder records" }, { status: 500 });
   const payments = paymentResult.data ?? [];
   const properties = new Map((propertyResult.data ?? []).map((property) => [property.id, property]));
   let accepted = 0, failed = 0, skipped = 0;
@@ -102,21 +100,23 @@ Deno.serve(async (request) => {
     const property = properties.get(account.property_id);
     if (!property) continue;
     const accountPayments = payments.filter((payment) => payment.account_id === account.id);
-    const recipients = parseReminderRecipients(account.party_email);
+    const recipients = parseReminderRecipients(account.party_email).sort((a, b) => a.localeCompare(b));
     const due = calculateUnpaidDue(account, monthStart, monthEnd, accountPayments);
-    const rows = recipients.length ? recipients : [null];
-    for (const recipient of rows) {
+    const rows = recipients.length
+      ? recipients.map((recipient, index) => ({ recipient, recipient_index: index + 1 }))
+      : [{ recipient: null, recipient_index: 0 }];
+    for (const { recipient, recipient_index } of rows) {
       let reason: string | null = null;
       if (!recipient) reason = "missing_recipient_email";
       else if (hasQualifyingPaymentInMonth(accountPayments, monthStart, monthEnd)) reason = "payment_recorded_this_month";
       else if (due.total <= 0) reason = "no_unpaid_scheduled_amount";
       const logRow = {
         user_id: account.user_id, account_id: account.id, reminder_month: reminderMonth,
-        recipient_email: recipient, reason, unpaid_due: due.total,
+        recipient_index, reason, unpaid_due: due.total,
         status: reason ? "skipped" : "sending", attempted_at: new Date().toISOString(),
       };
       if (reason) {
-        const { error } = await db.from("pd_reminder_logs").upsert(logRow, { onConflict: "account_id,reminder_month,recipient_key", ignoreDuplicates: true });
+        const { error } = await db.from("pd_reminder_logs").upsert(logRow, { onConflict: "account_id,reminder_month,recipient_index", ignoreDuplicates: true });
         if (error) failed++;
         else skipped++;
         continue;
@@ -149,5 +149,5 @@ Deno.serve(async (request) => {
       }
     }
   }
-  return Response.json({ ok: true, month: reminderMonth, accepted, failed, skipped }, { headers: corsHeaders });
+  return Response.json({ ok: true, month: reminderMonth, accepted, failed, skipped });
 });

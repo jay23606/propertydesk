@@ -35,7 +35,7 @@
                           : log.reason || "Month-end check";
               return `<tr><td>${fmtDate(log.reminder_month, { month: "short", year: "numeric" })}</td>
             <td>${esc(property?.address || property?.name || "Property")}<small class="table-subtext">${esc(account?.party_name || account?.name || "Account")}</small></td>
-            <td>${esc(log.recipient_email || "—")}</td>
+            <td>${log.recipient_index ? `Recipient ${esc(log.recipient_index)}` : "No valid recipient"}</td>
             <td><span class="reminder-status reminder-${esc(log.status)}">${esc(status)}</span></td>
             <td>${esc(detail)}${log.unpaid_due != null ? `<small class="table-subtext">Unpaid due: ${money(log.unpaid_due)}</small>` : ""}</td>
             <td>${esc(new Date(log.attempted_at).toLocaleString())}</td></tr>`;

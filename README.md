@@ -35,12 +35,20 @@ The future tenant/buyer portal is optional and separate from the owner workspace
 ## Connect Supabase
 
 1. Create a Supabase project.
-2. Run `supabase/schema.sql` in the Supabase SQL editor.
+2. For a new project, run `supabase/schema.sql` as the complete current schema snapshot. For a project managed with the Supabase CLI, link it and apply the ordered files in `supabase/migrations/` with `supabase db push`; do not apply the snapshot and then replay those same migrations.
 3. Copy `config.example.js` to `config.js`, then set your project URL and public anon key. This key is public project identification; Supabase RLS and grants protect records. Never use a service-role/secret key here.
 4. Enable email/password auth and email confirmation in Supabase. Each owner gets a separate account; records remain workspace-private except for people explicitly added by the owner. Before public onboarding, configure Auth rate limits and abuse protection; never rely on obscurity of the app URL as an access control.
 5. Configure GitHub repository secrets `PROPERTYDESK_SUPABASE_URL` and `PROPERTYDESK_SUPABASE_ANON_KEY`, enable GitHub Pages with GitHub Actions as the source, and push to `main`. The workflow generates ignored `config.js` only in the deployment artifact. The public anon key is not a service credential; RLS and least-privilege grants are the access boundary.
 
-All PropertyDesk tables use the `pd_` prefix so they can coexist with other apps in a shared Supabase project. The schema also creates a private agreement-file bucket with owner-scoped upload and read policies.
+All PropertyDesk tables use the `pd_` prefix so they can coexist with other apps in a shared Supabase project. The schema also creates a private agreement-file bucket with workspace-scoped upload and read policies.
+
+## Privacy and current security limits
+
+Supabase Auth, least-privilege grants, and row-level security separate unrelated workspaces. The rollback-only `supabase/tests/workspace_security.sql` checks that members can work in their shared workspace while an unrelated signed-in user cannot read or write it. Workspace members intentionally share access to all properties and records; property-holder labels do not restrict access.
+
+Supabase-managed encryption at rest and HTTPS protect infrastructure and network traffic, but the app does not currently encrypt customer records or agreement files before storing them. Authorized database and storage access, including the project operator and the reminder function's service role, can read that data. Supabase documents that secret/service-role credentials bypass RLS, so they must remain in trusted server-side code. Month-end reminders are optional and off by default; when enabled, the reminder function reads the contact and account data and MailerSend receives the recipient address and message. The activity log stores a recipient number rather than duplicating the email address; the saved account contact itself remains readable to authorized workspace members and privileged backend access.
+
+Audit history now keeps action metadata instead of copying full row contents into JSON snapshots; the linked database migration removed those redundant snapshots. This reduces duplication but does not make PropertyDesk end-to-end encrypted or operator-blind. The encryption, deployment-integrity, and independent-review gates are tracked in [design.md](design.md); do not make stronger privacy claims until they are met.
 
 ## Records and imports
 

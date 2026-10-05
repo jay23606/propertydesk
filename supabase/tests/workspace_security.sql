@@ -46,8 +46,8 @@ begin
     values('pd-private-agreements',v_owner_storage_name,ids.owner_id::text,'{"mimetype":"application/pdf","size":128}'::jsonb);
   insert into public.pd_property_holders(user_id,property_id,member_user_id)
     values(ids.owner_id,v_owner_property_id,ids.member_id);
-  insert into public.pd_reminder_logs(user_id,account_id,reminder_month,recipient_email,status,reason,unpaid_due)
-    values(ids.owner_id,v_owner_account_id,date '2026-10-01','tenant@example.test','accepted',null,100);
+  insert into public.pd_reminder_logs(user_id,account_id,reminder_month,recipient_index,status,reason,unpaid_due)
+    values(ids.owner_id,v_owner_account_id,date '2026-10-01',1,'accepted',null,100);
   insert into public.pd_payments(user_id,account_id,amount,received_date,income_category)
     values(ids.owner_id,v_owner_account_id,100,date '2026-10-01','rent');
   insert into public.pd_payments(user_id,account_id,amount,received_date,income_category)
@@ -90,6 +90,7 @@ begin
   if (select count(*) from public.pd_deposit_entries where account_id=ids.owner_account_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared deposit history'; end if;
   if (select count(*) from public.pd_property_holders where property_id=ids.owner_property_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared property-holder labels'; end if;
   if (select count(*) from public.pd_audit_events where user_id=ids.owner_id and entity_id=ids.owner_property_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared audit history'; end if;
+  if exists (select 1 from public.pd_audit_events where user_id=ids.owner_id and (before_data is not null or after_data is not null)) then raise exception 'FAIL: audit history duplicated private row contents'; end if;
   if (select count(*) from public.pd_reminder_logs where account_id=ids.owner_account_id) <> 1 then raise exception 'FAIL: workspace member cannot read shared reminder activity'; end if;
   if (select count(*) from public.pd_properties where id=ids.outsider_property_id) <> 0 then raise exception 'FAIL: workspace member can read another workspace'; end if;
 

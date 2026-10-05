@@ -203,14 +203,17 @@ create table if not exists public.pd_audit_events (
   after_data jsonb,
   created_at timestamptz not null default now()
 );
+comment on column public.pd_audit_events.before_data is
+  'Deprecated; must remain NULL to avoid duplicating sensitive row contents.';
+comment on column public.pd_audit_events.after_data is
+  'Deprecated; must remain NULL to avoid duplicating sensitive row contents.';
 
 create table if not exists public.pd_reminder_logs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   account_id uuid not null references public.pd_accounts(id) on delete cascade,
   reminder_month date not null check (extract(day from reminder_month) = 1),
-  recipient_email text,
-  recipient_key text generated always as (coalesce(lower(btrim(recipient_email)), '')) stored,
+  recipient_index integer not null default 0 check (recipient_index >= 0),
   status text not null check (status in ('sending','accepted','failed','skipped')),
   reason text,
   unpaid_due numeric(14,2) check (unpaid_due is null or unpaid_due >= 0),
@@ -233,7 +236,7 @@ create unique index if not exists pd_deposit_entries_payment_source_idx on publi
 create unique index if not exists pd_deposit_entries_expense_source_idx on public.pd_deposit_entries(source_expense_id) where source_expense_id is not null;
 create index if not exists pd_import_batches_user_idx on public.pd_import_batches(user_id, created_at desc);
 create index if not exists pd_audit_events_user_entity_idx on public.pd_audit_events(user_id, entity_type, entity_id, created_at desc);
-create unique index if not exists pd_reminder_logs_account_month_recipient_idx on public.pd_reminder_logs(account_id, reminder_month, recipient_key);
+create unique index if not exists pd_reminder_logs_account_month_recipient_idx on public.pd_reminder_logs(account_id, reminder_month, recipient_index);
 create index if not exists pd_reminder_logs_workspace_attempted_idx on public.pd_reminder_logs(user_id, attempted_at desc);
 create unique index if not exists pd_payments_one_correction_idx on public.pd_payments(correction_of_payment_id) where correction_of_payment_id is not null;
 create unique index if not exists pd_expenses_one_correction_idx on public.pd_expenses(correction_of_expense_id) where correction_of_expense_id is not null;
@@ -364,8 +367,8 @@ begin
     row_user_id := old.user_id;
     row_id := old.id;
     event_action := 'deleted';
-    insert into public.pd_audit_events(user_id, entity_type, entity_id, action, summary, before_data)
-      values (row_user_id, tg_table_name, row_id, event_action, 'Deleted row from ' || tg_table_name, to_jsonb(old));
+    insert into public.pd_audit_events(user_id, entity_type, entity_id, action, summary)
+      values (row_user_id, tg_table_name, row_id, event_action, 'Deleted row from ' || tg_table_name);
     return old;
   end if;
   row_user_id := new.user_id;
@@ -381,10 +384,9 @@ begin
   else
     event_action := 'updated';
   end if;
-  insert into public.pd_audit_events(user_id, entity_type, entity_id, action, summary, before_data, after_data)
+  insert into public.pd_audit_events(user_id, entity_type, entity_id, action, summary)
     values (row_user_id, tg_table_name, row_id, event_action,
-      case when event_action = 'voided' then 'Voided transaction in ' || tg_table_name else 'Recorded ' || lower(tg_op) || ' in ' || tg_table_name end,
-      case when tg_op = 'INSERT' then null else to_jsonb(old) end, to_jsonb(new));
+      case when event_action = 'voided' then 'Voided transaction in ' || tg_table_name else 'Recorded ' || lower(tg_op) || ' in ' || tg_table_name end);
   return new;
 end;
 $$;

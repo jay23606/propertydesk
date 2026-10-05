@@ -101,6 +101,7 @@ test("reminder activity view summarizes delivery results and escapes log data", 
         {
           account_id: "account-1",
           reminder_month: "2026-10-01",
+          recipient_index: 1,
           recipient_email: "buyer@example.test",
           status: "failed",
           reason: "mailersend_http_403",
@@ -119,7 +120,8 @@ test("reminder activity view summarizes delivery results and escapes log data", 
   const html = $("reminder-activity").innerHTML;
   assert.match(html, /&lt;10 Main St&gt;/);
   assert.match(html, /&lt;Buyer&gt;/);
-  assert.match(html, /buyer@example\.test/);
+  assert.match(html, /Recipient 1/);
+  assert.doesNotMatch(html, /buyer@example\.test/);
   assert.match(html, /MailerSend rejected the request/);
   assert.match(html, /Unpaid due: \$550\.00/);
   assert.match(html, /reminder-failed/);
