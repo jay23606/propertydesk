@@ -113,10 +113,16 @@ test("account detail event router dispatches edit, payment, and close actions", 
 
 test("property activity details include posted and voided records without counting voids", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-activity-details.js"), "utf8"),
-    context,
-  );
+  for (const filename of [
+    "property-activity-model.js",
+    "property-activity-view.js",
+    "property-activity-details.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const activity = context.window.PropertyDeskPropertyActivityDetails.create({
     state: {
       payments: [
@@ -144,6 +150,44 @@ test("property activity details include posted and voided records without counti
   assert.match(result.html, /transaction-voided/);
   assert.match(result.html, /&lt;cancelled&gt;/);
   assert.match(result.html, /−\$75\.00/);
+});
+
+test("property activity model aggregates posted cash flow and sorts eight recent rows", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-activity-model.js"), "utf8"),
+    context,
+  );
+  const state = {
+    payments: [
+      { account_id: "account-1", amount: 500, received_date: "2026-10-04", status: "posted" },
+      { account_id: "other-account", amount: 999, received_date: "2026-10-05", status: "posted" },
+    ],
+    expenses: Array.from({ length: 9 }, (_, index) => ({
+      property_id: "property-1",
+      amount: index + 1,
+      expense_date: `2026-10-${String(index + 1).padStart(2, "0")}`,
+      status: "posted",
+      payee: `Vendor ${index + 1}`,
+    })),
+  };
+  const model = context.window.PropertyDeskPropertyActivityModel.create({
+    state,
+    isPosted: (record) => record.status === "posted",
+    sumIncome: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumOperatingExpenses: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+  });
+
+  const result = model.buildPropertyActivity("property-1", [
+    { id: "account-1", name: "Rental" },
+  ]);
+
+  assert.equal(result.incomeTotal, 500);
+  assert.equal(result.expenseTotal, 45);
+  assert.equal(result.transactions.length, 8);
+  assert.equal(result.transactions[0].date, "2026-10-09");
+  assert.equal(result.transactions[0].amount, -9);
+  assert.equal(result.transactions.at(-1).date, "2026-10-03");
 });
 
 test("deposit details render rental-only ledger rows and preserve voided markers", () => {
