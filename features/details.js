@@ -15,7 +15,7 @@
       prettyType,
       paymentFrequencyLabel,
       accountBalance,
-      scheduleFor,
+      amortizationSchedule,
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
@@ -131,7 +131,13 @@
       if (!a) return;
       const p = state.properties.find((x) => x.id === a.property_id);
       const payments = state.payments.filter((x) => x.account_id === id);
-      const schedule = a.account_type === "rental" ? [] : scheduleFor(a);
+      const schedule = a.account_type === "rental" ? [] : amortizationSchedule(
+        a.original_principal,
+        a.interest_rate,
+        a.term_months,
+        a.start_date,
+        a.principal_interest_amount,
+      );
       const auditIds = [
         a.id,
         ...payments.slice(0, 50).map((payment) => payment.id),

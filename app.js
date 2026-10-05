@@ -3,11 +3,35 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const { amountDueSince, amortizationSchedule, createBackup, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = window.PropertyDeskLedgerUtils;
+  const { amountDueSince, createBackup, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = window.PropertyDeskLedgerUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const config = window.PROPERTYDESK_CONFIG || {};
   const configured = Boolean(config.supabaseUrl && config.supabaseAnonKey && window.supabase);
-  const state = { client: null, user: null, workspaceOwnerId: null, workspaceMembers: [], propertyHolders: [], depositEntries: [], reminderLogs: [], view: 'properties', properties: [], accounts: [], payments: [], expenses: [], documents: [], agreementVersions: [], importBatches: [], pendingImport: null, pendingCorrection: null, editingProperty: null, editingAccount: null, selectedPropertyId: null, auditRequestId: 0, passwordRecoveryInProgress: false, toastTimer: null };
+  const state = {
+    client: null,
+    user: null,
+    workspaceOwnerId: null,
+    workspaceMembers: [],
+    propertyHolders: [],
+    depositEntries: [],
+    reminderLogs: [],
+    view: 'properties',
+    properties: [],
+    accounts: [],
+    payments: [],
+    expenses: [],
+    documents: [],
+    agreementVersions: [],
+    importBatches: [],
+    pendingImport: null,
+    pendingCorrection: null,
+    editingProperty: null,
+    editingAccount: null,
+    selectedPropertyId: null,
+    auditRequestId: 0,
+    passwordRecoveryInProgress: false,
+    toastTimer: null,
+  };
   const money = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(value || 0));
   const dateOnly = (value) => value ? new Date(`${value}T12:00:00`) : null;
   const fmtDate = (value, opts = { month: 'short', day: 'numeric', year: 'numeric' }) => { const d = dateOnly(value); return d ? d.toLocaleDateString(undefined, opts) : '—'; };
@@ -85,7 +109,7 @@
   const { openPropertyDetails, openAccountDetails } =
     window.PropertyDeskDetailViews.create({
       $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
-      prettyType, paymentFrequencyLabel, accountBalance, scheduleFor,
+      prettyType, paymentFrequencyLabel, accountBalance, amortizationSchedule,
       amountDueSince, unpaidDueAccrualStart, todayIso, depositLedger, openModal,
       closeModal, editAccount, openPayment, deleteAccount, propertyAddress,
     });
@@ -123,25 +147,67 @@
     });
 
   async function fetchAll() {
-    const {data:workspaceId,error:workspaceError}=await state.client.rpc('pd_workspace_id');
-    if(workspaceError||!workspaceId){toast(workspaceError?.message||'Could not load this workspace');throw workspaceError||new Error('Missing workspace');}
-    state.workspaceOwnerId=workspaceId;
-    const [pr, ar, pay, exp, batches, docs, versions, holders, members, deposits, reminders] = await Promise.all([
-      state.client.from('pd_properties').select('*').eq('user_id',workspaceId).order('created_at', { ascending: false }),
-      state.client.from('pd_accounts').select('*').eq('user_id',workspaceId).order('created_at', { ascending: false }),
-      state.client.from('pd_payments').select('*').eq('user_id',workspaceId).order('received_date', { ascending: false }).order('recorded_at', { ascending: false }),
-      state.client.from('pd_expenses').select('*').eq('user_id',workspaceId).order('expense_date', { ascending: false }).order('recorded_at', { ascending: false }),
-      state.client.from('pd_import_batches').select('*').eq('user_id',workspaceId).order('created_at', { ascending: false }),
-      state.client.from('pd_documents').select('*').eq('user_id',workspaceId).order('created_at', { ascending: false }),
-      state.client.from('pd_agreement_versions').select('*').eq('user_id',workspaceId).order('replaced_on', { ascending: false }),
-      state.client.from('pd_property_holders').select('*').eq('user_id',workspaceId),
-      state.client.rpc('pd_list_workspace_members'),
-      state.client.from('pd_deposit_entries').select('*').eq('user_id',workspaceId).order('movement_date',{ascending:false}).order('created_at',{ascending:false}),
-      state.client.from('pd_reminder_logs').select('*').eq('user_id',workspaceId).order('attempted_at',{ascending:false}).limit(300)
-    ]);
-    const error = pr.error || ar.error || pay.error || exp.error || batches.error || docs.error || versions.error || holders.error || members.error || deposits.error || reminders.error;
-    if (error) { toast(error.message); throw error; }
-    state.properties = pr.data || []; state.accounts = ar.data || []; state.payments = pay.data || []; state.expenses = exp.data || []; state.depositEntries=deposits.data||[];state.reminderLogs=reminders.data||[];state.importBatches = batches.data || []; state.documents = docs.data || []; state.agreementVersions = versions.data || []; state.propertyHolders=holders.data||[];state.workspaceMembers=members.data||[];
+    const { data: workspaceId, error: workspaceError } =
+      await state.client.rpc('pd_workspace_id');
+    if (workspaceError || !workspaceId) {
+      const error = workspaceError || new Error('Missing workspace');
+      toast(workspaceError?.message || 'Could not load this workspace');
+      throw error;
+    }
+    state.workspaceOwnerId = workspaceId;
+
+    const [properties, accounts, payments, expenses, importBatches, documents,
+      agreementVersions, propertyHolders, workspaceMembers, depositEntries, reminderLogs] =
+      await Promise.all([
+        state.client.from('pd_properties').select('*')
+          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
+        state.client.from('pd_accounts').select('*')
+          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
+        state.client.from('pd_payments').select('*')
+          .eq('user_id', workspaceId)
+          .order('received_date', { ascending: false })
+          .order('recorded_at', { ascending: false }),
+        state.client.from('pd_expenses').select('*')
+          .eq('user_id', workspaceId)
+          .order('expense_date', { ascending: false })
+          .order('recorded_at', { ascending: false }),
+        state.client.from('pd_import_batches').select('*')
+          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
+        state.client.from('pd_documents').select('*')
+          .eq('user_id', workspaceId).order('created_at', { ascending: false }),
+        state.client.from('pd_agreement_versions').select('*')
+          .eq('user_id', workspaceId).order('replaced_on', { ascending: false }),
+        state.client.from('pd_property_holders').select('*').eq('user_id', workspaceId),
+        state.client.rpc('pd_list_workspace_members'),
+        state.client.from('pd_deposit_entries').select('*')
+          .eq('user_id', workspaceId)
+          .order('movement_date', { ascending: false })
+          .order('created_at', { ascending: false }),
+        state.client.from('pd_reminder_logs').select('*')
+          .eq('user_id', workspaceId)
+          .order('attempted_at', { ascending: false })
+          .limit(300),
+      ]);
+    const results = [properties, accounts, payments, expenses, importBatches,
+      documents, agreementVersions, propertyHolders, workspaceMembers,
+      depositEntries, reminderLogs];
+    const failedResult = results.find((result) => result.error);
+    if (failedResult) {
+      toast(failedResult.error.message);
+      throw failedResult.error;
+    }
+
+    state.properties = properties.data || [];
+    state.accounts = accounts.data || [];
+    state.payments = payments.data || [];
+    state.expenses = expenses.data || [];
+    state.importBatches = importBatches.data || [];
+    state.documents = documents.data || [];
+    state.agreementVersions = agreementVersions.data || [];
+    state.propertyHolders = propertyHolders.data || [];
+    state.workspaceMembers = workspaceMembers.data || [];
+    state.depositEntries = depositEntries.data || [];
+    state.reminderLogs = reminderLogs.data || [];
     render();
   }
   function render() { updateGreeting(); renderOverview(); renderProperties(); renderPayments(); renderReports(); }
@@ -150,7 +216,30 @@
     $('page-crumb').textContent=view.charAt(0).toUpperCase()+view.slice(1); window.scrollTo({top:0,behavior:'smooth'});
   }
   function openModal(id) { $(id).classList.remove('hidden'); document.body.style.overflow='hidden'; }
-  function closeModal(modal) { modal.classList.add('hidden'); document.body.style.overflow=''; if(modal.id==='import-preview-modal')state.pendingImport=null; if(modal.id==='detail-modal')state.auditRequestId++; if(modal.id==='payment-modal'||modal.id==='expense-modal'){state.pendingCorrection=null;if(modal.id==='payment-modal'){$('payment-modal-title').textContent='Record payment';$('payment-modal').querySelector('.eyebrow').textContent='PAYMENT ENTRY';$('payment-save-button').textContent='Save payment';$('payment-save-next').classList.remove('hidden');}else{$('expense-modal-title').textContent='Record expense';$('expense-modal').querySelector('.eyebrow').textContent='PROPERTY EXPENSE';$('expense-save-button').textContent='Save expense';$('expense-save-next').classList.remove('hidden');}} }
+  function resetPaymentModal() {
+    $('payment-modal-title').textContent = 'Record payment';
+    $('payment-modal').querySelector('.eyebrow').textContent = 'PAYMENT ENTRY';
+    $('payment-save-button').textContent = 'Save payment';
+    $('payment-save-next').classList.remove('hidden');
+  }
+  function resetExpenseModal() {
+    $('expense-modal-title').textContent = 'Record expense';
+    $('expense-modal').querySelector('.eyebrow').textContent = 'PROPERTY EXPENSE';
+    $('expense-save-button').textContent = 'Save expense';
+    $('expense-save-next').classList.remove('hidden');
+  }
+  function closeModal(modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+
+    if (modal.id === 'import-preview-modal') state.pendingImport = null;
+    if (modal.id === 'detail-modal') state.auditRequestId++;
+    if (modal.id !== 'payment-modal' && modal.id !== 'expense-modal') return;
+
+    state.pendingCorrection = null;
+    if (modal.id === 'payment-modal') resetPaymentModal();
+    else resetExpenseModal();
+  }
   function fillSelect(id, options, placeholder) {
     const el=$(id); el.innerHTML=`<option value="">${esc(placeholder)}</option>`+options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('');
   }
@@ -160,48 +249,351 @@
     fillSelect('expense-property',state.properties.map(p=>({value:p.id,label:`${p.name} — ${propertyAddress(p)}`})),'Choose a property');
     fillSelect('expense-account',state.accounts.map(a=>({value:a.id,label:`${a.name} — ${prettyType(a.account_type)}`})),'Property level');
   }
-  function scheduleFor(account) {
-    return amortizationSchedule(account.original_principal,account.interest_rate,account.term_months,account.start_date,account.principal_interest_amount);
-  }
-  function attachEvents() {
-    document.querySelectorAll('[data-theme-toggle]').forEach(button=>button.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true)));
+  function attachThemeAndNavigationEvents() {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      button.addEventListener('click', () =>
+        setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true),
+      );
+    });
     syncThemeButtons();
-    document.querySelectorAll('.nav-link').forEach(x=>x.addEventListener('click',()=>{if(x.dataset.view==='workspace')renderWorkspaceSettings();navigate(x.dataset.view);}));
-    document.querySelectorAll('[data-goto]').forEach(x=>x.addEventListener('click',()=>navigate(x.dataset.goto)));
-    document.querySelectorAll('[data-open="property-modal"]').forEach(x=>x.addEventListener('click',()=>{resetPropertyForm();openModal('property-modal');}));
-    document.querySelectorAll('[data-open="account-modal"]').forEach(x=>x.addEventListener('click',()=>{if(!state.properties.length){toast('Add a property before creating an account');navigate('properties');return;}resetAccountForm();populateFormOptions();openModal('account-modal');}));
-    document.querySelectorAll('[data-open="payment-modal"]').forEach(x=>x.addEventListener('click',()=>{if(!state.accounts.length){toast('Add an account before recording a payment');navigate('properties');return;}openPayment();}));
-    $('quick-payment').addEventListener('click',()=>{if(!state.accounts.length){toast('Add an account before recording a payment');navigate('properties');return;}openPayment();});
-    document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>closeModal(x.closest('.modal'))));
-    $('property-form').addEventListener('submit',saveProperty); $('account-form').addEventListener('submit',saveAccount); $('account-reminder-preview').addEventListener('click',previewReminderEmail); $('payment-form').addEventListener('submit',savePayment); $('expense-form').addEventListener('submit',saveExpense);
-    $('property-detail-content').addEventListener('click',event=>{const button=event.target.closest('[data-edit-account]');if(!button)return;const account=state.accounts.find(item=>item.id===button.dataset.editAccount);if(!account)return;event.preventDefault();closeModal($('property-detail-modal'));editAccount(account);});
-    $('account-type').addEventListener('change',updateLoanFields); $('payment-account').addEventListener('change',()=>{prefillPaymentAmount();updateAllocationPreview();}); $('payment-amount').addEventListener('input',updateAllocationPreview); $('payment-date').addEventListener('change',updateAllocationPreview);
-    $('expense-property').addEventListener('change',()=>{const pid=$('expense-property').value,related=state.accounts.filter(a=>a.property_id===pid);fillSelect('expense-account',related.map(a=>({value:a.id,label:`${a.name} — ${prettyType(a.account_type)}`})),'Property level');});
-    $('expense-category').addEventListener('change',()=>{$('deposit-refund-hint').classList.toggle('hidden',$('expense-category').value!=='deposit_refund');});
-    $('property-search').addEventListener('input',renderProperties); $('property-filter').addEventListener('change',renderProperties); $('property-holder-filter').addEventListener('change',renderProperties); $('show-archived').addEventListener('change',renderProperties); $('payment-search').addEventListener('input',renderPayments); $('payment-period').addEventListener('change',renderPayments); $('transaction-type').addEventListener('change',renderPayments);
-    document.addEventListener('click',e=>{const depositAdjustment=e.target.closest('[data-deposit-adjustment]');if(depositAdjustment){recordDepositAdjustment(depositAdjustment.dataset.accountId,depositAdjustment.dataset.depositAdjustment);return;}const removeMember=e.target.closest('[data-remove-member]');if(removeMember){removeWorkspaceMember(removeMember.dataset.removeMember);return;}if(e.target.closest('[data-save-holders]')){savePropertyHolders();return;}const accountPayment=e.target.closest('[data-account-payment]');if(accountPayment){e.preventDefault();e.stopPropagation();openPayment(accountPayment.dataset.accountPayment);return;}const propertyAccount=e.target.closest('[data-property-account]');if(propertyAccount){resetAccountForm();populateFormOptions();$('account-property').value=propertyAccount.dataset.propertyAccount;openModal('account-modal');return;}const propertyNote=e.target.closest('[data-property-note]');if(propertyNote){e.preventDefault();e.stopPropagation();editPropertyQuickNote(propertyNote.dataset.propertyNote);return;}const propertyOpen=e.target.closest('[data-property-open]');if(propertyOpen){openPropertyDetails(propertyOpen.dataset.propertyOpen);return;}const quickPayment=e.target.closest('[data-property-payment]');if(quickPayment){e.preventDefault();e.stopPropagation();openPropertyPayment(quickPayment.dataset.propertyPayment);return;}const deleteDoc=e.target.closest('[data-delete-document]');if(deleteDoc){deletePropertyDocument(deleteDoc.dataset.deleteDocument);return;}const openDoc=e.target.closest('[data-open-document]');if(openDoc){e.preventDefault();e.stopPropagation();openPropertyDocument(openDoc.dataset.openDocument);return;}const correction=e.target.closest('[data-correct-transaction]');if(correction){correctTransaction(correction.dataset.kind,correction.dataset.id);return;}const voidButton=e.target.closest('[data-void-transaction]');if(voidButton){voidTransaction(voidButton.dataset.kind,voidButton.dataset.id);return;}const a=e.target.closest('[data-detail]');if(a){closeModal($('property-detail-modal'));openAccountDetails(a.dataset.detail);return;}const card=e.target.closest('[data-property-card]');if(card){openPropertyDetails(card.dataset.propertyCard);return;}});
-    document.addEventListener('change',e=>{if(e.target.matches('[data-property-document]'))uploadPropertyDocument(e.target);});
-    $('property-detail-add-income').addEventListener('click',()=>{const propertyId=state.selectedPropertyId;if(!propertyId)return;closeModal($('property-detail-modal'));openPayment(null,propertyId);});
-    $('property-detail-add-expense').addEventListener('click',()=>{const propertyId=state.selectedPropertyId;if(!propertyId)return;closeModal($('property-detail-modal'));openExpense(propertyId);});
-    $('property-detail-add-account').addEventListener('click',()=>{const propertyId=state.selectedPropertyId;if(!propertyId)return;closeModal($('property-detail-modal'));resetAccountForm();populateFormOptions();$('account-property').value=propertyId;openModal('account-modal');});
-    $('display-name-form').addEventListener('submit',saveProfile);$('member-add-form').addEventListener('submit',addWorkspaceMember);$('user-menu').addEventListener('click',()=>{renderWorkspaceSettings();navigate('workspace');});$('property-archive-toggle').addEventListener('click',toggleArchiveProperty);
-    $('sign-out').addEventListener('click',async()=>{await state.client.auth.signOut();state.user=null;state.properties=[];state.accounts=[];state.payments=[];showAuth();setAuthMode(false);}); $('auth-toggle').addEventListener('click',()=>setAuthMode($('auth-form').dataset.mode!=='signup')); $('auth-form').addEventListener('submit',submitAuth); $('forgot-password').addEventListener('click',requestPasswordReset); $('password-reset-form').addEventListener('submit',submitPasswordReset); $('reset-password-cancel').addEventListener('click',()=>{state.passwordRecoveryInProgress=false;setAuthMode(false);showAuth();});
-    document.querySelectorAll('[data-open="expense-modal"]').forEach(x=>x.addEventListener('click',()=>{if(!state.properties.length){toast('Add a property before recording an expense');navigate('properties');return;}openExpense();}));
-    attachImportEvents();
-    $('export-all').addEventListener('click',exportAll); $('export-report').addEventListener('click',exportReport);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal:not(.hidden)').forEach(closeModal);});
+
+    document.querySelectorAll('.nav-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (link.dataset.view === 'workspace') renderWorkspaceSettings();
+        navigate(link.dataset.view);
+      });
+    });
+    document.querySelectorAll('[data-goto]').forEach((link) => {
+      link.addEventListener('click', () => navigate(link.dataset.goto));
+    });
+    document.querySelectorAll('[data-close]').forEach((button) => {
+      button.addEventListener('click', () => closeModal(button.closest('.modal')));
+    });
   }
 
+  function attachCreateActions() {
+    document.querySelectorAll('[data-open="property-modal"]').forEach((button) => {
+      button.addEventListener('click', () => {
+        resetPropertyForm();
+        openModal('property-modal');
+      });
+    });
+    document.querySelectorAll('[data-open="account-modal"]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (!state.properties.length) {
+          toast('Add a property before creating an account');
+          navigate('properties');
+          return;
+        }
+        resetAccountForm();
+        populateFormOptions();
+        openModal('account-modal');
+      });
+    });
+
+    const openPayments = () => {
+      if (!state.accounts.length) {
+        toast('Add an account before recording a payment');
+        navigate('properties');
+        return;
+      }
+      openPayment();
+    };
+    document.querySelectorAll('[data-open="payment-modal"]').forEach((button) => {
+      button.addEventListener('click', openPayments);
+    });
+    $('quick-payment').addEventListener('click', openPayments);
+    document.querySelectorAll('[data-open="expense-modal"]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (!state.properties.length) {
+          toast('Add a property before recording an expense');
+          navigate('properties');
+          return;
+        }
+        openExpense();
+      });
+    });
+  }
+
+  function attachFormEvents() {
+    $('property-form').addEventListener('submit', saveProperty);
+    $('account-form').addEventListener('submit', saveAccount);
+    $('account-reminder-preview').addEventListener('click', previewReminderEmail);
+    $('payment-form').addEventListener('submit', savePayment);
+    $('expense-form').addEventListener('submit', saveExpense);
+    $('account-type').addEventListener('change', updateLoanFields);
+    $('payment-account').addEventListener('change', () => {
+      prefillPaymentAmount();
+      updateAllocationPreview();
+    });
+    $('payment-amount').addEventListener('input', updateAllocationPreview);
+    $('payment-date').addEventListener('change', updateAllocationPreview);
+    $('expense-property').addEventListener('change', () => {
+      const propertyId = $('expense-property').value;
+      const relatedAccounts = state.accounts.filter((account) => account.property_id === propertyId);
+      fillSelect(
+        'expense-account',
+        relatedAccounts.map((account) => ({
+          value: account.id,
+          label: `${account.name} — ${prettyType(account.account_type)}`,
+        })),
+        'Property level',
+      );
+    });
+    $('expense-category').addEventListener('change', () => {
+      $('deposit-refund-hint').classList.toggle(
+        'hidden',
+        $('expense-category').value !== 'deposit_refund',
+      );
+    });
+  }
+
+  function attachSearchEvents() {
+    $('property-search').addEventListener('input', renderProperties);
+    $('property-filter').addEventListener('change', renderProperties);
+    $('property-holder-filter').addEventListener('change', renderProperties);
+    $('show-archived').addEventListener('change', renderProperties);
+    $('payment-search').addEventListener('input', renderPayments);
+    $('payment-period').addEventListener('change', renderPayments);
+    $('transaction-type').addEventListener('change', renderPayments);
+  }
+
+  function attachDelegatedActionEvents() {
+    document.addEventListener('click', (event) => {
+      const depositAdjustment = event.target.closest('[data-deposit-adjustment]');
+      if (depositAdjustment) {
+        recordDepositAdjustment(depositAdjustment.dataset.accountId, depositAdjustment.dataset.depositAdjustment);
+        return;
+      }
+      const removeMember = event.target.closest('[data-remove-member]');
+      if (removeMember) {
+        removeWorkspaceMember(removeMember.dataset.removeMember);
+        return;
+      }
+      if (event.target.closest('[data-save-holders]')) {
+        savePropertyHolders();
+        return;
+      }
+      const accountPayment = event.target.closest('[data-account-payment]');
+      if (accountPayment) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPayment(accountPayment.dataset.accountPayment);
+        return;
+      }
+      const propertyAccount = event.target.closest('[data-property-account]');
+      if (propertyAccount) {
+        resetAccountForm();
+        populateFormOptions();
+        $('account-property').value = propertyAccount.dataset.propertyAccount;
+        openModal('account-modal');
+        return;
+      }
+      const propertyNote = event.target.closest('[data-property-note]');
+      if (propertyNote) {
+        event.preventDefault();
+        event.stopPropagation();
+        editPropertyQuickNote(propertyNote.dataset.propertyNote);
+        return;
+      }
+      const propertyOpen = event.target.closest('[data-property-open]');
+      if (propertyOpen) {
+        openPropertyDetails(propertyOpen.dataset.propertyOpen);
+        return;
+      }
+      const quickPayment = event.target.closest('[data-property-payment]');
+      if (quickPayment) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPropertyPayment(quickPayment.dataset.propertyPayment);
+        return;
+      }
+      const deleteDocument = event.target.closest('[data-delete-document]');
+      if (deleteDocument) {
+        deletePropertyDocument(deleteDocument.dataset.deleteDocument);
+        return;
+      }
+      const openDocument = event.target.closest('[data-open-document]');
+      if (openDocument) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPropertyDocument(openDocument.dataset.openDocument);
+        return;
+      }
+      const correction = event.target.closest('[data-correct-transaction]');
+      if (correction) {
+        correctTransaction(correction.dataset.kind, correction.dataset.id);
+        return;
+      }
+      const voidButton = event.target.closest('[data-void-transaction]');
+      if (voidButton) {
+        voidTransaction(voidButton.dataset.kind, voidButton.dataset.id);
+        return;
+      }
+      const accountDetail = event.target.closest('[data-detail]');
+      if (accountDetail) {
+        closeModal($('property-detail-modal'));
+        openAccountDetails(accountDetail.dataset.detail);
+        return;
+      }
+      const propertyCard = event.target.closest('[data-property-card]');
+      if (propertyCard) openPropertyDetails(propertyCard.dataset.propertyCard);
+    });
+
+    document.addEventListener('change', (event) => {
+      if (event.target.matches('[data-property-document]')) uploadPropertyDocument(event.target);
+    });
+  }
+
+  function attachPropertyDetailEvents() {
+    $('property-detail-content').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-edit-account]');
+      if (!button) return;
+      const account = state.accounts.find((item) => item.id === button.dataset.editAccount);
+      if (!account) return;
+      event.preventDefault();
+      closeModal($('property-detail-modal'));
+      editAccount(account);
+    });
+
+    $('property-detail-add-income').addEventListener('click', () => {
+      const propertyId = state.selectedPropertyId;
+      if (!propertyId) return;
+      closeModal($('property-detail-modal'));
+      openPayment(null, propertyId);
+    });
+    $('property-detail-add-expense').addEventListener('click', () => {
+      const propertyId = state.selectedPropertyId;
+      if (!propertyId) return;
+      closeModal($('property-detail-modal'));
+      openExpense(propertyId);
+    });
+    $('property-detail-add-account').addEventListener('click', () => {
+      const propertyId = state.selectedPropertyId;
+      if (!propertyId) return;
+      closeModal($('property-detail-modal'));
+      resetAccountForm();
+      populateFormOptions();
+      $('account-property').value = propertyId;
+      openModal('account-modal');
+    });
+    $('property-archive-toggle').addEventListener('click', toggleArchiveProperty);
+  }
+
+  function attachWorkspaceAndAuthEvents() {
+    $('display-name-form').addEventListener('submit', saveProfile);
+    $('member-add-form').addEventListener('submit', addWorkspaceMember);
+    $('user-menu').addEventListener('click', () => {
+      renderWorkspaceSettings();
+      navigate('workspace');
+    });
+    $('sign-out').addEventListener('click', async () => {
+      await state.client.auth.signOut();
+      state.user = null;
+      state.properties = [];
+      state.accounts = [];
+      state.payments = [];
+      showAuth();
+      setAuthMode(false);
+    });
+    $('auth-toggle').addEventListener('click', () =>
+      setAuthMode($('auth-form').dataset.mode !== 'signup'),
+    );
+    $('auth-form').addEventListener('submit', submitAuth);
+    $('forgot-password').addEventListener('click', requestPasswordReset);
+    $('password-reset-form').addEventListener('submit', submitPasswordReset);
+    $('reset-password-cancel').addEventListener('click', () => {
+      state.passwordRecoveryInProgress = false;
+      setAuthMode(false);
+      showAuth();
+    });
+  }
+
+  function attachImportAndExportEvents() {
+    attachImportEvents();
+    $('export-all').addEventListener('click', exportAll);
+    $('export-report').addEventListener('click', exportReport);
+  }
+
+  function attachKeyboardEvents() {
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        document.querySelectorAll('.modal:not(.hidden)').forEach(closeModal);
+      }
+    });
+  }
+
+  function attachEvents() {
+    attachThemeAndNavigationEvents();
+    attachCreateActions();
+    attachFormEvents();
+    attachSearchEvents();
+    attachDelegatedActionEvents();
+    attachPropertyDetailEvents();
+    attachWorkspaceAndAuthEvents();
+    attachImportAndExportEvents();
+    attachKeyboardEvents();
+  }
+  function setupServiceWorker() {
+    if (!('serviceWorker' in navigator) || !window.location.protocol.startsWith('http')) return;
+    navigator.serviceWorker.register('./sw.js').catch((error) =>
+      console.warn('PropertyDesk shell cache could not be registered:', error),
+    );
+  }
+  function handleAuthStateChange(event, session) {
+    if (event === 'SIGNED_OUT') {
+      state.user = null;
+      state.passwordRecoveryInProgress = false;
+      showAuth();
+      setAuthMode(false);
+      return;
+    }
+    if (event === 'PASSWORD_RECOVERY' && session?.user) {
+      state.user = session.user;
+      showPasswordReset();
+      return;
+    }
+    if (!session?.user) return;
+
+    const previousUserId = state.user?.id;
+    state.user = session.user;
+    const signedIntoNewUser = event === 'SIGNED_IN' && previousUserId !== session.user.id;
+    if (signedIntoNewUser && !state.passwordRecoveryInProgress) startWorkspace();
+  }
+  function isPasswordRecoverySession(session) {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return params.get('type') === 'recovery' && params.get('access_token') === session?.access_token;
+  }
+  async function restoreAuthSession() {
+    const { data: { session } } = await state.client.auth.getSession();
+    if (!session?.user) {
+      showAuth();
+      return;
+    }
+
+    state.user = session.user;
+    if (isPasswordRecoverySession(session)) showPasswordReset();
+    else if (!state.passwordRecoveryInProgress) await startWorkspace();
+  }
   async function init() {
-    attachEvents(); $('payment-date').value=todayIso(); $('account-start').value=todayIso(); setAuthMode(false);
-    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(error => console.warn('PropertyDesk shell cache could not be registered:', error));
-    if(!configured){showConfigError();return;}
-    state.client=window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-    state.client.auth.onAuthStateChange((event,sessionNow)=>{if(event==='SIGNED_OUT'){state.user=null;state.passwordRecoveryInProgress=false;showAuth();setAuthMode(false);return;}if(event==='PASSWORD_RECOVERY'&&sessionNow?.user){state.user=sessionNow.user;showPasswordReset();return;}if(sessionNow?.user){const previousUserId=state.user?.id;state.user=sessionNow.user;if(event==='SIGNED_IN'&&previousUserId!==sessionNow.user.id&&!state.passwordRecoveryInProgress)startWorkspace();}});
-    const {data:{session}}=await state.client.auth.getSession();
-    const recoveryParams=new URLSearchParams(window.location.hash.replace(/^#/,''));
-    const recoveryLink=recoveryParams.get('type')==='recovery'&&recoveryParams.get('access_token')===session?.access_token;
-    if(session?.user){state.user=session.user;if(recoveryLink)showPasswordReset();else if(!state.passwordRecoveryInProgress)await startWorkspace();} else showAuth();
+    attachEvents();
+    $('payment-date').value = todayIso();
+    $('account-start').value = todayIso();
+    setAuthMode(false);
+    setupServiceWorker();
+
+    if (!configured) {
+      showConfigError();
+      return;
+    }
+
+    state.client = window.supabase.createClient(
+      config.supabaseUrl,
+      config.supabaseAnonKey,
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } },
+    );
+    state.client.auth.onAuthStateChange(handleAuthStateChange);
+    await restoreAuthSession();
   }
   document.addEventListener('DOMContentLoaded',init);
 })();
