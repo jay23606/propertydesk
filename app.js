@@ -99,7 +99,16 @@
   function syncThemeButtons() {
     setTheme(document.documentElement.dataset.theme);
   }
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const esc = (value) => {
+    const htmlEntities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return String(value ?? '').replace(/[&<>"']/g, (character) => htmlEntities[character]);
+  };
   const prettyType = (type) => ({
     rental: 'Rental',
     land_contract: 'Land contract',
@@ -134,8 +143,11 @@
     String(property.address || property.name || '').split(',')[0].trim();
 
   function toast(message) {
-    const el = $('toast'); el.textContent = message; el.classList.add('show');
-    clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    const element = $('toast');
+    element.textContent = message;
+    element.classList.add('show');
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => element.classList.remove('show'), 2800);
   }
   function moneyInput(value) {
     const raw = String(value ?? '').trim();
@@ -181,8 +193,6 @@
     if (category === 'deposit_refund') return 'Security deposit refund';
     return String(category || 'other').replaceAll('_', ' ');
   }
-  function expenseCategoryLabel(category) { return category==='deposit_refund'?'Security deposit refund':String(category||'other').replaceAll('_',' '); }
-
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const { updateGreeting, renderOverview, renderProperties } =
     window.PropertyDeskPropertyViews.create({
