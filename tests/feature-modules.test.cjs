@@ -143,6 +143,105 @@ test("document upload stores objects privately and removes an orphan after metad
   assert.match(messages[0], /metadata insert failed/);
 });
 
+test("backup export aborts before download when a private document path escapes the workspace", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "exports.js"), "utf8"),
+    context,
+  );
+  const tables = [
+    "pd_properties", "pd_accounts", "pd_agreement_versions", "pd_payments",
+    "pd_expenses", "pd_deposit_entries", "pd_documents", "pd_import_batches",
+    "pd_audit_events", "pd_workspace_members", "pd_property_holders",
+  ];
+  const button = { textContent: "Export backup", disabled: false };
+  const state = {
+    user: { id: "workspace-1" },
+    workspaceOwnerId: "workspace-1",
+    accounts: [],
+    properties: [],
+    client: {
+      from(table) {
+        assert.ok(tables.includes(table));
+        return {
+          select() {
+            return {
+              async range() {
+                return {
+                  data: table === "pd_documents"
+                    ? [{ id: "doc-1", user_id: "workspace-1", storage_path: "other-workspace/property/file.pdf", file_name: "file.pdf" }]
+                    : [],
+                  error: null,
+                };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const messages = [];
+  const downloads = [];
+  const feature = context.window.PropertyDeskExports.create({
+    $: (id) => id === "export-all" ? button : null,
+    state,
+    createBackup: () => assert.fail("invalid paths must stop before backup creation"),
+    todayIso: () => "2026-10-04",
+    toast: (message) => messages.push(message),
+    prettyType: (value) => value,
+    accountBalance: () => 0,
+    downloadBlob: (blob) => downloads.push(blob),
+    zipUtils: { createZip: () => assert.fail("invalid paths must stop before zip creation") },
+  });
+
+  await feature.exportAll();
+
+  assert.equal(downloads.length, 0);
+  assert.equal(button.disabled, false);
+  assert.equal(button.textContent, "Export backup");
+  assert.match(messages.at(-1), /invalid private storage path/);
+});
+
+test("password reset requests keep generic feedback and restore the submit control", async () => {
+  const context = vm.createContext({ window: {}, document: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: "owner@example.com",
+        disabled: false,
+        textContent: "",
+        reportValidity: () => true,
+      });
+    }
+    return elements.get(id);
+  };
+  const resetCalls = [];
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state: { client: { auth: { async resetPasswordForEmail(...args) {
+      resetCalls.push(args);
+      return { error: { message: "account-specific failure" } };
+    } } } },
+    fetchAll: async () => {},
+    toast() {},
+    windowRef: { location: { origin: "https://example.test", pathname: "/propertydesk/" } },
+    documentRef: {},
+  });
+
+  await feature.requestPasswordReset();
+
+  assert.equal(resetCalls.length, 1);
+  assert.equal(resetCalls[0][0], "owner@example.com");
+  assert.equal(resetCalls[0][1].redirectTo, "https://example.test/propertydesk/");
+  assert.equal(element("auth-message").textContent, "Unable to request a reset right now. Try again later.");
+  assert.equal(element("forgot-password").disabled, false);
+});
+
 test("recording a loan payment does not invent principal or interest splits", async () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(

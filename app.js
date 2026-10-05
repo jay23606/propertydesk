@@ -96,6 +96,13 @@
     window.PropertyDeskDocuments.create({
       state, toast, fetchAll, openPropertyDetails,
     });
+  const { exportAll, exportReport } = window.PropertyDeskExports.create({
+    $, state, createBackup, todayIso, toast, prettyType, accountBalance,
+  });
+  const {
+    showAuth, showApp, showConfigError, setAuthMode, showPasswordReset,
+    requestPasswordReset, submitPasswordReset, submitAuth, startWorkspace,
+  } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
 
   async function fetchAll() {
     const {data:workspaceId,error:workspaceError}=await state.client.rpc('pd_workspace_id');
@@ -118,13 +125,6 @@
     if (error) { toast(error.message); throw error; }
     state.properties = pr.data || []; state.accounts = ar.data || []; state.payments = pay.data || []; state.expenses = exp.data || []; state.depositEntries=deposits.data||[];state.reminderLogs=reminders.data||[];state.importBatches = batches.data || []; state.documents = docs.data || []; state.agreementVersions = versions.data || []; state.propertyHolders=holders.data||[];state.workspaceMembers=members.data||[];
     render();
-  }
-  function showAuth() { $('auth-view').classList.remove('hidden'); $('app-view').classList.add('hidden'); }
-  function showApp() { $('auth-view').classList.add('hidden'); $('app-view').classList.remove('hidden'); }
-  function showConfigError() {
-    const banner = $('config-banner'); banner.innerHTML = 'Supabase is not configured. Copy <code>config.example.js</code> to <code>config.js</code>, add your project URL and anon key, then reload.'; banner.classList.remove('hidden');
-    $('auth-title').textContent = 'Connect your workspace'; document.querySelector('.auth-intro').textContent = 'Add your Supabase project settings to start your private PropertyDesk workspace.';
-    $('auth-form').classList.add('hidden'); $('password-reset-form').classList.add('hidden'); $('forgot-password').classList.add('hidden'); $('auth-toggle').classList.add('hidden'); document.querySelector('.privacy-note').classList.add('hidden'); showAuth();
   }
   function render() { updateGreeting(); renderOverview(); renderProperties(); renderPayments(); renderReports(); }
   function navigate(view) {
@@ -189,60 +189,6 @@
   }
   async function deleteAccount(a) { if(!confirm(`Close “${a.name}”? Its payment history will remain in your records.`))return; const {error}=await state.client.from('pd_accounts').update({status:'closed'}).eq('id',a.id);if(error){toast(error.message);return;}closeModal($('detail-modal'));await fetchAll();toast('Account closed'); }
   async function voidTransaction(kind,id) { const table=kind==='income'?'pd_payments':'pd_expenses';if(!confirm(`Void this ${kind==='income'?'income entry':'expense'}? It will remain in the audit history but stop affecting balances and reports.`))return;const reason=prompt('Optional reason for the audit record:','Entered in error');if(reason===null)return;const {data,error}=await state.client.from(table).update({status:'voided',voided_at:new Date().toISOString(),void_reason:reason.trim()||'Voided by owner'}).eq('id',id).eq('status','posted').select('id').maybeSingle();if(error){toast(error.message);return;}if(!data){toast('This transaction was already voided or is no longer available.');return;}await fetchAll();toast('Transaction voided; original entry preserved'); }
-  function setAuthMode(signup) { $('auth-form').classList.remove('hidden'); $('password-reset-form').classList.add('hidden'); $('forgot-password').classList.toggle('hidden',signup); $('auth-toggle').classList.remove('hidden'); $('auth-form').dataset.mode=signup?'signup':'signin'; $('auth-title').textContent=signup?'Create your account':'Welcome back'; document.querySelector('.auth-intro').textContent=signup?'Set up your private PropertyDesk workspace.':'Sign in to manage your properties and accounts.'; $('auth-submit').textContent=signup?'Create account':'Sign in'; $('auth-password').autocomplete=signup?'new-password':'current-password'; $('auth-toggle').textContent=signup?'Already have an account? Sign in':'Create an account'; $('auth-message').textContent=''; }
-  function showPasswordReset() { state.passwordRecoveryInProgress=true; $('auth-title').textContent='Choose a new password'; document.querySelector('.auth-intro').textContent='Your reset link is verified. Set a new password for your private workspace.'; $('auth-form').classList.add('hidden'); $('password-reset-form').classList.remove('hidden'); $('forgot-password').classList.add('hidden'); $('auth-toggle').classList.add('hidden'); $('auth-message').textContent=''; showAuth(); }
-  async function requestPasswordReset() { const email=$('auth-email').value.trim(); if(!$('auth-email').reportValidity())return; $('forgot-password').disabled=true; try { const redirectTo=`${window.location.origin}${window.location.pathname}`; const {error}=await state.client.auth.resetPasswordForEmail(email,{redirectTo}); $('auth-message').textContent=error?'Unable to request a reset right now. Try again later.':'If that email has a PropertyDesk account, a reset link is on its way.'; } catch { $('auth-message').textContent='Unable to request a reset right now. Try again later.'; } finally { $('forgot-password').disabled=false; } }
-  async function submitPasswordReset(event) { event.preventDefault(); const password=$('reset-password').value; if(password!==$('reset-password-confirm').value){$('auth-message').textContent='Those passwords do not match.';return;} $('reset-password-submit').disabled=true; $('reset-password-submit').textContent='Updating…'; const {data,error}=await state.client.auth.updateUser({password}); $('reset-password-submit').disabled=false; $('reset-password-submit').textContent='Update password'; if(error){$('auth-message').textContent=error.message;return;} state.user=data.user||state.user; state.passwordRecoveryInProgress=false; window.history.replaceState(null,'',`${window.location.pathname}${window.location.search}`); setAuthMode(false); await startWorkspace(); toast('Password updated'); }
-  async function submitAuth(event) { event.preventDefault(); const email=$('auth-email').value.trim(), password=$('auth-password').value, signup=$('auth-form').dataset.mode==='signup'; $('auth-submit').disabled=true; $('auth-submit').textContent='Please wait…'; let result;
-    if(signup) result=await state.client.auth.signUp({email,password}); else result=await state.client.auth.signInWithPassword({email,password});
-    $('auth-submit').disabled=false; $('auth-submit').textContent=signup?'Create account':'Sign in';
-    if(result.error){$('auth-message').textContent=result.error.message;return;}
-    if(signup&&!result.data.session){$('auth-message').textContent='Check your email to confirm your account, then come back to sign in.';return;}
-    $('auth-message').textContent=''; if(result.data.user){state.user=result.data.user; await startWorkspace();}
-  }
-  async function startWorkspace() { showApp(); try { await fetchAll(); } catch { /* fetchAll already reports the failure */ } }
-
-  function csvCell(v){const s=String(v??'');return /[",\r\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
-  function downloadCSV(filename,headers,rows){const csv=[headers,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-  async function exportAll(){
-    if(!state.user||!state.client){toast('Sign in before exporting your private records.');return;}
-    const tables=['pd_properties','pd_accounts','pd_agreement_versions','pd_payments','pd_expenses','pd_deposit_entries','pd_documents','pd_import_batches','pd_audit_events','pd_workspace_members','pd_property_holders'];
-    const button=$('export-all'),originalLabel=button.textContent;
-    button.disabled=true;button.textContent='Preparing backup…';toast('Preparing a private backup with agreement files…');
-    try{
-      const exportTable=async table=>{
-        const pageSize=500,rows=[];
-        for(let offset=0;;offset+=pageSize){
-          const {data,error}=await state.client.from(table).select('*').range(offset,offset+pageSize-1);
-          if(error)throw error;
-          rows.push(...(data||[]));
-          if(!data||data.length<pageSize)break;
-        }
-        return rows;
-      };
-      const values=await Promise.all(tables.map(exportTable));
-      const records=Object.fromEntries(tables.map((table,index)=>[table,values[index]]));
-      const includedFiles=[],entries=[],ownerPrefix=`${state.workspaceOwnerId}/`;
-      for(const doc of records.pd_documents){
-        if(!doc.storage_path||!doc.storage_path.startsWith(ownerPrefix))throw new Error('An agreement record has an invalid private storage path. No backup was downloaded.');
-        const {data,error}=await state.client.storage.from('pd-private-agreements').download(doc.storage_path);
-        if(error||!data)throw new Error(`Could not download agreement “${doc.file_name||'file'}”. ${error?.message||''}`);
-        const safeName=String(doc.file_name||'agreement').normalize('NFKC').replace(/[^\w.-]/g,'_').slice(-100)||'agreement';
-        const path=`agreements/${doc.property_id||'unassigned'}/${doc.id}-${safeName}`;
-        const bytes=new Uint8Array(await data.arrayBuffer());
-        entries.push({name:path,data:bytes});
-        includedFiles.push({path,file_name:doc.file_name,content_type:doc.content_type,file_size:bytes.byteLength,property_id:doc.property_id,account_id:doc.account_id});
-      }
-      const backup=createBackup(records,new Date().toISOString(),includedFiles);
-      entries.unshift({name:'propertydesk-backup.json',data:JSON.stringify(backup,null,2)});
-      const blob=window.PropertyDeskZipUtils.createZip(entries),url=URL.createObjectURL(blob),link=document.createElement('a');
-      link.href=url;link.download=`propertydesk-backup-${todayIso()}.zip`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-      toast(`Private ZIP backup exported · ${tables.reduce((sum,table)=>sum+records[table].length,0)} records · ${includedFiles.length} agreement files`);
-    }catch(error){toast(`Backup failed; no file was downloaded. ${error.message||'Check your connection and try again.'}`);}
-    finally{button.disabled=false;button.textContent=originalLabel;}
-  }
-  function exportReport(){downloadCSV(`propertydesk-accounts-${todayIso()}.csv`,['account_name','account_type','property','party','monthly_due','estimated_on_time_loan_balance','next_due_date','status'],state.accounts.map(a=>[a.name,prettyType(a.account_type),state.properties.find(p=>p.id===a.property_id)?.name||'',a.party_name,a.payment_amount,a.account_type==='rental'?'':accountBalance(a),a.next_due_date,a.status]));}
-
   function attachEvents() {
     document.querySelectorAll('[data-theme-toggle]').forEach(button=>button.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true)));
     syncThemeButtons();
