@@ -95,10 +95,12 @@ test("opening a property delegates modal markup and preserves scoped details", (
 
 test("account details render action targets without owning action listeners", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-details.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["account-details-view.js", "account-details.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const account = {
     id: "account-1",
     property_id: "property-1",
@@ -142,12 +144,65 @@ test("account details render action targets without owning action listeners", as
     propertyAddress: (property) => property.name,
     depositSectionHTML: () => "",
     renderAccountHistory: async () => "",
+    renderAccountDetails: context.window.PropertyDeskAccountDetailsView.create({
+      money: (value) => `$${value}`,
+      fmtDate: () => "today",
+      esc: String,
+      prettyType: (type) => type,
+      paymentFrequencyLabel: () => "Monthly",
+    }).renderAccountDetails,
   });
 
   await feature.openAccountDetails(account.id);
   assert.match(elements.get("detail-content").innerHTML, /data-account-detail-edit="account-1"/);
   assert.match(elements.get("detail-content").innerHTML, /data-account-detail-payment="account-1"/);
   assert.match(elements.get("detail-content").innerHTML, /data-account-detail-close="account-1"/);
+});
+
+test("account detail view renders estimates and escapes payment history text", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-details-view.js"), "utf8"),
+    context,
+  );
+  const view = context.window.PropertyDeskAccountDetailsView.create({
+    money: (value) => `$${Number(value).toFixed(2)}`,
+    fmtDate: (value) => value || "—",
+    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[char]),
+    prettyType: () => "Private note",
+    paymentFrequencyLabel: () => "Monthly",
+  });
+
+  const html = view.renderAccountDetails({
+    account: {
+      id: "account-1", account_type: "note", party_name: "<Buyer>",
+      payment_amount: 500, payment_frequency: "monthly", next_due_date: "2026-11-01",
+    },
+    propertyName: "<Oak House>",
+    propertyAddressText: "<Main Street>",
+    postedPaymentTotal: 500,
+    estimatedLoanBalance: 9000,
+    unpaidDue: 0,
+    unpaidSinceLabel: "Oct 1, 2026",
+    depositHTML: "Deposit details",
+    schedule: [{ i: 1, date: "2026-11-01", payment: 500, principal: 400, interest: 100, balance: 9000 }],
+    historyHTML: "Prior terms",
+    payments: [{ status: "voided", received_date: "2026-10-01", amount: 500, memo: "<duplicate>" }],
+  });
+
+  assert.match(html, /&lt;Oak House&gt;/);
+  assert.match(html, /&lt;Buyer&gt;/);
+  assert.match(html, /Estimated amortization schedule/);
+  assert.match(html, /Taxes\/insurance escrow is excluded/);
+  assert.match(html, /Estimated loan balance · on-time schedule/);
+  assert.match(html, /unpaid due tracked since Oct 1, 2026: \$0\.00/);
+  assert.match(html, /Deposit details/);
+  assert.match(html, /Prior terms/);
+  assert.match(html, /Voided/);
+  assert.match(html, /&lt;duplicate&gt;/);
+  assert.doesNotMatch(html, /<duplicate>/);
 });
 
 test("account detail event router dispatches edit, payment, and close actions", () => {

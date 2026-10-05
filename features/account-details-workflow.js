@@ -9,6 +9,9 @@
       unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
       editAccount, openPayment, closeAccount, recordDepositAdjustment,
     } = context;
+    const { renderAccountDetails } = window.PropertyDeskAccountDetailsView.create({
+      money, fmtDate, esc, prettyType, paymentFrequencyLabel,
+    });
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state, depositLedger, money, fmtDate, esc,
     });
@@ -18,7 +21,8 @@
     const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
       $, state, isPosted, money, fmtDate, esc, prettyType, paymentFrequencyLabel,
       accountBalance, amortizationSchedule, amountDueSince, unpaidDueAccrualStart,
-      todayIso, depositSectionHTML, renderAccountHistory, openModal, propertyAddress,
+      todayIso, depositSectionHTML, renderAccountHistory, renderAccountDetails,
+      openModal, propertyAddress,
     });
     const { attachEvents: attachAccountDetailEvents } =
       window.PropertyDeskAccountDetailEvents.create({

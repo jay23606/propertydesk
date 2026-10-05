@@ -111,9 +111,22 @@ test("account details workflow composes account, history, deposit, and passed ma
   const passed = {};
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountDetailsView: {
+        create: (options) => {
+          created.push("account view");
+          passed.view = options;
+          return { renderAccountDetails: () => "account html" };
+        },
+      },
       PropertyDeskDepositDetails: { create: () => { created.push("deposit"); return { depositSectionHTML: () => "deposit html" }; } },
       PropertyDeskAccountHistoryDetails: { create: () => { created.push("history"); return { renderAccountHistory: () => "history html" }; } },
-      PropertyDeskAccountDetails: { create: () => { created.push("account details"); return { openAccountDetails: () => "opened" }; } },
+      PropertyDeskAccountDetails: {
+        create: (options) => {
+          created.push("account details");
+          passed.accountDetails = options;
+          return { openAccountDetails: () => "opened" };
+        },
+      },
       PropertyDeskAccountDetailEvents: {
         create: (options) => {
           created.push("account events");
@@ -135,11 +148,15 @@ test("account details workflow composes account, history, deposit, and passed ma
     context,
   );
   const dependencies = {
-    $() {}, state: {}, closeModal() {}, closeAccount() {}, recordDepositAdjustment() {},
+    $() {}, state: {}, money: () => 0, fmtDate: () => "", esc: String,
+    prettyType: String, paymentFrequencyLabel: () => "monthly",
+    closeModal() {}, closeAccount() {}, recordDepositAdjustment() {},
   };
   const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
-  assert.deepEqual(created, ["deposit", "history", "account details", "account events", "deposit events"]);
+  assert.deepEqual(created, ["account view", "deposit", "history", "account details", "account events", "deposit events"]);
+  assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
+  assert.equal(passed.view.money, dependencies.money);
   assert.equal(passed.accountEvents.closeAccount, dependencies.closeAccount);
   assert.equal(passed.depositEvents.recordDepositAdjustment, dependencies.recordDepositAdjustment);
   assert.equal(workflow.openAccountDetails(), "opened");

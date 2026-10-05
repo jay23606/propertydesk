@@ -108,6 +108,21 @@ async function main() {
         },
       };
       const money = (amount) => `$${Number(amount || 0).toFixed(2)}`;
+      const renderAccountDetails = window.PropertyDeskAccountDetailsView.create(
+        {
+          money,
+          fmtDate: (value, options) =>
+            value
+              ? new Date(`${value}T12:00:00`).toLocaleDateString(
+                  "en-US",
+                  options,
+                )
+              : "—",
+          esc: (value) => String(value ?? ""),
+          prettyType: (type) => type,
+          paymentFrequencyLabel: () => "Monthly",
+        },
+      ).renderAccountDetails;
       const feature = details.create({
         $: (id) => document.getElementById(id),
         state,
@@ -130,6 +145,7 @@ async function main() {
         depositLedger: () => ({ entries: [], active: [], totals: {} }),
         depositSectionHTML: () => "",
         renderAccountHistory: async () => "",
+        renderAccountDetails,
         openModal() {},
         closeModal() {},
         editAccount() {},
