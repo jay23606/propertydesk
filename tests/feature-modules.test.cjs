@@ -721,6 +721,37 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
+test("report workflow composes portfolio rendering and account export actions", () => {
+  const passed = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReportViews: {
+        create: (options) => {
+          passed.view = options;
+          return { renderReports: () => "reports" };
+        },
+      },
+      PropertyDeskReportExport: {
+        create: (options) => {
+          passed.export = options;
+          return { attachEvents: () => "export events" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "report-workflow.js"), "utf8"),
+    context,
+  );
+  const accountBalance = () => 0;
+  const workflow = context.window.PropertyDeskReportWorkflow.create({ accountBalance });
+
+  assert.equal(passed.view.accountBalance, accountBalance);
+  assert.equal(passed.export.accountBalance, accountBalance);
+  assert.equal(workflow.renderReports(), "reports");
+  assert.equal(workflow.attachReportExportEvents(), "export events");
+});
+
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(

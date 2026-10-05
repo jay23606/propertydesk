@@ -156,15 +156,9 @@
       correctTransaction: (...args) => correctTransaction(...args),
       voidTransaction: (...args) => voidTransaction(...args),
     });
-  const { renderReports } = window.PropertyDeskReportViews.create({
-    $,
-    state,
-    dateOnly,
-    esc,
-    money,
-    sumIncome,
-    sumOperatingExpenses,
-    accountBalance,
+  const { renderReports, attachReportExportEvents } = window.PropertyDeskReportWorkflow.create({
+    $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
+    accountBalance, todayIso, prettyType,
   });
   const {
     attachEvents: attachModalEvents,
@@ -362,14 +356,6 @@
       createBackup,
       todayIso,
       toast,
-    });
-  const { attachEvents: attachReportExportEvents } =
-    window.PropertyDeskReportExport.create({
-      $,
-      state,
-      todayIso,
-      prettyType,
-      accountBalance,
     });
   const {
     showConfigError,
