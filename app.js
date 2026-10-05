@@ -175,7 +175,14 @@
     populateFormOptions,
     openModal,
   });
-  let transactionMaintenance;
+  const { saveCorrection } =
+    window.PropertyDeskTransactionCorrections.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+    });
   const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
     $,
     state,
@@ -188,7 +195,7 @@
     populateFormOptions,
     prettyType,
     openModal,
-    saveCorrection: (...args) => transactionMaintenance.saveCorrection(...args),
+    saveCorrection,
   });
   const {
     resetPropertyForm,
@@ -203,13 +210,12 @@
     openExpense,
     attachEvents: attachLedgerEntryFormEvents,
   } = ledgerEntryForms;
-  transactionMaintenance =
+  const transactionMaintenance =
     window.PropertyDeskTransactionMaintenance.create({
       $,
       state,
       toast,
       fetchAll,
-      closeModal,
       prettyType,
       openPayment,
       openExpense,

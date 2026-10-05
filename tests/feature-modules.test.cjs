@@ -1235,8 +1235,9 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
-  assert.match(app, /transactionMaintenance\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
-  assert.match(app, /saveCorrection:\s*\(\.\.\.args\)\s*=>\s*transactionMaintenance\.saveCorrection/);
+  assert.match(app, /const transactionMaintenance\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
+  assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
+  assert.match(app, /window\.PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection,/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
     assert.doesNotMatch(source, /pd_correct_transaction/);
@@ -3236,14 +3237,10 @@ test("transaction maintenance reports rejected void requests without refreshing"
   ]);
 });
 
-test("transaction maintenance saves payment and expense corrections with their audit reasons", async () => {
-  const context = vm.createContext({
-    window: {},
-    Event: class MockEvent {},
-    Option: class MockOption {},
-  });
+test("transaction corrections save payment and expense changes with their audit reasons", async () => {
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-corrections.js"), "utf8"),
     context,
   );
   const rpcCalls = [];
@@ -3257,7 +3254,7 @@ test("transaction maintenance saves payment and expense corrections with their a
       },
     },
   };
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionCorrections.create({
     $: (id) => ({ id }),
     state,
     closeModal: (modal) => events.push(["close", modal.id]),
@@ -3298,13 +3295,9 @@ test("transaction maintenance saves payment and expense corrections with their a
 });
 
 test("transaction correction failures preserve the open form and pending correction", async () => {
-  const context = vm.createContext({
-    window: {},
-    Event: class MockEvent {},
-    Option: class MockOption {},
-  });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-corrections.js"), "utf8"),
     context,
   );
   const messages = [];
@@ -3314,7 +3307,7 @@ test("transaction correction failures preserve the open form and pending correct
     pendingCorrection: { kind: "payment", id: "payment-1", reason: "Fix date" },
     client: { rpc: async () => { throw new Error("offline"); } },
   };
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionCorrections.create({
     $: (id) => ({ id }),
     state,
     closeModal: () => { closes += 1; },
