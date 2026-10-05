@@ -4,19 +4,38 @@
 
   function create(context) {
     const {
-      $, state, depositLedger, money, fmtDate, esc, moneyInput, todayIso,
-      toast, fetchAll,
+      $,
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+      moneyInput,
+      todayIso,
+      toast,
+      fetchAll,
     } = context;
     const { recordDepositAdjustment } =
       window.PropertyDeskDepositMaintenance.create({
-        state, moneyInput, todayIso, toast, fetchAll,
+        state,
+        moneyInput,
+        todayIso,
+        toast,
+        fetchAll,
       });
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
-      state, depositLedger, money, fmtDate, esc,
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
     });
     const { attachEvents: attachDepositDetailEvents } =
       window.PropertyDeskDepositDetailEvents.create({
-        $, state, depositSectionHTML, recordDepositAdjustment,
+        $,
+        state,
+        depositSectionHTML,
+        recordDepositAdjustment,
       });
 
     return { depositSectionHTML, attachDepositDetailEvents };

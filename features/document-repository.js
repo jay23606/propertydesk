@@ -9,14 +9,15 @@
     function client() {
       const resolved =
         typeof clientSource === "function" ? clientSource() : clientSource;
-      if (!resolved) throw new Error("Document storage is unavailable until sign-in.");
+      if (!resolved)
+        throw new Error("Document storage is unavailable until sign-in.");
       return resolved;
     }
 
     return {
       upload(path, file, contentType) {
-        return client().storage
-          .from(BUCKET)
+        return client()
+          .storage.from(BUCKET)
           .upload(path, file, { contentType, upsert: false });
       },
       insertMetadata(record) {
@@ -34,9 +35,7 @@
           .eq("property_id", propertyId);
       },
       signedUrl(path, expiresIn) {
-        return client().storage
-          .from(BUCKET)
-          .createSignedUrl(path, expiresIn);
+        return client().storage.from(BUCKET).createSignedUrl(path, expiresIn);
       },
     };
   }

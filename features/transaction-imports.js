@@ -4,14 +4,32 @@
 
   function createTransactionImports(context) {
     const {
-      $, state, stageImport, parseCSV, validatePaymentRows,
-      validateExpenseRows, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validatePaymentRows,
+      validateExpenseRows,
+      fetchAll,
+      toast,
     } = context;
     const payments = window.PropertyDeskPaymentImport.create({
-      $, state, stageImport, parseCSV, validatePaymentRows, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validatePaymentRows,
+      fetchAll,
+      toast,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
-      $, state, stageImport, parseCSV, validateExpenseRows, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validateExpenseRows,
+      fetchAll,
+      toast,
     });
 
     function attachEvents() {

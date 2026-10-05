@@ -4,9 +4,19 @@
 
   function createAccountDetails(context) {
     const {
-      $, state, isPosted, accountBalance, amortizationSchedule, amountDueSince,
-      unpaidDueAccrualStart, todayIso, openModal, propertyAddress,
-      depositSectionHTML, renderAccountHistory, renderAccountDetails,
+      $,
+      state,
+      isPosted,
+      accountBalance,
+      amortizationSchedule,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      openModal,
+      propertyAddress,
+      depositSectionHTML,
+      renderAccountHistory,
+      renderAccountDetails,
       fmtDate,
     } = context;
 
@@ -45,10 +55,15 @@
         estimatedLoanBalance:
           account.account_type === "rental" ? null : accountBalance(account),
         unpaidDue: amountDueSince(
-          [account], state.payments, unpaidStart, todayIso(),
+          [account],
+          state.payments,
+          unpaidStart,
+          todayIso(),
         ),
         unpaidSinceLabel: fmtDate(unpaidStart, {
-          month: "short", day: "numeric", year: "numeric",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         }),
         depositHTML: depositSectionHTML(account),
         schedule,
@@ -61,5 +76,7 @@
     return { openAccountDetails };
   }
 
-  window.PropertyDeskAccountDetails = Object.freeze({ create: createAccountDetails });
+  window.PropertyDeskAccountDetails = Object.freeze({
+    create: createAccountDetails,
+  });
 })();

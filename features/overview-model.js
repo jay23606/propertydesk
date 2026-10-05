@@ -49,7 +49,9 @@
         hasLoanAccount: loanAccounts.length > 0,
         amountDue,
         parties: [
-          ...new Set(active.map((account) => account.party_name).filter(Boolean)),
+          ...new Set(
+            active.map((account) => account.party_name).filter(Boolean),
+          ),
         ].join(", "),
       };
     }
@@ -71,7 +73,9 @@
           String(payment.received_date) >= currentMonthStart,
       );
       const upcoming = state.accounts
-        .filter((account) => account.status === "active" && account.next_due_date)
+        .filter(
+          (account) => account.status === "active" && account.next_due_date,
+        )
         .sort((a, b) =>
           String(a.next_due_date).localeCompare(String(b.next_due_date)),
         )

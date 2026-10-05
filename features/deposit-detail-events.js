@@ -2,14 +2,22 @@
 (() => {
   "use strict";
 
-  function createDepositDetailEvents({ $, state, depositSectionHTML, recordDepositAdjustment }) {
+  function createDepositDetailEvents({
+    $,
+    state,
+    depositSectionHTML,
+    recordDepositAdjustment,
+  }) {
     function attachEvents() {
       $("detail-content").addEventListener("click", async (event) => {
         const adjustment = event.target.closest("[data-deposit-adjustment]");
         if (!adjustment) return;
 
         const { accountId, depositAdjustment } = adjustment.dataset;
-        const saved = await recordDepositAdjustment(accountId, depositAdjustment);
+        const saved = await recordDepositAdjustment(
+          accountId,
+          depositAdjustment,
+        );
         if (!saved) return;
 
         const account = state.accounts.find((row) => row.id === accountId);

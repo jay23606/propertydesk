@@ -3,8 +3,14 @@
   "use strict";
 
   function createAuthSession({
-    state, toast, showAuth, setAuthMode, showPasswordReset,
-    isPasswordRecoverySession, startWorkspace, resetWorkspaceState,
+    state,
+    toast,
+    showAuth,
+    setAuthMode,
+    showPasswordReset,
+    isPasswordRecoverySession,
+    startWorkspace,
+    resetWorkspaceState,
   }) {
     function handleAuthStateChange(event, session) {
       if (event === "SIGNED_OUT") {
@@ -36,7 +42,9 @@
         session = data?.session;
       } catch {
         showAuth();
-        toast("Unable to restore your session right now. Check your connection and try again.");
+        toast(
+          "Unable to restore your session right now. Check your connection and try again.",
+        );
         return;
       }
       if (!session?.user) {
@@ -58,7 +66,9 @@
           return;
         }
       } catch {
-        toast("Unable to sign out right now. Check your connection and try again.");
+        toast(
+          "Unable to sign out right now. Check your connection and try again.",
+        );
         return;
       }
       resetWorkspaceState(state);

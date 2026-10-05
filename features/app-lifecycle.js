@@ -3,8 +3,14 @@
   "use strict";
 
   function create({
-    $, state, backend, todayIso, registerShell, auth,
-    renderers, eventBinders,
+    $,
+    state,
+    backend,
+    todayIso,
+    registerShell,
+    auth,
+    renderers,
+    eventBinders,
   }) {
     function render() {
       renderers.forEach((renderView) => renderView());

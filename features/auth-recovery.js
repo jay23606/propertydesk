@@ -3,8 +3,14 @@
   "use strict";
 
   function createAuthRecovery({
-    $, state, toast, setAuthMode, startWorkspace, showAuth,
-    windowRef = window, documentRef = document,
+    $,
+    state,
+    toast,
+    setAuthMode,
+    startWorkspace,
+    showAuth,
+    windowRef = window,
+    documentRef = document,
   }) {
     function showPasswordReset() {
       state.passwordRecoveryInProgress = true;
@@ -25,12 +31,15 @@
       $("forgot-password").disabled = true;
       try {
         const redirectTo = `${windowRef.location.origin}${windowRef.location.pathname}`;
-        const { error } = await state.client.auth.resetPasswordForEmail(email, { redirectTo });
+        const { error } = await state.client.auth.resetPasswordForEmail(email, {
+          redirectTo,
+        });
         $("auth-message").textContent = error
           ? "Unable to request a reset right now. Try again later."
           : "If that email has a PropertyDesk account, a reset link is on its way.";
       } catch {
-        $("auth-message").textContent = "Unable to request a reset right now. Try again later.";
+        $("auth-message").textContent =
+          "Unable to request a reset right now. Try again later.";
       } finally {
         $("forgot-password").disabled = false;
       }
@@ -49,7 +58,8 @@
       try {
         result = await state.client.auth.updateUser({ password });
       } catch {
-        $("auth-message").textContent = "Unable to update your password right now. Try again.";
+        $("auth-message").textContent =
+          "Unable to update your password right now. Try again.";
         return;
       } finally {
         $("reset-password-submit").disabled = false;
@@ -62,7 +72,11 @@
       }
       state.user = data.user || state.user;
       state.passwordRecoveryInProgress = false;
-      windowRef.history.replaceState(null, "", `${windowRef.location.pathname}${windowRef.location.search}`);
+      windowRef.history.replaceState(
+        null,
+        "",
+        `${windowRef.location.pathname}${windowRef.location.search}`,
+      );
       setAuthMode(false);
       await startWorkspace();
       toast("Password updated");
@@ -97,5 +111,7 @@
     };
   }
 
-  window.PropertyDeskAuthRecovery = Object.freeze({ create: createAuthRecovery });
+  window.PropertyDeskAuthRecovery = Object.freeze({
+    create: createAuthRecovery,
+  });
 })();

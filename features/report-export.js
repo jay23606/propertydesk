@@ -26,7 +26,10 @@
       const csv = [headers, ...rows]
         .map((row) => row.map(csvCell).join(","))
         .join("\r\n");
-      downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
+      downloadBlob(
+        new Blob([csv], { type: "text/csv;charset=utf-8" }),
+        filename,
+      );
     }
 
     function exportReport() {
@@ -45,7 +48,9 @@
         state.accounts.map((account) => [
           account.name,
           prettyType(account.account_type),
-          state.properties.find((property) => property.id === account.property_id)?.name || "",
+          state.properties.find(
+            (property) => property.id === account.property_id,
+          )?.name || "",
           account.party_name,
           account.payment_amount,
           account.account_type === "rental" ? "" : accountBalance(account),
@@ -62,5 +67,7 @@
     return { attachEvents, exportReport };
   }
 
-  window.PropertyDeskReportExport = Object.freeze({ create: createReportExport });
+  window.PropertyDeskReportExport = Object.freeze({
+    create: createReportExport,
+  });
 })();

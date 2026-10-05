@@ -13,10 +13,17 @@
     confirmAction = (message) => window.confirm(message),
   }) {
     const profile = window.PropertyDeskProfileSettings.create({
-      $, state, toast, updateGreeting,
+      $,
+      state,
+      toast,
+      updateGreeting,
     });
     const members = window.PropertyDeskWorkspaceMembers.create({
-      $, state, esc, toast, fetchAll,
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
       refreshWorkspaceSettings: () => renderWorkspaceSettings(),
       confirmAction,
     });

@@ -5,9 +5,13 @@
   function createAccountHistoryDetails({ state, esc, money, fmtDate }) {
     const { loadAccountHistory } =
       window.PropertyDeskAccountHistoryModel.create({ state });
-    const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create({
-      esc, money, fmtDate,
-    });
+    const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create(
+      {
+        esc,
+        money,
+        fmtDate,
+      },
+    );
 
     async function renderAccountHistory(account, payments) {
       const history = await loadAccountHistory(account, payments);

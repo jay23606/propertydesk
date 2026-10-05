@@ -4,8 +4,14 @@
 
   function createAccountImport(context) {
     const {
-      $, state, stageImport, parseCSV, validateAccountRows,
-      todayIso, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validateAccountRows,
+      todayIso,
+      fetchAll,
+      toast,
     } = context;
 
     async function importAccounts(file) {
@@ -122,5 +128,7 @@
     return { importAccounts, attachEvents };
   }
 
-  window.PropertyDeskAccountImport = Object.freeze({ create: createAccountImport });
+  window.PropertyDeskAccountImport = Object.freeze({
+    create: createAccountImport,
+  });
 })();

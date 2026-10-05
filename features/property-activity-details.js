@@ -3,15 +3,27 @@
   "use strict";
 
   function createPropertyActivityDetails({
-    state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
+    state,
+    isPosted,
+    sumIncome,
+    sumOperatingExpenses,
+    money,
+    fmtDate,
+    esc,
   }) {
     const { buildPropertyActivity } =
       window.PropertyDeskPropertyActivityModel.create({
-        state, isPosted, sumIncome, sumOperatingExpenses,
+        state,
+        isPosted,
+        sumIncome,
+        sumOperatingExpenses,
       });
-    const { renderRecentActivity } = window.PropertyDeskPropertyActivityView.create({
-      money, fmtDate, esc,
-    });
+    const { renderRecentActivity } =
+      window.PropertyDeskPropertyActivityView.create({
+        money,
+        fmtDate,
+        esc,
+      });
 
     function renderPropertyActivity(propertyId, accounts) {
       const activity = buildPropertyActivity(propertyId, accounts);

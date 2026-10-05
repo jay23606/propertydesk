@@ -3,7 +3,11 @@
   "use strict";
 
   function createAccountDetailsView({
-    money, fmtDate, esc, prettyType, paymentFrequencyLabel,
+    money,
+    fmtDate,
+    esc,
+    prettyType,
+    paymentFrequencyLabel,
   }) {
     function renderAccountDetails({
       account,
@@ -89,7 +93,9 @@
         </thead>
         <tbody>${payments
           .map(
-            (payment) => `<tr class="${payment.status === "voided" ? "transaction-voided" : ""}">
+            (
+              payment,
+            ) => `<tr class="${payment.status === "voided" ? "transaction-voided" : ""}">
         <td>${fmtDate(payment.received_date)}</td>
         <td>${money(payment.amount)}</td>
         <td>${payment.status === "voided" ? "Voided" : "Posted"}</td>

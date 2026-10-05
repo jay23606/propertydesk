@@ -40,7 +40,9 @@
           reason: reason.trim(),
         }));
       } catch {
-        toast("Deposit adjustment failed. Check your connection and try again.");
+        toast(
+          "Deposit adjustment failed. Check your connection and try again.",
+        );
         return false;
       }
       if (error) {

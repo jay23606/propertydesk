@@ -57,7 +57,9 @@
               .includes(normalizedQuery)
           );
         })
-        .sort((left, right) => String(right.date).localeCompare(String(left.date)))
+        .sort((left, right) =>
+          String(right.date).localeCompare(String(left.date)),
+        )
         .map((row) => {
           const item = row.item;
           const isExpense = row.kind === "expense";
@@ -101,7 +103,8 @@
       );
       const monthExpenses = state.expenses.filter(
         (expense) =>
-          String(expense.expense_date) >= currentMonthStart && isPosted(expense),
+          String(expense.expense_date) >= currentMonthStart &&
+          isPosted(expense),
       );
       const collected = sumIncome(monthPayments);
       const expenses = sumOperatingExpenses(monthExpenses);

@@ -4,17 +4,35 @@
 
   function createTransactionViews(context) {
     const {
-      $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-      monthStart, sumIncome, sumOperatingExpenses,
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
     } = context;
     const { buildTransactionList } =
       window.PropertyDeskTransactionListModel.create({
-        state, dateOnly, expenseCategoryLabel, isPosted, monthStart,
-        sumIncome, sumOperatingExpenses,
+        state,
+        dateOnly,
+        expenseCategoryLabel,
+        isPosted,
+        monthStart,
+        sumIncome,
+        sumOperatingExpenses,
       });
-    const { transactionRowHTML } = window.PropertyDeskTransactionRowView.create({
-      esc, money, fmtDate,
-    });
+    const { transactionRowHTML } = window.PropertyDeskTransactionRowView.create(
+      {
+        esc,
+        money,
+        fmtDate,
+      },
+    );
 
     function attachEvents() {
       $("payment-search").addEventListener("input", renderPayments);

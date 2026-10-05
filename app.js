@@ -1,6 +1,6 @@
 /* PropertyDesk: static client backed by Supabase Auth, Postgres and RLS. */
 (() => {
-  'use strict';
+  "use strict";
 
   const $ = (id) => document.getElementById(id);
   let appLifecycle;
@@ -48,46 +48,86 @@
     collectedSince,
     depositLedger,
   } = window.PropertyDeskAppServices.create({
-    $, render, todayIso, scheduledLoanBalance, monthlyScheduledEstimate,
-    sumPosted, securityDepositBalance,
+    $,
+    render,
+    todayIso,
+    scheduledLoanBalance,
+    monthlyScheduledEstimate,
+    sumPosted,
+    securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
-  const { updateGreeting } = window.PropertyDeskProfileDisplay.create({ $, state });
-  const { renderReports, attachReportExportEvents } = window.PropertyDeskReportWorkflow.create({
-    $, state, dateOnly, esc, money, sumIncome, sumOperatingExpenses,
-    accountBalance, todayIso, prettyType,
+  const { updateGreeting } = window.PropertyDeskProfileDisplay.create({
+    $,
+    state,
   });
+  const { renderReports, attachReportExportEvents } =
+    window.PropertyDeskReportWorkflow.create({
+      $,
+      state,
+      dateOnly,
+      esc,
+      money,
+      sumIncome,
+      sumOperatingExpenses,
+      accountBalance,
+      todayIso,
+      prettyType,
+    });
   const {
     attachEvents: attachModalEvents,
     openModal,
     closeModal,
     fillSelect,
     populateFormOptions,
-  } =
-    window.PropertyDeskModalController.create({
-      $,
-      state,
-      esc,
-      propertyAddress,
-      prettyType,
-      documentRef: document,
-    });
-  const { saveCorrection } =
-    window.PropertyDeskTransactionCorrections.create({
-      $, state, toast, fetchAll, closeModal,
-    });
+  } = window.PropertyDeskModalController.create({
+    $,
+    state,
+    esc,
+    propertyAddress,
+    prettyType,
+    documentRef: document,
+  });
+  const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
+    $,
+    state,
+    toast,
+    fetchAll,
+    closeModal,
+  });
   const propertyForm = window.PropertyDeskPropertyForm.create({
-    $, state, toast, closeModal, fetchAll,
+    $,
+    state,
+    toast,
+    closeModal,
+    fetchAll,
   });
   const accountForm = window.PropertyDeskAccountForm.create({
-    $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-    populateFormOptions, openModal,
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    populateFormOptions,
+    openModal,
     buildAccountPayload: window.PropertyDeskAccountPayload.build,
     formModel: window.PropertyDeskAccountFormModel,
   });
   const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
-    $, state, moneyInput, todayIso, toast, closeModal, fetchAll, fillSelect,
-    populateFormOptions, prettyType, openModal, saveCorrection,
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+    saveCorrection,
   });
   const resetPropertyForm = propertyForm.resetPropertyForm;
   const resetAccountForm = accountForm.resetAccountForm;
@@ -100,8 +140,15 @@
   } = ledgerEntryForms;
   const { attachEvents: attachCreateActions } =
     window.PropertyDeskCreateActions.create({
-      $, state, toast, resetPropertyForm, resetAccountForm,
-      populateFormOptions, openModal, openPayment, openExpense,
+      $,
+      state,
+      toast,
+      resetPropertyForm,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      openPayment,
+      openExpense,
       documentRef: document,
     });
   const attachPropertyFormEvents = propertyForm.attachEvents;
@@ -109,78 +156,189 @@
   const attachLedgerEntryFormEvents = ledgerEntryForms.attachEvents;
   const { attachTransactionActionEvents } =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      $, state, toast, fetchAll, prettyType, openPayment, openExpense,
-      updateAllocationPreview, EventClass: Event, OptionClass: Option,
+      $,
+      state,
+      toast,
+      fetchAll,
+      prettyType,
+      openPayment,
+      openExpense,
+      updateAllocationPreview,
+      EventClass: Event,
+      OptionClass: Option,
       documentRef: document,
     });
-  const {
-    renderPayments,
-    attachTransactionViewEvents,
-  } = window.PropertyDeskTransactionWorkflow.create({
-    $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-    monthStart, sumIncome, sumOperatingExpenses,
-  });
-  const { closeAccount } =
-    window.PropertyDeskAccountMaintenanceWorkflow.create({
-      $, state, toast, fetchAll, closeModal,
+  const { renderPayments, attachTransactionViewEvents } =
+    window.PropertyDeskTransactionWorkflow.create({
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
     });
+  const { closeAccount } = window.PropertyDeskAccountMaintenanceWorkflow.create(
+    {
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+    },
+  );
   const { depositSectionHTML, attachDepositDetailEvents } =
     window.PropertyDeskDepositDetailsWorkflow.create({
-      $, state, depositLedger, money, fmtDate, esc, moneyInput, todayIso,
-      toast, fetchAll,
+      $,
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+      moneyInput,
+      todayIso,
+      toast,
+      fetchAll,
     });
-  const {
-    openAccountDetails,
-    attachAccountDetailEvents,
-  } = window.PropertyDeskAccountDetailsWorkflow.create({
-    $, state, money, fmtDate, esc, isPosted, prettyType,
-    paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
-    unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-    editAccount, openPayment, closeAccount, depositSectionHTML,
-  });
+  const { openAccountDetails, attachAccountDetailEvents } =
+    window.PropertyDeskAccountDetailsWorkflow.create({
+      $,
+      state,
+      money,
+      fmtDate,
+      esc,
+      isPosted,
+      prettyType,
+      paymentFrequencyLabel,
+      accountBalance,
+      amortizationSchedule,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      openModal,
+      propertyAddress,
+      closeModal,
+      editAccount,
+      openPayment,
+      closeAccount,
+      depositSectionHTML,
+    });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailsWorkflow.create({
-      $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
-      prettyType, paymentFrequencyLabel, accountBalance, openModal, propertyAddress,
+      $,
+      state,
+      isPosted,
+      sumIncome,
+      sumOperatingExpenses,
+      money,
+      fmtDate,
+      esc,
+      prettyType,
+      paymentFrequencyLabel,
+      accountBalance,
+      openModal,
+      propertyAddress,
     });
   const { attachPropertyDetailEvents } =
     window.PropertyDeskPropertyDetailActionsWorkflow.create({
-      $, state, toast, fetchAll, todayIso, openPropertyDetails,
-      closeModal, editAccount, openPayment, openExpense, resetAccountForm,
-      populateFormOptions, openModal, openAccountDetails, documentRef: document,
+      $,
+      state,
+      toast,
+      fetchAll,
+      todayIso,
+      openPropertyDetails,
+      closeModal,
+      editAccount,
+      openPayment,
+      openExpense,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      openAccountDetails,
+      documentRef: document,
     });
   const { attachPropertyDocumentEvents } =
     window.PropertyDeskPropertyDocumentWorkflow.create({
-      $, state, toast, fetchAll, openPropertyDetails,
+      $,
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
     });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({
-      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
-      unpaidDueAccrualStart, todayIso, esc, prettyKind, money, propertyAddress,
-      collectedSince, scheduledMonthlyRunRate, monthStart, isPosted, prettyType,
-      fmtDate, openPropertyDetails, openPropertyPayment,
+      $,
+      state,
+      monthlyScheduledEstimate,
+      accountBalance,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      esc,
+      prettyKind,
+      money,
+      propertyAddress,
+      collectedSince,
+      scheduledMonthlyRunRate,
+      monthStart,
+      isPosted,
+      prettyType,
+      fmtDate,
+      openPropertyDetails,
+      openPropertyPayment,
     });
   const {
     renderProperties,
     attachPropertyViewEvents,
     attachPropertyActionEvents,
   } = window.PropertyDeskPropertyPortfolioWorkflow.create({
-    $, state, toast, fetchAll, esc, money, paymentFrequencyLabel, monthlyScheduledEstimate,
-    accountBalance, amountDueSince, unpaidDueAccrualStart, todayIso,
-    propertyAddress, monthStart, streetAddress, dateOnly, monthEnd,
-    lateReminderMailto, paymentStatusInMonth, openPayment,
-    openPropertyDetails, resetAccountForm,
-    populateFormOptions, openModal,
+    $,
+    state,
+    toast,
+    fetchAll,
+    esc,
+    money,
+    paymentFrequencyLabel,
+    monthlyScheduledEstimate,
+    accountBalance,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    propertyAddress,
+    monthStart,
+    streetAddress,
+    dateOnly,
+    monthEnd,
+    lateReminderMailto,
+    paymentStatusInMonth,
+    openPayment,
+    openPropertyDetails,
+    resetAccountForm,
+    populateFormOptions,
+    openModal,
   });
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({
-      $, state,
+      $,
+      state,
       selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
       parseCSV: window.PropertyDeskImportUtils.parseCSV,
-      validateAccountRows: window.PropertyDeskImportWorkflows.validateAccountRows,
-      validatePaymentRows: window.PropertyDeskImportWorkflows.validatePaymentRows,
-      validateExpenseRows: window.PropertyDeskImportWorkflows.validateExpenseRows,
-      esc, openModal, closeModal, toast, todayIso, fetchAll,
+      validateAccountRows:
+        window.PropertyDeskImportWorkflows.validateAccountRows,
+      validatePaymentRows:
+        window.PropertyDeskImportWorkflows.validatePaymentRows,
+      validateExpenseRows:
+        window.PropertyDeskImportWorkflows.validateExpenseRows,
+      esc,
+      openModal,
+      closeModal,
+      toast,
+      todayIso,
+      fetchAll,
     });
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskExports.create({
@@ -199,9 +357,21 @@
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
   const { renderReminderActivity, previewReminderEmail } =
     window.PropertyDeskReminderWorkflow.create({
-      $, state, esc, fmtDate, money, amountDueSince, unpaidDueAccrualStart,
-      todayIso, monthEnd, moneyInput, toast, dateOnly, monthStart,
-      propertyAddress, openModal,
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal,
     });
   const {
     navigate,
@@ -209,10 +379,19 @@
     attachNavigationEvents,
     attachThemeEvents,
   } = window.PropertyDeskAppShellWorkflow.create({
-    $, state, esc, toast, fetchAll, updateGreeting, renderReminderActivity,
+    $,
+    state,
+    esc,
+    toast,
+    fetchAll,
+    updateGreeting,
+    renderReminderActivity,
   });
   appLifecycle = window.PropertyDeskAppLifecycle.create({
-    $, state, backend, todayIso,
+    $,
+    state,
+    backend,
+    todayIso,
     registerShell: () => window.PropertyDeskPwa.registerShell(),
     auth: {
       setAuthMode,
@@ -251,5 +430,5 @@
       attachReportExportEvents,
     ],
   });
-  document.addEventListener('DOMContentLoaded', appLifecycle.initialize);
+  document.addEventListener("DOMContentLoaded", appLifecycle.initialize);
 })();

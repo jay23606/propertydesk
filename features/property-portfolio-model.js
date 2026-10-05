@@ -31,7 +31,8 @@
             (account) => account.property_id === property.id,
           ),
           related = allRelated.filter(
-            (account) => showArchived || (account.status || "active") === "active",
+            (account) =>
+              showArchived || (account.status || "active") === "active",
           ),
           matches = related.filter(
             (account) =>
@@ -61,7 +62,8 @@
               address,
               unpaidDue: money(unpaidDue),
               senderName:
-                state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
+                state.user?.user_metadata?.display_name?.trim() ||
+                "PropertyDesk",
               recipientName: partyName,
               month: dateOnly(monthStart()).toLocaleDateString(undefined, {
                 month: "long",

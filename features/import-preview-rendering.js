@@ -109,11 +109,14 @@
         : count
           ? `Import ${count} row${count === 1 ? "" : "s"}`
           : "No valid rows to import";
-      $("import-commit").disabled = count === 0 || Boolean(pending?.commitUnconfirmed);
+      $("import-commit").disabled =
+        count === 0 || Boolean(pending?.commitUnconfirmed);
     }
 
     return { renderImportPreview, updateImportCommitButton };
   }
 
-  window.PropertyDeskImportPreviewRendering = Object.freeze({ create: createImportPreviewRendering });
+  window.PropertyDeskImportPreviewRendering = Object.freeze({
+    create: createImportPreviewRendering,
+  });
 })();

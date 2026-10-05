@@ -4,17 +4,44 @@
 
   function create(context) {
     const {
-      $, state, esc, fmtDate, money, amountDueSince, unpaidDueAccrualStart,
-      todayIso, monthEnd, moneyInput, toast, dateOnly, monthStart,
-      propertyAddress, openModal,
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal,
     } = context;
     const { renderReminderActivity } =
       window.PropertyDeskReminderActivityView.create({
-        $, state, esc, fmtDate, money,
+        $,
+        state,
+        esc,
+        fmtDate,
+        money,
       });
     const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-      $, state, amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd,
-      moneyInput, toast, dateOnly, monthStart, propertyAddress, money, esc,
+      $,
+      state,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      money,
+      esc,
       openModal,
     });
 

@@ -16,5 +16,7 @@
     return { depositSectionHTML };
   }
 
-  window.PropertyDeskDepositDetails = Object.freeze({ create: createDepositDetails });
+  window.PropertyDeskDepositDetails = Object.freeze({
+    create: createDepositDetails,
+  });
 })();

@@ -4,17 +4,47 @@
 
   function createLedgerEntryForms(context) {
     const {
-      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      saveCorrection,
     } = context;
     const payments = window.PropertyDeskPaymentEntryForm.create({
-      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      saveCorrection,
       buildPaymentPayload: window.PropertyDeskTransactionPayloads.buildPayment,
     });
     const expenses = window.PropertyDeskExpenseEntryForm.create({
-      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      saveCorrection,
       buildExpensePayload: window.PropertyDeskTransactionPayloads.buildExpense,
     });
 
@@ -36,5 +66,7 @@
     };
   }
 
-  window.PropertyDeskLedgerEntryForms = Object.freeze({ create: createLedgerEntryForms });
+  window.PropertyDeskLedgerEntryForms = Object.freeze({
+    create: createLedgerEntryForms,
+  });
 })();

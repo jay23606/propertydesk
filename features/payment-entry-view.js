@@ -4,12 +4,21 @@
 
   function createPaymentEntryView(context) {
     const {
-      $, state, moneyInput, todayIso, toast, fillSelect, populateFormOptions,
-      prettyType, openModal,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
     } = context;
 
     function updateAllocationPreview() {
-      const account = state.accounts.find((item) => item.id === $("payment-account").value);
+      const account = state.accounts.find(
+        (item) => item.id === $("payment-account").value,
+      );
       const amount = moneyInput($("payment-amount").value);
       if (!account || !amount) {
         $("allocation-preview").innerHTML = "";
@@ -34,7 +43,8 @@
         (item) => item.id === $("payment-account").value,
       );
       const scheduledAmount = Number(account?.payment_amount || 0);
-      if (!Number.isFinite(scheduledAmount) || scheduledAmount <= 0) return false;
+      if (!Number.isFinite(scheduledAmount) || scheduledAmount <= 0)
+        return false;
       amountInput.value = account.payment_amount;
       return true;
     }
@@ -46,7 +56,11 @@
         fillSelect(
           "payment-account",
           state.accounts
-            .filter((account) => account.property_id === propertyId && account.status === "active")
+            .filter(
+              (account) =>
+                account.property_id === propertyId &&
+                account.status === "active",
+            )
             .map((account) => ({
               value: account.id,
               label: `${account.party_name || account.name} — ${prettyType(account.account_type)}`,
@@ -56,7 +70,8 @@
       }
       $("payment-form").reset();
       $("payment-modal-title").textContent = "Record payment";
-      $("payment-modal").querySelector(".eyebrow").textContent = "PAYMENT ENTRY";
+      $("payment-modal").querySelector(".eyebrow").textContent =
+        "PAYMENT ENTRY";
       $("payment-save-button").textContent = "Save payment";
       $("payment-save-next").classList.remove("hidden");
       $("payment-date").value = todayIso();
@@ -68,7 +83,8 @@
 
     function openPropertyPayment(propertyId) {
       const accounts = state.accounts.filter(
-        (account) => account.property_id === propertyId && account.status === "active",
+        (account) =>
+          account.property_id === propertyId && account.status === "active",
       );
       if (!accounts.length) {
         toast("Add an active account before recording a payment");
@@ -95,5 +111,7 @@
     };
   }
 
-  window.PropertyDeskPaymentEntryView = Object.freeze({ create: createPaymentEntryView });
+  window.PropertyDeskPaymentEntryView = Object.freeze({
+    create: createPaymentEntryView,
+  });
 })();

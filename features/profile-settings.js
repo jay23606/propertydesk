@@ -18,7 +18,9 @@
           data: { display_name: displayName },
         }));
       } catch {
-        toast("Display name couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Display name couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {
@@ -38,5 +40,7 @@
     return { saveProfile, attachEvents };
   }
 
-  window.PropertyDeskProfileSettings = Object.freeze({ create: createProfileSettings });
+  window.PropertyDeskProfileSettings = Object.freeze({
+    create: createProfileSettings,
+  });
 })();

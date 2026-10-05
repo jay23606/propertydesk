@@ -19,14 +19,14 @@
         </thead>
         <tbody>${transactions
           .map(
-            (item) => `<tr class="${item.status === "voided" ? "transaction-voided" : ""}">
+            (
+              item,
+            ) => `<tr class="${item.status === "voided" ? "transaction-voided" : ""}">
         <td>${fmtDate(item.date)}</td>
         <td>${esc(item.kind)}</td>
         <td>${esc(item.label)}${
-              item.memo
-                ? `<br><span class="muted">${esc(item.memo)}</span>`
-                : ""
-            }</td>
+          item.memo ? `<br><span class="muted">${esc(item.memo)}</span>` : ""
+        }</td>
         <td class="${item.amount < 0 ? "negative-amount" : ""}">${item.amount < 0 ? "−" : ""}${money(Math.abs(item.amount))}</td>
         </tr>`,
           )

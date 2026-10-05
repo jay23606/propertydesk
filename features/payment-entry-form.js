@@ -4,8 +4,15 @@
 
   function createPaymentEntryForm(context) {
     const {
-      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      saveCorrection, buildPaymentPayload,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      saveCorrection,
+      buildPaymentPayload,
     } = context;
     const paymentView = window.PropertyDeskPaymentEntryView.create(context);
 
@@ -49,7 +56,9 @@
       try {
         ({ error } = await state.client.from("pd_payments").insert(payload));
       } catch {
-        toast("Payment couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Payment couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {
@@ -86,5 +95,7 @@
     };
   }
 
-  window.PropertyDeskPaymentEntryForm = Object.freeze({ create: createPaymentEntryForm });
+  window.PropertyDeskPaymentEntryForm = Object.freeze({
+    create: createPaymentEntryForm,
+  });
 })();

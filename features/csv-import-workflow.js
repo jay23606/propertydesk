@@ -4,25 +4,50 @@
 
   function create(context) {
     const {
-      $, state, selectImportRows, esc, openModal, closeModal, toast,
-      parseCSV, todayIso, fetchAll,
+      $,
+      state,
+      selectImportRows,
+      esc,
+      openModal,
+      closeModal,
+      toast,
+      parseCSV,
+      todayIso,
+      fetchAll,
     } = context;
     const preview = window.PropertyDeskImportPreview.create({
-      $, state, selectImportRows, esc, openModal, closeModal, toast,
+      $,
+      state,
+      selectImportRows,
+      esc,
+      openModal,
+      closeModal,
+      toast,
     });
     const { attachEvents: attachPreviewEvents } =
       window.PropertyDeskImportPreviewEvents.create({
-        $, state, selectImportRows,
+        $,
+        state,
+        selectImportRows,
         renderImportPreview: preview.renderImportPreview,
         updateImportCommitButton: preview.updateImportCommitButton,
-        closeModal, toast,
+        closeModal,
+        toast,
       });
     const importFeature = window.PropertyDeskImportFeature.create({
-      $, state, stageImport: preview.stageImport, parseCSV,
-      validateAccountRows: window.PropertyDeskImportWorkflows.validateAccountRows,
-      validatePaymentRows: window.PropertyDeskImportWorkflows.validatePaymentRows,
-      validateExpenseRows: window.PropertyDeskImportWorkflows.validateExpenseRows,
-      todayIso, fetchAll, toast,
+      $,
+      state,
+      stageImport: preview.stageImport,
+      parseCSV,
+      validateAccountRows:
+        window.PropertyDeskImportWorkflows.validateAccountRows,
+      validatePaymentRows:
+        window.PropertyDeskImportWorkflows.validatePaymentRows,
+      validateExpenseRows:
+        window.PropertyDeskImportWorkflows.validateExpenseRows,
+      todayIso,
+      fetchAll,
+      toast,
     });
 
     function attachEvents() {

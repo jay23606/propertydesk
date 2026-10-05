@@ -14,10 +14,12 @@
     }
 
     function showConfigError() {
-      $("config-banner").innerHTML = "Supabase is not configured. Copy <code>config.example.js</code> to <code>config.js</code>, add your project URL and anon key, then reload.";
+      $("config-banner").innerHTML =
+        "Supabase is not configured. Copy <code>config.example.js</code> to <code>config.js</code>, add your project URL and anon key, then reload.";
       $("config-banner").classList.remove("hidden");
       $("auth-title").textContent = "Connect your workspace";
-      documentRef.querySelector(".auth-intro").textContent = "Add your Supabase project settings to start your private PropertyDesk workspace.";
+      documentRef.querySelector(".auth-intro").textContent =
+        "Add your Supabase project settings to start your private PropertyDesk workspace.";
       $("auth-form").classList.add("hidden");
       $("password-reset-form").classList.add("hidden");
       $("forgot-password").classList.add("hidden");

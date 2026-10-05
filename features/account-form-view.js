@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  function createAccountFormView({ $, todayIso, populateFormOptions, openModal }) {
+  function createAccountFormView({
+    $,
+    todayIso,
+    populateFormOptions,
+    openModal,
+  }) {
     function resetAccountForm() {
       $("account-form").reset();
       $("account-id").value = "";
@@ -73,7 +78,8 @@
       $("account-pi-payment").value = account.principal_interest_amount || "";
       $("account-escrow").value = account.escrow_amount || "0";
       $("account-balance-adjustment").value = account.balance_adjustment || "0";
-      $("account-effective-date").value = account.agreement_effective_date || "";
+      $("account-effective-date").value =
+        account.agreement_effective_date || "";
       $("account-change-reason").value = "";
       $("account-rate").value = account.interest_rate;
       $("account-term").value = account.term_months || "";
@@ -93,7 +99,13 @@
       $("account-type").addEventListener("change", updateLoanFields);
     }
 
-    return { resetAccountForm, updateLoanFields, readValues, editAccount, attachEvents };
+    return {
+      resetAccountForm,
+      updateLoanFields,
+      readValues,
+      editAccount,
+      attachEvents,
+    };
   }
 
   window.PropertyDeskAccountFormView = Object.freeze({

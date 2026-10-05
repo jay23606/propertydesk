@@ -40,9 +40,8 @@
                   : "Recorded",
         reason:
           event.action === "voided"
-            ? state.payments.find(
-                (payment) => payment.id === event.entity_id,
-              )?.void_reason || ""
+            ? state.payments.find((payment) => payment.id === event.entity_id)
+                ?.void_reason || ""
             : "",
         created_at: event.created_at,
       }));

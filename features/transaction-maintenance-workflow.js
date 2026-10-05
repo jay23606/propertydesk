@@ -36,10 +36,16 @@
       });
     const { attachEvents: attachTransactionActionEvents } =
       window.PropertyDeskTransactionViewEvents.create({
-        documentRef, correctTransaction, voidTransaction,
+        documentRef,
+        correctTransaction,
+        voidTransaction,
       });
 
-    return { voidTransaction, correctTransaction, attachTransactionActionEvents };
+    return {
+      voidTransaction,
+      correctTransaction,
+      attachTransactionActionEvents,
+    };
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({ create });

@@ -6,7 +6,10 @@
     const { $, state, selectImportRows, esc, openModal } = context;
     const { renderImportPreview, updateImportCommitButton } =
       window.PropertyDeskImportPreviewRendering.create({
-        $, state, selectImportRows, esc,
+        $,
+        state,
+        selectImportRows,
+        esc,
       });
 
     function stageImport(title, rows, commit, note = "", report = {}) {
@@ -39,5 +42,7 @@
     return { stageImport, renderImportPreview, updateImportCommitButton };
   }
 
-  window.PropertyDeskImportPreview = Object.freeze({ create: createImportPreview });
+  window.PropertyDeskImportPreview = Object.freeze({
+    create: createImportPreview,
+  });
 })();

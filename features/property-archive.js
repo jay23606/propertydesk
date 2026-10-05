@@ -11,12 +11,15 @@
       const archived_at = property.archived_at ? null : todayIso();
       let error;
       try {
-        ({ error } = await state.client.from("pd_properties")
+        ({ error } = await state.client
+          .from("pd_properties")
           .update({ archived_at })
           .eq("id", id)
           .eq("user_id", state.workspaceOwnerId));
       } catch {
-        toast("Property status couldn't be updated right now. Check your connection and try again.");
+        toast(
+          "Property status couldn't be updated right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {

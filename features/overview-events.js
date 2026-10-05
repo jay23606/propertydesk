@@ -2,7 +2,11 @@
 (() => {
   "use strict";
 
-  function createOverviewEvents({ $, openPropertyDetails, openPropertyPayment }) {
+  function createOverviewEvents({
+    $,
+    openPropertyDetails,
+    openPropertyPayment,
+  }) {
     function attachEvents() {
       $("overview-properties").addEventListener("click", (event) => {
         const payment = event.target.closest("[data-property-payment]");
@@ -20,5 +24,7 @@
     return { attachEvents };
   }
 
-  window.PropertyDeskOverviewEvents = Object.freeze({ create: createOverviewEvents });
+  window.PropertyDeskOverviewEvents = Object.freeze({
+    create: createOverviewEvents,
+  });
 })();

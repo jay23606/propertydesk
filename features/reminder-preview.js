@@ -3,8 +3,19 @@
   "use strict";
 
   function create({
-    $, state, amountDueSince, unpaidDueAccrualStart, todayIso, monthEnd,
-    moneyInput, toast, dateOnly, monthStart, propertyAddress, money, esc,
+    $,
+    state,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    monthEnd,
+    moneyInput,
+    toast,
+    dateOnly,
+    monthStart,
+    propertyAddress,
+    money,
+    esc,
     openModal,
   }) {
     function previewReminderEmail() {
@@ -27,8 +38,8 @@
         payment_frequency: $("account-frequency").value,
         status: "active",
       };
-      const recipients = $("account-party-email").value
-        .split(/[;,]/)
+      const recipients = $("account-party-email")
+        .value.split(/[;,]/)
         .map((email) => email.trim())
         .filter(Boolean);
       const amount = amountDueSince(

@@ -4,16 +4,32 @@
 
   function create(context) {
     const {
-      $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-      monthStart, sumIncome, sumOperatingExpenses,
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
     } = context;
-    const {
-      renderPayments,
-      attachEvents: attachTransactionViewEvents,
-    } = window.PropertyDeskTransactionViews.create({
-      $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-      monthStart, sumIncome, sumOperatingExpenses,
-    });
+    const { renderPayments, attachEvents: attachTransactionViewEvents } =
+      window.PropertyDeskTransactionViews.create({
+        $,
+        state,
+        dateOnly,
+        fmtDate,
+        esc,
+        expenseCategoryLabel,
+        money,
+        isPosted,
+        monthStart,
+        sumIncome,
+        sumOperatingExpenses,
+      });
     return {
       renderPayments,
       attachTransactionViewEvents,

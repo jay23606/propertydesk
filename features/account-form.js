@@ -4,11 +4,18 @@
 
   function createAccountForm(context) {
     const {
-      $, state, moneyInput, toast, closeModal, fetchAll, buildAccountPayload,
+      $,
+      state,
+      moneyInput,
+      toast,
+      closeModal,
+      fetchAll,
+      buildAccountPayload,
       formModel,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create(context);
-    const { resetAccountForm, updateLoanFields, readValues, editAccount } = formView;
+    const { resetAccountForm, updateLoanFields, readValues, editAccount } =
+      formView;
 
     async function saveAccount(event) {
       event.preventDefault();
@@ -57,7 +64,9 @@
       try {
         ({ error } = await query);
       } catch {
-        toast("Account couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Account couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {

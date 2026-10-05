@@ -3,7 +3,12 @@
   "use strict";
 
   function createPropertyDetailsView({
-    money, fmtDate, esc, prettyType, paymentFrequencyLabel, accountBalance,
+    money,
+    fmtDate,
+    esc,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
   }) {
     function propertyDetailsHTML({
       property,

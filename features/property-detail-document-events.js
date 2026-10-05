@@ -3,7 +3,10 @@
   "use strict";
 
   function createPropertyDetailDocumentEvents({
-    $, openPropertyDocument, deletePropertyDocument, uploadPropertyDocument,
+    $,
+    openPropertyDocument,
+    deletePropertyDocument,
+    uploadPropertyDocument,
   }) {
     function attachEvents() {
       const detailContent = $("property-detail-content");

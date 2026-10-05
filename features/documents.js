@@ -11,7 +11,9 @@
       confirm = (message) => window.confirm(message),
       openWindow = (...args) => window.open(...args),
       makeId = () => crypto.randomUUID(),
-      repository = window.PropertyDeskDocumentRepository.create(() => state.client),
+      repository = window.PropertyDeskDocumentRepository.create(
+        () => state.client,
+      ),
     } = context;
 
     async function uploadPropertyDocument(input) {
@@ -33,16 +35,24 @@
         return;
       }
 
-      const safeName = file.name.normalize("NFKC")
-        .replace(/[^\w.() -]/g, "_")
-        .replace(/\s+/g, "_")
-        .slice(-100) || `agreement.${extension}`;
+      const safeName =
+        file.name
+          .normalize("NFKC")
+          .replace(/[^\w.() -]/g, "_")
+          .replace(/\s+/g, "_")
+          .slice(-100) || `agreement.${extension}`;
       const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
       let uploadError;
       try {
-        ({ error: uploadError } = await repository.upload(path, file, contentType));
+        ({ error: uploadError } = await repository.upload(
+          path,
+          file,
+          contentType,
+        ));
       } catch (error) {
-        toast(`Agreement upload failed: ${error.message || "Check your connection and try again."}`);
+        toast(
+          `Agreement upload failed: ${error.message || "Check your connection and try again."}`,
+        );
         return;
       }
       if (uploadError) {
@@ -62,12 +72,16 @@
           file_size: file.size,
         }));
       } catch (requestError) {
-        toast(`Agreement record status couldn't be confirmed. Reload the property details before retrying; the private file was kept to avoid breaking a saved record. ${requestError.message || "Check your connection and try again."}`);
+        toast(
+          `Agreement record status couldn't be confirmed. Reload the property details before retrying; the private file was kept to avoid breaking a saved record. ${requestError.message || "Check your connection and try again."}`,
+        );
         return;
       }
       if (error) {
         const cleaned = await removeUploadedFile(path);
-        toast(`Agreement record failed${cleaned ? "; uploaded file removed" : "; uploaded file may need cleanup"}. ${error.message}`);
+        toast(
+          `Agreement record failed${cleaned ? "; uploaded file removed" : "; uploaded file may need cleanup"}. ${error.message}`,
+        );
         return;
       }
 
@@ -83,14 +97,27 @@
     async function deletePropertyDocument(id) {
       const doc = state.documents.find((item) => item.id === id);
       const propertyId = state.selectedPropertyId;
-      if (!doc || !propertyId || doc.property_id !== propertyId || doc.user_id !== state.workspaceOwnerId) return;
-      if (!confirm(`Permanently delete “${doc.file_name}” from this property? This cannot be undone.`)) return;
+      if (
+        !doc ||
+        !propertyId ||
+        doc.property_id !== propertyId ||
+        doc.user_id !== state.workspaceOwnerId
+      )
+        return;
+      if (
+        !confirm(
+          `Permanently delete “${doc.file_name}” from this property? This cannot be undone.`,
+        )
+      )
+        return;
 
       let storageError;
       try {
         ({ error: storageError } = await repository.remove(doc.storage_path));
       } catch (error) {
-        toast(`Agreement removal failed: ${error.message || "Check your connection and try again."}`);
+        toast(
+          `Agreement removal failed: ${error.message || "Check your connection and try again."}`,
+        );
         return;
       }
       if (storageError) {
@@ -105,11 +132,15 @@
           propertyId,
         ));
       } catch (requestError) {
-        toast(`File deleted, but its document record could not be removed: ${requestError.message || "Check your connection and try again."}`);
+        toast(
+          `File deleted, but its document record could not be removed: ${requestError.message || "Check your connection and try again."}`,
+        );
         return;
       }
       if (error) {
-        toast(`File deleted, but its document record could not be removed: ${error.message}`);
+        toast(
+          `File deleted, but its document record could not be removed: ${error.message}`,
+        );
         return;
       }
 
@@ -127,7 +158,9 @@
       if (!doc || doc.user_id !== state.workspaceOwnerId) return;
       const viewer = openWindow("about:blank", "_blank");
       if (!viewer) {
-        toast("Allow pop-ups to open this agreement; you can also use Download.");
+        toast(
+          "Allow pop-ups to open this agreement; you can also use Download.",
+        );
         return;
       }
       viewer.opener = null;
@@ -137,7 +170,9 @@
         ({ data, error } = await repository.signedUrl(doc.storage_path, 60));
       } catch (requestError) {
         viewer.close();
-        toast(`Agreement link failed: ${requestError.message || "Check your connection and try again."}`);
+        toast(
+          `Agreement link failed: ${requestError.message || "Check your connection and try again."}`,
+        );
         return;
       }
       if (error) {
@@ -157,7 +192,11 @@
       }
     }
 
-    return { uploadPropertyDocument, deletePropertyDocument, openPropertyDocument };
+    return {
+      uploadPropertyDocument,
+      deletePropertyDocument,
+      openPropertyDocument,
+    };
   }
 
   window.PropertyDeskDocuments = { create };

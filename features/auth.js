@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ $, state, fetchAll, toast, windowRef = window, documentRef = document }) {
+  function create({
+    $,
+    state,
+    fetchAll,
+    toast,
+    windowRef = window,
+    documentRef = document,
+  }) {
     const { showAuth, showApp, showConfigError } =
       window.PropertyDeskAuthScreens.create({ $, documentRef });
 
@@ -11,7 +18,10 @@
       submitAuth,
       attachEvents: attachAuthFormEvents,
     } = window.PropertyDeskAuthForm.create({
-      $, state, documentRef, startWorkspace,
+      $,
+      state,
+      documentRef,
+      startWorkspace,
     });
 
     const {
@@ -38,20 +48,17 @@
       }
     }
 
-    const {
-      handleAuthStateChange,
-      restoreAuthSession,
-      signOut,
-    } = window.PropertyDeskAuthSession.create({
-      state,
-      toast,
-      showAuth,
-      setAuthMode,
-      showPasswordReset,
-      isPasswordRecoverySession,
-      startWorkspace,
-      resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
-    });
+    const { handleAuthStateChange, restoreAuthSession, signOut } =
+      window.PropertyDeskAuthSession.create({
+        state,
+        toast,
+        showAuth,
+        setAuthMode,
+        showPasswordReset,
+        isPasswordRecoverySession,
+        startWorkspace,
+        resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+      });
 
     function attachEvents() {
       $("sign-out").addEventListener("click", signOut);

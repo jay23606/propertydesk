@@ -71,7 +71,9 @@
     }
 
     function totalsRowHTML(totals) {
-      const loanBalanceTotal = totals.loanCount ? money(totals.loanBalance) : "—";
+      const loanBalanceTotal = totals.loanCount
+        ? money(totals.loanBalance)
+        : "—";
       return `<tr>
         <td>
         </td>

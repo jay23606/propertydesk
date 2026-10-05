@@ -3,8 +3,15 @@
   "use strict";
 
   function create({
-    $, state, closeModal, openPayment, openExpense, resetAccountForm,
-    populateFormOptions, openModal, toggleArchiveProperty,
+    $,
+    state,
+    closeModal,
+    openPayment,
+    openExpense,
+    resetAccountForm,
+    populateFormOptions,
+    openModal,
+    toggleArchiveProperty,
   }) {
     function attachEvents() {
       $("property-detail-add-income").addEventListener("click", () => {

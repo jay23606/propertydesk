@@ -4,16 +4,36 @@
 
   function createImportWorkflows(context) {
     const {
-      $, state, stageImport, parseCSV, validateAccountRows,
-      validatePaymentRows, validateExpenseRows, todayIso, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validateAccountRows,
+      validatePaymentRows,
+      validateExpenseRows,
+      todayIso,
+      fetchAll,
+      toast,
     } = context;
     const accounts = window.PropertyDeskAccountImport.create({
-      $, state, stageImport, parseCSV, validateAccountRows,
-      todayIso, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validateAccountRows,
+      todayIso,
+      fetchAll,
+      toast,
     });
     const transactions = window.PropertyDeskTransactionImports.create({
-      $, state, stageImport, parseCSV, validatePaymentRows,
-      validateExpenseRows, fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validatePaymentRows,
+      validateExpenseRows,
+      fetchAll,
+      toast,
     });
 
     function attachEvents() {

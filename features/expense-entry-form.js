@@ -4,8 +4,18 @@
 
   function createExpenseEntryForm(context) {
     const {
-      $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      fillSelect, populateFormOptions, prettyType, openModal, saveCorrection,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      saveCorrection,
       buildExpensePayload,
     } = context;
 
@@ -52,7 +62,9 @@
       try {
         ({ error } = await state.client.from("pd_expenses").insert(payload));
       } catch {
-        toast("Expense couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Expense couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {
@@ -86,7 +98,8 @@
       populateFormOptions();
       $("expense-form").reset();
       $("expense-modal-title").textContent = "Record expense";
-      $("expense-modal").querySelector(".eyebrow").textContent = "PROPERTY EXPENSE";
+      $("expense-modal").querySelector(".eyebrow").textContent =
+        "PROPERTY EXPENSE";
       $("expense-save-button").textContent = "Save expense";
       $("expense-save-next").classList.remove("hidden");
       $("expense-date").value = todayIso();
@@ -122,5 +135,7 @@
     return { saveExpense, openExpense, attachEvents };
   }
 
-  window.PropertyDeskExpenseEntryForm = Object.freeze({ create: createExpenseEntryForm });
+  window.PropertyDeskExpenseEntryForm = Object.freeze({
+    create: createExpenseEntryForm,
+  });
 })();

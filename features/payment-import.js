@@ -4,8 +4,13 @@
 
   function createPaymentImport(context) {
     const {
-      $, state, stageImport, parseCSV, validatePaymentRows,
-      fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validatePaymentRows,
+      fetchAll,
+      toast,
     } = context;
 
     async function importPayments(file) {
@@ -109,5 +114,7 @@
     return { importPayments, attachEvents };
   }
 
-  window.PropertyDeskPaymentImport = Object.freeze({ create: createPaymentImport });
+  window.PropertyDeskPaymentImport = Object.freeze({
+    create: createPaymentImport,
+  });
 })();

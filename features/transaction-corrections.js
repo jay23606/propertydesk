@@ -18,11 +18,15 @@
           p_reason: pending.reason,
         }));
       } catch {
-        toast("Correction failed; original entry is unchanged. Check your connection and try again.");
+        toast(
+          "Correction failed; original entry is unchanged. Check your connection and try again.",
+        );
         return false;
       }
       if (error) {
-        toast(`Correction failed; original entry is unchanged. ${error.message}`);
+        toast(
+          `Correction failed; original entry is unchanged. ${error.message}`,
+        );
         return false;
       }
       closeModal($(kind === "payment" ? "payment-modal" : "expense-modal"));
@@ -31,7 +35,9 @@
       } catch {
         return false;
       }
-      toast(`${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`);
+      toast(
+        `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
+      );
       return true;
     }
 

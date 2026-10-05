@@ -36,5 +36,7 @@
     };
   }
 
-  window.PropertyDeskAccountPayload = Object.freeze({ build: buildAccountPayload });
+  window.PropertyDeskAccountPayload = Object.freeze({
+    build: buildAccountPayload,
+  });
 })();

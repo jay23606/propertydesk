@@ -51,7 +51,8 @@
         `${summary.recordedPaymentCount} payment${summary.recordedPaymentCount === 1 ? "" : "s"} recorded`;
       $("upcoming-list").innerHTML = summary.upcoming.length
         ? summary.upcoming
-            .map(({ account, property }) => `<div class="list-row">
+            .map(
+              ({ account, property }) => `<div class="list-row">
         <span class="round-icon">${account.account_type === "rental" ? "⌂" : "▤"}</span>
         <div class="row-copy">
         <strong>${esc(account.party_name || account.name)}</strong>
@@ -61,12 +62,14 @@
         <strong>${money(account.payment_amount)}</strong>
         <small>Due ${fmtDate(account.next_due_date, { month: "short", day: "numeric" })}</small>
         </div>
-        </div>`)
+        </div>`,
+            )
             .join("")
         : '<div class="list-empty">No upcoming payments yet. Add an account to get started.</div>';
       $("activity-list").innerHTML = summary.recent.length
         ? summary.recent
-            .map(({ payment, account, property }) => `<div class="list-row">
+            .map(
+              ({ payment, account, property }) => `<div class="list-row">
         <span class="round-icon">↙</span>
         <div class="row-copy">
         <strong>${esc(account?.party_name || account?.name || "Payment")}</strong>
@@ -76,7 +79,8 @@
         <strong>${money(payment.amount)}</strong>
         <small>${esc(payment.payment_method.replace("_", " "))}</small>
         </div>
-        </div>`)
+        </div>`,
+            )
             .join("")
         : '<div class="list-empty">Recorded payments will appear here.</div>';
       $("overview-properties").innerHTML =

@@ -2,12 +2,7 @@
 (() => {
   "use strict";
 
-  function createReportViews({
-    $,
-    esc,
-    money,
-    buildReportModel,
-  }) {
+  function createReportViews({ $, esc, money, buildReportModel }) {
     function renderImportBatchRow(batch) {
       return `<tr>
         <td><strong>${esc(batch.source_name || "CSV import")}</strong></td>

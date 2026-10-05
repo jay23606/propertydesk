@@ -4,8 +4,16 @@
 
   function createActions(context) {
     const {
-      $, state, toast, resetPropertyForm, resetAccountForm,
-      populateFormOptions, openModal, openPayment, openExpense, documentRef,
+      $,
+      state,
+      toast,
+      resetPropertyForm,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      openPayment,
+      openExpense,
+      documentRef,
     } = context;
 
     function attachCreateActions(navigate) {

@@ -4,8 +4,13 @@
 
   function createExpenseImport(context) {
     const {
-      $, state, stageImport, parseCSV, validateExpenseRows,
-      fetchAll, toast,
+      $,
+      state,
+      stageImport,
+      parseCSV,
+      validateExpenseRows,
+      fetchAll,
+      toast,
     } = context;
 
     async function importExpenses(file) {
@@ -113,5 +118,7 @@
     return { importExpenses, attachEvents };
   }
 
-  window.PropertyDeskExpenseImport = Object.freeze({ create: createExpenseImport });
+  window.PropertyDeskExpenseImport = Object.freeze({
+    create: createExpenseImport,
+  });
 })();

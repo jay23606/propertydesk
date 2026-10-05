@@ -21,7 +21,9 @@
           p_email: email,
         }));
       } catch {
-        toast("Workspace member couldn't be added right now. Check your connection and try again.");
+        toast(
+          "Workspace member couldn't be added right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {
@@ -55,7 +57,9 @@
           p_member_user_id: memberId,
         }));
       } catch {
-        toast("Workspace member couldn't be removed right now. Check your connection and try again.");
+        toast(
+          "Workspace member couldn't be removed right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {

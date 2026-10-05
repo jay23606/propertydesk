@@ -7,7 +7,8 @@
     toast,
     fetchAll,
     streetAddress,
-    promptAction = (message, initialValue) => window.prompt(message, initialValue),
+    promptAction = (message, initialValue) =>
+      window.prompt(message, initialValue),
   }) {
     async function editPropertyQuickNote(id) {
       const property = state.properties.find((item) => item.id === id);
@@ -30,7 +31,9 @@
           .eq("id", id)
           .eq("user_id", state.workspaceOwnerId));
       } catch {
-        toast("Property note couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Property note couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {

@@ -29,7 +29,9 @@
       try {
         ({ error } = await query);
       } catch {
-        toast("Property couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Property couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (error) {
@@ -53,5 +55,7 @@
     return { resetPropertyForm, saveProperty, attachEvents };
   }
 
-  window.PropertyDeskPropertyForm = Object.freeze({ create: createPropertyForm });
+  window.PropertyDeskPropertyForm = Object.freeze({
+    create: createPropertyForm,
+  });
 })();

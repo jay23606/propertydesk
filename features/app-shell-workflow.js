@@ -4,10 +4,22 @@
 
   function create(context) {
     const {
-      $, state, esc, toast, fetchAll, updateGreeting, renderReminderActivity,
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
+      updateGreeting,
+      renderReminderActivity,
     } = context;
     const settings = window.PropertyDeskWorkspaceSettingsWorkflow.create({
-      $, state, esc, toast, fetchAll, updateGreeting, renderReminderActivity,
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
+      updateGreeting,
+      renderReminderActivity,
     });
     const navigation = window.PropertyDeskNavigation.create({
       $: context.$,

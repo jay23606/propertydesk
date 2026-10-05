@@ -2,21 +2,31 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, openPropertyDetails, documentRef = document }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    documentRef = document,
+  }) {
     async function savePropertyHolders() {
       const id = state.selectedPropertyId;
-      const selected = [...documentRef.querySelectorAll("[data-holder-choice]:checked")]
-        .map((input) => input.value);
+      const selected = [
+        ...documentRef.querySelectorAll("[data-holder-choice]:checked"),
+      ].map((input) => input.value);
       if (!id) return;
 
       let deleteError;
       try {
-        ({ error: deleteError } = await state.client.from("pd_property_holders")
+        ({ error: deleteError } = await state.client
+          .from("pd_property_holders")
           .delete()
           .eq("user_id", state.workspaceOwnerId)
           .eq("property_id", id));
       } catch {
-        toast("Account-holder labels couldn't be saved right now. Check your connection and try again.");
+        toast(
+          "Account-holder labels couldn't be saved right now. Check your connection and try again.",
+        );
         return;
       }
       if (deleteError) {
@@ -34,7 +44,9 @@
             })),
           ));
         } catch {
-          toast("Account-holder labels couldn't be saved right now. Check your connection and try again.");
+          toast(
+            "Account-holder labels couldn't be saved right now. Check your connection and try again.",
+          );
           return;
         }
         if (error) {
