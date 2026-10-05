@@ -6,7 +6,7 @@ Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Au
 
 The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it builds feature dependencies before the workflows that consume them, passes callbacks directly, and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
 
-Shared initialization lives in `features/app-services.js`. It creates the Supabase client, workspace loader, notifications, and ledger helpers. Posted transaction totals and deposit balances live in `ledger-utils.js`; due accrual and amortization calculations live in `ledger-schedule-utils.js` and are composed through the stable ledger API. Feature modules keep screens, forms, calculations, writes, and delegated actions focused by area:
+Shared initialization lives in `features/app-services.js`. It creates the Supabase client, workspace loader, notifications, and ledger helpers. General formatting and input helpers live in `features/app-utils.js`; property location and street-address formatting live in `features/property-address-utils.js`. Posted transaction totals and deposit balances live in `ledger-utils.js`; due accrual and amortization calculations live in `ledger-schedule-utils.js` and are composed through the stable ledger API. Feature modules keep screens, forms, calculations, writes, and delegated actions focused by area:
 
 - Properties: `property-portfolio-workflow.js`, `property-details-workflow.js`, and `property-actions-workflow.js`.
 - Receipts and expenses: `entry-workflow.js`, with separate payment and expense forms.
