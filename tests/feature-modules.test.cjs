@@ -1590,8 +1590,8 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
-  assert.match(app, /const \{ voidTransaction \}\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
+  assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);
   assert.match(app, /window\.PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection,/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
@@ -1601,7 +1601,55 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?updateAllocationPreview/,
   );
-  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(\{[\s\S]*?fetchAll/);
+  assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
+});
+
+test("record maintenance composes account, deposit, and transaction actions", () => {
+  const calls = [];
+  const action = (name) => () => calls.push(name);
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountMaintenance: {
+        create: (dependencies) => {
+          calls.push(["account", dependencies]);
+          return { closeAccount: action("closeAccount") };
+        },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (dependencies) => {
+          calls.push(["deposit", dependencies]);
+          return { recordDepositAdjustment: action("recordDepositAdjustment") };
+        },
+      },
+      PropertyDeskTransactionMaintenance: {
+        create: (dependencies) => {
+          calls.push(["transaction", dependencies]);
+          return { voidTransaction: action("voidTransaction") };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "record-maintenance.js"), "utf8"),
+    context,
+  );
+  const dependencies = {
+    $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {},
+    fetchAll() {}, closeModal() {},
+  };
+  const actions = context.window.PropertyDeskRecordMaintenance.create(dependencies);
+
+  assert.deepEqual(Object.keys(actions).sort(), [
+    "closeAccount", "recordDepositAdjustment", "voidTransaction",
+  ]);
+  assert.deepEqual(calls.map(([name]) => name), ["account", "deposit", "transaction"]);
+  assert.equal(calls[0][1].state, dependencies.state);
+  assert.equal(calls[1][1].moneyInput, dependencies.moneyInput);
+  assert.equal(calls[2][1].fetchAll, dependencies.fetchAll);
+  actions.closeAccount();
+  actions.recordDepositAdjustment();
+  actions.voidTransaction();
+  assert.deepEqual(calls.slice(3), ["closeAccount", "recordDepositAdjustment", "voidTransaction"]);
 });
 
 test("app coordinator delegates transient notices to the notification feature", () => {

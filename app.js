@@ -200,6 +200,13 @@
       fetchAll,
       closeModal,
     });
+  const {
+    closeAccount,
+    recordDepositAdjustment,
+    voidTransaction,
+  } = window.PropertyDeskRecordMaintenance.create({
+    $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
+  });
   const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
     $,
     state,
@@ -239,12 +246,6 @@
       EventClass: Event,
       OptionClass: Option,
     });
-  const { voidTransaction } =
-    window.PropertyDeskTransactionMaintenance.create({
-      state,
-      toast,
-      fetchAll,
-    });
   const { attachEvents: attachCreateActions } =
     window.PropertyDeskCreateActions.create({
       $,
@@ -257,22 +258,6 @@
       openPayment,
       openExpense,
       documentRef: document,
-    });
-  const { closeAccount } =
-    window.PropertyDeskAccountMaintenance.create({
-    $,
-    state,
-    toast,
-    fetchAll,
-    closeModal,
-  });
-  const { recordDepositAdjustment } =
-    window.PropertyDeskDepositMaintenance.create({
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
     });
   const { renderPropertyActivity } =
     window.PropertyDeskPropertyActivityDetails.create({
