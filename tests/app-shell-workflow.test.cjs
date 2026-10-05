@@ -18,12 +18,12 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskWorkspaceSettingsWorkflow: {
+      PropertyDeskWorkspace: {
         create(options) {
           calls.push(["settings", options]);
           return {
             renderWorkspaceSettings: handlers.renderWorkspaceSettings,
-            attachWorkspaceEvents: handlers.attachWorkspaceEvents,
+            attachEvents: handlers.attachWorkspaceEvents,
           };
         },
       },
@@ -113,6 +113,8 @@ test("app shell workflow loads before the coordinator and is precached", () => {
   assert.ok(
     html.indexOf("features/app-shell-workflow.js") < html.indexOf("app.js"),
   );
+  assert.doesNotMatch(html, /workspace-settings-workflow\.js/);
+  assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(worker, /'\.\/features\/app-shell-workflow\.js'/);
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.match(app, /PropertyDeskReminderWorkflow\.create/);

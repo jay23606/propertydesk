@@ -265,45 +265,6 @@ test("reminder workflow composes the activity view and email preview", () => {
   assert.equal(workflow.previewReminderEmail(), "preview");
 });
 
-test("workspace settings workflow receives reminder activity without owning preview", () => {
-  const passed = {};
-  const reminderActivity = () => "activity";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskWorkspace: {
-        create: (options) => {
-          passed.workspace = options;
-          return {
-            renderWorkspaceSettings: () => "settings",
-            attachEvents: () => "settings events",
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "workspace-settings-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const workflow = context.window.PropertyDeskWorkspaceSettingsWorkflow.create({
-    $() {},
-    state: {},
-    esc() {},
-    toast() {},
-    fetchAll() {},
-    updateGreeting() {},
-    renderReminderActivity: reminderActivity,
-  });
-
-  assert.equal(passed.workspace.renderReminderActivity, reminderActivity);
-  assert.equal(workflow.renderWorkspaceSettings(), "settings");
-  assert.equal(workflow.attachWorkspaceEvents(), "settings events");
-  assert.equal("previewReminderEmail" in workflow, false);
-});
-
 test("app coordinator delegates shared setup to the app services workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAppServices\.create\(/);

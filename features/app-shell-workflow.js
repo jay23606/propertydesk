@@ -12,7 +12,7 @@
       updateGreeting,
       renderReminderActivity,
     } = context;
-    const settings = window.PropertyDeskWorkspaceSettingsWorkflow.create({
+    const settings = window.PropertyDeskWorkspace.create({
       $,
       state,
       esc,
@@ -30,7 +30,7 @@
 
     return {
       navigate: navigation.navigate,
-      attachWorkspaceEvents: settings.attachWorkspaceEvents,
+      attachWorkspaceEvents: settings.attachEvents,
       attachNavigationEvents: navigation.attachEvents,
       attachThemeEvents: theme.attachEvents,
     };
