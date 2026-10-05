@@ -8,14 +8,20 @@ const { validateAccountRows, validateExpenseRows, validatePaymentRows } = requir
 test('the browser loads tested import and backup workflows before the app and precaches them in the PWA shell', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-views.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-views.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/imports.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/details.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
+  assert.match(worker, /'\.\/features\/imports\.js'/);
+  assert.match(worker, /'\.\/features\/details\.js'/);
+  assert.match(app, /attachImportEvents\(\)/);
 });
 
 const properties = [{ id: 'p1', name: 'Oak House', address: '10 Oak St' }];

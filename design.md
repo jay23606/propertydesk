@@ -167,6 +167,10 @@ Use a dark color theme by default on first visit. Provide a visible light/dark t
 
 Ship PropertyDesk as an installable PWA for phone and desktop use. The web app manifest must include compatible 192×192 and 512×512 PNG icons in addition to any scalable SVG icon. The service worker may cache the static app shell only. Do not cache authenticated API responses, tokens, property/account data, or uploaded documents in Cache Storage. The first release supports on-the-go use when connected; it does not queue financial writes offline. Offline transaction queues would need unique idempotency keys, visible sync status, conflict handling, and device logout/lock behavior before being enabled.
 
+## Source and module architecture
+
+Keep the app build-free and compatible with GitHub Pages. Place cohesive browser features such as portfolio, transaction, and detail views and CSV import review in small files under `features/`; keep reusable calculations and validation in their existing helper modules. `app.js` owns shared session state and connects feature modules to Supabase and the page. Load every feature before `app.js` and include it in the service-worker shell cache. When a feature changes, update its focused tests and preserve the product workflows above.
+
 ## Transactional email
 
 Use Resend for Supabase Auth only if a separately owned, accepted domain is available. The free `propertydesk.dynv6.net` hostname was rejected by Resend; buyer/tenant reminders use MailerSend through a Supabase Edge Function. Provider credentials stay in Supabase secrets, never the static browser app.
