@@ -25,6 +25,23 @@ Before broad public onboarding, evaluate and implement client-side, per-workspac
 
 Server-side features that need readable PII require a separate decision. Automatic email reminders are off by default, but the reminder function reads recipient email and payment status, and MailerSend receives the recipient address and message. A strict operator-blind mode cannot also provide those managed server-side reminders as currently implemented. Either keep reminders explicitly opt-in with clear provider disclosure, or move reminder execution to infrastructure and keys controlled by the customer before promising that the operator cannot access PII.
 
+### Privacy implementation and release gates
+
+The encryption review must include every copy of a customer's information, not just the main property and account rows:
+
+- Direct identifiers: property names, addresses, notes, buyer/tenant names, email addresses, phone numbers, account names, agreement filenames and contents.
+- Financial and relationship records: agreement terms and amendments, payment and expense details, deposit entries, import provenance, audit snapshots, reminder activity, and property/account links that can identify a household when combined.
+- Secondary copies and outbound disclosures: browser state and caches, exports, uploaded files, error/reporting logs, scheduled email payloads, email-provider logs, and database backups.
+
+Release gates before inviting users to enter real information:
+
+1. Encrypt private workspace content and agreement files in the browser before upload or database writes. Do not store a decryption key or passphrase in Supabase, GitHub Pages configuration, server secrets, or logs. Keep only the smallest necessary routing and authorization metadata readable.
+2. Support multi-device unlock, explicit key sharing with invited workspace members, revocation, recovery, rotation, and encrypted backup/restore. Document that unrecoverable keys mean unrecoverable data; never add a hidden operator recovery key.
+3. Keep email reminders off by default. Do not enable operator-blind claims while a centrally operated function can read recipient data or build message contents. Move that work to customer-controlled infrastructure or clearly treat it as an explicit exception with a separate consent and privacy mode.
+4. Verify workspace isolation and ciphertext-only storage with automated database and browser tests, including old agreement versions, audit records, import/export, logs, and private files. Obtain an independent security review before claiming the operator cannot access customer content.
+
+Until every applicable gate is met, use synthetic data for demonstrations and testing, retain the current accurate disclosure, and do not tell prospective users that the app is end-to-end encrypted or that the operator cannot read their information. The rollback-only `supabase/tests/workspace_security.sql` test verifies member access within one workspace and blocks a different authenticated workspace; this is necessary but does not test access by the Supabase project operator or service-role credentials.
+
 ## People and use cases
 
 PropertyDesk has two distinct experiences: an owner/manager workspace and an optional tenant/buyer portal. The initial owner is a small property owner who may keep rentals, land contracts, and private notes in one portfolio. Owners may have existing records in Buildium-like software, spreadsheets, statements, or screenshots. Tenants and buyers never need to create an account to receive enabled email notices or to keep paying outside the app.
