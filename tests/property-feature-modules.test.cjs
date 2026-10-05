@@ -683,6 +683,10 @@ test("transaction action router routes correction and void actions to maintenanc
 test("report views summarize the current-year ledger and escape import history", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "ledger-schedule-utils.js"), "utf8"),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "ledger-utils.js"), "utf8"),
     context,
   );

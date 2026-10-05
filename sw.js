@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v156';
+const CACHE_NAME = 'propertydesk-shell-v157';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const SHELL_FILES = [
   './email-utils.js',
   './workspace-data.js',
   './features/workspace-refresh.js',
+  './ledger-schedule-utils.js',
   './ledger-utils.js',
   './backup-utils.js',
   './zip-utils.js',

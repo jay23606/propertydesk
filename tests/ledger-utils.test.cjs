@@ -1,12 +1,34 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { createBackup } = require('../backup-utils.js');
+const scheduleFactory = require('../ledger-schedule-utils.js');
 const ledgerUtils = require('../ledger-utils.js');
+const scheduleUtils = scheduleFactory.create({
+  isPosted: ledgerUtils.isPosted,
+  sumPosted: ledgerUtils.sumPosted,
+});
 const { amountDueSince, amortizationSchedule, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = ledgerUtils;
 
 test('backup manifest generation stays separate from ledger calculations', () => {
   assert.equal(typeof createBackup, 'function');
   assert.equal(Object.hasOwn(ledgerUtils, 'createBackup'), false);
+});
+
+test('schedule utility loads before the stable ledger API and is precached', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  assert.ok(html.indexOf('ledger-schedule-utils.js') < html.indexOf('ledger-utils.js'));
+  assert.match(worker, /'\.\/ledger-schedule-utils\.js'/);
+  assert.equal(typeof scheduleUtils.amortizationSchedule, 'function');
+  assert.equal(typeof ledgerUtils.amortizationSchedule, 'function');
+  assert.deepEqual(Object.keys(ledgerUtils).sort(), [
+    'amountDueSince', 'amortizationSchedule', 'hasPostedPaymentInMonth', 'isPosted',
+    'monthlyScheduledEstimate', 'paymentStatusInMonth', 'postedPaymentTotalInMonth',
+    'principalBalance', 'scheduledLoanBalance', 'securityDepositBalance', 'sumIncome',
+    'sumOperatingExpenses', 'sumPosted', 'unpaidDueAccrualStart',
+  ].sort());
 });
 
 test('payment-month highlighting recognizes any posted installment or rent receipt in the selected month', () => {
