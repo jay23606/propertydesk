@@ -1,8 +1,20 @@
-# PropertyDesk starter
+# PropertyDesk
 
 Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
-The browser code stays build-free. Reusable ledger, import, email, backup, and workspace-scoped data helpers live in separate files. Focused view renderers, data models, delegated action routers, and domain workflows are grouped under `features/`; for example, the Properties grid derives filtered rows and totals in its portfolio model, separate from its table templates and DOM view. Overview, Transactions, account details, deposit details, CSV import preview, profile settings, modal lifecycle, theme preferences, authentication forms, auth session restoration, and account/deposit/transaction maintenance actions also keep rendering, actions, and writes in their own modules. `features/app-services.js` initializes the shared backend, workspace loader, notifications, and ledger context; `features/overview-workflow.js` pairs the dashboard with its property actions, `features/property-portfolio-workflow.js` composes the Properties table, model, and grid actions, `features/property-actions-workflow.js` connects notes, holder labels, agreements, and property detail actions, `features/entry-workflow.js` composes property/account forms, payment/expense forms, correction writes, and create actions, `features/account-details-workflow.js` composes account and deposit details with account closure and deposit ledger actions, `features/property-details-workflow.js` connects property activity to property details, `features/transaction-workflow.js` groups transaction display, correction, and void actions, `features/csv-import-workflow.js` coordinates import staging, review, and file handlers, `features/workspace-settings-workflow.js` connects settings to reminder activity and email preview, and `features/report-workflow.js` pairs report rendering with export actions. `app.js` connects these features; `features/app-lifecycle.js` coordinates rendering, event binding, and startup.
+## Browser architecture
+
+The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it connects feature workflows and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
+
+Shared initialization lives in `features/app-services.js`. It creates the Supabase client, workspace loader, notifications, and ledger helpers. Feature modules keep screens, forms, calculations, writes, and delegated actions focused by area:
+
+- Properties: `property-portfolio-workflow.js`, `property-details-workflow.js`, and `property-actions-workflow.js`.
+- Receipts and expenses: `entry-workflow.js`, with separate payment and expense forms.
+- Account details and transaction history: `account-details-workflow.js` and `transaction-workflow.js`.
+- Imports and exports: `csv-import-workflow.js`, `report-workflow.js`, and the private backup module.
+- Workspace settings, authentication, and reminders: `workspace-settings-workflow.js` and the related focused modules.
+
+The module scripts are loaded by `index.html` and listed in the service worker shell. Keep the shell list in sync when adding or removing a browser module; increment the shell cache version when a cached file changes.
 
 The app is installable as a PWA when served over HTTPS. Dark mode is the default, with a light/dark toggle remembered on the device. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
@@ -47,7 +59,7 @@ PropertyDesk is a recordkeeping tool and does not collect payments. Loan allocat
 
 ## Local checks
 
-With Node.js installed, run `npm run lint` and `npm test` from this directory. The lint check catches undefined and unused names in browser code; the tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
+With Node.js installed, run `npm run format:check`, `npm run lint`, and `npm test` from this directory. Formatting checks cover the HTML shell and stylesheets; lint catches undefined and unused names in browser code; tests cover CSV imports, money and date validation, ledger calculations, feature wiring, and reminder behavior. The rollback-only live Supabase checks use synthetic users and records:
 
 - `supabase db query --linked --file supabase/tests/workspace_security.sql` checks workspace row-level security.
 - `supabase db query --linked --file supabase/tests/payment_allocation_integrity.sql` checks legacy allocation constraints.

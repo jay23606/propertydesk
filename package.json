@@ -4,11 +4,13 @@
   "scripts": {
     "test": "node --test tests/*.test.cjs",
     "smoke:deployed": "node scripts/smoke-deployed.cjs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "format:check": "prettier --check index.html styles.css overrides.css"
   },
   "devDependencies": {
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
-    "playwright": "^1.63.0"
+    "playwright": "^1.63.0",
+    "prettier": "^3.9.9"
   }
 }

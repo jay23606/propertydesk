@@ -24,6 +24,7 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
       - run: npm ci
+      - run: npm run format:check
       - run: npm run lint
       - run: npm test
       - run: npx playwright install --with-deps chromium

@@ -1,189 +1,1405 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#151b17">
-  <script>(() => { try { const saved = localStorage.getItem("propertydesk-theme"); document.documentElement.dataset.theme = saved === "light" ? "light" : "dark"; } catch { document.documentElement.dataset.theme = "dark"; } })();</script>
-  <meta name="description" content="A private, simple workspace for property income, expenses, rentals, and land contract accounts.">
-  <link rel="manifest" href="propertydesk.webmanifest">
-  <link rel="icon" href="icons/propertydesk.svg" type="image/svg+xml">
-  <title>PropertyDesk — Property portfolio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="overrides.css">
-  <link rel="stylesheet" href="reminders.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script defer src="features/app-state.js"></script>
-  <script defer src="features/backend-client.js"></script>
-  <script defer src="import-utils.js"></script>
-  <script defer src="import-workflows.js"></script>
-  <script defer src="email-utils.js?v=reminder-copy-r2"></script>
-  <script defer src="workspace-data.js"></script>
-  <script defer src="features/workspace-refresh.js"></script>
-  <script defer src="ledger-utils.js?v=oct-only-2026-r2"></script>
-  <script defer src="zip-utils.js?v=30b7ac7"></script>
-  <script defer src="features/profile-display.js"></script>
-  <script defer src="features/profile-settings.js"></script>
-  <script defer src="features/overview.js"></script>
-  <script defer src="features/overview-events.js"></script>
-  <script defer src="features/overview-workflow.js"></script>
-  <script defer src="features/property-portfolio-table.js"></script>
-  <script defer src="features/property-portfolio-model.js"></script>
-  <script defer src="features/property-views.js"></script>
-  <script defer src="features/property-view-events.js"></script>
-  <script defer src="features/property-portfolio-workflow.js"></script>
-  <script defer src="features/transaction-views.js"></script>
-  <script defer src="features/transaction-view-events.js"></script>
-  <script defer src="features/report-views.js"></script>
-  <script defer src="features/report-export.js"></script>
-  <script defer src="features/report-workflow.js"></script>
-  <script defer src="features/app-utils.js"></script>
-  <script defer src="features/ledger-context.js"></script>
-  <script defer src="features/property-form.js"></script>
-  <script defer src="features/account-form.js"></script>
-  <script defer src="features/property-account-forms.js"></script>
-  <script defer src="features/payment-entry-form.js"></script>
-  <script defer src="features/expense-entry-form.js"></script>
-  <script defer src="features/ledger-entry-forms.js"></script>
-  <script defer src="features/create-actions.js"></script>
-  <script defer src="features/import-preview-rendering.js"></script>
-  <script defer src="features/import-preview.js"></script>
-  <script defer src="features/import-preview-events.js"></script>
-  <script defer src="features/account-import.js"></script>
-  <script defer src="features/payment-import.js"></script>
-  <script defer src="features/expense-import.js"></script>
-  <script defer src="features/transaction-imports.js"></script>
-  <script defer src="features/imports.js"></script>
-  <script defer src="features/csv-import-workflow.js"></script>
-  <script defer src="features/property-activity-details.js"></script>
-  <script defer src="features/property-details.js"></script>
-  <script defer src="features/property-details-workflow.js"></script>
-  <script defer src="features/property-detail-events.js"></script>
-  <script defer src="features/deposit-details.js"></script>
-  <script defer src="features/deposit-detail-events.js"></script>
-  <script defer src="features/account-history-details.js"></script>
-  <script defer src="features/account-details.js"></script>
-  <script defer src="features/account-detail-events.js"></script>
-  <script defer src="features/account-maintenance.js"></script>
-  <script defer src="features/deposit-maintenance.js"></script>
-  <script defer src="features/account-details-workflow.js"></script>
-  <script defer src="features/documents.js"></script>
-  <script defer src="features/exports.js"></script>
-  <script defer src="features/auth-recovery.js"></script>
-  <script defer src="features/auth-session.js"></script>
-  <script defer src="features/auth-form.js"></script>
-  <script defer src="features/auth.js"></script>
-  <script defer src="features/reminder-activity-view.js"></script>
-  <script defer src="features/workspace-members.js"></script>
-  <script defer src="features/workspace.js"></script>
-  <script defer src="features/property-quick-note.js"></script>
-  <script defer src="features/property-management.js"></script>
-  <script defer src="features/property-actions-workflow.js"></script>
-  <script defer src="features/transaction-correction-form.js"></script>
-  <script defer src="features/transaction-maintenance.js"></script>
-  <script defer src="features/transaction-corrections.js"></script>
-  <script defer src="features/entry-workflow.js"></script>
-  <script defer src="features/transaction-workflow.js"></script>
-  <script defer src="features/reminder-preview.js"></script>
-  <script defer src="features/workspace-settings-workflow.js"></script>
-  <script defer src="features/modal-controller.js"></script>
-  <script defer src="features/theme-controller.js"></script>
-  <script defer src="features/navigation.js"></script>
-  <script defer src="features/notifications.js"></script>
-  <script defer src="features/app-services.js"></script>
-  <script defer src="features/pwa-registration.js"></script>
-  <script defer src="features/app-lifecycle.js"></script>
-  <script defer src="app.js?v=propertydesk-feature-modules-r3"></script>
-</head>
-<body>
-  <div id="config-banner" class="config-banner hidden"></div>
-  <div id="auth-view" class="auth-view hidden">
-    <section class="auth-card">
-      <button class="theme-toggle auth-theme-toggle" type="button" data-theme-toggle><span class="theme-icon" aria-hidden="true">☼</span><span class="theme-label">Light mode</span></button>
-      <a class="brand" href="#"><span class="brand-mark">P</span><span>Property<span class="brand-light">Desk</span></span></a>
-      <p class="eyebrow">YOUR PROPERTY OFFICE</p>
-      <h1 id="auth-title">Welcome back</h1>
-      <p class="auth-intro">Sign in to manage your properties and accounts.</p>
-      <form id="auth-form" class="form-stack">
-        <label>Email address<input id="auth-email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-        <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters"></label>
-        <button id="auth-submit" class="button primary full" type="submit">Sign in</button>
-      </form>
-      <form id="password-reset-form" class="form-stack hidden">
-        <label>New password<input id="reset-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></label>
-        <label>Confirm new password<input id="reset-password-confirm" type="password" autocomplete="new-password" required minlength="8" placeholder="Type it again"></label>
-        <button id="reset-password-submit" class="button primary full" type="submit">Update password</button>
-        <button id="reset-password-cancel" class="text-button" type="button">Back to sign in</button>
-      </form>
-      <p id="auth-message" class="form-message" role="status"></p>
-      <button id="forgot-password" class="text-button" type="button">Forgot password?</button>
-      <button id="auth-toggle" class="text-button">Create an account</button>
-      <p class="privacy-note"><span>🔒</span> Your portfolio is private to your account.</p>
-    </section>
-  </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#151b17" />
+    <script>
+      (() => {
+        try {
+          const saved = localStorage.getItem("propertydesk-theme");
+          document.documentElement.dataset.theme =
+            saved === "light" ? "light" : "dark";
+        } catch {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+    <meta
+      name="description"
+      content="A private, simple workspace for property income, expenses, rentals, and land contract accounts."
+    />
+    <link rel="manifest" href="propertydesk.webmanifest" />
+    <link rel="icon" href="icons/propertydesk.svg" type="image/svg+xml" />
+    <title>PropertyDesk — Property portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="overrides.css" />
+    <link rel="stylesheet" href="reminders.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script defer src="features/app-state.js"></script>
+    <script defer src="features/backend-client.js"></script>
+    <script defer src="import-utils.js"></script>
+    <script defer src="import-workflows.js"></script>
+    <script defer src="email-utils.js?v=reminder-copy-r2"></script>
+    <script defer src="workspace-data.js"></script>
+    <script defer src="features/workspace-refresh.js"></script>
+    <script defer src="ledger-utils.js?v=oct-only-2026-r2"></script>
+    <script defer src="zip-utils.js?v=30b7ac7"></script>
+    <script defer src="features/profile-display.js"></script>
+    <script defer src="features/profile-settings.js"></script>
+    <script defer src="features/overview.js"></script>
+    <script defer src="features/overview-events.js"></script>
+    <script defer src="features/overview-workflow.js"></script>
+    <script defer src="features/property-portfolio-table.js"></script>
+    <script defer src="features/property-portfolio-model.js"></script>
+    <script defer src="features/property-views.js"></script>
+    <script defer src="features/property-view-events.js"></script>
+    <script defer src="features/property-portfolio-workflow.js"></script>
+    <script defer src="features/transaction-views.js"></script>
+    <script defer src="features/transaction-view-events.js"></script>
+    <script defer src="features/report-views.js"></script>
+    <script defer src="features/report-export.js"></script>
+    <script defer src="features/report-workflow.js"></script>
+    <script defer src="features/app-utils.js"></script>
+    <script defer src="features/ledger-context.js"></script>
+    <script defer src="features/property-form.js"></script>
+    <script defer src="features/account-form.js"></script>
+    <script defer src="features/property-account-forms.js"></script>
+    <script defer src="features/payment-entry-form.js"></script>
+    <script defer src="features/expense-entry-form.js"></script>
+    <script defer src="features/ledger-entry-forms.js"></script>
+    <script defer src="features/create-actions.js"></script>
+    <script defer src="features/import-preview-rendering.js"></script>
+    <script defer src="features/import-preview.js"></script>
+    <script defer src="features/import-preview-events.js"></script>
+    <script defer src="features/account-import.js"></script>
+    <script defer src="features/payment-import.js"></script>
+    <script defer src="features/expense-import.js"></script>
+    <script defer src="features/transaction-imports.js"></script>
+    <script defer src="features/imports.js"></script>
+    <script defer src="features/csv-import-workflow.js"></script>
+    <script defer src="features/property-activity-details.js"></script>
+    <script defer src="features/property-details.js"></script>
+    <script defer src="features/property-details-workflow.js"></script>
+    <script defer src="features/property-detail-events.js"></script>
+    <script defer src="features/deposit-details.js"></script>
+    <script defer src="features/deposit-detail-events.js"></script>
+    <script defer src="features/account-history-details.js"></script>
+    <script defer src="features/account-details.js"></script>
+    <script defer src="features/account-detail-events.js"></script>
+    <script defer src="features/account-maintenance.js"></script>
+    <script defer src="features/deposit-maintenance.js"></script>
+    <script defer src="features/account-details-workflow.js"></script>
+    <script defer src="features/documents.js"></script>
+    <script defer src="features/exports.js"></script>
+    <script defer src="features/auth-recovery.js"></script>
+    <script defer src="features/auth-session.js"></script>
+    <script defer src="features/auth-form.js"></script>
+    <script defer src="features/auth.js"></script>
+    <script defer src="features/reminder-activity-view.js"></script>
+    <script defer src="features/workspace-members.js"></script>
+    <script defer src="features/workspace.js"></script>
+    <script defer src="features/property-quick-note.js"></script>
+    <script defer src="features/property-management.js"></script>
+    <script defer src="features/property-actions-workflow.js"></script>
+    <script defer src="features/transaction-correction-form.js"></script>
+    <script defer src="features/transaction-maintenance.js"></script>
+    <script defer src="features/transaction-corrections.js"></script>
+    <script defer src="features/entry-workflow.js"></script>
+    <script defer src="features/transaction-workflow.js"></script>
+    <script defer src="features/reminder-preview.js"></script>
+    <script defer src="features/workspace-settings-workflow.js"></script>
+    <script defer src="features/modal-controller.js"></script>
+    <script defer src="features/theme-controller.js"></script>
+    <script defer src="features/navigation.js"></script>
+    <script defer src="features/notifications.js"></script>
+    <script defer src="features/app-services.js"></script>
+    <script defer src="features/pwa-registration.js"></script>
+    <script defer src="features/app-lifecycle.js"></script>
+    <script defer src="app.js?v=propertydesk-feature-modules-r3"></script>
+  </head>
+  <body>
+    <div id="config-banner" class="config-banner hidden"></div>
+    <div id="auth-view" class="auth-view hidden">
+      <section class="auth-card">
+        <button
+          class="theme-toggle auth-theme-toggle"
+          type="button"
+          data-theme-toggle
+        >
+          <span class="theme-icon" aria-hidden="true">☼</span
+          ><span class="theme-label">Light mode</span>
+        </button>
+        <a class="brand" href="#"
+          ><span class="brand-mark">P</span
+          ><span>Property<span class="brand-light">Desk</span></span></a
+        >
+        <p class="eyebrow">YOUR PROPERTY OFFICE</p>
+        <h1 id="auth-title">Welcome back</h1>
+        <p class="auth-intro">
+          Sign in to manage your properties and accounts.
+        </p>
+        <form id="auth-form" class="form-stack">
+          <label
+            >Email address<input
+              id="auth-email"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="you@example.com"
+          /></label>
+          <label
+            >Password<input
+              id="auth-password"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="8"
+              placeholder="At least 8 characters"
+          /></label>
+          <button id="auth-submit" class="button primary full" type="submit">
+            Sign in
+          </button>
+        </form>
+        <form id="password-reset-form" class="form-stack hidden">
+          <label
+            >New password<input
+              id="reset-password"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              placeholder="At least 8 characters"
+          /></label>
+          <label
+            >Confirm new password<input
+              id="reset-password-confirm"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="8"
+              placeholder="Type it again"
+          /></label>
+          <button
+            id="reset-password-submit"
+            class="button primary full"
+            type="submit"
+          >
+            Update password
+          </button>
+          <button id="reset-password-cancel" class="text-button" type="button">
+            Back to sign in
+          </button>
+        </form>
+        <p id="auth-message" class="form-message" role="status"></p>
+        <button id="forgot-password" class="text-button" type="button">
+          Forgot password?
+        </button>
+        <button id="auth-toggle" class="text-button">Create an account</button>
+        <p class="privacy-note">
+          <span>🔒</span> Your portfolio is private to your account.
+        </p>
+      </section>
+    </div>
 
-  <div id="app-view" class="app-shell hidden">
-    <aside class="sidebar">
-      <a class="brand sidebar-brand" href="#"><span class="brand-mark">P</span><span>Property<span class="brand-light">Desk</span></span></a>
-      <div class="workspace-label">WORKSPACE</div>
-      <nav class="main-nav" aria-label="Main navigation">
-        <button class="nav-link" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
-        <button class="nav-link active" data-view="properties"><span class="nav-icon">⌂</span> Properties <span id="property-nav-count" class="nav-count">0</span></button>
-        <button class="nav-link" data-view="payments"><span class="nav-icon">↕</span> Transactions</button>
-        <button class="nav-link" data-view="reports"><span class="nav-icon">▥</span> Reports</button>
-        <button class="nav-link" data-view="workspace"><span class="nav-icon">⚙</span> Workspace</button>
-      </nav>
-      <div class="sidebar-bottom">
-        <div class="privacy-card"><span class="privacy-icon">◈</span><div><strong>Private workspace</strong><small>Only invited members can access</small></div></div>
-        <div class="profile-row"><span id="avatar-initial" class="avatar">Y</span><div class="profile-copy"><strong id="user-email">Your account</strong><small>Personal workspace</small></div><button id="sign-out" class="icon-button" title="Sign out" aria-label="Sign out">↗</button></div>
-      </div>
-    </aside>
-    <main class="main-area">
-      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong id="page-crumb">Properties</strong></div><div class="topbar-actions"><span class="today-label" id="today-label"></span><button class="theme-toggle button secondary compact" type="button" data-theme-toggle><span class="theme-icon" aria-hidden="true">☼</span><span class="theme-label">Light mode</span></button><button id="quick-payment" class="button primary compact"><span>＋</span> Record payment</button><button id="user-menu" class="avatar avatar-small" aria-label="Account">Y</button></div></header>
-      <div class="page-content">
-        <section id="page-overview" class="page">
-          <div class="page-heading"><div><p class="eyebrow">YOUR PORTFOLIO</p><h1>Good morning<span id="greeting-name"></span></h1><p class="subheading">Here’s what’s happening across your properties.</p></div><button class="button secondary" data-open="property-modal">＋ Add property</button></div>
-          <div class="stats-grid">
-            <article class="stat-card"><div class="stat-top"><span>Total properties</span><span class="stat-icon sage">⌂</span></div><div id="stat-properties" class="stat-value">0</div><div class="stat-foot">In your portfolio</div></article>
-            <article class="stat-card"><div class="stat-top"><span>Active accounts</span><span class="stat-icon blue">▤</span></div><div id="stat-accounts" class="stat-value">0</div><div class="stat-foot">Rentals and notes</div></article>
-            <article class="stat-card"><div class="stat-top"><span>Cash received this month</span><span class="stat-icon gold">↗</span></div><div id="stat-collected" class="stat-value">$0</div><div id="stat-collected-foot" class="stat-foot">Includes security deposits</div></article>
-            <article class="stat-card"><div class="stat-top"><span>Scheduled monthly estimate</span><span class="stat-icon violet">◷</span></div><div id="stat-expected" class="stat-value">$0</div><div class="stat-foot">Cadence-normalized; actual due dates vary</div></article>
+    <div id="app-view" class="app-shell hidden">
+      <aside class="sidebar">
+        <a class="brand sidebar-brand" href="#"
+          ><span class="brand-mark">P</span
+          ><span>Property<span class="brand-light">Desk</span></span></a
+        >
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link" data-view="overview">
+            <span class="nav-icon">◫</span> Overview
+          </button>
+          <button class="nav-link active" data-view="properties">
+            <span class="nav-icon">⌂</span> Properties
+            <span id="property-nav-count" class="nav-count">0</span>
+          </button>
+          <button class="nav-link" data-view="payments">
+            <span class="nav-icon">↕</span> Transactions
+          </button>
+          <button class="nav-link" data-view="reports">
+            <span class="nav-icon">▥</span> Reports
+          </button>
+          <button class="nav-link" data-view="workspace">
+            <span class="nav-icon">⚙</span> Workspace
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="privacy-card">
+            <span class="privacy-icon">◈</span>
+            <div>
+              <strong>Private workspace</strong
+              ><small>Only invited members can access</small>
+            </div>
           </div>
-          <div class="overview-grid">
-            <section class="panel due-panel"><div class="panel-heading"><div><h2>Upcoming payments</h2><p>Scheduled across your accounts</p></div><button class="link-button" data-goto="payments">View all <span>→</span></button></div><div id="upcoming-list" class="list-body"></div></section>
-            <section class="panel activity-panel"><div class="panel-heading"><div><h2>Recent activity</h2><p>Your latest recorded payments</p></div><button class="link-button" data-goto="payments">View all <span>→</span></button></div><div id="activity-list" class="list-body"></div></section>
+          <div class="profile-row">
+            <span id="avatar-initial" class="avatar">Y</span>
+            <div class="profile-copy">
+              <strong id="user-email">Your account</strong
+              ><small>Personal workspace</small>
+            </div>
+            <button
+              id="sign-out"
+              class="icon-button"
+              title="Sign out"
+              aria-label="Sign out"
+            >
+              ↗
+            </button>
           </div>
-          <section class="panel portfolio-panel"><div class="panel-heading"><div><h2>Your properties</h2><p>Properties in your personal workspace</p></div><button class="link-button" data-goto="properties">All properties <span>→</span></button></div><div id="overview-properties" class="property-grid"></div></section>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs">
+            <span>Workspace</span><span class="crumb-slash">/</span
+            ><strong id="page-crumb">Properties</strong>
+          </div>
+          <div class="topbar-actions">
+            <span class="today-label" id="today-label"></span
+            ><button
+              class="theme-toggle button secondary compact"
+              type="button"
+              data-theme-toggle
+            >
+              <span class="theme-icon" aria-hidden="true">☼</span
+              ><span class="theme-label">Light mode</span></button
+            ><button id="quick-payment" class="button primary compact">
+              <span>＋</span> Record payment</button
+            ><button
+              id="user-menu"
+              class="avatar avatar-small"
+              aria-label="Account"
+            >
+              Y
+            </button>
+          </div>
+        </header>
+        <div class="page-content">
+          <section id="page-overview" class="page">
+            <div class="page-heading">
+              <div>
+                <p class="eyebrow">YOUR PORTFOLIO</p>
+                <h1>Good morning<span id="greeting-name"></span></h1>
+                <p class="subheading">
+                  Here’s what’s happening across your properties.
+                </p>
+              </div>
+              <button class="button secondary" data-open="property-modal">
+                ＋ Add property
+              </button>
+            </div>
+            <div class="stats-grid">
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Total properties</span
+                  ><span class="stat-icon sage">⌂</span>
+                </div>
+                <div id="stat-properties" class="stat-value">0</div>
+                <div class="stat-foot">In your portfolio</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Active accounts</span
+                  ><span class="stat-icon blue">▤</span>
+                </div>
+                <div id="stat-accounts" class="stat-value">0</div>
+                <div class="stat-foot">Rentals and notes</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Cash received this month</span
+                  ><span class="stat-icon gold">↗</span>
+                </div>
+                <div id="stat-collected" class="stat-value">$0</div>
+                <div id="stat-collected-foot" class="stat-foot">
+                  Includes security deposits
+                </div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Scheduled monthly estimate</span
+                  ><span class="stat-icon violet">◷</span>
+                </div>
+                <div id="stat-expected" class="stat-value">$0</div>
+                <div class="stat-foot">
+                  Cadence-normalized; actual due dates vary
+                </div>
+              </article>
+            </div>
+            <div class="overview-grid">
+              <section class="panel due-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Upcoming payments</h2>
+                    <p>Scheduled across your accounts</p>
+                  </div>
+                  <button class="link-button" data-goto="payments">
+                    View all <span>→</span>
+                  </button>
+                </div>
+                <div id="upcoming-list" class="list-body"></div>
+              </section>
+              <section class="panel activity-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Recent activity</h2>
+                    <p>Your latest recorded payments</p>
+                  </div>
+                  <button class="link-button" data-goto="payments">
+                    View all <span>→</span>
+                  </button>
+                </div>
+                <div id="activity-list" class="list-body"></div>
+              </section>
+            </div>
+            <section class="panel portfolio-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Your properties</h2>
+                  <p>Properties in your personal workspace</p>
+                </div>
+                <button class="link-button" data-goto="properties">
+                  All properties <span>→</span>
+                </button>
+              </div>
+              <div id="overview-properties" class="property-grid"></div>
+            </section>
+          </section>
+
+          <section id="page-properties" class="page active">
+            <div class="page-heading">
+              <div>
+                <p class="eyebrow">YOUR PORTFOLIO</p>
+                <h1>Properties</h1>
+                <p class="subheading">
+                  Properties, renters, buyers, payment schedules, balances, and
+                  quick payment entry.
+                </p>
+              </div>
+              <div class="heading-actions">
+                <button class="button secondary" data-open="property-modal">
+                  ＋ Add property</button
+                ><button class="button primary" data-open="account-modal">
+                  ＋ Add rental / contract
+                </button>
+              </div>
+            </div>
+            <div class="toolbar">
+              <div class="search-box">
+                <span>⌕</span
+                ><input
+                  id="property-search"
+                  placeholder="Search address, property, or person…"
+                />
+              </div>
+              <select id="property-filter">
+                <option value="all">All properties</option>
+                <option value="rental">Rentals</option>
+                <option value="land_contract">Land contracts</option>
+                <option value="note">Notes</option></select
+              ><select id="property-holder-filter">
+                <option value="all">All account holders</option></select
+              ><label class="archived-toggle"
+                ><input id="show-archived" type="checkbox" /> Show inactive /
+                archived</label
+              >
+            </div>
+            <div class="table-wrap portfolio-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>PAYMENT</th>
+                    <th>UNPAID DUE</th>
+                    <th>PROPERTY / ADDRESS</th>
+                    <th aria-sort="ascending" title="Sorted A–Z">
+                      BUYER / TENANT · ACCOUNT
+                    </th>
+                    <th>MONTHLY PAYMENT</th>
+                    <th>ESTIMATED LOAN BALANCE</th>
+                  </tr>
+                </thead>
+                <tbody id="properties-table"></tbody>
+                <tfoot id="properties-totals" class="hidden"></tfoot>
+              </table>
+              <div id="properties-empty" class="empty-state hidden"></div>
+            </div>
+            <p class="field-hint">
+              Properties and account management are combined here. The Payment
+              cell is light pink when no payment has been recorded, light green
+              for a partial payment, and darker green once receipts reach that
+              account's scheduled amount for the current calendar month. Only
+              posted rent or installment receipts count; partial receipts count
+              toward the total. Unpaid Due includes this calendar month's
+              scheduled payment immediately and subtracts posted receipts.
+              Tracking starts Oct 2026 for rentals, land contracts, and notes so
+              earlier unrecorded installments are not assumed unpaid. Later
+              unpaid installments carry forward. Estimated loan balance follows
+              the amortization schedule as if every installment was paid on
+              time, regardless of payment history. Recorded receipts affect
+              Unpaid Due and payment history only. Adjust the hypothetical
+              balance in account details; it is not a payoff quote. Inactive
+              accounts and archived properties stay hidden until Show inactive /
+              archived is checked.
+            </p>
+          </section>
+
+          <section id="page-workspace" class="page">
+            <div class="page-heading">
+              <div>
+                <p class="eyebrow">ACCOUNT SETTINGS</p>
+                <h1>Workspace</h1>
+                <p class="subheading">
+                  Choose how your name appears and manage trusted people with
+                  access to this full workspace.
+                </p>
+              </div>
+            </div>
+            <section class="panel report-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Display name</h2>
+                  <p>
+                    This name appears in your greeting and workspace member
+                    list.
+                  </p>
+                </div>
+              </div>
+              <form id="display-name-form" class="member-form">
+                <label for="display-name">Name</label
+                ><input
+                  id="display-name"
+                  maxlength="80"
+                  placeholder="Your name"
+                /><button class="button primary" type="submit">
+                  Save name
+                </button>
+              </form>
+            </section>
+            <section class="panel report-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Workspace members</h2>
+                  <p>
+                    Every member can view and edit all properties, transactions,
+                    balances, and documents. Removing a member revokes their
+                    access.
+                  </p>
+                </div>
+              </div>
+              <div id="workspace-members" class="member-list"></div>
+              <form id="member-add-form" class="member-form">
+                <label for="member-email">Add a person by email</label
+                ><input
+                  id="member-email"
+                  type="email"
+                  required
+                  placeholder="person@example.com"
+                /><button class="button secondary" type="submit">
+                  Add member
+                </button>
+                <p class="field-hint">
+                  They need a verified PropertyDesk account first. This app
+                  currently enables direct account sharing and does not email an
+                  invitation.
+                </p>
+              </form>
+            </section>
+            <section class="panel report-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Email reminder activity</h2>
+                  <p>
+                    Only accounts you enable send month-end reminders. A status
+                    of “Accepted” means MailerSend accepted the message for
+                    processing, not that it reached the inbox.
+                  </p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>MONTH</th>
+                      <th>PROPERTY / ACCOUNT</th>
+                      <th>RECIPIENT</th>
+                      <th>STATUS</th>
+                      <th>DETAIL</th>
+                      <th>CHECKED</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reminder-activity">
+                    <tr>
+                      <td colspan="6" class="muted">
+                        Reminder attempts will appear here.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <section id="page-payments" class="page">
+            <div class="page-heading">
+              <div>
+                <p class="eyebrow">CASH FLOW</p>
+                <h1>Transactions</h1>
+                <p class="subheading">
+                  Income received and property expenses in one ledger.
+                </p>
+              </div>
+              <div class="heading-actions">
+                <button class="button secondary" data-open="expense-modal">
+                  ＋ Record expense</button
+                ><button class="button primary" data-open="payment-modal">
+                  ＋ Record income
+                </button>
+              </div>
+            </div>
+            <div class="stats-grid payment-stats">
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Income this month</span
+                  ><span class="stat-icon sage">↗</span>
+                </div>
+                <div id="payments-collected" class="stat-value">$0</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Expenses this month</span
+                  ><span class="stat-icon gold">↘</span>
+                </div>
+                <div id="expenses-total" class="stat-value">$0</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Net cash flow</span
+                  ><span class="stat-icon blue">▤</span>
+                </div>
+                <div id="net-cash-flow" class="stat-value">$0</div>
+              </article>
+            </div>
+            <div class="toolbar">
+              <div class="search-box">
+                <span>⌕</span
+                ><input
+                  id="payment-search"
+                  placeholder="Search transactions…"
+                />
+              </div>
+              <select id="payment-period">
+                <option value="all">All time</option>
+                <option value="month">This month</option>
+                <option value="year">This year</option></select
+              ><select id="transaction-type">
+                <option value="all">Income and expenses</option>
+                <option value="income">Income</option>
+                <option value="expense">Expenses</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>TYPE</th>
+                    <th>PROPERTY / ACCOUNT</th>
+                    <th>CATEGORY</th>
+                    <th>AMOUNT</th>
+                    <th>METHOD / PAYEE</th>
+                    <th>MEMO</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table"></tbody>
+              </table>
+              <div id="payments-empty" class="empty-state hidden"></div>
+            </div>
+          </section>
+
+          <section id="page-reports" class="page">
+            <div class="page-heading">
+              <div>
+                <p class="eyebrow">PORTFOLIO INSIGHTS</p>
+                <h1>Reports</h1>
+                <p class="subheading">
+                  A quick view of income, expenses, balances, and account mix.
+                </p>
+              </div>
+              <button id="export-report" class="button secondary">
+                ↓ Export CSV
+              </button>
+            </div>
+            <div class="stats-grid">
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Income year to date</span
+                  ><span class="stat-icon sage">↗</span>
+                </div>
+                <div id="report-ytd" class="stat-value">$0</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Expenses year to date</span
+                  ><span class="stat-icon gold">↘</span>
+                </div>
+                <div id="report-expenses-ytd" class="stat-value">$0</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Net cash flow YTD</span
+                  ><span class="stat-icon blue">▤</span>
+                </div>
+                <div id="report-net-ytd" class="stat-value">$0</div>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top">
+                  <span>Estimated loan balance · on-time schedule</span
+                  ><span class="stat-icon violet">◷</span>
+                </div>
+                <div id="report-principal" class="stat-value">$0</div>
+              </article>
+            </div>
+            <section class="panel report-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Accounts by type</h2>
+                  <p>Portfolio composition</p>
+                </div>
+              </div>
+              <div id="account-breakdown" class="breakdown"></div>
+            </section>
+            <section class="panel report-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Import and export</h2>
+                  <p>
+                    Prepare a CSV with your AI assistant, review it here, then
+                    import it to your private workspace.
+                  </p>
+                </div>
+              </div>
+              <div class="import-actions">
+                <div>
+                  <strong>Import accounts</strong>
+                  <p>
+                    Use this when adding your properties and rental/note
+                    accounts.
+                  </p>
+                  <a
+                    class="link-button"
+                    href="templates/accounts-template.csv"
+                    download
+                    >Download account template ↓</a
+                  >
+                </div>
+                <label class="button secondary file-button"
+                  >↑ Choose CSV<input
+                    id="import-file"
+                    type="file"
+                    accept=".csv,text/csv"
+                    hidden
+                /></label>
+              </div>
+              <div class="import-actions">
+                <div>
+                  <strong>Import payment history</strong>
+                  <p>
+                    Payments must match an existing property and account. Loan
+                    receipts need only amount and date; allocations are optional
+                    legacy data.
+                  </p>
+                  <a
+                    class="link-button"
+                    href="templates/payments-template.csv"
+                    download
+                    >Download payment template ↓</a
+                  >
+                </div>
+                <label class="button secondary file-button"
+                  >↑ Choose CSV<input
+                    id="payment-import-file"
+                    type="file"
+                    accept=".csv,text/csv"
+                    hidden
+                /></label>
+              </div>
+              <div class="import-actions">
+                <div>
+                  <strong>Import expenses</strong>
+                  <p>
+                    Expenses must match an existing property; account is
+                    optional.
+                  </p>
+                  <a
+                    class="link-button"
+                    href="templates/expenses-template.csv"
+                    download
+                    >Download expense template ↓</a
+                  >
+                </div>
+                <label class="button secondary file-button"
+                  >↑ Choose CSV<input
+                    id="expense-import-file"
+                    type="file"
+                    accept=".csv,text/csv"
+                    hidden
+                /></label>
+              </div>
+              <p id="import-status" class="form-message"></p>
+              <div class="detail-section import-history">
+                <h3>Import history</h3>
+                <div class="table-wrap import-history-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>SOURCE FILE</th>
+                        <th>TYPE</th>
+                        <th>IMPORTED</th>
+                        <th>ROWS</th>
+                        <th>STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody id="import-history">
+                      <tr>
+                        <td colspan="5" class="muted">
+                          Completed imports will appear here.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="import-actions">
+                <div>
+                  <strong
+                    >Download a dated ZIP backup with agreement files</strong
+                  >
+                  <p>
+                    Includes workspace records and attached agreement files. The
+                    ZIP is assembled in your browser and sent to no third party.
+                    Restore is not supported yet.
+                  </p>
+                </div>
+                <button id="export-all" class="button secondary">
+                  ↓ Export ZIP backup
+                </button>
+              </div>
+            </section>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div
+      id="property-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="property-modal-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">PROPERTY DETAILS</p>
+            <h2 id="property-modal-title">Add property</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <form id="property-form" class="modal-form">
+          <input type="hidden" id="property-id" /><label
+            >Property name<input
+              id="property-name"
+              required
+              placeholder="e.g. Maple Street Home" /></label
+          ><label
+            >Street address<input
+              id="property-address"
+              required
+              placeholder="123 Maple Street"
+          /></label>
+          <div class="form-row">
+            <label>City<input id="property-city" placeholder="City" /></label
+            ><label
+              >State<input
+                id="property-state"
+                maxlength="2"
+                placeholder="ST" /></label
+            ><label>ZIP<input id="property-zip" placeholder="00000" /></label>
+          </div>
+          <label
+            >Property type<select id="property-kind">
+              <option value="residential">Residential</option>
+              <option value="land">Land</option>
+              <option value="commercial">Commercial</option>
+              <option value="other">Other</option>
+            </select></label
+          ><label
+            >Quick note (shown under address)<textarea
+              id="property-notes"
+              rows="2"
+              maxlength="140"
+              placeholder="Optional short note"
+            ></textarea>
+          </label>
+          <div class="modal-actions">
+            <button class="button secondary" type="button" data-close>
+              Cancel</button
+            ><button class="button primary" type="submit">Save property</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div
+      id="account-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="account-modal-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card modal-wide">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">ACCOUNT DETAILS</p>
+            <h2 id="account-modal-title">Add account</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <form id="account-form" class="modal-form">
+          <input type="hidden" id="account-id" />
+          <div class="form-row">
+            <label
+              >Account type<select id="account-type">
+                <option value="rental">Rental</option>
+                <option value="land_contract">Land contract</option>
+                <option value="note">Private note</option>
+              </select></label
+            ><label
+              >Property<select id="account-property" required></select
+            ></label>
+          </div>
+          <div class="form-row">
+            <label
+              >Account name<input
+                id="account-name"
+                required
+                placeholder="e.g. Smith Rental" /></label
+            ><label
+              >Tenant / buyer / borrower<input
+                id="account-party"
+                placeholder="Name"
+            /></label>
+          </div>
+          <div class="form-row">
+            <label
+              >Tenant / buyer emails<input
+                id="account-party-email"
+                type="text"
+                inputmode="email"
+                placeholder="name@example.com, co-buyer@example.com"
+              /><span class="field-hint"
+                >Stored for your records. Reminders stay off until you enable
+                them.</span
+              ></label
+            ><label
+              >Tenant / buyer phone<input
+                id="account-party-phone"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                maxlength="40"
+                placeholder="(555) 555-5555"
+              /><span class="field-hint"
+                >Optional contact number, stored privately.</span
+              ></label
+            >
+          </div>
+          <div class="reminder-toggle-row">
+            <label class="reminder-toggle"
+              ><input id="account-reminder-enabled" type="checkbox" /> Enable
+              automatic month-end email reminder</label
+            ><button
+              id="account-reminder-preview"
+              class="button secondary compact"
+              type="button"
+            >
+              Preview email
+            </button>
+            <p class="field-hint">
+              Off by default. On the last day of each month, an email goes to
+              the saved tenant / buyer addresses only if no rent or installment
+              payment was recorded that month. Review attempts in Workspace.
+            </p>
+          </div>
+          <div class="form-row">
+            <label
+              >Start date<input
+                id="account-start"
+                type="date"
+                required /></label
+            ><label
+              >Next due date<input id="account-next-due" type="date"
+            /></label>
+          </div>
+          <div class="form-row">
+            <label
+              >Regular payment amount<input
+                id="account-payment"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0" /></label
+            ><label
+              >Payment frequency<select id="account-frequency">
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Every two weeks</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annually</option>
+              </select></label
+            >
+          </div>
+          <fieldset id="loan-fields" class="loan-fields">
+            <legend>Loan and contract terms</legend>
+            <div class="form-row">
+              <label
+                >Original principal / financed amount<input
+                  id="account-principal"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00" /></label
+              ><label
+                >Annual interest rate (%)<input
+                  id="account-rate"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.00001"
+                  placeholder="0.00000"
+              /></label>
+            </div>
+            <p class="field-hint">
+              The estimated balance always follows this agreement's amortization
+              schedule as if every installment was paid on time. Payment records
+              track whether each month was paid; they do not change this
+              hypothetical estimate.
+            </p>
+            <div class="form-row">
+              <label
+                >Scheduled principal + interest<input
+                  id="account-pi-payment"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Estimate from principal, rate, term if blank" /></label
+              ><label
+                >Monthly escrow for taxes &amp; insurance<input
+                  id="account-escrow"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+              /></label>
+            </div>
+            <div class="form-row">
+              <label
+                >Adjustment to estimated loan balance<input
+                  id="account-balance-adjustment"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00" /></label
+              ><span></span>
+            </div>
+            <p class="field-hint">
+              Positive raises or negative lowers the on-time schedule estimate
+              to reflect your negotiated working figure. Payment receipts do not
+              change it. Unpaid charges are tracked separately.
+            </p>
+            <div class="form-row">
+              <label
+                >Term (months)<input
+                  id="account-term"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 180" /></label
+              ><label
+                >Balloon / maturity date<input id="account-balloon" type="date"
+              /></label>
+            </div>
+            <p class="field-hint">
+              Enter P&I-only when the installment also includes taxes or
+              insurance. Confirm contract terms before relying on an estimate.
+            </p>
+          </fieldset>
+          <div class="form-row">
+            <label
+              >Terms effective from<input
+                id="account-effective-date"
+                type="date" /></label
+            ><span></span>
+          </div>
+          <label
+            >Reason for terms change<input
+              id="account-change-reason"
+              placeholder="For example, signed amendment or corrected schedule"
+            /><span class="field-hint"
+              >Changes are saved with the prior terms and their effective
+              dates.</span
+            ></label
+          >
+          <div class="form-row">
+            <label
+              >Late fee<input
+                id="account-late-fee"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0" /></label
+            ><label
+              >Grace period (days)<input
+                id="account-grace"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+            /></label>
+          </div>
+          <label
+            >Notes<textarea
+              id="account-notes"
+              rows="2"
+              placeholder="Optional details"
+            ></textarea>
+          </label>
+          <div class="modal-actions">
+            <button class="button secondary" type="button" data-close>
+              Cancel</button
+            ><button class="button primary" type="submit">Save account</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div
+      id="payment-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-modal-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">PAYMENT ENTRY</p>
+            <h2 id="payment-modal-title">Record payment</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <form id="payment-form" class="modal-form">
+          <label>Account<select id="payment-account" required></select></label>
+          <div class="form-row">
+            <label
+              >Amount received<input
+                id="payment-amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                placeholder="0.00" /></label
+            ><label
+              >Date received<input id="payment-date" type="date" required
+            /></label>
+          </div>
+          <label id="income-category-wrap"
+            >Income category<select id="income-category">
+              <option value="rent">Rent</option>
+              <option value="late_fee">Late fee</option>
+              <option value="deposit">Deposit</option>
+              <option value="other">Other income</option>
+            </select></label
+          ><label
+            >Payment method<select id="payment-method">
+              <option value="manual">Manual / other</option>
+              <option value="check">Check</option>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank transfer</option>
+              <option value="money_order">Money order</option>
+              <option value="card">Card</option>
+            </select></label
+          ><label
+            >Reference / memo<input
+              id="payment-memo"
+              placeholder="Check number or note (optional)"
+          /></label>
+          <div id="allocation-preview" class="allocation-preview"></div>
+          <div class="modal-actions">
+            <button class="button secondary" type="button" data-close>
+              Cancel</button
+            ><button
+              id="payment-save-button"
+              class="button primary"
+              type="submit"
+            >
+              Save payment</button
+            ><button
+              id="payment-save-next"
+              class="button secondary"
+              type="submit"
+            >
+              Save &amp; add another
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div
+      id="expense-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="expense-modal-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">PROPERTY EXPENSE</p>
+            <h2 id="expense-modal-title">Record expense</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <form id="expense-form" class="modal-form">
+          <label
+            >Property<select id="expense-property" required></select
+          ></label>
+          <div class="form-row">
+            <label
+              >Amount<input
+                id="expense-amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                placeholder="0.00" /></label
+            ><label
+              >Date paid<input id="expense-date" type="date" required
+            /></label>
+          </div>
+          <div class="form-row">
+            <label
+              >Category<select id="expense-category">
+                <option value="repairs">Repairs</option>
+                <option value="contractor">Contractor labor</option>
+                <option value="materials">Materials</option>
+                <option value="taxes">Taxes</option>
+                <option value="insurance">Insurance</option>
+                <option value="utilities">Utilities</option>
+                <option value="management">Management</option>
+                <option value="deposit_refund">Security deposit refund</option>
+                <option value="other">Other</option>
+              </select></label
+            ><label
+              >Related account<select id="expense-account">
+                <option value="">Property level</option>
+              </select></label
+            >
+          </div>
+          <p id="deposit-refund-hint" class="field-hint hidden">
+            Choose the rental account whose deposit is being refunded. Refunds
+            reduce the held-deposit balance and are excluded from operating
+            expenses.
+          </p>
+          <div class="form-row">
+            <label
+              >Payee / contractor<input
+                id="expense-payee"
+                placeholder="Company or person" /></label
+            ><label
+              >Payment method<select id="expense-method">
+                <option value="manual">Manual / other</option>
+                <option value="check">Check</option>
+                <option value="cash">Cash</option>
+                <option value="bank_transfer">Bank transfer</option>
+                <option value="card">Card</option>
+              </select></label
+            >
+          </div>
+          <label
+            >Memo<input
+              id="expense-memo"
+              placeholder="What was repaired or purchased?"
+          /></label>
+          <div class="modal-actions">
+            <button class="button secondary" type="button" data-close>
+              Cancel</button
+            ><button
+              id="expense-save-button"
+              class="button primary"
+              type="submit"
+            >
+              Save expense</button
+            ><button
+              id="expense-save-next"
+              class="button secondary"
+              type="submit"
+            >
+              Save &amp; add another
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card modal-wide">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">ACCOUNT DETAILS</p>
+            <h2 id="detail-title"></h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <div id="detail-content"></div>
+      </section>
+    </div>
+    <div
+      id="import-preview-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="import-preview-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card modal-wide">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">LOCAL CSV REVIEW</p>
+            <h2 id="import-preview-title">Review import</h2>
+            <p id="import-preview-summary" class="subheading"></p>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <div class="table-wrap import-preview-table">
+          <table>
+            <thead id="import-preview-head"></thead>
+            <tbody id="import-preview-body"></tbody>
+          </table>
+        </div>
+        <label
+          id="import-include-duplicates-wrap"
+          class="duplicate-import-toggle hidden"
+          ><input id="import-include-duplicates" type="checkbox" /> Include
+          possible duplicates anyway</label
+        >
+        <section
+          id="import-preview-errors"
+          class="import-preview-errors hidden"
+        >
+          <h3>Rows needing correction</h3>
+          <p id="import-preview-error-summary" class="field-hint"></p>
+          <div
+            id="import-correction-table"
+            class="table-wrap import-correction-table hidden"
+          >
+            <table>
+              <thead id="import-correction-head"></thead>
+              <tbody id="import-correction-body"></tbody>
+            </table>
+          </div>
         </section>
-
-        <section id="page-properties" class="page active"><div class="page-heading"><div><p class="eyebrow">YOUR PORTFOLIO</p><h1>Properties</h1><p class="subheading">Properties, renters, buyers, payment schedules, balances, and quick payment entry.</p></div><div class="heading-actions"><button class="button secondary" data-open="property-modal">＋ Add property</button><button class="button primary" data-open="account-modal">＋ Add rental / contract</button></div></div><div class="toolbar"><div class="search-box"><span>⌕</span><input id="property-search" placeholder="Search address, property, or person…"></div><select id="property-filter"><option value="all">All properties</option><option value="rental">Rentals</option><option value="land_contract">Land contracts</option><option value="note">Notes</option></select><select id="property-holder-filter"><option value="all">All account holders</option></select><label class="archived-toggle"><input id="show-archived" type="checkbox"> Show inactive / archived</label></div><div class="table-wrap portfolio-table"><table><thead><tr><th>PAYMENT</th><th>UNPAID DUE</th><th>PROPERTY / ADDRESS</th><th aria-sort="ascending" title="Sorted A–Z">BUYER / TENANT · ACCOUNT</th><th>MONTHLY PAYMENT</th><th>ESTIMATED LOAN BALANCE</th></tr></thead><tbody id="properties-table"></tbody><tfoot id="properties-totals" class="hidden"></tfoot></table><div id="properties-empty" class="empty-state hidden"></div></div><p class="field-hint">Properties and account management are combined here. The Payment cell is light pink when no payment has been recorded, light green for a partial payment, and darker green once receipts reach that account's scheduled amount for the current calendar month. Only posted rent or installment receipts count; partial receipts count toward the total. Unpaid Due includes this calendar month's scheduled payment immediately and subtracts posted receipts. Tracking starts Oct 2026 for rentals, land contracts, and notes so earlier unrecorded installments are not assumed unpaid. Later unpaid installments carry forward. Estimated loan balance follows the amortization schedule as if every installment was paid on time, regardless of payment history. Recorded receipts affect Unpaid Due and payment history only. Adjust the hypothetical balance in account details; it is not a payoff quote. Inactive accounts and archived properties stay hidden until Show inactive / archived is checked.</p></section>
-
-        <section id="page-workspace" class="page"><div class="page-heading"><div><p class="eyebrow">ACCOUNT SETTINGS</p><h1>Workspace</h1><p class="subheading">Choose how your name appears and manage trusted people with access to this full workspace.</p></div></div><section class="panel report-panel"><div class="panel-heading"><div><h2>Display name</h2><p>This name appears in your greeting and workspace member list.</p></div></div><form id="display-name-form" class="member-form"><label for="display-name">Name</label><input id="display-name" maxlength="80" placeholder="Your name"><button class="button primary" type="submit">Save name</button></form></section><section class="panel report-panel"><div class="panel-heading"><div><h2>Workspace members</h2><p>Every member can view and edit all properties, transactions, balances, and documents. Removing a member revokes their access.</p></div></div><div id="workspace-members" class="member-list"></div><form id="member-add-form" class="member-form"><label for="member-email">Add a person by email</label><input id="member-email" type="email" required placeholder="person@example.com"><button class="button secondary" type="submit">Add member</button><p class="field-hint">They need a verified PropertyDesk account first. This app currently enables direct account sharing and does not email an invitation.</p></form></section><section class="panel report-panel"><div class="panel-heading"><div><h2>Email reminder activity</h2><p>Only accounts you enable send month-end reminders. A status of “Accepted” means MailerSend accepted the message for processing, not that it reached the inbox.</p></div></div><div class="table-wrap"><table><thead><tr><th>MONTH</th><th>PROPERTY / ACCOUNT</th><th>RECIPIENT</th><th>STATUS</th><th>DETAIL</th><th>CHECKED</th></tr></thead><tbody id="reminder-activity"><tr><td colspan="6" class="muted">Reminder attempts will appear here.</td></tr></tbody></table></div></section></section>
-
-
-        <section id="page-payments" class="page"><div class="page-heading"><div><p class="eyebrow">CASH FLOW</p><h1>Transactions</h1><p class="subheading">Income received and property expenses in one ledger.</p></div><div class="heading-actions"><button class="button secondary" data-open="expense-modal">＋ Record expense</button><button class="button primary" data-open="payment-modal">＋ Record income</button></div></div><div class="stats-grid payment-stats"><article class="stat-card"><div class="stat-top"><span>Income this month</span><span class="stat-icon sage">↗</span></div><div id="payments-collected" class="stat-value">$0</div></article><article class="stat-card"><div class="stat-top"><span>Expenses this month</span><span class="stat-icon gold">↘</span></div><div id="expenses-total" class="stat-value">$0</div></article><article class="stat-card"><div class="stat-top"><span>Net cash flow</span><span class="stat-icon blue">▤</span></div><div id="net-cash-flow" class="stat-value">$0</div></article></div><div class="toolbar"><div class="search-box"><span>⌕</span><input id="payment-search" placeholder="Search transactions…"></div><select id="payment-period"><option value="all">All time</option><option value="month">This month</option><option value="year">This year</option></select><select id="transaction-type"><option value="all">Income and expenses</option><option value="income">Income</option><option value="expense">Expenses</option></select></div><div class="table-wrap"><table><thead><tr><th>DATE</th><th>TYPE</th><th>PROPERTY / ACCOUNT</th><th>CATEGORY</th><th>AMOUNT</th><th>METHOD / PAYEE</th><th>MEMO</th><th>ACTION</th></tr></thead><tbody id="payments-table"></tbody></table><div id="payments-empty" class="empty-state hidden"></div></div></section>
-
-        <section id="page-reports" class="page"><div class="page-heading"><div><p class="eyebrow">PORTFOLIO INSIGHTS</p><h1>Reports</h1><p class="subheading">A quick view of income, expenses, balances, and account mix.</p></div><button id="export-report" class="button secondary">↓ Export CSV</button></div><div class="stats-grid"><article class="stat-card"><div class="stat-top"><span>Income year to date</span><span class="stat-icon sage">↗</span></div><div id="report-ytd" class="stat-value">$0</div></article><article class="stat-card"><div class="stat-top"><span>Expenses year to date</span><span class="stat-icon gold">↘</span></div><div id="report-expenses-ytd" class="stat-value">$0</div></article><article class="stat-card"><div class="stat-top"><span>Net cash flow YTD</span><span class="stat-icon blue">▤</span></div><div id="report-net-ytd" class="stat-value">$0</div></article><article class="stat-card"><div class="stat-top"><span>Estimated loan balance · on-time schedule</span><span class="stat-icon violet">◷</span></div><div id="report-principal" class="stat-value">$0</div></article></div><section class="panel report-panel"><div class="panel-heading"><div><h2>Accounts by type</h2><p>Portfolio composition</p></div></div><div id="account-breakdown" class="breakdown"></div></section><section class="panel report-panel"><div class="panel-heading"><div><h2>Import and export</h2><p>Prepare a CSV with your AI assistant, review it here, then import it to your private workspace.</p></div></div><div class="import-actions"><div><strong>Import accounts</strong><p>Use this when adding your properties and rental/note accounts.</p><a class="link-button" href="templates/accounts-template.csv" download>Download account template ↓</a></div><label class="button secondary file-button">↑ Choose CSV<input id="import-file" type="file" accept=".csv,text/csv" hidden></label></div><div class="import-actions"><div><strong>Import payment history</strong><p>Payments must match an existing property and account. Loan receipts need only amount and date; allocations are optional legacy data.</p><a class="link-button" href="templates/payments-template.csv" download>Download payment template ↓</a></div><label class="button secondary file-button">↑ Choose CSV<input id="payment-import-file" type="file" accept=".csv,text/csv" hidden></label></div><div class="import-actions"><div><strong>Import expenses</strong><p>Expenses must match an existing property; account is optional.</p><a class="link-button" href="templates/expenses-template.csv" download>Download expense template ↓</a></div><label class="button secondary file-button">↑ Choose CSV<input id="expense-import-file" type="file" accept=".csv,text/csv" hidden></label></div><p id="import-status" class="form-message"></p><div class="detail-section import-history"><h3>Import history</h3><div class="table-wrap import-history-table"><table><thead><tr><th>SOURCE FILE</th><th>TYPE</th><th>IMPORTED</th><th>ROWS</th><th>STATUS</th></tr></thead><tbody id="import-history"><tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr></tbody></table></div></div><div class="import-actions"><div><strong>Download a dated ZIP backup with agreement files</strong><p>Includes workspace records and attached agreement files. The ZIP is assembled in your browser and sent to no third party. Restore is not supported yet.</p></div><button id="export-all" class="button secondary">↓ Export ZIP backup</button></div></section></section>
-      </div>
-    </main>
-  </div>
-
-  <div id="property-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="property-modal-title"><div class="modal-backdrop" data-close></div><section class="modal-card"><div class="modal-heading"><div><p class="eyebrow">PROPERTY DETAILS</p><h2 id="property-modal-title">Add property</h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><form id="property-form" class="modal-form"><input type="hidden" id="property-id"><label>Property name<input id="property-name" required placeholder="e.g. Maple Street Home"></label><label>Street address<input id="property-address" required placeholder="123 Maple Street"></label><div class="form-row"><label>City<input id="property-city" placeholder="City"></label><label>State<input id="property-state" maxlength="2" placeholder="ST"></label><label>ZIP<input id="property-zip" placeholder="00000"></label></div><label>Property type<select id="property-kind"><option value="residential">Residential</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="other">Other</option></select></label><label>Quick note (shown under address)<textarea id="property-notes" rows="2" maxlength="140" placeholder="Optional short note"></textarea></label><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button class="button primary" type="submit">Save property</button></div></form></section></div>
-
-  <div id="account-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="account-modal-title"><div class="modal-backdrop" data-close></div><section class="modal-card modal-wide"><div class="modal-heading"><div><p class="eyebrow">ACCOUNT DETAILS</p><h2 id="account-modal-title">Add account</h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><form id="account-form" class="modal-form"><input type="hidden" id="account-id"><div class="form-row"><label>Account type<select id="account-type"><option value="rental">Rental</option><option value="land_contract">Land contract</option><option value="note">Private note</option></select></label><label>Property<select id="account-property" required></select></label></div><div class="form-row"><label>Account name<input id="account-name" required placeholder="e.g. Smith Rental"></label><label>Tenant / buyer / borrower<input id="account-party" placeholder="Name"></label></div><div class="form-row"><label>Tenant / buyer emails<input id="account-party-email" type="text" inputmode="email" placeholder="name@example.com, co-buyer@example.com"><span class="field-hint">Stored for your records. Reminders stay off until you enable them.</span></label><label>Tenant / buyer phone<input id="account-party-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" placeholder="(555) 555-5555"><span class="field-hint">Optional contact number, stored privately.</span></label></div><div class="reminder-toggle-row"><label class="reminder-toggle"><input id="account-reminder-enabled" type="checkbox"> Enable automatic month-end email reminder</label><button id="account-reminder-preview" class="button secondary compact" type="button">Preview email</button><p class="field-hint">Off by default. On the last day of each month, an email goes to the saved tenant / buyer addresses only if no rent or installment payment was recorded that month. Review attempts in Workspace.</p></div><div class="form-row"><label>Start date<input id="account-start" type="date" required></label><label>Next due date<input id="account-next-due" type="date"></label></div><div class="form-row"><label>Regular payment amount<input id="account-payment" type="number" min="0" step="0.01" value="0"></label><label>Payment frequency<select id="account-frequency"><option value="monthly">Monthly</option><option value="weekly">Weekly</option><option value="biweekly">Every two weeks</option><option value="quarterly">Quarterly</option><option value="annual">Annually</option></select></label></div><fieldset id="loan-fields" class="loan-fields"><legend>Loan and contract terms</legend><div class="form-row"><label>Original principal / financed amount<input id="account-principal" type="number" min="0" step="0.01" placeholder="0.00"></label><label>Annual interest rate (%)<input id="account-rate" type="number" min="0" max="100" step="0.00001" placeholder="0.00000"></label></div><p class="field-hint">The estimated balance always follows this agreement's amortization schedule as if every installment was paid on time. Payment records track whether each month was paid; they do not change this hypothetical estimate.</p><div class="form-row"><label>Scheduled principal + interest<input id="account-pi-payment" type="number" min="0" step="0.01" placeholder="Estimate from principal, rate, term if blank"></label><label>Monthly escrow for taxes &amp; insurance<input id="account-escrow" type="number" min="0" step="0.01" placeholder="0.00"></label></div><div class="form-row"><label>Adjustment to estimated loan balance<input id="account-balance-adjustment" type="number" step="0.01" placeholder="0.00"></label><span></span></div><p class="field-hint">Positive raises or negative lowers the on-time schedule estimate to reflect your negotiated working figure. Payment receipts do not change it. Unpaid charges are tracked separately.</p><div class="form-row"><label>Term (months)<input id="account-term" type="number" min="1" step="1" placeholder="e.g. 180"></label><label>Balloon / maturity date<input id="account-balloon" type="date"></label></div><p class="field-hint">Enter P&I-only when the installment also includes taxes or insurance. Confirm contract terms before relying on an estimate.</p></fieldset><div class="form-row"><label>Terms effective from<input id="account-effective-date" type="date"></label><span></span></div><label>Reason for terms change<input id="account-change-reason" placeholder="For example, signed amendment or corrected schedule"><span class="field-hint">Changes are saved with the prior terms and their effective dates.</span></label><div class="form-row"><label>Late fee<input id="account-late-fee" type="number" min="0" step="0.01" value="0"></label><label>Grace period (days)<input id="account-grace" type="number" min="0" step="1" value="0"></label></div><label>Notes<textarea id="account-notes" rows="2" placeholder="Optional details"></textarea></label><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button class="button primary" type="submit">Save account</button></div></form></section></div>
-
-  <div id="payment-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="payment-modal-title"><div class="modal-backdrop" data-close></div><section class="modal-card"><div class="modal-heading"><div><p class="eyebrow">PAYMENT ENTRY</p><h2 id="payment-modal-title">Record payment</h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><form id="payment-form" class="modal-form"><label>Account<select id="payment-account" required></select></label><div class="form-row"><label>Amount received<input id="payment-amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></label><label>Date received<input id="payment-date" type="date" required></label></div><label id="income-category-wrap">Income category<select id="income-category"><option value="rent">Rent</option><option value="late_fee">Late fee</option><option value="deposit">Deposit</option><option value="other">Other income</option></select></label><label>Payment method<select id="payment-method"><option value="manual">Manual / other</option><option value="check">Check</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="money_order">Money order</option><option value="card">Card</option></select></label><label>Reference / memo<input id="payment-memo" placeholder="Check number or note (optional)"></label><div id="allocation-preview" class="allocation-preview"></div><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button id="payment-save-button" class="button primary" type="submit">Save payment</button><button id="payment-save-next" class="button secondary" type="submit">Save &amp; add another</button></div></form></section></div>
-
-  <div id="expense-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title"><div class="modal-backdrop" data-close></div><section class="modal-card"><div class="modal-heading"><div><p class="eyebrow">PROPERTY EXPENSE</p><h2 id="expense-modal-title">Record expense</h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><form id="expense-form" class="modal-form"><label>Property<select id="expense-property" required></select></label><div class="form-row"><label>Amount<input id="expense-amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></label><label>Date paid<input id="expense-date" type="date" required></label></div><div class="form-row"><label>Category<select id="expense-category"><option value="repairs">Repairs</option><option value="contractor">Contractor labor</option><option value="materials">Materials</option><option value="taxes">Taxes</option><option value="insurance">Insurance</option><option value="utilities">Utilities</option><option value="management">Management</option><option value="deposit_refund">Security deposit refund</option><option value="other">Other</option></select></label><label>Related account<select id="expense-account"><option value="">Property level</option></select></label></div><p id="deposit-refund-hint" class="field-hint hidden">Choose the rental account whose deposit is being refunded. Refunds reduce the held-deposit balance and are excluded from operating expenses.</p><div class="form-row"><label>Payee / contractor<input id="expense-payee" placeholder="Company or person"></label><label>Payment method<select id="expense-method"><option value="manual">Manual / other</option><option value="check">Check</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="card">Card</option></select></label></div><label>Memo<input id="expense-memo" placeholder="What was repaired or purchased?"></label><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button id="expense-save-button" class="button primary" type="submit">Save expense</button><button id="expense-save-next" class="button secondary" type="submit">Save &amp; add another</button></div></form></section></div>
-
-  <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-backdrop" data-close></div><section class="modal-card modal-wide"><div class="modal-heading"><div><p class="eyebrow">ACCOUNT DETAILS</p><h2 id="detail-title"></h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><div id="detail-content"></div></section></div>
-  <div id="import-preview-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="import-preview-title"><div class="modal-backdrop" data-close></div><section class="modal-card modal-wide"><div class="modal-heading"><div><p class="eyebrow">LOCAL CSV REVIEW</p><h2 id="import-preview-title">Review import</h2><p id="import-preview-summary" class="subheading"></p></div><button class="icon-button" data-close aria-label="Close">×</button></div><div class="table-wrap import-preview-table"><table><thead id="import-preview-head"></thead><tbody id="import-preview-body"></tbody></table></div><label id="import-include-duplicates-wrap" class="duplicate-import-toggle hidden"><input id="import-include-duplicates" type="checkbox"> Include possible duplicates anyway</label><section id="import-preview-errors" class="import-preview-errors hidden"><h3>Rows needing correction</h3><p id="import-preview-error-summary" class="field-hint"></p><div id="import-correction-table" class="table-wrap import-correction-table hidden"><table><thead id="import-correction-head"></thead><tbody id="import-correction-body"></tbody></table></div></section><p class="field-hint">This preview stays in your browser. Nothing is saved until you choose Import rows.</p><div class="modal-actions"><button class="button secondary" type="button" data-close>Cancel</button><button id="import-commit" class="button primary" type="button">Import rows</button></div></section></div>
-  <div id="reminder-preview-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="reminder-preview-title"><div class="modal-backdrop" data-close></div><section class="modal-card modal-wide"><div class="modal-heading"><div><p class="eyebrow">EMAIL PREVIEW · NOTHING SENT</p><h2 id="reminder-preview-title">Month-end payment reminder</h2></div><button class="icon-button" data-close aria-label="Close">×</button></div><div id="reminder-preview-content" class="reminder-preview"></div><div class="modal-actions"><button class="button secondary" type="button" data-close>Close preview</button></div></section></div>
-  <div id="toast" class="toast" role="status"></div>
-  <div id="property-detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="property-detail-title"><div class="modal-backdrop" data-close></div><section class="modal-card modal-wide"><div class="modal-heading"><div><p class="eyebrow">PROPERTY</p><h2 id="property-detail-title"></h2><p id="property-detail-address" class="subheading"></p></div><button class="icon-button" data-close aria-label="Close">×</button></div><div id="property-detail-content"></div><div class="property-detail-actions"><button id="property-detail-add-income" class="button primary" type="button">＋ Record income</button><button id="property-detail-add-expense" class="button secondary" type="button">＋ Record expense</button><button id="property-detail-add-account" class="button secondary" type="button">＋ Add account</button><button id="property-archive-toggle" class="button secondary" type="button">Archive property</button></div></section></div>
-</body>
+        <p class="field-hint">
+          This preview stays in your browser. Nothing is saved until you choose
+          Import rows.
+        </p>
+        <div class="modal-actions">
+          <button class="button secondary" type="button" data-close>
+            Cancel</button
+          ><button id="import-commit" class="button primary" type="button">
+            Import rows
+          </button>
+        </div>
+      </section>
+    </div>
+    <div
+      id="reminder-preview-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reminder-preview-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card modal-wide">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">EMAIL PREVIEW · NOTHING SENT</p>
+            <h2 id="reminder-preview-title">Month-end payment reminder</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <div id="reminder-preview-content" class="reminder-preview"></div>
+        <div class="modal-actions">
+          <button class="button secondary" type="button" data-close>
+            Close preview
+          </button>
+        </div>
+      </section>
+    </div>
+    <div id="toast" class="toast" role="status"></div>
+    <div
+      id="property-detail-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="property-detail-title"
+    >
+      <div class="modal-backdrop" data-close></div>
+      <section class="modal-card modal-wide">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">PROPERTY</p>
+            <h2 id="property-detail-title"></h2>
+            <p id="property-detail-address" class="subheading"></p>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <div id="property-detail-content"></div>
+        <div class="property-detail-actions">
+          <button
+            id="property-detail-add-income"
+            class="button primary"
+            type="button"
+          >
+            ＋ Record income</button
+          ><button
+            id="property-detail-add-expense"
+            class="button secondary"
+            type="button"
+          >
+            ＋ Record expense</button
+          ><button
+            id="property-detail-add-account"
+            class="button secondary"
+            type="button"
+          >
+            ＋ Add account</button
+          ><button
+            id="property-archive-toggle"
+            class="button secondary"
+            type="button"
+          >
+            Archive property
+          </button>
+        </div>
+      </section>
+    </div>
+  </body>
 </html>
