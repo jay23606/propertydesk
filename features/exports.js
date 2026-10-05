@@ -122,7 +122,12 @@
       );
     }
 
-    return { exportAll, exportReport };
+    function attachEvents() {
+      $("export-all").addEventListener("click", exportAll);
+      $("export-report").addEventListener("click", exportReport);
+    }
+
+    return { attachEvents, exportAll, exportReport };
   }
 
   window.PropertyDeskExports = { create };

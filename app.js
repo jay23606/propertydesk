@@ -347,15 +347,16 @@
     fetchAll,
     openPropertyDetails,
   });
-  const { exportAll, exportReport } = window.PropertyDeskExports.create({
-    $,
-    state,
-    createBackup,
-    todayIso,
-    toast,
-    prettyType,
-    accountBalance,
-  });
+  const { attachEvents: attachExportEvents } =
+    window.PropertyDeskExports.create({
+      $,
+      state,
+      createBackup,
+      todayIso,
+      toast,
+      prettyType,
+      accountBalance,
+    });
   const {
     showConfigError,
     setAuthMode,
@@ -531,12 +532,6 @@
     });
   }
 
-  function attachImportAndExportEvents() {
-    attachImportEvents();
-    $('export-all').addEventListener('click', exportAll);
-    $('export-report').addEventListener('click', exportReport);
-  }
-
   function attachKeyboardEvents() {
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
@@ -555,7 +550,8 @@
     attachPropertyEvents(toggleArchiveProperty);
     attachWorkspaceEvents();
     attachAuthEvents();
-    attachImportAndExportEvents();
+    attachImportEvents();
+    attachExportEvents();
     attachKeyboardEvents();
   }
   function setupServiceWorker() {

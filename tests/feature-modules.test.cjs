@@ -24,6 +24,25 @@ test("CSV import feature loads as an isolated browser module", () => {
   assert.equal(typeof feature.importPayments, "function");
 });
 
+test("export feature owns backup and report button bindings", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "exports.js"), "utf8"),
+    context,
+  );
+  const bindings = new Map();
+  const feature = context.window.PropertyDeskExports.create({
+    $: (id) => ({
+      addEventListener: (event, handler) => bindings.set(`${id}:${event}`, handler),
+    }),
+  });
+
+  feature.attachEvents();
+
+  assert.deepEqual([...bindings.keys()], ["export-all:click", "export-report:click"]);
+  assert.ok([...bindings.values()].every((handler) => typeof handler === "function"));
+});
+
 test("property and account detail views expose focused render actions", () => {
   const context = vm.createContext({ window: {} });
   const source = fs.readFileSync(
