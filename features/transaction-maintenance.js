@@ -106,17 +106,24 @@
         "Entered in error",
       );
       if (reason === null) return;
-      const { data, error } = await state.client
-        .from(table)
-        .update({
-          status: "voided",
-          voided_at: timestamp(),
-          void_reason: reason.trim() || "Voided by owner",
-        })
-        .eq("id", id)
-        .eq("status", "posted")
-        .select("id")
-        .maybeSingle();
+      let result;
+      try {
+        result = await state.client
+          .from(table)
+          .update({
+            status: "voided",
+            voided_at: timestamp(),
+            void_reason: reason.trim() || "Voided by owner",
+          })
+          .eq("id", id)
+          .eq("status", "posted")
+          .select("id")
+          .maybeSingle();
+      } catch {
+        toast("Transaction couldn't be voided right now. Please try again.");
+        return;
+      }
+      const { data, error } = result;
       if (error) {
         toast(error.message);
         return;
@@ -125,7 +132,11 @@
         toast("This transaction was already voided or is no longer available.");
         return;
       }
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       toast("Transaction voided; original entry preserved");
     }
 

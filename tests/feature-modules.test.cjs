@@ -2079,6 +2079,38 @@ test("deposit maintenance retains adjustment audit details", async () => {
   assert.equal(calls.filter((call) => call === "refresh").length, 1);
 });
 
+test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-maintenance.js"), "utf8"),
+    context,
+  );
+  const prompts = ["25.00", "Retention correction"];
+  const messages = [];
+  const feature = context.window.PropertyDeskDepositMaintenance.create({
+    state: {
+      workspaceOwnerId: "workspace-1",
+      accounts: [{ id: "rental-1", account_type: "rental" }],
+      client: {
+        from: () => ({ insert: async () => { throw new Error("offline"); } }),
+      },
+    },
+    moneyInput: Number,
+    todayIso: () => "2026-10-04",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("failed save must not refresh"),
+    openAccountDetails: async () => assert.fail("failed save must not reopen details"),
+    promptAction: () => prompts.shift(),
+  });
+
+  await assert.doesNotReject(
+    feature.recordDepositAdjustment("rental-1", "retained"),
+  );
+  assert.deepEqual(messages, [
+    "Deposit adjustment failed. Check your connection and try again.",
+  ]);
+});
+
 test("account maintenance closes an account while preserving its history", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -2124,6 +2156,38 @@ test("account maintenance closes an account while preserving its history", async
   assert.deepEqual(updates[1], ["id", "account-1"]);
   assert.deepEqual(calls, [["close", "detail-modal"], "refresh"]);
   assert.equal(messages.at(-1), "Account closed");
+});
+
+test("account maintenance reports rejected requests and skips success actions", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-maintenance.js"), "utf8"),
+    context,
+  );
+  const calls = [];
+  const messages = [];
+  const feature = context.window.PropertyDeskAccountMaintenance.create({
+    $: (id) => ({ id }),
+    state: {
+      client: {
+        from: () => ({
+          update: () => ({ eq: async () => { throw new Error("offline"); } }),
+        }),
+      },
+    },
+    confirmAction: () => true,
+    closeModal: () => calls.push("close"),
+    fetchAll: async () => calls.push("refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await assert.doesNotReject(
+    feature.closeAccount({ id: "account-1", name: "Rental" }),
+  );
+  assert.deepEqual(calls, []);
+  assert.deepEqual(messages, [
+    "Account couldn't be closed right now. Please try again.",
+  ]);
 });
 
 test("transaction maintenance voids a posted row with an audit reason", async () => {
@@ -2190,6 +2254,46 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   assert.equal(updates[0][1].void_reason, "Entered in error");
   assert.equal(messages.at(-1), "Transaction voided; original entry preserved");
   assert.equal(refreshes, 1);
+});
+
+test("transaction maintenance reports rejected void requests without refreshing", async () => {
+  const context = vm.createContext({
+    window: {},
+    Event: class MockEvent {},
+    Option: class MockOption {},
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    context,
+  );
+  const messages = [];
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    $() {},
+    state: {
+      client: {
+        from: () => ({
+          update: () => ({
+            eq: () => ({
+              eq: () => ({
+                select: () => ({
+                  maybeSingle: async () => { throw new Error("offline"); },
+                }),
+              }),
+            }),
+          }),
+        }),
+      },
+    },
+    confirmAction: () => true,
+    promptAction: () => "Entered in error",
+    fetchAll: async () => assert.fail("failed void request must not refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await assert.doesNotReject(feature.voidTransaction("income", "payment-1"));
+  assert.deepEqual(messages, [
+    "Transaction couldn't be voided right now. Please try again.",
+  ]);
 });
 
 test("transaction corrections reopen posted payments and expenses with audit reasons", () => {

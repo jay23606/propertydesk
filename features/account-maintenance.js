@@ -17,16 +17,26 @@
         )
       )
         return;
-      const { error } = await state.client
-        .from("pd_accounts")
-        .update({ status: "closed" })
-        .eq("id", account.id);
+      let error;
+      try {
+        ({ error } = await state.client
+          .from("pd_accounts")
+          .update({ status: "closed" })
+          .eq("id", account.id));
+      } catch {
+        toast("Account couldn't be closed right now. Please try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
       closeModal($("detail-modal"));
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       toast("Account closed");
     }
 

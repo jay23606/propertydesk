@@ -30,20 +30,30 @@
         toast("Enter a reason so this adjustment can be audited");
         return;
       }
-      const { error } = await state.client.from("pd_deposit_entries").insert({
-        user_id: state.workspaceOwnerId,
-        account_id: accountId,
-        entry_type: type,
-        amount,
-        movement_date: todayIso(),
-        reason: reason.trim(),
-      });
+      let error;
+      try {
+        ({ error } = await state.client.from("pd_deposit_entries").insert({
+          user_id: state.workspaceOwnerId,
+          account_id: accountId,
+          entry_type: type,
+          amount,
+          movement_date: todayIso(),
+          reason: reason.trim(),
+        }));
+      } catch {
+        toast("Deposit adjustment failed. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(`Deposit adjustment failed: ${error.message}`);
         return;
       }
-      await fetchAll();
-      await openAccountDetails(accountId);
+      try {
+        await fetchAll();
+        await openAccountDetails(accountId);
+      } catch {
+        return;
+      }
       toast(
         type === "retained"
           ? "Deposit retention recorded"
