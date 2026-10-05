@@ -1011,6 +1011,44 @@ test("Properties grid routes payment, note, address, and add-account actions loc
   ]);
 });
 
+test("Properties table templates escape untrusted labels and render visible totals", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-table.js"), "utf8"),
+    context,
+  );
+  const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
+  const table = context.window.PropertyDeskPropertyPortfolioTable.create({
+    esc: escapeHTML,
+    money: (value) => `$${Number(value).toFixed(2)}`,
+    paymentFrequencyLabel: () => "Monthly",
+  });
+
+  const addressHTML = table.propertyAddressCell(
+    { id: "<property>", notes: "<repair>" },
+    "<10 Oak St>",
+  );
+  assert.match(addressHTML, /&lt;property&gt;/);
+  assert.match(addressHTML, /&lt;repair&gt;/);
+  assert.doesNotMatch(addressHTML, /<repair>/);
+
+  const totalsHTML = table.totalsRowHTML({
+    unpaidDue: 50,
+    scheduledPayment: 125,
+    loanBalance: 1000,
+    loanCount: 1,
+  });
+  assert.match(totalsHTML, /\$50\.00/);
+  assert.match(totalsHTML, /\$125\.00/);
+  assert.match(totalsHTML, /\$1000\.00/);
+});
+
 test("transaction view routes correction and void actions to maintenance", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -1250,6 +1288,8 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
+  assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
+  assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
   assert.match(app, /const \{ voidTransaction \}\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
@@ -1403,6 +1443,10 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   };
   const context = vm.createContext({ window: {} });
   vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-table.js"), "utf8"),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-views.js"),
       "utf8",
@@ -1411,6 +1455,11 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   );
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
+    portfolioTable: context.window.PropertyDeskPropertyPortfolioTable.create({
+      esc: (value) => String(value ?? ""),
+      money: (value) => `$${Number(value).toFixed(2)}`,
+      paymentFrequencyLabel: () => "Monthly",
+    }),
     state: {
       properties: [{ id: "property-1", name: "One Oak", address: "1 Oak St" }],
       accounts: [

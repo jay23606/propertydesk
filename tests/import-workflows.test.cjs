@@ -54,6 +54,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/create-actions.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/imports.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/property-views.js'));
+  assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-views.js'));
   assert.ok(html.indexOf('features/property-details.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));

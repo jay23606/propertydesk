@@ -91,6 +91,11 @@
     openPropertyDetails: (...args) => openPropertyDetails(...args),
     openPropertyPayment: (...args) => openPropertyPayment(...args),
   });
+  const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
+    esc,
+    money,
+    paymentFrequencyLabel,
+  });
   const {
     renderProperties,
     attachEvents: attachPropertyViewEvents,
@@ -104,13 +109,13 @@
     todayIso,
     esc,
     money,
+    portfolioTable,
     propertyAddress,
     monthStart,
     streetAddress,
     dateOnly,
     monthEnd,
     lateReminderMailto,
-    paymentFrequencyLabel,
     paymentStatusInMonth,
     openPayment: (...args) => openPayment(...args),
     editPropertyQuickNote: (...args) => editPropertyQuickNote(...args),
