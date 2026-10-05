@@ -3156,6 +3156,25 @@ test("workspace member feature loads before settings and is precached", () => {
   assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });
 
+test("local browser scripts exist and are precached except runtime config", () => {
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+  const shellFiles = new Set(
+    [...worker.matchAll(/['"]\.\/([^'"]+)['"]/g)].map((match) => match[1]),
+  );
+  assert.equal(shellFiles.has("config.js"), false, "runtime Supabase config should stay outside the cache");
+  const localScripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)]
+    .map((match) => match[1].split(/[?#]/, 1)[0])
+    .filter((src) => src.endsWith(".js") && !/^https?:\/\//i.test(src));
+
+  for (const src of localScripts) {
+    if (src === "config.js") continue;
+    assert.ok(fs.existsSync(path.join(root, src)), `${src} should exist`);
+    assert.ok(shellFiles.has(src), `${src} should be precached`);
+  }
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
