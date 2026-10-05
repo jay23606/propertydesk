@@ -74,13 +74,20 @@
     }
 
     function attachEvents() {
-      $("detail-content").addEventListener("click", (event) => {
+      $("detail-content").addEventListener("click", async (event) => {
         const adjustment = event.target.closest("[data-deposit-adjustment]");
         if (adjustment) {
-          recordDepositAdjustment(
-            adjustment.dataset.accountId,
-            adjustment.dataset.depositAdjustment,
+          const { accountId, depositAdjustment } = adjustment.dataset;
+          const saved = await recordDepositAdjustment(
+            accountId,
+            depositAdjustment,
           );
+          if (!saved) return;
+          const account = state.accounts.find((row) => row.id === accountId);
+          const section = $("detail-deposit-section");
+          if (account && section) {
+            section.innerHTML = depositSectionHTML(account);
+          }
         }
       });
     }

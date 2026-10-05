@@ -83,7 +83,7 @@
         <button id="detail-edit" class="button secondary compact">Edit</button>
         <button id="detail-record" class="button primary compact">Record payment</button>
         </div>
-        </div>${depositSectionHTML(a)}${scheduleHTML}${historyHTML}<div class="detail-section">
+        </div><div id="detail-deposit-section">${depositSectionHTML(a)}</div>${scheduleHTML}${historyHTML}<div class="detail-section">
         <h3>Payment history (${payments.length})</h3>${
           payments.length
             ? `<div class="schedule-table">

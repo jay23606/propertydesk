@@ -758,24 +758,38 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   assert.match(html, /data-deposit-adjustment="retained"/);
 });
 
-test("deposit details routes adjustment actions to deposit maintenance", () => {
+test("deposit details refreshes the held balance after a recorded adjustment", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details.js"), "utf8"),
     context,
   );
   const calls = [];
+  let held = 100;
   let clickHandler;
+  const elements = new Map([
+    ["detail-content", { addEventListener: (_name, handler) => { clickHandler = handler; } }],
+    ["detail-deposit-section", { innerHTML: "" }],
+  ]);
   const feature = context.window.PropertyDeskDepositDetails.create({
-    $: () => ({
-      addEventListener(name, handler) {
-        if (name === "click") clickHandler = handler;
-      },
+    $: (id) => elements.get(id),
+    state: { accounts: [{ id: "rental-1", account_type: "rental" }] },
+    depositLedger: () => ({
+      entries: [],
+      active: [],
+      totals: { held, received: 100, refunded: 0, retained: held - 100, restored: 0 },
     }),
-    recordDepositAdjustment: (...args) => calls.push(args),
+    money: (amount) => `$${amount.toFixed(2)}`,
+    fmtDate: (value) => value,
+    esc: String,
+    recordDepositAdjustment: async (...args) => {
+      calls.push(args);
+      held += 50;
+      return true;
+    },
   });
   feature.attachEvents();
-  clickHandler({
+  await clickHandler({
     target: {
       closest: (selector) => selector === "[data-deposit-adjustment]"
         ? { dataset: { accountId: "rental-1", depositAdjustment: "retained" } }
@@ -783,6 +797,7 @@ test("deposit details routes adjustment actions to deposit maintenance", () => {
     },
   });
   assert.deepEqual(calls, [["rental-1", "retained"]]);
+  assert.match(elements.get("detail-deposit-section").innerHTML, /\$150\.00/);
 });
 
 test("account history renders scoped prior terms and escaped void reasons", async () => {
@@ -2980,7 +2995,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
   const prompts = ["250.00", "Deposit retention per move-out inspection"];
   const inserts = [];
   const messages = [];
-  const calls = [];
+  let refreshes = 0;
   const state = {
     workspaceOwnerId: "workspace-1",
     accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -3000,14 +3015,12 @@ test("deposit maintenance retains adjustment audit details", async () => {
     moneyInput: Number,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
-    fetchAll: async () => calls.push("refresh"),
-    closeModal: (modal) => calls.push(["close", modal.id]),
-    openAccountDetails: async (id) => calls.push(["open-account", id]),
+    fetchAll: async () => { refreshes += 1; },
     confirmAction: () => true,
     promptAction: () => prompts.shift(),
   });
 
-  await feature.recordDepositAdjustment("rental-1", "retained");
+  assert.equal(await feature.recordDepositAdjustment("rental-1", "retained"), true);
 
   assert.equal(inserts[0][0], "pd_deposit_entries");
   assert.equal(inserts[0][1].user_id, "workspace-1");
@@ -3017,7 +3030,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
     "Deposit retention per move-out inspection",
   );
   assert.equal(messages.at(-1), "Deposit retention recorded");
-  assert.equal(calls.filter((call) => call === "refresh").length, 1);
+  assert.equal(refreshes, 1);
 });
 
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
@@ -3040,13 +3053,10 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
-    openAccountDetails: async () => assert.fail("failed save must not reopen details"),
     promptAction: () => prompts.shift(),
   });
 
-  await assert.doesNotReject(
-    feature.recordDepositAdjustment("rental-1", "retained"),
-  );
+  assert.equal(await feature.recordDepositAdjustment("rental-1", "retained"), false);
   assert.deepEqual(messages, [
     "Deposit adjustment failed. Check your connection and try again.",
   ]);

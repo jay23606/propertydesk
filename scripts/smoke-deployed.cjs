@@ -259,6 +259,10 @@ async function main() {
         const result = { data: rows[table] || [], error: null };
         const query = {
           select: () => query,
+          insert: async (payload) => {
+            rows[table].push({ id: `smoke-${table}-${rows[table].length + 1}`, ...payload });
+            return { error: null };
+          },
           eq: () => query,
           order: () => query,
           in: () => query,
@@ -390,6 +394,19 @@ async function main() {
     if (!signedInRentalDetail.includes("Prior agreement terms") || !signedInRentalDetail.includes("Change history")) {
       throw new Error("The signed-in app did not render account history through the Properties UI.");
     }
+    const depositPrompts = ["25.00", "Smoke test retention"];
+    const acceptDepositPrompts = (dialog) => {
+      void dialog.accept(depositPrompts.shift());
+      if (!depositPrompts.length) signedInPage.off("dialog", acceptDepositPrompts);
+    };
+    signedInPage.on("dialog", acceptDepositPrompts);
+    await signedInPage
+      .locator('#detail-content [data-deposit-adjustment="retained"]')
+      .click();
+    await signedInPage
+      .locator("#detail-deposit-section")
+      .getByText("Smoke test retention")
+      .waitFor({ state: "visible", timeout: 10000 });
     await signedInPage.locator('#detail-modal button[data-close]').click();
     await signedInPage.locator('.nav-link[data-view="payments"]').click();
     signedInPage.once("dialog", (dialog) => dialog.accept("Smoke-test correction"));

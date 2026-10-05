@@ -249,7 +249,6 @@
       todayIso,
       toast,
       fetchAll,
-      openAccountDetails: (...args) => openAccountDetails(...args),
     });
   const { correctTransaction, voidTransaction } = transactionMaintenance;
   const { renderPropertyActivity } =
