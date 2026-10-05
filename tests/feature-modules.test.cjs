@@ -566,6 +566,73 @@ test("password reset requests keep generic feedback and restore the submit contr
   assert.equal(element("forgot-password").disabled, false);
 });
 
+test("auth session restoration and state changes stay inside the auth feature", async () => {
+  const context = vm.createContext({ window: {}, URLSearchParams });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "auth.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        value: "",
+        textContent: "",
+        dataset: {},
+        classList: {
+          add() {},
+          remove() {},
+          toggle() {},
+        },
+      });
+    return elements.get(id);
+  };
+  const state = {
+    user: null,
+    passwordRecoveryInProgress: false,
+    client: {
+      auth: {
+        async getSession() {
+          return {
+            data: {
+              session: {
+                access_token: "reset-token",
+                user: { id: "owner-1" },
+              },
+            },
+          };
+        },
+      },
+    },
+  };
+  const calls = [];
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state,
+    fetchAll: async () => calls.push("fetch-workspace"),
+    toast() {},
+    windowRef: {
+      location: { hash: "#type=recovery&access_token=reset-token" },
+    },
+    documentRef: { querySelector: () => element("auth-intro") },
+  });
+
+  await feature.restoreAuthSession();
+  assert.equal(state.user.id, "owner-1");
+  assert.equal(state.passwordRecoveryInProgress, true);
+  assert.equal(element("auth-title").textContent, "Choose a new password");
+  assert.deepEqual(calls, []);
+
+  feature.handleAuthStateChange("SIGNED_OUT");
+  assert.equal(state.user, null);
+  assert.equal(state.passwordRecoveryInProgress, false);
+  assert.equal(element("auth-form").dataset.mode, "signin");
+
+  feature.handleAuthStateChange("SIGNED_IN", { user: { id: "owner-2" } });
+  assert.equal(state.user.id, "owner-2");
+  assert.deepEqual(calls, ["fetch-workspace"]);
+});
+
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

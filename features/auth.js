@@ -131,9 +131,65 @@
       }
     }
 
+    function handleAuthStateChange(event, session) {
+      if (event === 'SIGNED_OUT') {
+        state.user = null;
+        state.passwordRecoveryInProgress = false;
+        showAuth();
+        setAuthMode(false);
+        return;
+      }
+      if (event === 'PASSWORD_RECOVERY' && session?.user) {
+        state.user = session.user;
+        showPasswordReset();
+        return;
+      }
+      if (!session?.user) return;
+
+      const previousUserId = state.user?.id;
+      state.user = session.user;
+      const signedIntoNewUser =
+        event === 'SIGNED_IN' && previousUserId !== session.user.id;
+      if (signedIntoNewUser && !state.passwordRecoveryInProgress)
+        startWorkspace();
+    }
+
+    function isPasswordRecoverySession(session) {
+      const params = new URLSearchParams(
+        windowRef.location.hash.replace(/^#/, ''),
+      );
+      return (
+        params.get('type') === 'recovery' &&
+        params.get('access_token') === session?.access_token
+      );
+    }
+
+    async function restoreAuthSession() {
+      const {
+        data: { session },
+      } = await state.client.auth.getSession();
+      if (!session?.user) {
+        showAuth();
+        return;
+      }
+
+      state.user = session.user;
+      if (isPasswordRecoverySession(session)) showPasswordReset();
+      else if (!state.passwordRecoveryInProgress) await startWorkspace();
+    }
+
     return {
-      showAuth, showApp, showConfigError, setAuthMode, showPasswordReset,
-      requestPasswordReset, submitPasswordReset, submitAuth, startWorkspace,
+      showAuth,
+      showApp,
+      showConfigError,
+      setAuthMode,
+      showPasswordReset,
+      requestPasswordReset,
+      submitPasswordReset,
+      submitAuth,
+      startWorkspace,
+      handleAuthStateChange,
+      restoreAuthSession,
     };
   }
 
