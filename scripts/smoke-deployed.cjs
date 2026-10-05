@@ -79,7 +79,22 @@ async function main() {
       route.fulfill({ contentType: "text/javascript", body: "" }),
     );
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
-    await page.locator("#auth-title").waitFor({ state: "visible", timeout: 30000 });
+    assertNoBrowserErrors(runtimeErrors, consoleErrors, "Initial startup");
+    try {
+      await page.locator("#auth-title").waitFor({
+        state: "visible",
+        timeout: 10000,
+      });
+    } catch (error) {
+      const pageState = await page.evaluate(() => ({
+        authView: document.getElementById("auth-view")?.className,
+        appView: document.getElementById("app-view")?.className,
+        bodyText: document.body.innerText.slice(0, 1200),
+      }));
+      throw new Error(
+        `The sign-in screen did not appear. Browser errors: ${[...runtimeErrors, ...consoleErrors].join(" | ") || "none"}. Page state: ${JSON.stringify(pageState)}. ${error.message}`,
+      );
+    }
     await reloadThroughServiceWorker(page);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
     await assertNoUnhandledRejections(page, "Startup");
