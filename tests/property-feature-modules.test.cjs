@@ -1035,10 +1035,12 @@ test("report views summarize the current-year ledger and escape import history",
 
 test("property detail events own editing and quick-action bindings", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-events.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["property-detail-events.js", "property-detail-quick-actions.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const handlers = new Map();
   const elements = new Map();
   const calls = [];
@@ -1063,16 +1065,23 @@ test("property detail events own editing and quick-action bindings", () => {
     },
     closeModal: (modal) => calls.push(`close:${modal.id}`),
     editAccount: (account) => calls.push(`edit:${account.id}`),
+    savePropertyHolders: () => calls.push("save-holders"),
+    openAccountDetails: (id) => calls.push(`open-account:${id}`),
+  });
+  const quickActionState = { selectedPropertyId: "property-1" };
+  const quickActions = context.window.PropertyDeskPropertyDetailQuickActions.create({
+    $: getElement,
+    state: quickActionState,
+    closeModal: (modal) => calls.push(`close:${modal.id}`),
     openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
     openExpense: (propertyId) => calls.push(`expense:${propertyId}`),
     resetAccountForm: () => calls.push("reset-account"),
     populateFormOptions: () => calls.push("populate-options"),
     openModal: (id) => calls.push(`open:${id}`),
-    savePropertyHolders: () => calls.push("save-holders"),
-    openAccountDetails: (id) => calls.push(`open-account:${id}`),
   });
 
-  feature.attachEvents(() => calls.push("archive"));
+  feature.attachEvents();
+  quickActions.attachEvents(() => calls.push("archive"));
   handlers.get("property-detail-content:click")({
     target: {
       closest: (selector) =>
@@ -1113,14 +1122,22 @@ test("property detail events own editing and quick-action bindings", () => {
     "open:account-modal",
     "archive",
   ]);
+  const callsBeforeNoSelection = calls.length;
+  quickActionState.selectedPropertyId = null;
+  handlers.get("property-detail-add-income:click")();
+  handlers.get("property-detail-add-expense:click")();
+  handlers.get("property-detail-add-account:click")();
+  assert.equal(calls.length, callsBeforeNoSelection);
 });
 
 test("property detail events route private document actions to document workflows", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-events.js"), "utf8"),
-    context,
-  );
+  for (const filename of ["property-detail-events.js", "property-detail-quick-actions.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   const calls = [];
   const handlers = new Map();
   const feature = context.window.PropertyDeskPropertyDetailEvents.create({
@@ -1130,14 +1147,13 @@ test("property detail events route private document actions to document workflow
       },
     }),
     state: { accounts: [] },
-    closeModal() {}, editAccount() {}, openPayment() {}, openExpense() {},
-    resetAccountForm() {}, populateFormOptions() {}, openModal() {},
+    closeModal() {}, editAccount() {},
     savePropertyHolders() {}, openAccountDetails() {},
     openPropertyDocument: (id) => calls.push(["open", id]),
     deletePropertyDocument: (id) => calls.push(["delete", id]),
     uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
   });
-  feature.attachEvents(() => {});
+  feature.attachEvents();
 
   for (const [selector, dataset] of [
     ["[data-open-document]", { openDocument: "document-1" }],
@@ -1203,6 +1219,7 @@ test("property details workflow connects activity summaries to the property view
 test("property actions workflow composes holder, document, and detail event behavior", () => {
   const passed = {};
   const action = () => {};
+  const attachCalls = [];
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyQuickNote: {
@@ -1223,7 +1240,13 @@ test("property actions workflow composes holder, document, and detail event beha
       PropertyDeskPropertyDetailEvents: {
         create: (options) => {
           passed.events = options;
-          return { attachEvents: (toggleArchiveProperty) => toggleArchiveProperty };
+          return { attachEvents: () => attachCalls.push("content") };
+        },
+      },
+      PropertyDeskPropertyDetailQuickActions: {
+        create: (options) => {
+          passed.quickActions = options;
+          return { attachEvents: (toggleArchiveProperty) => attachCalls.push(toggleArchiveProperty) };
         },
       },
     },
@@ -1233,12 +1256,27 @@ test("property actions workflow composes holder, document, and detail event beha
     context,
   );
   const state = { client: {} };
-  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({ state, documentRef: {} });
+  const quickActionDependencies = {
+    state,
+    closeModal: action,
+    openPayment: action,
+    openExpense: action,
+    resetAccountForm: action,
+    populateFormOptions: action,
+    openModal: action,
+  };
+  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({
+    ...quickActionDependencies,
+    documentRef: {},
+  });
 
   assert.equal(passed.events.savePropertyHolders, action);
   assert.equal(passed.events.deletePropertyDocument, action);
+  assert.equal(passed.quickActions.openPayment, action);
+  assert.equal(passed.quickActions.openExpense, action);
   assert.equal(passed.documents.repository.mocked, true);
   assert.equal(passed.repositoryClient, state.client);
   assert.equal(workflow.editPropertyQuickNote, action);
-  assert.equal(workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty), action);
+  workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty);
+  assert.deepEqual(attachCalls, ["content", workflow.toggleArchiveProperty]);
 });

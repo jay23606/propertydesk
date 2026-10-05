@@ -26,13 +26,22 @@
       state, toast, fetchAll, openPropertyDetails,
       repository: window.PropertyDeskDocumentRepository.create(state.client),
     });
-    const { attachEvents: attachPropertyDetailEvents } =
+    const { attachEvents: attachPropertyDetailContentEvents } =
       window.PropertyDeskPropertyDetailEvents.create({
-        $, state, closeModal, editAccount, openPayment, openExpense,
-        resetAccountForm, populateFormOptions, openModal, savePropertyHolders,
+        $, state, closeModal, editAccount, savePropertyHolders,
         openAccountDetails, deletePropertyDocument, openPropertyDocument,
         uploadPropertyDocument,
       });
+    const { attachEvents: attachPropertyQuickActions } =
+      window.PropertyDeskPropertyDetailQuickActions.create({
+        $, state, closeModal, openPayment, openExpense, resetAccountForm,
+        populateFormOptions, openModal,
+      });
+
+    function attachPropertyDetailEvents(toggleArchiveProperty) {
+      attachPropertyDetailContentEvents();
+      attachPropertyQuickActions(toggleArchiveProperty);
+    }
 
     return {
       editPropertyQuickNote,

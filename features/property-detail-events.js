@@ -7,18 +7,13 @@
     state,
     closeModal,
     editAccount,
-    openPayment,
-    openExpense,
-    resetAccountForm,
-    populateFormOptions,
-    openModal,
     savePropertyHolders,
     openAccountDetails,
     deletePropertyDocument,
     openPropertyDocument,
     uploadPropertyDocument,
   }) {
-    function attachEvents(toggleArchiveProperty) {
+    function attachEvents() {
       const detailContent = $("property-detail-content");
       detailContent.addEventListener("click", (event) => {
         const button = event.target.closest("[data-edit-account]");
@@ -60,31 +55,6 @@
         }
       });
 
-      $("property-detail-add-income").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        openPayment(null, propertyId);
-      });
-      $("property-detail-add-expense").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        openExpense(propertyId);
-      });
-      $("property-detail-add-account").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
-        if (!propertyId) return;
-        closeModal($("property-detail-modal"));
-        resetAccountForm();
-        populateFormOptions();
-        $("account-property").value = propertyId;
-        openModal("account-modal");
-      });
-      $("property-archive-toggle").addEventListener(
-        "click",
-        toggleArchiveProperty,
-      );
     }
 
     return { attachEvents };
