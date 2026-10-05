@@ -121,7 +121,14 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/transaction-maintenance-workflow.js") <
-      html.indexOf("app.js"),
+      html.indexOf("features/transaction-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-views.js") <
+      html.indexOf("features/transaction-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/report-views.js") <
@@ -468,7 +475,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/app-lifecycle\.js'/);
   assert.match(worker, /'\.\/features\/backend-client\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
-  assert.doesNotMatch(worker, /transaction-workflow\.js/);
+  assert.match(worker, /'\.\/features\/transaction-workflow\.js'/);
   assert.match(worker, /'\.\/features\/report-views\.js'/);
   assert.match(worker, /'\.\/features\/report-model\.js'/);
   assert.match(worker, /'\.\/features\/report-export\.js'/);
@@ -510,6 +517,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);
   assert.doesNotMatch(worker, /account-maintenance-workflow\.js/);
   assert.match(worker, /'\.\/features\/transaction-maintenance-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/transaction-workflow\.js'/);
   assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-document-workflow\.js'/);

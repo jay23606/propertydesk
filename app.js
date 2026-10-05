@@ -154,22 +154,8 @@
   const attachPropertyFormEvents = propertyForm.attachEvents;
   const attachAccountFormEvents = accountForm.attachEvents;
   const attachLedgerEntryFormEvents = ledgerEntryForms.attachEvents;
-  const { attachTransactionActionEvents } =
-    window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      prettyType,
-      openPayment,
-      openExpense,
-      updateAllocationPreview,
-      EventClass: Event,
-      OptionClass: Option,
-      documentRef: document,
-    });
-  const { renderPayments, attachEvents: attachTransactionViewEvents } =
-    window.PropertyDeskTransactionViews.create({
+  const { renderPayments, attachEvents: attachTransactionEvents } =
+    window.PropertyDeskTransactionWorkflow.create({
       $,
       state,
       dateOnly,
@@ -181,6 +167,15 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
+      toast,
+      fetchAll,
+      prettyType,
+      openPayment,
+      openExpense,
+      updateAllocationPreview,
+      EventClass: Event,
+      OptionClass: Option,
+      documentRef: document,
     });
   const {
     openAccountDetails,
@@ -396,8 +391,7 @@
       attachOverviewEvents,
       attachPropertyViewEvents,
       attachPropertyActionEvents,
-      attachTransactionViewEvents,
-      attachTransactionActionEvents,
+      attachTransactionEvents,
       attachDepositDetailEvents,
       attachAccountDetailEvents,
       () => attachCreateActions(navigate),
