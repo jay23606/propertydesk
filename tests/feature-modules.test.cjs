@@ -615,6 +615,91 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   assert.match(html, /data-deposit-adjustment="retained"/);
 });
 
+test("account history renders scoped prior terms and escaped void reasons", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-history-details.js"), "utf8"),
+    context,
+  );
+  const seenAuditIds = [];
+  const state = {
+    agreementVersions: [{
+      account_id: "account-1",
+      reason: "Amendment",
+      effective_from: "2026-01-01",
+      replaced_on: "2026-02-01",
+      created_at: "2026-02-02T12:00:00Z",
+      terms: { payment_amount: 550, original_principal: 40000, interest_rate: 5, term_months: 240, party_name: "<Buyer>" },
+    }, {
+      account_id: "another-account",
+      reason: "Should not appear",
+      terms: {},
+    }],
+    payments: [{ id: "payment-1", void_reason: "<duplicate>" }],
+    client: {
+      from(table) {
+        assert.equal(table, "pd_audit_events");
+        const query = {
+          select(columns) {
+            assert.match(columns, /entity_type,entity_id,action/);
+            return query;
+          },
+          in(column, ids) {
+            assert.equal(column, "entity_id");
+            seenAuditIds.push(...ids);
+            return query;
+          },
+          order(column, options) {
+            assert.equal(column, "created_at");
+            assert.equal(options.ascending, false);
+            return query;
+          },
+          limit: async (count) => {
+            assert.equal(count, 100);
+            return {
+              data: [{
+                entity_type: "pd_payments",
+                entity_id: "payment-1",
+                action: "voided",
+                created_at: "2026-10-01T12:00:00Z",
+              }],
+              error: null,
+            };
+          },
+        };
+        return query;
+      },
+    },
+  };
+  const history = context.window.PropertyDeskAccountHistoryDetails.create({
+    state,
+    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    money: (value) => `$${Number(value || 0).toFixed(2)}`,
+    fmtDate: (value) => value || "—",
+  });
+
+  const html = await history.renderAccountHistory(
+    { id: "account-1" },
+    [{ id: "payment-1" }],
+  );
+
+  assert.deepEqual(seenAuditIds, ["account-1", "payment-1"]);
+  assert.match(html, /Prior agreement terms/);
+  assert.match(html, /Amendment/);
+  assert.match(html, /&lt;Buyer&gt;/);
+  assert.doesNotMatch(html, /Should not appear/);
+  assert.match(html, /Voided payment/);
+  assert.match(html, /Reason: &lt;duplicate&gt;/);
+
+  state.client.from = () => { throw new Error("audit unavailable"); };
+  const unavailableHTML = await history.renderAccountHistory(
+    { id: "account-1" },
+    [],
+  );
+  assert.match(unavailableHTML, /Change history is temporarily unavailable/);
+  assert.match(unavailableHTML, /Prior agreement terms/);
+});
+
 test("delegated action router preserves action routing and event propagation", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -820,6 +905,8 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDeskAccountDetails\.create\(\{[\s\S]*?amortizationSchedule,/,
   );
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
+  assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
   assert.match(
     app,
     /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskTransactionMaintenance\.create/,

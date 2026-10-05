@@ -116,6 +116,7 @@ async function main() {
         todayIso: () => "2026-01-01",
         depositLedger: () => ({ entries: [], active: [], totals: {} }),
         depositSectionHTML: () => "",
+        renderAccountHistory: async () => "",
         openModal() {},
         closeModal() {},
         editAccount() {},
