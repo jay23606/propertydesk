@@ -1169,6 +1169,17 @@ test("property action router loads after its view and is precached", () => {
   assert.match(worker, /'\.\/features\/property-view-events\.js'/);
 });
 
+test("transaction action router loads after its view and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/transaction-views.js") < html.indexOf("features/transaction-view-events.js") &&
+      html.indexOf("features/transaction-view-events.js") < html.indexOf("app.js"),
+    "transaction view should load before its action router and the app",
+  );
+  assert.match(worker, /'\.\/features\/transaction-view-events\.js'/);
+});
+
 test("Properties table templates escape untrusted labels and render visible totals", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -1207,16 +1218,15 @@ test("Properties table templates escape untrusted labels and render visible tota
   assert.match(totalsHTML, /\$1000\.00/);
 });
 
-test("transaction view routes correction and void actions to maintenance", () => {
+test("transaction action router routes correction and void actions to maintenance", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-views.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-view-events.js"), "utf8"),
     context,
   );
   const calls = [];
   let clickHandler;
-  const feature = context.window.PropertyDeskTransactionViews.create({
-    $: () => ({ addEventListener() {} }),
+  const feature = context.window.PropertyDeskTransactionViewEvents.create({
     documentRef: {
       addEventListener(name, handler) {
         if (name === "click") clickHandler = handler;

@@ -15,26 +15,12 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      correctTransaction,
-      voidTransaction,
-      documentRef,
     } = context;
 
     function attachEvents() {
       $("payment-search").addEventListener("input", renderPayments);
       $("payment-period").addEventListener("change", renderPayments);
       $("transaction-type").addEventListener("change", renderPayments);
-      documentRef.addEventListener("click", (event) => {
-        const correction = event.target.closest("[data-correct-transaction]");
-        if (correction) {
-          correctTransaction(correction.dataset.kind, correction.dataset.id);
-          return;
-        }
-        const voidButton = event.target.closest("[data-void-transaction]");
-        if (voidButton) {
-          voidTransaction(voidButton.dataset.kind, voidButton.dataset.id);
-        }
-      });
     }
 
     function renderTransactionRow(record) {

@@ -144,9 +144,12 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
+    });
+  const { attachEvents: attachTransactionActionEvents } =
+    window.PropertyDeskTransactionViewEvents.create({
+      documentRef: document,
       correctTransaction: (...args) => correctTransaction(...args),
       voidTransaction: (...args) => voidTransaction(...args),
-      documentRef: document,
     });
   const { renderReports } = window.PropertyDeskReportViews.create({
     $,
@@ -483,6 +486,7 @@
       attachPropertyViewEvents,
       attachPropertyActionEvents,
       attachTransactionViewEvents,
+      attachTransactionActionEvents,
       attachDepositDetailEvents,
       () => attachCreateActions(navigate),
       () => attachPropertyFormEvents(previewReminderEmail),
