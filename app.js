@@ -202,23 +202,15 @@
       $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
       prettyType, paymentFrequencyLabel, accountBalance, openModal, propertyAddress,
     });
-  const { attachEvents: attachPropertyDetailEvents } =
-    window.PropertyDeskPropertyDetailEvents.create({
-      $,
-      state,
-      closeModal,
-      editAccount,
-      openPayment,
-      openExpense,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
-      savePropertyHolders: () => savePropertyHolders(),
-      openAccountDetails: (...args) => openAccountDetails(...args),
-      deletePropertyDocument: (...args) => deletePropertyDocument(...args),
-      openPropertyDocument: (...args) => openPropertyDocument(...args),
-      uploadPropertyDocument: (...args) => uploadPropertyDocument(...args),
-    });
+  const {
+    editPropertyQuickNote,
+    toggleArchiveProperty,
+    attachPropertyDetailEvents,
+  } = window.PropertyDeskPropertyActionsWorkflow.create({
+    $, state, toast, fetchAll, todayIso, streetAddress, openPropertyDetails,
+    closeModal, editAccount, openPayment, openExpense, resetAccountForm,
+    populateFormOptions, openModal, openAccountDetails, documentRef: document,
+  });
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({
       $, state,
@@ -227,16 +219,6 @@
       ...window.PropertyDeskImportWorkflows,
       esc, openModal, closeModal, toast, todayIso, fetchAll,
     });
-  const {
-    uploadPropertyDocument,
-    deletePropertyDocument,
-    openPropertyDocument,
-  } = window.PropertyDeskDocuments.create({
-    state,
-    toast,
-    fetchAll,
-    openPropertyDetails,
-  });
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskExports.create({
       $,
@@ -269,20 +251,6 @@
     });
   const { attachEvents: attachThemeEvents } =
     window.PropertyDeskTheme.create();
-  const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
-    state,
-    toast,
-    fetchAll,
-    streetAddress,
-  });
-  const { savePropertyHolders, toggleArchiveProperty } =
-    window.PropertyDeskPropertyManagement.create({
-      state,
-      toast,
-      fetchAll,
-      todayIso,
-      openPropertyDetails,
-    });
   appLifecycle = window.PropertyDeskAppLifecycle.create({
     $, state, backend, todayIso,
     registerShell: () => window.PropertyDeskPwa.registerShell(),

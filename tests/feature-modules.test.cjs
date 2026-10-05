@@ -1757,6 +1757,40 @@ test("property details workflow connects activity summaries to the property view
   assert.equal(workflow.openPropertyDetails(), "property details");
 });
 
+test("property actions workflow composes holder, document, and detail event behavior", () => {
+  const passed = {};
+  const action = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyQuickNote: {
+        create: () => ({ editPropertyQuickNote: action }),
+      },
+      PropertyDeskPropertyManagement: {
+        create: () => ({ savePropertyHolders: action, toggleArchiveProperty: action }),
+      },
+      PropertyDeskDocuments: {
+        create: () => ({ uploadPropertyDocument: action, deletePropertyDocument: action, openPropertyDocument: action }),
+      },
+      PropertyDeskPropertyDetailEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: (toggleArchiveProperty) => toggleArchiveProperty };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-actions-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({ documentRef: {} });
+
+  assert.equal(passed.events.savePropertyHolders, action);
+  assert.equal(passed.events.deletePropertyDocument, action);
+  assert.equal(workflow.editPropertyQuickNote, action);
+  assert.equal(workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty), action);
+});
+
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
@@ -1769,6 +1803,8 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Events)?\.create/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/);
+  assert.match(app, /PropertyDeskPropertyActionsWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDesk(?:PropertyDetailEvents|Documents|PropertyQuickNote|PropertyManagement)\.create/);
   assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?voidTransaction/);
   assert.match(app, /const \{ saveCorrection \}\s*=\s*window\.PropertyDeskTransactionCorrections\.create/);
   assert.match(app, /window\.PropertyDeskRecordMaintenance\.create\(\{[\s\S]*?closeModal/);

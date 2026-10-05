@@ -79,6 +79,11 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/property-details-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
   assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/documents.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-management.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('features/property-actions-workflow.js'));
+  assert.ok(html.indexOf('features/property-actions-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('features/account-detail-events.js'));
   assert.ok(html.indexOf('features/deposit-details.js') < html.indexOf('features/deposit-detail-events.js'));
@@ -153,6 +158,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-details\.js'/);
   assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/documents\.js'/);
+  assert.match(worker, /'\.\/features\/property-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/exports\.js'/);
   assert.match(worker, /'\.\/features\/auth-recovery\.js'/);
   assert.match(worker, /'\.\/features\/auth-session\.js'/);
