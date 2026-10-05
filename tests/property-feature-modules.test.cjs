@@ -131,7 +131,8 @@ test("property activity details include posted and voided records without counti
     isPosted: (record) => record.status !== "voided",
     sumIncome: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
     sumOperatingExpenses: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
-    money: (amount) => `$${Number(amount).toFixed(2)}`,
+    money: (amount) =>
+      `$${Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
     fmtDate: (date) => date,
     esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
   });
@@ -386,31 +387,102 @@ test("overview routes property-card and quick-payment actions to property workfl
   assert.deepEqual(calls, [["open", "property-1"], ["payment", "property-2"]]);
 });
 
+test("overview renderer displays its summary model and quick-payment card", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "overview.js"), "utf8"),
+    context,
+  );
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) elements.set(id, { textContent: "", innerHTML: "" });
+    return elements.get(id);
+  };
+  const property = {
+    id: "property-1",
+    name: "One Oak",
+    address: "1 Oak St",
+    property_kind: "residential",
+  };
+  const feature = context.window.PropertyDeskOverview.create({
+    $,
+    esc: String,
+    prettyKind: String,
+    money: (amount) => `$${Number(amount).toFixed(2)}`,
+    propertyAddress: (record) => record.address,
+    prettyType: String,
+    fmtDate: String,
+    overviewModel: {
+      buildOverview: () => ({
+        propertyCount: 1,
+        accountCount: 2,
+        collected: 800,
+        expected: 1300,
+        recordedPaymentCount: 1,
+        upcoming: [],
+        recent: [],
+        propertyCards: [
+          {
+            property,
+            parties: "Alice Buyer",
+            scheduledMonthly: 550,
+            hasNonMonthly: false,
+            loanBalance: 42000,
+            hasLoanAccount: true,
+            amountDue: 550,
+          },
+        ],
+      }),
+    },
+  });
+
+  feature.renderOverview();
+
+  assert.equal($("stat-properties").textContent, 1);
+  assert.equal($("stat-accounts").textContent, 2);
+  assert.equal($("stat-collected").textContent, "$800.00");
+  assert.equal($("stat-expected").textContent, "$1300.00");
+  assert.match($("overview-properties").innerHTML, /1 Oak St/);
+  assert.match($("overview-properties").innerHTML, /Alice Buyer/);
+  assert.match($("overview-properties").innerHTML, /data-property-payment="property-1"/);
+  assert.match($("overview-properties").innerHTML, /\$42000\.00/);
+  assert.match($("upcoming-list").innerHTML, /No upcoming payments yet/);
+});
+
 test("overview workflow composes dashboard rendering with property actions", () => {
   const received = {};
-  const viewContext = {
-    $: () => {},
+  const modelContext = {
     state: {},
     monthlyScheduledEstimate: () => 0,
     accountBalance: () => 0,
     amountDueSince: () => 0,
     unpaidDueAccrualStart: () => "2026-10-01",
     todayIso: () => "2026-10-05",
-    esc: String,
-    prettyKind: String,
-    money: String,
-    propertyAddress: String,
     collectedSince: () => 0,
     scheduledMonthlyRunRate: () => 0,
     monthStart: () => "2026-10-01",
     isPosted: () => true,
+  };
+  const viewContext = {
+    $: () => {},
+    esc: String,
+    prettyKind: String,
+    money: String,
+    propertyAddress: String,
     prettyType: String,
     fmtDate: String,
   };
+  const overviewModel = { buildOverview: () => ({}) };
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
   const context = vm.createContext({
     window: {
+      PropertyDeskOverviewModel: {
+        create: (options) => {
+          received.model = options;
+          return overviewModel;
+        },
+      },
       PropertyDeskOverview: {
         create: (options) => {
           received.view = options;
@@ -430,13 +502,21 @@ test("overview workflow composes dashboard rendering with property actions", () 
     context,
   );
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
-    ...viewContext, openPropertyDetails, openPropertyPayment,
+    ...modelContext, ...viewContext, openPropertyDetails, openPropertyPayment,
   });
 
-  assert.deepEqual(Object.keys(received.view).sort(), Object.keys(viewContext).sort());
+  assert.deepEqual(
+    Object.keys(received.view).sort(),
+    [...Object.keys(viewContext), "overviewModel"].sort(),
+  );
   for (const [key, value] of Object.entries(viewContext)) {
     assert.equal(received.view[key], value);
   }
+  assert.deepEqual(Object.keys(received.model).sort(), Object.keys(modelContext).sort());
+  for (const [key, value] of Object.entries(modelContext)) {
+    assert.equal(received.model[key], value);
+  }
+  assert.equal(received.view.overviewModel, overviewModel);
   assert.equal(received.events.openPropertyDetails, openPropertyDetails);
   assert.equal(received.events.openPropertyPayment, openPropertyPayment);
   assert.equal(workflow.renderOverview(), "overview");
@@ -487,12 +567,15 @@ test("profile display loads before overview and is precached", () => {
     "profile display should load before dashboard composition",
   );
   assert.ok(
+    html.indexOf("features/overview-model.js") < html.indexOf("features/overview.js") &&
+      html.indexOf("features/overview-model.js") < html.indexOf("features/overview-workflow.js") &&
     html.indexOf("features/overview.js") < html.indexOf("features/overview-workflow.js") &&
       html.indexOf("features/overview-events.js") < html.indexOf("features/overview-workflow.js") &&
       html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
     "overview modules should load before their workflow and the app",
   );
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
+  assert.match(worker, /'\.\/features\/overview-model\.js'/);
   assert.match(worker, /'\.\/features\/overview-events\.js'/);
   assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
 });

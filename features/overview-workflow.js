@@ -9,11 +9,14 @@
       propertyAddress, collectedSince, scheduledMonthlyRunRate, monthStart,
       isPosted, prettyType, fmtDate, openPropertyDetails, openPropertyPayment,
     } = context;
+    const overviewModel = window.PropertyDeskOverviewModel.create({
+      state, monthlyScheduledEstimate, accountBalance, amountDueSince,
+      unpaidDueAccrualStart, todayIso, collectedSince, scheduledMonthlyRunRate,
+      monthStart, isPosted,
+    });
     const { renderOverview } = window.PropertyDeskOverview.create({
-      $, state, monthlyScheduledEstimate, accountBalance, amountDueSince,
-      unpaidDueAccrualStart, todayIso, esc, prettyKind, money,
-      propertyAddress, collectedSince, scheduledMonthlyRunRate, monthStart,
-      isPosted, prettyType, fmtDate,
+      $, esc, prettyKind, money, propertyAddress, prettyType, fmtDate,
+      overviewModel,
     });
     const { attachEvents: attachOverviewEvents } =
       window.PropertyDeskOverviewEvents.create({

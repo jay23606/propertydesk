@@ -1,52 +1,19 @@
-/* PropertyDesk dashboard and overview views. */
+/* Render dashboard summaries and property cards. */
 (() => {
   "use strict";
-  function createOverview(context) {
-    const {
-      $,
-      state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      esc,
-      prettyKind,
-      money,
-      propertyAddress,
-      collectedSince,
-      scheduledMonthlyRunRate,
-      monthStart,
-      isPosted,
-      prettyType,
-      fmtDate,
-    } = context;
-    function propertyCard(property) {
-      const related = state.accounts.filter(
-        (a) => a.property_id === property.id,
-      );
-      const active = related.filter((a) => (a.status || "active") === "active");
-      const scheduledMonthly = monthlyScheduledEstimate(active);
-      const hasNonMonthly = active.some(
-        (a) => a.payment_frequency !== "monthly",
-      );
-      const balance = active
-        .filter((a) => a.account_type !== "rental")
-        .reduce((sum, a) => sum + accountBalance(a), 0);
-      const amountDue = active.reduce(
-        (sum, account) =>
-          sum +
-          amountDueSince(
-            [account],
-            state.payments,
-          unpaidDueAccrualStart(),
-            todayIso(),
-          ),
-        0,
-      );
-      const parties = [
-        ...new Set(active.map((a) => a.party_name).filter(Boolean)),
-      ].join(", ");
+
+  function createOverview({
+    $,
+    esc,
+    prettyKind,
+    money,
+    propertyAddress,
+    prettyType,
+    fmtDate,
+    overviewModel,
+  }) {
+    function propertyCard(summary) {
+      const { property, parties } = summary;
       return `<article class="property-card" data-property-card="${esc(property.id)}">
         <div class="property-art">
         <span class="property-type">${esc(prettyKind(property.property_kind))}</span>
@@ -58,15 +25,15 @@
         <div class="property-address">${esc(propertyAddress(property))}</div>${parties ? `<div class="property-party">${esc(parties)}</div>` : ""}<div class="property-summary-grid">
         <div>
         <small>Monthly payment</small>
-        <strong>${hasNonMonthly ? "≈ " : ""}${money(scheduledMonthly)}</strong>
+        <strong>${summary.hasNonMonthly ? "≈ " : ""}${money(summary.scheduledMonthly)}</strong>
         </div>
         <div>
         <small>Loan balance</small>
-        <strong>${balance ? money(balance) : active.some((a) => a.account_type !== "rental") ? "$0.00" : "—"}</strong>
+        <strong>${summary.loanBalance ? money(summary.loanBalance) : summary.hasLoanAccount ? "$0.00" : "—"}</strong>
         </div>
         <div>
         <small>Balance due · carries forward</small>
-        <strong>${money(amountDue)}</strong>
+        <strong>${money(summary.amountDue)}</strong>
         </div>
         <button class="button primary compact property-quick-payment" type="button" data-property-payment="${esc(property.id)}">＋ Record payment</button>
         </div>
@@ -75,74 +42,50 @@
     }
 
     function renderOverview() {
-      $("stat-properties").textContent = state.properties.filter(
-        (p) => !p.archived_at,
-      ).length;
-      $("stat-accounts").textContent = state.accounts.filter(
-        (a) =>
-          (a.status || "active") === "active" &&
-          !state.properties.find((p) => p.id === a.property_id)?.archived_at,
-      ).length;
-      $("stat-collected").textContent = money(collectedSince(monthStart()));
-      $("stat-expected").textContent = money(scheduledMonthlyRunRate());
-      const postedThisMonth = state.payments.filter(
-        (p) => isPosted(p) && String(p.received_date) >= monthStart(),
-      );
+      const summary = overviewModel.buildOverview();
+      $("stat-properties").textContent = summary.propertyCount;
+      $("stat-accounts").textContent = summary.accountCount;
+      $("stat-collected").textContent = money(summary.collected);
+      $("stat-expected").textContent = money(summary.expected);
       $("stat-collected-foot").textContent =
-        `${postedThisMonth.length} payment${postedThisMonth.length === 1 ? "" : "s"} recorded`;
-      const upcoming = state.accounts
-        .filter((a) => a.status === "active" && a.next_due_date)
-        .sort((a, b) =>
-          String(a.next_due_date).localeCompare(String(b.next_due_date)),
-        )
-        .slice(0, 4);
-      $("upcoming-list").innerHTML = upcoming.length
-        ? upcoming
-            .map((a) => {
-              const p = state.properties.find((x) => x.id === a.property_id);
-              return `<div class="list-row">
-        <span class="round-icon">${a.account_type === "rental" ? "⌂" : "▤"}</span>
+        `${summary.recordedPaymentCount} payment${summary.recordedPaymentCount === 1 ? "" : "s"} recorded`;
+      $("upcoming-list").innerHTML = summary.upcoming.length
+        ? summary.upcoming
+            .map(({ account, property }) => `<div class="list-row">
+        <span class="round-icon">${account.account_type === "rental" ? "⌂" : "▤"}</span>
         <div class="row-copy">
-        <strong>${esc(a.party_name || a.name)}</strong>
-        <small>${esc(p?.name || "Property")} · ${esc(prettyType(a.account_type))}</small>
+        <strong>${esc(account.party_name || account.name)}</strong>
+        <small>${esc(property?.name || "Property")} · ${esc(prettyType(account.account_type))}</small>
         </div>
         <div class="row-right">
-        <strong>${money(a.payment_amount)}</strong>
-        <small>Due ${fmtDate(a.next_due_date, { month: "short", day: "numeric" })}</small>
+        <strong>${money(account.payment_amount)}</strong>
+        <small>Due ${fmtDate(account.next_due_date, { month: "short", day: "numeric" })}</small>
         </div>
-        </div>`;
-            })
+        </div>`)
             .join("")
         : '<div class="list-empty">No upcoming payments yet. Add an account to get started.</div>';
-      const recent = state.payments.filter(isPosted).slice(0, 4);
-      $("activity-list").innerHTML = recent.length
-        ? recent
-            .map((p) => {
-              const a = state.accounts.find((x) => x.id === p.account_id),
-                prop = state.properties.find((x) => x.id === a?.property_id);
-              return `<div class="list-row">
+      $("activity-list").innerHTML = summary.recent.length
+        ? summary.recent
+            .map(({ payment, account, property }) => `<div class="list-row">
         <span class="round-icon">↙</span>
         <div class="row-copy">
-        <strong>${esc(a?.party_name || a?.name || "Payment")}</strong>
-        <small>${esc(prop?.name || "Property")} · ${fmtDate(p.received_date, { month: "short", day: "numeric" })}</small>
+        <strong>${esc(account?.party_name || account?.name || "Payment")}</strong>
+        <small>${esc(property?.name || "Property")} · ${fmtDate(payment.received_date, { month: "short", day: "numeric" })}</small>
         </div>
         <div class="row-right">
-        <strong>${money(p.amount)}</strong>
-        <small>${esc(p.payment_method.replace("_", " "))}</small>
+        <strong>${money(payment.amount)}</strong>
+        <small>${esc(payment.payment_method.replace("_", " "))}</small>
         </div>
-        </div>`;
-            })
+        </div>`)
             .join("")
         : '<div class="list-empty">Recorded payments will appear here.</div>';
       $("overview-properties").innerHTML =
-        state.properties
-          .filter((p) => !p.archived_at)
-          .slice(0, 3)
-          .map(propertyCard)
-          .join("") ||
+        summary.propertyCards.map(propertyCard).join("") ||
         '<div class="list-empty">Add your first property to build your portfolio.</div>';
     }
+
     return { renderOverview };
   }
+
   window.PropertyDeskOverview = Object.freeze({ create: createOverview });
 })();
