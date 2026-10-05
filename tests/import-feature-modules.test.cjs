@@ -46,6 +46,33 @@ test("CSV import feature loads as an isolated browser module", () => {
   );
 });
 
+test("CSV preview renderer receives only rendering dependencies", () => {
+  const passed = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskImportPreviewRendering: {
+        create: (options) => {
+          passed.renderer = options;
+          return { renderImportPreview() {}, updateImportCommitButton() {} };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
+    context,
+  );
+  const dependencies = {
+    $() {}, state: {}, selectImportRows() {}, esc() {}, openModal() {},
+    closeModal() {}, toast() {}, unrelatedDependency() {},
+  };
+  const preview = context.window.PropertyDeskImportPreview.create(dependencies);
+
+  assert.deepEqual(Object.keys(passed.renderer).sort(), ["$", "esc", "selectImportRows", "state"].sort());
+  assert.equal(passed.renderer.selectImportRows, dependencies.selectImportRows);
+  assert.equal(typeof preview.stageImport, "function");
+});
+
 test("transaction import workflow publishes explicit payment and expense actions", () => {
   const calls = [];
   const passed = {};

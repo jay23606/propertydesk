@@ -3,9 +3,11 @@
   "use strict";
 
   function createImportPreview(context) {
-    const { $, state, openModal } = context;
+    const { $, state, selectImportRows, esc, openModal } = context;
     const { renderImportPreview, updateImportCommitButton } =
-      window.PropertyDeskImportPreviewRendering.create(context);
+      window.PropertyDeskImportPreviewRendering.create({
+        $, state, selectImportRows, esc,
+      });
 
     function stageImport(title, rows, commit, note = "", report = {}) {
       const total = Number(report.total ?? rows.length);
