@@ -18,6 +18,46 @@
       accountBalance,
     } = context;
 
+    function renderTransactionRow(record) {
+      const item = record.item;
+      const isExpense = record.kind === "expense";
+      const isVoided = item.status === "voided";
+      const account = state.accounts.find((row) => row.id === item.account_id);
+      const property = isExpense
+        ? state.properties.find((row) => row.id === item.property_id)
+        : state.properties.find((row) => row.id === account?.property_id);
+      const correctionOf = isExpense
+        ? item.correction_of_expense_id
+        : item.correction_of_payment_id;
+      const transactionType = isExpense
+        ? "Expense"
+        : item.income_category === "deposit"
+          ? "Security deposit"
+          : "Income";
+      const detailsType = isExpense
+        ? expenseCategoryLabel(item.category)
+        : account?.account_type === "rental"
+          ? item.income_category
+          : "Installment receipt";
+      const paymentMethod = isExpense
+        ? item.payee || item.payment_method
+        : item.payment_method.replace("_", " ");
+      const actionButtons = isVoided
+        ? '<span class="muted">Voided</span>'
+        : `<button type='button' class='text-button' data-correct-transaction data-kind='${record.kind}' data-id='${esc(item.id)}'>Correct</button> <button type='button' class='text-button' data-void-transaction data-kind='${record.kind}' data-id='${esc(item.id)}'>Void</button>`;
+
+      return `<tr class='${isVoided ? "transaction-voided" : ""}'>
+        <td>${fmtDate(record.date)}</td>
+        <td><span class='${isExpense ? "expense-pill" : "status-pill"}'>${transactionType}${isVoided ? " · voided" : ""}</span></td>
+        <td><strong>${esc(property?.name || "—")}</strong><br>${esc(account?.party_name || account?.name || "Property")}</td>
+        <td>${esc(detailsType)}</td>
+        <td><strong>${isExpense ? "−" : ""}${money(record.amount)}</strong></td>
+        <td>${esc(paymentMethod)}</td>
+        <td>${esc(item.memo || "—")}${item.void_reason ? `<small class='table-subtext'>${esc(item.void_reason)}</small>` : ""}${correctionOf ? '<small class="table-subtext">Corrected replacement</small>' : ""}</td>
+        <td>${actionButtons}</td>
+      </tr>`;
+    }
+
     function renderPayments() {
       const period = $("payment-period").value,
         q = $("payment-search").value.trim().toLowerCase(),
@@ -73,7 +113,7 @@
             correctionOf = exp
               ? item.correction_of_expense_id
               : item.correction_of_payment_id;
-          return `<tr class="${voided ? "transaction-voided" : ""}"><td>${fmtDate(x.date)}</td><td><span class="${exp ? "expense-pill" : "status-pill"}">${exp ? "Expense" : item.income_category === "deposit" ? "Security deposit" : "Income"}${voided ? " · voided" : ""}</span></td><td><strong>${esc(p?.name || "—")}</strong><br>${esc(a?.party_name || a?.name || "Property")}</td><td>${esc(exp ? expenseCategoryLabel(item.category) : a?.account_type === "rental" ? item.income_category : "Installment receipt")}</td><td><strong>${exp ? "−" : ""}${money(x.amount)}</strong></td><td>${esc(exp ? item.payee || item.payment_method : item.payment_method.replace("_", " "))}</td><td>${esc(item.memo || "—")}${item.void_reason ? `<small class="table-subtext">${esc(item.void_reason)}</small>` : ""}${correctionOf ? '<small class="table-subtext">Corrected replacement</small>' : ""}</td><td>${voided ? '<span class="muted">Voided</span>' : `<button type="button" class="text-button" data-correct-transaction data-kind="${x.kind}" data-id="${esc(item.id)}">Correct</button> <button type="button" class="text-button" data-void-transaction data-kind="${x.kind}" data-id="${esc(item.id)}">Void</button>`}</td></tr>`;
+          return renderTransactionRow(x);
         })
         .join("");
       $("payments-empty").classList.toggle("hidden", rows.length > 0);
