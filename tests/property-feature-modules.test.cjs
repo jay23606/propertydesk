@@ -321,10 +321,16 @@ test("property activity model aggregates posted cash flow and sorts eight recent
 
 test("deposit details render rental-only ledger rows and preserve voided markers", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details.js"), "utf8"),
-    context,
-  );
+  for (const filename of [
+    "deposit-details-model.js",
+    "deposit-details-view.js",
+    "deposit-details.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
   let ledgerReads = 0;
   const details = context.window.PropertyDeskDepositDetails.create({
     state: {

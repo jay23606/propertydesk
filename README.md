@@ -10,7 +10,7 @@ Shared initialization lives in `features/app-services.js`. It creates the Supaba
 
 - Overview, Properties, and property activity: `overview-model.js` and `overview.js`, `property-portfolio-model.js` and the portfolio views, and `property-activity-model.js` with its activity view keep calculations separate from rendering. `property-details.js` handles modal state, while `property-details-view.js` renders the property modal; administration actions are composed through dedicated workflows.
 - Receipts and expenses: `entry-workflow.js`, with separate payment and expense forms.
-- Account and deposit maintenance: `account-maintenance-workflow.js` composes account closure and deposit adjustments for the account detail view.
+- Account and deposit maintenance: `account-maintenance-workflow.js` composes account closure and deposit adjustments; `deposit-details-model.js` prepares held-balance rows for `deposit-details-view.js` in the account detail view.
 - Account details: `account-details.js` prepares the selected account and estimates; `account-details-view.js` renders them. `account-history-model.js` loads and maps prior terms and audit events for `account-history-view.js`.
 - Transaction history and maintenance: `transaction-list-model.js` filters and associates rows, `transaction-row-view.js` renders them, and `transaction-views.js` updates the ledger screen. `transaction-maintenance-workflow.js` composes audited corrections and voids.
 - Reports, imports, and exports: `report-model.js` separates report totals from `report-views.js`; `csv-import-workflow.js` coordinates imports, while `report-workflow.js` connects reports and account export. `backup-utils.js` maintains the versioned private backup manifest.
