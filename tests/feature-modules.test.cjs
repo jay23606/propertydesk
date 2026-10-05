@@ -5,7 +5,7 @@ const vm = require("node:vm");
 const test = require("node:test");
 
 function loadAuthFeatures(context) {
-  for (const filename of ["auth-recovery.js", "auth.js"]) {
+  for (const filename of ["auth-recovery.js", "auth-session.js", "auth.js"]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -2662,7 +2662,7 @@ test("password recovery restores its submit control when the auth request reject
   assert.match(element("auth-message").textContent, /try again/i);
 });
 
-test("auth session restoration and state changes stay inside the auth feature", async () => {
+test("auth feature delegates session restoration and state changes to its session module", async () => {
   const context = vm.createContext({ window: {}, URLSearchParams });
   loadAuthFeatures(context);
   const elements = new Map();
