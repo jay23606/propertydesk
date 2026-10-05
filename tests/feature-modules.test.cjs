@@ -26,6 +26,19 @@ function loadLedgerEntryForms(context) {
   }
 }
 
+function loadPropertyAccountForms(context) {
+  for (const filename of [
+    "property-form.js",
+    "account-form.js",
+    "property-account-forms.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 function loadImportFeatures(context) {
   for (const filename of [
     "account-import.js",
@@ -909,15 +922,11 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
 
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
-  for (const filename of [
-    "property-account-forms.js",
-    "create-actions.js",
-  ]) {
-    vm.runInContext(
-      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
-      context,
-    );
-  }
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "create-actions.js"), "utf8"),
+    context,
+  );
+  loadPropertyAccountForms(context);
   loadLedgerEntryForms(context);
   const property = context.window.PropertyDeskPropertyAccountForms.create({});
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
@@ -933,10 +942,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
 
 test("record-entry feature owns form event bindings and category hints", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-account-forms.js"), "utf8"),
-    context,
-  );
+  loadPropertyAccountForms(context);
   loadLedgerEntryForms(context);
   const handlers = new Map();
   const toggles = [];

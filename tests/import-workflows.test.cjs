@@ -21,6 +21,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/transaction-views.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/app-utils.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/ledger-context.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-form.js') < html.indexOf('features/property-account-forms.js'));
+  assert.ok(html.indexOf('features/account-form.js') < html.indexOf('features/property-account-forms.js'));
   assert.ok(html.indexOf('features/property-account-forms.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/payment-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
   assert.ok(html.indexOf('features/expense-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
@@ -57,6 +59,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
   assert.match(worker, /'\.\/features\/app-utils\.js'/);
   assert.match(worker, /'\.\/features\/ledger-context\.js'/);
+  assert.match(worker, /'\.\/features\/property-form\.js'/);
+  assert.match(worker, /'\.\/features\/account-form\.js'/);
   assert.match(worker, /'\.\/features\/property-account-forms\.js'/);
   assert.match(worker, /'\.\/features\/payment-entry-form\.js'/);
   assert.match(worker, /'\.\/features\/expense-entry-form\.js'/);
