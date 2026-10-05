@@ -12,11 +12,13 @@
     }
 
     return {
-      ...payments,
-      ...expenses,
+      importPayments: payments.importPayments,
+      importExpenses: expenses.importExpenses,
       attachEvents,
     };
   }
 
-  window.PropertyDeskTransactionImports = Object.freeze({ create: createTransactionImports });
+  window.PropertyDeskTransactionImports = Object.freeze({
+    create: createTransactionImports,
+  });
 })();

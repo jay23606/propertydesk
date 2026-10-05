@@ -1,6 +1,10 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadImportFeatures, loadImportPreview, formElements } = require("./feature-test-helpers.cjs");
+const {
+  loadImportFeatures,
+  loadImportPreview,
+  formElements,
+} = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -15,11 +19,14 @@ test("CSV import feature loads as an isolated browser module", () => {
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
   const preview = context.window.PropertyDeskImportPreview.create({});
-  const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({});
+  const previewEvents = context.window.PropertyDeskImportPreviewEvents.create(
+    {},
+  );
   const handlers = new Map();
   const feature = context.window.PropertyDeskImportFeature.create({
     $: (id) => ({
-      addEventListener: (event, handler) => handlers.set(`${id}:${event}`, handler),
+      addEventListener: (event, handler) =>
+        handlers.set(`${id}:${event}`, handler),
     }),
     stageImport: preview.stageImport,
   });
@@ -29,11 +36,91 @@ test("CSV import feature loads as an isolated browser module", () => {
   assert.equal(typeof feature.importPayments, "function");
   assert.equal(typeof previewEvents.attachEvents, "function");
   feature.attachEvents();
-  assert.deepEqual([...handlers.keys()], [
-    "import-file:change",
-    "payment-import-file:change",
-    "expense-import-file:change",
-  ]);
+  assert.deepEqual(
+    [...handlers.keys()],
+    [
+      "import-file:change",
+      "payment-import-file:change",
+      "expense-import-file:change",
+    ],
+  );
+});
+
+test("transaction import workflow publishes explicit payment and expense actions", () => {
+  const calls = [];
+  const payments = {
+    importPayments: () => "payments",
+    attachEvents: () => calls.push("payment events"),
+  };
+  const expenses = {
+    importExpenses: () => "expenses",
+    attachEvents: () => calls.push("expense events"),
+  };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPaymentImport: { create: () => payments },
+      PropertyDeskExpenseImport: { create: () => expenses },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-imports.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const imports = context.window.PropertyDeskTransactionImports.create({});
+
+  assert.deepEqual(
+    Object.keys(imports).sort(),
+    ["attachEvents", "importExpenses", "importPayments"].sort(),
+  );
+  assert.equal(imports.importPayments, payments.importPayments);
+  assert.equal(imports.importExpenses, expenses.importExpenses);
+  imports.attachEvents();
+  assert.deepEqual(calls, ["payment events", "expense events"]);
+});
+
+test("import workflow publishes explicit account, payment, and expense actions", () => {
+  const calls = [];
+  const accounts = {
+    importAccounts: () => "accounts",
+    attachEvents: () => calls.push("account events"),
+  };
+  const transactions = {
+    importPayments: () => "payments",
+    importExpenses: () => "expenses",
+    attachEvents: () => calls.push("transaction events"),
+  };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountImport: { create: () => accounts },
+      PropertyDeskTransactionImports: { create: () => transactions },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "imports.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const imports = context.window.PropertyDeskImportFeature.create({});
+
+  assert.deepEqual(
+    Object.keys(imports).sort(),
+    [
+      "attachEvents",
+      "importAccounts",
+      "importExpenses",
+      "importPayments",
+    ].sort(),
+  );
+  assert.equal(imports.importAccounts, accounts.importAccounts);
+  assert.equal(imports.importPayments, transactions.importPayments);
+  assert.equal(imports.importExpenses, transactions.importExpenses);
+  imports.attachEvents();
+  assert.deepEqual(calls, ["account events", "transaction events"]);
 });
 
 test("CSV import workflow stages preview before attaching review and file handlers", () => {
@@ -69,7 +156,10 @@ test("CSV import workflow stages preview before attaching review and file handle
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "csv-import-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "csv-import-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const stage = () => {};
@@ -79,10 +169,17 @@ test("CSV import workflow stages preview before attaching review and file handle
   workflow.attachEvents();
 
   assert.deepEqual(sequence, [
-    "preview", "preview events", "import feature", "attach preview events", "attach import feature",
+    "preview",
+    "preview events",
+    "import feature",
+    "attach preview events",
+    "attach import feature",
   ]);
   assert.equal(typeof passed.importFeature.stageImport, "function");
-  assert.equal(passed.previewEvents.renderImportPreview instanceof Function, true);
+  assert.equal(
+    passed.previewEvents.renderImportPreview instanceof Function,
+    true,
+  );
 });
 
 test("payment and expense CSV importers save their own validated transaction payloads", async () => {
@@ -118,8 +215,16 @@ test("payment and expense CSV importers save their own validated transaction pay
     stageImport: (title, rows, commit, note, report) =>
       staged.push({ title, rows, commit, note, report }),
     parseCSV: (content) => JSON.parse(content),
-    validateExpenseRows: (rows) => ({ valid: rows, total: rows.length, errors: [] }),
-    validatePaymentRows: (rows) => ({ valid: rows, total: rows.length, errors: [] }),
+    validateExpenseRows: (rows) => ({
+      valid: rows,
+      total: rows.length,
+      errors: [],
+    }),
+    validatePaymentRows: (rows) => ({
+      valid: rows,
+      total: rows.length,
+      errors: [],
+    }),
     fetchAll: async () => {},
     toast() {},
   });
@@ -199,7 +304,10 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
     state,
     selectImportRows: (rows, includeDuplicates) =>
       rows.filter((row) => includeDuplicates || !row._possible_duplicate),
-    esc: (value) => String(value ?? "").replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    esc: (value) =>
+      String(value ?? "")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;"),
     openModal: (id) => opened.push(id),
   });
 
@@ -215,9 +323,18 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   );
 
   assert.equal(state.pendingImport.title, "Review payment import");
-  assert.equal(getElement("import-preview-title").textContent, "Review payment import");
-  assert.match(getElement("import-preview-summary").textContent, /2 CSV rows · 2 valid · 1 possible duplicate/);
-  assert.match(getElement("import-preview-body").innerHTML, /&lt;Oak House&gt;/);
+  assert.equal(
+    getElement("import-preview-title").textContent,
+    "Review payment import",
+  );
+  assert.match(
+    getElement("import-preview-summary").textContent,
+    /2 CSV rows · 2 valid · 1 possible duplicate/,
+  );
+  assert.match(
+    getElement("import-preview-body").innerHTML,
+    /&lt;Oak House&gt;/,
+  );
   assert.equal(getElement("import-commit").textContent, "Import 1 row");
   assert.equal(getElement("import-commit").disabled, false);
   assert.deepEqual(opened, ["import-preview-modal"]);
@@ -234,7 +351,8 @@ test("import preview event router corrects rows, updates duplicate selection, an
         checked: false,
         disabled: false,
         textContent: "",
-        addEventListener: (event, handler) => handlers.set(`${id}:${event}`, handler),
+        addEventListener: (event, handler) =>
+          handlers.set(`${id}:${event}`, handler),
       });
     }
     return elements.get(id);
@@ -243,7 +361,11 @@ test("import preview event router corrects rows, updates duplicate selection, an
     pendingImport: {
       rows: [],
       rawRows: [{ _source_row: 2, amount: "bad" }],
-      revalidate: (rawRows) => ({ valid: [{ amount: rawRows[0].amount }], errors: [], total: 1 }),
+      revalidate: (rawRows) => ({
+        valid: [{ amount: rawRows[0].amount }],
+        errors: [],
+        total: 1,
+      }),
       commit: async (rows) => calls.push(["commit", rows]),
     },
   };
@@ -260,9 +382,10 @@ test("import preview event router corrects rows, updates duplicate selection, an
 
   await handlers.get("import-correction-body:change")({
     target: {
-      closest: (selector) => selector === "[data-import-correction]"
-        ? { dataset: { row: "2", column: "amount" }, value: "25" }
-        : null,
+      closest: (selector) =>
+        selector === "[data-import-correction]"
+          ? { dataset: { row: "2", column: "amount" }, value: "25" }
+          : null,
     },
   });
   await handlers.get("import-include-duplicates:change")();
@@ -319,7 +442,9 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
   preview.stageImport(
     "Review payment import",
     [{ id: "row-1" }],
-    async () => { throw new Error("workspace refresh failed"); },
+    async () => {
+      throw new Error("workspace refresh failed");
+    },
     "",
     { total: 1 },
   );
@@ -327,8 +452,14 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
 
   await assert.doesNotReject(handlers.get("import-commit:click")());
 
-  assert.match($("import-preview-summary").textContent, /status couldn't be confirmed/i);
-  assert.match($("import-preview-summary").textContent, /Reports import history/i);
+  assert.match(
+    $("import-preview-summary").textContent,
+    /status couldn't be confirmed/i,
+  );
+  assert.match(
+    $("import-preview-summary").textContent,
+    /Reports import history/i,
+  );
   assert.equal($("import-commit").disabled, true);
   assert.equal($("import-commit").textContent, "Reload to check status");
   assert.equal(state.pendingImport.commitUnconfirmed, true);

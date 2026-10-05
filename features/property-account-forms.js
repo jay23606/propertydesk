@@ -12,8 +12,12 @@
     }
 
     return {
-      ...properties,
-      ...accounts,
+      resetPropertyForm: properties.resetPropertyForm,
+      saveProperty: properties.saveProperty,
+      resetAccountForm: accounts.resetAccountForm,
+      updateLoanFields: accounts.updateLoanFields,
+      saveAccount: accounts.saveAccount,
+      editAccount: accounts.editAccount,
       attachEvents,
     };
   }

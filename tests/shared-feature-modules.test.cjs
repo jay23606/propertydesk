@@ -7,7 +7,10 @@ const vm = require("node:vm");
 test("shared app utilities preserve formatting, addresses, labels, and money input", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "app-utils.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-utils.js"),
+      "utf8",
+    ),
     context,
   );
   const utils = context.window.PropertyDeskAppUtils;
@@ -20,13 +23,27 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
   assert.equal(utils.prettyKind("residential"), "Residential");
   assert.equal(utils.paymentFrequencyLabel("biweekly"), "Every 2 weeks");
   assert.equal(utils.paymentFrequencyLabel("unknown"), "Monthly");
-  assert.equal(utils.expenseCategoryLabel("deposit_refund"), "Security deposit refund");
-  assert.equal(utils.expenseCategoryLabel("contractor_labor"), "contractor labor");
   assert.equal(
-    utils.propertyAddress({ address: "10 Main St", city: "Altoona", state: "PA", postal_code: "16601" }),
+    utils.expenseCategoryLabel("deposit_refund"),
+    "Security deposit refund",
+  );
+  assert.equal(
+    utils.expenseCategoryLabel("contractor_labor"),
+    "contractor labor",
+  );
+  assert.equal(
+    utils.propertyAddress({
+      address: "10 Main St",
+      city: "Altoona",
+      state: "PA",
+      postal_code: "16601",
+    }),
     "10 Main St, Altoona, PA, 16601",
   );
-  assert.equal(utils.streetAddress({ address: "10 Main St, Altoona, PA" }), "10 Main St");
+  assert.equal(
+    utils.streetAddress({ address: "10 Main St, Altoona, PA" }),
+    "10 Main St",
+  );
   assert.match(utils.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
   assert.match(utils.monthStart(), /^\d{4}-\d{2}-01$/);
   assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
@@ -35,7 +52,10 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
 test("app state starts in Properties with fresh workspace collections", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "app-state.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-state.js"),
+      "utf8",
+    ),
     context,
   );
   const first = context.window.PropertyDeskAppState.create();
@@ -54,7 +74,10 @@ test("app state starts in Properties with fresh workspace collections", () => {
 test("backend client only initializes with complete public Supabase config", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "backend-client.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "backend-client.js"),
+      "utf8",
+    ),
     context,
   );
   let captured;
@@ -98,14 +121,21 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
   const toast = () => {};
   const fetchAll = () => {};
   const ledger = {
-    accountBalance: () => {}, scheduledMonthlyRunRate: () => {},
-    collectedSince: () => {}, depositLedger: () => {},
+    accountBalance: () => {},
+    scheduledMonthlyRunRate: () => {},
+    collectedSince: () => {},
+    depositLedger: () => {},
   };
-  const config = { supabaseUrl: "https://example.test", supabaseAnonKey: "public-key" };
+  const config = {
+    supabaseUrl: "https://example.test",
+    supabaseAnonKey: "public-key",
+  };
   const supabase = { createClient() {} };
   const context = vm.createContext({
     window: {
-      PropertyDeskWorkspaceData: { create: () => ({ loadWorkspaceRecords() {} }) },
+      PropertyDeskWorkspaceData: {
+        create: () => ({ loadWorkspaceRecords() {} }),
+      },
       PropertyDeskBackendClient: {
         create: (options) => {
           received.backend = options;
@@ -134,13 +164,22 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "app-services.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-services.js"),
+      "utf8",
+    ),
     context,
   );
   const dependencies = {
-    $() {}, render() {}, todayIso() {}, scheduledLoanBalance() {},
-    monthlyScheduledEstimate() {}, sumPosted() {}, securityDepositBalance() {},
-    config, supabase,
+    $() {},
+    render() {},
+    todayIso() {},
+    scheduledLoanBalance() {},
+    monthlyScheduledEstimate() {},
+    sumPosted() {},
+    securityDepositBalance() {},
+    config,
+    supabase,
   };
   const services = context.window.PropertyDeskAppServices.create(dependencies);
 
@@ -152,18 +191,37 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
   assert.equal(received.refresh.render, dependencies.render);
   assert.equal(received.ledger.state, state);
   assert.equal(received.ledger.todayIso, dependencies.todayIso);
-  assert.equal(received.ledger.scheduledLoanBalance, dependencies.scheduledLoanBalance);
+  assert.equal(
+    received.ledger.scheduledLoanBalance,
+    dependencies.scheduledLoanBalance,
+  );
   assert.equal(services.backend.configured, true);
   assert.equal(services.state, state);
   assert.equal(services.toast, toast);
   assert.equal(services.fetchAll, fetchAll);
   assert.equal(services.depositLedger, ledger.depositLedger);
+  assert.deepEqual(
+    Object.keys(services).sort(),
+    [
+      "accountBalance",
+      "backend",
+      "collectedSince",
+      "depositLedger",
+      "fetchAll",
+      "scheduledMonthlyRunRate",
+      "state",
+      "toast",
+    ].sort(),
+  );
 });
 
 test("notification feature replaces its timer and hides transient feedback", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "notifications.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "notifications.js"),
+      "utf8",
+    ),
     context,
   );
   const classes = new Set();
@@ -214,7 +272,10 @@ test("notification feature replaces its timer and hides transient feedback", () 
 test("PWA registration runs only in a web context and reports registration failures", async () => {
   const context = vm.createContext({ window: {}, navigator: {}, console });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "pwa-registration.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "pwa-registration.js"),
+      "utf8",
+    ),
     context,
   );
   const registerShell = context.window.PropertyDeskPwa.registerShell;
@@ -263,7 +324,10 @@ test("PWA registration runs only in a web context and reports registration failu
 test("ledger context scopes balance, collections, and deposits to workspace state", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-context.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-context.js"),
+      "utf8",
+    ),
     context,
   );
   const accounts = [{ id: "a1" }, { id: "a2" }];
@@ -322,14 +386,17 @@ test("backup and report exports own separate button bindings", () => {
     const bindings = new Map();
     const feature = context.window[globalName].create({
       $: (id) => ({
-        addEventListener: (event, handler) => bindings.set(`${id}:${event}`, handler),
+        addEventListener: (event, handler) =>
+          bindings.set(`${id}:${event}`, handler),
       }),
     });
 
     feature.attachEvents();
 
     assert.deepEqual([...bindings.keys()], expected);
-    assert.ok([...bindings.values()].every((handler) => typeof handler === "function"));
+    assert.ok(
+      [...bindings.values()].every((handler) => typeof handler === "function"),
+    );
   }
 });
 
@@ -352,11 +419,16 @@ test("report workflow composes portfolio rendering and account export actions", 
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "report-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "report-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const accountBalance = () => 0;
-  const workflow = context.window.PropertyDeskReportWorkflow.create({ accountBalance });
+  const workflow = context.window.PropertyDeskReportWorkflow.create({
+    accountBalance,
+  });
 
   assert.equal(passed.view.accountBalance, accountBalance);
   assert.equal(passed.export.accountBalance, accountBalance);
@@ -372,7 +444,10 @@ test("transaction workflow composes ledger display and passed maintenance action
       PropertyDeskTransactionViews: {
         create: (options) => {
           received.views = options;
-          return { renderPayments: () => "payments", attachEvents: () => "view events" };
+          return {
+            renderPayments: () => "payments",
+            attachEvents: () => "view events",
+          };
         },
       },
       PropertyDeskTransactionViewEvents: {
@@ -384,14 +459,23 @@ test("transaction workflow composes ledger display and passed maintenance action
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const updateAllocationPreview = () => {};
   const voidTransaction = () => "voided";
-  const transactionDependencies = { state: {}, correctTransaction: correct, voidTransaction };
+  const transactionDependencies = {
+    state: {},
+    correctTransaction: correct,
+    voidTransaction,
+  };
   const workflow = context.window.PropertyDeskTransactionWorkflow.create({
-    updateAllocationPreview, ...transactionDependencies, documentRef: {},
+    updateAllocationPreview,
+    ...transactionDependencies,
+    documentRef: {},
   });
 
   assert.equal(received.events.correctTransaction, correct);
@@ -405,7 +489,10 @@ test("transaction workflow composes ledger display and passed maintenance action
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "report-export.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "report-export.js"),
+      "utf8",
+    ),
     context,
   );
   const downloads = [];
@@ -415,18 +502,30 @@ test("account CSV export keeps rental balances blank and escapes spreadsheet fie
       properties: [{ id: "property-1", name: "Main House, East" }],
       accounts: [
         {
-          id: "rental-1", property_id: "property-1", name: "Lease", account_type: "rental",
-          party_name: "Tenant", payment_amount: 825, next_due_date: "2026-11-01", status: "active",
+          id: "rental-1",
+          property_id: "property-1",
+          name: "Lease",
+          account_type: "rental",
+          party_name: "Tenant",
+          payment_amount: 825,
+          next_due_date: "2026-11-01",
+          status: "active",
         },
         {
-          id: "note-1", property_id: "property-1", name: "Seller note", account_type: "note",
-          party_name: "Buyer", payment_amount: 400, next_due_date: "2026-11-01", status: "active",
+          id: "note-1",
+          property_id: "property-1",
+          name: "Seller note",
+          account_type: "note",
+          party_name: "Buyer",
+          payment_amount: 400,
+          next_due_date: "2026-11-01",
+          status: "active",
         },
       ],
     },
     todayIso: () => "2026-10-05",
     prettyType: (type) => type,
-    accountBalance: (account) => account.id === "note-1" ? 12000 : 0,
+    accountBalance: (account) => (account.id === "note-1" ? 12000 : 0),
     downloadBlob: (blob, filename) => downloads.push({ blob, filename }),
   });
 

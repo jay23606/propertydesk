@@ -1,6 +1,10 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadLedgerEntryForms, loadPropertyAccountForms, formElements } = require("./feature-test-helpers.cjs");
+const {
+  loadLedgerEntryForms,
+  loadPropertyAccountForms,
+  formElements,
+} = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -21,11 +25,17 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   };
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-table.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-portfolio-table.js"),
+      "utf8",
+    ),
     context,
   );
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-model.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-portfolio-model.js"),
+      "utf8",
+    ),
     context,
   );
   vm.runInContext(
@@ -83,12 +93,14 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     paymentStatusInMonth: () => "none",
     money,
   };
-  const portfolioTable = context.window.PropertyDeskPropertyPortfolioTable.create({
-    esc,
-    money,
-    paymentFrequencyLabel: () => "Monthly",
-  });
-  const portfolioModel = context.window.PropertyDeskPropertyPortfolioModel.create(dependencies);
+  const portfolioTable =
+    context.window.PropertyDeskPropertyPortfolioTable.create({
+      esc,
+      money,
+      paymentFrequencyLabel: () => "Monthly",
+    });
+  const portfolioModel =
+    context.window.PropertyDeskPropertyPortfolioModel.create(dependencies);
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
     state,
@@ -119,15 +131,24 @@ test("property portfolio workflow connects its model, table, and action routers"
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyPortfolioTable: {
-        create: (options) => { passed.tableOptions = options; return "table"; },
+        create: (options) => {
+          passed.tableOptions = options;
+          return "table";
+        },
       },
       PropertyDeskPropertyPortfolioModel: {
-        create: (options) => { passed.modelOptions = options; return "model"; },
+        create: (options) => {
+          passed.modelOptions = options;
+          return "model";
+        },
       },
       PropertyDeskPropertyViews: {
         create: (options) => {
           passed.viewOptions = options;
-          return { renderProperties: () => "properties", attachEvents: () => "filters" };
+          return {
+            renderProperties: () => "properties",
+            attachEvents: () => "filters",
+          };
         },
       },
       PropertyDeskPropertyViewEvents: {
@@ -139,17 +160,34 @@ test("property portfolio workflow connects its model, table, and action routers"
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-portfolio-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
-    esc: action, money: action, paymentFrequencyLabel: action,
-    monthlyScheduledEstimate: action, accountBalance: action, amountDueSince: action,
-    unpaidDueAccrualStart: action, todayIso: action, propertyAddress: action,
-    monthStart: action, streetAddress: action, dateOnly: action, monthEnd: action,
-    lateReminderMailto: action, paymentStatusInMonth: action, openPayment: action,
-    editPropertyQuickNote: action, openPropertyDetails: action,
-    resetAccountForm: action, populateFormOptions: action, openModal: action,
+    esc: action,
+    money: action,
+    paymentFrequencyLabel: action,
+    monthlyScheduledEstimate: action,
+    accountBalance: action,
+    amountDueSince: action,
+    unpaidDueAccrualStart: action,
+    todayIso: action,
+    propertyAddress: action,
+    monthStart: action,
+    streetAddress: action,
+    dateOnly: action,
+    monthEnd: action,
+    lateReminderMailto: action,
+    paymentStatusInMonth: action,
+    openPayment: action,
+    editPropertyQuickNote: action,
+    openPropertyDetails: action,
+    resetAccountForm: action,
+    populateFormOptions: action,
+    openModal: action,
   });
 
   assert.equal(passed.viewOptions.portfolioTable, "table");
@@ -182,25 +220,91 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-entry-forms.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
+      "utf8",
+    ),
     context,
   );
   const forms = context.window.PropertyDeskLedgerEntryForms.create({});
 
-  assert.deepEqual(Object.keys(forms).sort(), [
-    "attachEvents", "openExpense", "openPayment", "openPropertyPayment",
-    "prefillPaymentAmount", "saveExpense", "savePayment", "updateAllocationPreview",
-  ].sort());
-  assert.equal(forms.updateAllocationPreview, paymentActions.updateAllocationPreview);
+  assert.deepEqual(
+    Object.keys(forms).sort(),
+    [
+      "attachEvents",
+      "openExpense",
+      "openPayment",
+      "openPropertyPayment",
+      "prefillPaymentAmount",
+      "saveExpense",
+      "savePayment",
+      "updateAllocationPreview",
+    ].sort(),
+  );
+  assert.equal(
+    forms.updateAllocationPreview,
+    paymentActions.updateAllocationPreview,
+  );
   assert.equal(forms.openExpense, expenseActions.openExpense);
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
+test("property and account form workflow publishes an explicit interface", () => {
+  const calls = [];
+  const propertyActions = {
+    resetPropertyForm: () => "reset property",
+    saveProperty: () => "save property",
+    attachEvents: () => calls.push("property events"),
+  };
+  const accountActions = {
+    resetAccountForm: () => "reset account",
+    updateLoanFields: () => "loan fields",
+    saveAccount: () => "save account",
+    editAccount: () => "edit account",
+    attachEvents: (preview) => calls.push(["account events", preview]),
+  };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyForm: { create: () => propertyActions },
+      PropertyDeskAccountForm: { create: () => accountActions },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-account-forms.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const forms = context.window.PropertyDeskPropertyAccountForms.create({});
+
+  assert.deepEqual(
+    Object.keys(forms).sort(),
+    [
+      "attachEvents",
+      "editAccount",
+      "resetAccountForm",
+      "resetPropertyForm",
+      "saveAccount",
+      "saveProperty",
+      "updateLoanFields",
+    ].sort(),
+  );
+  assert.equal(forms.saveProperty, propertyActions.saveProperty);
+  assert.equal(forms.editAccount, accountActions.editAccount);
+  const preview = () => {};
+  forms.attachEvents(preview);
+  assert.deepEqual(calls, ["property events", ["account events", preview]]);
+});
+
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "create-actions.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "create-actions.js"),
+      "utf8",
+    ),
     context,
   );
   loadPropertyAccountForms(context);
@@ -209,11 +313,33 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
-    [property, ["resetPropertyForm", "resetAccountForm", "saveProperty", "saveAccount", "editAccount", "attachEvents"]],
-    [ledger, ["savePayment", "saveExpense", "openPayment", "prefillPaymentAmount", "openPropertyPayment", "openExpense", "attachEvents"]],
+    [
+      property,
+      [
+        "resetPropertyForm",
+        "resetAccountForm",
+        "saveProperty",
+        "saveAccount",
+        "editAccount",
+        "attachEvents",
+      ],
+    ],
+    [
+      ledger,
+      [
+        "savePayment",
+        "saveExpense",
+        "openPayment",
+        "prefillPaymentAmount",
+        "openPropertyPayment",
+        "openExpense",
+        "attachEvents",
+      ],
+    ],
     [actions, ["attachEvents"]],
   ]) {
-    for (const name of names) assert.equal(typeof feature[name], "function", name);
+    for (const name of names)
+      assert.equal(typeof feature[name], "function", name);
   }
 });
 
@@ -234,7 +360,9 @@ test("property and account forms report rejected saves without running success a
     workspaceOwnerId: "workspace-1",
     client: {
       from: () => ({
-        insert: async () => { throw new Error("offline"); },
+        insert: async () => {
+          throw new Error("offline");
+        },
       }),
     },
   };
@@ -279,11 +407,19 @@ test("payment and expense forms report rejected saves without clearing the entri
   const $ = formElements(values);
   const state = {
     workspaceOwnerId: "workspace-1",
-    accounts: [{ id: "rental-1", property_id: "property-1", account_type: "rental" }],
+    accounts: [
+      { id: "rental-1", property_id: "property-1", account_type: "rental" },
+    ],
     pendingCorrection: null,
     client: {
-      from: () => ({ insert: async () => { throw new Error("offline"); } }),
-      rpc: async () => { throw new Error("offline"); },
+      from: () => ({
+        insert: async () => {
+          throw new Error("offline");
+        },
+      }),
+      rpc: async () => {
+        throw new Error("offline");
+      },
     },
   };
   const corrections = [];
@@ -313,29 +449,35 @@ test("payment and expense forms report rejected saves without clearing the entri
     "Expense couldn't be saved right now. Check your connection and try again.",
   ]);
   assert.deepEqual(JSON.parse(JSON.stringify(corrections)), [
-    ["payment", {
-      account_id: "rental-1",
-      amount: 500,
-      received_date: "2026-10-05",
-      payment_method: "check",
-      income_category: "rent",
-      principal_amount: 0,
-      interest_amount: 0,
-      fee_amount: 0,
-      escrow_amount: 0,
-      unapplied_amount: 0,
-      memo: "October",
-    }],
-    ["expense", {
-      property_id: "property-1",
-      account_id: null,
-      amount: 100,
-      expense_date: "2026-10-05",
-      category: "repair",
-      payee: null,
-      payment_method: "check",
-      memo: "Plumbing repair",
-    }],
+    [
+      "payment",
+      {
+        account_id: "rental-1",
+        amount: 500,
+        received_date: "2026-10-05",
+        payment_method: "check",
+        income_category: "rent",
+        principal_amount: 0,
+        interest_amount: 0,
+        fee_amount: 0,
+        escrow_amount: 0,
+        unapplied_amount: 0,
+        memo: "October",
+      },
+    ],
+    [
+      "expense",
+      {
+        property_id: "property-1",
+        account_id: null,
+        amount: 100,
+        expense_date: "2026-10-05",
+        category: "repair",
+        payee: null,
+        payment_method: "check",
+        memo: "Plumbing repair",
+      },
+    ],
   ]);
 });
 
@@ -366,8 +508,10 @@ test("record-entry feature owns form event bindings and category hints", () => {
     fillSelect() {},
     prettyType: (type) => type,
   };
-  const propertyForms = context.window.PropertyDeskPropertyAccountForms.create(formContext);
-  const entryForms = context.window.PropertyDeskLedgerEntryForms.create(formContext);
+  const propertyForms =
+    context.window.PropertyDeskPropertyAccountForms.create(formContext);
+  const entryForms =
+    context.window.PropertyDeskLedgerEntryForms.create(formContext);
 
   propertyForms.attachEvents(() => {});
   entryForms.attachEvents();
@@ -388,15 +532,16 @@ test("expense entry saves a property-level contractor expense through the expens
   const element = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
-        value: ({
-          "expense-property": "property-1",
-          "expense-category": "contractor_labor",
-          "expense-payee": "Roofing Co",
-          "expense-method": "check",
-          "expense-amount": "425.50",
-          "expense-date": "2026-10-04",
-          "expense-memo": "Roof repair",
-        })[id] || "",
+        value:
+          {
+            "expense-property": "property-1",
+            "expense-category": "contractor_labor",
+            "expense-payee": "Roofing Co",
+            "expense-method": "check",
+            "expense-amount": "425.50",
+            "expense-date": "2026-10-04",
+            "expense-memo": "Roof repair",
+          }[id] || "",
         textContent: "",
         classList: { add() {}, remove() {}, toggle() {} },
         querySelector: () => ({ textContent: "" }),
@@ -466,7 +611,11 @@ test("expense entry requires a rental account before recording a deposit refund"
     state: {
       accounts: [{ id: "loan-account", account_type: "note" }],
       pendingCorrection: null,
-      client: { from() { throw new Error("should not save"); } },
+      client: {
+        from() {
+          throw new Error("should not save");
+        },
+      },
     },
     moneyInput: Number,
     todayIso: () => "2026-10-05",
@@ -480,13 +629,18 @@ test("expense entry requires a rental account before recording a deposit refund"
   });
 
   await forms.saveExpense({ preventDefault() {} });
-  assert.deepEqual(calls, ["Choose a rental account for a security deposit refund"]);
+  assert.deepEqual(calls, [
+    "Choose a rental account for a security deposit refund",
+  ]);
 });
 
 test("record-entry feature owns create actions and handles empty workspace states", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "create-actions.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "create-actions.js"),
+      "utf8",
+    ),
     context,
   );
   const handlers = new Map();

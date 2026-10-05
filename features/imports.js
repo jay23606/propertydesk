@@ -12,11 +12,14 @@
     }
 
     return {
-      ...accounts,
-      ...transactions,
+      importAccounts: accounts.importAccounts,
+      importPayments: transactions.importPayments,
+      importExpenses: transactions.importExpenses,
       attachEvents,
     };
   }
 
-  window.PropertyDeskImportFeature = Object.freeze({ create: createImportWorkflows });
+  window.PropertyDeskImportFeature = Object.freeze({
+    create: createImportWorkflows,
+  });
 })();
