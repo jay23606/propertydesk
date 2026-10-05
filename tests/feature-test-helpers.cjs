@@ -3,7 +3,14 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function loadAuthFeatures(context) {
-  for (const filename of ["app-state.js", "auth-screens.js", "auth-recovery.js", "auth-session.js", "auth-form.js", "auth.js"]) {
+  for (const filename of [
+    "app-state.js",
+    "auth-screens.js",
+    "auth-recovery.js",
+    "auth-session.js",
+    "auth-form.js",
+    "auth.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -12,7 +19,11 @@ function loadAuthFeatures(context) {
 }
 
 function loadWorkspaceFeatures(context) {
-  for (const filename of ["profile-settings.js", "workspace-members.js", "workspace.js"]) {
+  for (const filename of [
+    "profile-settings.js",
+    "workspace-members.js",
+    "workspace.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -66,7 +77,11 @@ function loadImportFeatures(context) {
 }
 
 function loadImportPreview(context) {
-  for (const filename of ["import-preview-rendering.js", "import-preview.js", "import-preview-events.js"]) {
+  for (const filename of [
+    "import-preview-rendering.js",
+    "import-preview.js",
+    "import-preview-events.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -95,4 +110,12 @@ function formElements(values = {}) {
   };
 }
 
-module.exports = { loadAuthFeatures, loadWorkspaceFeatures, loadLedgerEntryForms, loadPropertyAndAccountForms, loadImportFeatures, loadImportPreview, formElements };
+module.exports = {
+  loadAuthFeatures,
+  loadWorkspaceFeatures,
+  loadLedgerEntryForms,
+  loadPropertyAndAccountForms,
+  loadImportFeatures,
+  loadImportPreview,
+  formElements,
+};

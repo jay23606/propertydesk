@@ -65,31 +65,56 @@ test("account details render action targets without owning action listeners", as
   });
 
   await feature.openAccountDetails(account.id);
-  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-edit="account-1"/);
-  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-payment="account-1"/);
-  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-close="account-1"/);
+  assert.match(
+    elements.get("detail-content").innerHTML,
+    /data-account-detail-edit="account-1"/,
+  );
+  assert.match(
+    elements.get("detail-content").innerHTML,
+    /data-account-detail-payment="account-1"/,
+  );
+  assert.match(
+    elements.get("detail-content").innerHTML,
+    /data-account-detail-close="account-1"/,
+  );
 });
 
 test("account detail view renders estimates and escapes payment history text", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-details-view.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-details-view.js"),
+      "utf8",
+    ),
     context,
   );
   const view = context.window.PropertyDeskAccountDetailsView.create({
     money: (value) => `$${Number(value).toFixed(2)}`,
     fmtDate: (value) => value || "—",
-    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-    })[char]),
+    esc: (value) =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char],
+      ),
     prettyType: () => "Private note",
     paymentFrequencyLabel: () => "Monthly",
   });
 
   const html = view.renderAccountDetails({
     account: {
-      id: "account-1", account_type: "note", party_name: "<Buyer>",
-      payment_amount: 500, payment_frequency: "monthly", next_due_date: "2026-11-01",
+      id: "account-1",
+      account_type: "note",
+      party_name: "<Buyer>",
+      payment_amount: 500,
+      payment_frequency: "monthly",
+      next_due_date: "2026-11-01",
     },
     propertyName: "<Oak House>",
     propertyAddressText: "<Main Street>",
@@ -98,9 +123,25 @@ test("account detail view renders estimates and escapes payment history text", (
     unpaidDue: 0,
     unpaidSinceLabel: "Oct 1, 2026",
     depositHTML: "Deposit details",
-    schedule: [{ i: 1, date: "2026-11-01", payment: 500, principal: 400, interest: 100, balance: 9000 }],
+    schedule: [
+      {
+        i: 1,
+        date: "2026-11-01",
+        payment: 500,
+        principal: 400,
+        interest: 100,
+        balance: 9000,
+      },
+    ],
     historyHTML: "Prior terms",
-    payments: [{ status: "voided", received_date: "2026-10-01", amount: 500, memo: "<duplicate>" }],
+    payments: [
+      {
+        status: "voided",
+        received_date: "2026-10-01",
+        amount: 500,
+        memo: "<duplicate>",
+      },
+    ],
   });
 
   assert.match(html, /&lt;Oak House&gt;/);
@@ -119,14 +160,22 @@ test("account detail view renders estimates and escapes payment history text", (
 test("account detail event router dispatches edit, payment, and close actions", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-detail-events.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-detail-events.js"),
+      "utf8",
+    ),
     context,
   );
   const account = { id: "account-1" };
   const calls = [];
   let clickHandler;
   const feature = context.window.PropertyDeskAccountDetailEvents.create({
-    $: (id) => ({ id, addEventListener: (_event, handler) => { clickHandler = handler; } }),
+    $: (id) => ({
+      id,
+      addEventListener: (_event, handler) => {
+        clickHandler = handler;
+      },
+    }),
     state: { accounts: [account] },
     closeModal: (modal) => calls.push(`close:${modal.id}`),
     editAccount: (value) => calls.push(`edit:${value.id}`),
@@ -141,12 +190,14 @@ test("account detail event router dispatches edit, payment, and close actions", 
   ];
   for (const [selector, dataset] of actions) {
     clickHandler({
-      target: { closest: (value) => value === selector ? { dataset } : null },
+      target: { closest: (value) => (value === selector ? { dataset } : null) },
     });
   }
   assert.deepEqual(calls, [
-    "close:detail-modal", "edit:account-1",
-    "close:detail-modal", "payment:account-1",
+    "close:detail-modal",
+    "edit:account-1",
+    "close:detail-modal",
+    "payment:account-1",
     "account-close:account-1",
   ]);
 });
@@ -165,18 +216,27 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   }
   const seenAuditIds = [];
   const state = {
-    agreementVersions: [{
-      account_id: "account-1",
-      reason: "Amendment",
-      effective_from: "2026-01-01",
-      replaced_on: "2026-02-01",
-      created_at: "2026-02-02T12:00:00Z",
-      terms: { payment_amount: 550, original_principal: 40000, interest_rate: 5, term_months: 240, party_name: "<Buyer>" },
-    }, {
-      account_id: "another-account",
-      reason: "Should not appear",
-      terms: {},
-    }],
+    agreementVersions: [
+      {
+        account_id: "account-1",
+        reason: "Amendment",
+        effective_from: "2026-01-01",
+        replaced_on: "2026-02-01",
+        created_at: "2026-02-02T12:00:00Z",
+        terms: {
+          payment_amount: 550,
+          original_principal: 40000,
+          interest_rate: 5,
+          term_months: 240,
+          party_name: "<Buyer>",
+        },
+      },
+      {
+        account_id: "another-account",
+        reason: "Should not appear",
+        terms: {},
+      },
+    ],
     payments: [{ id: "payment-1", void_reason: "<duplicate>" }],
     client: {
       from(table) {
@@ -199,12 +259,14 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
           limit: async (count) => {
             assert.equal(count, 100);
             return {
-              data: [{
-                entity_type: "pd_payments",
-                entity_id: "payment-1",
-                action: "voided",
-                created_at: "2026-10-01T12:00:00Z",
-              }],
+              data: [
+                {
+                  entity_type: "pd_payments",
+                  entity_id: "payment-1",
+                  action: "voided",
+                  created_at: "2026-10-01T12:00:00Z",
+                },
+              ],
               error: null,
             };
           },
@@ -215,15 +277,15 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   };
   const history = context.window.PropertyDeskAccountHistoryDetails.create({
     state,
-    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    esc: (value) =>
+      String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     money: (value) => `$${Number(value || 0).toFixed(2)}`,
     fmtDate: (value) => value || "—",
   });
 
-  const html = await history.renderAccountHistory(
-    { id: "account-1" },
-    [{ id: "payment-1" }],
-  );
+  const html = await history.renderAccountHistory({ id: "account-1" }, [
+    { id: "payment-1" },
+  ]);
 
   assert.deepEqual(seenAuditIds, ["account-1", "payment-1"]);
   assert.match(html, /Prior agreement terms/);
@@ -233,7 +295,9 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   assert.match(html, /Voided payment/);
   assert.match(html, /Reason: &lt;duplicate&gt;/);
 
-  state.client.from = () => { throw new Error("audit unavailable"); };
+  state.client.from = () => {
+    throw new Error("audit unavailable");
+  };
   const unavailableHTML = await history.renderAccountHistory(
     { id: "account-1" },
     [],

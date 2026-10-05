@@ -1,13 +1,22 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadPropertyAndAccountForms, formElements } = require("./feature-test-helpers.cjs");
+const {
+  loadPropertyAndAccountForms,
+  formElements,
+} = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
 test("property and account form modules expose separate APIs", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
   const dependencies = {
-    $: formElements(), state: {}, toast() {}, closeModal() {}, fetchAll() {},
-    moneyInput() {}, todayIso: () => "2026-10-05", populateFormOptions() {},
+    $: formElements(),
+    state: {},
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    moneyInput() {},
+    todayIso: () => "2026-10-05",
+    populateFormOptions() {},
     openModal() {},
   };
   const property = context.window.PropertyDeskPropertyForm.create(dependencies);
@@ -18,13 +27,18 @@ test("property and account form modules expose separate APIs", () => {
   });
 
   assert.deepEqual(Object.keys(property).sort(), [
-    "attachEvents", "resetPropertyForm", "saveProperty",
+    "attachEvents",
+    "resetPropertyForm",
+    "saveProperty",
   ]);
   assert.deepEqual(Object.keys(account).sort(), [
-    "attachEvents", "editAccount", "resetAccountForm", "saveAccount", "updateLoanFields",
+    "attachEvents",
+    "editAccount",
+    "resetAccountForm",
+    "saveAccount",
+    "updateLoanFields",
   ]);
 });
-
 
 test("account form view resets and populates fields without owning persistence", () => {
   const context = vm.createContext({ window: {} });
@@ -70,35 +84,32 @@ test("account form view resets and populates fields without owning persistence",
   assert.equal(elements("account-party-phone").value, "555-0100");
   assert.equal(elements("account-escrow").value, 150);
   assert.equal(elements("account-term").value, 360);
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(view.readValues())),
-    {
-      id: "account-1",
-      type: "note",
-      propertyId: "property-1",
-      name: "Seller note",
-      partyName: "Buyer",
-      partyEmail: "buyer@example.com",
-      partyPhone: "555-0100",
-      reminderEnabled: false,
-      startDate: "2024-01-01",
-      nextDueDate: "2026-11-01",
-      paymentAmount: 550,
-      paymentFrequency: "monthly",
-      originalPrincipal: 40000,
-      principalInterestAmount: 400,
-      escrowAmount: 150,
-      balanceAdjustment: 100,
-      interestRate: 5,
-      termMonths: 360,
-      balloonDate: "",
-      agreementEffectiveDate: "2025-06-01",
-      agreementChangeReason: "",
-      lateFee: 25,
-      graceDays: 5,
-      notes: "Current agreement",
-    },
-  );
+  assert.deepEqual(JSON.parse(JSON.stringify(view.readValues())), {
+    id: "account-1",
+    type: "note",
+    propertyId: "property-1",
+    name: "Seller note",
+    partyName: "Buyer",
+    partyEmail: "buyer@example.com",
+    partyPhone: "555-0100",
+    reminderEnabled: false,
+    startDate: "2024-01-01",
+    nextDueDate: "2026-11-01",
+    paymentAmount: 550,
+    paymentFrequency: "monthly",
+    originalPrincipal: 40000,
+    principalInterestAmount: 400,
+    escrowAmount: 150,
+    balanceAdjustment: 100,
+    interestRate: 5,
+    termMonths: 360,
+    balloonDate: "",
+    agreementEffectiveDate: "2025-06-01",
+    agreementChangeReason: "",
+    lateFee: 25,
+    graceDays: 5,
+    notes: "Current agreement",
+  });
   assert.deepEqual(opened, ["options", "account-modal"]);
   assert.deepEqual(toggles.at(-1), ["hidden", false]);
 
@@ -109,7 +120,6 @@ test("account form view resets and populates fields without owning persistence",
   assert.equal(elements("account-reminder-enabled").checked, false);
   assert.deepEqual(toggles.at(-1), ["hidden", true]);
 });
-
 
 test("property and account forms report rejected saves without running success actions", async () => {
   const context = vm.createContext({ window: {} });
@@ -159,5 +169,3 @@ test("property and account forms report rejected saves without running success a
     "Account couldn't be saved right now. Check your connection and try again.",
   ]);
 });
-
-

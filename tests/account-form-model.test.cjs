@@ -29,7 +29,10 @@ test("account form model normalizes a list of party email addresses", () => {
 });
 
 test("account form model rejects malformed party addresses", () => {
-  const result = loadModel().partyEmails("buyer@example.test, not-an-email", false);
+  const result = loadModel().partyEmails(
+    "buyer@example.test, not-an-email",
+    false,
+  );
 
   assert.deepEqual(JSON.parse(JSON.stringify(result)), {
     emails: ["buyer@example.test", "not-an-email"],

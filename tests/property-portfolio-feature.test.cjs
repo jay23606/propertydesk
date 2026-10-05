@@ -119,7 +119,6 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.ok(totals.innerHTML.includes("—"));
 });
 
-
 test("property portfolio workflow connects its model, table, and action routers", () => {
   const passed = {};
   const action = () => {};
@@ -206,4 +205,3 @@ test("property portfolio workflow connects its model, table, and action routers"
   assert.equal(workflow.attachPropertyViewEvents(), "filters");
   assert.equal(workflow.attachPropertyActionEvents(), "actions");
 });
-

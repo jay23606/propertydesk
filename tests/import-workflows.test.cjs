@@ -1,164 +1,482 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 
-test('every local deferred script loads before app.js and is included in the PWA shell', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+test("every local deferred script loads before app.js and is included in the PWA shell", () => {
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const localScripts = [...html.matchAll(/<script\b([^>]*)>/gi)]
     .filter(([, attributes]) => /\bdefer\b/i.test(attributes))
     .map(([, attributes]) => attributes.match(/\bsrc=["']([^"']+)["']/i)?.[1])
     .filter((source) => source && !/^https?:\/\//i.test(source))
-    .map((source) => source.split('?')[0].replace(/^\.\//, ''));
+    .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const shellMatch = worker.match(/const SHELL_FILES\s*=\s*\[([\s\S]*?)\];/);
-  assert.ok(shellMatch, 'service worker defines its shell file list');
+  assert.ok(shellMatch, "service worker defines its shell file list");
   const shellFiles = new Set(
-    [...shellMatch[1].matchAll(/["']([^"']+)["']/g)]
-      .map(([, source]) => source.replace(/^\.\//, '')),
+    [...shellMatch[1].matchAll(/["']([^"']+)["']/g)].map(([, source]) =>
+      source.replace(/^\.\//, ""),
+    ),
   );
-  const appIndex = localScripts.indexOf('app.js');
-  assert.notEqual(appIndex, -1, 'app.js is loaded');
-  assert.equal(appIndex, localScripts.length - 1, 'app.js is the last local deferred script');
+  const appIndex = localScripts.indexOf("app.js");
+  assert.notEqual(appIndex, -1, "app.js is loaded");
+  assert.equal(
+    appIndex,
+    localScripts.length - 1,
+    "app.js is the last local deferred script",
+  );
   for (const source of localScripts) {
-    assert.ok(shellFiles.has(source), `${source} is cached by the service worker`);
+    assert.ok(
+      shellFiles.has(source),
+      `${source} is cached by the service worker`,
+    );
   }
 });
 
-test('the browser loads tested import and backup workflows before the app and precaches them in the PWA shell', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
-  assert.ok(html.indexOf('features/app-state.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/app-lifecycle.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/backend-client.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/workspace-refresh.js') < html.indexOf('features/app-services.js'));
-  assert.ok(html.indexOf('features/notifications.js') < html.indexOf('features/app-services.js'));
-  assert.ok(html.indexOf('features/ledger-context.js') < html.indexOf('features/app-services.js'));
-  assert.ok(html.indexOf('features/app-services.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-address-utils.js') < html.indexOf('app.js'));
+test("the browser loads tested import and backup workflows before the app and precaches them in the PWA shell", () => {
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.ok(html.indexOf("features/app-state.js") < html.indexOf("app.js"));
+  assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/backend-client.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/workspace-refresh.js") <
+      html.indexOf("features/app-services.js"),
+  );
+  assert.ok(
+    html.indexOf("features/notifications.js") <
+      html.indexOf("features/app-services.js"),
+  );
+  assert.ok(
+    html.indexOf("features/ledger-context.js") <
+      html.indexOf("features/app-services.js"),
+  );
+  assert.ok(html.indexOf("features/app-services.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/property-address-utils.js") < html.indexOf("app.js"),
+  );
   for (const validator of [
-    'account-import-validation.js',
-    'expense-import-validation.js',
-    'payment-import-validation.js',
+    "account-import-validation.js",
+    "expense-import-validation.js",
+    "payment-import-validation.js",
   ]) {
-    assert.ok(html.indexOf(validator) < html.indexOf('import-workflows.js'));
+    assert.ok(html.indexOf(validator) < html.indexOf("import-workflows.js"));
   }
-  assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/import-preview-rendering.js') < html.indexOf('features/import-preview.js'));
-  assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/import-preview-events.js'));
-  assert.ok(html.indexOf('features/import-preview-events.js') < html.indexOf('features/imports.js'));
-  assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/imports.js'));
-  assert.ok(html.indexOf('features/account-import.js') < html.indexOf('features/imports.js'));
-  assert.ok(html.indexOf('features/payment-import.js') < html.indexOf('features/transaction-imports.js'));
-  assert.ok(html.indexOf('features/expense-import.js') < html.indexOf('features/transaction-imports.js'));
-  assert.ok(html.indexOf('features/transaction-imports.js') < html.indexOf('features/imports.js'));
-  assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-views.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-views.js') < html.indexOf('features/transaction-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-view-events.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-correction-form.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-maintenance-workflow.js') < html.indexOf('features/transaction-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/report-views.js') < html.indexOf('features/report-workflow.js'));
-  assert.ok(html.indexOf('features/report-model.js') < html.indexOf('features/report-views.js'));
-  assert.ok(html.indexOf('features/report-export.js') < html.indexOf('features/report-workflow.js'));
-  assert.ok(html.indexOf('features/report-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/app-utils.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/ledger-context.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-form.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/account-payload.js') < html.indexOf('features/account-form.js'));
-  assert.ok(html.indexOf('features/account-form-view.js') < html.indexOf('features/account-form.js'));
-  assert.ok(html.indexOf('features/account-form.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/payment-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
-  assert.ok(html.indexOf('features/transaction-payloads.js') < html.indexOf('features/ledger-entry-forms.js'));
-  assert.ok(html.indexOf('features/expense-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
-  assert.ok(html.indexOf('features/ledger-entry-forms.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/ledger-entry-forms.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/create-actions.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-corrections.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf("import-workflows.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/import-preview-rendering.js") <
+      html.indexOf("features/import-preview.js"),
+  );
+  assert.ok(
+    html.indexOf("features/import-preview.js") <
+      html.indexOf("features/import-preview-events.js"),
+  );
+  assert.ok(
+    html.indexOf("features/import-preview-events.js") <
+      html.indexOf("features/imports.js"),
+  );
+  assert.ok(
+    html.indexOf("features/import-preview.js") <
+      html.indexOf("features/imports.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-import.js") <
+      html.indexOf("features/imports.js"),
+  );
+  assert.ok(
+    html.indexOf("features/payment-import.js") <
+      html.indexOf("features/transaction-imports.js"),
+  );
+  assert.ok(
+    html.indexOf("features/expense-import.js") <
+      html.indexOf("features/transaction-imports.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-imports.js") <
+      html.indexOf("features/imports.js"),
+  );
+  assert.ok(html.indexOf("zip-utils.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/property-views.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-views.js") <
+      html.indexOf("features/transaction-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-view-events.js") <
+      html.indexOf("features/transaction-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-correction-form.js") <
+      html.indexOf("features/transaction-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-maintenance.js") <
+      html.indexOf("features/transaction-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-maintenance-workflow.js") <
+      html.indexOf("features/transaction-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-views.js") <
+      html.indexOf("features/report-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-model.js") <
+      html.indexOf("features/report-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-export.js") <
+      html.indexOf("features/report-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(html.indexOf("features/app-utils.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/ledger-context.js") < html.indexOf("app.js"),
+  );
+  assert.ok(html.indexOf("features/property-form.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/account-payload.js") <
+      html.indexOf("features/account-form.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-form-view.js") <
+      html.indexOf("features/account-form.js"),
+  );
+  assert.ok(html.indexOf("features/account-form.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/payment-entry-form.js") <
+      html.indexOf("features/ledger-entry-forms.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-payloads.js") <
+      html.indexOf("features/ledger-entry-forms.js"),
+  );
+  assert.ok(
+    html.indexOf("features/expense-entry-form.js") <
+      html.indexOf("features/ledger-entry-forms.js"),
+  );
+  assert.ok(
+    html.indexOf("features/ledger-entry-forms.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/ledger-entry-forms.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/create-actions.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-corrections.js") <
+      html.indexOf("app.js"),
+  );
   assert.doesNotMatch(html, /features\/entry-workflow\.js/);
-  assert.ok(html.indexOf('features/imports.js') < html.indexOf('features/csv-import-workflow.js'));
-  assert.ok(html.indexOf('features/csv-import-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/overview-model.js') < html.indexOf('features/overview.js'));
-  assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/property-views.js'));
-  assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/overview-workflow.js'));
-  assert.ok(html.indexOf('features/overview-events.js') < html.indexOf('features/overview-workflow.js'));
-  assert.ok(html.indexOf('features/overview-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-views.js'));
-  assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-portfolio-model.js'));
-  assert.ok(html.indexOf('features/property-portfolio-model.js') < html.indexOf('features/property-views.js'));
-  assert.ok(html.indexOf('features/property-views.js') < html.indexOf('features/property-portfolio-workflow.js'));
-  assert.ok(html.indexOf('features/property-view-events.js') < html.indexOf('features/property-portfolio-workflow.js'));
-  assert.ok(html.indexOf('features/property-portfolio-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-details.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-details-view.js') < html.indexOf('features/property-details.js'));
-  assert.ok(html.indexOf('features/transaction-list-model.js') < html.indexOf('features/transaction-views.js'));
-  assert.ok(html.indexOf('features/transaction-row-view.js') < html.indexOf('features/transaction-views.js'));
-  assert.ok(html.indexOf('features/property-activity-model.js') < html.indexOf('features/property-activity-details.js'));
-  assert.ok(html.indexOf('features/property-activity-view.js') < html.indexOf('features/property-activity-details.js'));
-  assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details-workflow.js'));
-  assert.ok(html.indexOf('features/property-details.js') < html.indexOf('features/property-details-workflow.js'));
-  assert.ok(html.indexOf('features/property-details-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-activity-details.js') < html.indexOf('features/property-details.js'));
-  assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-detail-document-events.js') < html.indexOf('features/property-document-workflow.js'));
-  assert.ok(html.indexOf('features/property-detail-quick-actions.js') < html.indexOf('features/property-detail-actions-workflow.js'));
-  assert.ok(html.indexOf('features/document-repository.js') < html.indexOf('features/documents.js'));
-  assert.ok(html.indexOf('features/documents.js') < html.indexOf('features/property-document-workflow.js'));
-  assert.ok(html.indexOf('features/property-holder-management.js') < html.indexOf('features/property-detail-actions-workflow.js'));
-  assert.ok(html.indexOf('features/property-archive.js') < html.indexOf('features/property-detail-actions-workflow.js'));
-  assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('features/property-detail-actions-workflow.js'));
-  assert.ok(html.indexOf('features/property-detail-events.js') < html.indexOf('features/property-detail-actions-workflow.js'));
-  assert.ok(html.indexOf('features/property-detail-actions-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-document-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/account-details.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/account-details-view.js') < html.indexOf('features/account-details.js'));
-  assert.ok(html.indexOf('features/account-history-model.js') < html.indexOf('features/account-history-details.js'));
-  assert.ok(html.indexOf('features/account-history-view.js') < html.indexOf('features/account-history-details.js'));
-  assert.ok(html.indexOf('features/account-details.js') < html.indexOf('features/account-detail-events.js'));
-  assert.ok(html.indexOf('features/deposit-details-model.js') < html.indexOf('features/deposit-details.js'));
-  assert.ok(html.indexOf('features/deposit-details-view.js') < html.indexOf('features/deposit-details.js'));
-  assert.ok(html.indexOf('features/deposit-details.js') < html.indexOf('features/deposit-detail-events.js'));
-  assert.ok(html.indexOf('features/deposit-detail-events.js') < html.indexOf('features/deposit-details-workflow.js'));
-  assert.ok(html.indexOf('features/deposit-details-workflow.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/account-details.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/account-history-details.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/account-detail-events.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('features/account-maintenance-workflow.js'));
-  assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('features/account-maintenance-workflow.js'));
-  assert.ok(html.indexOf('features/account-maintenance-workflow.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/account-details-workflow.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/documents.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/exports.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/auth-recovery.js') < html.indexOf('features/auth.js'));
-  assert.ok(html.indexOf('features/auth-recovery.js') < html.indexOf('features/auth-session.js'));
-  assert.ok(html.indexOf('features/auth-session.js') < html.indexOf('features/auth.js'));
-  assert.ok(html.indexOf('features/auth-form.js') < html.indexOf('features/auth.js'));
-  assert.ok(html.indexOf('features/auth.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/profile-settings.js') < html.indexOf('features/workspace.js'));
-  assert.ok(html.indexOf('features/workspace.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/workspace-members.js') < html.indexOf('features/workspace.js'));
-  assert.ok(html.indexOf('features/property-holder-management.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-archive.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-view-events.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-view-events.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/property-quick-note.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-correction-form.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-corrections.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/notifications.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/pwa-registration.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/reminder-preview.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/reminder-workflow.js') < html.indexOf('features/app-shell-workflow.js'));
-  assert.ok(html.indexOf('features/reminder-activity-view.js') < html.indexOf('features/workspace-settings-workflow.js'));
-  assert.ok(html.indexOf('features/workspace.js') < html.indexOf('features/workspace-settings-workflow.js'));
-  assert.ok(html.indexOf('features/reminder-preview.js') < html.indexOf('features/workspace-settings-workflow.js'));
-  assert.ok(html.indexOf('features/workspace-settings-workflow.js') < html.indexOf('app.js'));
+  assert.ok(
+    html.indexOf("features/imports.js") <
+      html.indexOf("features/csv-import-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/csv-import-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/overview-model.js") <
+      html.indexOf("features/overview.js"),
+  );
+  assert.ok(
+    html.indexOf("features/overview.js") <
+      html.indexOf("features/property-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/overview.js") <
+      html.indexOf("features/overview-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/overview-events.js") <
+      html.indexOf("features/overview-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-table.js") <
+      html.indexOf("features/property-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-table.js") <
+      html.indexOf("features/property-portfolio-model.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-model.js") <
+      html.indexOf("features/property-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-views.js") <
+      html.indexOf("features/property-portfolio-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-view-events.js") <
+      html.indexOf("features/property-portfolio-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-details.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-details-view.js") <
+      html.indexOf("features/property-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-list-model.js") <
+      html.indexOf("features/transaction-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-row-view.js") <
+      html.indexOf("features/transaction-views.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-activity-model.js") <
+      html.indexOf("features/property-activity-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-activity-view.js") <
+      html.indexOf("features/property-activity-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-activity-details.js") <
+      html.indexOf("features/property-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-details.js") <
+      html.indexOf("features/property-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-details-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-activity-details.js") <
+      html.indexOf("features/property-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-detail-events.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-detail-document-events.js") <
+      html.indexOf("features/property-document-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-detail-quick-actions.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/document-repository.js") <
+      html.indexOf("features/documents.js"),
+  );
+  assert.ok(
+    html.indexOf("features/documents.js") <
+      html.indexOf("features/property-document-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-holder-management.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-archive.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-quick-note.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-detail-events.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-detail-actions-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-document-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-details.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-details-view.js") <
+      html.indexOf("features/account-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-history-model.js") <
+      html.indexOf("features/account-history-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-history-view.js") <
+      html.indexOf("features/account-history-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-details.js") <
+      html.indexOf("features/account-detail-events.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-details-model.js") <
+      html.indexOf("features/deposit-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-details-view.js") <
+      html.indexOf("features/deposit-details.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-details.js") <
+      html.indexOf("features/deposit-detail-events.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-detail-events.js") <
+      html.indexOf("features/deposit-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-details-workflow.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-details.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-history-details.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-detail-events.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-maintenance.js") <
+      html.indexOf("features/account-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-maintenance.js") <
+      html.indexOf("features/account-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-maintenance-workflow.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-details-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(html.indexOf("features/documents.js") < html.indexOf("app.js"));
+  assert.ok(html.indexOf("features/exports.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/auth-recovery.js") <
+      html.indexOf("features/auth.js"),
+  );
+  assert.ok(
+    html.indexOf("features/auth-recovery.js") <
+      html.indexOf("features/auth-session.js"),
+  );
+  assert.ok(
+    html.indexOf("features/auth-session.js") < html.indexOf("features/auth.js"),
+  );
+  assert.ok(
+    html.indexOf("features/auth-form.js") < html.indexOf("features/auth.js"),
+  );
+  assert.ok(html.indexOf("features/auth.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/profile-settings.js") <
+      html.indexOf("features/workspace.js"),
+  );
+  assert.ok(html.indexOf("features/workspace.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/workspace-members.js") <
+      html.indexOf("features/workspace.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-holder-management.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-archive.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-view-events.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-view-events.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-quick-note.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-maintenance.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-maintenance.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-correction-form.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-maintenance.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-corrections.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(html.indexOf("features/notifications.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/pwa-registration.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-maintenance.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/reminder-preview.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/reminder-workflow.js") <
+      html.indexOf("features/app-shell-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/reminder-activity-view.js") <
+      html.indexOf("features/workspace-settings-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/workspace.js") <
+      html.indexOf("features/workspace-settings-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/reminder-preview.js") <
+      html.indexOf("features/workspace-settings-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/workspace-settings-workflow.js") <
+      html.indexOf("app.js"),
+  );
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/import-preview\.js'/);

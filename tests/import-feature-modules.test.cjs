@@ -59,16 +59,28 @@ test("CSV preview renderer receives only rendering dependencies", () => {
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "import-preview.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "import-preview.js"),
+      "utf8",
+    ),
     context,
   );
   const dependencies = {
-    $() {}, state: {}, selectImportRows() {}, esc() {}, openModal() {},
-    closeModal() {}, toast() {}, unrelatedDependency() {},
+    $() {},
+    state: {},
+    selectImportRows() {},
+    esc() {},
+    openModal() {},
+    closeModal() {},
+    toast() {},
+    unrelatedDependency() {},
   };
   const preview = context.window.PropertyDeskImportPreview.create(dependencies);
 
-  assert.deepEqual(Object.keys(passed.renderer).sort(), ["$", "esc", "selectImportRows", "state"].sort());
+  assert.deepEqual(
+    Object.keys(passed.renderer).sort(),
+    ["$", "esc", "selectImportRows", "state"].sort(),
+  );
   assert.equal(passed.renderer.selectImportRows, dependencies.selectImportRows);
   assert.equal(typeof preview.stageImport, "function");
 });
@@ -86,8 +98,18 @@ test("transaction import workflow publishes explicit payment and expense actions
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskPaymentImport: { create: (options) => { passed.payment = options; return payments; } },
-      PropertyDeskExpenseImport: { create: (options) => { passed.expense = options; return expenses; } },
+      PropertyDeskPaymentImport: {
+        create: (options) => {
+          passed.payment = options;
+          return payments;
+        },
+      },
+      PropertyDeskExpenseImport: {
+        create: (options) => {
+          passed.expense = options;
+          return expenses;
+        },
+      },
     },
   });
   vm.runInContext(
@@ -98,11 +120,18 @@ test("transaction import workflow publishes explicit payment and expense actions
     context,
   );
   const dependencies = {
-    $() {}, state: {}, stageImport() {}, parseCSV() {},
-    validatePaymentRows() {}, validateExpenseRows() {}, fetchAll() {}, toast() {},
+    $() {},
+    state: {},
+    stageImport() {},
+    parseCSV() {},
+    validatePaymentRows() {},
+    validateExpenseRows() {},
+    fetchAll() {},
+    toast() {},
     unrelatedDependency() {},
   };
-  const imports = context.window.PropertyDeskTransactionImports.create(dependencies);
+  const imports =
+    context.window.PropertyDeskTransactionImports.create(dependencies);
 
   assert.deepEqual(
     Object.keys(imports).sort(),
@@ -110,16 +139,38 @@ test("transaction import workflow publishes explicit payment and expense actions
   );
   assert.equal(imports.importPayments, payments.importPayments);
   assert.equal(imports.importExpenses, expenses.importExpenses);
-  assert.deepEqual(Object.keys(passed.payment).sort(), [
-    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
-    "validatePaymentRows",
-  ].sort());
-  assert.deepEqual(Object.keys(passed.expense).sort(), [
-    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
-    "validateExpenseRows",
-  ].sort());
-  assert.equal(passed.payment.validatePaymentRows, dependencies.validatePaymentRows);
-  assert.equal(passed.expense.validateExpenseRows, dependencies.validateExpenseRows);
+  assert.deepEqual(
+    Object.keys(passed.payment).sort(),
+    [
+      "$",
+      "fetchAll",
+      "parseCSV",
+      "stageImport",
+      "state",
+      "toast",
+      "validatePaymentRows",
+    ].sort(),
+  );
+  assert.deepEqual(
+    Object.keys(passed.expense).sort(),
+    [
+      "$",
+      "fetchAll",
+      "parseCSV",
+      "stageImport",
+      "state",
+      "toast",
+      "validateExpenseRows",
+    ].sort(),
+  );
+  assert.equal(
+    passed.payment.validatePaymentRows,
+    dependencies.validatePaymentRows,
+  );
+  assert.equal(
+    passed.expense.validateExpenseRows,
+    dependencies.validateExpenseRows,
+  );
   imports.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
@@ -138,8 +189,18 @@ test("import workflow publishes explicit account, payment, and expense actions",
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountImport: { create: (options) => { passed.account = options; return accounts; } },
-      PropertyDeskTransactionImports: { create: (options) => { passed.transaction = options; return transactions; } },
+      PropertyDeskAccountImport: {
+        create: (options) => {
+          passed.account = options;
+          return accounts;
+        },
+      },
+      PropertyDeskTransactionImports: {
+        create: (options) => {
+          passed.transaction = options;
+          return transactions;
+        },
+      },
     },
   });
   vm.runInContext(
@@ -150,9 +211,17 @@ test("import workflow publishes explicit account, payment, and expense actions",
     context,
   );
   const dependencies = {
-    $() {}, state: {}, stageImport() {}, parseCSV() {}, todayIso() {},
-    validateAccountRows() {}, validatePaymentRows() {}, validateExpenseRows() {},
-    fetchAll() {}, toast() {}, unrelatedDependency() {},
+    $() {},
+    state: {},
+    stageImport() {},
+    parseCSV() {},
+    todayIso() {},
+    validateAccountRows() {},
+    validatePaymentRows() {},
+    validateExpenseRows() {},
+    fetchAll() {},
+    toast() {},
+    unrelatedDependency() {},
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
@@ -168,14 +237,32 @@ test("import workflow publishes explicit account, payment, and expense actions",
   assert.equal(imports.importAccounts, accounts.importAccounts);
   assert.equal(imports.importPayments, transactions.importPayments);
   assert.equal(imports.importExpenses, transactions.importExpenses);
-  assert.deepEqual(Object.keys(passed.account).sort(), [
-    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
-    "todayIso", "validateAccountRows",
-  ].sort());
-  assert.deepEqual(Object.keys(passed.transaction).sort(), [
-    "$", "fetchAll", "parseCSV", "stageImport", "state", "toast",
-    "validateExpenseRows", "validatePaymentRows",
-  ].sort());
+  assert.deepEqual(
+    Object.keys(passed.account).sort(),
+    [
+      "$",
+      "fetchAll",
+      "parseCSV",
+      "stageImport",
+      "state",
+      "toast",
+      "todayIso",
+      "validateAccountRows",
+    ].sort(),
+  );
+  assert.deepEqual(
+    Object.keys(passed.transaction).sort(),
+    [
+      "$",
+      "fetchAll",
+      "parseCSV",
+      "stageImport",
+      "state",
+      "toast",
+      "validateExpenseRows",
+      "validatePaymentRows",
+    ].sort(),
+  );
   imports.attachEvents();
   assert.deepEqual(calls, ["account events", "transaction events"]);
 });
@@ -238,9 +325,18 @@ test("CSV import workflow stages preview before attaching review and file handle
     "attach import feature",
   ]);
   assert.equal(typeof passed.importFeature.stageImport, "function");
-  assert.equal(passed.importFeature.validateAccountRows, validators.validateAccountRows);
-  assert.equal(passed.importFeature.validatePaymentRows, validators.validatePaymentRows);
-  assert.equal(passed.importFeature.validateExpenseRows, validators.validateExpenseRows);
+  assert.equal(
+    passed.importFeature.validateAccountRows,
+    validators.validateAccountRows,
+  );
+  assert.equal(
+    passed.importFeature.validatePaymentRows,
+    validators.validatePaymentRows,
+  );
+  assert.equal(
+    passed.importFeature.validateExpenseRows,
+    validators.validateExpenseRows,
+  );
   assert.equal(
     passed.previewEvents.renderImportPreview instanceof Function,
     true,
@@ -555,11 +651,11 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
   };
   const feature = context.window.PropertyDeskImportFeature.create({
     $: element,
-      state,
-      stageImport(title, rows, commit, note, report) {
-        state.pendingImport = { title, rows, commit, note, ...report };
-      },
-      parseCSV: () => [{}],
+    state,
+    stageImport(title, rows, commit, note, report) {
+      state.pendingImport = { title, rows, commit, note, ...report };
+    },
+    parseCSV: () => [{}],
     validateAccountRows: () => ({
       valid: [{ account_name: "Test" }],
       errors: [],

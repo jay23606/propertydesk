@@ -10,16 +10,29 @@ test("account maintenance workflow composes account closure only", () => {
   const context = vm.createContext({
     window: {
       PropertyDeskAccountMaintenance: {
-        create: (options) => { passed.account = options; return { closeAccount }; },
+        create: (options) => {
+          passed.account = options;
+          return { closeAccount };
+        },
       },
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-maintenance-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-maintenance-workflow.js"),
+      "utf8",
+    ),
     context,
   );
-  const dependencies = { $() {}, state: {}, toast() {}, fetchAll() {}, closeModal() {} };
-  const workflow = context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
+  const dependencies = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    closeModal() {},
+  };
+  const workflow =
+    context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
 
   assert.equal(passed.account.state, dependencies.state);
   assert.equal(passed.account.closeModal, dependencies.closeModal);
@@ -59,12 +72,17 @@ test("deposit maintenance retains adjustment audit details", async () => {
     moneyInput: Number,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
-    fetchAll: async () => { refreshes += 1; },
+    fetchAll: async () => {
+      refreshes += 1;
+    },
     confirmAction: () => true,
     promptAction: () => prompts.shift(),
   });
 
-  assert.equal(await feature.recordDepositAdjustment("rental-1", "retained"), true);
+  assert.equal(
+    await feature.recordDepositAdjustment("rental-1", "retained"),
+    true,
+  );
 
   assert.equal(inserts[0][0], "pd_deposit_entries");
   assert.equal(inserts[0][1].user_id, "workspace-1");
@@ -80,7 +98,10 @@ test("deposit maintenance retains adjustment audit details", async () => {
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-maintenance.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-maintenance.js"),
+      "utf8",
+    ),
     context,
   );
   const prompts = ["25.00", "Retention correction"];
@@ -90,7 +111,11 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
       workspaceOwnerId: "workspace-1",
       accounts: [{ id: "rental-1", account_type: "rental" }],
       client: {
-        from: () => ({ insert: async () => { throw new Error("offline"); } }),
+        from: () => ({
+          insert: async () => {
+            throw new Error("offline");
+          },
+        }),
       },
     },
     moneyInput: Number,
@@ -100,7 +125,10 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     promptAction: () => prompts.shift(),
   });
 
-  assert.equal(await feature.recordDepositAdjustment("rental-1", "retained"), false);
+  assert.equal(
+    await feature.recordDepositAdjustment("rental-1", "retained"),
+    false,
+  );
   assert.deepEqual(messages, [
     "Deposit adjustment failed. Check your connection and try again.",
   ]);
@@ -156,7 +184,10 @@ test("account maintenance closes an account while preserving its history", async
 test("account maintenance reports rejected requests and skips success actions", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-maintenance.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-maintenance.js"),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
@@ -166,7 +197,11 @@ test("account maintenance reports rejected requests and skips success actions", 
     state: {
       client: {
         from: () => ({
-          update: () => ({ eq: async () => { throw new Error("offline"); } }),
+          update: () => ({
+            eq: async () => {
+              throw new Error("offline");
+            },
+          }),
         }),
       },
     },

@@ -58,7 +58,9 @@ test("workspace settings render member labels and escape untrusted text", () => 
     toast() {},
     fetchAll: async () => {},
     updateGreeting() {},
-    renderReminderActivity: () => { remindersRendered = true; },
+    renderReminderActivity: () => {
+      remindersRendered = true;
+    },
     confirmAction: () => true,
   });
 
@@ -74,11 +76,13 @@ test("workspace settings render member labels and escape untrusted text", () => 
   assert.equal(remindersRendered, true);
 });
 
-
 test("reminder activity view summarizes delivery results and escapes log data", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-activity-view.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "reminder-activity-view.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
@@ -89,19 +93,24 @@ test("reminder activity view summarizes delivery results and escapes log data", 
   const feature = context.window.PropertyDeskReminderActivityView.create({
     $,
     state: {
-      accounts: [{ id: "account-1", property_id: "property-1", party_name: "<Buyer>" }],
+      accounts: [
+        { id: "account-1", property_id: "property-1", party_name: "<Buyer>" },
+      ],
       properties: [{ id: "property-1", address: "<10 Main St>" }],
-      reminderLogs: [{
-        account_id: "account-1",
-        reminder_month: "2026-10-01",
-        recipient_email: "buyer@example.test",
-        status: "failed",
-        reason: "mailersend_http_403",
-        unpaid_due: 550,
-        attempted_at: "2026-10-31T12:00:00Z",
-      }],
+      reminderLogs: [
+        {
+          account_id: "account-1",
+          reminder_month: "2026-10-01",
+          recipient_email: "buyer@example.test",
+          status: "failed",
+          reason: "mailersend_http_403",
+          unpaid_due: 550,
+          attempted_at: "2026-10-31T12:00:00Z",
+        },
+      ],
     },
-    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    esc: (value) =>
+      String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     fmtDate: () => "Oct 2026",
     money: (value) => `$${Number(value).toFixed(2)}`,
   });
@@ -115,7 +124,6 @@ test("reminder activity view summarizes delivery results and escapes log data", 
   assert.match(html, /Unpaid due: \$550\.00/);
   assert.match(html, /reminder-failed/);
 });
-
 
 test("workspace feature owns profile and member form bindings", () => {
   const context = vm.createContext({ window: {} });
@@ -135,7 +143,6 @@ test("workspace feature owns profile and member form bindings", () => {
   assert.equal(typeof handlers.get("member-add-form:submit"), "function");
   assert.equal(typeof handlers.get("workspace-members:click"), "function");
 });
-
 
 test("adding a workspace member clears the address only after successful refresh", async () => {
   const context = vm.createContext({ window: {} });
@@ -183,7 +190,6 @@ test("adding a workspace member clears the address only after successful refresh
   assert.equal(messages.at(-1), "Workspace member added");
 });
 
-
 test("workspace setting writes report rejected requests and retain entered values", async () => {
   const context = vm.createContext({ window: {} });
   loadWorkspaceFeatures(context);
@@ -195,8 +201,14 @@ test("workspace setting writes report rejected requests and retain entered value
   const messages = [];
   const state = {
     client: {
-      auth: { updateUser: async () => { throw new Error("offline"); } },
-      rpc: async () => { throw new Error("offline"); },
+      auth: {
+        updateUser: async () => {
+          throw new Error("offline");
+        },
+      },
+      rpc: async () => {
+        throw new Error("offline");
+      },
     },
     workspaceMembers: [{ member_user_id: "member-1", display_name: "Member" }],
     reminderLogs: [],
@@ -205,19 +217,29 @@ test("workspace setting writes report rejected requests and retain entered value
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
   };
   const feature = context.window.PropertyDeskWorkspace.create({
-    $, state, esc: String, fmtDate: () => "", money: () => "",
+    $,
+    state,
+    esc: String,
+    fmtDate: () => "",
+    money: () => "",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected request must not refresh"),
-    updateGreeting: () => assert.fail("a rejected profile save must not update the greeting"),
+    updateGreeting: () =>
+      assert.fail("a rejected profile save must not update the greeting"),
     confirmAction: () => true,
   });
   const profile = context.window.PropertyDeskProfileSettings.create({
-    $, state, toast: (message) => messages.push(message),
-    updateGreeting: () => assert.fail("a rejected profile save must not update the greeting"),
+    $,
+    state,
+    toast: (message) => messages.push(message),
+    updateGreeting: () =>
+      assert.fail("a rejected profile save must not update the greeting"),
   });
 
   await assert.doesNotReject(profile.saveProfile({ preventDefault() {} }));
-  await assert.doesNotReject(feature.addWorkspaceMember({ preventDefault() {} }));
+  await assert.doesNotReject(
+    feature.addWorkspaceMember({ preventDefault() {} }),
+  );
   await assert.doesNotReject(feature.removeWorkspaceMember("member-1"));
   assert.equal(state.user.user_metadata.display_name, "Owner");
   assert.equal($("member-email").value, " spouse@example.test ");
@@ -228,14 +250,16 @@ test("workspace setting writes report rejected requests and retain entered value
   ]);
 });
 
-
 test("workspace member feature loads before settings and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
-    html.indexOf("features/workspace-members.js") < html.indexOf("features/workspace.js"),
+    html.indexOf("features/workspace-members.js") <
+      html.indexOf("features/workspace.js"),
     "workspace members should load before the settings coordinator",
   );
   assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });
-

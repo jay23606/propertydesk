@@ -25,21 +25,30 @@ test("deposit details render rental-only ledger rows and preserve voided markers
     depositLedger: () => {
       ledgerReads += 1;
       return {
-        entries: [{
-          id: "entry-1",
-          entry_type: "received",
-          movement_date: "2026-10-01",
-          amount: 500,
-          source_payment_id: "payment-1",
-        }, {
-          id: "entry-2",
-          entry_type: "retained",
-          movement_date: "2026-10-02",
-          amount: 100,
-          reason: "Repair",
-        }],
+        entries: [
+          {
+            id: "entry-1",
+            entry_type: "received",
+            movement_date: "2026-10-01",
+            amount: 500,
+            source_payment_id: "payment-1",
+          },
+          {
+            id: "entry-2",
+            entry_type: "retained",
+            movement_date: "2026-10-02",
+            amount: 100,
+            reason: "Repair",
+          },
+        ],
         active: [{ id: "entry-1" }],
-        totals: { held: 400, received: 500, refunded: 0, retained: 100, restored: 0 },
+        totals: {
+          held: 400,
+          received: 500,
+          refunded: 0,
+          retained: 100,
+          restored: 0,
+        },
       };
     },
     money: (value) => `$${value.toFixed(2)}`,
@@ -47,9 +56,15 @@ test("deposit details render rental-only ledger rows and preserve voided markers
     esc: (value) => String(value).replaceAll("<", "&lt;"),
   });
 
-  assert.equal(details.depositSectionHTML({ id: "note-1", account_type: "note" }), "");
+  assert.equal(
+    details.depositSectionHTML({ id: "note-1", account_type: "note" }),
+    "",
+  );
   assert.equal(ledgerReads, 0);
-  const html = details.depositSectionHTML({ id: "rental-1", account_type: "rental" });
+  const html = details.depositSectionHTML({
+    id: "rental-1",
+    account_type: "rental",
+  });
   assert.equal(ledgerReads, 1);
   assert.match(html, /Security deposit ledger/);
   assert.match(html, /\$400\.00/);
@@ -62,14 +77,24 @@ test("deposit details render rental-only ledger rows and preserve voided markers
 test("deposit detail event router refreshes the ledger after a recorded adjustment", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-detail-events.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-detail-events.js"),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
   let held = 100;
   let clickHandler;
   const elements = new Map([
-    ["detail-content", { addEventListener: (_name, handler) => { clickHandler = handler; } }],
+    [
+      "detail-content",
+      {
+        addEventListener: (_name, handler) => {
+          clickHandler = handler;
+        },
+      },
+    ],
     ["detail-deposit-section", { innerHTML: "" }],
   ]);
   const feature = context.window.PropertyDeskDepositDetailEvents.create({
@@ -85,9 +110,12 @@ test("deposit detail event router refreshes the ledger after a recorded adjustme
   feature.attachEvents();
   await clickHandler({
     target: {
-      closest: (selector) => selector === "[data-deposit-adjustment]"
-        ? { dataset: { accountId: "rental-1", depositAdjustment: "retained" } }
-        : null,
+      closest: (selector) =>
+        selector === "[data-deposit-adjustment]"
+          ? {
+              dataset: { accountId: "rental-1", depositAdjustment: "retained" },
+            }
+          : null,
     },
   });
   assert.deepEqual(calls, [["rental-1", "retained"]]);

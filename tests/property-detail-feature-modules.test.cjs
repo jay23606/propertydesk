@@ -19,7 +19,6 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
-
 test("opening a property delegates modal markup and preserves scoped details", () => {
   const context = vm.createContext({ window: {} });
   for (const filename of ["property-details-view.js", "property-details.js"]) {
@@ -30,9 +29,14 @@ test("opening a property delegates modal markup and preserves scoped details", (
   }
   const property = { id: "property-1", name: "<Oak House>", archived_at: null };
   const account = {
-    id: "account-1", property_id: property.id, account_type: "note",
-    status: "active", name: "<Private Note>", party_name: "Buyer",
-    payment_amount: 500, payment_frequency: "monthly",
+    id: "account-1",
+    property_id: property.id,
+    account_type: "note",
+    status: "active",
+    name: "<Private Note>",
+    party_name: "Buyer",
+    payment_amount: 500,
+    payment_frequency: "monthly",
   };
   const elements = new Map();
   const $ = (id) => {
@@ -46,31 +50,55 @@ test("opening a property delegates modal markup and preserves scoped details", (
   const detailsView = context.window.PropertyDeskPropertyDetailsView.create({
     money: (value) => `$${Number(value).toFixed(2)}`,
     fmtDate: (value) => value,
-    esc: (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-    })[char]),
+    esc: (value) =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char],
+      ),
     prettyType: (value) => value,
     paymentFrequencyLabel: () => "Monthly",
     accountBalance: () => 9000,
   });
   const feature = context.window.PropertyDeskPropertyDetails.create({
-    $, state: {
+    $,
+    state: {
       auditRequestId: 0,
       selectedPropertyId: null,
       properties: [property],
       accounts: [account, { id: "elsewhere", property_id: "property-2" }],
       documents: [
-        { id: "doc-1", property_id: property.id, file_name: "<agreement>.pdf", created_at: "2026-10-01", content_type: "application/pdf" },
+        {
+          id: "doc-1",
+          property_id: property.id,
+          file_name: "<agreement>.pdf",
+          created_at: "2026-10-01",
+          content_type: "application/pdf",
+        },
         { id: "other-doc", property_id: "property-2", file_name: "other.pdf" },
       ],
-      workspaceMembers: [{ member_user_id: "member-1", display_name: "<Manager>" }],
-      propertyHolders: [{ property_id: property.id, member_user_id: "member-1" }],
+      workspaceMembers: [
+        { member_user_id: "member-1", display_name: "<Manager>" },
+      ],
+      propertyHolders: [
+        { property_id: property.id, member_user_id: "member-1" },
+      ],
     },
     openModal: (id) => opened.push(id),
     propertyAddress: () => "Oak House address",
     renderPropertyActivity: (...args) => {
       activityCalls.push(args);
-      return { incomeTotal: 600, expenseTotal: 75, html: "<section>Recent activity</section>" };
+      return {
+        incomeTotal: 600,
+        expenseTotal: 75,
+        html: "<section>Recent activity</section>",
+      };
     },
     propertyDetailsHTML: detailsView.propertyDetailsHTML,
   });
@@ -80,10 +108,19 @@ test("opening a property delegates modal markup and preserves scoped details", (
   assert.equal(activityCalls.length, 1);
   assert.equal(activityCalls[0][0], property.id);
   assert.deepEqual(activityCalls[0][1], [account]);
-  assert.equal(elements.get("property-detail-title").textContent, property.name);
-  assert.equal(elements.get("property-detail-address").textContent, "Oak House address");
+  assert.equal(
+    elements.get("property-detail-title").textContent,
+    property.name,
+  );
+  assert.equal(
+    elements.get("property-detail-address").textContent,
+    "Oak House address",
+  );
   assert.equal(elements.get("property-detail-add-income").disabled, false);
-  assert.equal(elements.get("property-archive-toggle").textContent, "Archive property");
+  assert.equal(
+    elements.get("property-archive-toggle").textContent,
+    "Archive property",
+  );
   const html = elements.get("property-detail-content").innerHTML;
   assert.match(html, /&lt;Private Note&gt;/);
   assert.match(html, /&lt;Manager&gt;/);
@@ -93,7 +130,6 @@ test("opening a property delegates modal markup and preserves scoped details", (
   assert.doesNotMatch(html, /other\.pdf/);
   assert.deepEqual(opened, ["property-detail-modal"]);
 });
-
 
 test("property activity details include posted and voided records without counting voids", () => {
   const context = vm.createContext({ window: {} });
@@ -110,24 +146,53 @@ test("property activity details include posted and voided records without counti
   const activity = context.window.PropertyDeskPropertyActivityDetails.create({
     state: {
       payments: [
-        { account_id: "account-1", amount: 500, received_date: "2026-10-04", status: "posted", memo: "October rent" },
-        { account_id: "account-1", amount: 90, received_date: "2026-10-03", status: "voided", memo: "<cancelled>" },
+        {
+          account_id: "account-1",
+          amount: 500,
+          received_date: "2026-10-04",
+          status: "posted",
+          memo: "October rent",
+        },
+        {
+          account_id: "account-1",
+          amount: 90,
+          received_date: "2026-10-03",
+          status: "voided",
+          memo: "<cancelled>",
+        },
       ],
       expenses: [
-        { property_id: "property-1", amount: 75, expense_date: "2026-10-02", status: "posted", payee: "Plumber" },
-        { property_id: "property-1", amount: 40, expense_date: "2026-10-01", status: "voided", payee: "Old vendor" },
+        {
+          property_id: "property-1",
+          amount: 75,
+          expense_date: "2026-10-02",
+          status: "posted",
+          payee: "Plumber",
+        },
+        {
+          property_id: "property-1",
+          amount: 40,
+          expense_date: "2026-10-01",
+          status: "voided",
+          payee: "Old vendor",
+        },
       ],
     },
     isPosted: (record) => record.status !== "voided",
-    sumIncome: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
-    sumOperatingExpenses: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumIncome: (rows) =>
+      rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumOperatingExpenses: (rows) =>
+      rows.reduce((total, row) => total + Number(row.amount || 0), 0),
     money: (amount) =>
       `$${Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
     fmtDate: (date) => date,
-    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    esc: (value) =>
+      String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
   });
 
-  const result = activity.renderPropertyActivity("property-1", [{ id: "account-1", name: "Rental" }]);
+  const result = activity.renderPropertyActivity("property-1", [
+    { id: "account-1", name: "Rental" },
+  ]);
   assert.equal(result.incomeTotal, 500);
   assert.equal(result.expenseTotal, 75);
   assert.match(result.html, /October rent/);
@@ -136,17 +201,29 @@ test("property activity details include posted and voided records without counti
   assert.match(result.html, /−\$75\.00/);
 });
 
-
 test("property activity model aggregates posted cash flow and sorts eight recent rows", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-activity-model.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-activity-model.js"),
+      "utf8",
+    ),
     context,
   );
   const state = {
     payments: [
-      { account_id: "account-1", amount: 500, received_date: "2026-10-04", status: "posted" },
-      { account_id: "other-account", amount: 999, received_date: "2026-10-05", status: "posted" },
+      {
+        account_id: "account-1",
+        amount: 500,
+        received_date: "2026-10-04",
+        status: "posted",
+      },
+      {
+        account_id: "other-account",
+        amount: 999,
+        received_date: "2026-10-05",
+        status: "posted",
+      },
     ],
     expenses: Array.from({ length: 9 }, (_, index) => ({
       property_id: "property-1",
@@ -159,8 +236,10 @@ test("property activity model aggregates posted cash flow and sorts eight recent
   const model = context.window.PropertyDeskPropertyActivityModel.create({
     state,
     isPosted: (record) => record.status === "posted",
-    sumIncome: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
-    sumOperatingExpenses: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumIncome: (rows) =>
+      rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumOperatingExpenses: (rows) =>
+      rows.reduce((total, row) => total + Number(row.amount || 0), 0),
   });
 
   const result = model.buildPropertyActivity("property-1", [
@@ -175,11 +254,13 @@ test("property activity model aggregates posted cash flow and sorts eight recent
   assert.equal(result.transactions.at(-1).date, "2026-10-03");
 });
 
-
 test("property view actions route payment, note, address, and add-account actions", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-view-events.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-view-events.js"),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
@@ -190,7 +271,8 @@ test("property view actions route payment, note, address, and add-account action
       elements.set(id, {
         value: "",
         addEventListener(name, handler) {
-          if (id === "properties-table" && name === "click") clickHandler = handler;
+          if (id === "properties-table" && name === "click")
+            clickHandler = handler;
         },
       });
     }
@@ -214,7 +296,7 @@ test("property view actions route payment, note, address, and add-account action
     ["[data-property-account]", { propertyAccount: "property-3" }],
   ]) {
     clickHandler({
-      target: { closest: (value) => value === selector ? { dataset } : null },
+      target: { closest: (value) => (value === selector ? { dataset } : null) },
       preventDefault() {},
       stopPropagation() {},
     });
@@ -231,32 +313,42 @@ test("property view actions route payment, note, address, and add-account action
   ]);
 });
 
-
 test("property action router loads after its view and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
-    html.indexOf("features/property-views.js") < html.indexOf("features/property-view-events.js") &&
+    html.indexOf("features/property-views.js") <
+      html.indexOf("features/property-view-events.js") &&
       html.indexOf("features/property-view-events.js") < html.indexOf("app.js"),
     "property view should load before its action router and the app",
   );
   assert.match(worker, /'\.\/features\/property-view-events\.js'/);
 });
 
-
 test("Properties table templates escape untrusted labels and render visible totals", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-table.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-portfolio-table.js"),
+      "utf8",
+    ),
     context,
   );
-  const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[char]);
+  const escapeHTML = (value) =>
+    String(value ?? "").replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char],
+    );
   const table = context.window.PropertyDeskPropertyPortfolioTable.create({
     esc: escapeHTML,
     money: (value) => `$${Number(value).toFixed(2)}`,
@@ -282,10 +374,12 @@ test("Properties table templates escape untrusted labels and render visible tota
   assert.match(totalsHTML, /\$1000\.00/);
 });
 
-
 test("property detail events own editing and quick-action bindings", () => {
   const context = vm.createContext({ window: {} });
-  for (const filename of ["property-detail-events.js", "property-detail-quick-actions.js"]) {
+  for (const filename of [
+    "property-detail-events.js",
+    "property-detail-quick-actions.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -319,17 +413,18 @@ test("property detail events own editing and quick-action bindings", () => {
     openAccountDetails: (id) => calls.push(`open-account:${id}`),
   });
   const quickActionState = { selectedPropertyId: "property-1" };
-  const quickActions = context.window.PropertyDeskPropertyDetailQuickActions.create({
-    $: getElement,
-    state: quickActionState,
-    closeModal: (modal) => calls.push(`close:${modal.id}`),
-    openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
-    openExpense: (propertyId) => calls.push(`expense:${propertyId}`),
-    resetAccountForm: () => calls.push("reset-account"),
-    populateFormOptions: () => calls.push("populate-options"),
-    openModal: (id) => calls.push(`open:${id}`),
-    toggleArchiveProperty: () => calls.push("archive"),
-  });
+  const quickActions =
+    context.window.PropertyDeskPropertyDetailQuickActions.create({
+      $: getElement,
+      state: quickActionState,
+      closeModal: (modal) => calls.push(`close:${modal.id}`),
+      openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
+      openExpense: (propertyId) => calls.push(`expense:${propertyId}`),
+      resetAccountForm: () => calls.push("reset-account"),
+      populateFormOptions: () => calls.push("populate-options"),
+      openModal: (id) => calls.push(`open:${id}`),
+      toggleArchiveProperty: () => calls.push("archive"),
+    });
 
   feature.attachEvents();
   quickActions.attachEvents();
@@ -345,10 +440,18 @@ test("property detail events own editing and quick-action bindings", () => {
     preventDefault() {},
   });
   handlers.get("property-detail-content:click")({
-    target: { closest: (selector) => selector === "[data-save-holders]" ? { dataset: {} } : null },
+    target: {
+      closest: (selector) =>
+        selector === "[data-save-holders]" ? { dataset: {} } : null,
+    },
   });
   handlers.get("property-detail-content:click")({
-    target: { closest: (selector) => selector === "[data-detail]" ? { dataset: { detail: "account-1" } } : null },
+    target: {
+      closest: (selector) =>
+        selector === "[data-detail]"
+          ? { dataset: { detail: "account-1" } }
+          : null,
+    },
   });
   handlers.get("property-detail-add-income:click")();
   handlers.get("property-detail-add-expense:click")();
@@ -381,42 +484,73 @@ test("property detail events own editing and quick-action bindings", () => {
   assert.equal(calls.length, callsBeforeNoSelection);
 });
 
-
 test("property detail document events route private document actions to document workflows", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-document-events.js"), "utf8"),
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-detail-document-events.js",
+      ),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
   const handlers = new Map();
-  const feature = context.window.PropertyDeskPropertyDetailDocumentEvents.create({
-    $: (id) => ({
-      addEventListener(name, handler) {
-        handlers.set(`${id}:${name}`, handler);
-      },
-    }),
-    openPropertyDocument: (id) => calls.push(["open", id]),
-    deletePropertyDocument: (id) => calls.push(["delete", id]),
-    uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
-  });
+  const feature =
+    context.window.PropertyDeskPropertyDetailDocumentEvents.create({
+      $: (id) => ({
+        addEventListener(name, handler) {
+          handlers.set(`${id}:${name}`, handler);
+        },
+      }),
+      openPropertyDocument: (id) => calls.push(["open", id]),
+      deletePropertyDocument: (id) => calls.push(["delete", id]),
+      uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
+    });
   feature.attachEvents();
 
   let prevented = false;
   let propagationStopped = false;
   handlers.get("property-detail-content:click")({
-    target: { closest: (value) => value === "[data-open-document]" ? { dataset: { openDocument: "document-1" } } : null },
-    preventDefault() { prevented = true; },
-    stopPropagation() { propagationStopped = true; },
+    target: {
+      closest: (value) =>
+        value === "[data-open-document]"
+          ? { dataset: { openDocument: "document-1" } }
+          : null,
+    },
+    preventDefault() {
+      prevented = true;
+    },
+    stopPropagation() {
+      propagationStopped = true;
+    },
   });
   assert.equal(prevented, true);
   assert.equal(propagationStopped, true);
   handlers.get("property-detail-content:click")({
-    target: { closest: (value) => value === "[data-delete-document]" ? { dataset: { deleteDocument: "document-2" } } : null },
-    preventDefault() { assert.fail("delete action should preserve its existing default behavior"); },
-    stopPropagation() { assert.fail("delete action should preserve event bubbling"); },
+    target: {
+      closest: (value) =>
+        value === "[data-delete-document]"
+          ? { dataset: { deleteDocument: "document-2" } }
+          : null,
+    },
+    preventDefault() {
+      assert.fail(
+        "delete action should preserve its existing default behavior",
+      );
+    },
+    stopPropagation() {
+      assert.fail("delete action should preserve event bubbling");
+    },
   });
-  const input = { id: "agreement-input", matches: (selector) => selector === "[data-property-document]" };
+  const input = {
+    id: "agreement-input",
+    matches: (selector) => selector === "[data-property-document]",
+  };
   handlers.get("property-detail-content:change")({ target: input });
 
   assert.deepEqual(calls, [
@@ -425,7 +559,6 @@ test("property detail document events route private document actions to document
     ["upload", "agreement-input"],
   ]);
 });
-
 
 test("property details workflow connects activity summaries to the property view", () => {
   let detailContext;
@@ -452,22 +585,34 @@ test("property details workflow connects activity summaries to the property view
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-details-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-details-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const detailsDependencies = {
-    money() {}, fmtDate() {}, esc() {}, prettyType() {},
-    paymentFrequencyLabel() {}, accountBalance() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    accountBalance() {},
   };
-  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create(detailsDependencies);
+  const workflow =
+    context.window.PropertyDeskPropertyDetailsWorkflow.create(
+      detailsDependencies,
+    );
 
-  assert.deepEqual(Object.keys(viewContext).sort(), Object.keys(detailsDependencies).sort());
+  assert.deepEqual(
+    Object.keys(viewContext).sort(),
+    Object.keys(detailsDependencies).sort(),
+  );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.renderPropertyActivity, renderPropertyActivity);
   assert.equal(workflow.openPropertyDetails(), "property details");
 });
-
 
 test("property detail actions workflow composes administration and modal actions", () => {
   const passed = {};
@@ -490,13 +635,24 @@ test("property detail actions workflow composes administration and modal actions
       PropertyDeskPropertyDetailQuickActions: {
         create: (options) => {
           passed.quickActions = options;
-          return { attachEvents: () => attachCalls.push(passed.quickActions.toggleArchiveProperty) };
+          return {
+            attachEvents: () =>
+              attachCalls.push(passed.quickActions.toggleArchiveProperty),
+          };
         },
       },
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-actions-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-detail-actions-workflow.js",
+      ),
+      "utf8",
+    ),
     context,
   );
   const quickActionDependencies = {
@@ -508,10 +664,11 @@ test("property detail actions workflow composes administration and modal actions
     populateFormOptions: action,
     openModal: action,
   };
-  const workflow = context.window.PropertyDeskPropertyDetailActionsWorkflow.create({
-    ...quickActionDependencies,
-    documentRef: {},
-  });
+  const workflow =
+    context.window.PropertyDeskPropertyDetailActionsWorkflow.create({
+      ...quickActionDependencies,
+      documentRef: {},
+    });
 
   assert.equal(passed.events.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
@@ -521,7 +678,6 @@ test("property detail actions workflow composes administration and modal actions
   workflow.attachPropertyDetailEvents();
   assert.deepEqual(attachCalls, ["content", action]);
 });
-
 
 test("property document workflow composes private file actions and event routing", () => {
   const passed = {};
@@ -553,7 +709,10 @@ test("property document workflow composes private file actions and event routing
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "property-document-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-document-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const state = { client: null };

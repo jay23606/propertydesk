@@ -30,20 +30,25 @@ test("overview routes property-card and quick-payment actions to property workfl
     ["[data-property-payment]", { propertyPayment: "property-2" }],
   ]) {
     clickHandler({
-      target: { closest: (value) => value === selector ? { dataset } : null },
+      target: { closest: (value) => (value === selector ? { dataset } : null) },
       preventDefault() {},
       stopPropagation() {},
     });
   }
 
-  assert.deepEqual(calls, [["open", "property-1"], ["payment", "property-2"]]);
+  assert.deepEqual(calls, [
+    ["open", "property-1"],
+    ["payment", "property-2"],
+  ]);
 });
-
 
 test("overview renderer displays its summary model and quick-payment card", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "overview.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "overview.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
@@ -97,11 +102,13 @@ test("overview renderer displays its summary model and quick-payment card", () =
   assert.equal($("stat-expected").textContent, "$1300.00");
   assert.match($("overview-properties").innerHTML, /1 Oak St/);
   assert.match($("overview-properties").innerHTML, /Alice Buyer/);
-  assert.match($("overview-properties").innerHTML, /data-property-payment="property-1"/);
+  assert.match(
+    $("overview-properties").innerHTML,
+    /data-property-payment="property-1"/,
+  );
   assert.match($("overview-properties").innerHTML, /\$42000\.00/);
   assert.match($("upcoming-list").innerHTML, /No upcoming payments yet/);
 });
-
 
 test("overview workflow composes dashboard rendering with property actions", () => {
   const received = {};
@@ -152,11 +159,17 @@ test("overview workflow composes dashboard rendering with property actions", () 
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "overview-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "overview-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
-    ...modelContext, ...viewContext, openPropertyDetails, openPropertyPayment,
+    ...modelContext,
+    ...viewContext,
+    openPropertyDetails,
+    openPropertyPayment,
   });
 
   assert.deepEqual(
@@ -166,7 +179,10 @@ test("overview workflow composes dashboard rendering with property actions", () 
   for (const [key, value] of Object.entries(viewContext)) {
     assert.equal(received.view[key], value);
   }
-  assert.deepEqual(Object.keys(received.model).sort(), Object.keys(modelContext).sort());
+  assert.deepEqual(
+    Object.keys(received.model).sort(),
+    Object.keys(modelContext).sort(),
+  );
   for (const [key, value] of Object.entries(modelContext)) {
     assert.equal(received.model[key], value);
   }
@@ -177,11 +193,13 @@ test("overview workflow composes dashboard rendering with property actions", () 
   assert.equal(workflow.attachOverviewEvents(), "overview events");
 });
 
-
 test("profile display updates the shared app shell from the current workspace user", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "profile-display.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "profile-display.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
@@ -197,7 +215,12 @@ test("profile display updates the shared app shell from the current workspace us
   };
   const feature = context.window.PropertyDeskProfileDisplay.create({
     $,
-    state: { user: { email: "owner@example.test", user_metadata: { display_name: "Workspace Owner" } } },
+    state: {
+      user: {
+        email: "owner@example.test",
+        user_metadata: { display_name: "Workspace Owner" },
+      },
+    },
     now: () => ({
       getHours: () => 14,
       toLocaleDateString: () => "Mon, Oct 5",
@@ -214,19 +237,26 @@ test("profile display updates the shared app shell from the current workspace us
   assert.equal($("today-label").textContent, "Mon, Oct 5");
 });
 
-
 test("profile display loads before overview and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
-    html.indexOf("features/profile-display.js") < html.indexOf("features/overview.js"),
+    html.indexOf("features/profile-display.js") <
+      html.indexOf("features/overview.js"),
     "profile display should load before dashboard composition",
   );
   assert.ok(
-    html.indexOf("features/overview-model.js") < html.indexOf("features/overview.js") &&
-      html.indexOf("features/overview-model.js") < html.indexOf("features/overview-workflow.js") &&
-    html.indexOf("features/overview.js") < html.indexOf("features/overview-workflow.js") &&
-      html.indexOf("features/overview-events.js") < html.indexOf("features/overview-workflow.js") &&
+    html.indexOf("features/overview-model.js") <
+      html.indexOf("features/overview.js") &&
+      html.indexOf("features/overview-model.js") <
+        html.indexOf("features/overview-workflow.js") &&
+      html.indexOf("features/overview.js") <
+        html.indexOf("features/overview-workflow.js") &&
+      html.indexOf("features/overview-events.js") <
+        html.indexOf("features/overview-workflow.js") &&
       html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
     "overview modules should load before their workflow and the app",
   );
@@ -236,11 +266,13 @@ test("profile display loads before overview and is precached", () => {
   assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
 });
 
-
 test("profile settings save the display label and refresh the shared shell", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "profile-settings.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "profile-settings.js"),
+      "utf8",
+    ),
     context,
   );
   const messages = [];
@@ -251,7 +283,10 @@ test("profile settings save the display label and refresh the shared shell", asy
       auth: {
         updateUser: async (payload) => {
           calls.push(payload);
-          return { data: { user: { id: "owner-1", user_metadata: payload.data } }, error: null };
+          return {
+            data: { user: { id: "owner-1", user_metadata: payload.data } },
+            error: null,
+          };
         },
       },
     },
@@ -270,4 +305,3 @@ test("profile settings save the display label and refresh the shared shell", asy
   assert.equal(state.user.user_metadata.display_name, "Property Manager");
   assert.deepEqual(messages, ["Display name saved"]);
 });
-

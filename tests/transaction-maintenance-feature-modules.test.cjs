@@ -11,29 +11,61 @@ test("transaction maintenance workflow composes correction and void actions", ()
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionMaintenance: {
-        create: (options) => { passed.void = options; return { voidTransaction }; },
+        create: (options) => {
+          passed.void = options;
+          return { voidTransaction };
+        },
       },
       PropertyDeskTransactionCorrectionForm: {
-        create: (options) => { passed.correction = options; return { correctTransaction }; },
+        create: (options) => {
+          passed.correction = options;
+          return { correctTransaction };
+        },
       },
       PropertyDeskTransactionViewEvents: {
-        create: (options) => { passed.events = options; return { attachEvents: () => "action events" }; },
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: () => "action events" };
+        },
       },
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-maintenance-workflow.js",
+      ),
+      "utf8",
+    ),
     context,
   );
   const dependencies = {
-    $() {}, state: {}, toast() {}, fetchAll() {}, prettyType() {}, openPayment() {},
-    openExpense() {}, updateAllocationPreview() {}, EventClass: class {}, OptionClass: class {}, documentRef: {},
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    prettyType() {},
+    openPayment() {},
+    openExpense() {},
+    updateAllocationPreview() {},
+    EventClass: class {},
+    OptionClass: class {},
+    documentRef: {},
   };
-  const workflow = context.window.PropertyDeskTransactionMaintenanceWorkflow.create(dependencies);
+  const workflow =
+    context.window.PropertyDeskTransactionMaintenanceWorkflow.create(
+      dependencies,
+    );
 
   assert.equal(passed.void.state, dependencies.state);
   assert.equal(passed.void.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.correction.updateAllocationPreview, dependencies.updateAllocationPreview);
+  assert.equal(
+    passed.correction.updateAllocationPreview,
+    dependencies.updateAllocationPreview,
+  );
   assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
@@ -94,7 +126,9 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
     confirmAction: () => true,
     promptAction: () => "Entered in error",
     timestamp: () => "2026-10-04T12:00:00.000Z",
-    fetchAll: async () => { refreshes += 1; },
+    fetchAll: async () => {
+      refreshes += 1;
+    },
     toast: (message) => messages.push(message),
   });
 
@@ -115,7 +149,10 @@ test("transaction maintenance reports rejected void requests without refreshing"
     Option: class MockOption {},
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-maintenance.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
+      "utf8",
+    ),
     context,
   );
   const messages = [];
@@ -128,7 +165,9 @@ test("transaction maintenance reports rejected void requests without refreshing"
             eq: () => ({
               eq: () => ({
                 select: () => ({
-                  maybeSingle: async () => { throw new Error("offline"); },
+                  maybeSingle: async () => {
+                    throw new Error("offline");
+                  },
                 }),
               }),
             }),
@@ -151,13 +190,20 @@ test("transaction maintenance reports rejected void requests without refreshing"
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-corrections.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      "utf8",
+    ),
     context,
   );
   const rpcCalls = [];
   const events = [];
   const state = {
-    pendingCorrection: { kind: "payment", id: "payment-1", reason: "Bank statement" },
+    pendingCorrection: {
+      kind: "payment",
+      id: "payment-1",
+      reason: "Bank statement",
+    },
     client: {
       async rpc(name, args) {
         rpcCalls.push([name, args]);
@@ -182,18 +228,24 @@ test("transaction corrections save payment and expense changes with their audit 
   assert.equal(await feature.saveCorrection("expense", { amount: 40 }), true);
 
   assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls)), [
-    ["pd_correct_transaction", {
-      p_kind: "payment",
-      p_transaction_id: "payment-1",
-      p_correction: { amount: 75 },
-      p_reason: "Bank statement",
-    }],
-    ["pd_correct_transaction", {
-      p_kind: "expense",
-      p_transaction_id: "expense-1",
-      p_correction: { amount: 40 },
-      p_reason: "Duplicate receipt",
-    }],
+    [
+      "pd_correct_transaction",
+      {
+        p_kind: "payment",
+        p_transaction_id: "payment-1",
+        p_correction: { amount: 75 },
+        p_reason: "Bank statement",
+      },
+    ],
+    [
+      "pd_correct_transaction",
+      {
+        p_kind: "expense",
+        p_transaction_id: "expense-1",
+        p_correction: { amount: 40 },
+        p_reason: "Duplicate receipt",
+      },
+    ],
   ]);
   assert.deepEqual(events, [
     ["close", "payment-modal"],
@@ -208,7 +260,10 @@ test("transaction corrections save payment and expense changes with their audit 
 test("transaction correction failures preserve the open form and pending correction", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "transaction-corrections.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      "utf8",
+    ),
     context,
   );
   const messages = [];
@@ -216,13 +271,21 @@ test("transaction correction failures preserve the open form and pending correct
   let refreshes = 0;
   const state = {
     pendingCorrection: { kind: "payment", id: "payment-1", reason: "Fix date" },
-    client: { rpc: async () => { throw new Error("offline"); } },
+    client: {
+      rpc: async () => {
+        throw new Error("offline");
+      },
+    },
   };
   const feature = context.window.PropertyDeskTransactionCorrections.create({
     $: (id) => ({ id }),
     state,
-    closeModal: () => { closes += 1; },
-    fetchAll: async () => { refreshes += 1; },
+    closeModal: () => {
+      closes += 1;
+    },
+    fetchAll: async () => {
+      refreshes += 1;
+    },
     toast: (message) => messages.push(message),
   });
 
@@ -246,7 +309,10 @@ test("transaction correction form reopens posted payments and expenses with audi
       }
     },
     Option: class MockOption {
-      constructor(text, value) { this.text = text; this.value = value; }
+      constructor(text, value) {
+        this.text = text;
+        this.value = value;
+      }
     },
   });
   vm.runInContext(

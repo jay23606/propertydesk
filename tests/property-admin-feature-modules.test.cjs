@@ -65,7 +65,6 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   assert.equal(messages.at(-1), "Property note saved");
 });
 
-
 test("property quick notes enforce the character limit before writing", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -92,10 +91,15 @@ test("property quick notes enforce the character limit before writing", async ()
   assert.deepEqual(messages, ["Quick notes are limited to 140 characters."]);
 });
 
-
 test("property holder and archive workflows report rejected writes without running success actions", async () => {
-  const context = vm.createContext({ window: {}, document: { querySelectorAll: () => [] } });
-  for (const source of ["property-holder-management.js", "property-archive.js"]) {
+  const context = vm.createContext({
+    window: {},
+    document: { querySelectorAll: () => [] },
+  });
+  for (const source of [
+    "property-holder-management.js",
+    "property-archive.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
       context,
@@ -115,7 +119,9 @@ test("property holder and archive workflows report rejected writes without runni
   const state = {
     workspaceOwnerId: "workspace-1",
     selectedPropertyId: "property-1",
-    properties: [{ id: "property-1", address: "10 Main St", archived_at: null }],
+    properties: [
+      { id: "property-1", address: "10 Main St", archived_at: null },
+    ],
     client: {
       from() {
         return {
@@ -129,18 +135,21 @@ test("property holder and archive workflows report rejected writes without runni
       },
     },
   };
-  const holderManagement = context.window.PropertyDeskPropertyHolderManagement.create({
-    state,
-    toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("a rejected write must not refresh"),
-    openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
-  });
+  const holderManagement =
+    context.window.PropertyDeskPropertyHolderManagement.create({
+      state,
+      toast: (message) => messages.push(message),
+      fetchAll: async () => assert.fail("a rejected write must not refresh"),
+      openPropertyDetails: () =>
+        assert.fail("a rejected write must not reopen details"),
+    });
   const archive = context.window.PropertyDeskPropertyArchive.create({
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected write must not refresh"),
     todayIso: () => "2026-10-05",
-    openPropertyDetails: () => assert.fail("a rejected write must not reopen details"),
+    openPropertyDetails: () =>
+      assert.fail("a rejected write must not reopen details"),
   });
 
   await assert.doesNotReject(holderManagement.savePropertyHolders());
@@ -151,14 +160,16 @@ test("property holder and archive workflows report rejected writes without runni
   ]);
 });
 
-
 test("quick note feature loads before the portfolio workflow and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
-    html.indexOf("features/property-quick-note.js") < html.indexOf("features/property-portfolio-workflow.js"),
+    html.indexOf("features/property-quick-note.js") <
+      html.indexOf("features/property-portfolio-workflow.js"),
     "property quick note should load before the portfolio coordinator",
   );
   assert.match(worker, /'\.\/features\/property-quick-note\.js'/);
 });
-

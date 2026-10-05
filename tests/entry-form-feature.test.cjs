@@ -33,8 +33,18 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
         buildPayment: buildPaymentPayload,
         buildExpense: buildExpensePayload,
       },
-      PropertyDeskPaymentEntryForm: { create: (options) => { passed.payment = options; return paymentActions; } },
-      PropertyDeskExpenseEntryForm: { create: (options) => { passed.expense = options; return expenseActions; } },
+      PropertyDeskPaymentEntryForm: {
+        create: (options) => {
+          passed.payment = options;
+          return paymentActions;
+        },
+      },
+      PropertyDeskExpenseEntryForm: {
+        create: (options) => {
+          passed.expense = options;
+          return expenseActions;
+        },
+      },
     },
   });
   vm.runInContext(
@@ -45,11 +55,22 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     context,
   );
   const dependencies = {
-    $() {}, state: {}, moneyInput() {}, todayIso() {}, toast() {},
-    closeModal() {}, fetchAll() {}, fillSelect() {}, populateFormOptions() {},
-    prettyType() {}, openModal() {}, saveCorrection() {}, unrelatedDependency() {},
+    $() {},
+    state: {},
+    moneyInput() {},
+    todayIso() {},
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    fillSelect() {},
+    populateFormOptions() {},
+    prettyType() {},
+    openModal() {},
+    saveCorrection() {},
+    unrelatedDependency() {},
   };
-  const forms = context.window.PropertyDeskLedgerEntryForms.create(dependencies);
+  const forms =
+    context.window.PropertyDeskLedgerEntryForms.create(dependencies);
 
   assert.deepEqual(
     Object.keys(forms).sort(),
@@ -69,14 +90,42 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     paymentActions.updateAllocationPreview,
   );
   assert.equal(forms.openExpense, expenseActions.openExpense);
-  assert.deepEqual(Object.keys(passed.payment).sort(), [
-    "$", "buildPaymentPayload", "closeModal", "fetchAll", "fillSelect", "moneyInput", "openModal",
-    "populateFormOptions", "prettyType", "saveCorrection", "state", "todayIso", "toast",
-  ].sort());
-  assert.deepEqual(Object.keys(passed.expense).sort(), [
-    "$", "buildExpensePayload", "closeModal", "fetchAll", "fillSelect", "moneyInput", "openModal",
-    "populateFormOptions", "prettyType", "saveCorrection", "state", "todayIso", "toast",
-  ].sort());
+  assert.deepEqual(
+    Object.keys(passed.payment).sort(),
+    [
+      "$",
+      "buildPaymentPayload",
+      "closeModal",
+      "fetchAll",
+      "fillSelect",
+      "moneyInput",
+      "openModal",
+      "populateFormOptions",
+      "prettyType",
+      "saveCorrection",
+      "state",
+      "todayIso",
+      "toast",
+    ].sort(),
+  );
+  assert.deepEqual(
+    Object.keys(passed.expense).sort(),
+    [
+      "$",
+      "buildExpensePayload",
+      "closeModal",
+      "fetchAll",
+      "fillSelect",
+      "moneyInput",
+      "openModal",
+      "populateFormOptions",
+      "prettyType",
+      "saveCorrection",
+      "state",
+      "todayIso",
+      "toast",
+    ].sort(),
+  );
   assert.equal(passed.payment.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.expense.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.payment.buildPaymentPayload, buildPaymentPayload);
@@ -84,7 +133,6 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
-
 
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
@@ -98,8 +146,14 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   loadPropertyAndAccountForms(context);
   loadLedgerEntryForms(context);
   const formContext = {
-    $: formElements(), state: {}, toast() {}, closeModal() {}, fetchAll() {},
-    moneyInput: Number, todayIso: () => "2026-10-05", populateFormOptions() {},
+    $: formElements(),
+    state: {},
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    moneyInput: Number,
+    todayIso: () => "2026-10-05",
+    populateFormOptions() {},
     openModal() {},
   };
   const property = context.window.PropertyDeskPropertyForm.create(formContext);
@@ -111,10 +165,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
-    [
-      property,
-      ["resetPropertyForm", "saveProperty", "attachEvents"],
-    ],
+    [property, ["resetPropertyForm", "saveProperty", "attachEvents"]],
     [
       account,
       ["resetAccountForm", "saveAccount", "editAccount", "attachEvents"],
@@ -137,7 +188,6 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
       assert.equal(typeof feature[name], "function", name);
   }
 });
-
 
 test("payment and expense forms report rejected saves without clearing the entries", async () => {
   const context = vm.createContext({ window: {}, Event });
@@ -234,7 +284,6 @@ test("payment and expense forms report rejected saves without clearing the entri
   ]);
 });
 
-
 test("record-entry feature owns form event bindings and category hints", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
@@ -264,12 +313,19 @@ test("record-entry feature owns form event bindings and category hints", () => {
   };
   const propertyForm = context.window.PropertyDeskPropertyForm.create({
     ...formContext,
-    toast() {}, closeModal() {}, fetchAll() {},
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
   });
   const accountForm = context.window.PropertyDeskAccountForm.create({
     ...formContext,
-    todayIso: () => "2026-10-05", populateFormOptions() {}, openModal() {},
-    moneyInput: Number, toast() {}, closeModal() {}, fetchAll() {},
+    todayIso: () => "2026-10-05",
+    populateFormOptions() {},
+    openModal() {},
+    moneyInput: Number,
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
   });
@@ -288,7 +344,6 @@ test("record-entry feature owns form event bindings and category hints", () => {
     ["deposit-refund-hint", "hidden", false],
   ]);
 });
-
 
 test("expense entry saves a property-level contractor expense through the expense workflow", async () => {
   const context = vm.createContext({ window: {}, Event });
@@ -363,7 +418,6 @@ test("expense entry saves a property-level contractor expense through the expens
   assert.deepEqual(calls, ["refresh", "close-modal", "toast:Expense recorded"]);
 });
 
-
 test("expense entry requires a rental account before recording a deposit refund", async () => {
   const context = vm.createContext({ window: {}, Event });
   loadLedgerEntryForms(context);
@@ -399,7 +453,6 @@ test("expense entry requires a rental account before recording a deposit refund"
     "Choose a rental account for a security deposit refund",
   ]);
 });
-
 
 test("record-entry feature owns create actions and handles empty workspace states", () => {
   const context = vm.createContext({ window: {} });
@@ -481,7 +534,6 @@ test("record-entry feature owns create actions and handles empty workspace state
     "open-expense",
   ]);
 });
-
 
 test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {
   const context = vm.createContext({ window: {} });

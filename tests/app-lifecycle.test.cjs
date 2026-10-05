@@ -7,7 +7,10 @@ const vm = require("node:vm");
 test("app lifecycle preserves render, event-binding, and startup order", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "app-lifecycle.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-lifecycle.js"),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
@@ -50,9 +53,15 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
   await lifecycle.initialize();
 
   assert.deepEqual(calls, [
-    "greeting", "properties", "modals", "navigation",
-    "auth-mode:false", "register-shell", "create-client",
-    "subscribe-auth", "restore-session",
+    "greeting",
+    "properties",
+    "modals",
+    "navigation",
+    "auth-mode:false",
+    "register-shell",
+    "create-client",
+    "subscribe-auth",
+    "restore-session",
   ]);
   assert.equal($("payment-date").value, "2026-10-05");
   assert.equal($("account-start").value, "2026-10-05");
@@ -61,7 +70,10 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
 test("app lifecycle shows the configuration error before creating a client", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "app-lifecycle.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-lifecycle.js"),
+      "utf8",
+    ),
     context,
   );
   const calls = [];
@@ -87,5 +99,9 @@ test("app lifecycle shows the configuration error before creating a client", asy
   });
 
   await lifecycle.initialize();
-  assert.deepEqual(calls, ["auth-mode:false", "register-shell", "config-error"]);
+  assert.deepEqual(calls, [
+    "auth-mode:false",
+    "register-shell",
+    "config-error",
+  ]);
 });

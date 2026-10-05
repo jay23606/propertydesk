@@ -7,7 +7,10 @@ const vm = require("node:vm");
 test("authentication screens own sign-in, workspace, and configuration presentation", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "auth-screens.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "auth-screens.js"),
+      "utf8",
+    ),
     context,
   );
   const elements = new Map();
@@ -39,13 +42,15 @@ test("authentication screens own sign-in, workspace, and configuration presentat
   assert.equal(element("auth-view").classes.has("hidden"), true);
   assert.equal(element("app-view").classes.has("hidden"), false);
   screens.showConfigError();
-  assert.match(element("config-banner").innerHTML, /Supabase is not configured/);
+  assert.match(
+    element("config-banner").innerHTML,
+    /Supabase is not configured/,
+  );
   assert.equal(element("auth-title").textContent, "Connect your workspace");
   assert.equal(element("auth-form").classes.has("hidden"), true);
   assert.equal(element(".privacy-note").classes.has("hidden"), true);
   assert.equal(element("auth-view").classes.has("hidden"), false);
 });
-
 
 test("password reset requests keep generic feedback and restore the submit control", async () => {
   const context = vm.createContext({ window: {}, document: {} });
@@ -101,14 +106,17 @@ test("password reset requests keep generic feedback and restore the submit contr
   assert.equal(element("forgot-password").disabled, false);
 });
 
-
 test("authentication screen module loads before auth and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.ok(html.indexOf("features/auth-screens.js") < html.indexOf("features/auth.js"));
+  assert.ok(
+    html.indexOf("features/auth-screens.js") < html.indexOf("features/auth.js"),
+  );
   assert.match(worker, /'\.\/features\/auth-screens\.js'/);
 });
-
 
 test("password recovery saves the new password before resuming workspace access", async () => {
   const context = vm.createContext({ window: {}, document: {} });
@@ -165,7 +173,6 @@ test("password recovery saves the new password before resuming workspace access"
   assert.equal(element("reset-password-submit").textContent, "Update password");
 });
 
-
 test("password recovery restores its submit control when the auth request rejects", async () => {
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
@@ -207,7 +214,6 @@ test("password recovery restores its submit control when the auth request reject
   assert.equal(element("reset-password-submit").textContent, "Update password");
   assert.match(element("auth-message").textContent, /try again/i);
 });
-
 
 test("auth feature delegates session restoration and state changes to its session module", async () => {
   const context = vm.createContext({ window: {}, URLSearchParams });
@@ -275,7 +281,6 @@ test("auth feature delegates session restoration and state changes to its sessio
   assert.deepEqual(calls, ["fetch-workspace"]);
 });
 
-
 test("auth feature owns login controls and clears workspace data on sign-out", async () => {
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
@@ -316,7 +321,13 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
     selectedPropertyId: "property-1",
     auditRequestId: 3,
     passwordRecoveryInProgress: true,
-    client: { auth: { async signOut() { signOutCalls += 1; } } },
+    client: {
+      auth: {
+        async signOut() {
+          signOutCalls += 1;
+        },
+      },
+    },
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
@@ -345,9 +356,16 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   assert.equal(state.accounts.length, 0);
   assert.equal(state.payments.length, 0);
   for (const key of [
-    "workspaceMembers", "propertyHolders", "depositEntries", "reminderLogs",
-    "expenses", "documents", "agreementVersions", "importBatches",
-  ]) assert.equal(state[key].length, 0, key);
+    "workspaceMembers",
+    "propertyHolders",
+    "depositEntries",
+    "reminderLogs",
+    "expenses",
+    "documents",
+    "agreementVersions",
+    "importBatches",
+  ])
+    assert.equal(state[key].length, 0, key);
   assert.equal(state.workspaceOwnerId, null);
   assert.equal(state.pendingImport, null);
   assert.equal(state.pendingCorrection, null);
@@ -358,7 +376,6 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   assert.equal(state.passwordRecoveryInProgress, false);
   assert.equal(element("auth-form").dataset.mode, "signin");
 });
-
 
 test("auth feature restores login controls when the auth request rejects", async () => {
   const context = vm.createContext({ window: {}, document: {} });
@@ -394,19 +411,19 @@ test("auth feature restores login controls when the auth request rejects", async
     documentRef: { querySelector: () => element("auth-intro") },
   });
 
-  await assert.doesNotReject(
-    feature.submitAuth({ preventDefault() {} }),
-  );
+  await assert.doesNotReject(feature.submitAuth({ preventDefault() {} }));
   assert.equal(element("auth-submit").disabled, false);
   assert.equal(element("auth-submit").textContent, "Sign in");
   assert.match(element("auth-message").textContent, /try again/i);
 });
 
-
 test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to verify", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "auth-form.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "auth-form.js"),
+      "utf8",
+    ),
     context,
   );
   const handlers = new Map();
@@ -436,7 +453,10 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
           return { data: { user: { id: "owner-1" } }, error: null };
         },
         async signUp() {
-          return { data: { user: { id: "owner-2" }, session: null }, error: null };
+          return {
+            data: { user: { id: "owner-2" }, session: null },
+            error: null,
+          };
         },
       },
     },
@@ -445,7 +465,9 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
   const form = context.window.PropertyDeskAuthForm.create({
     $: element,
     state,
-    startWorkspace: async () => { workspaceStarts += 1; },
+    startWorkspace: async () => {
+      workspaceStarts += 1;
+    },
     documentRef: { querySelector: () => element("auth-intro") },
   });
   form.attachEvents();
@@ -460,7 +482,6 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
   assert.match(element("auth-message").textContent, /confirm your account/i);
   assert.equal(workspaceStarts, 1);
 });
-
 
 test("auth session restore and sign-out report rejected requests without clearing user state", async () => {
   const context = vm.createContext({ window: {}, document: {} });
@@ -481,8 +502,12 @@ test("auth session restore and sign-out report rejected requests without clearin
     passwordRecoveryInProgress: false,
     client: {
       auth: {
-        signOut: async () => { throw new Error("offline"); },
-        getSession: async () => { throw new Error("offline"); },
+        signOut: async () => {
+          throw new Error("offline");
+        },
+        getSession: async () => {
+          throw new Error("offline");
+        },
       },
     },
   };
@@ -504,4 +529,3 @@ test("auth session restore and sign-out report rejected requests without clearin
     "Unable to restore your session right now. Check your connection and try again.",
   ]);
 });
-

@@ -380,7 +380,10 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
   const deposit = ledger.depositLedger("a1");
   assert.equal(deposit.entries.length, 1);
   assert.equal(deposit.entries[0], depositEntries[0]);
-  assert.deepEqual(Object.keys(deposit).sort(), ["active", "entries", "totals"].sort());
+  assert.deepEqual(
+    Object.keys(deposit).sort(),
+    ["active", "entries", "totals"].sort(),
+  );
   assert.equal(deposit.active.length, 1);
   assert.equal(deposit.totals.held, 40);
   assert.deepEqual(calls, [
@@ -453,7 +456,11 @@ test("report workflow composes portfolio rendering and account export actions", 
   const sumOperatingExpenses = () => 0;
   const state = {};
   const workflow = context.window.PropertyDeskReportWorkflow.create({
-    state, dateOnly, sumIncome, sumOperatingExpenses, accountBalance,
+    state,
+    dateOnly,
+    sumIncome,
+    sumOperatingExpenses,
+    accountBalance,
   });
 
   assert.equal(passed.model.accountBalance, accountBalance);

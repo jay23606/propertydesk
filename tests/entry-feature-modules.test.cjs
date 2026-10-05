@@ -10,7 +10,10 @@ test("app root connects separate property, account, ledger, and create-action fe
   assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
   assert.match(app, /PropertyDeskPropertyForm\.create\(/);
   assert.match(app, /PropertyDeskAccountForm\.create\(/);
-  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection/);
+  assert.match(
+    app,
+    /PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection/,
+  );
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
@@ -22,27 +25,57 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /amortizationSchedule,[\s\S]*?\} = window\.PropertyDeskLedgerUtils;/,
   );
-  assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/);
-  assert.doesNotMatch(app, /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/);
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
+  );
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
+  );
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Events)?\.create/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/,
+  );
   assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
   assert.doesNotMatch(app, /\(\) => attachPropertyDetailEvents\(/);
   assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/);
-  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?fetchAll/);
-  assert.match(app, /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
+  );
+  assert.match(
+    app,
+    /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?fetchAll/,
+  );
+  assert.match(
+    app,
+    /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+  );
   assert.match(app, /window\.PropertyDeskAccountMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
-    const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
+    const source = fs.readFileSync(
+      path.join(__dirname, "..", "features", filename),
+      "utf8",
+    );
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.doesNotMatch(app, /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/);
-  assert.match(app, /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/);
-  assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/,
+  );
+  assert.match(
+    app,
+    /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/,
+  );
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/,
+  );
 });
 
 test("app coordinator creates cross-linked property views after their actions", () => {
@@ -58,8 +91,14 @@ test("app coordinator creates cross-linked property views after their actions", 
   ].map((marker) => app.indexOf(marker));
 
   assert.ok(order.every((position) => position >= 0));
-  assert.deepEqual(order, [...order].sort((left, right) => left - right));
-  assert.doesNotMatch(app, /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/);
+  assert.deepEqual(
+    order,
+    [...order].sort((left, right) => left - right),
+  );
+  assert.doesNotMatch(
+    app,
+    /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/,
+  );
 });
 
 test("account details workflow composes account, history, and account actions", () => {
@@ -74,7 +113,12 @@ test("account details workflow composes account, history, and account actions", 
           return { renderAccountDetails: () => "account html" };
         },
       },
-      PropertyDeskAccountHistoryDetails: { create: () => { created.push("history"); return { renderAccountHistory: () => "history html" }; } },
+      PropertyDeskAccountHistoryDetails: {
+        create: () => {
+          created.push("history");
+          return { renderAccountHistory: () => "history html" };
+        },
+      },
       PropertyDeskAccountDetails: {
         create: (options) => {
           created.push("account details");
@@ -92,21 +136,40 @@ test("account details workflow composes account, history, and account actions", 
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "account-details-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-details-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const dependencies = {
-    $() {}, state: {}, money: () => 0, fmtDate: () => "", esc: String,
-    prettyType: String, paymentFrequencyLabel: () => "monthly",
-    closeModal() {}, closeAccount() {}, depositSectionHTML: () => "deposit html",
+    $() {},
+    state: {},
+    money: () => 0,
+    fmtDate: () => "",
+    esc: String,
+    prettyType: String,
+    paymentFrequencyLabel: () => "monthly",
+    closeModal() {},
+    closeAccount() {},
+    depositSectionHTML: () => "deposit html",
   };
-  const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
+  const workflow =
+    context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
-  assert.deepEqual(created, ["account view", "history", "account details", "account events"]);
+  assert.deepEqual(created, [
+    "account view",
+    "history",
+    "account details",
+    "account events",
+  ]);
   assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
   assert.equal(passed.view.money, dependencies.money);
   assert.equal(passed.accountEvents.closeAccount, dependencies.closeAccount);
-  assert.equal(passed.accountDetails.depositSectionHTML, dependencies.depositSectionHTML);
+  assert.equal(
+    passed.accountDetails.depositSectionHTML,
+    dependencies.depositSectionHTML,
+  );
   assert.equal(workflow.openAccountDetails(), "opened");
   assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
 });
@@ -139,14 +202,26 @@ test("deposit details workflow composes ledger rendering with adjustment actions
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const dependencies = {
-    $() {}, state: {}, depositLedger() {}, money() {}, fmtDate() {}, esc() {},
-    moneyInput() {}, todayIso() {}, toast() {}, fetchAll() {},
+    $() {},
+    state: {},
+    depositLedger() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    moneyInput() {},
+    todayIso() {},
+    toast() {},
+    fetchAll() {},
   };
-  const workflow = context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
+  const workflow =
+    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
 
   assert.equal(passed.details.state, dependencies.state);
   assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
@@ -174,11 +249,16 @@ test("reminder workflow composes the activity view and email preview", () => {
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "reminder-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "reminder-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const openModal = () => {};
-  const workflow = context.window.PropertyDeskReminderWorkflow.create({ openModal });
+  const workflow = context.window.PropertyDeskReminderWorkflow.create({
+    openModal,
+  });
 
   assert.equal(passed.preview.openModal, openModal);
   assert.equal(workflow.renderReminderActivity, reminderActivity);
@@ -202,11 +282,19 @@ test("workspace settings workflow receives reminder activity without owning prev
     },
   });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace-settings-workflow.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace-settings-workflow.js"),
+      "utf8",
+    ),
     context,
   );
   const workflow = context.window.PropertyDeskWorkspaceSettingsWorkflow.create({
-    $() {}, state: {}, esc() {}, toast() {}, fetchAll() {}, updateGreeting() {},
+    $() {},
+    state: {},
+    esc() {},
+    toast() {},
+    fetchAll() {},
+    updateGreeting() {},
     renderReminderActivity: reminderActivity,
   });
 
@@ -219,5 +307,8 @@ test("workspace settings workflow receives reminder activity without owning prev
 test("app coordinator delegates shared setup to the app services workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAppServices\.create\(/);
-  assert.doesNotMatch(app, /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh|LedgerContext)\.create/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh|LedgerContext)\.create/,
+  );
 });

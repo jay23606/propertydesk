@@ -50,14 +50,18 @@ test("document repository centralizes private storage and workspace-scoped metad
       return query;
     },
   };
-  const repository = context.window.PropertyDeskDocumentRepository.create(client);
+  const repository =
+    context.window.PropertyDeskDocumentRepository.create(client);
 
   await repository.upload(
     "owner/property/file.pdf",
     { name: "file.pdf" },
     "application/pdf",
   );
-  await repository.insertMetadata({ user_id: "owner", property_id: "property" });
+  await repository.insertMetadata({
+    user_id: "owner",
+    property_id: "property",
+  });
   await repository.remove("owner/property/file.pdf");
   await repository.deleteMetadata("document", "owner", "property");
   const signed = await repository.signedUrl("owner/property/file.pdf", 60);
@@ -68,7 +72,9 @@ test("document repository centralizes private storage and workspace-scoped metad
       (call) => call[0] === "bucket" && call[1] === "pd-private-agreements",
     ),
   );
-  assert.ok(calls.some((call) => call[0] === "upload" && call[3].upsert === false));
+  assert.ok(
+    calls.some((call) => call[0] === "upload" && call[3].upsert === false),
+  );
   assert.ok(
     calls.some((call) => call[0] === "table" && call[1] === "pd_documents"),
   );
@@ -86,7 +92,10 @@ test("document repository centralizes private storage and workspace-scoped metad
 test("document repository resolves the client lazily after workspace sign-in", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "document-repository.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "document-repository.js"),
+      "utf8",
+    ),
     context,
   );
   let client = null;

@@ -6,7 +6,10 @@ const vm = require("node:vm");
 test("navigation owns page routing and workspace settings navigation", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "navigation.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "navigation.js"),
+      "utf8",
+    ),
     context,
   );
   const handlers = new Map();
@@ -70,11 +73,13 @@ test("navigation owns page routing and workspace settings navigation", () => {
   assert.deepEqual(routes.slice(-2), ["workspace-settings", "scroll"]);
 });
 
-
 test("theme controller synchronizes toggles and persists theme changes", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "theme-controller.js"), "utf8"),
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "theme-controller.js"),
+      "utf8",
+    ),
     context,
   );
   const handlers = new Map();
@@ -99,11 +104,15 @@ test("theme controller synchronizes toggles and persists theme changes", () => {
   const toggles = [makeToggle(0), makeToggle(1)];
   labels.push({ textContent: "" }, { textContent: "" });
   icons.push({ textContent: "" }, { textContent: "" });
-  const meta = { setAttribute: (name, value) => (attributes[`meta:${name}`] = value) };
+  const meta = {
+    setAttribute: (name, value) => (attributes[`meta:${name}`] = value),
+  };
   const documentRef = {
     documentElement: { dataset: { theme: "dark" } },
-    querySelector: (selector) => selector === 'meta[name="theme-color"]' ? meta : null,
-    querySelectorAll: (selector) => selector === "[data-theme-toggle]" ? toggles : [],
+    querySelector: (selector) =>
+      selector === 'meta[name="theme-color"]' ? meta : null,
+    querySelectorAll: (selector) =>
+      selector === "[data-theme-toggle]" ? toggles : [],
   };
   const storageWrites = [];
   const theme = context.window.PropertyDeskTheme.create({
@@ -128,9 +137,11 @@ test("theme controller synchronizes toggles and persists theme changes", () => {
   assert.deepEqual(storageWrites, [["propertydesk-theme", "light"]]);
 });
 
-
 test("navigation feature loads before app startup and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
     html.indexOf("features/navigation.js") < html.indexOf("app.js"),
@@ -139,15 +150,21 @@ test("navigation feature loads before app startup and is precached", () => {
   assert.match(worker, /'\.\/features\/navigation\.js'/);
 });
 
-
 test("theme controller loads before app startup and is precached", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.ok(html.indexOf("features/theme-controller.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/theme-controller.js") < html.indexOf("app.js"),
+  );
   assert.match(worker, /'\.\/features\/theme-controller\.js'/);
-  assert.match(fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"), /PropertyDeskAppShellWorkflow\.create/);
+  assert.match(
+    fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"),
+    /PropertyDeskAppShellWorkflow\.create/,
+  );
 });
-
 
 test("local browser scripts exist and are precached except runtime config", () => {
   const root = path.join(__dirname, "..");
@@ -156,8 +173,14 @@ test("local browser scripts exist and are precached except runtime config", () =
   const shellFiles = new Set(
     [...worker.matchAll(/['"]\.\/([^'"]+)['"]/g)].map((match) => match[1]),
   );
-  assert.equal(shellFiles.has("config.js"), false, "runtime Supabase config should stay outside the cache");
-  const localScripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)]
+  assert.equal(
+    shellFiles.has("config.js"),
+    false,
+    "runtime Supabase config should stay outside the cache",
+  );
+  const localScripts = [
+    ...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi),
+  ]
     .map((match) => match[1].split(/[?#]/, 1)[0])
     .filter((src) => src.endsWith(".js") && !/^https?:\/\//i.test(src));
 

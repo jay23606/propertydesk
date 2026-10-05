@@ -98,33 +98,49 @@ test("private document workflows handle rejected storage requests without leakin
   const state = {
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",
-    documents: [{
-      id: "doc-1",
-      user_id: "workspace-1",
-      property_id: "property-1",
-      storage_path: "workspace-1/property-1/file.pdf",
-      file_name: "file.pdf",
-    }],
+    documents: [
+      {
+        id: "doc-1",
+        user_id: "workspace-1",
+        property_id: "property-1",
+        storage_path: "workspace-1/property-1/file.pdf",
+        file_name: "file.pdf",
+      },
+    ],
     client: {
       storage: {
         from() {
           return {
-            upload: async () => { throw new Error("upload offline"); },
-            remove: async () => { throw new Error("storage offline"); },
-            createSignedUrl: async () => { throw new Error("signing offline"); },
+            upload: async () => {
+              throw new Error("upload offline");
+            },
+            remove: async () => {
+              throw new Error("storage offline");
+            },
+            createSignedUrl: async () => {
+              throw new Error("signing offline");
+            },
           };
         },
       },
-      from: () => assert.fail("database should not be touched after storage rejects"),
+      from: () =>
+        assert.fail("database should not be touched after storage rejects"),
     },
   };
   const messages = [];
-  const viewer = { closed: false, close() { this.closed = true; }, opener: "parent" };
+  const viewer = {
+    closed: false,
+    close() {
+      this.closed = true;
+    },
+    opener: "parent",
+  };
   const feature = context.window.PropertyDeskDocuments.create({
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected request must not refresh"),
-    openPropertyDetails: () => assert.fail("a rejected request must not reopen details"),
+    openPropertyDetails: () =>
+      assert.fail("a rejected request must not reopen details"),
     confirm: () => true,
     openWindow: () => viewer,
     makeId: () => "file-id",
@@ -158,26 +174,35 @@ test("uncertain document metadata writes keep the private file for reconciliatio
         from() {
           return {
             upload: async () => ({ error: null }),
-            remove: async () => assert.fail("uncertain metadata must not delete its file"),
+            remove: async () =>
+              assert.fail("uncertain metadata must not delete its file"),
           };
         },
       },
-      from: () => ({ insert: async () => { throw new Error("connection lost"); } }),
+      from: () => ({
+        insert: async () => {
+          throw new Error("connection lost");
+        },
+      }),
     },
   };
   const messages = [];
   const feature = context.window.PropertyDeskDocuments.create({
     state,
     toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("an unconfirmed write must not show success"),
-    openPropertyDetails: () => assert.fail("an unconfirmed write must not reopen details"),
+    fetchAll: async () =>
+      assert.fail("an unconfirmed write must not show success"),
+    openPropertyDetails: () =>
+      assert.fail("an unconfirmed write must not reopen details"),
     makeId: () => "file-id",
   });
 
-  await assert.doesNotReject(feature.uploadPropertyDocument({
-    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
-    value: "selected",
-  }));
+  await assert.doesNotReject(
+    feature.uploadPropertyDocument({
+      files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+      value: "selected",
+    }),
+  );
 
   assert.match(messages[0], /status couldn't be confirmed/i);
   assert.match(messages[0], /file was kept/i);
