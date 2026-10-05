@@ -286,6 +286,7 @@ test("record-entry module exposes property, account, and transaction workflows",
     "openPropertyPayment",
     "openExpense",
     "attachEvents",
+    "attachCreateActions",
   ]) {
     assert.equal(typeof feature[action], "function", action);
   }
@@ -329,6 +330,84 @@ test("record-entry feature owns form event bindings and category hints", () => {
   assert.deepEqual(toggles, [
     ["loan-fields", "hidden", true],
     ["deposit-refund-hint", "hidden", false],
+  ]);
+});
+
+test("record-entry feature owns create actions and handles empty workspace states", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "record-forms.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const calls = [];
+  const elements = new Map();
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: id === "account-type" ? "rental" : "",
+        checked: false,
+        textContent: "",
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+        querySelector: () => ({ textContent: "" }),
+        classList: { toggle() {}, remove() {}, add() {} },
+        reset() {
+          calls.push(`reset:${id}`);
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const button = (id) => getElement(id);
+  const selectors = {
+    '[data-open="property-modal"]': [button("property")],
+    '[data-open="account-modal"]': [button("account")],
+    '[data-open="payment-modal"]': [button("payment")],
+    '[data-open="expense-modal"]': [button("expense")],
+  };
+  const state = { properties: [], accounts: [] };
+  const feature = context.window.PropertyDeskRecordForms.create({
+    $: getElement,
+    state,
+    documentRef: { querySelectorAll: (selector) => selectors[selector] || [] },
+    todayIso: () => "2026-10-04",
+    toast: (message) => calls.push(`toast:${message}`),
+    populateFormOptions: () => calls.push("populate-options"),
+    openModal: (id) => calls.push(`open:${id}`),
+    openPayment: () => calls.push("open-payment"),
+    openExpense: () => calls.push("open-expense"),
+  });
+  const navigate = (view) => calls.push(`navigate:${view}`);
+
+  feature.attachCreateActions(navigate);
+  handlers.get("account:click")();
+  handlers.get("payment:click")();
+  handlers.get("expense:click")();
+  assert.deepEqual(calls, [
+    "toast:Add a property before creating an account",
+    "navigate:properties",
+    "toast:Add an account before recording a payment",
+    "navigate:properties",
+    "toast:Add a property before recording an expense",
+    "navigate:properties",
+  ]);
+
+  calls.length = 0;
+  handlers.get("property:click")();
+  state.properties.push({ id: "property-1" });
+  handlers.get("account:click")();
+  handlers.get("expense:click")();
+  assert.deepEqual(calls, [
+    "reset:property-form",
+    "open:property-modal",
+    "reset:account-form",
+    "populate-options",
+    "open:account-modal",
+    "populate-options",
+    "reset:expense-form",
+    "open:expense-modal",
   ]);
 });
 

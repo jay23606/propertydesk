@@ -252,6 +252,7 @@
     openPropertyPayment,
     openExpense,
     attachEvents: attachRecordFormEvents,
+    attachCreateActions: attachRecordCreateActions,
   } = recordForms;
   const {
     recordDepositAdjustment,
@@ -419,58 +420,6 @@
     renderPayments();
     renderReports();
   }
-  function attachCreateActions() {
-    document
-      .querySelectorAll('[data-open="property-modal"]')
-      .forEach((button) => {
-        button.addEventListener('click', () => {
-          resetPropertyForm();
-          openModal('property-modal');
-        });
-      });
-    document
-      .querySelectorAll('[data-open="account-modal"]')
-      .forEach((button) => {
-        button.addEventListener('click', () => {
-          if (!state.properties.length) {
-            toast('Add a property before creating an account');
-            navigate('properties');
-            return;
-          }
-          resetAccountForm();
-          populateFormOptions();
-          openModal('account-modal');
-        });
-      });
-
-    const openPayments = () => {
-      if (!state.accounts.length) {
-        toast('Add an account before recording a payment');
-        navigate('properties');
-        return;
-      }
-      openPayment();
-    };
-    document
-      .querySelectorAll('[data-open="payment-modal"]')
-      .forEach((button) => {
-        button.addEventListener('click', openPayments);
-      });
-    $('quick-payment').addEventListener('click', openPayments);
-    document
-      .querySelectorAll('[data-open="expense-modal"]')
-      .forEach((button) => {
-        button.addEventListener('click', () => {
-          if (!state.properties.length) {
-            toast('Add a property before recording an expense');
-            navigate('properties');
-            return;
-          }
-          openExpense();
-        });
-      });
-  }
-
   function attachSearchEvents() {
     $('property-search').addEventListener('input', renderProperties);
     $('property-filter').addEventListener('change', renderProperties);
@@ -659,7 +608,7 @@
 
   function attachEvents() {
     attachNavigationEvents();
-    attachCreateActions();
+    attachRecordCreateActions(navigate);
     attachRecordFormEvents(previewReminderEmail);
     attachSearchEvents();
     attachDelegatedActionEvents();
