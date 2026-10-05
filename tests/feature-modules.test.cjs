@@ -597,6 +597,74 @@ test("backend client only initializes with complete public Supabase config", () 
   });
 });
 
+test("app services compose shared state, workspace refresh, and ledger helpers", () => {
+  const received = {};
+  const state = {};
+  const toast = () => {};
+  const fetchAll = () => {};
+  const ledger = {
+    accountBalance: () => {}, scheduledMonthlyRunRate: () => {},
+    collectedSince: () => {}, depositLedger: () => {},
+  };
+  const config = { supabaseUrl: "https://example.test", supabaseAnonKey: "public-key" };
+  const supabase = { createClient() {} };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskWorkspaceData: { create: () => ({ loadWorkspaceRecords() {} }) },
+      PropertyDeskBackendClient: {
+        create: (options) => {
+          received.backend = options;
+          return { configured: true };
+        },
+      },
+      PropertyDeskAppState: { create: () => state },
+      PropertyDeskNotifications: {
+        create: (options) => {
+          received.notifications = options;
+          return { toast };
+        },
+      },
+      PropertyDeskWorkspaceRefresh: {
+        create: (options) => {
+          received.refresh = options;
+          return { fetchAll };
+        },
+      },
+      PropertyDeskLedgerContext: {
+        create: (options) => {
+          received.ledger = options;
+          return ledger;
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "app-services.js"), "utf8"),
+    context,
+  );
+  const dependencies = {
+    $() {}, render() {}, todayIso() {}, scheduledLoanBalance() {},
+    monthlyScheduledEstimate() {}, sumPosted() {}, securityDepositBalance() {},
+    config, supabase,
+  };
+  const services = context.window.PropertyDeskAppServices.create(dependencies);
+
+  assert.equal(received.backend.config, config);
+  assert.equal(received.backend.supabase, supabase);
+  assert.equal(received.notifications.$, dependencies.$);
+  assert.equal(received.refresh.state, state);
+  assert.equal(received.refresh.toast, toast);
+  assert.equal(received.refresh.render, dependencies.render);
+  assert.equal(received.ledger.state, state);
+  assert.equal(received.ledger.todayIso, dependencies.todayIso);
+  assert.equal(received.ledger.scheduledLoanBalance, dependencies.scheduledLoanBalance);
+  assert.equal(services.backend.configured, true);
+  assert.equal(services.state, state);
+  assert.equal(services.toast, toast);
+  assert.equal(services.fetchAll, fetchAll);
+  assert.equal(services.depositLedger, ledger.depositLedger);
+});
+
 test("notification feature replaces its timer and hides transient feedback", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -1982,10 +2050,10 @@ test("workspace settings workflow shares reminder activity with settings and pre
   assert.equal(workflow.previewReminderEmail(), "preview");
 });
 
-test("app coordinator delegates transient notices to the notification feature", () => {
+test("app coordinator delegates shared setup to the app services workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskNotifications\.create\(\{\s*\$\s*\}\)/);
-  assert.doesNotMatch(app, /toastTimer|function toast\(/);
+  assert.match(app, /PropertyDeskAppServices\.create\(/);
+  assert.doesNotMatch(app, /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh|LedgerContext)\.create/);
 });
 
 test("service worker caches a cloned shell response within the fetch lifetime", async () => {

@@ -123,11 +123,13 @@ test('workspace data module loads before the coordinator and is precached', () =
   );
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const services = fs.readFileSync(path.join(__dirname, '..', 'features', 'app-services.js'), 'utf8');
 
   assert.ok(html.indexOf('workspace-data.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/workspace-data\.js'/);
   assert.ok(html.indexOf('features/workspace-refresh.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
-  assert.match(app, /PropertyDeskWorkspaceData\.create\(\)/);
-  assert.match(app, /PropertyDeskWorkspaceRefresh\.create\(/);
+  assert.match(app, /PropertyDeskAppServices\.create\(/);
+  assert.match(services, /PropertyDeskWorkspaceData\.create\(\)/);
+  assert.match(services, /PropertyDeskWorkspaceRefresh\.create\(/);
 });

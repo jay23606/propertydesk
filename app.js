@@ -38,32 +38,18 @@
     paymentFrequencyLabel,
     expenseCategoryLabel,
   } = window.PropertyDeskAppUtils;
-  const workspaceData = window.PropertyDeskWorkspaceData.create();
-  const config = window.PROPERTYDESK_CONFIG || {};
-  const backend = window.PropertyDeskBackendClient.create({
-    config,
-    supabase: window.supabase,
-  });
-  const state = window.PropertyDeskAppState.create();
-  const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
-    state,
-    workspaceData,
-    toast,
-    render,
-  });
   const {
+    backend,
+    state,
+    toast,
+    fetchAll,
     accountBalance,
     scheduledMonthlyRunRate,
     collectedSince,
     depositLedger,
-  } = window.PropertyDeskLedgerContext.create({
-    state,
-    todayIso,
-    scheduledLoanBalance,
-    monthlyScheduledEstimate,
-    sumPosted,
-    securityDepositBalance,
+  } = window.PropertyDeskAppServices.create({
+    $, render, todayIso, scheduledLoanBalance, monthlyScheduledEstimate,
+    sumPosted, securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const { updateGreeting } = window.PropertyDeskProfileDisplay.create({ $, state });
