@@ -4,73 +4,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("entry workflow shares correction saving across forms and create actions", () => {
-  const passed = {};
-  const correction = () => {};
-  const resetPropertyForm = () => {};
-  const resetAccountForm = () => {};
-  const openPayment = () => {};
-  const openExpense = () => {};
-  const preview = () => {};
-  const navigate = () => {};
-  const calls = [];
-  const context = vm.createContext({
-    window: {
-      PropertyDeskTransactionCorrections: {
-        create: () => ({ saveCorrection: correction }),
-      },
-      PropertyDeskAccountPayload: { build: () => ({}) },
-      PropertyDeskAccountFormModel: {},
-      PropertyDeskPropertyForm: {
-        create: () => ({
-          resetPropertyForm,
-          attachEvents: () => calls.push(["property form events"]),
-        }),
-      },
-      PropertyDeskAccountForm: {
-        create: () => ({
-          resetAccountForm,
-          editAccount: () => {},
-          attachEvents: (callback) => calls.push(["account form events", callback]),
-        }),
-      },
-      PropertyDeskLedgerEntryForms: {
-        create: (options) => {
-          passed.ledger = options;
-          return {
-            updateAllocationPreview: () => {}, openPayment, openPropertyPayment: () => {},
-            openExpense,
-            attachEvents: () => calls.push(["ledger forms"]),
-          };
-        },
-      },
-      PropertyDeskCreateActions: {
-        create: (options) => {
-          passed.actions = options;
-          return { attachEvents: (callback) => calls.push(["create actions", callback]) };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "entry-workflow.js"), "utf8"),
-    context,
-  );
-  const workflow = context.window.PropertyDeskEntryWorkflow.create({ documentRef: {} });
+test("app root connects separate property, account, ledger, and create-action features", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
-  assert.equal(passed.ledger.saveCorrection, correction);
-  assert.equal(passed.actions.resetPropertyForm, resetPropertyForm);
-  assert.equal(passed.actions.resetAccountForm, resetAccountForm);
-  assert.equal(passed.actions.openPayment, openPayment);
-  assert.equal(passed.actions.openExpense, openExpense);
-  workflow.attachPropertyFormEvents();
-  workflow.attachAccountFormEvents(preview);
-  workflow.attachLedgerEntryFormEvents();
-  workflow.attachCreateActions(navigate);
-  assert.deepEqual(calls, [
-    ["property form events"], ["account form events", preview],
-    ["ledger forms"], ["create actions", navigate],
-  ]);
+  assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
+  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
+  assert.match(app, /PropertyDeskAccountForm\.create\(/);
+  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection/);
+  assert.match(app, /PropertyDeskCreateActions\.create\(/);
+  assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
+  assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 
 test("app coordinator passes the amortization helper into account details", () => {
@@ -93,20 +36,19 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /window\.PropertyDeskAccountMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
-  assert.match(app, /window\.PropertyDeskEntryWorkflow\.create\(/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8");
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
   assert.doesNotMatch(app, /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/);
-  assert.doesNotMatch(app, /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/);
+  assert.match(app, /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/);
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
 });
 
 test("app coordinator creates cross-linked property views after their actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const order = [
-    "PropertyDeskEntryWorkflow.create(",
+    "PropertyDeskCreateActions.create(",
     "PropertyDeskAccountDetailsWorkflow.create(",
     "PropertyDeskPropertyDetailsWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
