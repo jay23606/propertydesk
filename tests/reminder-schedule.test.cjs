@@ -54,9 +54,9 @@ test('reminder controls remain off by default and the preview stylesheet is in t
 
   assert.match(html, /id="account-reminder-enabled" type="checkbox"/);
   assert.doesNotMatch(html.match(/id="account-reminder-enabled"[^>]*>/)?.[0] || '', /checked/);
-  assert.match(forms, /reminderEnabled:\s*\$\("account-reminder-enabled"\)\.checked/);
+  assert.match(forms, /const reminderEnabled = \$\("account-reminder-enabled"\)\.checked/);
+  assert.match(forms, /formModel\.partyEmails\(/);
   assert.match(payload, /monthly_reminder_enabled:\s*values\.reminderEnabled/);
-  assert.match(forms, /if\s*\(\s*\$\("account-reminder-enabled"\)\.checked\s*&&\s*!partyEmails\.length\s*\)/);
   assert.match(migration, /monthly_reminder_enabled boolean not null default false/);
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);

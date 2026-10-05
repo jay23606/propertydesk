@@ -37,6 +37,7 @@ function loadLedgerEntryForms(context) {
 function loadPropertyAccountForms(context) {
   for (const filename of [
     "property-form.js",
+    "account-form-model.js",
     "account-payload.js",
     "account-form.js",
     "property-account-forms.js",

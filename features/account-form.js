@@ -5,7 +5,7 @@
   function createAccountForm(context) {
     const {
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
-      populateFormOptions, openModal, buildAccountPayload,
+      populateFormOptions, openModal, buildAccountPayload, formModel,
     } = context;
 
     function resetAccountForm() {
@@ -30,16 +30,13 @@
       event.preventDefault();
       const id = $("account-id").value;
       const type = $("account-type").value;
-      const partyEmails = $("account-party-email")
-        .value.split(/[;,]/)
-        .map((email) => email.trim())
-        .filter(Boolean);
-      if (partyEmails.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
-        toast("Check each tenant/buyer email address.");
-        return;
-      }
-      if ($("account-reminder-enabled").checked && !partyEmails.length) {
-        toast("Add at least one tenant/buyer email before enabling reminders.");
+      const reminderEnabled = $("account-reminder-enabled").checked;
+      const contacts = formModel.partyEmails(
+        $("account-party-email").value,
+        reminderEnabled,
+      );
+      if (contacts.error) {
+        toast(contacts.error);
         return;
       }
       const payload = buildAccountPayload(
@@ -49,9 +46,9 @@
           accountType: type,
           name: $("account-name").value.trim(),
           partyName: $("account-party").value.trim(),
-          partyEmails,
+          partyEmails: contacts.emails,
           partyPhone: $("account-party-phone").value.trim(),
-          reminderEnabled: $("account-reminder-enabled").checked,
+          reminderEnabled,
           startDate: $("account-start").value,
           nextDueDate: $("account-next-due").value,
           paymentAmount: $("account-payment").value,

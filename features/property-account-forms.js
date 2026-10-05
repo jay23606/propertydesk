@@ -14,6 +14,7 @@
       $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
       populateFormOptions, openModal,
       buildAccountPayload: window.PropertyDeskAccountPayload.build,
+      formModel: window.PropertyDeskAccountFormModel,
     });
 
     function attachEvents(previewReminderEmail) {
