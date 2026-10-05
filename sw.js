@@ -16,6 +16,7 @@ const SHELL_FILES = [
   './workspace-data.js',
   './features/workspace-refresh.js',
   './ledger-schedule-utils.js',
+  './loan-amortization-utils.js',
   './ledger-utils.js',
   './backup-utils.js',
   './zip-utils.js',

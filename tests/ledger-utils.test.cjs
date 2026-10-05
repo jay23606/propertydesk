@@ -4,11 +4,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createBackup } = require('../backup-utils.js');
 const scheduleFactory = require('../ledger-schedule-utils.js');
+const loanAmortizationFactory = require('../loan-amortization-utils.js');
 const ledgerUtils = require('../ledger-utils.js');
-const scheduleUtils = scheduleFactory.create({
-  isPosted: ledgerUtils.isPosted,
-  sumPosted: ledgerUtils.sumPosted,
-});
+const scheduleUtils = scheduleFactory.create({ isPosted: ledgerUtils.isPosted });
+const loanUtils = loanAmortizationFactory.create({ sumPosted: ledgerUtils.sumPosted });
 const { amountDueSince, amortizationSchedule, hasPostedPaymentInMonth, isPosted, monthlyScheduledEstimate, paymentStatusInMonth, postedPaymentTotalInMonth, principalBalance, scheduledLoanBalance, securityDepositBalance, sumIncome, sumOperatingExpenses, sumPosted, unpaidDueAccrualStart } = ledgerUtils;
 
 test('backup manifest generation stays separate from ledger calculations', () => {
@@ -16,12 +15,15 @@ test('backup manifest generation stays separate from ledger calculations', () =>
   assert.equal(Object.hasOwn(ledgerUtils, 'createBackup'), false);
 });
 
-test('schedule utility loads before the stable ledger API and is precached', () => {
+test('due schedule and loan amortization utilities load before the stable ledger API and are precached', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const worker = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
   assert.ok(html.indexOf('ledger-schedule-utils.js') < html.indexOf('ledger-utils.js'));
+  assert.ok(html.indexOf('loan-amortization-utils.js') < html.indexOf('ledger-utils.js'));
   assert.match(worker, /'\.\/ledger-schedule-utils\.js'/);
-  assert.equal(typeof scheduleUtils.amortizationSchedule, 'function');
+  assert.match(worker, /'\.\/loan-amortization-utils\.js'/);
+  assert.equal(typeof scheduleUtils.amountDueSince, 'function');
+  assert.equal(typeof loanUtils.amortizationSchedule, 'function');
   assert.equal(typeof ledgerUtils.amortizationSchedule, 'function');
   assert.deepEqual(Object.keys(ledgerUtils).sort(), [
     'amountDueSince', 'amortizationSchedule', 'hasPostedPaymentInMonth', 'isPosted',

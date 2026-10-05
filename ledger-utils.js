@@ -89,17 +89,20 @@
 
   const scheduleFactory = globalThis.PropertyDeskScheduleUtils;
   if (!scheduleFactory) throw new Error('PropertyDeskScheduleUtils must load before PropertyDeskLedgerUtils.');
-  const schedule = scheduleFactory.create({ isPosted, sumPosted });
+  const loanFactory = globalThis.PropertyDeskLoanAmortizationUtils;
+  if (!loanFactory) throw new Error('PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.');
+  const schedule = scheduleFactory.create({ isPosted });
+  const loans = loanFactory.create({ sumPosted });
   const helpers = Object.freeze({
     amountDueSince: schedule.amountDueSince,
-    amortizationSchedule: schedule.amortizationSchedule,
+    amortizationSchedule: loans.amortizationSchedule,
     hasPostedPaymentInMonth,
     isPosted,
     monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
     paymentStatusInMonth,
     postedPaymentTotalInMonth,
-    principalBalance: schedule.principalBalance,
-    scheduledLoanBalance: schedule.scheduledLoanBalance,
+    principalBalance: loans.principalBalance,
+    scheduledLoanBalance: loans.scheduledLoanBalance,
     securityDepositBalance,
     sumIncome,
     sumOperatingExpenses,
