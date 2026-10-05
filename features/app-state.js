@@ -29,5 +29,18 @@
     };
   }
 
-  window.PropertyDeskAppState = Object.freeze({ create: createAppState });
+  function resetWorkspaceState(state) {
+    const defaults = createAppState();
+    const client = state.client;
+    const view = state.view;
+    const auditRequestId = Number.isFinite(state.auditRequestId)
+      ? state.auditRequestId + 1
+      : 1;
+    Object.assign(state, defaults, { client, view, auditRequestId });
+  }
+
+  window.PropertyDeskAppState = Object.freeze({
+    create: createAppState,
+    resetWorkspaceState,
+  });
 })();

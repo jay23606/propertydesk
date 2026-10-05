@@ -50,6 +50,7 @@
       showPasswordReset,
       isPasswordRecoverySession,
       startWorkspace,
+      resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
     });
 
     function attachEvents() {

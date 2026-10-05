@@ -3,7 +3,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function loadAuthFeatures(context) {
-  for (const filename of ["auth-screens.js", "auth-recovery.js", "auth-session.js", "auth-form.js", "auth.js"]) {
+  for (const filename of ["app-state.js", "auth-screens.js", "auth-recovery.js", "auth-session.js", "auth-form.js", "auth.js"]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,

@@ -4,34 +4,11 @@
 
   function createAuthSession({
     state, toast, showAuth, setAuthMode, showPasswordReset,
-    isPasswordRecoverySession, startWorkspace,
+    isPasswordRecoverySession, startWorkspace, resetWorkspaceState,
   }) {
-    function clearWorkspaceState() {
-      state.user = null;
-      state.workspaceOwnerId = null;
-      state.workspaceMembers = [];
-      state.propertyHolders = [];
-      state.depositEntries = [];
-      state.reminderLogs = [];
-      state.properties = [];
-      state.accounts = [];
-      state.payments = [];
-      state.expenses = [];
-      state.documents = [];
-      state.agreementVersions = [];
-      state.importBatches = [];
-      state.pendingImport = null;
-      state.pendingCorrection = null;
-      state.editingProperty = null;
-      state.editingAccount = null;
-      state.selectedPropertyId = null;
-      state.auditRequestId++;
-      state.passwordRecoveryInProgress = false;
-    }
-
     function handleAuthStateChange(event, session) {
       if (event === "SIGNED_OUT") {
-        clearWorkspaceState();
+        resetWorkspaceState(state);
         showAuth();
         setAuthMode(false);
         return;
@@ -84,7 +61,7 @@
         toast("Unable to sign out right now. Check your connection and try again.");
         return;
       }
-      clearWorkspaceState();
+      resetWorkspaceState(state);
       showAuth();
       setAuthMode(false);
     }
