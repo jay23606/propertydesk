@@ -115,6 +115,7 @@ async function main() {
         unpaidDueAccrualStart: () => "2026-01-01",
         todayIso: () => "2026-01-01",
         depositLedger: () => ({ entries: [], active: [], totals: {} }),
+        depositSectionHTML: () => "",
         openModal() {},
         closeModal() {},
         editAccount() {},

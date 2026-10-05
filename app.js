@@ -241,6 +241,13 @@
       populateFormOptions,
       propertyAddress,
     });
+  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+    state,
+    depositLedger,
+    money,
+    fmtDate,
+    esc,
+  });
   const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
     $,
     state,
@@ -255,7 +262,7 @@
     amountDueSince,
     unpaidDueAccrualStart,
     todayIso,
-    depositLedger,
+    depositSectionHTML,
     openModal,
     closeModal,
     editAccount,

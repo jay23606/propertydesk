@@ -566,6 +566,55 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
+test("deposit details render rental-only ledger rows and preserve voided markers", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details.js"), "utf8"),
+    context,
+  );
+  let ledgerReads = 0;
+  const details = context.window.PropertyDeskDepositDetails.create({
+    state: {
+      payments: [{ id: "payment-1", memo: "Move-in" }],
+      expenses: [],
+    },
+    depositLedger: () => {
+      ledgerReads += 1;
+      return {
+        entries: [{
+          id: "entry-1",
+          entry_type: "received",
+          movement_date: "2026-10-01",
+          amount: 500,
+          source_payment_id: "payment-1",
+        }, {
+          id: "entry-2",
+          entry_type: "retained",
+          movement_date: "2026-10-02",
+          amount: 100,
+          reason: "Repair",
+        }],
+        active: [{ id: "entry-1" }],
+        totals: { held: 400, received: 500, refunded: 0, retained: 100, restored: 0 },
+      };
+    },
+    money: (value) => `$${value.toFixed(2)}`,
+    fmtDate: (value) => value,
+    esc: (value) => String(value).replaceAll("<", "&lt;"),
+  });
+
+  assert.equal(details.depositSectionHTML({ id: "note-1", account_type: "note" }), "");
+  assert.equal(ledgerReads, 0);
+  const html = details.depositSectionHTML({ id: "rental-1", account_type: "rental" });
+  assert.equal(ledgerReads, 1);
+  assert.match(html, /Security deposit ledger/);
+  assert.match(html, /\$400\.00/);
+  assert.match(html, /Move-in/);
+  assert.match(html, /transaction-voided/);
+  assert.match(html, /Source transaction voided/);
+  assert.match(html, /data-deposit-adjustment="retained"/);
+});
+
 test("delegated action router preserves action routing and event propagation", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -770,6 +819,7 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskAccountDetails\.create\(\{[\s\S]*?amortizationSchedule,/,
   );
+  assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(
     app,
     /correctTransaction,[\s\S]*?=\s*window\.PropertyDeskTransactionMaintenance\.create/,
