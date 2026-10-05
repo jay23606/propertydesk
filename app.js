@@ -475,7 +475,6 @@
       $,
       state,
       renderWorkspaceSettings,
-      closeModal,
     });
   const { editPropertyQuickNote } = window.PropertyDeskPropertyQuickNote.create({
     state,

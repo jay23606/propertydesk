@@ -45,6 +45,11 @@
     }
 
     function attachEvents() {
+      documentRef.querySelectorAll('[data-close]').forEach((button) => {
+        button.addEventListener('click', () =>
+          closeModal(button.closest('.modal')),
+        );
+      });
       documentRef.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
         documentRef

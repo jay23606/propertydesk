@@ -3,7 +3,7 @@
   'use strict';
 
   function create({
-    $, state, renderWorkspaceSettings, closeModal,
+    $, state, renderWorkspaceSettings,
     documentRef = document, windowRef = window, storage,
   }) {
     function setTheme(theme, persist = false) {
@@ -76,11 +76,6 @@
       });
       documentRef.querySelectorAll('[data-goto]').forEach((link) => {
         link.addEventListener('click', () => navigate(link.dataset.goto));
-      });
-      documentRef.querySelectorAll('[data-close]').forEach((button) => {
-        button.addEventListener('click', () =>
-          closeModal(button.closest('.modal')),
-        );
       });
     }
 

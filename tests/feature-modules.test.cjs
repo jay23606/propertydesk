@@ -2868,7 +2868,7 @@ test("auth session restore and sign-out report rejected requests without clearin
   ]);
 });
 
-test("navigation owns theme toggles, page routing, and modal close shortcuts", () => {
+test("navigation owns theme toggles and page routing", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", "navigation.js"), "utf8"),
@@ -2900,9 +2900,6 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
           ? themeIcon
           : null;
     },
-    closest() {
-      return modal;
-    },
   });
   const themeLabel = { textContent: "" };
   const themeIcon = { textContent: "" };
@@ -2915,15 +2912,12 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
   const reportsLink = makeElement("reports-link", { view: "reports" });
   const workspaceLink = makeElement("workspace-link", { view: "workspace" });
   const gotoLink = makeElement("goto-link", { goto: "reports" });
-  const closeButton = makeElement("close-button");
   const userMenu = makeElement("user-menu");
-  const modal = { id: "test-modal" };
   const selectors = {
     "[data-theme-toggle]": [toggle],
     ".page": [propertiesPage, workspacePage, reportsPage],
     ".nav-link": [propertiesLink, reportsLink, workspaceLink],
     "[data-goto]": [gotoLink],
-    "[data-close]": [closeButton],
   };
   const documentRef = {
     documentElement: { dataset: { theme: "dark" } },
@@ -2939,7 +2933,6 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
       id === "page-crumb" ? crumb : id === "user-menu" ? userMenu : null,
     state,
     renderWorkspaceSettings: () => routes.push("workspace-settings"),
-    closeModal: (element) => routes.push(`close:${element.id}`),
     documentRef,
     windowRef: { scrollTo: () => routes.push("scroll") },
     storage: { setItem: (...args) => storageWrites.push(args) },
@@ -2970,8 +2963,6 @@ test("navigation owns theme toggles, page routing, and modal close shortcuts", (
   handlers.get("user-menu:click")();
   assert.equal(state.view, "workspace");
   assert.deepEqual(routes.slice(-2), ["workspace-settings", "scroll"]);
-  handlers.get("close-button:click")();
-  assert.equal(routes.at(-1), "close:test-modal");
 });
 
 test("navigation feature loads before app startup and is precached", () => {

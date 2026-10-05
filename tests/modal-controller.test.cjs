@@ -10,7 +10,13 @@ function createController() {
   const document = {
     body: { style: { overflow: '' } },
     addEventListener: (name, handler) => listeners.set(name, handler),
-    querySelectorAll: () => [elements.get('payment-modal')].filter(Boolean),
+    querySelectorAll: (selector) => selector === '[data-close]'
+      ? [closeButton]
+      : [elements.get('payment-modal')].filter(Boolean),
+  };
+  const closeButton = {
+    addEventListener: (name, handler) => listeners.set(`close:${name}`, handler),
+    closest: () => elements.get('payment-modal'),
   };
   const getElement = (id) => {
     if (!elements.has(id)) {
@@ -118,6 +124,21 @@ test('modal controller closes the active dialog on Escape', () => {
   assert.equal(paymentModal.classList.lastAdded, 'hidden');
   assert.equal(document.body.style.overflow, '');
   assert.equal(state.pendingCorrection, null);
+});
+
+test('modal controller wires close buttons to modal cleanup', () => {
+  const { controller, document, getElement, listeners, state } = createController();
+  const paymentModal = getElement('payment-modal');
+  controller.openModal('payment-modal');
+  state.pendingCorrection = { id: 'payment-1' };
+  controller.attachEvents();
+
+  listeners.get('close:click')();
+
+  assert.equal(paymentModal.classList.lastAdded, 'hidden');
+  assert.equal(document.body.style.overflow, '');
+  assert.equal(state.pendingCorrection, null);
+  assert.equal(getElement('payment-modal-title').textContent, 'Record payment');
 });
 
 test('modal controller is loaded before app startup and precached', () => {
