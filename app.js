@@ -259,6 +259,16 @@
       openExpense,
       documentRef: document,
     });
+  const {
+    openAccountDetails,
+    attachAccountDetailEvents,
+    attachDepositDetailEvents,
+  } = window.PropertyDeskAccountDetailsWorkflow.create({
+    $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
+    paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
+    unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
+    editAccount, openPayment, closeAccount, recordDepositAdjustment,
+  });
   const { renderPropertyActivity } =
     window.PropertyDeskPropertyActivityDetails.create({
       state,
@@ -299,57 +309,6 @@
       deletePropertyDocument: (...args) => deletePropertyDocument(...args),
       openPropertyDocument: (...args) => openPropertyDocument(...args),
       uploadPropertyDocument: (...args) => uploadPropertyDocument(...args),
-    });
-  const {
-    depositSectionHTML,
-  } = window.PropertyDeskDepositDetails.create({
-    state,
-    depositLedger,
-    money,
-    fmtDate,
-    esc,
-  });
-  const { attachEvents: attachDepositDetailEvents } =
-    window.PropertyDeskDepositDetailEvents.create({
-      $,
-      state,
-      depositSectionHTML,
-      recordDepositAdjustment,
-  });
-  const { renderAccountHistory } =
-    window.PropertyDeskAccountHistoryDetails.create({
-      state,
-      esc,
-      money,
-      fmtDate,
-    });
-  const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
-    $,
-    state,
-    isPosted,
-    money,
-    fmtDate,
-    esc,
-    prettyType,
-    paymentFrequencyLabel,
-    accountBalance,
-    amortizationSchedule,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
-    depositSectionHTML,
-    renderAccountHistory,
-    openModal,
-    propertyAddress,
-  });
-  const { attachEvents: attachAccountDetailEvents } =
-    window.PropertyDeskAccountDetailEvents.create({
-      $,
-      state,
-      closeModal,
-      editAccount,
-      openPayment,
-      closeAccount,
     });
   const importPreview = window.PropertyDeskImportPreview.create({
     $,

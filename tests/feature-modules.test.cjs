@@ -1576,15 +1576,8 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /amortizationSchedule,[\s\S]*?\} = window\.PropertyDeskLedgerUtils;/,
   );
-  assert.match(
-    app,
-    /PropertyDeskAccountDetails\.create\(\{[\s\S]*?amortizationSchedule,/,
-  );
-  assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
-  assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
-  assert.match(app, /PropertyDeskAccountDetailEvents\.create\(/);
-  assert.match(app, /PropertyDeskDepositDetailEvents\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/);
+  assert.doesNotMatch(app, /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/);
   assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
@@ -1602,6 +1595,29 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?updateAllocationPreview/,
   );
   assert.doesNotMatch(app, /PropertyDesk(?:Account|Deposit|Transaction)Maintenance\.create/);
+});
+
+test("account details workflow composes account, history, and deposit views with their actions", () => {
+  const created = [];
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositDetails: { create: () => { created.push("deposit"); return { depositSectionHTML: () => "deposit html" }; } },
+      PropertyDeskAccountHistoryDetails: { create: () => { created.push("history"); return { renderAccountHistory: () => "history html" }; } },
+      PropertyDeskAccountDetails: { create: () => { created.push("account details"); return { openAccountDetails: () => "opened" }; } },
+      PropertyDeskAccountDetailEvents: { create: () => { created.push("account events"); return { attachEvents: () => "account events attached" }; } },
+      PropertyDeskDepositDetailEvents: { create: () => { created.push("deposit events"); return { attachEvents: () => "deposit events attached" }; } },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-details-workflow.js"), "utf8"),
+    context,
+  );
+  const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create({});
+
+  assert.deepEqual(created, ["deposit", "history", "account details", "account events", "deposit events"]);
+  assert.equal(workflow.openAccountDetails(), "opened");
+  assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
+  assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 
 test("record maintenance composes account, deposit, and transaction actions", () => {
