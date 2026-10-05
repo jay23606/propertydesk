@@ -27,7 +27,7 @@ async function main() {
 
     const detailText = await page.evaluate(async () => {
       const utilities = window.PropertyDeskLedgerUtils;
-      const details = window.PropertyDeskDetailViews;
+      const details = window.PropertyDeskAccountDetails;
       if (!utilities || !details) {
         throw new Error("PropertyDesk account detail modules did not load.");
       }

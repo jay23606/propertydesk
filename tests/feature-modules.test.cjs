@@ -220,18 +220,20 @@ test("export feature owns backup and report button bindings", () => {
   assert.ok([...bindings.values()].every((handler) => typeof handler === "function"));
 });
 
-test("property and account detail views expose focused render actions", () => {
+test("property and account detail modules expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "details.js"),
-    "utf8",
-  );
-  vm.runInContext(source, context);
+  for (const filename of ["property-details.js", "account-details.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
 
-  const feature = context.window.PropertyDeskDetailViews.create({});
-  assert.equal(typeof feature.openPropertyDetails, "function");
-  assert.equal(typeof feature.openAccountDetails, "function");
-  assert.equal(typeof feature.attachPropertyEvents, "function");
+  const property = context.window.PropertyDeskPropertyDetails.create({});
+  const account = context.window.PropertyDeskAccountDetails.create({});
+  assert.equal(typeof property.openPropertyDetails, "function");
+  assert.equal(typeof property.attachPropertyEvents, "function");
+  assert.equal(typeof account.openAccountDetails, "function");
 });
 
 test("delegated action router preserves action routing and event propagation", () => {
@@ -362,7 +364,7 @@ test("property and transaction views own their search and filter bindings", () =
 test("property detail feature owns its editing and quick-action event bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "details.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-details.js"), "utf8"),
     context,
   );
   const handlers = new Map();
@@ -381,7 +383,7 @@ test("property detail feature owns its editing and quick-action event bindings",
     return elements.get(id);
   };
   const propertyModal = getElement("property-detail-modal");
-  const feature = context.window.PropertyDeskDetailViews.create({
+  const feature = context.window.PropertyDeskPropertyDetails.create({
     $: getElement,
     state: {
       selectedPropertyId: "property-1",
@@ -436,7 +438,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /PropertyDeskDetailViews\.create\(\{[\s\S]*?amortizationSchedule,/,
+    /PropertyDeskAccountDetails\.create\(\{[\s\S]*?amortizationSchedule,/,
   );
   assert.match(
     app,

@@ -201,12 +201,8 @@
       openExpense,
       updateAllocationPreview,
     });
-  const {
-    openPropertyDetails,
-    openAccountDetails,
-    attachPropertyEvents,
-  } =
-    window.PropertyDeskDetailViews.create({
+  const { openPropertyDetails, attachPropertyEvents } =
+    window.PropertyDeskPropertyDetails.create({
       $,
       state,
       isPosted,
@@ -218,21 +214,36 @@
       prettyType,
       paymentFrequencyLabel,
       accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      depositLedger,
       openModal,
       closeModal,
       editAccount,
       openPayment,
-      openExpense,
       resetAccountForm,
       populateFormOptions,
-      deleteAccount: closeAccount,
       propertyAddress,
     });
+  const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
+    $,
+    state,
+    isPosted,
+    money,
+    fmtDate,
+    esc,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
+    amortizationSchedule,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    depositLedger,
+    openModal,
+    closeModal,
+    editAccount,
+    openPayment,
+    deleteAccount: closeAccount,
+    propertyAddress,
+  });
   const { attachEvents: attachImportEvents } =
     window.PropertyDeskImportFeature.create({
       $,
