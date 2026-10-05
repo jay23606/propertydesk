@@ -13,6 +13,15 @@ function loadAuthFeatures(context) {
   }
 }
 
+function loadWorkspaceFeatures(context) {
+  for (const filename of ["workspace-members.js", "workspace.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 function loadLedgerEntryForms(context) {
   for (const filename of [
     "payment-entry-form.js",
@@ -2772,13 +2781,7 @@ test("navigation feature loads before app startup and is precached", () => {
 
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "workspace.js"),
-      "utf8",
-    ),
-    context,
-  );
+  loadWorkspaceFeatures(context);
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id))
@@ -2889,10 +2892,7 @@ test("reminder activity view summarizes delivery results and escapes log data", 
 
 test("workspace feature owns profile and member form bindings", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
-    context,
-  );
+  loadWorkspaceFeatures(context);
   const handlers = new Map();
   const feature = context.window.PropertyDeskWorkspace.create({
     $: (id) => ({
@@ -2911,13 +2911,7 @@ test("workspace feature owns profile and member form bindings", () => {
 
 test("adding a workspace member clears the address only after successful refresh", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "workspace.js"),
-      "utf8",
-    ),
-    context,
-  );
+  loadWorkspaceFeatures(context);
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id))
@@ -2963,10 +2957,7 @@ test("adding a workspace member clears the address only after successful refresh
 
 test("workspace setting writes report rejected requests and retain entered values", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "workspace.js"), "utf8"),
-    context,
-  );
+  loadWorkspaceFeatures(context);
   const elements = new Map([
     ["display-name", { value: "New Label" }],
     ["member-email", { value: " spouse@example.test " }],
@@ -3153,6 +3144,16 @@ test("quick note feature loads before app startup and is precached", () => {
     "property quick note should load before the app coordinator",
   );
   assert.match(worker, /'\.\/features\/property-quick-note\.js'/);
+});
+
+test("workspace member feature loads before settings and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/workspace-members.js") < html.indexOf("features/workspace.js"),
+    "workspace members should load before the settings coordinator",
+  );
+  assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });
 
 test("deposit maintenance retains adjustment audit details", async () => {
