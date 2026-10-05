@@ -1587,6 +1587,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskDepositDetailEvents\.create\(/);
   assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
   assert.match(app, /const \{ voidTransaction \}\s*=\s*window\.PropertyDeskTransactionMaintenance\.create/);
@@ -1745,75 +1746,83 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     context,
   );
   vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-portfolio-model.js"), "utf8"),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-views.js"),
       "utf8",
     ),
     context,
   );
-  const feature = context.window.PropertyDeskPropertyViews.create({
-    $: getElement,
-    portfolioTable: context.window.PropertyDeskPropertyPortfolioTable.create({
-      esc: (value) => String(value ?? ""),
-      money: (value) => `$${Number(value).toFixed(2)}`,
-      paymentFrequencyLabel: () => "Monthly",
-    }),
-    state: {
-      properties: [{ id: "property-1", name: "One Oak", address: "1 Oak St" }],
-      accounts: [
-        {
-          id: "account-1",
-          property_id: "property-1",
-          status: "active",
-          account_type: "land_contract",
-          payment_amount: 125,
-          payment_frequency: "monthly",
-          name: "Contract",
-          party_name: "Buyer",
-        },
-        {
-          id: "account-2",
-          property_id: "property-1",
-          status: "active",
-          account_type: "rental",
-          payment_amount: 200,
-          payment_frequency: "monthly",
-          name: "Rental",
-          party_name: "Tenant",
-        },
-      ],
-      payments: [],
-      propertyHolders: [],
-      workspaceMembers: [],
-      user: null,
-    },
+  const state = {
+    properties: [{ id: "property-1", name: "One Oak", address: "1 Oak St" }],
+    accounts: [
+      {
+        id: "account-1",
+        property_id: "property-1",
+        status: "active",
+        account_type: "land_contract",
+        payment_amount: 125,
+        payment_frequency: "monthly",
+        name: "Contract",
+        party_name: "Buyer",
+      },
+      {
+        id: "account-2",
+        property_id: "property-1",
+        status: "active",
+        account_type: "rental",
+        payment_amount: 200,
+        payment_frequency: "monthly",
+        name: "Rental",
+        party_name: "Tenant",
+      },
+    ],
+    payments: [],
+    propertyHolders: [],
+    workspaceMembers: [],
+    user: null,
+  };
+  const esc = (value) => String(value ?? "");
+  const money = (value) => `$${Number(value).toFixed(2)}`;
+  const dependencies = {
+    state,
     monthlyScheduledEstimate: (accounts) =>
       accounts.reduce((sum, account) => sum + account.payment_amount, 0),
     accountBalance: (account) => (account.id === "account-1" ? 1000 : 0),
     amountDueSince: (accounts) => (accounts[0].id === "account-1" ? 50 : 80),
     unpaidDueAccrualStart: () => "2026-10-01",
     todayIso: () => "2026-10-04",
-    esc: (value) => String(value ?? ""),
-    prettyKind: (value) => value,
-    money: (value) => `$${Number(value).toFixed(2)}`,
     propertyAddress: (property) => property.address,
-    collectedSince: () => 0,
-    scheduledMonthlyRunRate: () => 0,
     monthStart: () => "2026-10-01",
-    isPosted: () => true,
-    prettyType: (value) => value,
-    fmtDate: () => "",
     streetAddress: (property) => property.address,
     dateOnly: (value) => new Date(`${value}T12:00:00`),
     monthEnd: () => "2026-10-31",
     lateReminderMailto: () => "mailto:buyer@example.com",
-    paymentFrequencyLabel: () => "Monthly",
     paymentStatusInMonth: () => "none",
+    money,
+  };
+  const portfolioTable = context.window.PropertyDeskPropertyPortfolioTable.create({
+    esc,
+    money,
+    paymentFrequencyLabel: () => "Monthly",
+  });
+  const portfolioModel = context.window.PropertyDeskPropertyPortfolioModel.create(dependencies);
+  const feature = context.window.PropertyDeskPropertyViews.create({
+    $: getElement,
+    state,
+    esc,
+    portfolioTable,
+    portfolioModel,
   });
 
   feature.renderProperties();
 
   const totals = getElement("accounts-totals");
+  const tableRows = getElement("accounts-table").innerHTML;
+  assert.ok(tableRows.indexOf("Buyer") < tableRows.indexOf("Tenant"));
   assert.match(totals.innerHTML, /\$130\.00/);
   assert.match(totals.innerHTML, /\$325\.00/);
   assert.match(totals.innerHTML, /\$1000\.00/);

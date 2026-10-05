@@ -97,20 +97,13 @@
     money,
     paymentFrequencyLabel,
   });
-  const {
-    renderProperties,
-    attachEvents: attachPropertyViewEvents,
-  } = window.PropertyDeskPropertyViews.create({
-    $,
+  const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
     state,
     monthlyScheduledEstimate,
     accountBalance,
     amountDueSince,
     unpaidDueAccrualStart,
     todayIso,
-    esc,
-    money,
-    portfolioTable,
     propertyAddress,
     monthStart,
     streetAddress,
@@ -118,6 +111,17 @@
     monthEnd,
     lateReminderMailto,
     paymentStatusInMonth,
+    money,
+  });
+  const {
+    renderProperties,
+    attachEvents: attachPropertyViewEvents,
+  } = window.PropertyDeskPropertyViews.create({
+    $,
+    state,
+    esc,
+    portfolioTable,
+    portfolioModel,
   });
   const { attachEvents: attachPropertyActionEvents } =
     window.PropertyDeskPropertyViewEvents.create({

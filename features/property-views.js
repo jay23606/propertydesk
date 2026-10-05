@@ -3,25 +3,7 @@
   "use strict";
 
   function createPropertyViews(context) {
-    const {
-      $,
-      state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      esc,
-      money,
-      propertyAddress,
-      portfolioTable,
-      monthStart,
-      streetAddress,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentStatusInMonth,
-    } = context;
+    const { $, state, esc, portfolioTable, portfolioModel } = context;
 
     function attachEvents() {
       $("property-search").addEventListener("input", renderProperties);
@@ -51,146 +33,31 @@
       ).length;
     }
     function renderAccounts() {
-      const q = $("property-search").value.trim().toLowerCase(),
-        type = $("property-filter").value,
-        holder = $("property-holder-filter").value,
-        showArchived = $("show-archived").checked,
-        rows = [];
-      for (const property of state.properties) {
-        const tags = state.propertyHolders
-          .filter((x) => x.property_id === property.id)
-          .map((x) => x.member_user_id);
-        if (property.archived_at && !showArchived) continue;
-        if (holder !== "all" && !tags.includes(holder)) continue;
-        const allRelated = state.accounts.filter(
-            (a) => a.property_id === property.id,
-          ),
-          related = allRelated.filter(
-            (a) => showArchived || (a.status || "active") === "active",
-          ),
-          matches = related.filter(
-            (a) =>
-              (type === "all" || a.account_type === type) &&
-              (!q ||
-                `${property.name} ${propertyAddress(property)} ${property.notes || ""} ${a.name} ${a.party_name || ""}`
-                  .toLowerCase()
-                  .includes(q)),
-          );
-        const street = streetAddress(property);
-        if (matches.length)
-          for (const account of matches) {
-            const due = amountDueSince(
-              [account],
-              state.payments,
-              unpaidDueAccrualStart(),
-              todayIso(),
-            );
-            const monthly = monthlyScheduledEstimate([
-              { ...account, status: "active" },
-            ]);
-            const partyName = account.party_name || account.name,
-              fullAddress = propertyAddress(property);
-            const reminderPeriod = dateOnly(monthStart()).toLocaleDateString(
-                undefined,
-                { month: "long", year: "numeric" },
-              ),
-              reminderAsOf = monthEnd();
-            const reminderHref = lateReminderMailto({
-              email: account.party_email,
-              address: fullAddress,
-              unpaidDue: money(due),
-              senderName:
-                state.user?.user_metadata?.display_name?.trim() ||
-                "PropertyDesk",
-              recipientName: partyName,
-              month: reminderPeriod,
-              asOf: reminderAsOf,
-            });
-            const recipientHint = account.party_email
-              ? "Draft late reminder email"
-              : "No email saved; opens an unaddressed late reminder draft";
-            const scheduledThisMonth =
-              amountDueSince(
-                [{ ...account, status: "active" }],
-                [],
-                monthStart(),
-                monthEnd(),
-              ) || Number(account.payment_amount || 0);
-            const paymentStatus = paymentStatusInMonth(
-              state.payments,
-              account.id,
-              monthStart(),
-              scheduledThisMonth,
-            );
-            const loanBalance =
-              account.account_type === "rental" ? 0 : accountBalance(account);
-            rows.push({
-              hasAccount: true,
-              party: partyName,
-              account: account.name,
-              address: street,
-              id: account.id,
-              unpaidDue: due,
-              scheduledPayment: monthly,
-              loanBalance,
-              hasLoanBalance: account.account_type !== "rental",
-                html: portfolioTable.accountRowHTML({
-                property,
-                account,
-                street,
-                due,
-                monthly,
-                loanBalance,
-                partyName,
-                paymentStatus,
-                reminderHref,
-                recipientHint,
-              }),
-            });
-          }
-        else if (
-          allRelated.length === 0 &&
-          type === "all" &&
-          (!q ||
-            `${property.name} ${propertyAddress(property)} ${property.notes || ""}`
-              .toLowerCase()
-              .includes(q))
-        ) {
-          rows.push({
-            hasAccount: false,
-            party: "",
-            account: "",
-            address: street,
-            id: property.id,
-            html: portfolioTable.emptyPropertyRowHTML(property, street),
-          });
-        }
-      }
-      const compare = (a, b) =>
-        String(a || "").localeCompare(String(b || ""), undefined, {
-          sensitivity: "base",
-          numeric: true,
-        });
-      rows.sort(
-        (a, b) =>
-          Number(b.hasAccount) - Number(a.hasAccount) ||
-          compare(a.party, b.party) ||
-          compare(a.account, b.account) ||
-          compare(a.address, b.address) ||
-          compare(a.id, b.id),
-      );
-      $("accounts-table").innerHTML = rows.map((row) => row.html).join("");
-      const totals = rows.reduce(
-        (result, row) => {
-          if (!row.hasAccount) return result;
-          result.unpaidDue += row.unpaidDue;
-          result.scheduledPayment += row.scheduledPayment;
-          result.loanBalance += row.loanBalance;
-          if (row.hasLoanBalance) result.loanCount++;
-          return result;
-        },
-        { unpaidDue: 0, scheduledPayment: 0, loanBalance: 0, loanCount: 0 },
-      );
+      const rows = portfolioModel.buildRows({
+        query: $("property-search").value.trim().toLowerCase(),
+        type: $("property-filter").value,
+        holderId: $("property-holder-filter").value,
+        showArchived: $("show-archived").checked,
+      });
+      $("accounts-table").innerHTML = rows
+        .map((row) =>
+          row.hasAccount
+            ? portfolioTable.accountRowHTML({
+                property: row.property,
+                account: row.accountRecord,
+                street: row.street,
+                due: row.unpaidDue,
+                monthly: row.scheduledPayment,
+                loanBalance: row.loanBalance,
+                partyName: row.partyName,
+                paymentStatus: row.paymentStatus,
+                reminderHref: row.reminderHref,
+                recipientHint: row.recipientHint,
+              })
+            : portfolioTable.emptyPropertyRowHTML(row.property, row.street),
+        )
+        .join("");
+      const totals = portfolioModel.totalsFor(rows);
       $("accounts-totals").innerHTML = portfolioTable.totalsRowHTML(totals);
       $("accounts-totals").classList.toggle(
         "hidden",
