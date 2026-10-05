@@ -49,11 +49,55 @@ test("app coordinator passes the amortization helper into account details", () =
   );
 });
 
-test("service worker clones before caching and avoids late fetch waitUntil calls", () => {
-  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.match(worker, /const cachedResponse = response\.clone\(\);\s*const cache = await caches\.open/);
-  assert.match(worker, /propertydesk-shell-v53/);
-  assert.doesNotMatch(worker, /then\(response\s*=>\s*\{[\s\S]*?event\.waitUntil\(/);
+test("service worker caches a cloned shell response within the fetch lifetime", async () => {
+  let fetchHandler;
+  let eventDispatchFinished = false;
+  let waitUntilPromise;
+  let responsePromise;
+  let cachedBody = "";
+  let cachedKey;
+  const self = {
+    registration: { scope: "https://propertydesk.test/" },
+    location: { origin: "https://propertydesk.test" },
+    addEventListener(type, handler) {
+      if (type === "fetch") fetchHandler = handler;
+    },
+  };
+  const caches = {
+    async open() {
+      return {
+        async put(key, response) {
+          cachedKey = key.url || key;
+          cachedBody = await response.text();
+        },
+      };
+    },
+    async match() { return null; },
+  };
+  const context = vm.createContext({
+    self,
+    caches,
+    URL,
+    Response,
+    fetch: async () => new Response("shell asset"),
+  });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8"), context);
+
+  fetchHandler({
+    request: { method: "GET", mode: "cors", url: "https://propertydesk.test/app.js" },
+    waitUntil(promise) {
+      assert.equal(eventDispatchFinished, false, "waitUntil must be called during fetch dispatch");
+      waitUntilPromise = promise;
+    },
+    respondWith(promise) { responsePromise = promise; },
+  });
+  eventDispatchFinished = true;
+
+  const response = await responsePromise;
+  await waitUntilPromise;
+  assert.equal(await response.text(), "shell asset");
+  assert.equal(cachedBody, "shell asset");
+  assert.equal(cachedKey, "https://propertydesk.test/app.js");
 });
 
 test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
