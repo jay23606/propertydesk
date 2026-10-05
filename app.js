@@ -71,29 +71,19 @@
     clearTimeout(state.toastTimer);
     state.toastTimer = setTimeout(() => element.classList.remove('show'), 2800);
   }
-  function accountBalance(account, asOf = todayIso()) {
-    return scheduledLoanBalance(account, asOf);
-  }
-  function scheduledMonthlyRunRate() {
-    return monthlyScheduledEstimate(state.accounts);
-  }
-  function collectedSince(date) {
-    const payments = state.payments.filter(
-      (payment) => String(payment.received_date) >= date,
-    );
-    return sumPosted(payments);
-  }
-  function depositLedger(accountId) {
-    const entries = state.depositEntries.filter(
-      (row) => row.account_id === accountId,
-    );
-    const result = securityDepositBalance(
-      entries,
-      state.payments,
-      state.expenses,
-    );
-    return { ...result, entries };
-  }
+  const {
+    accountBalance,
+    scheduledMonthlyRunRate,
+    collectedSince,
+    depositLedger,
+  } = window.PropertyDeskLedgerContext.create({
+    state,
+    todayIso,
+    scheduledLoanBalance,
+    monthlyScheduledEstimate,
+    sumPosted,
+    securityDepositBalance,
+  });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
   const {
     updateGreeting,

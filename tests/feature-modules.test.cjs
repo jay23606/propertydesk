@@ -52,6 +52,55 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
   assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
+test("ledger context scopes balance, collections, and deposits to workspace state", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "ledger-context.js"), "utf8"),
+    context,
+  );
+  const accounts = [{ id: "a1" }, { id: "a2" }];
+  const payments = [
+    { account_id: "a1", received_date: "2026-10-01", amount: 20 },
+    { account_id: "a1", received_date: "2026-09-30", amount: 100 },
+  ];
+  const depositEntries = [
+    { account_id: "a1", amount: 40 },
+    { account_id: "a2", amount: 90 },
+  ];
+  const expenses = [{ account_id: "a1", amount: 5 }];
+  const calls = [];
+  const ledger = context.window.PropertyDeskLedgerContext.create({
+    state: { accounts, payments, depositEntries, expenses },
+    todayIso: () => "2026-10-04",
+    scheduledLoanBalance: (account, date) => {
+      calls.push(["balance", account.id, date]);
+      return account.id === "a1" ? 500 : 300;
+    },
+    monthlyScheduledEstimate: (rows) => rows.length * 600,
+    sumPosted: (rows) => rows.reduce((sum, row) => sum + row.amount, 0),
+    securityDepositBalance: (entries, paid, costs) => ({
+      held: entries.reduce((sum, row) => sum + row.amount, 0),
+      paymentCount: paid.length,
+      expenseCount: costs.length,
+    }),
+  });
+
+  assert.equal(ledger.accountBalance(accounts[0]), 500);
+  assert.equal(ledger.accountBalance(accounts[0], "2026-08-01"), 500);
+  assert.equal(ledger.scheduledMonthlyRunRate(), 1200);
+  assert.equal(ledger.collectedSince("2026-10-01"), 20);
+  const deposit = ledger.depositLedger("a1");
+  assert.equal(deposit.held, 40);
+  assert.equal(deposit.paymentCount, 2);
+  assert.equal(deposit.expenseCount, 1);
+  assert.equal(deposit.entries.length, 1);
+  assert.equal(deposit.entries[0], depositEntries[0]);
+  assert.deepEqual(calls, [
+    ["balance", "a1", "2026-10-04"],
+    ["balance", "a1", "2026-08-01"],
+  ]);
+});
+
 test("export feature owns backup and report button bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
