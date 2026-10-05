@@ -24,6 +24,7 @@
       openPropertyDocument,
     } = window.PropertyDeskDocuments.create({
       state, toast, fetchAll, openPropertyDetails,
+      repository: window.PropertyDeskDocumentRepository.create(state.client),
     });
     const { attachEvents: attachPropertyDetailEvents } =
       window.PropertyDeskPropertyDetailEvents.create({

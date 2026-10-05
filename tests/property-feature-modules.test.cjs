@@ -1215,7 +1215,10 @@ test("property actions workflow composes holder, document, and detail event beha
         create: () => ({ toggleArchiveProperty: action }),
       },
       PropertyDeskDocuments: {
-        create: () => ({ uploadPropertyDocument: action, deletePropertyDocument: action, openPropertyDocument: action }),
+        create: (options) => { passed.documents = options; return { uploadPropertyDocument: action, deletePropertyDocument: action, openPropertyDocument: action }; },
+      },
+      PropertyDeskDocumentRepository: {
+        create: (client) => { passed.repositoryClient = client; return { mocked: true }; },
       },
       PropertyDeskPropertyDetailEvents: {
         create: (options) => {
@@ -1229,10 +1232,13 @@ test("property actions workflow composes holder, document, and detail event beha
     fs.readFileSync(path.join(__dirname, "..", "features", "property-actions-workflow.js"), "utf8"),
     context,
   );
-  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({ documentRef: {} });
+  const state = { client: {} };
+  const workflow = context.window.PropertyDeskPropertyActionsWorkflow.create({ state, documentRef: {} });
 
   assert.equal(passed.events.savePropertyHolders, action);
   assert.equal(passed.events.deletePropertyDocument, action);
+  assert.equal(passed.documents.repository.mocked, true);
+  assert.equal(passed.repositoryClient, state.client);
   assert.equal(workflow.editPropertyQuickNote, action);
   assert.equal(workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty), action);
 });

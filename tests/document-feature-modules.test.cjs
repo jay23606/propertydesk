@@ -4,15 +4,22 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function loadDocumentModules(context) {
+  for (const filename of ["document-repository.js", "documents.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+}
+
 test("private document module exposes upload, delete, and open workflows", () => {
   const context = vm.createContext({ window: {} });
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "features", "documents.js"),
-    "utf8",
-  );
-  vm.runInContext(source, context);
+  loadDocumentModules(context);
 
-  const feature = context.window.PropertyDeskDocuments.create({});
+  const feature = context.window.PropertyDeskDocuments.create({
+    state: { client: {} },
+  });
   for (const action of [
     "uploadPropertyDocument",
     "deletePropertyDocument",
@@ -24,13 +31,7 @@ test("private document module exposes upload, delete, and open workflows", () =>
 
 test("document upload stores objects privately and removes an orphan after metadata failure", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "documents.js"),
-      "utf8",
-    ),
-    context,
-  );
+  loadDocumentModules(context);
   const state = {
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",
@@ -93,10 +94,7 @@ test("document upload stores objects privately and removes an orphan after metad
 
 test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
-    context,
-  );
+  loadDocumentModules(context);
   const state = {
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",
@@ -150,10 +148,7 @@ test("private document workflows handle rejected storage requests without leakin
 
 test("uncertain document metadata writes keep the private file for reconciliation", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
-    context,
-  );
+  loadDocumentModules(context);
   const state = {
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",

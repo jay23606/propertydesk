@@ -11,6 +11,7 @@
       confirm = (message) => window.confirm(message),
       openWindow = (...args) => window.open(...args),
       makeId = () => crypto.randomUUID(),
+      repository = window.PropertyDeskDocumentRepository.create(state.client),
     } = context;
 
     async function uploadPropertyDocument(input) {
@@ -39,9 +40,7 @@
       const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
       let uploadError;
       try {
-        ({ error: uploadError } = await state.client.storage
-          .from("pd-private-agreements")
-          .upload(path, file, { contentType, upsert: false }));
+        ({ error: uploadError } = await repository.upload(path, file, contentType));
       } catch (error) {
         toast(`Agreement upload failed: ${error.message || "Check your connection and try again."}`);
         return;
@@ -53,7 +52,7 @@
 
       let error;
       try {
-        ({ error } = await state.client.from("pd_documents").insert({
+        ({ error } = await repository.insertMetadata({
           user_id: state.workspaceOwnerId,
           property_id: propertyId,
           account_id: null,
@@ -89,9 +88,7 @@
 
       let storageError;
       try {
-        ({ error: storageError } = await state.client.storage
-          .from("pd-private-agreements")
-          .remove([doc.storage_path]));
+        ({ error: storageError } = await repository.remove(doc.storage_path));
       } catch (error) {
         toast(`Agreement removal failed: ${error.message || "Check your connection and try again."}`);
         return;
@@ -102,11 +99,11 @@
       }
       let error;
       try {
-        ({ error } = await state.client.from("pd_documents")
-          .delete()
-          .eq("id", doc.id)
-          .eq("user_id", state.workspaceOwnerId)
-          .eq("property_id", propertyId));
+        ({ error } = await repository.deleteMetadata(
+          doc.id,
+          state.workspaceOwnerId,
+          propertyId,
+        ));
       } catch (requestError) {
         toast(`File deleted, but its document record could not be removed: ${requestError.message || "Check your connection and try again."}`);
         return;
@@ -137,9 +134,7 @@
       let data;
       let error;
       try {
-        ({ data, error } = await state.client.storage
-          .from("pd-private-agreements")
-          .createSignedUrl(doc.storage_path, 60));
+        ({ data, error } = await repository.signedUrl(doc.storage_path, 60));
       } catch (requestError) {
         viewer.close();
         toast(`Agreement link failed: ${requestError.message || "Check your connection and try again."}`);
@@ -155,9 +150,7 @@
 
     async function removeUploadedFile(path) {
       try {
-        const { error } = await state.client.storage
-          .from("pd-private-agreements")
-          .remove([path]);
+        const { error } = await repository.remove(path);
         return !error;
       } catch {
         return false;
