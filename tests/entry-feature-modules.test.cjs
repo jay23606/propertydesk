@@ -210,10 +210,13 @@ test("account details workflow composes account, deposit, history, and maintenan
   );
   assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.depositMaintenance.fetchAll, dependencies.fetchAll);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachAccountDetailEvents",
+    "attachDepositDetailEvents",
+    "openAccountDetails",
+  ]);
   assert.equal(workflow.openAccountDetails(), "opened");
   assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
-  assert.equal(workflow.closeAccount(), "closed");
-  assert.equal(workflow.depositSectionHTML(), "deposit html");
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 

@@ -103,8 +103,6 @@
     return {
       openAccountDetails,
       attachAccountDetailEvents,
-      closeAccount,
-      depositSectionHTML,
       attachDepositDetailEvents,
     };
   }
