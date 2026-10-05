@@ -4,10 +4,10 @@
 
   function createPropertyDetails(context) {
     const {
-      $, state, isPosted, sumIncome, sumOperatingExpenses, money, fmtDate, esc,
+      $, state, money, fmtDate, esc,
       prettyType, paymentFrequencyLabel, accountBalance, openModal, closeModal,
       editAccount, openPayment, openExpense, resetAccountForm, populateFormOptions,
-      propertyAddress,
+      propertyAddress, renderPropertyActivity,
     } = context;
 
     function openPropertyDetails(id) {
@@ -15,61 +15,9 @@
       const property = state.properties.find((x) => x.id === id);
       if (!property) return;
       state.selectedPropertyId = id;
-      const accounts = state.accounts.filter((a) => a.property_id === id),
-        accountIds = new Set(accounts.map((a) => a.id));
-      const income = state.payments.filter(
-          (p) => accountIds.has(p.account_id) && isPosted(p),
-        ),
-        accountPayments = state.payments.filter((p) =>
-          accountIds.has(p.account_id),
-        ),
-        allExpenses = state.expenses.filter((e) => e.property_id === id),
-        expenses = allExpenses.filter(isPosted);
-      const incomeTotal = sumIncome(income),
-        expenseTotal = sumOperatingExpenses(expenses);
-      const transactions = [
-        ...income.map((item) => ({
-          date: item.received_date,
-          kind:
-            item.income_category === "deposit" ? "Security deposit" : "Income",
-          label:
-            accounts.find((a) => a.id === item.account_id)?.name || "Payment",
-          amount: Number(item.amount || 0),
-          memo: item.memo,
-          status: item.status,
-        })),
-        ...accountPayments
-          .filter((p) => !isPosted(p))
-          .map((item) => ({
-            date: item.received_date,
-            kind: "Income · voided",
-            label:
-              accounts.find((a) => a.id === item.account_id)?.name || "Payment",
-            amount: Number(item.amount || 0),
-            memo: item.memo,
-            status: item.status,
-          })),
-        ...expenses.map((item) => ({
-          date: item.expense_date,
-          kind: "Expense",
-          label: item.payee || item.category || "Expense",
-          amount: -Number(item.amount || 0),
-          memo: item.memo,
-          status: item.status,
-        })),
-        ...allExpenses
-          .filter((e) => !isPosted(e))
-          .map((item) => ({
-            date: item.expense_date,
-            kind: "Expense · voided",
-            label: item.payee || item.category || "Expense",
-            amount: -Number(item.amount || 0),
-            memo: item.memo,
-            status: item.status,
-          })),
-      ]
-        .sort((a, b) => String(b.date).localeCompare(String(a.date)))
-        .slice(0, 8);
+      const accounts = state.accounts.filter((account) => account.property_id === id);
+      const { incomeTotal, expenseTotal, html: activityHTML } =
+        renderPropertyActivity(id, accounts);
       $("property-detail-title").textContent = property.name;
       $("property-detail-address").textContent = propertyAddress(property);
       $("property-detail-add-income").disabled = !accounts.some(
@@ -166,40 +114,7 @@
             : '<p class="list-empty">No agreement files attached yet.</p>'
         }</div>
         </div>
-        <div class="detail-section">
-        <h3>Recent activity</h3>${
-          transactions.length
-            ? `<div class="table-wrap property-detail-table">
-        <table>
-        <thead>
-        <tr>
-        <th>DATE</th>
-        <th>TYPE</th>
-        <th>ACCOUNT / DETAILS</th>
-        <th>AMOUNT</th>
-        </tr>
-        </thead>
-        <tbody>${transactions
-          .map(
-            (
-              x,
-            ) => `<tr class="${x.status === "voided" ? "transaction-voided" : ""}">
-        <td>${fmtDate(x.date)}</td>
-        <td>${esc(x.kind)}</td>
-        <td>${esc(x.label)}${
-          x.memo
-            ? `<br>
-        <span class="muted">${esc(x.memo)}</span>`
-            : ""
-        }</td>
-        <td class="${x.amount < 0 ? "negative-amount" : ""}">${x.amount < 0 ? "−" : ""}${money(Math.abs(x.amount))}</td>
-        </tr>`,
-          )
-          .join("")}</tbody>
-        </table>
-        </div>`
-            : '<p class="list-empty">Recorded income and expenses will appear here.</p>'
-        }</div>`;
+        ${activityHTML}`;
       $("property-archive-toggle").textContent = property.archived_at
         ? "Restore property"
         : "Archive property";

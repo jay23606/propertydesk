@@ -566,6 +566,40 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
+test("property activity details include posted and voided records without counting voids", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-activity-details.js"), "utf8"),
+    context,
+  );
+  const activity = context.window.PropertyDeskPropertyActivityDetails.create({
+    state: {
+      payments: [
+        { account_id: "account-1", amount: 500, received_date: "2026-10-04", status: "posted", memo: "October rent" },
+        { account_id: "account-1", amount: 90, received_date: "2026-10-03", status: "voided", memo: "<cancelled>" },
+      ],
+      expenses: [
+        { property_id: "property-1", amount: 75, expense_date: "2026-10-02", status: "posted", payee: "Plumber" },
+        { property_id: "property-1", amount: 40, expense_date: "2026-10-01", status: "voided", payee: "Old vendor" },
+      ],
+    },
+    isPosted: (record) => record.status !== "voided",
+    sumIncome: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    sumOperatingExpenses: (rows) => rows.reduce((total, row) => total + Number(row.amount || 0), 0),
+    money: (amount) => `$${Number(amount).toFixed(2)}`,
+    fmtDate: (date) => date,
+    esc: (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+  });
+
+  const result = activity.renderPropertyActivity("property-1", [{ id: "account-1", name: "Rental" }]);
+  assert.equal(result.incomeTotal, 500);
+  assert.equal(result.expenseTotal, 75);
+  assert.match(result.html, /October rent/);
+  assert.match(result.html, /transaction-voided/);
+  assert.match(result.html, /&lt;cancelled&gt;/);
+  assert.match(result.html, /−\$75\.00/);
+});
+
 test("deposit details render rental-only ledger rows and preserve voided markers", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

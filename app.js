@@ -220,6 +220,16 @@
       openExpense,
       updateAllocationPreview,
     });
+  const { renderPropertyActivity } =
+    window.PropertyDeskPropertyActivityDetails.create({
+      state,
+      isPosted,
+      sumIncome,
+      sumOperatingExpenses,
+      money,
+      fmtDate,
+      esc,
+    });
   const { openPropertyDetails, attachPropertyEvents } =
     window.PropertyDeskPropertyDetails.create({
       $,
@@ -240,6 +250,7 @@
       resetAccountForm,
       populateFormOptions,
       propertyAddress,
+      renderPropertyActivity,
     });
   const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
     state,

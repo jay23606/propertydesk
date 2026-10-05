@@ -16,6 +16,14 @@ async function reloadThroughServiceWorker(page) {
   });
 }
 
+function assertNoBrowserErrors(pageErrors, consoleErrors, label) {
+  if (pageErrors.length || consoleErrors.length) {
+    throw new Error(
+      `${label} browser errors: ${[...pageErrors, ...consoleErrors].join(" | ")}`,
+    );
+  }
+}
+
 async function main() {
   const url = process.argv[2];
   if (!url) throw new Error("Pass the deployed PropertyDesk URL as an argument.");
@@ -50,6 +58,7 @@ async function main() {
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
     await page.locator("#auth-title").waitFor({ state: "visible", timeout: 30000 });
     await reloadThroughServiceWorker(page);
+    assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
 
     const detailText = await page.evaluate(async () => {
       const utilities = window.PropertyDeskLedgerUtils;
@@ -245,15 +254,26 @@ async function main() {
 
     await signedInPage.goto(url, { waitUntil: "networkidle", timeout: 60000 });
     await reloadThroughServiceWorker(signedInPage);
-    await signedInPage
-      .locator('#accounts-table [data-property-open="smoke-property"]')
-      .first()
-      .waitFor({ state: "visible", timeout: 30000 });
+    assertNoBrowserErrors(signedInPageErrors, signedInConsoleErrors, "Signed-in startup");
+    try {
+      await signedInPage
+        .locator('#accounts-table [data-property-open="smoke-property"]')
+        .first()
+        .waitFor({ state: "visible", timeout: 10000 });
+    } catch (error) {
+      const body = await signedInPage.locator("body").innerText();
+      throw new Error(`Synthetic Properties row did not appear. Page text: ${body.slice(-2500)}. ${error.message}`);
+    }
     await signedInPage
       .locator('#accounts-table [data-property-open="smoke-property"]')
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    const propertyDetail = await signedInPage.locator("#property-detail-content").innerText();
+    if (!propertyDetail.includes("Recent activity") ||
+        !propertyDetail.includes("Recorded income and expenses will appear here.")) {
+      throw new Error("The signed-in app did not render property activity in the Properties details view.");
+    }
     await signedInPage
       .locator('#property-detail-content [data-detail="smoke-account"]')
       .click();
@@ -290,7 +310,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("Deployed PropertyDesk rendered note, rental deposit, and account history details in the signed-in app without browser errors.");
+    console.log("PropertyDesk rendered property activity, note amortization, rental deposits, and account history in the signed-in app without browser errors.");
   } finally {
     await browser.close();
   }
