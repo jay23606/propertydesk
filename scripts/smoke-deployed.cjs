@@ -372,6 +372,18 @@ async function main() {
       throw new Error("The signed-in app did not render account history through the Properties UI.");
     }
     await signedInPage.locator('#detail-modal button[data-close]').click();
+    await signedInPage.locator('.nav-link[data-view="payments"]').click();
+    signedInPage.once("dialog", (dialog) => dialog.accept("Smoke-test correction"));
+    await signedInPage
+      .locator('#payments-table [data-correct-transaction][data-id="smoke-payment"]')
+      .click();
+    await signedInPage.locator("#payment-modal:not(.hidden)").waitFor();
+    if (await signedInPage.locator("#payment-modal-title").innerText() !== "Correct payment" ||
+        await signedInPage.locator("#payment-amount").inputValue() !== "800") {
+      throw new Error("The Transactions view did not open the selected payment in correction mode.");
+    }
+    await signedInPage.locator('#payment-modal button[data-close]').first().click();
+    await signedInPage.locator("#payment-modal.hidden").waitFor({ state: "hidden" });
     await signedInPage.locator('.nav-link[data-view="reports"]').click();
     const reportPage = await signedInPage.locator("#page-reports").innerText();
     for (const expected of ["$800.00", "$25.00", "$775.00", "Import history"]) {
@@ -390,7 +402,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered the signed-in Properties, payment-entry, note-amortization, rental-deposit, account-history, and Reports workflows without browser errors or unhandled rejections.");
+    console.log("PropertyDesk rendered signed-in Properties, payment entry and correction, note amortization, rental deposits, account history, and Reports without browser errors or unhandled rejections.");
   } finally {
     await browser.close();
   }
