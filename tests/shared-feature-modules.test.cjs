@@ -471,37 +471,6 @@ test("report workflow composes portfolio rendering and account export actions", 
   assert.equal(workflow.attachReportExportEvents(), "export events");
 });
 
-test("transaction workflow composes only ledger display and filters", () => {
-  const received = {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskTransactionViews: {
-        create: (options) => {
-          received.views = options;
-          return {
-            renderPayments: () => "payments",
-            attachEvents: () => "view events",
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const workflow = context.window.PropertyDeskTransactionWorkflow.create({
-    state: {},
-  });
-
-  assert.equal(workflow.renderPayments(), "payments");
-  assert.equal(workflow.attachTransactionViewEvents(), "view events");
-  assert.equal("attachTransactionActionEvents" in workflow, false);
-});
-
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(

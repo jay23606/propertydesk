@@ -168,8 +168,8 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { renderPayments, attachTransactionViewEvents } =
-    window.PropertyDeskTransactionWorkflow.create({
+  const { renderPayments, attachEvents: attachTransactionViewEvents } =
+    window.PropertyDeskTransactionViews.create({
       $,
       state,
       dateOnly,

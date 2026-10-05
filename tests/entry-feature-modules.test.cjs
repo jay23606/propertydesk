@@ -49,8 +49,9 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /window\.PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?fetchAll/,
+    /const \{\s*renderPayments,\s*attachEvents: attachTransactionViewEvents\s*\} =\s*window\.PropertyDeskTransactionViews\.create\(\{\s*\$,\s*state,[\s\S]*?sumOperatingExpenses,\s*\}\);/,
   );
+  assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow/);
   assert.match(
     app,
     /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
@@ -66,7 +67,7 @@ test("app coordinator passes the amortization helper into account details", () =
   }
   assert.doesNotMatch(
     app,
-    /PropertyDeskTransaction(?:Views|ViewEvents|CorrectionForm)\.create/,
+    /PropertyDeskTransaction(?:ViewEvents|CorrectionForm)\.create/,
   );
   assert.match(
     app,
