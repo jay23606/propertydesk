@@ -17,6 +17,17 @@
       accountBalance,
       openModal,
       propertyAddress,
+      toast,
+      fetchAll,
+      todayIso,
+      closeModal,
+      editAccount,
+      openPayment,
+      openExpense,
+      resetAccountForm,
+      populateFormOptions,
+      openAccountDetails,
+      documentRef = document,
     } = context;
     const { propertyDetailsHTML } =
       window.PropertyDeskPropertyDetailsView.create({
@@ -54,15 +65,28 @@
 
     const { attachPropertyDetailEvents } =
       window.PropertyDeskPropertyDetailActionsWorkflow.create({
-        ...context,
+        $,
+        state,
+        toast,
+        fetchAll,
+        todayIso,
         openPropertyDetails,
+        closeModal,
+        editAccount,
+        openPayment,
+        openExpense,
+        resetAccountForm,
+        populateFormOptions,
+        openModal,
+        openAccountDetails,
+        documentRef,
       });
     const { attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDocumentWorkflow.create({
         $,
         state,
-        toast: context.toast,
-        fetchAll: context.fetchAll,
+        toast,
+        fetchAll,
         openPropertyDetails,
       });
 

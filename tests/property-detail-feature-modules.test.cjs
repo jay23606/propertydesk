@@ -615,10 +615,10 @@ test("property details workflow connects activity summaries to the property view
     paymentFrequencyLabel() {},
     accountBalance() {},
   };
-  const workflow =
-    context.window.PropertyDeskPropertyDetailsWorkflow.create(
-      detailsDependencies,
-    );
+  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create({
+    ...detailsDependencies,
+    documentRef: {},
+  });
 
   assert.deepEqual(
     Object.keys(viewContext).sort(),
@@ -636,6 +636,33 @@ test("property details workflow connects activity summaries to the property view
     documentContext.openPropertyDetails,
     workflow.openPropertyDetails,
   );
+  assert.deepEqual(
+    Object.keys(detailActionsContext).sort(),
+    [
+      "$",
+      "closeModal",
+      "documentRef",
+      "editAccount",
+      "fetchAll",
+      "openAccountDetails",
+      "openExpense",
+      "openModal",
+      "openPayment",
+      "openPropertyDetails",
+      "populateFormOptions",
+      "resetAccountForm",
+      "state",
+      "toast",
+      "todayIso",
+    ].sort(),
+  );
+  assert.deepEqual(Object.keys(documentContext).sort(), [
+    "$",
+    "fetchAll",
+    "openPropertyDetails",
+    "state",
+    "toast",
+  ]);
   assert.equal(workflow.attachPropertyDetailEvents, attachPropertyDetailEvents);
   assert.equal(
     workflow.attachPropertyDocumentEvents,
