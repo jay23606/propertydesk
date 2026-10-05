@@ -102,6 +102,7 @@
     const {
       handleAuthStateChange,
       restoreAuthSession,
+      signOut,
     } = window.PropertyDeskAuthSession.create({
       state,
       toast,
@@ -111,27 +112,6 @@
       isPasswordRecoverySession,
       startWorkspace,
     });
-
-    async function signOut() {
-      try {
-        const result = await state.client.auth.signOut();
-        const error = result?.error;
-        if (error) {
-          toast(error.message);
-          return;
-        }
-      } catch {
-        toast("Unable to sign out right now. Check your connection and try again.");
-        return;
-      }
-      state.user = null;
-      state.passwordRecoveryInProgress = false;
-      state.properties = [];
-      state.accounts = [];
-      state.payments = [];
-      showAuth();
-      setAuthMode(false);
-    }
 
     function attachEvents() {
       $("sign-out").addEventListener("click", signOut);

@@ -2719,6 +2719,8 @@ test("auth feature delegates session restoration and state changes to its sessio
   feature.handleAuthStateChange("SIGNED_OUT");
   assert.equal(state.user, null);
   assert.equal(state.passwordRecoveryInProgress, false);
+  assert.equal(state.properties.length, 0);
+  assert.equal(state.documents.length, 0);
   assert.equal(element("auth-form").dataset.mode, "signin");
 
   feature.handleAuthStateChange("SIGNED_IN", { user: { id: "owner-2" } });
@@ -2747,9 +2749,24 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   let signOutCalls = 0;
   const state = {
     user: { id: "owner-1" },
+    workspaceOwnerId: "owner-1",
+    workspaceMembers: [{ id: "member-1" }],
+    propertyHolders: [{ id: "holder-1" }],
+    depositEntries: [{ id: "deposit-1" }],
+    reminderLogs: [{ id: "reminder-1" }],
     properties: [{ id: "property-1" }],
     accounts: [{ id: "account-1" }],
     payments: [{ id: "payment-1" }],
+    expenses: [{ id: "expense-1" }],
+    documents: [{ id: "document-1" }],
+    agreementVersions: [{ id: "agreement-version-1" }],
+    importBatches: [{ id: "import-batch-1" }],
+    pendingImport: { id: "pending-import" },
+    pendingCorrection: { id: "pending-correction" },
+    editingProperty: { id: "editing-property" },
+    editingAccount: { id: "editing-account" },
+    selectedPropertyId: "property-1",
+    auditRequestId: 3,
     passwordRecoveryInProgress: true,
     client: { auth: { async signOut() { signOutCalls += 1; } } },
   };
@@ -2779,6 +2796,17 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   assert.equal(state.properties.length, 0);
   assert.equal(state.accounts.length, 0);
   assert.equal(state.payments.length, 0);
+  for (const key of [
+    "workspaceMembers", "propertyHolders", "depositEntries", "reminderLogs",
+    "expenses", "documents", "agreementVersions", "importBatches",
+  ]) assert.equal(state[key].length, 0, key);
+  assert.equal(state.workspaceOwnerId, null);
+  assert.equal(state.pendingImport, null);
+  assert.equal(state.pendingCorrection, null);
+  assert.equal(state.editingProperty, null);
+  assert.equal(state.editingAccount, null);
+  assert.equal(state.selectedPropertyId, null);
+  assert.equal(state.auditRequestId, 4);
   assert.equal(state.passwordRecoveryInProgress, false);
   assert.equal(element("auth-form").dataset.mode, "signin");
 });

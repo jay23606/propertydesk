@@ -6,10 +6,32 @@
     state, toast, showAuth, setAuthMode, showPasswordReset,
     isPasswordRecoverySession, startWorkspace,
   }) {
+    function clearWorkspaceState() {
+      state.user = null;
+      state.workspaceOwnerId = null;
+      state.workspaceMembers = [];
+      state.propertyHolders = [];
+      state.depositEntries = [];
+      state.reminderLogs = [];
+      state.properties = [];
+      state.accounts = [];
+      state.payments = [];
+      state.expenses = [];
+      state.documents = [];
+      state.agreementVersions = [];
+      state.importBatches = [];
+      state.pendingImport = null;
+      state.pendingCorrection = null;
+      state.editingProperty = null;
+      state.editingAccount = null;
+      state.selectedPropertyId = null;
+      state.auditRequestId++;
+      state.passwordRecoveryInProgress = false;
+    }
+
     function handleAuthStateChange(event, session) {
       if (event === "SIGNED_OUT") {
-        state.user = null;
-        state.passwordRecoveryInProgress = false;
+        clearWorkspaceState();
         showAuth();
         setAuthMode(false);
         return;
@@ -50,7 +72,24 @@
       else if (!state.passwordRecoveryInProgress) await startWorkspace();
     }
 
-    return { handleAuthStateChange, restoreAuthSession };
+    async function signOut() {
+      try {
+        const result = await state.client.auth.signOut();
+        const error = result?.error;
+        if (error) {
+          toast(error.message);
+          return;
+        }
+      } catch {
+        toast("Unable to sign out right now. Check your connection and try again.");
+        return;
+      }
+      clearWorkspaceState();
+      showAuth();
+      setAuthMode(false);
+    }
+
+    return { handleAuthStateChange, restoreAuthSession, signOut };
   }
 
   window.PropertyDeskAuthSession = Object.freeze({ create: createAuthSession });
