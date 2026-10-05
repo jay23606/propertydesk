@@ -858,6 +858,71 @@ test("property and transaction views own their search and filter bindings", () =
   }
 });
 
+test("report views summarize the current-year ledger and escape import history", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "ledger-utils.js"), "utf8"),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "report-views.js"), "utf8"),
+    context,
+  );
+  const year = new Date().getFullYear();
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) elements.set(id, { textContent: "", innerHTML: "" });
+    return elements.get(id);
+  };
+  const esc = (value) => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  const feature = context.window.PropertyDeskReportViews.create({
+    $,
+    state: {
+      payments: [
+        { amount: 600, received_date: `${year}-02-01`, income_category: "rent", status: "posted" },
+        { amount: 900, received_date: `${year}-03-01`, income_category: "deposit", status: "posted" },
+        { amount: 75, received_date: `${year}-04-01`, income_category: "rent", status: "voided" },
+        { amount: 200, received_date: `${year - 1}-12-01`, income_category: "rent", status: "posted" },
+      ],
+      expenses: [
+        { amount: 100, expense_date: `${year}-02-02`, category: "repair", status: "posted" },
+        { amount: 50, expense_date: `${year}-03-02`, category: "deposit_refund", status: "posted" },
+        { amount: 20, expense_date: `${year}-04-02`, category: "repair", status: "voided" },
+      ],
+      accounts: [
+        { id: "rental", account_type: "rental" },
+        { id: "note", account_type: "note" },
+        { id: "contract", account_type: "land_contract" },
+      ],
+      importBatches: [{
+        source_name: "<import>.csv",
+        source_type: "accounts",
+        created_at: `${year}-02-01T12:00:00Z`,
+        rows_accepted: 2,
+        rows_total: 3,
+        status: "completed",
+      }],
+    },
+    dateOnly: (date) => date ? new Date(`${date}T12:00:00`) : null,
+    esc,
+    money: (amount) => `$${Number(amount).toFixed(2)}`,
+    ...context.PropertyDeskLedgerUtils,
+    accountBalance: (account) => account.id === "rental" ? 0 : account.id === "note" ? 1200 : 800,
+  });
+
+  feature.renderReports();
+
+  assert.equal($("report-ytd").textContent, "$600.00");
+  assert.equal($("report-expenses-ytd").textContent, "$100.00");
+  assert.equal($("report-net-ytd").textContent, "$500.00");
+  assert.equal($("report-principal").textContent, "$2000.00");
+  assert.match($("account-breakdown").innerHTML, />Rentals<\/span>[\s\S]*?\>1<\/strong>/);
+  assert.match($("account-breakdown").innerHTML, /Land contracts/);
+  assert.match($("account-breakdown").innerHTML, /Private notes/);
+  assert.match($("import-history").innerHTML, /&lt;import&gt;\.csv/);
+  assert.match($("import-history").innerHTML, /2 of 3/);
+});
+
 test("property detail events own editing and quick-action bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

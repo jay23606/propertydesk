@@ -109,7 +109,6 @@
     });
   const {
     renderPayments,
-    renderReports,
     attachEvents: attachTransactionViewEvents,
   } =
     window.PropertyDeskTransactionViews.create({
@@ -124,8 +123,17 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      accountBalance,
     });
+  const { renderReports } = window.PropertyDeskReportViews.create({
+    $,
+    state,
+    dateOnly,
+    esc,
+    money,
+    sumIncome,
+    sumOperatingExpenses,
+    accountBalance,
+  });
   const {
     attachEvents: attachModalEvents,
     openModal,

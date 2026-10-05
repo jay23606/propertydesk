@@ -1,4 +1,4 @@
-/* PropertyDesk transaction and report views. */
+/* PropertyDesk payment and expense transaction views. */
 (() => {
   "use strict";
 
@@ -15,7 +15,6 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      accountBalance,
     } = context;
 
     function attachEvents() {
@@ -109,16 +108,6 @@
         .sort((a, b) => String(b.date).localeCompare(String(a.date)));
       $("payments-table").innerHTML = rows
         .map((x) => {
-          const item = x.item,
-            exp = x.kind === "expense",
-            voided = item.status === "voided",
-            a = state.accounts.find((z) => z.id === item.account_id),
-            p = exp
-              ? state.properties.find((z) => z.id === item.property_id)
-              : state.properties.find((z) => z.id === a?.property_id),
-            correctionOf = exp
-              ? item.correction_of_expense_id
-              : item.correction_of_payment_id;
           return renderTransactionRow(x);
         })
         .join("");
@@ -137,56 +126,7 @@
       $("expenses-total").textContent = money(expenses);
       $("net-cash-flow").textContent = money(income - expenses);
     }
-    function renderImportBatchRow(batch) {
-      return `<tr>
-        <td><strong>${esc(batch.source_name || "CSV import")}</strong></td>
-        <td>${esc(batch.source_type)}</td>
-        <td>${esc(new Date(batch.created_at).toLocaleString())}</td>
-        <td>${Number(batch.rows_accepted)} of ${Number(batch.rows_total)}</td>
-        <td><span class="status-pill">${esc(batch.status)}</span></td>
-      </tr>`;
-    }
-
-    function renderReports() {
-      const y = new Date().getFullYear(),
-        yearPayments = state.payments.filter(
-          (p) => dateOnly(p.received_date)?.getFullYear() === y,
-        ),
-        income = sumIncome(yearPayments),
-        costs = sumOperatingExpenses(
-          state.expenses.filter(
-            (p) => dateOnly(p.expense_date)?.getFullYear() === y,
-          ),
-        );
-      $("report-ytd").textContent = money(income);
-      $("report-expenses-ytd").textContent = money(costs);
-      $("report-net-ytd").textContent = money(income - costs);
-      $("report-principal").textContent = money(
-        state.accounts
-          .filter((a) => a.account_type !== "rental")
-          .reduce((s, a) => s + accountBalance(a), 0),
-      );
-      const labels = [
-        ["rental", "Rentals"],
-        ["land_contract", "Land contracts"],
-        ["note", "Private notes"],
-      ];
-      const counts = labels.map(
-          ([k]) => state.accounts.filter((a) => a.account_type === k).length,
-        ),
-        max = Math.max(1, ...counts);
-      $("account-breakdown").innerHTML = labels
-        .map(
-          ([key, label], i) =>
-            `<div class="breakdown-row"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(counts[i] / max) * 100}%"></div></div><strong>${counts[i]}</strong></div>`,
-        )
-        .join("");
-      $("import-history").innerHTML = state.importBatches.length
-        ? state.importBatches.map(renderImportBatchRow).join("")
-        : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
-    }
-
-    return { renderPayments, renderReports, attachEvents };
+    return { renderPayments, attachEvents };
   }
 
   window.PropertyDeskTransactionViews = Object.freeze({

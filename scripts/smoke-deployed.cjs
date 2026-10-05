@@ -317,6 +317,14 @@ async function main() {
     if (!signedInRentalDetail.includes("Prior agreement terms") || !signedInRentalDetail.includes("Change history")) {
       throw new Error("The signed-in app did not render account history through the Properties UI.");
     }
+    await signedInPage.locator('#detail-modal button[data-close]').click();
+    await signedInPage.locator('.nav-link[data-view="reports"]').click();
+    const reportPage = await signedInPage.locator("#page-reports").innerText();
+    for (const expected of ["$800.00", "$25.00", "$775.00", "Import history"]) {
+      if (!reportPage.includes(expected)) {
+        throw new Error(`The Reports view did not include the expected value: ${expected}.`);
+      }
+    }
     if (signedInPageErrors.length || signedInConsoleErrors.length) {
       throw new Error(
         `Signed-in app browser errors: ${[...signedInPageErrors, ...signedInConsoleErrors].join(" | ")}`,
@@ -328,7 +336,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered property activity, note amortization, rental deposits, and account history in the signed-in app without browser errors.");
+    console.log("PropertyDesk rendered property activity, note amortization, rental deposits, account history, and portfolio reports in the signed-in app without browser errors.");
   } finally {
     await browser.close();
   }
