@@ -52,6 +52,27 @@ function loadImportFeatures(context) {
   }
 }
 
+function formElements(values = {}) {
+  const elements = new Map();
+  return (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        value: values[id] ?? "",
+        checked: false,
+        textContent: "",
+        innerHTML: "",
+        classList: { add() {}, remove() {}, toggle() {} },
+        reset() {},
+        focus() {},
+        dispatchEvent() {},
+        querySelector: () => ({ textContent: "" }),
+        addEventListener() {},
+      });
+    }
+    return elements.get(id);
+  };
+}
+
 test("app lifecycle preserves render, event-binding, and startup order", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -938,6 +959,103 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   ]) {
     for (const name of names) assert.equal(typeof feature[name], "function", name);
   }
+});
+
+test("property and account forms report rejected saves without running success actions", async () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAccountForms(context);
+  const messages = [];
+  const $ = formElements({
+    "property-name": "Rental house",
+    "property-address": "10 Main St",
+    "property-kind": "residential",
+    "account-type": "rental",
+    "account-name": "Monthly rent",
+    "account-start": "2026-10-01",
+    "account-frequency": "monthly",
+  });
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    client: {
+      from: () => ({
+        insert: async () => { throw new Error("offline"); },
+      }),
+    },
+  };
+  const forms = context.window.PropertyDeskPropertyAccountForms.create({
+    $,
+    state,
+    moneyInput: Number,
+    todayIso: () => "2026-10-05",
+    toast: (message) => messages.push(message),
+    closeModal: () => assert.fail("rejected save must keep its form open"),
+    fetchAll: async () => assert.fail("rejected save must not refresh"),
+    populateFormOptions() {},
+    openModal() {},
+  });
+
+  await assert.doesNotReject(forms.saveProperty({ preventDefault() {} }));
+  await assert.doesNotReject(forms.saveAccount({ preventDefault() {} }));
+  assert.deepEqual(messages, [
+    "Property couldn't be saved right now. Check your connection and try again.",
+    "Account couldn't be saved right now. Check your connection and try again.",
+  ]);
+});
+
+test("payment and expense forms report rejected saves without clearing the entries", async () => {
+  const context = vm.createContext({ window: {}, Event });
+  loadLedgerEntryForms(context);
+  const messages = [];
+  const values = {
+    "payment-account": "rental-1",
+    "payment-amount": "500",
+    "payment-date": "2026-10-05",
+    "payment-method": "check",
+    "payment-memo": "October",
+    "income-category": "rent",
+    "expense-property": "property-1",
+    "expense-category": "repair",
+    "expense-amount": "100",
+    "expense-date": "2026-10-05",
+    "expense-method": "check",
+    "expense-memo": "Plumbing repair",
+  };
+  const $ = formElements(values);
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", property_id: "property-1", account_type: "rental" }],
+    pendingCorrection: null,
+    client: {
+      from: () => ({ insert: async () => { throw new Error("offline"); } }),
+      rpc: async () => { throw new Error("offline"); },
+    },
+  };
+  const forms = context.window.PropertyDeskLedgerEntryForms.create({
+    $,
+    state,
+    moneyInput: Number,
+    todayIso: () => "2026-10-05",
+    toast: (message) => messages.push(message),
+    closeModal: () => assert.fail("rejected save must keep its form open"),
+    fetchAll: async () => assert.fail("rejected save must not refresh"),
+    fillSelect() {},
+    populateFormOptions() {},
+    prettyType: (type) => type,
+    openModal() {},
+  });
+
+  await assert.doesNotReject(forms.savePayment({ preventDefault() {} }));
+  await assert.doesNotReject(forms.saveExpense({ preventDefault() {} }));
+  state.pendingCorrection = { kind: "payment", id: "payment-1", reason: "fix" };
+  await assert.doesNotReject(forms.savePayment({ preventDefault() {} }));
+  state.pendingCorrection = { kind: "expense", id: "expense-1", reason: "fix" };
+  await assert.doesNotReject(forms.saveExpense({ preventDefault() {} }));
+  assert.deepEqual(messages, [
+    "Payment couldn't be saved right now. Check your connection and try again.",
+    "Expense couldn't be saved right now. Check your connection and try again.",
+    "Correction failed; original entry is unchanged. Check your connection and try again.",
+    "Correction failed; original entry is unchanged. Check your connection and try again.",
+  ]);
 });
 
 test("record-entry feature owns form event bindings and category hints", () => {

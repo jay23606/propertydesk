@@ -25,14 +25,24 @@
       const query = id
         ? state.client.from("pd_properties").update(payload).eq("id", id)
         : state.client.from("pd_properties").insert(payload);
-      const { error } = await query;
+      let error;
+      try {
+        ({ error } = await query);
+      } catch {
+        toast("Property couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
       closeModal($("property-modal"));
       resetPropertyForm();
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       toast(id ? "Property updated" : "Property added");
     }
 

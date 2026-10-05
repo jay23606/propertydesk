@@ -85,14 +85,24 @@
       const query = id
         ? state.client.from("pd_accounts").update(payload).eq("id", id)
         : state.client.from("pd_accounts").insert(payload);
-      const { error } = await query;
+      let error;
+      try {
+        ({ error } = await query);
+      } catch {
+        toast("Account couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
       closeModal($("account-modal"));
       resetAccountForm();
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       toast(id ? "Account updated" : "Account added");
     }
 

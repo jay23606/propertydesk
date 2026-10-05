@@ -1,5 +1,21 @@
 const { chromium } = require("playwright");
 
+async function reloadThroughServiceWorker(page) {
+  await page.evaluate(async () => {
+    if (!("serviceWorker" in navigator)) {
+      throw new Error("This browser does not support the PropertyDesk app shell.");
+    }
+    const registration = await navigator.serviceWorker.ready;
+    if (!registration.active) {
+      throw new Error("The PropertyDesk service worker did not become active.");
+    }
+  });
+  await page.reload({ waitUntil: "networkidle", timeout: 60000 });
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), null, {
+    timeout: 30000,
+  });
+}
+
 async function main() {
   const url = process.argv[2];
   if (!url) throw new Error("Pass the deployed PropertyDesk URL as an argument.");
@@ -33,6 +49,7 @@ async function main() {
     );
     await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
     await page.locator("#auth-title").waitFor({ state: "visible", timeout: 30000 });
+    await reloadThroughServiceWorker(page);
 
     const detailText = await page.evaluate(async () => {
       const utilities = window.PropertyDeskLedgerUtils;
@@ -210,13 +227,10 @@ async function main() {
           from: queryFor,
         }),
       };
-      Object.defineProperty(navigator, "serviceWorker", {
-        configurable: true,
-        value: { register: async () => ({}) },
-      });
     });
 
     await signedInPage.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+    await reloadThroughServiceWorker(signedInPage);
     await signedInPage
       .locator('#accounts-table [data-property-open="smoke-property"]')
       .waitFor({ state: "visible", timeout: 30000 });

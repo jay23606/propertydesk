@@ -72,35 +72,51 @@
       };
 
       if (state.pendingCorrection?.kind === "payment") {
-        const { error } = await state.client.rpc("pd_correct_transaction", {
-          p_kind: "payment",
-          p_transaction_id: state.pendingCorrection.id,
-          p_correction: {
-            account_id: payload.account_id,
-            amount: payload.amount,
-            received_date: payload.received_date,
-            payment_method: payload.payment_method,
-            income_category: payload.income_category,
-            principal_amount: payload.principal_amount,
-            interest_amount: payload.interest_amount,
-            fee_amount: payload.fee_amount,
-            escrow_amount: payload.escrow_amount,
-            unapplied_amount: payload.unapplied_amount,
-            memo: payload.memo,
-          },
-          p_reason: state.pendingCorrection.reason,
-        });
+        let error;
+        try {
+          ({ error } = await state.client.rpc("pd_correct_transaction", {
+            p_kind: "payment",
+            p_transaction_id: state.pendingCorrection.id,
+            p_correction: {
+              account_id: payload.account_id,
+              amount: payload.amount,
+              received_date: payload.received_date,
+              payment_method: payload.payment_method,
+              income_category: payload.income_category,
+              principal_amount: payload.principal_amount,
+              interest_amount: payload.interest_amount,
+              fee_amount: payload.fee_amount,
+              escrow_amount: payload.escrow_amount,
+              unapplied_amount: payload.unapplied_amount,
+              memo: payload.memo,
+            },
+            p_reason: state.pendingCorrection.reason,
+          }));
+        } catch {
+          toast("Correction failed; original entry is unchanged. Check your connection and try again.");
+          return;
+        }
         if (error) {
           toast(`Correction failed; original entry is unchanged. ${error.message}`);
           return;
         }
         closeModal($("payment-modal"));
-        await fetchAll();
+        try {
+          await fetchAll();
+        } catch {
+          return;
+        }
         toast("Payment corrected; original kept in history");
         return;
       }
 
-      const { error } = await state.client.from("pd_payments").insert(payload);
+      let error;
+      try {
+        ({ error } = await state.client.from("pd_payments").insert(payload));
+      } catch {
+        toast("Payment couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
@@ -108,7 +124,11 @@
       $("payment-form").reset();
       $("payment-date").value = todayIso();
       $("payment-account").value = account.id;
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       if (addAnother) {
         updateAllocationPreview();
         $("payment-amount").focus();

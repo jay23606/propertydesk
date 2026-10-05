@@ -35,39 +35,59 @@
         source_type: "manual",
       };
       if (state.pendingCorrection?.kind === "expense") {
-        const { error } = await state.client.rpc("pd_correct_transaction", {
-          p_kind: "expense",
-          p_transaction_id: state.pendingCorrection.id,
-          p_correction: {
-            property_id: payload.property_id,
-            account_id: payload.account_id,
-            amount: payload.amount,
-            expense_date: payload.expense_date,
-            category: payload.category,
-            payee: payload.payee,
-            payment_method: payload.payment_method,
-            memo: payload.memo,
-          },
-          p_reason: state.pendingCorrection.reason,
-        });
+        let error;
+        try {
+          ({ error } = await state.client.rpc("pd_correct_transaction", {
+            p_kind: "expense",
+            p_transaction_id: state.pendingCorrection.id,
+            p_correction: {
+              property_id: payload.property_id,
+              account_id: payload.account_id,
+              amount: payload.amount,
+              expense_date: payload.expense_date,
+              category: payload.category,
+              payee: payload.payee,
+              payment_method: payload.payment_method,
+              memo: payload.memo,
+            },
+            p_reason: state.pendingCorrection.reason,
+          }));
+        } catch {
+          toast("Correction failed; original entry is unchanged. Check your connection and try again.");
+          return;
+        }
         if (error) {
           toast(`Correction failed; original entry is unchanged. ${error.message}`);
           return;
         }
         closeModal($("expense-modal"));
-        await fetchAll();
+        try {
+          await fetchAll();
+        } catch {
+          return;
+        }
         toast("Expense corrected; original kept in history");
         return;
       }
 
-      const { error } = await state.client.from("pd_expenses").insert(payload);
+      let error;
+      try {
+        ({ error } = await state.client.from("pd_expenses").insert(payload));
+      } catch {
+        toast("Expense couldn't be saved right now. Check your connection and try again.");
+        return;
+      }
       if (error) {
         toast(error.message);
         return;
       }
       $("expense-form").reset();
       $("expense-date").value = todayIso();
-      await fetchAll();
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
       if (addAnother) {
         $("expense-property").value = propertyId;
         $("expense-property").dispatchEvent(new Event("change"));
