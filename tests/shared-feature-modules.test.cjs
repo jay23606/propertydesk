@@ -350,10 +350,9 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
     },
     monthlyScheduledEstimate: (rows) => rows.length * 600,
     sumPosted: (rows) => rows.reduce((sum, row) => sum + row.amount, 0),
-    securityDepositBalance: (entries, paid, costs) => ({
-      held: entries.reduce((sum, row) => sum + row.amount, 0),
-      paymentCount: paid.length,
-      expenseCount: costs.length,
+    securityDepositBalance: (entries) => ({
+      active: entries,
+      totals: { held: entries.reduce((sum, row) => sum + row.amount, 0) },
     }),
   });
 
@@ -362,11 +361,11 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
   assert.equal(ledger.scheduledMonthlyRunRate(), 1200);
   assert.equal(ledger.collectedSince("2026-10-01"), 20);
   const deposit = ledger.depositLedger("a1");
-  assert.equal(deposit.held, 40);
-  assert.equal(deposit.paymentCount, 2);
-  assert.equal(deposit.expenseCount, 1);
   assert.equal(deposit.entries.length, 1);
   assert.equal(deposit.entries[0], depositEntries[0]);
+  assert.deepEqual(Object.keys(deposit).sort(), ["active", "entries", "totals"].sort());
+  assert.equal(deposit.active.length, 1);
+  assert.equal(deposit.totals.held, 40);
   assert.deepEqual(calls, [
     ["balance", "a1", "2026-10-04"],
     ["balance", "a1", "2026-08-01"],

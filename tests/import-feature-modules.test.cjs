@@ -126,6 +126,11 @@ test("import workflow publishes explicit account, payment, and expense actions",
 test("CSV import workflow stages preview before attaching review and file handlers", () => {
   const sequence = [];
   const passed = {};
+  const validators = {
+    validateAccountRows() {},
+    validatePaymentRows() {},
+    validateExpenseRows() {},
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskImportPreview: {
@@ -152,7 +157,7 @@ test("CSV import workflow stages preview before attaching review and file handle
           return { attachEvents: () => sequence.push("attach import feature") };
         },
       },
-      PropertyDeskImportWorkflows: { importAccounts: () => {} },
+      PropertyDeskImportWorkflows: validators,
     },
   });
   vm.runInContext(
@@ -176,6 +181,9 @@ test("CSV import workflow stages preview before attaching review and file handle
     "attach import feature",
   ]);
   assert.equal(typeof passed.importFeature.stageImport, "function");
+  assert.equal(passed.importFeature.validateAccountRows, validators.validateAccountRows);
+  assert.equal(passed.importFeature.validatePaymentRows, validators.validatePaymentRows);
+  assert.equal(passed.importFeature.validateExpenseRows, validators.validateExpenseRows);
   assert.equal(
     passed.previewEvents.renderImportPreview instanceof Function,
     true,

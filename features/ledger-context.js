@@ -34,7 +34,7 @@
         state.payments,
         state.expenses,
       );
-      return { ...result, entries };
+      return { active: result.active, totals: result.totals, entries };
     }
 
     return {

@@ -19,7 +19,10 @@
       });
     const importFeature = window.PropertyDeskImportFeature.create({
       $, state, stageImport: preview.stageImport, parseCSV,
-      ...window.PropertyDeskImportWorkflows, todayIso, fetchAll, toast,
+      validateAccountRows: window.PropertyDeskImportWorkflows.validateAccountRows,
+      validatePaymentRows: window.PropertyDeskImportWorkflows.validatePaymentRows,
+      validateExpenseRows: window.PropertyDeskImportWorkflows.validateExpenseRows,
+      todayIso, fetchAll, toast,
     });
 
     function attachEvents() {

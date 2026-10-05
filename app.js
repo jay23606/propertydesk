@@ -151,7 +151,9 @@
       $, state,
       selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
       parseCSV: window.PropertyDeskImportUtils.parseCSV,
-      ...window.PropertyDeskImportWorkflows,
+      validateAccountRows: window.PropertyDeskImportWorkflows.validateAccountRows,
+      validatePaymentRows: window.PropertyDeskImportWorkflows.validatePaymentRows,
+      validateExpenseRows: window.PropertyDeskImportWorkflows.validateExpenseRows,
       esc, openModal, closeModal, toast, todayIso, fetchAll,
     });
   const { attachEvents: attachExportEvents } =
