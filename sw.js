@@ -1,6 +1,36 @@
 const CACHE_NAME = 'propertydesk-shell-v53';
-const SHELL_FILES = ['./', './index.html', './styles.css', './overrides.css', './reminders.css', './import-utils.js', './import-workflows.js', './email-utils.js', './ledger-utils.js', './zip-utils.js', './features/property-views.js', './features/transaction-views.js', './features/record-forms.js', './features/imports.js', './features/details.js', './features/documents.js', './features/exports.js', './features/auth.js', './features/workspace.js', './features/property-management.js', './features/ledger-actions.js', './features/reminder-preview.js', './app.js', './propertydesk.webmanifest', './icons/propertydesk.svg', './icons/propertydesk-192.png', './icons/propertydesk-512.png'];
-const SHELL_URLS = new Set(SHELL_FILES.map(path => new URL(path, self.registration.scope).href));
+const SHELL_FILES = [
+  './',
+  './index.html',
+  './styles.css',
+  './overrides.css',
+  './reminders.css',
+  './import-utils.js',
+  './import-workflows.js',
+  './email-utils.js',
+  './ledger-utils.js',
+  './zip-utils.js',
+  './features/property-views.js',
+  './features/transaction-views.js',
+  './features/record-forms.js',
+  './features/imports.js',
+  './features/details.js',
+  './features/documents.js',
+  './features/exports.js',
+  './features/auth.js',
+  './features/workspace.js',
+  './features/property-management.js',
+  './features/ledger-actions.js',
+  './features/reminder-preview.js',
+  './app.js',
+  './propertydesk.webmanifest',
+  './icons/propertydesk.svg',
+  './icons/propertydesk-192.png',
+  './icons/propertydesk-512.png',
+];
+const SHELL_URLS = new Set(
+  SHELL_FILES.map((path) => new URL(path, self.registration.scope).href),
+);
 
 async function fetchAndCache(request, cacheKey = request) {
   const response = await fetch(request);
@@ -13,20 +43,38 @@ async function fetchAndCache(request, cacheKey = request) {
   return response;
 }
 
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(SHELL_FILES))
+      .then(() => self.skipWaiting()),
+  );
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
   // Cache only this static app shell. Never cache API, auth, user records, or config.js responses.
-  if (!SHELL_URLS.has(url.href.split('?')[0])) return;
+  if (!SHELL_URLS.has(url.href.split('?')[0])) {
+    return;
+  }
   if (request.mode === 'navigate') {
     event.respondWith(
       fetchAndCache(request, './index.html')
@@ -36,8 +84,10 @@ self.addEventListener('fetch', event => {
   }
 
   const network = fetchAndCache(request).catch(async (error) => {
-    const cached = await caches.match(request);
-    if (cached) return cached;
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
     throw error;
   });
   // Extend the fetch event from its synchronous handler; do not call waitUntil
