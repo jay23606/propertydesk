@@ -24,6 +24,34 @@ test("CSV import feature loads as an isolated browser module", () => {
   assert.equal(typeof feature.importPayments, "function");
 });
 
+test("shared app utilities preserve formatting, addresses, labels, and money input", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "app-utils.js"), "utf8"),
+    context,
+  );
+  const utils = context.window.PropertyDeskAppUtils;
+
+  assert.equal(utils.esc(`<a x="'">&`), "&lt;a x=&quot;&#39;&quot;&gt;&amp;");
+  assert.equal(utils.moneyInput("$1,234.567"), 1234.57);
+  assert.equal(utils.moneyInput("(15.50)"), -15.5);
+  assert.equal(utils.moneyInput("not a number"), 0);
+  assert.equal(utils.prettyType("land_contract"), "Land contract");
+  assert.equal(utils.prettyKind("residential"), "Residential");
+  assert.equal(utils.paymentFrequencyLabel("biweekly"), "Every 2 weeks");
+  assert.equal(utils.paymentFrequencyLabel("unknown"), "Monthly");
+  assert.equal(utils.expenseCategoryLabel("deposit_refund"), "Security deposit refund");
+  assert.equal(utils.expenseCategoryLabel("contractor_labor"), "contractor labor");
+  assert.equal(
+    utils.propertyAddress({ address: "10 Main St", city: "Altoona", state: "PA", postal_code: "16601" }),
+    "10 Main St, Altoona, PA, 16601",
+  );
+  assert.equal(utils.streetAddress({ address: "10 Main St, Altoona, PA" }), "10 Main St");
+  assert.match(utils.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(utils.monthStart(), /^\d{4}-\d{2}-01$/);
+  assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
+});
+
 test("export feature owns backup and report button bindings", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
