@@ -45,10 +45,29 @@
     passwordRecoveryInProgress: false,
     toastTimer: null,
   };
-  const money = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(value || 0));
-  const dateOnly = (value) => value ? new Date(`${value}T12:00:00`) : null;
-  const fmtDate = (value, opts = { month: 'short', day: 'numeric', year: 'numeric' }) => { const d = dateOnly(value); return d ? d.toLocaleDateString(undefined, opts) : '—'; };
-  const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const money = (value) => {
+    const amount = Number(value || 0);
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+  const dateOnly = (value) =>
+    value ? new Date(`${value}T12:00:00`) : null;
+  const fmtDate = (
+    value,
+    options = { month: 'short', day: 'numeric', year: 'numeric' },
+  ) => {
+    const date = dateOnly(value);
+    return date ? date.toLocaleDateString(undefined, options) : '—';
+  };
+  const todayIso = () => {
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
+  };
   function setTheme(theme, persist = false) {
     const next = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
@@ -81,13 +100,38 @@
     setTheme(document.documentElement.dataset.theme);
   }
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const prettyType = (t) => ({ rental: 'Rental', land_contract: 'Land contract', note: 'Private note' }[t] || t || 'Account');
-  const prettyKind = (t) => ({ residential: 'Residential', land: 'Land', commercial: 'Commercial', other: 'Other' }[t] || t || 'Property');
-  const monthStart = () => { const d = new Date(); d.setDate(1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; };
-  const monthEnd = () => { const d = new Date(); d.setMonth(d.getMonth() + 1, 0); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-  const location = p => [p.city, p.state, p.postal_code].filter(Boolean).join(', ');
-  const propertyAddress = p => [p.address, location(p)].filter(Boolean).join(', ');
-  const streetAddress = p => String(p.address || p.name || '').split(',')[0].trim();
+  const prettyType = (type) => ({
+    rental: 'Rental',
+    land_contract: 'Land contract',
+    note: 'Private note',
+  }[type] || type || 'Account');
+  const prettyKind = (kind) => ({
+    residential: 'Residential',
+    land: 'Land',
+    commercial: 'Commercial',
+    other: 'Other',
+  }[kind] || kind || 'Property');
+  const monthStart = () => {
+    const date = new Date();
+    date.setDate(1);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-01`;
+  };
+  const monthEnd = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 1, 0);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
+  };
+  const location = (property) =>
+    [property.city, property.state, property.postal_code]
+      .filter(Boolean)
+      .join(', ');
+  const propertyAddress = (property) =>
+    [property.address, location(property)].filter(Boolean).join(', ');
+  const streetAddress = (property) =>
+    String(property.address || property.name || '').split(',')[0].trim();
 
   function toast(message) {
     const el = $('toast'); el.textContent = message; el.classList.add('show');
