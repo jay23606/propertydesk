@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { parseCSV, selectImportRows } = require('../import-utils.js');
+require('../account-import-validation.js');
+require('../expense-import-validation.js');
+require('../payment-import-validation.js');
 const { validateAccountRows, validateExpenseRows, validatePaymentRows } = require('../import-workflows.js');
 
 test('every local deferred script loads before app.js and is included in the PWA shell', () => {
@@ -38,6 +41,13 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/notifications.js') < html.indexOf('features/app-services.js'));
   assert.ok(html.indexOf('features/ledger-context.js') < html.indexOf('features/app-services.js'));
   assert.ok(html.indexOf('features/app-services.js') < html.indexOf('app.js'));
+  for (const validator of [
+    'account-import-validation.js',
+    'expense-import-validation.js',
+    'payment-import-validation.js',
+  ]) {
+    assert.ok(html.indexOf(validator) < html.indexOf('import-workflows.js'));
+  }
   assert.ok(html.indexOf('import-workflows.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/import-preview-rendering.js') < html.indexOf('features/import-preview.js'));
   assert.ok(html.indexOf('features/import-preview.js') < html.indexOf('features/import-preview-events.js'));
@@ -191,6 +201,14 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(worker, /'\.\/features\/workspace-settings-workflow\.js'/);
   assert.match(app, /attachCsvImportEvents,/);
+});
+
+test('CSV validation modules expose focused validators through the stable import API', () => {
+  assert.deepEqual(Object.keys(require('../import-workflows.js')).sort(), [
+    'validateAccountRows',
+    'validateExpenseRows',
+    'validatePaymentRows',
+  ]);
 });
 
 const properties = [{ id: 'p1', name: 'Oak House', address: '10 Oak St' }];
