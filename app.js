@@ -64,6 +64,12 @@
     passwordRecoveryInProgress: false,
   };
   const { toast } = window.PropertyDeskNotifications.create({ $ });
+  const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
+    state,
+    workspaceData,
+    toast,
+    render,
+  });
   const {
     accountBalance,
     scheduledMonthlyRunRate,
@@ -337,26 +343,6 @@
       uploadPropertyDocument,
     });
 
-  async function fetchAll() {
-    const { data: workspaceId, error: workspaceError } =
-      await state.client.rpc('pd_workspace_id');
-    if (workspaceError || !workspaceId) {
-      const error = workspaceError || new Error('Missing workspace');
-      toast(workspaceError?.message || 'Could not load this workspace');
-      throw error;
-    }
-    state.workspaceOwnerId = workspaceId;
-    try {
-      Object.assign(
-        state,
-        await workspaceData.loadWorkspaceRecords(state.client, workspaceId),
-      );
-    } catch (error) {
-      toast(error?.message || 'Could not load this workspace');
-      throw error;
-    }
-    render();
-  }
   function render() {
     updateGreeting();
     renderOverview();

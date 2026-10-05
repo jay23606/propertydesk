@@ -126,6 +126,8 @@ test('workspace data module loads before the coordinator and is precached', () =
 
   assert.ok(html.indexOf('workspace-data.js') < html.indexOf('app.js'));
   assert.match(worker, /'\.\/workspace-data\.js'/);
+  assert.ok(html.indexOf('features/workspace-refresh.js') < html.indexOf('app.js'));
+  assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
   assert.match(app, /PropertyDeskWorkspaceData\.create\(\)/);
-  assert.match(app, /workspaceData\.loadWorkspaceRecords/);
+  assert.match(app, /PropertyDeskWorkspaceRefresh\.create\(/);
 });
