@@ -64,8 +64,9 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/imports.js') < html.indexOf('features/csv-import-workflow.js'));
   assert.ok(html.indexOf('features/csv-import-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/property-views.js'));
-  assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/overview-events.js'));
-  assert.ok(html.indexOf('features/overview-events.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/overview-workflow.js'));
+  assert.ok(html.indexOf('features/overview-events.js') < html.indexOf('features/overview-workflow.js'));
+  assert.ok(html.indexOf('features/overview-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-views.js'));
   assert.ok(html.indexOf('features/property-portfolio-table.js') < html.indexOf('features/property-portfolio-model.js'));
   assert.ok(html.indexOf('features/property-portfolio-model.js') < html.indexOf('features/property-views.js'));
