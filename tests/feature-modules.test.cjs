@@ -633,6 +633,117 @@ test("auth session restoration and state changes stay inside the auth feature", 
   assert.deepEqual(calls, ["fetch-workspace"]);
 });
 
+test("navigation owns theme toggles, page routing, and modal close shortcuts", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "navigation.js"), "utf8"),
+    context,
+  );
+  const handlers = new Map();
+  const attributes = {};
+  const classes = new Set();
+  const makeElement = (id, dataset = {}) => ({
+    id,
+    dataset,
+    textContent: "",
+    classList: {
+      toggle(name, enabled) {
+        if (enabled) classes.add(`${id}:${name}`);
+        else classes.delete(`${id}:${name}`);
+      },
+    },
+    setAttribute(name, value) {
+      attributes[`${id}:${name}`] = value;
+    },
+    addEventListener(name, handler) {
+      handlers.set(`${id}:${name}`, handler);
+    },
+    querySelector(selector) {
+      return selector === ".theme-label"
+        ? themeLabel
+        : selector === ".theme-icon"
+          ? themeIcon
+          : null;
+    },
+    closest() {
+      return modal;
+    },
+  });
+  const themeLabel = { textContent: "" };
+  const themeIcon = { textContent: "" };
+  const meta = { setAttribute: (name, value) => (attributes[`meta:${name}`] = value) };
+  const toggle = makeElement("theme");
+  const propertiesPage = makeElement("page-properties");
+  const workspacePage = makeElement("page-workspace");
+  const reportsPage = makeElement("page-reports");
+  const propertiesLink = makeElement("properties-link", { view: "properties" });
+  const reportsLink = makeElement("reports-link", { view: "reports" });
+  const workspaceLink = makeElement("workspace-link", { view: "workspace" });
+  const gotoLink = makeElement("goto-link", { goto: "reports" });
+  const closeButton = makeElement("close-button");
+  const modal = { id: "test-modal" };
+  const selectors = {
+    "[data-theme-toggle]": [toggle],
+    ".page": [propertiesPage, workspacePage, reportsPage],
+    ".nav-link": [propertiesLink, reportsLink, workspaceLink],
+    "[data-goto]": [gotoLink],
+    "[data-close]": [closeButton],
+  };
+  const documentRef = {
+    documentElement: { dataset: { theme: "dark" } },
+    querySelector: (selector) => (selector === 'meta[name="theme-color"]' ? meta : null),
+    querySelectorAll: (selector) => selectors[selector] || [],
+  };
+  const storageWrites = [];
+  const routes = [];
+  const state = { view: "properties" };
+  const crumb = { textContent: "" };
+  const feature = context.window.PropertyDeskNavigation.create({
+    $: (id) => (id === "page-crumb" ? crumb : null),
+    state,
+    renderWorkspaceSettings: () => routes.push("workspace-settings"),
+    closeModal: (element) => routes.push(`close:${element.id}`),
+    documentRef,
+    windowRef: { scrollTo: () => routes.push("scroll") },
+    storage: { setItem: (...args) => storageWrites.push(args) },
+  });
+
+  feature.attachEvents();
+  assert.equal(attributes["theme:aria-label"], "Switch to light mode");
+  assert.equal(attributes["theme:aria-pressed"], "true");
+  assert.equal(themeLabel.textContent, "Light mode");
+  assert.equal(themeIcon.textContent, "☼");
+
+  handlers.get("theme:click")();
+  assert.equal(documentRef.documentElement.dataset.theme, "light");
+  assert.equal(attributes["meta:content"], "#f6f7f4");
+  assert.deepEqual(storageWrites, [["propertydesk-theme", "light"]]);
+
+  handlers.get("workspace-link:click")();
+  assert.equal(state.view, "workspace");
+  assert.equal(crumb.textContent, "Workspace");
+  assert.ok(classes.has("page-properties:active") === false);
+  assert.ok(classes.has("page-workspace:active"));
+  assert.ok(classes.has("page-reports:active") === false);
+  assert.ok(classes.has("workspace-link:active"));
+  assert.deepEqual(routes.slice(0, 2), ["workspace-settings", "scroll"]);
+
+  handlers.get("goto-link:click")();
+  assert.equal(state.view, "reports");
+  handlers.get("close-button:click")();
+  assert.equal(routes.at(-1), "close:test-modal");
+});
+
+test("navigation feature loads before app startup and is precached", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/navigation.js") < html.indexOf("app.js"),
+    "navigation should load before the app coordinator",
+  );
+  assert.match(worker, /'\.\/features\/navigation\.js'/);
+});
+
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
