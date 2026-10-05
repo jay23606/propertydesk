@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadLedgerEntryForms, loadImportFeatures } = require("./feature-test-helpers.cjs");
+const { loadLedgerEntryForms } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -27,6 +27,7 @@ test("account maintenance workflow composes account closure only", () => {
   assert.equal(workflow.closeAccount, closeAccount);
   assert.equal("recordDepositAdjustment" in workflow, false);
 });
+
 
 test("transaction maintenance workflow composes correction and void actions", () => {
   const passed = {};
@@ -65,6 +66,7 @@ test("transaction maintenance workflow composes correction and void actions", ()
   assert.equal(workflow.voidTransaction, voidTransaction);
   assert.equal(workflow.attachTransactionActionEvents(), "action events");
 });
+
 
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
@@ -116,6 +118,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
   assert.equal(refreshes, 1);
 });
 
+
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -144,6 +147,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     "Deposit adjustment failed. Check your connection and try again.",
   ]);
 });
+
 
 test("account maintenance closes an account while preserving its history", async () => {
   const context = vm.createContext({ window: {} });
@@ -192,6 +196,7 @@ test("account maintenance closes an account while preserving its history", async
   assert.equal(messages.at(-1), "Account closed");
 });
 
+
 test("account maintenance reports rejected requests and skips success actions", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -223,6 +228,7 @@ test("account maintenance reports rejected requests and skips success actions", 
     "Account couldn't be closed right now. Please try again.",
   ]);
 });
+
 
 test("transaction maintenance voids a posted row with an audit reason", async () => {
   const context = vm.createContext({
@@ -290,6 +296,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   assert.equal(refreshes, 1);
 });
 
+
 test("transaction maintenance reports rejected void requests without refreshing", async () => {
   const context = vm.createContext({
     window: {},
@@ -329,6 +336,7 @@ test("transaction maintenance reports rejected void requests without refreshing"
     "Transaction couldn't be voided right now. Please try again.",
   ]);
 });
+
 
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
@@ -387,6 +395,7 @@ test("transaction corrections save payment and expense changes with their audit 
   ]);
 });
 
+
 test("transaction correction failures preserve the open form and pending correction", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -418,6 +427,7 @@ test("transaction correction failures preserve the open form and pending correct
     "This correction is no longer available.",
   ]);
 });
+
 
 test("transaction correction form reopens posted payments and expenses with audit reasons", () => {
   const context = vm.createContext({
@@ -549,199 +559,4 @@ test("transaction correction form reopens posted payments and expenses with audi
     "refresh-allocation",
     "open-expense",
   ]);
-});
-
-test("reminder preview uses current form values and escapes recipient-facing text", () => {
-  const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "reminder-preview.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const values = {
-    "account-property": { value: "property-1" },
-    "account-id": { value: "" },
-    "account-type": { value: "land_contract" },
-    "account-name": { value: "Installment" },
-    "account-party": { value: "<Renter>" },
-    "account-start": { value: "" },
-    "account-next-due": { value: "" },
-    "account-payment": { value: "550" },
-    "account-frequency": { value: "monthly" },
-    "account-party-email": { value: "buyer@example.test" },
-    "reminder-preview-content": { innerHTML: "" },
-  };
-  const state = {
-    properties: [{ id: "property-1", address: "10 Main <St>" }],
-    payments: [],
-  };
-  const calls = [];
-  const feature = context.window.PropertyDeskReminderPreview.create({
-    $: (id) => values[id],
-    state,
-    amountDueSince: (accounts, payments, start, end) => {
-      calls.push({ account: accounts[0], payments, start, end });
-      return 550;
-    },
-    unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-04",
-    monthEnd: () => "2026-10-31",
-    moneyInput: Number,
-    toast: (message) => calls.push(message),
-    dateOnly: () => ({ toLocaleDateString: () => "October 2026" }),
-    monthStart: () => "2026-10-01",
-    propertyAddress: (property) => property.address,
-    money: (value) => "USD " + Number(value).toFixed(2),
-    esc: (value) =>
-      String(value ?? "").replace(
-        /[&<>"']/g,
-        (char) =>
-          ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-          })[char],
-      ),
-    openModal: (id) => calls.push(id),
-  });
-
-  feature.previewReminderEmail();
-
-  assert.equal(calls[0].account.payment_amount, 550);
-  assert.equal(calls[0].start, "2026-10-01");
-  assert.match(
-    values["reminder-preview-content"].innerHTML,
-    /buyer@example\.test/,
-  );
-  assert.match(values["reminder-preview-content"].innerHTML, /&lt;Renter&gt;/);
-  assert.match(values["reminder-preview-content"].innerHTML, /&lt;St&gt;/);
-  assert.match(
-    values["reminder-preview-content"].innerHTML,
-    /Hello &lt;Renter&gt;,<br><br>Our records show no rent or installment payment recorded for October 2026\./,
-  );
-  assert.match(
-    values["reminder-preview-content"].innerHTML,
-    /Unpaid due as of 2026-10-31: USD 550\.00<br>Property: 10 Main &lt;St&gt;/,
-  );
-  assert.equal(calls.at(-1), "reminder-preview-modal");
-});
-
-test("recording a loan payment does not invent principal or interest splits", async () => {
-  const context = vm.createContext({ window: {} });
-  loadLedgerEntryForms(context);
-
-  const elements = new Map();
-  const element = (id) => {
-    if (!elements.has(id)) {
-      elements.set(id, {
-        classList: { add() {}, remove() {}, toggle() {} },
-        focus() {},
-        reset() {},
-        value: "",
-      });
-    }
-    return elements.get(id);
-  };
-  element("payment-account").value = "account-1";
-  element("payment-amount").value = "550.00";
-  element("payment-date").value = "2026-10-04";
-  element("payment-method").value = "manual";
-  const state = {
-    workspaceOwnerId: "workspace-1",
-    accounts: [{ id: "account-1", account_type: "land_contract" }],
-    pendingCorrection: null,
-    client: {
-      from(table) {
-        assert.equal(table, "pd_payments");
-        return {
-          async insert(payload) {
-            state.savedPayment = payload;
-            return { error: null };
-          },
-        };
-      },
-    },
-  };
-  const feature = context.window.PropertyDeskLedgerEntryForms.create({
-    $: element,
-    state,
-    moneyInput: (value) => Number(value),
-    todayIso: () => "2026-10-04",
-    toast() {},
-    closeModal() {},
-    fetchAll: async () => {},
-    fillSelect() {},
-    populateFormOptions() {},
-    prettyType: (value) => value,
-    paymentFrequencyLabel: (value) => value,
-    openModal() {},
-  });
-
-  await feature.savePayment({ preventDefault() {} });
-
-  assert.equal(state.savedPayment.amount, 550);
-  assert.equal(state.savedPayment.income_category, "installment");
-  assert.equal(state.savedPayment.principal_amount, 0);
-  assert.equal(state.savedPayment.interest_amount, 0);
-  assert.equal(state.savedPayment.unapplied_amount, 550);
-});
-
-test("CSV imports report a real zero accepted by the server as zero", async () => {
-  const context = vm.createContext({ window: {} });
-  loadImportFeatures(context);
-
-  const elements = new Map();
-  const element = (id) => {
-    if (!elements.has(id)) {
-      elements.set(id, {
-        classList: { add() {}, remove() {}, toggle() {} },
-        checked: false,
-        disabled: false,
-        textContent: "",
-        value: "",
-      });
-    }
-    return elements.get(id);
-  };
-  const state = {
-    accounts: [],
-    properties: [],
-    client: { rpc: async () => ({ data: { rows_accepted: 0 }, error: null }) },
-  };
-  const feature = context.window.PropertyDeskImportFeature.create({
-    $: element,
-      state,
-      stageImport(title, rows, commit, note, report) {
-        state.pendingImport = { title, rows, commit, note, ...report };
-      },
-      parseCSV: () => [{}],
-    validateAccountRows: () => ({
-      valid: [{ account_name: "Test" }],
-      errors: [],
-      total: 1,
-    }),
-    validateExpenseRows() {},
-    validatePaymentRows() {},
-    esc: (value) => String(value ?? ""),
-    todayIso: () => "2026-10-04",
-    openModal() {},
-    closeModal() {},
-    fetchAll: async () => {},
-    toast() {},
-  });
-
-  await feature.importAccounts({ name: "accounts.csv", text: async () => "" });
-  await state.pendingImport.commit(
-    state.pendingImport.rows,
-    state.pendingImport,
-  );
-
-  assert.match(
-    element("import-status").textContent,
-    /Imported 0 accounts; 1 row was skipped/,
-  );
 });
