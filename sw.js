@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v116';
+const CACHE_NAME = 'propertydesk-shell-v117';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -34,6 +34,7 @@ const SHELL_FILES = [
   './features/create-actions.js',
   './features/import-preview-rendering.js',
   './features/import-preview.js',
+  './features/import-preview-events.js',
   './features/account-import.js',
   './features/payment-import.js',
   './features/expense-import.js',

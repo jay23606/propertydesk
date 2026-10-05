@@ -64,7 +64,7 @@ function loadImportFeatures(context) {
 }
 
 function loadImportPreview(context) {
-  for (const filename of ["import-preview-rendering.js", "import-preview.js"]) {
+  for (const filename of ["import-preview-rendering.js", "import-preview.js", "import-preview-events.js"]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -189,6 +189,7 @@ test("CSV import feature loads as an isolated browser module", () => {
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
   const preview = context.window.PropertyDeskImportPreview.create({});
+  const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({});
   const handlers = new Map();
   const feature = context.window.PropertyDeskImportFeature.create({
     $: (id) => ({
@@ -200,7 +201,7 @@ test("CSV import feature loads as an isolated browser module", () => {
   assert.equal(typeof feature.importAccounts, "function");
   assert.equal(typeof feature.importExpenses, "function");
   assert.equal(typeof feature.importPayments, "function");
-  assert.equal(typeof preview.attachEvents, "function");
+  assert.equal(typeof previewEvents.attachEvents, "function");
   feature.attachEvents();
   assert.deepEqual([...handlers.keys()], [
     "import-file:change",
@@ -347,6 +348,61 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   assert.deepEqual(opened, ["import-preview-modal"]);
 });
 
+test("import preview event router corrects rows, updates duplicate selection, and commits approved rows", async () => {
+  const context = vm.createContext({ window: {} });
+  loadImportPreview(context);
+  const handlers = new Map();
+  const elements = new Map();
+  const getElement = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        checked: false,
+        disabled: false,
+        textContent: "",
+        addEventListener: (event, handler) => handlers.set(`${id}:${event}`, handler),
+      });
+    }
+    return elements.get(id);
+  };
+  const state = {
+    pendingImport: {
+      rows: [],
+      rawRows: [{ _source_row: 2, amount: "bad" }],
+      revalidate: (rawRows) => ({ valid: [{ amount: rawRows[0].amount }], errors: [], total: 1 }),
+      commit: async (rows) => calls.push(["commit", rows]),
+    },
+  };
+  const calls = [];
+  const events = context.window.PropertyDeskImportPreviewEvents.create({
+    $: getElement,
+    state,
+    selectImportRows: (rows) => rows,
+    renderImportPreview: () => calls.push("render"),
+    updateImportCommitButton: () => calls.push("update-button"),
+    closeModal: (id) => calls.push(`close:${id}`),
+  });
+  events.attachEvents();
+
+  await handlers.get("import-correction-body:change")({
+    target: {
+      closest: (selector) => selector === "[data-import-correction]"
+        ? { dataset: { row: "2", column: "amount" }, value: "25" }
+        : null,
+    },
+  });
+  await handlers.get("import-include-duplicates:change")();
+  await handlers.get("import-commit:click")();
+
+  assert.equal(state.pendingImport, null);
+  assert.deepEqual(calls, [
+    "render",
+    "update-button",
+    ["commit", [{ amount: "25" }]],
+    "close:import-preview-modal",
+    "update-button",
+  ]);
+});
+
 test("an unconfirmed import disables retry and directs the owner to verify the receipt", async () => {
   const context = vm.createContext({ window: {} });
   loadImportPreview(context);
@@ -377,6 +433,14 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
     openModal() {},
     closeModal: (id) => closed.push(id),
   });
+  const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
+    $,
+    state,
+    selectImportRows: (rows) => rows,
+    renderImportPreview: preview.renderImportPreview,
+    updateImportCommitButton: preview.updateImportCommitButton,
+    closeModal: (id) => closed.push(id),
+  });
   preview.stageImport(
     "Review payment import",
     [{ id: "row-1" }],
@@ -384,7 +448,7 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
     "",
     { total: 1 },
   );
-  preview.attachEvents();
+  previewEvents.attachEvents();
 
   await assert.doesNotReject(handlers.get("import-commit:click")());
 

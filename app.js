@@ -370,7 +370,21 @@
     closeModal,
     toast,
   });
-  const { stageImport, attachEvents: attachImportPreviewEvents } = importPreview;
+  const {
+    stageImport,
+    renderImportPreview,
+    updateImportCommitButton,
+  } = importPreview;
+  const { attachEvents: attachImportPreviewEvents } =
+    window.PropertyDeskImportPreviewEvents.create({
+      $,
+      state,
+      selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
+      renderImportPreview,
+      updateImportCommitButton,
+      closeModal,
+      toast,
+    });
   const { attachEvents: attachImportEvents } =
     window.PropertyDeskImportFeature.create({
       $,
