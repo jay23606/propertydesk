@@ -24,6 +24,28 @@ function assertNoBrowserErrors(pageErrors, consoleErrors, label) {
   }
 }
 
+async function assertNoUnhandledRejections(page, label) {
+  await page.waitForTimeout(100);
+  const rejections = await page.evaluate(
+    () => window.__propertyDeskUnhandledRejections || [],
+  );
+  if (rejections.length) {
+    throw new Error(`${label} unhandled promise rejections: ${rejections.join(" | ")}`);
+  }
+}
+
+function captureUnhandledRejections(page) {
+  return page.addInitScript(() => {
+    window.__propertyDeskUnhandledRejections = [];
+    window.addEventListener("unhandledrejection", (event) => {
+      const reason = event.reason;
+      window.__propertyDeskUnhandledRejections.push(
+        reason instanceof Error ? reason.message : String(reason),
+      );
+    });
+  });
+}
+
 async function main() {
   const url = process.argv[2];
   if (!url) throw new Error("Pass the deployed PropertyDesk URL as an argument.");
@@ -31,6 +53,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
+  await captureUnhandledRejections(page);
   const runtimeErrors = [];
   const consoleErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(error.message));
@@ -59,6 +82,7 @@ async function main() {
     await page.locator("#auth-title").waitFor({ state: "visible", timeout: 30000 });
     await reloadThroughServiceWorker(page);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
+    await assertNoUnhandledRejections(page, "Startup");
 
     const detailText = await page.evaluate(async () => {
       const utilities = window.PropertyDeskLedgerUtils;
@@ -149,6 +173,7 @@ async function main() {
     const signedInPageErrors = [];
     const signedInConsoleErrors = [];
     const signedInPage = await signedInContext.newPage();
+    await captureUnhandledRejections(signedInPage);
     signedInPage.on("pageerror", (error) => signedInPageErrors.push(error.message));
     signedInPage.on("console", (message) => {
       if (message.type() === "error") signedInConsoleErrors.push(message.text());
@@ -286,6 +311,35 @@ async function main() {
       .first()
       .click();
     await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
+    await signedInPage
+      .locator('#property-detail-modal button[data-close]')
+      .first()
+      .click();
+    await signedInPage
+      .locator("#property-detail-modal.hidden")
+      .waitFor({ state: "hidden" });
+    await signedInPage
+      .locator('#accounts-table [data-account-payment="smoke-account"]')
+      .click();
+    await signedInPage.locator("#payment-modal:not(.hidden)").waitFor();
+    if (await signedInPage.locator("#payment-amount").inputValue() !== "53.68") {
+      throw new Error("The note payment form did not prefill the scheduled installment amount.");
+    }
+    await assertNoBrowserErrors(
+      signedInPageErrors,
+      signedInConsoleErrors,
+      "Payment entry",
+    );
+    await assertNoUnhandledRejections(signedInPage, "Payment entry");
+    await signedInPage.locator('#payment-modal button[data-close]').first().click();
+    await signedInPage
+      .locator("#payment-modal.hidden")
+      .waitFor({ state: "hidden" });
+    await signedInPage
+      .locator('#accounts-table [data-property-open="smoke-property"]')
+      .first()
+      .click();
+    await signedInPage.locator("#property-detail-modal:not(.hidden)").waitFor();
     const propertyDetail = await signedInPage.locator("#property-detail-content").innerText();
     if (!propertyDetail.includes("Recent activity") ||
         !propertyDetail.includes("October smoke payment") ||
@@ -336,7 +390,7 @@ async function main() {
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(" | ")}`);
     }
-    console.log("PropertyDesk rendered property activity, note amortization, rental deposits, account history, and portfolio reports in the signed-in app without browser errors.");
+    console.log("PropertyDesk rendered the signed-in Properties, payment-entry, note-amortization, rental-deposit, account-history, and Reports workflows without browser errors or unhandled rejections.");
   } finally {
     await browser.close();
   }

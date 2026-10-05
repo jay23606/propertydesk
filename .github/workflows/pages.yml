@@ -36,7 +36,7 @@ jobs:
             sleep 1
           done
           curl --silent --fail http://127.0.0.1:4173/ >/dev/null
-      - name: Check candidate account-detail workflow in Chromium
+      - name: Check candidate signed-in workflows in Chromium
         run: npm run smoke:deployed -- http://127.0.0.1:4173/
       - name: Check deployment configuration
         id: config
