@@ -9,9 +9,6 @@
     editAccount,
     savePropertyHolders,
     openAccountDetails,
-    deletePropertyDocument,
-    openPropertyDocument,
-    uploadPropertyDocument,
   }) {
     function attachEvents() {
       const detailContent = $("property-detail-content");
@@ -37,24 +34,7 @@
           openAccountDetails(accountDetail.dataset.detail);
           return;
         }
-        const openDocument = event.target.closest("[data-open-document]");
-        if (openDocument) {
-          event.preventDefault();
-          event.stopPropagation();
-          openPropertyDocument(openDocument.dataset.openDocument);
-          return;
-        }
-        const deleteDocument = event.target.closest("[data-delete-document]");
-        if (deleteDocument) {
-          deletePropertyDocument(deleteDocument.dataset.deleteDocument);
-        }
       });
-      detailContent.addEventListener("change", (event) => {
-        if (event.target.matches("[data-property-document]")) {
-          uploadPropertyDocument(event.target);
-        }
-      });
-
     }
 
     return { attachEvents };

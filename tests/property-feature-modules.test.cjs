@@ -1130,41 +1130,40 @@ test("property detail events own editing and quick-action bindings", () => {
   assert.equal(calls.length, callsBeforeNoSelection);
 });
 
-test("property detail events route private document actions to document workflows", () => {
+test("property detail document events route private document actions to document workflows", () => {
   const context = vm.createContext({ window: {} });
-  for (const filename of ["property-detail-events.js", "property-detail-quick-actions.js"]) {
-    vm.runInContext(
-      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
-      context,
-    );
-  }
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "property-detail-document-events.js"), "utf8"),
+    context,
+  );
   const calls = [];
   const handlers = new Map();
-  const feature = context.window.PropertyDeskPropertyDetailEvents.create({
+  const feature = context.window.PropertyDeskPropertyDetailDocumentEvents.create({
     $: (id) => ({
       addEventListener(name, handler) {
         handlers.set(`${id}:${name}`, handler);
       },
     }),
-    state: { accounts: [] },
-    closeModal() {}, editAccount() {},
-    savePropertyHolders() {}, openAccountDetails() {},
     openPropertyDocument: (id) => calls.push(["open", id]),
     deletePropertyDocument: (id) => calls.push(["delete", id]),
     uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
   });
   feature.attachEvents();
 
-  for (const [selector, dataset] of [
-    ["[data-open-document]", { openDocument: "document-1" }],
-    ["[data-delete-document]", { deleteDocument: "document-2" }],
-  ]) {
-    handlers.get("property-detail-content:click")({
-      target: { closest: (value) => value === selector ? { dataset } : null },
-      preventDefault() {},
-      stopPropagation() {},
-    });
-  }
+  let prevented = false;
+  let propagationStopped = false;
+  handlers.get("property-detail-content:click")({
+    target: { closest: (value) => value === "[data-open-document]" ? { dataset: { openDocument: "document-1" } } : null },
+    preventDefault() { prevented = true; },
+    stopPropagation() { propagationStopped = true; },
+  });
+  assert.equal(prevented, true);
+  assert.equal(propagationStopped, true);
+  handlers.get("property-detail-content:click")({
+    target: { closest: (value) => value === "[data-delete-document]" ? { dataset: { deleteDocument: "document-2" } } : null },
+    preventDefault() { assert.fail("delete action should preserve its existing default behavior"); },
+    stopPropagation() { assert.fail("delete action should preserve event bubbling"); },
+  });
   const input = { id: "agreement-input", matches: (selector) => selector === "[data-property-document]" };
   handlers.get("property-detail-content:change")({ target: input });
 
@@ -1243,6 +1242,12 @@ test("property actions workflow composes holder, document, and detail event beha
           return { attachEvents: () => attachCalls.push("content") };
         },
       },
+      PropertyDeskPropertyDetailDocumentEvents: {
+        create: (options) => {
+          passed.documentEvents = options;
+          return { attachEvents: () => attachCalls.push("documents") };
+        },
+      },
       PropertyDeskPropertyDetailQuickActions: {
         create: (options) => {
           passed.quickActions = options;
@@ -1271,12 +1276,14 @@ test("property actions workflow composes holder, document, and detail event beha
   });
 
   assert.equal(passed.events.savePropertyHolders, action);
-  assert.equal(passed.events.deletePropertyDocument, action);
+  assert.equal(passed.documentEvents.deletePropertyDocument, action);
+  assert.equal(passed.documentEvents.openPropertyDocument, action);
+  assert.equal(passed.documentEvents.uploadPropertyDocument, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
   assert.equal(passed.documents.repository.mocked, true);
   assert.equal(passed.repositoryClient, state.client);
   assert.equal(workflow.editPropertyQuickNote, action);
   workflow.attachPropertyDetailEvents(workflow.toggleArchiveProperty);
-  assert.deepEqual(attachCalls, ["content", workflow.toggleArchiveProperty]);
+  assert.deepEqual(attachCalls, ["content", "documents", workflow.toggleArchiveProperty]);
 });

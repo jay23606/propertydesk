@@ -29,8 +29,11 @@
     const { attachEvents: attachPropertyDetailContentEvents } =
       window.PropertyDeskPropertyDetailEvents.create({
         $, state, closeModal, editAccount, savePropertyHolders,
-        openAccountDetails, deletePropertyDocument, openPropertyDocument,
-        uploadPropertyDocument,
+        openAccountDetails,
+      });
+    const { attachEvents: attachPropertyDetailDocumentEvents } =
+      window.PropertyDeskPropertyDetailDocumentEvents.create({
+        $, deletePropertyDocument, openPropertyDocument, uploadPropertyDocument,
       });
     const { attachEvents: attachPropertyQuickActions } =
       window.PropertyDeskPropertyDetailQuickActions.create({
@@ -40,6 +43,7 @@
 
     function attachPropertyDetailEvents(toggleArchiveProperty) {
       attachPropertyDetailContentEvents();
+      attachPropertyDetailDocumentEvents();
       attachPropertyQuickActions(toggleArchiveProperty);
     }
 
