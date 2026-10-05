@@ -279,40 +279,13 @@
       openPropertyDocument: (...args) => openPropertyDocument(...args),
       uploadPropertyDocument: (...args) => uploadPropertyDocument(...args),
     });
-  const importPreview = window.PropertyDeskImportPreview.create({
-    $,
-    state,
-    selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
-    esc,
-    openModal,
-    closeModal,
-    toast,
-  });
-  const {
-    stageImport,
-    renderImportPreview,
-    updateImportCommitButton,
-  } = importPreview;
-  const { attachEvents: attachImportPreviewEvents } =
-    window.PropertyDeskImportPreviewEvents.create({
-      $,
-      state,
+  const { attachEvents: attachCsvImportEvents } =
+    window.PropertyDeskCsvImportWorkflow.create({
+      $, state,
       selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
-      renderImportPreview,
-      updateImportCommitButton,
-      closeModal,
-      toast,
-    });
-  const { attachEvents: attachImportEvents } =
-    window.PropertyDeskImportFeature.create({
-      $,
-      state,
-      stageImport,
       parseCSV: window.PropertyDeskImportUtils.parseCSV,
       ...window.PropertyDeskImportWorkflows,
-      todayIso,
-      fetchAll,
-      toast,
+      esc, openModal, closeModal, toast, todayIso, fetchAll,
     });
   const {
     uploadPropertyDocument,
@@ -403,8 +376,7 @@
       () => attachPropertyDetailEvents(toggleArchiveProperty),
       attachWorkspaceEvents,
       attachAuthEvents,
-      attachImportPreviewEvents,
-      attachImportEvents,
+      attachCsvImportEvents,
       attachExportEvents,
       attachReportExportEvents,
     ],

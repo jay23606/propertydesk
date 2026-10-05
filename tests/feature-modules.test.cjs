@@ -210,6 +210,55 @@ test("CSV import feature loads as an isolated browser module", () => {
   ]);
 });
 
+test("CSV import workflow stages preview before attaching review and file handlers", () => {
+  const sequence = [];
+  const passed = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskImportPreview: {
+        create: () => {
+          sequence.push("preview");
+          return {
+            stageImport: () => {},
+            renderImportPreview: () => {},
+            updateImportCommitButton: () => {},
+          };
+        },
+      },
+      PropertyDeskImportPreviewEvents: {
+        create: (options) => {
+          sequence.push("preview events");
+          passed.previewEvents = options;
+          return { attachEvents: () => sequence.push("attach preview events") };
+        },
+      },
+      PropertyDeskImportFeature: {
+        create: (options) => {
+          sequence.push("import feature");
+          passed.importFeature = options;
+          return { attachEvents: () => sequence.push("attach import feature") };
+        },
+      },
+      PropertyDeskImportWorkflows: { importAccounts: () => {} },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "csv-import-workflow.js"), "utf8"),
+    context,
+  );
+  const stage = () => {};
+  const workflow = context.window.PropertyDeskCsvImportWorkflow.create({
+    stageImport: stage,
+  });
+  workflow.attachEvents();
+
+  assert.deepEqual(sequence, [
+    "preview", "preview events", "import feature", "attach preview events", "attach import feature",
+  ]);
+  assert.equal(typeof passed.importFeature.stageImport, "function");
+  assert.equal(passed.previewEvents.renderImportPreview instanceof Function, true);
+});
+
 test("payment and expense CSV importers save their own validated transaction payloads", async () => {
   const context = vm.createContext({ window: {} });
   loadImportFeatures(context);

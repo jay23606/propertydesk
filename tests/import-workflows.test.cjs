@@ -61,7 +61,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/expense-entry-form.js') < html.indexOf('features/ledger-entry-forms.js'));
   assert.ok(html.indexOf('features/ledger-entry-forms.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/create-actions.js') < html.indexOf('app.js'));
-  assert.ok(html.indexOf('features/imports.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/imports.js') < html.indexOf('features/csv-import-workflow.js'));
+  assert.ok(html.indexOf('features/csv-import-workflow.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/property-views.js'));
   assert.ok(html.indexOf('features/overview.js') < html.indexOf('features/overview-events.js'));
   assert.ok(html.indexOf('features/overview-events.js') < html.indexOf('app.js'));
@@ -136,6 +137,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/ledger-entry-forms\.js'/);
   assert.match(worker, /'\.\/features\/create-actions\.js'/);
   assert.match(worker, /'\.\/features\/imports\.js'/);
+  assert.match(worker, /'\.\/features\/csv-import-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-details\.js'/);
   assert.match(worker, /'\.\/features\/property-activity-details\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-events\.js'/);
@@ -159,7 +161,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(worker, /'\.\/features\/workspace-settings-workflow\.js'/);
-  assert.match(app, /attachImportEvents,/);
+  assert.match(app, /attachCsvImportEvents,/);
 });
 
 const properties = [{ id: 'p1', name: 'Oak House', address: '10 Oak St' }];
