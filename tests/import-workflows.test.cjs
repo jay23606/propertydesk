@@ -61,7 +61,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('zip-utils.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/property-views.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/transaction-views.js') < html.indexOf('features/transaction-workflow.js'));
-  assert.ok(html.indexOf('features/transaction-view-events.js') < html.indexOf('features/transaction-workflow.js'));
+  assert.ok(html.indexOf('features/transaction-view-events.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
   assert.ok(html.indexOf('features/transaction-correction-form.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
   assert.ok(html.indexOf('features/transaction-maintenance.js') < html.indexOf('features/transaction-maintenance-workflow.js'));
   assert.ok(html.indexOf('features/transaction-maintenance-workflow.js') < html.indexOf('features/transaction-workflow.js'));
@@ -127,11 +127,11 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/deposit-details-model.js') < html.indexOf('features/deposit-details.js'));
   assert.ok(html.indexOf('features/deposit-details-view.js') < html.indexOf('features/deposit-details.js'));
   assert.ok(html.indexOf('features/deposit-details.js') < html.indexOf('features/deposit-detail-events.js'));
+  assert.ok(html.indexOf('features/deposit-detail-events.js') < html.indexOf('features/deposit-details-workflow.js'));
+  assert.ok(html.indexOf('features/deposit-details-workflow.js') < html.indexOf('features/account-details-workflow.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('features/account-details-workflow.js'));
   assert.ok(html.indexOf('features/account-history-details.js') < html.indexOf('features/account-details-workflow.js'));
   assert.ok(html.indexOf('features/account-detail-events.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/deposit-details.js') < html.indexOf('features/account-details-workflow.js'));
-  assert.ok(html.indexOf('features/deposit-detail-events.js') < html.indexOf('features/account-details-workflow.js'));
   assert.ok(html.indexOf('features/account-maintenance.js') < html.indexOf('features/account-maintenance-workflow.js'));
   assert.ok(html.indexOf('features/deposit-maintenance.js') < html.indexOf('features/account-maintenance-workflow.js'));
   assert.ok(html.indexOf('features/account-maintenance-workflow.js') < html.indexOf('features/account-details-workflow.js'));
@@ -215,6 +215,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-history-view\.js'/);
   assert.match(worker, /'\.\/features\/deposit-details-model\.js'/);
   assert.match(worker, /'\.\/features\/deposit-details-view\.js'/);
+  assert.match(worker, /'\.\/features\/deposit-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/transaction-list-model\.js'/);
   assert.match(worker, /'\.\/features\/transaction-row-view\.js'/);
   assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);

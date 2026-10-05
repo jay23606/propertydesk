@@ -464,9 +464,8 @@ test("report workflow composes portfolio rendering and account export actions", 
   assert.equal(workflow.attachReportExportEvents(), "export events");
 });
 
-test("transaction workflow composes ledger display and passed maintenance actions", () => {
+test("transaction workflow composes only ledger display and filters", () => {
   const received = {};
-  const correct = () => "correct";
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionViews: {
@@ -478,12 +477,6 @@ test("transaction workflow composes ledger display and passed maintenance action
           };
         },
       },
-      PropertyDeskTransactionViewEvents: {
-        create: (options) => {
-          received.events = options;
-          return { attachEvents: () => "action events" };
-        },
-      },
     },
   });
   vm.runInContext(
@@ -493,25 +486,13 @@ test("transaction workflow composes ledger display and passed maintenance action
     ),
     context,
   );
-  const updateAllocationPreview = () => {};
-  const voidTransaction = () => "voided";
-  const transactionDependencies = {
-    state: {},
-    correctTransaction: correct,
-    voidTransaction,
-  };
   const workflow = context.window.PropertyDeskTransactionWorkflow.create({
-    updateAllocationPreview,
-    ...transactionDependencies,
-    documentRef: {},
+    state: {},
   });
 
-  assert.equal(received.events.correctTransaction, correct);
-  assert.equal(received.events.voidTransaction, voidTransaction);
-  assert.equal(received.events.voidTransaction(), "voided");
   assert.equal(workflow.renderPayments(), "payments");
   assert.equal(workflow.attachTransactionViewEvents(), "view events");
-  assert.equal(workflow.attachTransactionActionEvents(), "action events");
+  assert.equal("attachTransactionActionEvents" in workflow, false);
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {

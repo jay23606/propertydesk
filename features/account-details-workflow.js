@@ -4,16 +4,13 @@
 
   function create(context) {
     const {
-      $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
+      $, state, money, fmtDate, esc, isPosted, prettyType,
       paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
       unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-      editAccount, openPayment, closeAccount, recordDepositAdjustment,
+      editAccount, openPayment, closeAccount, depositSectionHTML,
     } = context;
     const { renderAccountDetails } = window.PropertyDeskAccountDetailsView.create({
       money, fmtDate, esc, prettyType, paymentFrequencyLabel,
-    });
-    const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
-      state, depositLedger, money, fmtDate, esc,
     });
     const { renderAccountHistory } = window.PropertyDeskAccountHistoryDetails.create({
       state, esc, money, fmtDate,
@@ -28,15 +25,9 @@
       window.PropertyDeskAccountDetailEvents.create({
         $, state, closeModal, editAccount, openPayment, closeAccount,
       });
-    const { attachEvents: attachDepositDetailEvents } =
-      window.PropertyDeskDepositDetailEvents.create({
-        $, state, depositSectionHTML, recordDepositAdjustment,
-      });
-
     return {
       openAccountDetails,
       attachAccountDetailEvents,
-      attachDepositDetailEvents,
     };
   }
 

@@ -14,6 +14,7 @@
       updateAllocationPreview,
       EventClass,
       OptionClass,
+      documentRef = document,
     } = context;
     const { voidTransaction } =
       window.PropertyDeskTransactionMaintenance.create({
@@ -33,8 +34,12 @@
         EventClass,
         OptionClass,
       });
+    const { attachEvents: attachTransactionActionEvents } =
+      window.PropertyDeskTransactionViewEvents.create({
+        documentRef, correctTransaction, voidTransaction,
+      });
 
-    return { voidTransaction, correctTransaction };
+    return { voidTransaction, correctTransaction, attachTransactionActionEvents };
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({ create });

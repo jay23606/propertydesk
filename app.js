@@ -87,32 +87,35 @@
     $, state, moneyInput, todayIso, toast, closeModal, fetchAll,
     fillSelect, populateFormOptions, prettyType, openModal, documentRef: document,
   });
-  const { correctTransaction, voidTransaction } =
+  const { attachTransactionActionEvents } =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
       $, state, toast, fetchAll, prettyType, openPayment, openExpense,
       updateAllocationPreview, EventClass: Event, OptionClass: Option,
+      documentRef: document,
     });
   const {
     renderPayments,
     attachTransactionViewEvents,
-    attachTransactionActionEvents,
   } = window.PropertyDeskTransactionWorkflow.create({
     $, state, dateOnly, fmtDate, esc, expenseCategoryLabel, money, isPosted,
-    monthStart, sumIncome, sumOperatingExpenses, correctTransaction, voidTransaction,
+    monthStart, sumIncome, sumOperatingExpenses,
   });
   const { closeAccount, recordDepositAdjustment } =
     window.PropertyDeskAccountMaintenanceWorkflow.create({
       $, state, moneyInput, todayIso, toast, fetchAll, closeModal,
     });
+  const { depositSectionHTML, attachDepositDetailEvents } =
+    window.PropertyDeskDepositDetailsWorkflow.create({
+      $, state, depositLedger, money, fmtDate, esc, recordDepositAdjustment,
+    });
   const {
     openAccountDetails,
     attachAccountDetailEvents,
-    attachDepositDetailEvents,
   } = window.PropertyDeskAccountDetailsWorkflow.create({
-    $, state, depositLedger, money, fmtDate, esc, isPosted, prettyType,
+    $, state, money, fmtDate, esc, isPosted, prettyType,
     paymentFrequencyLabel, accountBalance, amortizationSchedule, amountDueSince,
     unpaidDueAccrualStart, todayIso, openModal, propertyAddress, closeModal,
-    editAccount, openPayment, closeAccount, recordDepositAdjustment,
+    editAccount, openPayment, closeAccount, depositSectionHTML,
   });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailsWorkflow.create({

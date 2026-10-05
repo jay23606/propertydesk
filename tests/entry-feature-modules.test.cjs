@@ -120,7 +120,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   assert.doesNotMatch(app, /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/);
 });
 
-test("account details workflow composes account, history, deposit, and passed maintenance actions", () => {
+test("account details workflow composes account, history, and account actions", () => {
   const created = [];
   const passed = {};
   const context = vm.createContext({
@@ -132,7 +132,6 @@ test("account details workflow composes account, history, deposit, and passed ma
           return { renderAccountDetails: () => "account html" };
         },
       },
-      PropertyDeskDepositDetails: { create: () => { created.push("deposit"); return { depositSectionHTML: () => "deposit html" }; } },
       PropertyDeskAccountHistoryDetails: { create: () => { created.push("history"); return { renderAccountHistory: () => "history html" }; } },
       PropertyDeskAccountDetails: {
         create: (options) => {
@@ -148,13 +147,6 @@ test("account details workflow composes account, history, deposit, and passed ma
           return { attachEvents: () => "account events attached" };
         },
       },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          created.push("deposit events");
-          passed.depositEvents = options;
-          return { attachEvents: () => "deposit events attached" };
-        },
-      },
     },
   });
   vm.runInContext(
@@ -164,17 +156,53 @@ test("account details workflow composes account, history, deposit, and passed ma
   const dependencies = {
     $() {}, state: {}, money: () => 0, fmtDate: () => "", esc: String,
     prettyType: String, paymentFrequencyLabel: () => "monthly",
-    closeModal() {}, closeAccount() {}, recordDepositAdjustment() {},
+    closeModal() {}, closeAccount() {}, depositSectionHTML: () => "deposit html",
   };
   const workflow = context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
-  assert.deepEqual(created, ["account view", "deposit", "history", "account details", "account events", "deposit events"]);
+  assert.deepEqual(created, ["account view", "history", "account details", "account events"]);
   assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
   assert.equal(passed.view.money, dependencies.money);
   assert.equal(passed.accountEvents.closeAccount, dependencies.closeAccount);
-  assert.equal(passed.depositEvents.recordDepositAdjustment, dependencies.recordDepositAdjustment);
+  assert.equal(passed.accountDetails.depositSectionHTML, dependencies.depositSectionHTML);
   assert.equal(workflow.openAccountDetails(), "opened");
   assert.equal(workflow.attachAccountDetailEvents(), "account events attached");
+});
+
+test("deposit details workflow composes ledger rendering with adjustment actions", () => {
+  const passed = {};
+  const depositSectionHTML = () => "deposit html";
+  const attachEvents = () => "deposit events attached";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositDetails: {
+        create: (options) => {
+          passed.details = options;
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details-workflow.js"), "utf8"),
+    context,
+  );
+  const dependencies = {
+    $() {}, state: {}, depositLedger() {}, money() {}, fmtDate() {}, esc() {},
+    recordDepositAdjustment() {},
+  };
+  const workflow = context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
+
+  assert.equal(passed.details.state, dependencies.state);
+  assert.equal(passed.events.recordDepositAdjustment, dependencies.recordDepositAdjustment);
+  assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
   assert.equal(workflow.attachDepositDetailEvents(), "deposit events attached");
 });
 

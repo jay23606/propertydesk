@@ -46,6 +46,9 @@ test("transaction maintenance workflow composes correction and void actions", ()
       PropertyDeskTransactionCorrectionForm: {
         create: (options) => { passed.correction = options; return { correctTransaction }; },
       },
+      PropertyDeskTransactionViewEvents: {
+        create: (options) => { passed.events = options; return { attachEvents: () => "action events" }; },
+      },
     },
   });
   vm.runInContext(
@@ -54,7 +57,7 @@ test("transaction maintenance workflow composes correction and void actions", ()
   );
   const dependencies = {
     $() {}, state: {}, toast() {}, fetchAll() {}, prettyType() {}, openPayment() {},
-    openExpense() {}, updateAllocationPreview() {}, EventClass: class {}, OptionClass: class {},
+    openExpense() {}, updateAllocationPreview() {}, EventClass: class {}, OptionClass: class {}, documentRef: {},
   };
   const workflow = context.window.PropertyDeskTransactionMaintenanceWorkflow.create(dependencies);
 
@@ -62,8 +65,11 @@ test("transaction maintenance workflow composes correction and void actions", ()
   assert.equal(passed.void.fetchAll, dependencies.fetchAll);
   assert.equal(passed.correction.updateAllocationPreview, dependencies.updateAllocationPreview);
   assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
+  assert.equal(passed.events.correctTransaction, correctTransaction);
+  assert.equal(passed.events.voidTransaction, voidTransaction);
   assert.equal(workflow.correctTransaction, correctTransaction);
   assert.equal(workflow.voidTransaction, voidTransaction);
+  assert.equal(workflow.attachTransactionActionEvents(), "action events");
 });
 
 test("deposit maintenance retains adjustment audit details", async () => {
