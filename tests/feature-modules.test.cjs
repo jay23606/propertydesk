@@ -1414,6 +1414,63 @@ test("document upload stores objects privately and removes an orphan after metad
   assert.match(messages[0], /metadata insert failed/);
 });
 
+test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "documents.js"), "utf8"),
+    context,
+  );
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [{
+      id: "doc-1",
+      user_id: "workspace-1",
+      property_id: "property-1",
+      storage_path: "workspace-1/property-1/file.pdf",
+      file_name: "file.pdf",
+    }],
+    client: {
+      storage: {
+        from() {
+          return {
+            upload: async () => { throw new Error("upload offline"); },
+            remove: async () => { throw new Error("storage offline"); },
+            createSignedUrl: async () => { throw new Error("signing offline"); },
+          };
+        },
+      },
+      from: () => assert.fail("database should not be touched after storage rejects"),
+    },
+  };
+  const messages = [];
+  const viewer = { closed: false, close() { this.closed = true; }, opener: "parent" };
+  const feature = context.window.PropertyDeskDocuments.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    openPropertyDetails: () => assert.fail("a rejected request must not reopen details"),
+    confirm: () => true,
+    openWindow: () => viewer,
+    makeId: () => "file-id",
+  });
+  const input = {
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  };
+
+  await assert.doesNotReject(feature.uploadPropertyDocument(input));
+  await assert.doesNotReject(feature.deletePropertyDocument("doc-1"));
+  await assert.doesNotReject(feature.openPropertyDocument("doc-1"));
+  assert.equal(input.value, "");
+  assert.equal(viewer.closed, true);
+  assert.deepEqual(messages, [
+    "Agreement upload failed: upload offline",
+    "Agreement removal failed: storage offline",
+    "Agreement link failed: signing offline",
+  ]);
+});
+
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
