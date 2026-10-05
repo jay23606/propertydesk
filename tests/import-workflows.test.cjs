@@ -64,6 +64,8 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/account-details.js') < html.indexOf('features/account-detail-events.js'));
   assert.ok(html.indexOf('features/account-detail-events.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/deposit-details.js') < html.indexOf('features/deposit-detail-events.js'));
+  assert.ok(html.indexOf('features/deposit-detail-events.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/documents.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/exports.js') < html.indexOf('app.js'));
   assert.ok(html.indexOf('features/auth-recovery.js') < html.indexOf('features/auth.js'));

@@ -2,9 +2,7 @@
 (() => {
   "use strict";
 
-  function createDepositDetails({
-    $, state, depositLedger, money, fmtDate, esc, recordDepositAdjustment,
-  }) {
+  function createDepositDetails({ state, depositLedger, money, fmtDate, esc }) {
     function depositSectionHTML(account) {
       if (account.account_type !== "rental") return "";
       const { entries, active, totals } = depositLedger(account.id),
@@ -73,26 +71,7 @@
         }</div>`;
     }
 
-    function attachEvents() {
-      $("detail-content").addEventListener("click", async (event) => {
-        const adjustment = event.target.closest("[data-deposit-adjustment]");
-        if (adjustment) {
-          const { accountId, depositAdjustment } = adjustment.dataset;
-          const saved = await recordDepositAdjustment(
-            accountId,
-            depositAdjustment,
-          );
-          if (!saved) return;
-          const account = state.accounts.find((row) => row.id === accountId);
-          const section = $("detail-deposit-section");
-          if (account && section) {
-            section.innerHTML = depositSectionHTML(account);
-          }
-        }
-      });
-    }
-
-    return { depositSectionHTML, attachEvents };
+    return { depositSectionHTML };
   }
 
   window.PropertyDeskDepositDetails = Object.freeze({ create: createDepositDetails });

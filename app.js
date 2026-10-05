@@ -312,15 +312,19 @@
     });
   const {
     depositSectionHTML,
-    attachEvents: attachDepositDetailEvents,
   } = window.PropertyDeskDepositDetails.create({
-    $,
     state,
     depositLedger,
     money,
     fmtDate,
     esc,
-    recordDepositAdjustment,
+  });
+  const { attachEvents: attachDepositDetailEvents } =
+    window.PropertyDeskDepositDetailEvents.create({
+      $,
+      state,
+      depositSectionHTML,
+      recordDepositAdjustment,
   });
   const { renderAccountHistory } =
     window.PropertyDeskAccountHistoryDetails.create({

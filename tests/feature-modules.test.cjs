@@ -888,10 +888,10 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   assert.match(html, /data-deposit-adjustment="retained"/);
 });
 
-test("deposit details refreshes the held balance after a recorded adjustment", async () => {
+test("deposit detail event router refreshes the ledger after a recorded adjustment", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-details.js"), "utf8"),
+    fs.readFileSync(path.join(__dirname, "..", "features", "deposit-detail-events.js"), "utf8"),
     context,
   );
   const calls = [];
@@ -901,17 +901,10 @@ test("deposit details refreshes the held balance after a recorded adjustment", a
     ["detail-content", { addEventListener: (_name, handler) => { clickHandler = handler; } }],
     ["detail-deposit-section", { innerHTML: "" }],
   ]);
-  const feature = context.window.PropertyDeskDepositDetails.create({
+  const feature = context.window.PropertyDeskDepositDetailEvents.create({
     $: (id) => elements.get(id),
     state: { accounts: [{ id: "rental-1", account_type: "rental" }] },
-    depositLedger: () => ({
-      entries: [],
-      active: [],
-      totals: { held, received: 100, refunded: 0, retained: held - 100, restored: 0 },
-    }),
-    money: (amount) => `$${amount.toFixed(2)}`,
-    fmtDate: (value) => value,
-    esc: String,
+    depositSectionHTML: () => `<p>Held balance: $${held.toFixed(2)}</p>`,
     recordDepositAdjustment: async (...args) => {
       calls.push(args);
       held += 50;
@@ -1485,6 +1478,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
   assert.match(app, /PropertyDeskAccountDetailEvents\.create\(/);
+  assert.match(app, /PropertyDeskDepositDetailEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);
