@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("shared app utilities preserve formatting, addresses, labels, and money input", () => {
+test("shared app utilities preserve formatting, labels, and money input", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -31,6 +31,22 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
     utils.expenseCategoryLabel("contractor_labor"),
     "contractor labor",
   );
+  assert.match(utils.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(utils.monthStart(), /^\d{4}-\d{2}-01$/);
+  assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
+});
+
+test("property address utilities format full and street addresses", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-address-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const utils = context.window.PropertyDeskPropertyAddressUtils;
+
   assert.equal(
     utils.propertyAddress({
       address: "10 Main St",
@@ -41,12 +57,13 @@ test("shared app utilities preserve formatting, addresses, labels, and money inp
     "10 Main St, Altoona, PA, 16601",
   );
   assert.equal(
+    utils.propertyLocation({ city: "Altoona", state: "PA" }),
+    "Altoona, PA",
+  );
+  assert.equal(
     utils.streetAddress({ address: "10 Main St, Altoona, PA" }),
     "10 Main St",
   );
-  assert.match(utils.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
-  assert.match(utils.monthStart(), /^\d{4}-\d{2}-01$/);
-  assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
 test("app state starts in Properties with fresh workspace collections", () => {

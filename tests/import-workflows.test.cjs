@@ -41,6 +41,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf('features/notifications.js') < html.indexOf('features/app-services.js'));
   assert.ok(html.indexOf('features/ledger-context.js') < html.indexOf('features/app-services.js'));
   assert.ok(html.indexOf('features/app-services.js') < html.indexOf('app.js'));
+  assert.ok(html.indexOf('features/property-address-utils.js') < html.indexOf('app.js'));
   for (const validator of [
     'account-import-validation.js',
     'expense-import-validation.js',
@@ -161,6 +162,7 @@ test('the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/report-export\.js'/);
   assert.match(worker, /'\.\/features\/report-workflow\.js'/);
   assert.match(worker, /'\.\/features\/app-utils\.js'/);
+  assert.match(worker, /'\.\/features\/property-address-utils\.js'/);
   assert.match(worker, /'\.\/features\/ledger-context\.js'/);
   assert.match(worker, /'\.\/features\/app-services\.js'/);
   assert.match(worker, /'\.\/features\/property-form\.js'/);

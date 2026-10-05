@@ -22,6 +22,8 @@
   } = window.PropertyDeskLedgerUtils;
   const { createBackup } = window.PropertyDeskBackupUtils;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
+  const { propertyAddress, streetAddress } =
+    window.PropertyDeskPropertyAddressUtils;
   const {
     money,
     dateOnly,
@@ -32,8 +34,6 @@
     prettyKind,
     monthStart,
     monthEnd,
-    propertyAddress,
-    streetAddress,
     moneyInput,
     paymentFrequencyLabel,
     expenseCategoryLabel,

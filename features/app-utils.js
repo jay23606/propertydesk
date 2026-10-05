@@ -67,16 +67,6 @@
     const day = String(date.getDate()).padStart(2, "0");
     return `${date.getFullYear()}-${month}-${day}`;
   };
-  const propertyLocation = (property) =>
-    [property.city, property.state, property.postal_code]
-      .filter(Boolean)
-      .join(", ");
-  const propertyAddress = (property) =>
-    [property.address, propertyLocation(property)].filter(Boolean).join(", ");
-  const streetAddress = (property) =>
-    String(property.address || property.name || "")
-      .split(",")[0]
-      .trim();
   const moneyInput = (value) => {
     const raw = String(value ?? "").trim();
     const negative = /^\(.*\)$/.test(raw);
@@ -110,9 +100,6 @@
     prettyKind,
     monthStart,
     monthEnd,
-    propertyLocation,
-    propertyAddress,
-    streetAddress,
     moneyInput,
     paymentFrequencyLabel,
     expenseCategoryLabel,
