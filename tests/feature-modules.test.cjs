@@ -713,7 +713,7 @@ test("property and account detail modules expose separate workflows", () => {
   assert.equal(typeof account.openAccountDetails, "function");
 });
 
-test("account details routes the close action to account maintenance by its domain name", async () => {
+test("account details render action targets without owning action listeners", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", "account-details.js"), "utf8"),
@@ -729,19 +729,16 @@ test("account details routes the close action to account maintenance by its doma
     payment_frequency: "monthly",
     next_due_date: "2026-11-01",
   };
-  const handlers = {};
   const elements = new Map();
   const $ = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
-        addEventListener: (event, handler) => { handlers[`${id}:${event}`] = handler; },
         classList: { add() {}, remove() {} },
         querySelector: () => ({ textContent: "" }),
       });
     }
     return elements.get(id);
   };
-  const closed = [];
   const feature = context.window.PropertyDeskAccountDetails.create({
     $,
     state: {
@@ -762,19 +759,50 @@ test("account details routes the close action to account maintenance by its doma
     unpaidDueAccrualStart: () => "2026-10-01",
     todayIso: () => "2026-10-05",
     openModal() {},
-    closeModal() {},
-    editAccount() {},
-    openPayment() {},
-    closeAccount: (value) => closed.push(value),
     propertyAddress: (property) => property.name,
     depositSectionHTML: () => "",
     renderAccountHistory: async () => "",
   });
 
   await feature.openAccountDetails(account.id);
-  assert.match(elements.get("detail-content").innerHTML, /detail-close-account/);
-  handlers["detail-close-account:click"]();
-  assert.deepEqual(closed, [account]);
+  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-edit="account-1"/);
+  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-payment="account-1"/);
+  assert.match(elements.get("detail-content").innerHTML, /data-account-detail-close="account-1"/);
+});
+
+test("account detail event router dispatches edit, payment, and close actions", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "features", "account-detail-events.js"), "utf8"),
+    context,
+  );
+  const account = { id: "account-1" };
+  const calls = [];
+  let clickHandler;
+  const feature = context.window.PropertyDeskAccountDetailEvents.create({
+    $: (id) => ({ id, addEventListener: (_event, handler) => { clickHandler = handler; } }),
+    state: { accounts: [account] },
+    closeModal: (modal) => calls.push(`close:${modal.id}`),
+    editAccount: (value) => calls.push(`edit:${value.id}`),
+    openPayment: (id) => calls.push(`payment:${id}`),
+    closeAccount: (value) => calls.push(`account-close:${value.id}`),
+  });
+  feature.attachEvents();
+  const actions = [
+    ["[data-account-detail-edit]", { accountDetailEdit: "account-1" }],
+    ["[data-account-detail-payment]", { accountDetailPayment: "account-1" }],
+    ["[data-account-detail-close]", { accountDetailClose: "account-1" }],
+  ];
+  for (const [selector, dataset] of actions) {
+    clickHandler({
+      target: { closest: (value) => value === selector ? { dataset } : null },
+    });
+  }
+  assert.deepEqual(calls, [
+    "close:detail-modal", "edit:account-1",
+    "close:detail-modal", "payment:account-1",
+    "account-close:account-1",
+  ]);
 });
 
 test("property activity details include posted and voided records without counting voids", () => {
@@ -1456,6 +1484,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?depositSectionHTML,/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(app, /PropertyDeskAccountDetails\.create\(\{[\s\S]*?renderAccountHistory,/);
+  assert.match(app, /PropertyDeskAccountDetailEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(\{[\s\S]*?portfolioTable,/);
   assert.match(app, /const \{ correctTransaction \}\s*=\s*window\.PropertyDeskTransactionCorrectionForm\.create/);

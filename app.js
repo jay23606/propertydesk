@@ -346,12 +346,17 @@
     depositSectionHTML,
     renderAccountHistory,
     openModal,
-    closeModal,
-    editAccount,
-    openPayment,
-    closeAccount,
     propertyAddress,
   });
+  const { attachEvents: attachAccountDetailEvents } =
+    window.PropertyDeskAccountDetailEvents.create({
+      $,
+      state,
+      closeModal,
+      editAccount,
+      openPayment,
+      closeAccount,
+    });
   const importPreview = window.PropertyDeskImportPreview.create({
     $,
     state,
@@ -488,6 +493,7 @@
       attachTransactionViewEvents,
       attachTransactionActionEvents,
       attachDepositDetailEvents,
+      attachAccountDetailEvents,
       () => attachCreateActions(navigate),
       () => attachPropertyFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,

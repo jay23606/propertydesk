@@ -6,8 +6,7 @@
     const {
       $, state, isPosted, money, fmtDate, esc, prettyType, paymentFrequencyLabel,
       accountBalance, amortizationSchedule, amountDueSince, unpaidDueAccrualStart,
-      todayIso, openModal, closeModal, editAccount, openPayment,
-      closeAccount, propertyAddress, depositSectionHTML, renderAccountHistory,
+      todayIso, openModal, propertyAddress, depositSectionHTML, renderAccountHistory,
     } = context;
     async function openAccountDetails(id) {
       const auditRequestId = ++state.auditRequestId;
@@ -80,8 +79,8 @@
         <strong>${esc(propertyAddress(p || {}))}</strong>
         <small>Next due ${fmtDate(a.next_due_date)} · ${esc(paymentFrequencyLabel(a.payment_frequency))} · unpaid due tracked since ${fmtDate(unpaidDueAccrualStart(), { month: "short", day: "numeric", year: "numeric" })}: ${money(amountDueSince([a], state.payments, unpaidDueAccrualStart(), todayIso()))}</small>
         </div>
-        <button id="detail-edit" class="button secondary compact">Edit</button>
-        <button id="detail-record" class="button primary compact">Record payment</button>
+        <button type="button" data-account-detail-edit="${esc(a.id)}" class="button secondary compact">Edit</button>
+        <button type="button" data-account-detail-payment="${esc(a.id)}" class="button primary compact">Record payment</button>
         </div>
         </div><div id="detail-deposit-section">${depositSectionHTML(a)}</div>${scheduleHTML}${historyHTML}<div class="detail-section">
         <h3>Payment history (${payments.length})</h3>${
@@ -112,17 +111,8 @@
         </div>`
             : '<div class="list-empty">No payments recorded for this account.</div>'
         }</div><div class="detail-section">
-        <button id="detail-close-account" class="text-button">Close account and preserve its history</button>
+        <button type="button" data-account-detail-close="${esc(a.id)}" class="text-button">Close account and preserve its history</button>
         </div>`;
-      $("detail-edit").addEventListener("click", () => {
-        closeModal($("detail-modal"));
-        editAccount(a);
-      });
-      $("detail-record").addEventListener("click", () => {
-        closeModal($("detail-modal"));
-        openPayment(a.id);
-      });
-      $("detail-close-account").addEventListener("click", () => closeAccount(a));
       openModal("detail-modal");
     }
 

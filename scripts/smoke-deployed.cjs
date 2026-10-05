@@ -496,7 +496,7 @@ async function main() {
     await signedInPage.locator('#property-detail-content [data-detail="smoke-account"]').click();
     await signedInPage.locator("#detail-modal:not(.hidden)").waitFor();
     signedInPage.once("dialog", (dialog) => dialog.accept());
-    await signedInPage.locator("#detail-close-account").click();
+    await signedInPage.locator('[data-account-detail-close="smoke-account"]').click();
     await signedInPage.getByText("Account closed").waitFor();
     const accountClosed = await signedInPage.evaluate(() =>
       window.__smokeRows.pd_accounts.find((row) => row.id === "smoke-account")?.status === "closed",
