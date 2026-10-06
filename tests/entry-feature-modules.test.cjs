@@ -81,7 +81,10 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:AccountDetailEvents|DepositDetailEvents)\.create/,
   );
-  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskOverviewPropertySummaryModel\.create\(/);
+  assert.match(app, /PropertyDeskOverviewModel\.create\(/);
+  assert.match(app, /PropertyDeskOverview\.create\(/);
+  assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
   assert.match(app, /function attachPropertyPortfolioEvents\(\)/);
@@ -140,7 +143,10 @@ test("app root composes independent property screens and shares detail actions",
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
     "PropertyDeskPropertyDetailsWorkflow.create(",
-    "PropertyDeskOverviewWorkflow.create(",
+    "PropertyDeskOverviewPropertySummaryModel.create(",
+    "PropertyDeskOverviewModel.create(",
+    "PropertyDeskOverview.create(",
+    "PropertyDeskOverviewEvents.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
     "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
@@ -155,7 +161,10 @@ test("app root composes independent property screens and shares detail actions",
   );
   for (const script of [
     "features/property-details-workflow.js",
-    "features/overview-workflow.js",
+    "features/overview-property-summary-model.js",
+    "features/overview-model.js",
+    "features/overview.js",
+    "features/overview-events.js",
     "features/property-portfolio-workflow.js",
     "features/property-portfolio-actions-workflow.js",
   ]) {

@@ -447,17 +447,20 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/overview.js") <
       html.indexOf("features/property-views.js"),
   );
-  assert.ok(
-    html.indexOf("features/overview.js") <
-      html.indexOf("features/overview-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/overview-events.js") <
-      html.indexOf("features/overview-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
-  );
+  for (const script of [
+    "features/overview-property-summary-model.js",
+    "features/overview-model.js",
+    "features/overview.js",
+    "features/overview-events.js",
+  ]) {
+    assert.ok(
+      html.indexOf(script) >= 0 &&
+        html.indexOf(script) < html.indexOf("app.js"),
+      `${script} loads before the app composition root`,
+    );
+  }
+  assert.doesNotMatch(html, /features\/overview-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/overview-workflow\.js/);
   assert.ok(
     html.indexOf("features/property-portfolio-table.js") <
       html.indexOf("features/property-views.js"),

@@ -141,124 +141,26 @@ test("overview renderer displays its summary model and quick-payment card", () =
   assert.match($("activity-list").innerHTML, /2026-10-03/);
 });
 
-test("overview workflow composes dashboard rendering with property actions", () => {
-  const received = {};
-  const modelContext = {
-    state: {},
-    monthlyScheduledEstimate: () => 0,
-    accountBalance: () => 0,
-    amountDueSince: () => 0,
-    unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-05",
-    collectedSince: () => 0,
-    scheduledMonthlyRunRate: () => 0,
-    monthStart: () => "2026-10-01",
-    isPosted: () => true,
-    postedOnOrAfter: () => [],
-  };
-  const viewContext = {
-    $: () => {},
-    esc: String,
-    prettyKind: String,
-    money: String,
-    propertyAddress: String,
-    prettyType: String,
-    fmtDate: String,
-  };
-  const overviewModel = { buildOverview: () => ({}) };
-  const openPropertyDetails = () => {};
-  const openPropertyPayment = () => {};
-  const propertySummaryModel = { summarizeProperty: () => ({}) };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskOverviewPropertySummaryModel: {
-        create: (options) => {
-          received.propertySummary = options;
-          return propertySummaryModel;
-        },
-      },
-      PropertyDeskOverviewModel: {
-        create: (options) => {
-          received.model = options;
-          return overviewModel;
-        },
-      },
-      PropertyDeskOverview: {
-        create: (options) => {
-          received.view = options;
-          return { renderOverview: () => "overview" };
-        },
-      },
-      PropertyDeskOverviewEvents: {
-        create: (options) => {
-          received.events = options;
-          return { attachEvents: () => "overview events" };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "overview-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const workflow = context.window.PropertyDeskOverviewWorkflow.create({
-    ...modelContext,
-    ...viewContext,
-    openPropertyDetails,
-    openPropertyPayment,
-  });
-
+test("app composes dashboard models, rendering, and actions directly", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const order = [
+    "PropertyDeskOverviewPropertySummaryModel.create(",
+    "PropertyDeskOverviewModel.create(",
+    "PropertyDeskOverview.create(",
+    "PropertyDeskOverviewEvents.create(",
+  ].map((marker) => app.indexOf(marker));
+  assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
-    Object.keys(received.view).sort(),
-    [...Object.keys(viewContext), "overviewModel"].sort(),
+    order,
+    [...order].sort((left, right) => left - right),
   );
-  for (const [key, value] of Object.entries(viewContext)) {
-    assert.equal(received.view[key], value);
-  }
-  const propertySummaryKeys = [
-    "state",
-    "monthlyScheduledEstimate",
-    "accountBalance",
-    "amountDueSince",
-    "unpaidDueAccrualStart",
-    "todayIso",
-  ];
-  assert.deepEqual(
-    Object.keys(received.propertySummary).sort(),
-    [...propertySummaryKeys].sort(),
+  assert.match(
+    app,
+    /PropertyDeskOverviewModel.create\(\{\s*state,\s*propertySummaryModel,[\s\S]*?postedOnOrAfter,/,
   );
-  for (const key of propertySummaryKeys) {
-    assert.equal(received.propertySummary[key], modelContext[key]);
-  }
-  assert.deepEqual(
-    Object.keys(received.model).sort(),
-    [
-      "state",
-      "propertySummaryModel",
-      "collectedSince",
-      "scheduledMonthlyRunRate",
-      "monthStart",
-      "isPosted",
-      "postedOnOrAfter",
-    ].sort(),
-  );
-  assert.equal(received.model.propertySummaryModel, propertySummaryModel);
-  for (const key of [
-    "state",
-    "collectedSince",
-    "scheduledMonthlyRunRate",
-    "monthStart",
-    "isPosted",
-  ])
-    assert.equal(received.model[key], modelContext[key]);
-  assert.equal(received.view.overviewModel, overviewModel);
-  assert.equal(received.events.openPropertyDetails, openPropertyDetails);
-  assert.equal(received.events.openPropertyPayment, openPropertyPayment);
-  assert.equal(workflow.renderOverview(), "overview");
-  assert.equal(workflow.attachOverviewEvents(), "overview events");
+  assert.match(app, /renderers:[\s\S]*?renderOverview/);
+  assert.match(app, /eventBinders:[\s\S]*?attachOverviewEvents/);
+  assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
 });
 
 test("profile display updates the shared app shell from the current workspace user", () => {
@@ -319,19 +221,16 @@ test("profile display loads before overview and is precached", () => {
   assert.ok(
     html.indexOf("features/overview-model.js") <
       html.indexOf("features/overview.js") &&
-      html.indexOf("features/overview-model.js") <
-        html.indexOf("features/overview-workflow.js") &&
-      html.indexOf("features/overview.js") <
-        html.indexOf("features/overview-workflow.js") &&
-      html.indexOf("features/overview-events.js") <
-        html.indexOf("features/overview-workflow.js") &&
-      html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
-    "overview modules should load before their workflow and the app",
+      html.indexOf("features/overview-events.js") < html.indexOf("app.js") &&
+      html.indexOf("features/overview.js") < html.indexOf("app.js"),
+    "overview modules should load before the app",
   );
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
   assert.match(worker, /'\.\/features\/overview-model\.js'/);
   assert.match(worker, /'\.\/features\/overview-events\.js'/);
-  assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/overview-property-summary-model\.js'/);
+  assert.doesNotMatch(html, /features\/overview-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/overview-workflow\.js/);
 });
 
 test("profile settings save the display label and refresh the shared shell", async () => {

@@ -264,26 +264,37 @@
       openAccountForProperty,
       openAccountDetails,
     });
-  const { renderOverview, attachOverviewEvents } =
-    window.PropertyDeskOverviewWorkflow.create({
-      $,
+  const propertySummaryModel =
+    window.PropertyDeskOverviewPropertySummaryModel.create({
       state,
       monthlyScheduledEstimate,
       accountBalance,
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-      esc,
-      prettyKind,
-      money,
-      propertyAddress,
-      collectedSince,
-      scheduledMonthlyRunRate,
-      monthStart,
-      isPosted,
-      postedOnOrAfter,
-      prettyType,
-      fmtDate,
+    });
+  const overviewModel = window.PropertyDeskOverviewModel.create({
+    state,
+    propertySummaryModel,
+    collectedSince,
+    scheduledMonthlyRunRate,
+    monthStart,
+    isPosted,
+    postedOnOrAfter,
+  });
+  const { renderOverview } = window.PropertyDeskOverview.create({
+    $,
+    esc,
+    prettyKind,
+    money,
+    propertyAddress,
+    prettyType,
+    fmtDate,
+    overviewModel,
+  });
+  const { attachEvents: attachOverviewEvents } =
+    window.PropertyDeskOverviewEvents.create({
+      $,
       openPropertyDetails,
       openPropertyPayment,
     });
