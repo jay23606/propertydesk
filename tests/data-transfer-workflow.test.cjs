@@ -10,8 +10,7 @@ test("app wires CSV import and private backup export independently", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   const importOrder = [
-    "PropertyDeskImportPreview.create(",
-    "PropertyDeskImportPreviewEvents.create(",
+    "PropertyDeskImportPreviewWorkflow.create(",
     "PropertyDeskImportFeature.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(importOrder.every((position) => position >= 0));
@@ -19,7 +18,9 @@ test("app wires CSV import and private backup export independently", () => {
     importOrder,
     [...importOrder].sort((left, right) => left - right),
   );
-  assert.match(app, /stageImport: importPreview\.stageImport/);
+  assert.match(app, /stageImport,/);
+  assert.doesNotMatch(app, /PropertyDeskImportPreview\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskImportPreviewEvents\.create\(/);
   assert.match(
     app,
     /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,
@@ -39,6 +40,13 @@ test("app wires CSV import and private backup export independently", () => {
     );
     assert.match(worker, new RegExp(`'\\./${script.replaceAll("/", "\\/")}'`));
   }
+  assert.ok(
+    html.indexOf("features/import-preview-events.js") <
+      html.indexOf("features/import-preview-workflow.js") &&
+      html.indexOf("features/import-preview-workflow.js") <
+        html.indexOf("app.js"),
+  );
+  assert.match(worker, /'\.\/features\/import-preview-workflow\.js'/);
   assert.doesNotMatch(app, /PropertyDeskCsvImportWorkflow/);
   assert.doesNotMatch(html, /features\/csv-import-workflow\.js/);
   assert.doesNotMatch(worker, /features\/csv-import-workflow\.js/);
