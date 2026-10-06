@@ -89,6 +89,28 @@ test("workspace data reads every owner table in parallel and maps named results"
       `${table} should be filtered to the active workspace`,
     );
   }
+  const expectedOrders = {
+    pd_properties: ["created_at"],
+    pd_accounts: ["created_at"],
+    pd_payments: ["received_date", "recorded_at"],
+    pd_expenses: ["expense_date", "recorded_at"],
+    pd_import_batches: ["created_at"],
+    pd_documents: ["created_at"],
+    pd_agreement_versions: ["replaced_on"],
+    pd_property_holders: [],
+    pd_deposit_entries: ["movement_date", "created_at"],
+    pd_reminder_logs: ["attempted_at"],
+  };
+  for (const { table, operations } of requests) {
+    const actualOrders = operations
+      .filter(([operation]) => operation === "order")
+      .map(([, column, options]) => [column, options.ascending]);
+    assert.deepEqual(
+      actualOrders,
+      expectedOrders[table].map((column) => [column, false]),
+      `${table} retains its display ordering`,
+    );
+  }
   assert.ok(
     requests
       .find((request) => request.table === "pd_reminder_logs")

@@ -2,108 +2,85 @@
 (() => {
   "use strict";
 
+  const WORKSPACE_READS = [
+    {
+      key: "properties",
+      table: "pd_properties",
+      order: [["created_at", false]],
+    },
+    {
+      key: "accounts",
+      table: "pd_accounts",
+      order: [["created_at", false]],
+    },
+    {
+      key: "payments",
+      table: "pd_payments",
+      order: [
+        ["received_date", false],
+        ["recorded_at", false],
+      ],
+    },
+    {
+      key: "expenses",
+      table: "pd_expenses",
+      order: [
+        ["expense_date", false],
+        ["recorded_at", false],
+      ],
+    },
+    {
+      key: "importBatches",
+      table: "pd_import_batches",
+      order: [["created_at", false]],
+    },
+    {
+      key: "documents",
+      table: "pd_documents",
+      order: [["created_at", false]],
+    },
+    {
+      key: "agreementVersions",
+      table: "pd_agreement_versions",
+      order: [["replaced_on", false]],
+    },
+    { key: "propertyHolders", table: "pd_property_holders" },
+    { key: "workspaceMembers", rpc: "pd_list_workspace_members" },
+    {
+      key: "depositEntries",
+      table: "pd_deposit_entries",
+      order: [
+        ["movement_date", false],
+        ["created_at", false],
+      ],
+    },
+    {
+      key: "reminderLogs",
+      table: "pd_reminder_logs",
+      order: [["attempted_at", false]],
+      limit: 300,
+    },
+  ];
+
+  function runWorkspaceRead(client, workspaceId, read) {
+    if (read.rpc) return client.rpc(read.rpc);
+    let query = client.from(read.table).select("*").eq("user_id", workspaceId);
+    for (const [column, ascending] of read.order || [])
+      query = query.order(column, { ascending });
+    if (read.limit) query = query.limit(read.limit);
+    return query;
+  }
+
   function create() {
     function loadWorkspaceId(client) {
       return client.rpc("pd_workspace_id");
     }
 
     async function loadWorkspaceRecords(client, workspaceId) {
-      const requests = [
-        [
-          "properties",
-          () =>
-            client
-              .from("pd_properties")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("created_at", { ascending: false }),
-        ],
-        [
-          "accounts",
-          () =>
-            client
-              .from("pd_accounts")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("created_at", { ascending: false }),
-        ],
-        [
-          "payments",
-          () =>
-            client
-              .from("pd_payments")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("received_date", { ascending: false })
-              .order("recorded_at", { ascending: false }),
-        ],
-        [
-          "expenses",
-          () =>
-            client
-              .from("pd_expenses")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("expense_date", { ascending: false })
-              .order("recorded_at", { ascending: false }),
-        ],
-        [
-          "importBatches",
-          () =>
-            client
-              .from("pd_import_batches")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("created_at", { ascending: false }),
-        ],
-        [
-          "documents",
-          () =>
-            client
-              .from("pd_documents")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("created_at", { ascending: false }),
-        ],
-        [
-          "agreementVersions",
-          () =>
-            client
-              .from("pd_agreement_versions")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("replaced_on", { ascending: false }),
-        ],
-        [
-          "propertyHolders",
-          () =>
-            client
-              .from("pd_property_holders")
-              .select("*")
-              .eq("user_id", workspaceId),
-        ],
-        ["workspaceMembers", () => client.rpc("pd_list_workspace_members")],
-        [
-          "depositEntries",
-          () =>
-            client
-              .from("pd_deposit_entries")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("movement_date", { ascending: false })
-              .order("created_at", { ascending: false }),
-        ],
-        [
-          "reminderLogs",
-          () =>
-            client
-              .from("pd_reminder_logs")
-              .select("*")
-              .eq("user_id", workspaceId)
-              .order("attempted_at", { ascending: false })
-              .limit(300),
-        ],
-      ];
+      const requests = WORKSPACE_READS.map((read) => [
+        read.key,
+        () => runWorkspaceRead(client, workspaceId, read),
+      ]);
 
       const results = await Promise.all(requests.map(([, run]) => run()));
       const failedResult = results.find((result) => result.error);
