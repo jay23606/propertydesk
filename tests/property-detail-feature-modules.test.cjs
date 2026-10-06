@@ -582,17 +582,13 @@ test("property detail document events route private document actions to document
   ]);
 });
 
-test("property details workflow connects activity summaries to the property view", () => {
+test("property detail content workflow connects activity summaries to property rendering", () => {
   let detailContext;
   let viewContext;
+  let activityContext;
   const renderPropertyActivity = () => "activity";
   const propertyDetailsHTML = () => "property details html";
   const propertyDocumentsHTML = () => "documents html";
-  const attachPropertyDetailEvents = () => "detail events";
-  const attachPropertyDocumentEvents = () => "document events";
-  const attached = [];
-  let detailActionsContext;
-  let documentContext;
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDocumentsView: {
@@ -608,12 +604,92 @@ test("property details workflow connects activity summaries to the property view
         },
       },
       PropertyDeskPropertyActivityDetails: {
-        create: () => ({ renderPropertyActivity }),
+        create: (options) => {
+          activityContext = options;
+          return { renderPropertyActivity };
+        },
       },
       PropertyDeskPropertyDetails: {
         create: (options) => {
           detailContext = options;
           return { openPropertyDetails: () => "property details" };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-detail-content-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const detailsDependencies = {
+    $() {},
+    state: {},
+    isPosted() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    accountBalance() {},
+    openModal() {},
+    propertyAddress() {},
+  };
+  const workflow =
+    context.window.PropertyDeskPropertyDetailContentWorkflow.create(
+      detailsDependencies,
+    );
+
+  assert.equal(viewContext.fmtDate, detailsDependencies.fmtDate);
+  assert.equal(viewContext.esc, detailsDependencies.esc);
+  const detailsViewDependencies = {
+    money: detailsDependencies.money,
+    esc: detailsDependencies.esc,
+    prettyType: detailsDependencies.prettyType,
+    paymentFrequencyLabel: detailsDependencies.paymentFrequencyLabel,
+    accountBalance: detailsDependencies.accountBalance,
+  };
+  assert.deepEqual(
+    Object.keys(viewContext.details).sort(),
+    [...Object.keys(detailsViewDependencies), "propertyDocumentsHTML"].sort(),
+  );
+  assert.equal(
+    viewContext.details.propertyDocumentsHTML,
+    propertyDocumentsHTML,
+  );
+  assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
+  assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
+  assert.equal(activityContext.state, detailsDependencies.state);
+  assert.equal(activityContext.isPosted, detailsDependencies.isPosted);
+  assert.equal(activityContext.sumIncome, detailsDependencies.sumIncome);
+  assert.deepEqual(Object.keys(workflow), ["openPropertyDetails"]);
+  assert.equal(workflow.openPropertyDetails(), "property details");
+});
+
+test("property details workflow connects content with action and document routes", () => {
+  const passed = {};
+  const openPropertyDetails = () => "property details";
+  const attachPropertyDetailEvents = () => "detail events";
+  const attachPropertyDocumentEvents = () => "document events";
+  const attached = [];
+  let detailActionsContext;
+  let documentContext;
+  const context = vm.createContext({
+    document: {},
+    window: {
+      PropertyDeskPropertyDetailContentWorkflow: {
+        create: (options) => {
+          passed.content = options;
+          return { openPropertyDetails };
         },
       },
       PropertyDeskPropertyDetailActionsWorkflow: {
@@ -643,48 +719,38 @@ test("property details workflow connects activity summaries to the property view
     ),
     context,
   );
-  const detailsDependencies = {
+  const dependencies = {
+    $() {},
+    state: {},
+    isPosted() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
     money() {},
     fmtDate() {},
     esc() {},
     prettyType() {},
     paymentFrequencyLabel() {},
     accountBalance() {},
-  };
-  const workflow = context.window.PropertyDeskPropertyDetailsWorkflow.create({
-    ...detailsDependencies,
+    openModal() {},
+    propertyAddress() {},
+    toast() {},
+    fetchAll() {},
+    todayIso() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+    openExpense() {},
+    resetAccountForm() {},
+    populateFormOptions() {},
+    openAccountDetails() {},
     documentRef: {},
-  });
+  };
+  const workflow =
+    context.window.PropertyDeskPropertyDetailsWorkflow.create(dependencies);
 
-  assert.equal(viewContext.fmtDate, detailsDependencies.fmtDate);
-  assert.equal(viewContext.esc, detailsDependencies.esc);
-  const detailsViewDependencies = { ...detailsDependencies };
-  delete detailsViewDependencies.fmtDate;
-  assert.deepEqual(
-    Object.keys(viewContext.details).sort(),
-    [...Object.keys(detailsViewDependencies), "propertyDocumentsHTML"].sort(),
-  );
-  assert.equal(
-    viewContext.details.propertyDocumentsHTML,
-    propertyDocumentsHTML,
-  );
-  assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
-  assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachPropertyDetailEvents",
-    "attachPropertyDocumentEvents",
-    "openPropertyDetails",
-  ]);
-  assert.equal(Object.hasOwn(workflow, "renderPropertyActivity"), false);
-  assert.equal(workflow.openPropertyDetails(), "property details");
-  assert.equal(
-    detailActionsContext.openPropertyDetails,
-    workflow.openPropertyDetails,
-  );
-  assert.equal(
-    documentContext.openPropertyDetails,
-    workflow.openPropertyDetails,
-  );
+  assert.equal(passed.content.state, dependencies.state);
+  assert.equal(detailActionsContext.openPropertyDetails, openPropertyDetails);
+  assert.equal(documentContext.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(
     Object.keys(detailActionsContext).sort(),
     [
@@ -712,6 +778,12 @@ test("property details workflow connects activity summaries to the property view
     "state",
     "toast",
   ]);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachPropertyDetailEvents",
+    "attachPropertyDocumentEvents",
+    "openPropertyDetails",
+  ]);
+  assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   workflow.attachPropertyDetailEvents();
   workflow.attachPropertyDocumentEvents();
   assert.deepEqual(attached, ["detail events", "document events"]);

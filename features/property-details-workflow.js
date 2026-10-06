@@ -1,4 +1,4 @@
-/* Compose the property details view with its actions and private documents. */
+/* Connect property-detail content with action and private-document workflows. */
 (() => {
   "use strict";
 
@@ -29,19 +29,9 @@
       openAccountDetails,
       documentRef = document,
     } = context;
-    const { propertyDocumentsHTML } =
-      window.PropertyDeskPropertyDocumentsView.create({ fmtDate, esc });
-    const { propertyDetailsHTML } =
-      window.PropertyDeskPropertyDetailsView.create({
-        money,
-        esc,
-        prettyType,
-        paymentFrequencyLabel,
-        accountBalance,
-        propertyDocumentsHTML,
-      });
-    const { renderPropertyActivity } =
-      window.PropertyDeskPropertyActivityDetails.create({
+    const { openPropertyDetails } =
+      window.PropertyDeskPropertyDetailContentWorkflow.create({
+        $,
         state,
         isPosted,
         sumIncome,
@@ -49,21 +39,12 @@
         money,
         fmtDate,
         esc,
+        prettyType,
+        paymentFrequencyLabel,
+        accountBalance,
+        openModal,
+        propertyAddress,
       });
-    const { openPropertyDetails } = window.PropertyDeskPropertyDetails.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      openModal,
-      propertyAddress,
-      renderPropertyActivity,
-      propertyDetailsHTML,
-    });
 
     const { attachPropertyDetailEvents } =
       window.PropertyDeskPropertyDetailActionsWorkflow.create({
