@@ -2,123 +2,48 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
-const vm = require("node:vm");
 
-test("financial workspace connects payment, transaction, and account actions", () => {
-  const calls = [];
-  const methods = Object.fromEntries(
-    [
-      "editAccount",
-      "updatePaymentGuidance",
-      "openPayment",
-      "openPropertyPayment",
-      "openExpense",
-      "openAccountForProperty",
-      "renderPayments",
-      "attachTransactionEvents",
-      "openAccountDetails",
-      "attachEntryEvents",
-      "attachAccountDetailsEvents",
-    ].map((name) => [name, () => name]),
-  );
-  const context = vm.createContext({
-    window: {
-      PropertyDeskEntryWorkflow: {
-        create: (options) => {
-          calls.push(["entry", options]);
-          return {
-            editAccount: methods.editAccount,
-            updatePaymentGuidance: methods.updatePaymentGuidance,
-            openPayment: methods.openPayment,
-            openPropertyPayment: methods.openPropertyPayment,
-            openExpense: methods.openExpense,
-            openAccountForProperty: methods.openAccountForProperty,
-            attachEvents: methods.attachEntryEvents,
-          };
-        },
-      },
-      PropertyDeskTransactionWorkflow: {
-        create: (options) => {
-          calls.push(["transactions", options]);
-          return {
-            renderPayments: methods.renderPayments,
-            attachEvents: methods.attachTransactionEvents,
-          };
-        },
-      },
-      PropertyDeskAccountDetailsWorkflow: {
-        create: (options) => {
-          calls.push(["account-details", options]);
-          return {
-            openAccountDetails: methods.openAccountDetails,
-            attachEvents: methods.attachAccountDetailsEvents,
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "financial-workspace-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = { state: { accounts: [] }, amortizationSchedule() {} };
-  const workflow =
-    context.window.PropertyDeskFinancialWorkspaceWorkflow.create(dependencies);
-
-  assert.deepEqual(
-    calls.map(([name]) => name),
-    ["entry", "transactions", "account-details"],
-  );
-  assert.equal(calls[0][1].state, dependencies.state);
-  assert.equal(calls[1][1].openPayment, methods.openPayment);
-  assert.equal(calls[1][1].openExpense, methods.openExpense);
-  assert.equal(
-    calls[1][1].updatePaymentGuidance,
-    methods.updatePaymentGuidance,
-  );
-  assert.equal(calls[2][1].editAccount, methods.editAccount);
-  assert.equal(calls[2][1].openPayment, methods.openPayment);
-  assert.equal(
-    calls[2][1].amortizationSchedule,
-    dependencies.amortizationSchedule,
-  );
-  assert.equal(workflow.editAccount, methods.editAccount);
-  assert.equal(workflow.openPropertyPayment, methods.openPropertyPayment);
-  assert.equal(workflow.renderPayments, methods.renderPayments);
-  assert.equal(
-    workflow.attachTransactionEvents,
-    methods.attachTransactionEvents,
-  );
-  assert.equal(workflow.openAccountDetails, methods.openAccountDetails);
-  assert.equal(workflow.attachEntryEvents, methods.attachEntryEvents);
-  assert.equal(
-    workflow.attachAccountDetailsEvents,
-    methods.attachAccountDetailsEvents,
-  );
-});
-
-test("financial workspace loads before app and is precached", () => {
+test("app root composes entry, transaction, and account workflows directly", () => {
   const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-
-  assert.ok(
-    html.indexOf("features/financial-workspace-workflow.js") <
-      html.indexOf("app.js"),
-  );
-  for (const dependency of [
+  const workflows = [
     "features/entry-workflow.js",
     "features/transaction-workflow.js",
     "features/account-details-workflow.js",
-  ]) {
+  ];
+  const creationOrder = [
+    "PropertyDeskEntryWorkflow.create(",
+    "PropertyDeskTransactionWorkflow.create(",
+    "PropertyDeskAccountDetailsWorkflow.create(",
+  ].map((marker) => app.indexOf(marker));
+
+  assert.ok(creationOrder.every((position) => position >= 0));
+  assert.ok(creationOrder[0] < creationOrder[1]);
+  assert.ok(creationOrder[1] < creationOrder[2]);
+  assert.match(
+    app,
+    /PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?amortizationSchedule,/,
+  );
+  assert.match(app, /attachEvents: attachEntryEvents/);
+  assert.match(app, /attachEvents: attachTransactionEvents/);
+  assert.match(app, /attachEvents: attachAccountDetailsEvents/);
+
+  for (const script of workflows) {
     assert.ok(
-      html.indexOf(dependency) <
-        html.indexOf("features/financial-workspace-workflow.js"),
-      `${dependency} loads before the financial workspace workflow`,
+      html.indexOf(script) >= 0 &&
+        html.indexOf(script) < html.indexOf("app.js"),
+      `${script} loads before app.js`,
     );
+    const workerPath = script.replaceAll("/", "\\/");
+    assert.match(worker, new RegExp(`'\\./${workerPath}'`));
   }
-  assert.match(worker, /'\.\/features\/financial-workspace-workflow\.js'/);
+  assert.doesNotMatch(app, /PropertyDeskFinancialWorkspaceWorkflow/);
+  assert.doesNotMatch(html, /financial-workspace-workflow\.js/);
+  assert.doesNotMatch(worker, /financial-workspace-workflow\.js/);
 });
