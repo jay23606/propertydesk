@@ -121,6 +121,7 @@ test("theme controller synchronizes toggles and persists theme changes", () => {
     storage: { setItem: (...args) => storageWrites.push(args) },
   });
 
+  assert.deepEqual(Object.keys(theme), ["attachEvents"]);
   theme.attachEvents();
   assert.equal(attributes["0:aria-label"], "Switch to light mode");
   assert.equal(attributes["0:aria-pressed"], "true");

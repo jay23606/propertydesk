@@ -56,7 +56,7 @@
       syncThemeButtons();
     }
 
-    return { setTheme, syncThemeButtons, attachEvents };
+    return { attachEvents };
   }
 
   window.PropertyDeskTheme = Object.freeze({ create });
