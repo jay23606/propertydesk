@@ -156,7 +156,6 @@
     esc,
     expenseCategoryLabel,
     money,
-    isPosted,
     monthStart,
     sumIncome,
     sumOperatingExpenses,
