@@ -133,7 +133,6 @@
       fillSelect,
       prettyType,
       openModal,
-      navigate,
       previewReminderEmail,
       dateOnly,
       fmtDate,
