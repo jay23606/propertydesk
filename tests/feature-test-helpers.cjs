@@ -48,6 +48,7 @@ function loadLedgerEntryForms(context) {
     "payment-entry-form.js",
     "expense-entry-view.js",
     "expense-entry-form.js",
+    "ledger-entry-save-workflow.js",
     "ledger-entry-forms.js",
   ]) {
     vm.runInContext(

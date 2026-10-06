@@ -27,29 +27,13 @@
       state,
       toast,
     });
-    async function finishSuccessfulEntry({
-      label,
-      addAnother,
-      modalId,
-      resetAfterSave,
-      resetArguments = [],
-      prepareNext,
-      nextArguments = [],
-    }) {
-      resetAfterSave(...resetArguments);
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      if (addAnother) {
-        prepareNext(...nextArguments);
-        toast(`${label} recorded. Ready for the next entry`);
-        return;
-      }
-      closeModal($(modalId));
-      toast(`${label} recorded`);
-    }
+    const { finishSuccessfulEntry } =
+      window.PropertyDeskLedgerEntrySaveWorkflow.create({
+        $,
+        closeModal,
+        fetchAll,
+        toast,
+      });
     const payments = window.PropertyDeskPaymentEntryForm.create({
       $,
       state,

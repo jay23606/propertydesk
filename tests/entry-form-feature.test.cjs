@@ -56,6 +56,12 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
           return { insertTransaction };
         },
       },
+      PropertyDeskLedgerEntrySaveWorkflow: {
+        create: (options) => {
+          passed.saveWorkflowOptions = options;
+          return { finishSuccessfulEntry: () => "finished" };
+        },
+      },
       PropertyDeskPaymentEntryForm: {
         create: (options) => {
           passed.payment = options;
@@ -160,6 +166,13 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.equal(passed.expense.insertTransaction, insertTransaction);
   assert.equal(passed.persistenceOptions.state, dependencies.state);
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
+  assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
+  assert.equal(passed.saveWorkflowOptions.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.payment.finishSuccessfulEntry(), "finished");
+  assert.equal(
+    passed.expense.finishSuccessfulEntry,
+    passed.payment.finishSuccessfulEntry,
+  );
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
@@ -186,6 +199,13 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
       },
     },
   });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-entry-save-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "ledger-entry-forms.js"),

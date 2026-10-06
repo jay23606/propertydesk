@@ -721,6 +721,11 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/workspace-query\.js'/);
   assert.match(worker, /'\.\/features\/backup-records\.js'/);
   assert.match(worker, /'\.\/features\/backup-archive\.js'/);
+  assert.ok(
+    html.indexOf("features/ledger-entry-save-workflow.js") <
+      html.indexOf("features/ledger-entry-forms.js"),
+  );
+  assert.match(worker, /'\.\/features\/ledger-entry-save-workflow\.js'/);
   assert.match(worker, /'\.\/features\/document-repository\.js'/);
   assert.ok(
     html.indexOf("features/document-repository.js") <
