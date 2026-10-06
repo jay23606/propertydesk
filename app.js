@@ -115,7 +115,18 @@
     fetchAll,
     renderReminderActivity,
   });
-  const entryWorkflow = window.PropertyDeskEntryWorkflow.create({
+  const {
+    editAccount,
+    updateAllocationPreview,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachPropertyFormEvents,
+    attachAccountFormEvents,
+    attachLedgerEntryFormEvents,
+    attachCreateActions,
+    openAccountForProperty,
+  } = window.PropertyDeskEntryWorkflow.create({
     $,
     state,
     moneyInput,
@@ -131,17 +142,6 @@
     navigate,
     documentRef: document,
   });
-  const {
-    editAccount,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachPropertyFormEvents,
-    attachAccountFormEvents,
-    attachLedgerEntryFormEvents,
-    attachCreateActions,
-    openAccountForProperty,
-  } = entryWorkflow;
   const {
     renderPayments,
     attachTransactionEvents,
@@ -163,7 +163,7 @@
     prettyType,
     openPayment,
     openExpense,
-    updateAllocationPreview: entryWorkflow.updateAllocationPreview,
+    updateAllocationPreview,
     EventClass: Event,
     OptionClass: Option,
     documentRef: document,
