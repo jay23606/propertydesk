@@ -242,15 +242,74 @@ test("uncertain document metadata writes keep the private file for reconciliatio
   assert.match(messages[0], /file was kept/i);
 });
 
-test("backup export aborts before download when a private document path escapes the workspace", async () => {
+test("backup agreement collector downloads only workspace-scoped files into the archive manifest", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "backup-export.js"),
+      path.join(__dirname, "..", "features", "backup-agreement-files.js"),
       "utf8",
     ),
     context,
   );
+  const fileBytes = new Uint8Array([1, 2, 3]);
+  const storagePath = "workspace-1/property-1/doc-1-agreement.pdf";
+  const collected =
+    await context.window.PropertyDeskBackupAgreementFiles.collect({
+      documents: [
+        {
+          id: "doc-1",
+          user_id: "workspace-1",
+          property_id: "property-1",
+          account_id: null,
+          storage_path: storagePath,
+          file_name: "Signed # agreement.pdf",
+          content_type: "application/pdf",
+        },
+      ],
+      workspaceOwnerId: "workspace-1",
+      client: {
+        storage: {
+          from(bucket) {
+            assert.equal(bucket, "pd-private-agreements");
+            return {
+              async download(path) {
+                assert.equal(path, storagePath);
+                return {
+                  data: {
+                    async arrayBuffer() {
+                      return fileBytes.buffer;
+                    },
+                  },
+                  error: null,
+                };
+              },
+            };
+          },
+        },
+      },
+    });
+
+  assert.equal(
+    collected.entries[0].name,
+    "agreements/property-1/doc-1-Signed___agreement.pdf",
+  );
+  assert.deepEqual(Array.from(collected.entries[0].data), [1, 2, 3]);
+  assert.equal(collected.includedFiles[0].file_size, 3);
+  assert.equal(collected.includedFiles[0].content_type, "application/pdf");
+  assert.equal(collected.includedFiles[0].property_id, "property-1");
+});
+
+test("backup export aborts before download when a private document path escapes the workspace", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const moduleName of ["backup-agreement-files.js", "backup-export.js"]) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", moduleName),
+        "utf8",
+      ),
+      context,
+    );
+  }
   const tables = [
     "pd_properties",
     "pd_accounts",
@@ -332,4 +391,126 @@ test("backup export aborts before download when a private document path escapes 
   assert.equal(button.disabled, false);
   assert.equal(button.textContent, "Export backup");
   assert.match(messages.at(-1), /invalid private storage path/);
+});
+
+test("backup export adds the validated private agreement to the ZIP and manifest", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const moduleName of ["backup-agreement-files.js", "backup-export.js"]) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", moduleName),
+        "utf8",
+      ),
+      context,
+    );
+  }
+  const tables = [
+    "pd_properties",
+    "pd_accounts",
+    "pd_agreement_versions",
+    "pd_payments",
+    "pd_expenses",
+    "pd_deposit_entries",
+    "pd_documents",
+    "pd_import_batches",
+    "pd_audit_events",
+    "pd_workspace_members",
+    "pd_property_holders",
+  ];
+  const agreement = {
+    id: "doc-1",
+    user_id: "workspace-1",
+    property_id: "property-1",
+    account_id: null,
+    storage_path: "workspace-1/property-1/doc-1-agreement.pdf",
+    file_name: "Agreement.pdf",
+    content_type: "application/pdf",
+  };
+  const fileBytes = new Uint8Array([4, 5, 6]);
+  const state = {
+    user: { id: "workspace-1" },
+    workspaceOwnerId: "workspace-1",
+    client: {
+      from(table) {
+        assert.ok(tables.includes(table));
+        return {
+          select() {
+            return {
+              async range() {
+                return {
+                  data: table === "pd_documents" ? [agreement] : [],
+                  error: null,
+                };
+              },
+            };
+          },
+        };
+      },
+      storage: {
+        from(bucket) {
+          assert.equal(bucket, "pd-private-agreements");
+          return {
+            async download(path) {
+              assert.equal(path, agreement.storage_path);
+              return {
+                data: {
+                  async arrayBuffer() {
+                    return fileBytes.buffer;
+                  },
+                },
+                error: null,
+              };
+            },
+          };
+        },
+      },
+    },
+  };
+  const button = {
+    textContent: "Export backup",
+    disabled: false,
+    addEventListener(_event, handler) {
+      this.handler = handler;
+    },
+  };
+  const archived = { archive: true };
+  let backupContents;
+  let zipEntries;
+  let download;
+  const feature = context.window.PropertyDeskBackupExport.create({
+    $: (id) => (id === "export-all" ? button : null),
+    state,
+    createBackup(records, exportedAt, includedFiles) {
+      backupContents = { records, exportedAt, includedFiles };
+      return { records };
+    },
+    todayIso: () => "2026-10-04",
+    toast() {},
+    downloadBlob(blob, filename) {
+      download = { blob, filename };
+    },
+    zipUtils: {
+      createZip(entries) {
+        zipEntries = entries;
+        return archived;
+      },
+    },
+  });
+
+  feature.attachEvents();
+  await button.handler();
+
+  assert.equal(backupContents.records.pd_documents[0].id, "doc-1");
+  assert.equal(
+    backupContents.includedFiles[0].path,
+    "agreements/property-1/doc-1-Agreement.pdf",
+  );
+  assert.equal(backupContents.includedFiles[0].file_size, 3);
+  assert.equal(zipEntries[0].name, "propertydesk-backup.json");
+  assert.equal(zipEntries[1].name, backupContents.includedFiles[0].path);
+  assert.deepEqual(Array.from(zipEntries[1].data), [4, 5, 6]);
+  assert.equal(download.blob, archived);
+  assert.equal(download.filename, "propertydesk-backup-2026-10-04.zip");
+  assert.equal(button.disabled, false);
+  assert.equal(button.textContent, "Export backup");
 });

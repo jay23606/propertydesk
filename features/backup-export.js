@@ -63,41 +63,12 @@
         const records = Object.fromEntries(
           tables.map((table, index) => [table, values[index]]),
         );
-        const includedFiles = [];
-        const entries = [];
-        const ownerPrefix = `${state.workspaceOwnerId}/`;
-
-        for (const doc of records.pd_documents) {
-          if (!doc.storage_path || !doc.storage_path.startsWith(ownerPrefix)) {
-            throw new Error(
-              "An agreement record has an invalid private storage path. No backup was downloaded.",
-            );
-          }
-          const { data, error } = await state.client.storage
-            .from("pd-private-agreements")
-            .download(doc.storage_path);
-          if (error || !data) {
-            throw new Error(
-              `Could not download agreement “${doc.file_name || "file"}”. ${error?.message || ""}`,
-            );
-          }
-          const safeName =
-            String(doc.file_name || "agreement")
-              .normalize("NFKC")
-              .replace(/[^\w.-]/g, "_")
-              .slice(-100) || "agreement";
-          const path = `agreements/${doc.property_id || "unassigned"}/${doc.id}-${safeName}`;
-          const bytes = new Uint8Array(await data.arrayBuffer());
-          entries.push({ name: path, data: bytes });
-          includedFiles.push({
-            path,
-            file_name: doc.file_name,
-            content_type: doc.content_type,
-            file_size: bytes.byteLength,
-            property_id: doc.property_id,
-            account_id: doc.account_id,
+        const { entries, includedFiles } =
+          await window.PropertyDeskBackupAgreementFiles.collect({
+            documents: records.pd_documents,
+            client: state.client,
+            workspaceOwnerId: state.workspaceOwnerId,
           });
-        }
 
         const backup = createBackup(
           records,

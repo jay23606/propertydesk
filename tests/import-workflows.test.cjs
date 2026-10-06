@@ -396,6 +396,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("app.js"),
   );
   assert.ok(html.indexOf("features/documents.js") < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/backup-agreement-files.js") <
+      html.indexOf("features/backup-export.js"),
+  );
   assert.ok(html.indexOf("features/backup-export.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/auth-recovery.js") <
@@ -550,6 +554,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-document-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/backup-agreement-files\.js'/);
   assert.match(worker, /'\.\/features\/backup-export\.js'/);
   assert.match(worker, /'\.\/features\/auth-recovery\.js'/);
   assert.match(worker, /'\.\/features\/auth-session\.js'/);
