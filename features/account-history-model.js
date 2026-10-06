@@ -10,6 +10,9 @@
         account.id,
         ...payments.slice(0, 50).map((payment) => payment.id),
       ];
+      const paymentById = new Map(
+        payments.map((payment) => [payment.id, payment]),
+      );
       const { events: history, error: auditError } =
         await loadAccountAuditEvents(state.client, auditIds);
 
@@ -30,8 +33,7 @@
                   : "Recorded",
         reason:
           event.action === "voided"
-            ? state.payments.find((payment) => payment.id === event.entity_id)
-                ?.void_reason || ""
+            ? paymentById.get(event.entity_id)?.void_reason || ""
             : "",
         created_at: event.created_at,
       }));

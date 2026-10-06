@@ -269,7 +269,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
         terms: {},
       },
     ],
-    payments: [{ id: "payment-1", void_reason: "<duplicate>" }],
+    payments: [{ id: "payment-1", void_reason: "wrong workspace copy" }],
     client: {
       from(table) {
         assert.equal(table, "pd_audit_events");
@@ -316,7 +316,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   });
 
   const html = await history.renderAccountHistory({ id: "account-1" }, [
-    { id: "payment-1" },
+    { id: "payment-1", void_reason: "<duplicate>" },
   ]);
 
   assert.deepEqual(seenAuditIds, ["account-1", "payment-1"]);
@@ -326,6 +326,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   assert.doesNotMatch(html, /Should not appear/);
   assert.match(html, /Voided payment/);
   assert.match(html, /Reason: &lt;duplicate&gt;/);
+  assert.doesNotMatch(html, /wrong workspace copy/);
 
   state.client.from = () => {
     throw new Error("audit unavailable");
