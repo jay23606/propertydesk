@@ -55,13 +55,7 @@
       };
     }
 
-    function editAccount(account) {
-      resetAccountForm();
-      populateFormOptions();
-      $("account-modal-title").textContent = "Edit account";
-      $("account-id").value = account.id;
-      $("account-type").value = account.account_type;
-      updateLoanFields();
+    function populateAccountDetails(account) {
       $("account-property").value = account.property_id;
       $("account-name").value = account.name;
       $("account-party").value = account.party_name || "";
@@ -70,10 +64,16 @@
       $("account-reminder-enabled").checked = Boolean(
         account.monthly_reminder_enabled,
       );
+    }
+
+    function populatePaymentSchedule(account) {
       $("account-start").value = account.start_date;
       $("account-next-due").value = account.next_due_date || "";
       $("account-payment").value = account.payment_amount;
       $("account-frequency").value = account.payment_frequency;
+    }
+
+    function populateLoanTerms(account) {
       $("account-principal").value = account.original_principal;
       $("account-pi-payment").value = account.principal_interest_amount || "";
       $("account-escrow").value = account.escrow_amount || "0";
@@ -84,9 +84,25 @@
       $("account-rate").value = account.interest_rate;
       $("account-term").value = account.term_months || "";
       $("account-balloon").value = account.balloon_date || "";
+    }
+
+    function populateAccountFees(account) {
       $("account-late-fee").value = account.late_fee;
       $("account-grace").value = account.grace_days;
       $("account-notes").value = account.notes || "";
+    }
+
+    function editAccount(account) {
+      resetAccountForm();
+      populateFormOptions();
+      $("account-modal-title").textContent = "Edit account";
+      $("account-id").value = account.id;
+      $("account-type").value = account.account_type;
+      updateLoanFields();
+      populateAccountDetails(account);
+      populatePaymentSchedule(account);
+      populateLoanTerms(account);
+      populateAccountFees(account);
       openModal("account-modal");
     }
 
