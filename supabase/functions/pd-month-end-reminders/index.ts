@@ -10,6 +10,10 @@ import { reminderMessage } from "../_shared/reminder-message.mjs";
 import { createReminderLogStore } from "../_shared/reminder-log.mjs";
 import { sendReminderEmail } from "../_shared/mailersend.mjs";
 import { deliverReminderRecipient } from "../_shared/reminder-delivery.mjs";
+import {
+  loadEnabledReminderAccounts,
+  loadReminderRecords,
+} from "../_shared/reminder-repository.mjs";
 
 const FROM_EMAIL =
   Deno.env.get("MAILERSEND_FROM_EMAIL") ??
@@ -63,13 +67,8 @@ Deno.serve(async (request) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const reminderLog = createReminderLogStore(db);
-  const { data: accounts, error: accountsError } = await db
-    .from("pd_accounts")
-    .select(
-      "id,user_id,property_id,account_type,name,party_name,party_email,start_date,next_due_date,payment_amount,payment_frequency,status",
-    )
-    .eq("monthly_reminder_enabled", true)
-    .eq("status", "active");
+  const { data: accounts, error: accountsError } =
+    await loadEnabledReminderAccounts(db);
   if (accountsError)
     return Response.json(
       { error: "Could not load enabled reminder accounts" },
@@ -79,31 +78,18 @@ Deno.serve(async (request) => {
   if (!enabled.length)
     return Response.json({ ok: true, month: reminderMonth, processed: 0 });
 
-  const ids = enabled.map((account) => account.id);
-  const propertyIds = [
-    ...new Set(enabled.map((account) => account.property_id)),
-  ];
-  const [paymentResult, propertyResult] = await Promise.all([
-    db
-      .from("pd_payments")
-      .select("account_id,amount,received_date,income_category,status")
-      .in("account_id", ids)
-      .gte("received_date", TRACKING_START)
-      .lte("received_date", monthEnd)
-      .eq("status", "posted"),
-    db
-      .from("pd_properties")
-      .select("id,name,address,city,state,postal_code")
-      .in("id", propertyIds),
-  ]);
-  if (paymentResult.error || propertyResult.error)
+  const {
+    payments,
+    properties: propertyRows,
+    error: recordsError,
+  } = await loadReminderRecords(db, enabled, monthEnd, TRACKING_START);
+  if (recordsError)
     return Response.json(
       { error: "Could not load reminder records" },
       { status: 500 },
     );
-  const payments = paymentResult.data ?? [];
   const properties = new Map(
-    (propertyResult.data ?? []).map((property) => [property.id, property]),
+    propertyRows.map((property) => [property.id, property]),
   );
   let accepted = 0,
     failed = 0,
