@@ -8,7 +8,8 @@
       state,
       parseCSV,
       validateExpenseRows,
-      transactionImportReview,
+      commitTransactions,
+      importReview,
       createFileWorkflow,
     } = context;
 
@@ -26,7 +27,7 @@
             state.accounts,
             state.expenses,
           );
-        transactionImportReview.stage({
+        importReview.stage({
           title: "Review expense import",
           rows,
           validateRows,
@@ -43,8 +44,6 @@
             "source_note",
           ],
           file,
-          kind: "expenses",
-          label: "expense",
           mapRows(rowsToImport) {
             return rowsToImport.map((row) => {
               const property = state.properties.find(
@@ -79,6 +78,15 @@
                 payment_method: row.payment_method,
                 memo: row.memo || null,
               };
+            });
+          },
+          commit({ rows: payload, file: sourceFile, total }) {
+            return commitTransactions({
+              kind: "expenses",
+              rows: payload,
+              sourceName: sourceFile.name,
+              total,
+              label: "expense",
             });
           },
         });

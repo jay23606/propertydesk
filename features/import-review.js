@@ -1,17 +1,16 @@
-/* Share transaction CSV review and commit coordination. */
+/* Share validated CSV preview staging and commit coordination. */
 (() => {
   "use strict";
 
-  function createTransactionImportReview({ stageImport, commitTransactions }) {
+  function createImportReview({ stageImport }) {
     function stage({
       title,
       rows,
       validateRows,
       correctionKeys,
       file,
-      kind,
-      label,
       mapRows,
+      commit,
     }) {
       const validation = validateRows(rows);
       stageImport(
@@ -19,13 +18,7 @@
         validation.valid,
         async (rowsToImport, review) => {
           const payload = await mapRows(rowsToImport);
-          await commitTransactions({
-            kind,
-            rows: payload,
-            sourceName: file.name,
-            total: review.total,
-            label,
-          });
+          await commit({ rows: payload, file, total: review.total });
         },
         "",
         {
@@ -41,7 +34,7 @@
     return { stage };
   }
 
-  window.PropertyDeskTransactionImportReview = Object.freeze({
-    create: createTransactionImportReview,
+  window.PropertyDeskImportReview = Object.freeze({
+    create: createImportReview,
   });
 })();

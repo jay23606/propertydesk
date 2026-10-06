@@ -147,9 +147,9 @@ test("import workflow keeps file import handlers inside its event bindings", () 
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
-      PropertyDeskTransactionImportReview: {
+      PropertyDeskImportReview: {
         create: (options) => {
-          passed.transactionReview = options;
+          passed.importReviewDependencies = options;
           return { stage() {} };
         },
       },
@@ -203,8 +203,8 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "buildPayloads",
       "commitAccounts",
       "createFileWorkflow",
+      "importReview",
       "parseCSV",
-      "stageImport",
       "state",
       "todayIso",
       "validateAccountRows",
@@ -214,10 +214,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.payment).sort(),
     [
       "$",
+      "commitTransactions",
       "createFileWorkflow",
+      "importReview",
       "parseCSV",
       "state",
-      "transactionImportReview",
       "validatePaymentRows",
     ].sort(),
   );
@@ -225,19 +226,17 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.expense).sort(),
     [
       "$",
+      "commitTransactions",
       "createFileWorkflow",
+      "importReview",
       "parseCSV",
       "state",
-      "transactionImportReview",
       "validateExpenseRows",
     ].sort(),
   );
-  assert.equal(
-    passed.payment.transactionImportReview,
-    passed.expense.transactionImportReview,
-  );
-  assert.deepEqual(Object.keys(passed.transactionReview).sort(), [
-    "commitTransactions",
+  assert.equal(passed.account.importReview, passed.payment.importReview);
+  assert.equal(passed.payment.importReview, passed.expense.importReview);
+  assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
   imports.attachEvents();
@@ -246,6 +245,60 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "payment events",
     "expense events",
   ]);
+});
+
+test("shared import review stages validation and maps only approved rows before commit", async () => {
+  const context = vm.createContext({ window: {} });
+  loadImportFeatures(context);
+  const staged = [];
+  const validationInputs = [];
+  const commitCalls = [];
+  const review = context.window.PropertyDeskImportReview.create({
+    stageImport: (...args) => staged.push(args),
+  });
+  const file = { name: "accounts.csv" };
+  const rows = [{ name: "valid" }, { name: "invalid" }];
+  const validateRows = (sourceRows) => {
+    validationInputs.push(sourceRows);
+    return {
+      valid: sourceRows.filter((row) => row.name === "valid"),
+      total: sourceRows.length,
+      errors: [{ row: 3, message: "Missing property" }],
+    };
+  };
+
+  review.stage({
+    title: "Review account import",
+    rows,
+    validateRows,
+    correctionKeys: ["name"],
+    file,
+    mapRows: async (approvedRows) =>
+      approvedRows.map((row) => ({ account_name: row.name })),
+    commit: async (payload) => commitCalls.push(payload),
+  });
+
+  const [title, validRows, commit, note, report] = staged[0];
+  assert.equal(title, "Review account import");
+  assert.deepEqual(validRows, [{ name: "valid" }]);
+  assert.equal(note, "");
+  assert.equal(report.total, 2);
+  assert.equal(report.errors[0].row, 3);
+  assert.equal(report.errors[0].message, "Missing property");
+  assert.equal(report.rawRows, rows);
+  assert.deepEqual(Array.from(report.correctionKeys), ["name"]);
+  assert.equal(report.revalidate, validateRows);
+  assert.deepEqual(validationInputs, [rows]);
+  assert.deepEqual(report.revalidate([{ name: "valid" }]).valid, [
+    { name: "valid" },
+  ]);
+
+  await commit(validRows, { total: 2 });
+
+  assert.equal(commitCalls.length, 1);
+  assert.deepEqual(commitCalls[0].rows, [{ account_name: "valid" }]);
+  assert.equal(commitCalls[0].file, file);
+  assert.equal(commitCalls[0].total, 2);
 });
 
 test("CSV import workflow stages preview before attaching review and file handlers", () => {

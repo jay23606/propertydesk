@@ -12,7 +12,7 @@ The product should feel calm and minimal. It should make routine bookkeeping fas
 2. **Record a transaction quickly.** A frequent task should take only a few clear fields: property/account, amount, date, category, and optional memo.
 3. **Keep the ledger explainable.** Store original transactions and derive payment status from them. Preserve legacy allocation data for imported history, but routine loan receipts are simple payment records. Do not silently rewrite history when terms change.
 4. **Private by default.** Each workspace is private to its owner and people the owner explicitly adds. Invited household members can manage the whole workspace. Enforce access in database policies, not just in the interface.
-5. **Make imports reviewable.** Support manual app entry and CSV imports. Show mapped fields and validation errors before writing imported records. Keep payment and expense validation and row mapping specific while sharing their preview-to-commit coordination.
+5. **Make imports reviewable.** Support manual app entry and CSV imports. Show mapped fields and validation errors before writing imported records. Keep validation and row mapping specific while sharing the review-to-commit coordination across account, payment, and expense imports.
 6. **Stay focused.** Avoid heavyweight enterprise dashboards, payment processing, maintenance dispatch, tenant screening, and legal automation until users ask for them. Basic property issue notes and agreement history can remain lightweight.
 
 ## Privacy and operator access (priority before broad onboarding)

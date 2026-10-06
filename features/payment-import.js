@@ -8,7 +8,8 @@
       state,
       parseCSV,
       validatePaymentRows,
-      transactionImportReview,
+      commitTransactions,
+      importReview,
       createFileWorkflow,
     } = context;
 
@@ -26,7 +27,7 @@
             state.accounts,
             state.payments,
           );
-        transactionImportReview.stage({
+        importReview.stage({
           title: "Review payment import",
           rows,
           validateRows,
@@ -46,8 +47,6 @@
             "memo",
           ],
           file,
-          kind: "payments",
-          label: "payment",
           mapRows(rowsToImport) {
             const rowsToInsert = rowsToImport.map((row) => ({
               account_id: state.accounts.find(
@@ -77,6 +76,15 @@
               );
             }
             return rowsToInsert;
+          },
+          commit({ rows: payload, file: sourceFile, total }) {
+            return commitTransactions({
+              kind: "payments",
+              rows: payload,
+              sourceName: sourceFile.name,
+              total,
+              label: "payment",
+            });
           },
         });
       },
