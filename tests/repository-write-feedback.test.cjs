@@ -64,6 +64,23 @@ test("repository write feedback supports domain-specific database messages", asy
   assert.deepEqual(messages, ["Deposit adjustment failed: Permission denied"]);
 });
 
+test("repository write feedback can reject a successful response by domain rule", async () => {
+  const messages = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.run({
+      operation: async () => ({ data: null, error: null }),
+      toast: (message) => messages.push(message),
+      failureMessage: "Unavailable",
+      resultFailureMessage: ({ data }) =>
+        data ? null : "The record was already changed.",
+    }),
+    false,
+  );
+  assert.deepEqual(messages, ["The record was already changed."]);
+});
+
 test("repository write feedback reports rejected requests with domain fallback", async () => {
   const messages = [];
   const feedback = createFeedback();

@@ -18,26 +18,22 @@
         toast("This transaction type can't be voided");
         return;
       }
-      let result;
-      try {
-        result = await repository.voidPosted(state.client, {
-          target,
-          id,
-          payload: buildVoidPayload(reason, timestamp()),
-        });
-      } catch {
-        toast("Transaction couldn't be voided right now. Please try again.");
-        return;
-      }
-      const { data, error } = result;
-      if (error) {
-        toast(error.message);
-        return;
-      }
-      if (!data) {
-        toast("This transaction was already voided or is no longer available.");
-        return;
-      }
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () =>
+          repository.voidPosted(state.client, {
+            target,
+            id,
+            payload: buildVoidPayload(reason, timestamp()),
+          }),
+        toast,
+        failureMessage:
+          "Transaction couldn't be voided right now. Please try again.",
+        resultFailureMessage: ({ data }) =>
+          data
+            ? null
+            : "This transaction was already voided or is no longer available.",
+      });
+      if (!saved) return;
       try {
         await fetchAll();
       } catch {

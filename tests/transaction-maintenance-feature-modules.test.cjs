@@ -14,6 +14,13 @@ function loadTransactionRepository(context) {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-repository.js"),
       "utf8",
     ),
@@ -292,6 +299,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
   for (const filename of [
     "transaction-void-model.js",
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "transaction-repository.js",
     "transaction-maintenance.js",
   ]) {
@@ -367,15 +375,67 @@ test("transaction maintenance reports rejected void requests without refreshing"
   ]);
 });
 
+test("transaction maintenance reports returned database errors without refreshing", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "repository-write-feedback.js",
+    "transaction-maintenance.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const messages = [];
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    state: { client: {} },
+    repository: {
+      voidPosted: async () => ({
+        data: null,
+        error: { message: "Permission denied" },
+      }),
+    },
+    fetchAll: async () => assert.fail("database errors must not refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await feature.saveVoidTransaction("income", "payment-1", "Entered in error");
+
+  assert.deepEqual(messages, ["Permission denied"]);
+});
+
+test("transaction maintenance reports an already-changed row without refreshing", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "repository-write-feedback.js",
+    "transaction-maintenance.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const messages = [];
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    state: { client: {} },
+    repository: {
+      voidPosted: async () => ({ data: null, error: null }),
+    },
+    fetchAll: async () => assert.fail("a missing row must not refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await feature.saveVoidTransaction("income", "payment-1", "Entered in error");
+
+  assert.deepEqual(messages, [
+    "This transaction was already voided or is no longer available.",
+  ]);
+});
+
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
@@ -447,13 +507,6 @@ test("transaction corrections save payment and expense changes with their audit 
 
 test("transaction correction failures preserve the open form and pending correction", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
@@ -498,13 +551,6 @@ test("transaction correction failures preserve the open form and pending correct
 
 test("transaction correction database errors keep the correction open", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(

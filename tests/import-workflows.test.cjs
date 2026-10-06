@@ -156,6 +156,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-maintenance.js"),
   );
   assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/transaction-maintenance.js"),
+  );
+  assert.ok(
     html.indexOf("features/transaction-repository.js") <
       html.indexOf("features/transaction-corrections.js"),
   );

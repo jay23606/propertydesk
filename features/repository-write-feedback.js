@@ -7,16 +7,24 @@
     toast,
     failureMessage,
     errorMessage = (error) => error.message,
+    resultFailureMessage = () => null,
   }) {
+    let result;
     let error;
     try {
-      ({ error } = await operation());
+      result = await operation();
+      ({ error } = result);
     } catch {
       toast(failureMessage);
       return false;
     }
     if (error) {
       toast(errorMessage(error));
+      return false;
+    }
+    const resultMessage = resultFailureMessage(result);
+    if (resultMessage) {
+      toast(resultMessage);
       return false;
     }
     return true;
