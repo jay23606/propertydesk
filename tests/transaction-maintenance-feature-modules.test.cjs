@@ -4,6 +4,38 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("transaction void model maps supported kinds and preserves audit defaults", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-void-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const model = context.window.PropertyDeskTransactionVoidModel;
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(model.resolveVoidTarget("income"))),
+    { table: "pd_payments", label: "income entry" },
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(model.resolveVoidTarget("expense"))),
+    { table: "pd_expenses", label: "expense" },
+  );
+  assert.equal(model.resolveVoidTarget("unknown"), null);
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(model.buildVoidPayload("  Entered in error  ", "now")),
+    ),
+    { status: "voided", voided_at: "now", void_reason: "Entered in error" },
+  );
+  assert.equal(
+    model.buildVoidPayload("   ", "later").void_reason,
+    "Voided by owner",
+  );
+});
+
 test("transaction workflow connects history and maintenance interfaces", () => {
   const created = [];
   const passed = {};
@@ -180,6 +212,13 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-void-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-maintenance.js"),
       "utf8",
     ),
@@ -240,12 +279,46 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   assert.equal(refreshes, 1);
 });
 
+test("transaction maintenance rejects unsupported kinds before prompting or writing", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "transaction-maintenance.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const messages = [];
+  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+    state: {
+      client: {
+        from: () => assert.fail("unsupported kind must not write"),
+      },
+    },
+    confirmAction: () => assert.fail("unsupported kind must not prompt"),
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("unsupported kind must not refresh"),
+  });
+
+  await feature.voidTransaction("unexpected", "transaction-1");
+  assert.deepEqual(messages, ["This transaction type can't be voided"]);
+});
+
 test("transaction maintenance reports rejected void requests without refreshing", async () => {
   const context = vm.createContext({
     window: {},
     Event: class MockEvent {},
     Option: class MockOption {},
   });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-void-model.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-maintenance.js"),

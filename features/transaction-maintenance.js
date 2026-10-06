@@ -10,13 +10,19 @@
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
     timestamp = () => new Date().toISOString(),
+    resolveVoidTarget = window.PropertyDeskTransactionVoidModel
+      .resolveVoidTarget,
+    buildVoidPayload = window.PropertyDeskTransactionVoidModel.buildVoidPayload,
   }) {
     async function voidTransaction(kind, id) {
-      const table = kind === "income" ? "pd_payments" : "pd_expenses";
-      const label = kind === "income" ? "income entry" : "expense";
+      const target = resolveVoidTarget(kind);
+      if (!target) {
+        toast("This transaction type can't be voided");
+        return;
+      }
       if (
         !confirmAction(
-          `Void this ${label}? It will remain in the audit history but stop affecting balances and reports.`,
+          `Void this ${target.label}? It will remain in the audit history but stop affecting balances and reports.`,
         )
       )
         return;
@@ -28,12 +34,8 @@
       let result;
       try {
         result = await state.client
-          .from(table)
-          .update({
-            status: "voided",
-            voided_at: timestamp(),
-            void_reason: reason.trim() || "Voided by owner",
-          })
+          .from(target.table)
+          .update(buildVoidPayload(reason, timestamp()))
           .eq("id", id)
           .eq("status", "posted")
           .select("id")
