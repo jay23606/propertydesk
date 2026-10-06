@@ -125,15 +125,7 @@
     attachNavigationEvents();
     workspace.attachEvents();
   }
-  const {
-    editAccount,
-    updatePaymentGuidance,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachEvents: attachEntryEvents,
-    openAccountForProperty,
-  } = window.PropertyDeskEntryWorkflow.create({
+  const recordEntry = window.PropertyDeskLedgerWorkflow.create({
     $,
     state,
     moneyInput,
@@ -146,9 +138,39 @@
     prettyType,
     openModal,
     previewReminderEmail,
-    navigate,
-    documentRef: document,
   });
+  const {
+    editAccount,
+    updatePaymentGuidance,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachPropertyFormEvents,
+    attachAccountFormEvents,
+    attachLedgerEntryFormEvents,
+    resetPropertyForm,
+    resetAccountForm,
+  } = recordEntry;
+  const { attachEvents: attachCreateActionEvents, openAccountForProperty } =
+    window.PropertyDeskCreateActions.create({
+      $,
+      state,
+      toast,
+      resetPropertyForm,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      openPayment,
+      openExpense,
+      navigate,
+      documentRef: document,
+    });
+  function attachEntryEvents() {
+    attachCreateActionEvents();
+    attachPropertyFormEvents();
+    attachAccountFormEvents();
+    attachLedgerEntryFormEvents();
+  }
   const { renderPayments, attachEvents: attachTransactionViewEvents } =
     window.PropertyDeskTransactionViews.create({
       $,

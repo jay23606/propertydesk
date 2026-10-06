@@ -9,7 +9,6 @@ test("app root composes financial screens and maintenance boundaries directly", 
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const workflows = [
-    "features/entry-workflow.js",
     "features/transaction-views.js",
     "features/transaction-maintenance-workflow.js",
     "features/deposit-maintenance-workflow.js",
@@ -18,7 +17,8 @@ test("app root composes financial screens and maintenance boundaries directly", 
     "features/account-detail-content-workflow.js",
   ];
   const creationOrder = [
-    "PropertyDeskEntryWorkflow.create(",
+    "PropertyDeskLedgerWorkflow.create(",
+    "PropertyDeskCreateActions.create(",
     "PropertyDeskTransactionViews.create(",
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
     "PropertyDeskDepositDetails.create(",
@@ -53,7 +53,7 @@ test("app root composes financial screens and maintenance boundaries directly", 
     app,
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule,[\s\S]*?depositSectionHTML,[\s\S]*?renderAccountHistory,/,
   );
-  assert.match(app, /attachEvents: attachEntryEvents/);
+  assert.match(app, /function attachEntryEvents\(\)/);
   assert.match(app, /function attachTransactionEvents\(\)/);
   assert.match(app, /function attachAccountDetailsEvents\(\)/);
 
@@ -81,4 +81,6 @@ test("app root composes financial screens and maintenance boundaries directly", 
   assert.doesNotMatch(app, /PropertyDeskFinancialWorkspaceWorkflow/);
   assert.doesNotMatch(html, /financial-workspace-workflow\.js/);
   assert.doesNotMatch(worker, /financial-workspace-workflow\.js/);
+  assert.doesNotMatch(html, /features\/entry-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/entry-workflow\.js/);
 });
