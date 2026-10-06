@@ -39,13 +39,16 @@
       toast,
       fetchAll,
     });
-    const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-    });
+    const accountMaintenance =
+      window.PropertyDeskAccountMaintenanceWorkflow.create({
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        editAccount,
+        openPayment,
+      });
     const { accountLoanScheduleHTML } =
       window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
     const { renderAccountDetails } =
@@ -84,23 +87,9 @@
       openModal,
       propertyAddress,
     });
-    const { attachEvents: attachAccountDetailEvents } =
-      window.PropertyDeskAccountDetailEvents.create({
-        $,
-        state,
-        closeModal,
-        editAccount,
-        openPayment,
-        closeAccount,
-      });
-
-    function attachAccountEvents() {
-      attachAccountDetailEvents();
-    }
-
     return {
       openAccountDetails,
-      attachEvents: attachAccountEvents,
+      attachEvents: accountMaintenance.attachEvents,
       attachDepositEvents: depositWorkflow.attachEvents,
     };
   }

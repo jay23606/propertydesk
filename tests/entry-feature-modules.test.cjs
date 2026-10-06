@@ -143,10 +143,9 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details keeps account actions separate from deposit maintenance", () => {
+test("account details delegates account and deposit actions to separate workflows", () => {
   const created = [];
   const passed = {};
-  const closeAccount = () => "closed";
   const depositSectionHTML = () => "deposit html";
   let depositAttached = 0;
   const context = vm.createContext({
@@ -161,11 +160,11 @@ test("account details keeps account actions separate from deposit maintenance", 
           };
         },
       },
-      PropertyDeskAccountMaintenance: {
+      PropertyDeskAccountMaintenanceWorkflow: {
         create: (options) => {
-          created.push("account maintenance");
+          created.push("account maintenance workflow");
           passed.accountMaintenance = options;
-          return { closeAccount };
+          return { attachEvents: () => {} };
         },
       },
       PropertyDeskAccountDetailsView: {
@@ -193,15 +192,6 @@ test("account details keeps account actions separate from deposit maintenance", 
           created.push("account details");
           passed.accountDetails = options;
           return { openAccountDetails: () => "opened" };
-        },
-      },
-      PropertyDeskAccountDetailEvents: {
-        create: (options) => {
-          created.push("account events");
-          passed.accountEvents = options;
-          return {
-            attachEvents: () => {},
-          };
         },
       },
     },
@@ -233,26 +223,25 @@ test("account details keeps account actions separate from deposit maintenance", 
 
   assert.deepEqual(created, [
     "deposit details workflow",
-    "account maintenance",
+    "account maintenance workflow",
     "schedule view",
     "account view",
     "history",
     "account details",
-    "account events",
   ]);
   assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
   assert.equal(passed.view.money, dependencies.money);
   assert.equal(passed.scheduleView.money, dependencies.money);
   assert.equal(passed.view.accountLoanScheduleHTML instanceof Function, true);
-  assert.equal(passed.accountEvents.closeAccount, closeAccount);
-  assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
+  assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
+  assert.equal(passed.accountMaintenance.editAccount, dependencies.editAccount);
+  assert.equal(passed.accountMaintenance.openPayment, dependencies.openPayment);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
   assert.equal(
     passed.depositWorkflow.depositLedger,
     dependencies.depositLedger,
   );
   assert.equal(passed.depositWorkflow.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachDepositEvents",
     "attachEvents",

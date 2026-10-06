@@ -99,6 +99,55 @@ test("deposit details workflow composes the view, maintenance, and action router
   assert.equal(attached, 1);
 });
 
+test("account maintenance workflow composes account closure with detail actions", () => {
+  const passed = {};
+  const closeAccount = () => "closed";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountMaintenance: {
+        create: (options) => {
+          passed.maintenance = options;
+          return { closeAccount };
+        },
+      },
+      PropertyDeskAccountDetailEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: () => attached++ };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-maintenance-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+  };
+  const workflow =
+    context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
+
+  assert.equal(passed.maintenance.state, dependencies.state);
+  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.events.closeAccount, closeAccount);
+  assert.equal(passed.events.editAccount, dependencies.editAccount);
+  assert.equal(passed.events.openPayment, dependencies.openPayment);
+  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
