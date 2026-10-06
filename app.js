@@ -192,6 +192,7 @@
     });
   const {
     attachPropertyDetailsEvents,
+    attachPropertyDocumentEvents,
     renderOverview,
     attachOverviewEvents,
     renderProperties,
@@ -293,6 +294,7 @@
       attachAccountFormEvents,
       attachLedgerEntryFormEvents,
       attachPropertyDetailsEvents,
+      attachPropertyDocumentEvents,
       attachAuthEvents,
       attachCsvImportEvents,
       attachExportEvents,

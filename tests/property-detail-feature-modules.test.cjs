@@ -671,7 +671,8 @@ test("property details workflow connects activity summaries to the property view
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
+    "attachPropertyDetailEvents",
+    "attachPropertyDocumentEvents",
     "openPropertyDetails",
   ]);
   assert.equal(Object.hasOwn(workflow, "renderPropertyActivity"), false);
@@ -711,7 +712,8 @@ test("property details workflow connects activity summaries to the property view
     "state",
     "toast",
   ]);
-  workflow.attachEvents();
+  workflow.attachPropertyDetailEvents();
+  workflow.attachPropertyDocumentEvents();
   assert.deepEqual(attached, ["detail events", "document events"]);
 });
 

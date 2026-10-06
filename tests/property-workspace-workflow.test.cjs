@@ -8,6 +8,7 @@ test("property workspace workflow connects details, overview, and portfolio acti
   const passed = {};
   const openPropertyDetails = () => "details";
   const attachPropertyDetailsEvents = () => "details events";
+  const attachPropertyDocumentEvents = () => "document events";
   const renderOverview = () => "overview";
   const attachOverviewEvents = () => "overview events";
   const renderProperties = () => "properties";
@@ -20,7 +21,8 @@ test("property workspace workflow connects details, overview, and portfolio acti
           passed.details = dependencies;
           return {
             openPropertyDetails,
-            attachEvents: attachPropertyDetailsEvents,
+            attachPropertyDetailEvents: attachPropertyDetailsEvents,
+            attachPropertyDocumentEvents,
           };
         },
       },
@@ -72,6 +74,10 @@ test("property workspace workflow connects details, overview, and portfolio acti
   assert.equal(
     workflow.attachPropertyDetailsEvents,
     attachPropertyDetailsEvents,
+  );
+  assert.equal(
+    workflow.attachPropertyDocumentEvents,
+    attachPropertyDocumentEvents,
   );
   assert.equal(workflow.renderOverview, renderOverview);
   assert.equal(workflow.attachOverviewEvents, attachOverviewEvents);
