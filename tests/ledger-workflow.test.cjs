@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("ledger workflow wires entry forms and transaction history", () => {
+test("ledger workflow injects audited corrections into entry forms", () => {
   const calls = [];
   const passed = {};
   const saveCorrection = () => "saved correction";
@@ -12,10 +12,6 @@ test("ledger workflow wires entry forms and transaction history", () => {
     openPayment: () => "payment form",
     openExpense: () => "expense form",
     updateAllocationPreview: () => "preview updated",
-  };
-  const transactions = {
-    renderPayments: () => "ledger rendered",
-    attachEvents: () => "ledger events attached",
   };
   const context = vm.createContext({
     window: {
@@ -31,13 +27,6 @@ test("ledger workflow wires entry forms and transaction history", () => {
           calls.push("entries");
           passed.entries = options;
           return entries;
-        },
-      },
-      PropertyDeskTransactionViews: {
-        create: (options) => {
-          calls.push("transactions");
-          passed.transactions = options;
-          return transactions;
         },
       },
     },
@@ -58,12 +47,11 @@ test("ledger workflow wires entry forms and transaction history", () => {
     closeModal() {},
     previewReminderEmail() {},
     moneyInput() {},
-    dateOnly() {},
   };
   const workflow =
     context.window.PropertyDeskLedgerWorkflow.create(dependencies);
 
-  assert.deepEqual(calls, ["corrections", "entries", "transactions"]);
+  assert.deepEqual(calls, ["corrections", "entries"]);
   assert.equal(passed.corrections.state, dependencies.state);
   assert.equal(passed.corrections.closeModal, dependencies.closeModal);
   assert.equal(passed.entries.state, dependencies.state);
@@ -72,10 +60,6 @@ test("ledger workflow wires entry forms and transaction history", () => {
     passed.entries.previewReminderEmail,
     dependencies.previewReminderEmail,
   );
-  assert.equal(passed.transactions.state, dependencies.state);
-  assert.equal("openPayment" in passed.transactions, false);
-  assert.equal("moneyInput" in passed.transactions, false);
-  assert.deepEqual(Object.keys(workflow).sort(), ["entries", "transactions"]);
-  assert.equal(workflow.entries, entries);
-  assert.equal(workflow.transactions, transactions);
+  assert.deepEqual(Object.keys(workflow).sort(), Object.keys(entries).sort());
+  assert.equal(workflow, entries);
 });

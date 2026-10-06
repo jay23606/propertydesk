@@ -1,4 +1,4 @@
-/* Coordinate record entry with the transaction history view. */
+/* Connect audited corrections to the shared property and ledger entry forms. */
 (() => {
   "use strict";
 
@@ -16,15 +16,6 @@
       prettyType,
       openModal,
       previewReminderEmail,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
     } = context;
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
       {
@@ -50,20 +41,7 @@
       previewReminderEmail,
       saveCorrection,
     });
-    const transactions = window.PropertyDeskTransactionViews.create({
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    });
-    return { entries, transactions };
+    return entries;
   }
 
   window.PropertyDeskLedgerWorkflow = Object.freeze({ create });

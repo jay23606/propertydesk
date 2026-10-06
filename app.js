@@ -120,30 +120,20 @@
     fetchAll,
     renderReminderActivity,
   });
-  const { entries: recordEntryWorkflow, transactions } =
-    window.PropertyDeskLedgerWorkflow.create({
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      closeModal,
-      fetchAll,
-      populateFormOptions,
-      fillSelect,
-      prettyType,
-      openModal,
-      previewReminderEmail,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    });
+  const recordEntryWorkflow = window.PropertyDeskLedgerWorkflow.create({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    populateFormOptions,
+    fillSelect,
+    prettyType,
+    openModal,
+    previewReminderEmail,
+  });
   const {
     resetPropertyForm,
     resetAccountForm,
@@ -170,7 +160,19 @@
       documentRef: document,
     });
   const { renderPayments, attachEvents: attachTransactionEvents } =
-    transactions;
+    window.PropertyDeskTransactionViews.create({
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    });
   const { attachTransactionActionEvents } =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
       $,
