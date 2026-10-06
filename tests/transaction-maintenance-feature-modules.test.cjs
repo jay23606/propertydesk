@@ -178,7 +178,7 @@ test("transaction workflow connects history and maintenance interfaces", () => {
     prettyType() {},
     openPayment() {},
     openExpense() {},
-    updateAllocationPreview() {},
+    updatePaymentGuidance() {},
     EventClass: class {},
     OptionClass: class {},
     documentRef: {},
@@ -205,8 +205,8 @@ test("transaction workflow connects history and maintenance interfaces", () => {
   assert.equal(passed.views.toast, undefined);
   assert.equal(passed.maintenance.state, dependencies.state);
   assert.equal(
-    passed.maintenance.updateAllocationPreview,
-    dependencies.updateAllocationPreview,
+    passed.maintenance.updatePaymentGuidance,
+    dependencies.updatePaymentGuidance,
   );
   assert.deepEqual(Object.keys(workflow), ["renderPayments", "attachEvents"]);
   assert.equal(workflow.renderPayments, methods.renderPayments);
@@ -266,7 +266,7 @@ test("transaction maintenance workflow composes correction and void actions", ()
     prettyType() {},
     openPayment() {},
     openExpense() {},
-    updateAllocationPreview() {},
+    updatePaymentGuidance() {},
     EventClass: class {},
     OptionClass: class {},
     documentRef: {},
@@ -282,8 +282,8 @@ test("transaction maintenance workflow composes correction and void actions", ()
   assert.equal(passed.voidEntry.toast, dependencies.toast);
   assert.equal(passed.voidEntry.saveVoidTransaction, voidTransaction);
   assert.equal(
-    passed.correction.updateAllocationPreview,
-    dependencies.updateAllocationPreview,
+    passed.correction.updatePaymentGuidance,
+    dependencies.updatePaymentGuidance,
   );
   assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
   assert.equal(passed.events.correctTransaction, correctTransaction);
@@ -712,7 +712,7 @@ test("transaction correction form reopens posted payments and expenses with audi
     prettyType: () => "Land contract",
     openPayment: () => calls.push("open-payment"),
     openExpense: () => calls.push("open-expense"),
-    updateAllocationPreview: () => calls.push("refresh-allocation"),
+    updatePaymentGuidance: () => calls.push("refresh-allocation"),
     toast: (message) => calls.push(message),
   });
 

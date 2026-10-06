@@ -57,7 +57,7 @@
       resetPropertyForm: propertyForm.resetPropertyForm,
       resetAccountForm: accountForm.resetAccountForm,
       editAccount: accountForm.editAccount,
-      updateAllocationPreview: ledgerEntryForms.updateAllocationPreview,
+      updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,
       openExpense: ledgerEntryForms.openExpense,

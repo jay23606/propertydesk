@@ -27,7 +27,7 @@ test("entry workflow joins record forms to their create actions", () => {
     openPropertyPayment() {},
     resetAccountForm() {},
     resetPropertyForm() {},
-    updateAllocationPreview() {},
+    updatePaymentGuidance() {},
   };
   const context = vm.createContext({
     window: {
@@ -86,7 +86,7 @@ test("entry workflow joins record forms to their create actions", () => {
     "openExpense",
     "openPayment",
     "openPropertyPayment",
-    "updateAllocationPreview",
+    "updatePaymentGuidance",
   ]);
   assert.equal(workflow.resetAccountForm, undefined);
   assert.equal(workflow.resetPropertyForm, undefined);
@@ -98,8 +98,5 @@ test("entry workflow joins record forms to their create actions", () => {
     "ledger",
   ]);
   assert.equal(workflow.openAccountForProperty, methods.openAccountForProperty);
-  assert.equal(
-    workflow.updateAllocationPreview,
-    methods.updateAllocationPreview,
-  );
+  assert.equal(workflow.updatePaymentGuidance, methods.updatePaymentGuidance);
 });

@@ -90,7 +90,7 @@
 
     // Keep only app-level actions; submit handlers stay inside their forms.
     return {
-      updateAllocationPreview: payments.updateAllocationPreview,
+      updatePaymentGuidance: payments.updatePaymentGuidance,
       openPayment: payments.openPayment,
       openPropertyPayment: payments.openPropertyPayment,
       openExpense: expenses.openExpense,

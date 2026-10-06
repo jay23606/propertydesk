@@ -57,7 +57,7 @@
 
     return {
       editAccount: recordEntry.editAccount,
-      updateAllocationPreview: recordEntry.updateAllocationPreview,
+      updatePaymentGuidance: recordEntry.updatePaymentGuidance,
       openPayment: recordEntry.openPayment,
       openPropertyPayment: recordEntry.openPropertyPayment,
       openExpense: recordEntry.openExpense,

@@ -13,7 +13,7 @@ test("record entry workflow composes forms and exposes their actions and binders
   const openPayment = () => calls.push("payment");
   const openPropertyPayment = () => calls.push("property payment");
   const openExpense = () => calls.push("expense");
-  const updateAllocationPreview = () => calls.push("allocation preview");
+  const updatePaymentGuidance = () => calls.push("payment guidance");
   const propertyAttach = () => calls.push("property events");
   const accountAttach = (preview) => calls.push(["account events", preview]);
   const ledgerAttach = () => calls.push("ledger events");
@@ -44,7 +44,7 @@ test("record entry workflow composes forms and exposes their actions and binders
         create(dependencies) {
           passed.ledger = dependencies;
           return {
-            updateAllocationPreview,
+            updatePaymentGuidance,
             openPayment,
             openPropertyPayment,
             openExpense,
@@ -97,7 +97,7 @@ test("record entry workflow composes forms and exposes their actions and binders
     resetPropertyForm: propertyReset,
     resetAccountForm: accountReset,
     editAccount,
-    updateAllocationPreview,
+    updatePaymentGuidance,
     openPayment,
     openPropertyPayment,
     openExpense,

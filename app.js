@@ -119,7 +119,7 @@
   });
   const {
     editAccount,
-    updateAllocationPreview,
+    updatePaymentGuidance,
     openPayment,
     openPropertyPayment,
     openExpense,
@@ -159,7 +159,7 @@
       prettyType,
       openPayment,
       openExpense,
-      updateAllocationPreview,
+      updatePaymentGuidance,
       EventClass: Event,
       OptionClass: Option,
       documentRef: document,

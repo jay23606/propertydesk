@@ -15,13 +15,13 @@
       openModal,
     } = context;
 
-    function updateAllocationPreview() {
+    function updatePaymentGuidance() {
       const account = state.accounts.find(
         (item) => item.id === $("payment-account").value,
       );
       const amount = moneyInput($("payment-amount").value);
       if (!account || !amount) {
-        $("allocation-preview").innerHTML = "";
+        $("payment-guidance").innerHTML = "";
         return;
       }
       $("income-category-wrap").classList.toggle(
@@ -29,11 +29,11 @@
         account.account_type !== "rental",
       );
       if (account.account_type === "rental") {
-        $("allocation-preview").innerHTML = "";
+        $("payment-guidance").innerHTML = "";
         return;
       }
-      $("allocation-preview").innerHTML =
-        '<p class="allocation-note">Payment history only. The estimated loan balance assumes every scheduled installment was paid on time; recorded receipts affect Unpaid Due, not this estimate.</p>';
+      $("payment-guidance").innerHTML =
+        '<p class="payment-guidance-note">Payment history only. The estimated loan balance assumes every scheduled installment was paid on time; recorded receipts affect Unpaid Due, not this estimate.</p>';
     }
 
     function prefillPaymentAmount() {
@@ -67,7 +67,7 @@
     }
 
     function prepareNextPayment() {
-      updateAllocationPreview();
+      updatePaymentGuidance();
       $("payment-amount").focus();
     }
 
@@ -99,7 +99,7 @@
       $("payment-date").value = todayIso();
       if (accountId) $("payment-account").value = accountId;
       prefillPaymentAmount();
-      updateAllocationPreview();
+      updatePaymentGuidance();
       openModal("payment-modal");
     }
 
@@ -118,14 +118,14 @@
     function attachEvents() {
       $("payment-account").addEventListener("change", () => {
         prefillPaymentAmount();
-        updateAllocationPreview();
+        updatePaymentGuidance();
       });
-      $("payment-amount").addEventListener("input", updateAllocationPreview);
-      $("payment-date").addEventListener("change", updateAllocationPreview);
+      $("payment-amount").addEventListener("input", updatePaymentGuidance);
+      $("payment-date").addEventListener("change", updatePaymentGuidance);
     }
 
     return {
-      updateAllocationPreview,
+      updatePaymentGuidance,
       readValues,
       resetAfterSave,
       prepareNextPayment,

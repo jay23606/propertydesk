@@ -5,7 +5,7 @@
   function create({
     $,
     prettyType,
-    updateAllocationPreview,
+    updatePaymentGuidance,
     EventClass = Event,
     OptionClass = Option,
   }) {
@@ -28,7 +28,7 @@
       $("payment-method").value = payment.payment_method;
       $("income-category").value = payment.income_category;
       $("payment-memo").value = payment.memo || "";
-      updateAllocationPreview();
+      updatePaymentGuidance();
       $("payment-modal-title").textContent = "Correct payment";
       $("payment-modal").querySelector(".eyebrow").textContent =
         "TRANSACTION CORRECTION";

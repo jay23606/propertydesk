@@ -83,7 +83,7 @@
     }
 
     return {
-      updateAllocationPreview: paymentView.updateAllocationPreview,
+      updatePaymentGuidance: paymentView.updatePaymentGuidance,
       readValues: paymentView.readValues,
       resetAfterSave: paymentView.resetAfterSave,
       prepareNextPayment: paymentView.prepareNextPayment,

@@ -11,7 +11,7 @@
       prettyType,
       openPayment,
       openExpense,
-      updateAllocationPreview,
+      updatePaymentGuidance,
       EventClass,
       OptionClass,
       documentRef = document,
@@ -34,7 +34,7 @@
         prettyType,
         openPayment,
         openExpense,
-        updateAllocationPreview,
+        updatePaymentGuidance,
         EventClass,
         OptionClass,
       });

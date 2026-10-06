@@ -30,7 +30,7 @@ test("app root delegates entry forms and create actions to one workflow", () => 
   assert.match(app, /attachEvents: attachEntryEvents/);
   assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /openAccountForProperty,/);
-  assert.match(app, /updateAllocationPreview,/);
+  assert.match(app, /updatePaymentGuidance,/);
   assert.doesNotMatch(app, /entryWorkflow\./);
   assert.match(app, /attachEvents: attachAccountDetailsEvents/);
   assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);

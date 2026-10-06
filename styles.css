@@ -871,25 +871,17 @@ button {
   padding-top: 15px;
   margin-top: 4px;
 }
-.allocation-preview {
+.payment-guidance {
   border-radius: 7px;
   background: #f4f7f4;
   padding: 11px 12px;
   font-size: 11px;
   color: #6b786e;
 }
-.allocation-preview:empty {
+.payment-guidance:empty {
   display: none;
 }
-.allocation-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 3px 0;
-}
-.allocation-line strong {
-  color: #354238;
-}
-.allocation-note {
+.payment-guidance-note {
   font-size: 10px;
   color: #9aa49c;
   margin-top: 6px;

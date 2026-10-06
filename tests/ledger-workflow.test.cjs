@@ -11,7 +11,7 @@ test("ledger workflow injects audited corrections into entry forms", () => {
   const entries = {
     openPayment: () => "payment form",
     openExpense: () => "expense form",
-    updateAllocationPreview: () => "preview updated",
+    updatePaymentGuidance: () => "preview updated",
   };
   const context = vm.createContext({
     window: {

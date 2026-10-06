@@ -33,7 +33,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   const buildExpenseCorrection = () => ({ expense_correction: true });
   const insertTransaction = () => true;
   const paymentActions = {
-    updateAllocationPreview: () => "preview",
+    updatePaymentGuidance: () => "preview",
     openPayment: () => "open payment",
     openPropertyPayment: () => "open property payment",
     attachEvents: () => calls.push("payment events"),
@@ -104,12 +104,12 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "openExpense",
       "openPayment",
       "openPropertyPayment",
-      "updateAllocationPreview",
+      "updatePaymentGuidance",
     ].sort(),
   );
   assert.equal(
-    forms.updateAllocationPreview,
-    paymentActions.updateAllocationPreview,
+    forms.updatePaymentGuidance,
+    paymentActions.updatePaymentGuidance,
   );
   assert.equal(forms.openExpense, expenseActions.openExpense);
   assert.deepEqual(
@@ -294,7 +294,7 @@ test("payment and expense form workflows publish explicit view operations", () =
     create: (options) => {
       viewDependencies.payment = options;
       return {
-        updateAllocationPreview() {},
+        updatePaymentGuidance() {},
         readValues() {},
         resetAfterSave() {},
         prepareNextPayment() {},
@@ -375,7 +375,7 @@ test("payment and expense form workflows publish explicit view operations", () =
     "prepareNextPayment",
     "readValues",
     "resetAfterSave",
-    "updateAllocationPreview",
+    "updatePaymentGuidance",
   ]);
   assert.deepEqual(Object.keys(expense).sort(), [
     "attachEvents",
@@ -788,7 +788,7 @@ test("opening a payment for an account prefills its scheduled installment withou
     ["payment-modal-title", { textContent: "" }],
     ["payment-save-button", { textContent: "" }],
     ["payment-save-next", { classList: { remove() {} } }],
-    ["allocation-preview", { innerHTML: "" }],
+    ["payment-guidance", { innerHTML: "" }],
     ["income-category-wrap", { classList: { toggle() {} } }],
   ]);
   elements.get("payment-account").value = "account-1";

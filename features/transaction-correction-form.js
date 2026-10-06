@@ -11,7 +11,7 @@
     prettyType,
     openPayment,
     openExpense,
-    updateAllocationPreview,
+    updatePaymentGuidance,
     EventClass = Event,
     OptionClass = Option,
     findCorrectionTarget = window.PropertyDeskTransactionCorrectionModel
@@ -20,7 +20,7 @@
     const view = window.PropertyDeskTransactionCorrectionView.create({
       $,
       prettyType,
-      updateAllocationPreview,
+      updatePaymentGuidance,
       EventClass,
       OptionClass,
     });
