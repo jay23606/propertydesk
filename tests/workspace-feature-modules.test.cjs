@@ -65,7 +65,6 @@ test("workspace settings render member labels and escape untrusted text", () => 
       ),
     toast() {},
     fetchAll: async () => {},
-    updateGreeting() {},
     renderReminderActivity: () => {
       remindersRendered = true;
     },
@@ -160,6 +159,7 @@ test("workspace feature owns profile and member form bindings", () => {
   assert.deepEqual(Object.keys(feature).sort(), [
     "attachEvents",
     "renderWorkspaceSettings",
+    "updateGreeting",
   ]);
   assert.equal(typeof handlers.get("display-name-form:submit"), "function");
   assert.equal(typeof handlers.get("member-add-form:submit"), "function");
@@ -332,6 +332,11 @@ test("workspace member feature loads before settings and is precached", () => {
     html.indexOf("features/workspace-members.js") <
       html.indexOf("features/workspace.js"),
     "workspace members should load before the settings coordinator",
+  );
+  assert.ok(
+    html.indexOf("features/profile-display.js") <
+      html.indexOf("features/workspace.js"),
+    "profile display should load before the settings coordinator",
   );
   assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });

@@ -8,10 +8,14 @@
     esc,
     toast,
     fetchAll,
-    updateGreeting,
     renderReminderActivity,
     confirmAction = (message) => window.confirm(message),
   }) {
+    const profileDisplay = window.PropertyDeskProfileDisplay.create({
+      $,
+      state,
+    });
+    const { updateGreeting } = profileDisplay;
     const profile = window.PropertyDeskProfileSettings.create({
       $,
       state,
@@ -45,6 +49,7 @@
     }
 
     return {
+      updateGreeting,
       renderWorkspaceSettings,
       attachEvents,
     };

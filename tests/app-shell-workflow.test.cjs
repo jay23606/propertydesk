@@ -26,12 +26,6 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskProfileDisplay: {
-        create(options) {
-          calls.push(["profile", options]);
-          return { updateGreeting: handlers.updateGreeting };
-        },
-      },
       PropertyDeskReminderWorkflow: {
         create(options) {
           calls.push(["reminders", options]);
@@ -45,6 +39,7 @@ test("app shell workflow owns settings and groups shell event binding", () => {
         create(options) {
           calls.push(["settings", options]);
           return {
+            updateGreeting: handlers.updateGreeting,
             renderWorkspaceSettings: handlers.renderWorkspaceSettings,
             attachEvents: handlers.attachWorkspaceEvents,
           };
@@ -102,37 +97,26 @@ test("app shell workflow owns settings and groups shell event binding", () => {
     "previewReminderEmail",
     "updateGreeting",
   ]);
-  assert.equal(calls[0][0], "profile");
-  assert.equal(calls[0][1].state, options.state);
-  assert.equal(calls[1][0], "reminders");
-  assert.equal(calls[1][1].openModal, options.openModal);
-  assert.equal(calls[2][0], "settings");
-  assert.notEqual(calls[2][1], options);
+  assert.equal(calls[0][0], "reminders");
+  assert.equal(calls[0][1].openModal, options.openModal);
+  assert.equal(calls[1][0], "settings");
+  assert.notEqual(calls[1][1], options);
   assert.deepEqual(
-    Object.keys(calls[2][1]).sort(),
-    [
-      "$",
-      "esc",
-      "fetchAll",
-      "renderReminderActivity",
-      "state",
-      "toast",
-      "updateGreeting",
-    ].sort(),
+    Object.keys(calls[1][1]).sort(),
+    ["$", "esc", "fetchAll", "renderReminderActivity", "state", "toast"].sort(),
   );
-  assert.equal(calls[2][1].state, options.state);
+  assert.equal(calls[1][1].state, options.state);
   assert.equal(
-    calls[2][1].renderReminderActivity,
+    calls[1][1].renderReminderActivity,
     handlers.renderReminderActivity,
   );
-  assert.equal(calls[2][1].updateGreeting, handlers.updateGreeting);
   assert.equal(
-    calls[3][1].renderWorkspaceSettings,
+    calls[2][1].renderWorkspaceSettings,
     handlers.renderWorkspaceSettings,
   );
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["profile", "reminders", "settings", "navigation", "theme"],
+    ["reminders", "settings", "navigation", "theme"],
   );
   assert.equal(shell.updateGreeting, handlers.updateGreeting);
   assert.equal(shell.previewReminderEmail, handlers.previewReminderEmail);

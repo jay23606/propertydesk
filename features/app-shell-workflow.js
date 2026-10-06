@@ -21,10 +21,6 @@
       propertyAddress,
       openModal,
     } = context;
-    const { updateGreeting } = window.PropertyDeskProfileDisplay.create({
-      $,
-      state,
-    });
     const reminders = window.PropertyDeskReminderWorkflow.create({
       $,
       state,
@@ -48,9 +44,9 @@
       esc,
       toast,
       fetchAll,
-      updateGreeting,
       renderReminderActivity: reminders.renderReminderActivity,
     });
+    const { updateGreeting } = settings;
     const navigation = window.PropertyDeskNavigation.create({
       $,
       state,
