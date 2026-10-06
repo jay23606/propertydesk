@@ -2,8 +2,14 @@
 (() => {
   "use strict";
 
-  const { csvMoney, markPossibleDuplicates, validIsoDate, validateImportRows } =
-    globalThis.PropertyDeskImportUtils;
+  const {
+    csvMoney,
+    findImportAccount,
+    findImportProperty,
+    markPossibleDuplicates,
+    validIsoDate,
+    validateImportRows,
+  } = globalThis.PropertyDeskImportUtils;
 
   function validateExpenseRows(rows, properties, accounts, expenses) {
     const expenseKey = (propertyId, accountId, date, amount, payee, memo) =>
@@ -39,21 +45,17 @@
         throw new Error(
           "Each expense row needs property_name, property_address, expense_date, and amount.",
         );
-      const property = properties.find(
-        (x) =>
-          x.name.toLowerCase() === row.property_name.toLowerCase() &&
-          x.address.toLowerCase() === row.property_address.toLowerCase(),
+      const property = findImportProperty(
+        properties,
+        row.property_name,
+        row.property_address,
       );
       if (!property)
         throw new Error(
           `Property not found: ${row.property_name} at ${row.property_address}. Add or import the property first.`,
         );
       const account = row.account_name
-        ? accounts.find(
-            (a) =>
-              a.property_id === property.id &&
-              a.name.toLowerCase() === row.account_name.toLowerCase(),
-          )
+        ? findImportAccount(accounts, property.id, row.account_name)
         : null;
       if (row.account_name && !account)
         throw new Error(

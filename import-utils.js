@@ -50,6 +50,25 @@
     );
   }
 
+  function findImportProperty(properties, name, address) {
+    const normalizedName = String(name || "").toLowerCase();
+    const normalizedAddress = String(address || "").toLowerCase();
+    return properties.find(
+      (property) =>
+        property.name.toLowerCase() === normalizedName &&
+        property.address.toLowerCase() === normalizedAddress,
+    );
+  }
+
+  function findImportAccount(accounts, propertyId, name) {
+    const normalizedName = String(name || "").toLowerCase();
+    return accounts.find(
+      (account) =>
+        account.property_id === propertyId &&
+        account.name.toLowerCase() === normalizedName,
+    );
+  }
+
   function markPossibleDuplicates(rows, existingKeys, keyForRow) {
     const seen = new Set(existingKeys);
     return rows.map((row) => {
@@ -157,6 +176,8 @@
   const helpers = Object.freeze({
     csvMoney,
     csvRate,
+    findImportAccount,
+    findImportProperty,
     markPossibleDuplicates,
     parseCSV,
     selectImportRows,

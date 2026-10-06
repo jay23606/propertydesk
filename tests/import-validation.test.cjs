@@ -129,6 +129,29 @@ test("expense import matches property/account, combines source notes, and skips 
   assert.equal(result.valid[0].memo, "Kitchen faucet repair · Receipt 1024");
 });
 
+test("expense import matches property and account names without case sensitivity", () => {
+  const rows = parseCSV(
+    "property_name,property_address,account_name,expense_date,amount,category\nMAPLE STREET HOME,123 MAPLE STREET,maple street rental,2026-10-03,25,repairs",
+  );
+  const result = validateExpenseRows(
+    rows,
+    [{ id: "p1", name: "Maple Street Home", address: "123 Maple Street" }],
+    [
+      {
+        id: "a1",
+        property_id: "p1",
+        name: "Maple Street Rental",
+        account_type: "rental",
+      },
+    ],
+    [],
+  );
+
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.valid[0].property_name, "Maple Street Home");
+  assert.equal(result.valid[0].account_name, "Maple Street Rental");
+});
+
 test("expense import reports property, date, category, and positive-amount errors", () => {
   const rows = parseCSV(
     "property_name,property_address,expense_date,amount,category\nMissing,1 Unknown,2026-02-28,12,repairs\nOak House,10 Oak St,2026-02-30,0,bogus",
@@ -215,6 +238,29 @@ test("simple loan payment imports do not need principal and interest columns", (
   assert.equal(result.valid[0].principal_amount, 0);
   assert.equal(result.valid[0].interest_amount, 0);
   assert.equal(result.valid[0].unapplied_amount, 750);
+});
+
+test("payment import matches property and account names without case sensitivity", () => {
+  const rows = parseCSV(
+    "property_name,property_address,account_name,received_date,amount\noak house,10 oak st,OAK CONTRACT,2026-10-01,100",
+  );
+  const result = validatePaymentRows(
+    rows,
+    [{ id: "p1", name: "Oak House", address: "10 Oak St" }],
+    [
+      {
+        id: "a1",
+        property_id: "p1",
+        name: "Oak Contract",
+        account_type: "note",
+      },
+    ],
+    [],
+  );
+
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.valid[0].property_name, "Oak House");
+  assert.equal(result.valid[0].account_name, "Oak Contract");
 });
 
 test("payment import counts escrow separately from interest and principal", () => {
