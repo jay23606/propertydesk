@@ -49,6 +49,31 @@
       };
     }
 
+    function propertyIsVisible(property, filters, assignedHolders) {
+      const { holderId, showArchived } = filters;
+      if (property.archived_at && !showArchived) return false;
+      if (
+        holderId !== "all" &&
+        !assignedHolders.get(property.id)?.has(holderId)
+      )
+        return false;
+      return true;
+    }
+
+    function activeAccountsForProperty(accounts, showArchived) {
+      return accounts.filter(
+        (account) => showArchived || (account.status || "active") === "active",
+      );
+    }
+
+    function shouldShowEmptyProperty(property, allRelated, filters) {
+      return (
+        allRelated.length === 0 &&
+        filters.type === "all" &&
+        propertyMatchesQuery(property, filters.query)
+      );
+    }
+
     function compareRows(a, b) {
       const compare = (left, right) =>
         String(left || "").localeCompare(String(right || ""), undefined, {
@@ -66,24 +91,20 @@
 
     function rowsForProperty(
       property,
-      { query, type, holderId, showArchived },
+      filters,
       accountsByProperty,
       assignedHolders,
     ) {
-      if (property.archived_at && !showArchived) return [];
-      if (
-        holderId !== "all" &&
-        !assignedHolders.get(property.id)?.has(holderId)
-      )
-        return [];
+      if (!propertyIsVisible(property, filters, assignedHolders)) return [];
 
       const allRelated = accountsByProperty.get(property.id) || [];
-      const visible = allRelated.filter(
-        (account) => showArchived || (account.status || "active") === "active",
+      const visible = activeAccountsForProperty(
+        allRelated,
+        filters.showArchived,
       );
       const street = streetAddress(property);
       const matches = visible.filter((account) =>
-        accountMatches(property, account, { query, type }),
+        accountMatches(property, account, filters),
       );
 
       if (matches.length) {
@@ -91,11 +112,7 @@
           accountRowModel.buildAccountRow(property, account, street),
         );
       }
-      if (
-        allRelated.length === 0 &&
-        type === "all" &&
-        propertyMatchesQuery(property, query)
-      )
+      if (shouldShowEmptyProperty(property, allRelated, filters))
         return [emptyPropertyRow(property, street)];
       return [];
     }
