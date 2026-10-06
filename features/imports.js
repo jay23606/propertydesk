@@ -46,6 +46,8 @@
       importReview,
       references,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
+      createTransactionImportWorkflow:
+        window.PropertyDeskTransactionImportWorkflow.create,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
       $,
@@ -56,6 +58,8 @@
       importReview,
       references,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
+      createTransactionImportWorkflow:
+        window.PropertyDeskTransactionImportWorkflow.create,
     });
 
     function attachEvents() {

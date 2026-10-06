@@ -172,6 +172,15 @@ test("the browser loads tested import and backup workflows before the app and pr
       `shared import review should load before ${importer}`,
     );
   }
+  assert.ok(
+    html.indexOf("features/import-review.js") <
+      html.indexOf("features/transaction-import-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-import-workflow.js") <
+      html.indexOf("features/payment-import.js"),
+  );
+  assert.match(worker, /'\.\/features\/transaction-import-workflow\.js'/);
   assert.match(worker, /'\.\/features\/import-review\.js'/);
   assert.ok(
     html.indexOf("features/account-import.js") <

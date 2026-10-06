@@ -74,6 +74,7 @@ function loadImportFeatures(context) {
     "csv-import-file.js",
     "import-review.js",
     "import-references.js",
+    "transaction-import-workflow.js",
     "account-import.js",
     "payment-import.js",
     "expense-import.js",

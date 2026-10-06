@@ -12,85 +12,73 @@
       importReview,
       references = window.PropertyDeskImportReferences.create(),
       createFileWorkflow,
+      createTransactionImportWorkflow,
     } = context;
 
-    const fileWorkflow = createFileWorkflow({
-      input: $("payment-import-file"),
-      status: $("import-status"),
+    return createTransactionImportWorkflow({
+      $,
       parseCSV,
+      importReview,
+      createFileWorkflow,
+      inputId: "payment-import-file",
       emptyMessage: "The CSV file has no payment rows.",
       failurePrefix: "Payment import needs review: ",
-      handleRows(file, rows) {
-        const validateRows = (sourceRows) =>
-          validatePaymentRows(
-            sourceRows,
-            state.properties,
+      title: "Review payment import",
+      validateRows: (sourceRows) =>
+        validatePaymentRows(
+          sourceRows,
+          state.properties,
+          state.accounts,
+          state.payments,
+        ),
+      correctionKeys: [
+        "property_name",
+        "property_address",
+        "account_name",
+        "received_date",
+        "amount",
+        "income_category",
+        "payment_method",
+        "principal_amount",
+        "interest_amount",
+        "fee_amount",
+        "escrow_amount",
+        "unapplied_amount",
+        "memo",
+      ],
+      mapRows(rowsToImport) {
+        const rowsToInsert = rowsToImport.map((row) => ({
+          account_id: references.findAccount(
             state.accounts,
-            state.payments,
+            references.findProperty(
+              state.properties,
+              row.property_name,
+              row.property_address,
+            )?.id,
+            row.account_name,
+          )?.id,
+          received_date: row.received_date,
+          amount: row.amount,
+          income_category: row.income_category,
+          payment_method: row.payment_method,
+          principal_amount: row.principal_amount,
+          interest_amount: row.interest_amount,
+          fee_amount: row.fee_amount,
+          escrow_amount: row.escrow_amount,
+          unapplied_amount: row.unapplied_amount,
+          memo: row.memo || null,
+        }));
+        if (rowsToInsert.some((row) => !row.account_id)) {
+          throw new Error(
+            "An account is no longer available for one or more payments. Reload and select the CSV again.",
           );
-        importReview.stage({
-          title: "Review payment import",
-          rows,
-          validateRows,
-          correctionKeys: [
-            "property_name",
-            "property_address",
-            "account_name",
-            "received_date",
-            "amount",
-            "income_category",
-            "payment_method",
-            "principal_amount",
-            "interest_amount",
-            "fee_amount",
-            "escrow_amount",
-            "unapplied_amount",
-            "memo",
-          ],
-          file,
-          mapRows(rowsToImport) {
-            const rowsToInsert = rowsToImport.map((row) => ({
-              account_id: references.findAccount(
-                state.accounts,
-                references.findProperty(
-                  state.properties,
-                  row.property_name,
-                  row.property_address,
-                )?.id,
-                row.account_name,
-              )?.id,
-              received_date: row.received_date,
-              amount: row.amount,
-              income_category: row.income_category,
-              payment_method: row.payment_method,
-              principal_amount: row.principal_amount,
-              interest_amount: row.interest_amount,
-              fee_amount: row.fee_amount,
-              escrow_amount: row.escrow_amount,
-              unapplied_amount: row.unapplied_amount,
-              memo: row.memo || null,
-            }));
-            if (rowsToInsert.some((row) => !row.account_id)) {
-              throw new Error(
-                "An account is no longer available for one or more payments. Reload and select the CSV again.",
-              );
-            }
-            return rowsToInsert;
-          },
-          commit({ rows: payload, file: sourceFile, total }) {
-            return commitTransactions({
-              kind: "payments",
-              rows: payload,
-              sourceName: sourceFile.name,
-              total,
-              label: "payment",
-            });
-          },
-        });
+        }
+        return rowsToInsert;
       },
+      commitTransactions,
+      kind: "payments",
+      label: "payment",
     });
-
-    return fileWorkflow;
   }
 
   window.PropertyDeskPaymentImport = Object.freeze({

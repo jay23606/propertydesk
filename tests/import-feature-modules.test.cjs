@@ -175,6 +175,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
       PropertyDeskImportReferences: { create: () => references },
+      PropertyDeskTransactionImportWorkflow: { create() {} },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskImportReview: {
         create: (options) => {
@@ -245,6 +246,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "$",
       "commitTransactions",
       "createFileWorkflow",
+      "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
       "references",
@@ -258,6 +260,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "$",
       "commitTransactions",
       "createFileWorkflow",
+      "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
       "references",
@@ -332,6 +335,66 @@ test("shared import review stages validation and maps only approved rows before 
   assert.deepEqual(commitCalls[0].rows, [{ account_name: "valid" }]);
   assert.equal(commitCalls[0].file, file);
   assert.equal(commitCalls[0].total, 2);
+});
+
+test("transaction import workflow shares file staging and batch commit wiring", async () => {
+  const context = vm.createContext({ window: {} });
+  loadImportFeatures(context);
+  const staged = [];
+  const commitCalls = [];
+  const fileOptions = [];
+  const validateRows = () => {};
+  const mapRows = () => [];
+  const importReview = {
+    stage: (options) => staged.push(options),
+  };
+  const commitTransactions = (options) => commitCalls.push(options);
+  const workflow = context.window.PropertyDeskTransactionImportWorkflow.create({
+    $: (id) => id,
+    parseCSV: () => [],
+    importReview,
+    createFileWorkflow(options) {
+      fileOptions.push(options);
+      return { attachEvents() {} };
+    },
+    inputId: "payment-import-file",
+    emptyMessage: "No payment rows",
+    failurePrefix: "Review payment import: ",
+    title: "Review payment import",
+    validateRows,
+    correctionKeys: ["amount"],
+    mapRows,
+    commitTransactions,
+    kind: "payments",
+    label: "payment",
+  });
+  const file = { name: "payments.csv" };
+  const rows = [{ amount: 100 }];
+  fileOptions[0].handleRows(file, rows);
+
+  assert.equal(fileOptions[0].input, "payment-import-file");
+  assert.equal(fileOptions[0].status, "import-status");
+  assert.equal(fileOptions[0].parseCSV instanceof Function, true);
+  assert.equal(fileOptions[0].emptyMessage, "No payment rows");
+  assert.equal(fileOptions[0].failurePrefix, "Review payment import: ");
+  assert.equal(staged[0].title, "Review payment import");
+  assert.equal(staged[0].rows, rows);
+  assert.equal(staged[0].validateRows, validateRows);
+  assert.equal(staged[0].correctionKeys[0], "amount");
+  assert.equal(staged[0].file, file);
+  assert.equal(staged[0].mapRows, mapRows);
+
+  const payload = [{ account_id: "account-1", amount: 100 }];
+  await staged[0].commit({ rows: payload, file, total: 1 });
+  assert.deepEqual(JSON.parse(JSON.stringify(commitCalls)), [
+    {
+      kind: "payments",
+      rows: payload,
+      sourceName: "payments.csv",
+      total: 1,
+      label: "payment",
+    },
+  ]);
 });
 
 test("CSV import workflow stages preview before attaching review and file handlers", () => {
