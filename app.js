@@ -289,8 +289,6 @@
     window.PropertyDeskPropertyPortfolioWorkflow.create({
       $,
       state,
-      toast,
-      fetchAll,
       esc,
       money,
       paymentFrequencyLabel,
@@ -301,11 +299,18 @@
       todayIso,
       propertyAddress,
       monthStart,
-      streetAddress,
       dateOnly,
       monthEnd,
       lateReminderMailto,
       paymentStatusInMonth,
+    });
+  const { attachEvents: attachPropertyPortfolioActionEvents } =
+    window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      streetAddress,
       openPayment,
       openPropertyDetails,
       resetAccountForm,
@@ -363,6 +368,7 @@
       attachAppShellEvents,
       attachOverviewEvents,
       attachPropertyPortfolioEvents,
+      attachPropertyPortfolioActionEvents,
       attachTransactionEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,

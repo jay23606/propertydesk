@@ -219,19 +219,13 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.ok(totals.innerHTML.includes("—"));
 });
 
-test("property portfolio workflow connects its model, table, and action routers", () => {
+test("property portfolio workflow connects its filter model and read view", () => {
   const passed = {};
   const action = () => {};
-  const attached = [];
+  let attached = 0;
   const state = {};
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyQuickNote: {
-        create: (options) => {
-          passed.quickNoteOptions = options;
-          return { editPropertyQuickNote: action };
-        },
-      },
       PropertyDeskPropertyPortfolioTable: {
         create: (options) => {
           passed.tableOptions = options;
@@ -255,14 +249,8 @@ test("property portfolio workflow connects its model, table, and action routers"
           passed.viewOptions = options;
           return {
             renderProperties: () => "properties",
-            attachEvents: () => attached.push("filters"),
+            attachEvents: () => attached++,
           };
-        },
-      },
-      PropertyDeskPropertyViewEvents: {
-        create: (options) => {
-          passed.actionOptions = options;
-          return { attachEvents: () => attached.push("actions") };
         },
       },
     },
@@ -276,8 +264,6 @@ test("property portfolio workflow connects its model, table, and action routers"
   );
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
     state,
-    toast: action,
-    fetchAll: action,
     esc: action,
     money: action,
     paymentFrequencyLabel: action,
@@ -288,16 +274,10 @@ test("property portfolio workflow connects its model, table, and action routers"
     todayIso: action,
     propertyAddress: action,
     monthStart: action,
-    streetAddress: action,
     dateOnly: action,
     monthEnd: action,
     lateReminderMailto: action,
     paymentStatusInMonth: action,
-    openPayment: action,
-    openPropertyDetails: action,
-    resetAccountForm: action,
-    populateFormOptions: action,
-    openModal: action,
   });
 
   assert.equal(passed.viewOptions.portfolioTable, "table");
@@ -305,17 +285,69 @@ test("property portfolio workflow connects its model, table, and action routers"
   assert.equal(passed.accountRowOptions.state, state);
   assert.equal(passed.accountRowOptions.amountDueSince, action);
   assert.equal(passed.viewOptions.portfolioModel, "model");
-  assert.equal(passed.quickNoteOptions.state, state);
-  assert.equal(passed.quickNoteOptions.toast, action);
-  assert.equal(passed.quickNoteOptions.fetchAll, action);
-  assert.equal(passed.quickNoteOptions.streetAddress, action);
-  assert.equal(passed.actionOptions.openPayment, action);
-  assert.equal(passed.actionOptions.editPropertyQuickNote, action);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "renderProperties",
   ]);
   assert.equal(workflow.renderProperties(), "properties");
   workflow.attachEvents();
-  assert.deepEqual(attached, ["filters", "actions"]);
+  assert.equal(attached, 1);
+});
+
+test("property portfolio actions workflow owns quick-note and grid action routing", () => {
+  const passed = {};
+  const action = () => {};
+  let attached = 0;
+  const state = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyQuickNote: {
+        create: (options) => {
+          passed.quickNoteOptions = options;
+          return { editPropertyQuickNote: action };
+        },
+      },
+      PropertyDeskPropertyViewEvents: {
+        create: (options) => {
+          passed.actionOptions = options;
+          return { attachEvents: () => attached++ };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-actions-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const workflow =
+    context.window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
+      $: action,
+      state,
+      toast: action,
+      fetchAll: action,
+      streetAddress: action,
+      openPayment: action,
+      openPropertyDetails: action,
+      resetAccountForm: action,
+      populateFormOptions: action,
+      openModal: action,
+    });
+
+  assert.equal(passed.quickNoteOptions.state, state);
+  assert.equal(passed.quickNoteOptions.toast, action);
+  assert.equal(passed.quickNoteOptions.fetchAll, action);
+  assert.equal(passed.quickNoteOptions.streetAddress, action);
+  assert.equal(passed.actionOptions.openPayment, action);
+  assert.equal(passed.actionOptions.editPropertyQuickNote, action);
+  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
 });
