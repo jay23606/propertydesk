@@ -406,6 +406,13 @@ test("backup and report exports own separate button bindings", () => {
     ["report-export.js", "PropertyDeskReportExport", ["export-report:click"]],
   ]) {
     const context = vm.createContext({ window: {} });
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", "download-utils.js"),
+        "utf8",
+      ),
+      context,
+    );
     if (file === "backup-export.js") {
       for (const dependency of [
         "backup-records.js",
@@ -495,6 +502,13 @@ test("report workflow composes portfolio rendering and account export actions", 
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "download-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "report-export.js"),

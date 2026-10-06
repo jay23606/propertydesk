@@ -306,6 +306,7 @@ test("backup export aborts before download when a private document path escapes 
   for (const moduleName of [
     "backup-agreement-files.js",
     "backup-records.js",
+    "download-utils.js",
     "backup-export.js",
   ]) {
     vm.runInContext(
@@ -404,6 +405,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   for (const moduleName of [
     "backup-agreement-files.js",
     "backup-records.js",
+    "download-utils.js",
     "backup-export.js",
   ]) {
     vm.runInContext(
