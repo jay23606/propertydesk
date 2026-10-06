@@ -13,7 +13,7 @@ test("app composes account detail and deposit features without a broad wrapper",
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(
     app,
-    /attachAccountDetailActionEvents\(\);[\s\S]*?attachDepositEvents\(\);/,
+    /eventBinders:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });

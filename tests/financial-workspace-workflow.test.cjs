@@ -43,19 +43,15 @@ test("app root composes financial screens and maintenance boundaries directly", 
   );
   assert.match(
     app,
-    /attachTransactionViewEvents\(\);[\s\S]*?attachTransactionActionEvents\(\);/,
-  );
-  assert.match(
-    app,
-    /attachAccountDetailActionEvents\(\);[\s\S]*?attachDepositEvents\(\);/,
+    /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
   assert.match(
     app,
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule,[\s\S]*?depositSectionHTML,[\s\S]*?renderAccountHistory,/,
   );
   assert.match(app, /function attachEntryEvents\(\)/);
-  assert.match(app, /function attachTransactionEvents\(\)/);
-  assert.match(app, /function attachAccountDetailsEvents\(\)/);
+  assert.doesNotMatch(app, /function attachTransactionEvents\(/);
+  assert.doesNotMatch(app, /function attachAccountDetailsEvents\(/);
 
   for (const script of workflows) {
     assert.ok(

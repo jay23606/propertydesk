@@ -37,7 +37,7 @@ test("app root wires record entry forms and create actions directly", () => {
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{[\s\S]*?updatePaymentGuidance,/,
   );
   assert.doesNotMatch(app, /entryWorkflow\./);
-  assert.match(app, /function attachAccountDetailsEvents\(\)/);
+  assert.match(app, /attachAccountDetailActionEvents,\s*attachDepositEvents,/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),

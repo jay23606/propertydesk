@@ -132,10 +132,6 @@
   }
   const { navigate, attachEvents: attachNavigationEvents } =
     window.PropertyDeskNavigation.create({ $, state, renderWorkspaceSettings });
-  function attachAppShellEvents() {
-    attachNavigationEvents();
-    workspace.attachEvents();
-  }
   const recordEntry = window.PropertyDeskLedgerWorkflow.create({
     $,
     state,
@@ -210,10 +206,6 @@
       OptionClass: Option,
       documentRef: document,
     });
-  function attachTransactionEvents() {
-    attachTransactionViewEvents();
-    attachTransactionActionEvents();
-  }
   const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
     state,
     depositLedger,
@@ -268,10 +260,6 @@
       depositSectionHTML,
       renderAccountHistory,
     });
-  function attachAccountDetailsEvents() {
-    attachAccountDetailActionEvents();
-    attachDepositEvents();
-  }
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailContentWorkflow.create({
       $,
@@ -477,11 +465,14 @@
     eventBinders: [
       attachModalEvents,
       attachThemeEvents,
-      attachAppShellEvents,
+      attachNavigationEvents,
+      workspace.attachEvents,
       attachOverviewEvents,
       attachPropertyPortfolioEvents,
-      attachTransactionEvents,
-      attachAccountDetailsEvents,
+      attachTransactionViewEvents,
+      attachTransactionActionEvents,
+      attachAccountDetailActionEvents,
+      attachDepositEvents,
       attachEntryEvents,
       attachPropertyDetailsEvents,
       attachAuthEvents,

@@ -123,8 +123,9 @@ test("app composes transaction history and maintenance without a broad wrapper",
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(
     app,
-    /attachTransactionViewEvents\(\);[\s\S]*?attachTransactionActionEvents\(\);/,
+    /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,
   );
+  assert.doesNotMatch(app, /function attachTransactionEvents\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);
 });
 

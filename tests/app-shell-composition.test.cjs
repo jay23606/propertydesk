@@ -18,9 +18,9 @@ test("app composes workspace settings, navigation, and reminder history", () => 
   );
   assert.match(
     app,
-    /function attachAppShellEvents\(\) \{\s*attachNavigationEvents\(\);\s*workspace\.attachEvents\(\);/,
+    /eventBinders:[\s\S]*?attachNavigationEvents,\s*workspace\.attachEvents,/,
   );
-  assert.match(app, /eventBinders:[\s\S]*?attachAppShellEvents/);
+  assert.doesNotMatch(app, /attachAppShellEvents/);
   for (const script of ["features/workspace.js", "features/navigation.js"]) {
     assert.ok(
       html.indexOf(script) >= 0 &&
