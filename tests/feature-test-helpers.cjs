@@ -63,6 +63,7 @@ function loadPropertyAndAccountForms(context) {
 
 function loadImportFeatures(context) {
   for (const filename of [
+    "account-import-payload.js",
     "account-import.js",
     "payment-import.js",
     "expense-import.js",

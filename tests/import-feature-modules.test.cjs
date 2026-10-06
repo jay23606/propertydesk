@@ -96,6 +96,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountImportPayload: { build() {} },
       PropertyDeskTransactionImportCommit: {
         create: () => ({ commit() {} }),
       },
@@ -146,6 +147,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.account).sort(),
     [
       "$",
+      "buildPayloads",
       "fetchAll",
       "parseCSV",
       "stageImport",
