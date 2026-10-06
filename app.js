@@ -249,7 +249,7 @@
     state,
     backend,
     todayIso,
-    registerShell: () => window.PropertyDeskPwa.registerShell(),
+    registerShell: window.PropertyDeskPwa.registerShell,
     auth: {
       setAuthMode,
       showConfigError,
