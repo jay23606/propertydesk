@@ -4,6 +4,90 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("transaction workflow connects history and maintenance interfaces", () => {
+  const created = [];
+  const passed = {};
+  const methods = {
+    attachEvents() {},
+    attachTransactionActionEvents() {},
+    renderPayments() {},
+  };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionViews: {
+        create: (options) => {
+          created.push("views");
+          passed.views = options;
+          return {
+            attachEvents: methods.attachEvents,
+            renderPayments: methods.renderPayments,
+          };
+        },
+      },
+      PropertyDeskTransactionMaintenanceWorkflow: {
+        create: (options) => {
+          created.push("maintenance");
+          passed.maintenance = options;
+          return {
+            attachTransactionActionEvents:
+              methods.attachTransactionActionEvents,
+          };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    dateOnly() {},
+    fmtDate() {},
+    esc() {},
+    expenseCategoryLabel() {},
+    money() {},
+    isPosted() {},
+    monthStart() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    toast() {},
+    fetchAll() {},
+    prettyType() {},
+    openPayment() {},
+    openExpense() {},
+    updateAllocationPreview() {},
+    EventClass: class {},
+    OptionClass: class {},
+    documentRef: {},
+  };
+  const workflow =
+    context.window.PropertyDeskTransactionWorkflow.create(dependencies);
+
+  assert.deepEqual(created, ["views", "maintenance"]);
+  assert.equal(passed.views, dependencies);
+  assert.equal(passed.maintenance.state, dependencies.state);
+  assert.equal(
+    passed.maintenance.updateAllocationPreview,
+    dependencies.updateAllocationPreview,
+  );
+  assert.deepEqual(Object.keys(workflow), [
+    "renderPayments",
+    "attachTransactionEvents",
+    "attachTransactionActionEvents",
+  ]);
+  assert.equal(workflow.renderPayments, methods.renderPayments);
+  assert.equal(workflow.attachTransactionEvents, methods.attachEvents);
+  assert.equal(
+    workflow.attachTransactionActionEvents,
+    methods.attachTransactionActionEvents,
+  );
+});
+
 test("transaction maintenance workflow composes correction and void actions", () => {
   const passed = {};
   const correctTransaction = () => "corrected";

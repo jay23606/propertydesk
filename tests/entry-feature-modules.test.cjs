@@ -13,7 +13,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   );
   assert.match(app, /PropertyDeskAppServices\.create\(\{[\s\S]*?toast,/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportExport\.create\(/);
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
@@ -95,9 +95,10 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /window\.PropertyDeskLedgerWorkflow\.create\(/);
-  assert.match(
+  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(/);
+  assert.doesNotMatch(
     app,
-    /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+    /PropertyDesk(?:TransactionViews|TransactionMaintenanceWorkflow)\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
   assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);

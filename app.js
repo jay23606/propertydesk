@@ -159,34 +159,32 @@
       openExpense,
       documentRef: document,
     });
-  const { renderPayments, attachEvents: attachTransactionEvents } =
-    window.PropertyDeskTransactionViews.create({
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    });
-  const { attachTransactionActionEvents } =
-    window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      prettyType,
-      openPayment,
-      openExpense,
-      updateAllocationPreview: recordEntryWorkflow.updateAllocationPreview,
-      EventClass: Event,
-      OptionClass: Option,
-      documentRef: document,
-    });
+  const {
+    renderPayments,
+    attachTransactionEvents,
+    attachTransactionActionEvents,
+  } = window.PropertyDeskTransactionWorkflow.create({
+    $,
+    state,
+    dateOnly,
+    fmtDate,
+    esc,
+    expenseCategoryLabel,
+    money,
+    isPosted,
+    monthStart,
+    sumIncome,
+    sumOperatingExpenses,
+    toast,
+    fetchAll,
+    prettyType,
+    openPayment,
+    openExpense,
+    updateAllocationPreview: recordEntryWorkflow.updateAllocationPreview,
+    EventClass: Event,
+    OptionClass: Option,
+    documentRef: document,
+  });
   const {
     attachAccountDetailActionEvents,
     attachDepositEvents,
