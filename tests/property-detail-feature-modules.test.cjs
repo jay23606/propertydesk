@@ -21,7 +21,11 @@ test("property and account detail modules expose separate workflows", () => {
 
 test("opening a property delegates modal markup and preserves scoped details", () => {
   const context = vm.createContext({ window: {} });
-  for (const filename of ["property-details-view.js", "property-details.js"]) {
+  for (const filename of [
+    "property-documents-view.js",
+    "property-details-view.js",
+    "property-details.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -47,6 +51,15 @@ test("opening a property delegates modal markup and preserves scoped details", (
   };
   const opened = [];
   const activityCalls = [];
+  const documentsView = context.window.PropertyDeskPropertyDocumentsView.create(
+    {
+      fmtDate: (value) => value,
+      esc: (value) =>
+        String(value ?? "")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;"),
+    },
+  );
   const detailsView = context.window.PropertyDeskPropertyDetailsView.create({
     money: (value) => `$${Number(value).toFixed(2)}`,
     fmtDate: (value) => value,
@@ -65,6 +78,7 @@ test("opening a property delegates modal markup and preserves scoped details", (
     prettyType: (value) => value,
     paymentFrequencyLabel: () => "Monthly",
     accountBalance: () => 9000,
+    propertyDocumentsHTML: documentsView.propertyDocumentsHTML,
   });
   const feature = context.window.PropertyDeskPropertyDetails.create({
     $,
@@ -573,6 +587,7 @@ test("property details workflow connects activity summaries to the property view
   let viewContext;
   const renderPropertyActivity = () => "activity";
   const propertyDetailsHTML = () => "property details html";
+  const propertyDocumentsHTML = () => "documents html";
   const attachPropertyDetailEvents = () => "detail events";
   const attachPropertyDocumentEvents = () => "document events";
   const attached = [];
@@ -580,9 +595,15 @@ test("property details workflow connects activity summaries to the property view
   let documentContext;
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyDetailsView: {
+      PropertyDeskPropertyDocumentsView: {
         create: (options) => {
           viewContext = options;
+          return { propertyDocumentsHTML };
+        },
+      },
+      PropertyDeskPropertyDetailsView: {
+        create: (options) => {
+          viewContext.details = options;
           return { propertyDetailsHTML };
         },
       },
@@ -635,9 +656,17 @@ test("property details workflow connects activity summaries to the property view
     documentRef: {},
   });
 
+  assert.equal(viewContext.fmtDate, detailsDependencies.fmtDate);
+  assert.equal(viewContext.esc, detailsDependencies.esc);
+  const detailsViewDependencies = { ...detailsDependencies };
+  delete detailsViewDependencies.fmtDate;
   assert.deepEqual(
-    Object.keys(viewContext).sort(),
-    Object.keys(detailsDependencies).sort(),
+    Object.keys(viewContext.details).sort(),
+    [...Object.keys(detailsViewDependencies), "propertyDocumentsHTML"].sort(),
+  );
+  assert.equal(
+    viewContext.details.propertyDocumentsHTML,
+    propertyDocumentsHTML,
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);

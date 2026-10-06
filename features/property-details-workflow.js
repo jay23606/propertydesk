@@ -29,14 +29,16 @@
       openAccountDetails,
       documentRef = document,
     } = context;
+    const { propertyDocumentsHTML } =
+      window.PropertyDeskPropertyDocumentsView.create({ fmtDate, esc });
     const { propertyDetailsHTML } =
       window.PropertyDeskPropertyDetailsView.create({
         money,
-        fmtDate,
         esc,
         prettyType,
         paymentFrequencyLabel,
         accountBalance,
+        propertyDocumentsHTML,
       });
     const { renderPropertyActivity } =
       window.PropertyDeskPropertyActivityDetails.create({

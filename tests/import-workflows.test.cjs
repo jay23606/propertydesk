@@ -274,6 +274,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/property-details.js"),
   );
   assert.ok(
+    html.indexOf("features/property-documents-view.js") <
+      html.indexOf("features/property-details-view.js"),
+  );
+  assert.match(worker, /'\.\/features\/property-documents-view\.js'/);
+  assert.ok(
     html.indexOf("features/transaction-list-model.js") <
       html.indexOf("features/transaction-views.js"),
   );
