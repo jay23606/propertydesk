@@ -89,7 +89,6 @@
     }
 
     return {
-      savePayment,
       ...paymentView,
       attachEvents,
     };

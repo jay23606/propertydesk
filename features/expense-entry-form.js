@@ -132,7 +132,7 @@
       });
     }
 
-    return { saveExpense, openExpense, attachEvents };
+    return { openExpense, attachEvents };
   }
 
   window.PropertyDeskExpenseEntryForm = Object.freeze({
