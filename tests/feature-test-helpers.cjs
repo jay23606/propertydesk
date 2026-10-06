@@ -60,6 +60,7 @@ function loadPropertyAndAccountForms(context) {
     "property-form-view.js",
     "property-maintenance.js",
     "property-form.js",
+    "account-repository.js",
     "account-maintenance.js",
     "account-form-model.js",
     "account-payload.js",

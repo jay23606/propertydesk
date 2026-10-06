@@ -8,6 +8,7 @@
     toast,
     fetchAll,
     prepareAdjustment = window.PropertyDeskDepositAdjustmentModel.prepare,
+    repository = window.PropertyDeskDepositRepository,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {
       const account = state.accounts.find((row) => row.id === accountId);
@@ -29,9 +30,7 @@
       if (prepared.status !== "ready") return false;
       let error;
       try {
-        ({ error } = await state.client
-          .from("pd_deposit_entries")
-          .insert(prepared.payload));
+        ({ error } = await repository.insert(state.client, prepared.payload));
       } catch {
         toast(
           "Deposit adjustment failed. Check your connection and try again.",

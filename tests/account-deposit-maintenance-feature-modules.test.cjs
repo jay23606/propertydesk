@@ -478,6 +478,13 @@ test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
       "utf8",
     ),
@@ -549,6 +556,13 @@ test("deposit maintenance retains adjustment audit details", async () => {
 
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
@@ -653,6 +667,13 @@ test("account maintenance closes an account while preserving its history", async
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "account-maintenance.js"),
       "utf8",
     ),
@@ -696,6 +717,13 @@ test("account maintenance closes an account while preserving its history", async
 
 test("account maintenance reports rejected requests and skips success actions", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "account-maintenance.js"),
