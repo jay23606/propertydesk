@@ -2,15 +2,20 @@
 (() => {
   "use strict";
 
-  function create({ state, toast }) {
+  function create({
+    state,
+    toast,
+    repository = window.PropertyDeskPropertyRepository,
+  }) {
     async function updateProperty(propertyId, ownerId, values, failureMessage) {
       let error;
       try {
-        ({ error } = await state.client
-          .from("pd_properties")
-          .update(values)
-          .eq("id", propertyId)
-          .eq("user_id", ownerId));
+        ({ error } = await repository.updateOwned(
+          state.client,
+          propertyId,
+          ownerId,
+          values,
+        ));
       } catch {
         toast(failureMessage);
         return false;
@@ -25,13 +30,7 @@
     async function saveProperty(payload, propertyId) {
       let error;
       try {
-        const query = propertyId
-          ? state.client
-              .from("pd_properties")
-              .update(payload)
-              .eq("id", propertyId)
-          : state.client.from("pd_properties").insert(payload);
-        ({ error } = await query);
+        ({ error } = await repository.save(state.client, payload, propertyId));
       } catch {
         toast(
           "Property couldn't be saved right now. Check your connection and try again.",
