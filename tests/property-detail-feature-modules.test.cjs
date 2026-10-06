@@ -4,6 +4,47 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("property detail model selects only records linked to the requested property", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-details-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const property = { id: "property-1", address: "1 Oak St" };
+  const account = {
+    id: "account-1",
+    property_id: property.id,
+    status: "closed",
+  };
+  const document = { id: "doc-1", property_id: property.id };
+  const state = {
+    properties: [property],
+    accounts: [account, { id: "elsewhere", property_id: "property-2" }],
+    documents: [document, { id: "other-doc", property_id: "property-2" }],
+    workspaceMembers: [{ member_user_id: "member-1" }],
+    propertyHolders: [{ property_id: property.id, member_user_id: "member-1" }],
+  };
+  const model = context.window.PropertyDeskPropertyDetailsModel.create({
+    state,
+    propertyAddress: (value) => value.address,
+  });
+
+  const detailData = model.buildPropertyDetailData(property.id);
+  assert.equal(detailData.property, property);
+  assert.equal(detailData.propertyAddressText, property.address);
+  assert.equal(detailData.hasActiveAccount, false);
+  assert.equal(detailData.accounts.length, 1);
+  assert.equal(detailData.accounts[0], account);
+  assert.equal(detailData.propertyDocs.length, 1);
+  assert.equal(detailData.propertyDocs[0], document);
+  assert.equal(detailData.workspaceMembers, state.workspaceMembers);
+  assert.equal(detailData.propertyHolders, state.propertyHolders);
+  assert.equal(model.buildPropertyDetailData("missing"), null);
+});
+
 test("property and account detail modules expose separate workflows", () => {
   const context = vm.createContext({ window: {} });
   for (const filename of ["property-details.js", "account-details.js"]) {
@@ -24,6 +65,7 @@ test("opening a property delegates modal markup and preserves scoped details", (
   for (const filename of [
     "property-documents-view.js",
     "property-details-view.js",
+    "property-details-model.js",
     "property-details.js",
   ]) {
     vm.runInContext(
@@ -80,32 +122,37 @@ test("opening a property delegates modal markup and preserves scoped details", (
     accountBalance: () => 9000,
     propertyDocumentsHTML: documentsView.propertyDocumentsHTML,
   });
+  const state = {
+    auditRequestId: 0,
+    selectedPropertyId: null,
+    properties: [property],
+    accounts: [account, { id: "elsewhere", property_id: "property-2" }],
+    documents: [
+      {
+        id: "doc-1",
+        property_id: property.id,
+        file_name: "<agreement>.pdf",
+        created_at: "2026-10-01",
+        content_type: "application/pdf",
+      },
+      { id: "other-doc", property_id: "property-2", file_name: "other.pdf" },
+    ],
+    workspaceMembers: [
+      { member_user_id: "member-1", display_name: "<Manager>" },
+    ],
+    propertyHolders: [{ property_id: property.id, member_user_id: "member-1" }],
+  };
+  const propertyAddress = () => "Oak House address";
+  const { buildPropertyDetailData } =
+    context.window.PropertyDeskPropertyDetailsModel.create({
+      state,
+      propertyAddress,
+    });
   const feature = context.window.PropertyDeskPropertyDetails.create({
     $,
-    state: {
-      auditRequestId: 0,
-      selectedPropertyId: null,
-      properties: [property],
-      accounts: [account, { id: "elsewhere", property_id: "property-2" }],
-      documents: [
-        {
-          id: "doc-1",
-          property_id: property.id,
-          file_name: "<agreement>.pdf",
-          created_at: "2026-10-01",
-          content_type: "application/pdf",
-        },
-        { id: "other-doc", property_id: "property-2", file_name: "other.pdf" },
-      ],
-      workspaceMembers: [
-        { member_user_id: "member-1", display_name: "<Manager>" },
-      ],
-      propertyHolders: [
-        { property_id: property.id, member_user_id: "member-1" },
-      ],
-    },
+    state,
+    buildPropertyDetailData,
     openModal: (id) => opened.push(id),
-    propertyAddress: () => "Oak House address",
     renderPropertyActivity: (...args) => {
       activityCalls.push(args);
       return {
@@ -340,6 +387,19 @@ test("property action router loads after its view and is precached", () => {
     "property view should load before its action router and the app",
   );
   assert.match(worker, /'\.\/features\/property-view-events\.js'/);
+});
+
+test("property detail model loads before its coordinator and is precached", () => {
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/property-details-model.js") <
+      html.indexOf("features/property-details.js"),
+  );
+  assert.match(worker, /'\.\/features\/property-details-model\.js'/);
 });
 
 test("Properties table templates escape untrusted labels and render visible totals", () => {
@@ -582,6 +642,7 @@ test("property detail content workflow connects activity summaries to property r
   let detailContext;
   let viewContext;
   let activityContext;
+  let modelContext;
   const renderPropertyActivity = () => "activity";
   const propertyDetailsHTML = () => "property details html";
   const propertyDocumentsHTML = () => "documents html";
@@ -603,6 +664,12 @@ test("property detail content workflow connects activity summaries to property r
         create: (options) => {
           activityContext = options;
           return { renderPropertyActivity };
+        },
+      },
+      PropertyDeskPropertyDetailsModel: {
+        create: (options) => {
+          modelContext = options;
+          return { buildPropertyDetailData: () => ({}) };
         },
       },
       PropertyDeskPropertyDetails: {
@@ -664,6 +731,12 @@ test("property detail content workflow connects activity summaries to property r
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
+  assert.equal(modelContext.state, detailsDependencies.state);
+  assert.equal(
+    modelContext.propertyAddress,
+    detailsDependencies.propertyAddress,
+  );
+  assert.equal(typeof detailContext.buildPropertyDetailData, "function");
   assert.equal(activityContext.state, detailsDependencies.state);
   assert.equal(activityContext.isPosted, detailsDependencies.isPosted);
   assert.equal(activityContext.sumIncome, detailsDependencies.sumIncome);

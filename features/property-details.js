@@ -7,34 +7,33 @@
       $,
       state,
       openModal,
-      propertyAddress,
+      buildPropertyDetailData,
       renderPropertyActivity,
       propertyDetailsHTML,
     } = context;
 
     function openPropertyDetails(id) {
       state.auditRequestId++;
-      const property = state.properties.find((x) => x.id === id);
-      if (!property) return;
+      const detailData = buildPropertyDetailData(id);
+      if (!detailData) return;
+      const {
+        property,
+        accounts,
+        propertyDocs,
+        workspaceMembers,
+        propertyHolders,
+      } = detailData;
       state.selectedPropertyId = id;
-      const accounts = state.accounts.filter(
-        (account) => account.property_id === id,
-      );
       const activity = renderPropertyActivity(id, accounts);
       $("property-detail-title").textContent = property.name;
-      $("property-detail-address").textContent = propertyAddress(property);
-      $("property-detail-add-income").disabled = !accounts.some(
-        (a) => a.status === "active",
-      );
-      const propertyDocs = state.documents.filter(
-        (doc) => doc.property_id === id,
-      );
+      $("property-detail-address").textContent = detailData.propertyAddressText;
+      $("property-detail-add-income").disabled = !detailData.hasActiveAccount;
       $("property-detail-content").innerHTML = propertyDetailsHTML({
         property,
         accounts,
         propertyDocs,
-        workspaceMembers: state.workspaceMembers,
-        propertyHolders: state.propertyHolders,
+        workspaceMembers,
+        propertyHolders,
         incomeTotal: activity.incomeTotal,
         expenseTotal: activity.expenseTotal,
         activityHTML: activity.html,

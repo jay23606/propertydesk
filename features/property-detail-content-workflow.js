@@ -39,6 +39,11 @@
         fmtDate,
         esc,
       });
+    const { buildPropertyDetailData } =
+      window.PropertyDeskPropertyDetailsModel.create({
+        state,
+        propertyAddress,
+      });
     const { openPropertyDetails } = window.PropertyDeskPropertyDetails.create({
       $,
       state,
@@ -49,7 +54,7 @@
       paymentFrequencyLabel,
       accountBalance,
       openModal,
-      propertyAddress,
+      buildPropertyDetailData,
       renderPropertyActivity,
       propertyDetailsHTML,
     });
