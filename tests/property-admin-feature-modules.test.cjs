@@ -97,6 +97,7 @@ test("property holder and archive workflows report rejected writes without runni
     document: { querySelectorAll: () => [] },
   });
   for (const source of [
+    "property-holder-repository.js",
     "property-holder-management.js",
     "property-archive.js",
   ]) {
@@ -162,13 +163,15 @@ test("property holder and archive workflows report rejected writes without runni
 
 test("property holder save persists the member IDs supplied by the event layer", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-holder-management.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const source of [
+    "property-holder-repository.js",
+    "property-holder-management.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
   const calls = [];
   const messages = [];
   const state = {

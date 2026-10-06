@@ -2,18 +2,25 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, openPropertyDetails }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    repository = window.PropertyDeskPropertyHolderRepository.create({
+      getClient: () => state.client,
+    }),
+  }) {
     async function savePropertyHolders(selectedMemberIds = []) {
       const id = state.selectedPropertyId;
       if (!id) return;
 
       let deleteError;
       try {
-        ({ error: deleteError } = await state.client
-          .from("pd_property_holders")
-          .delete()
-          .eq("user_id", state.workspaceOwnerId)
-          .eq("property_id", id));
+        ({ error: deleteError } = await repository.clearPropertyHolders(
+          state.workspaceOwnerId,
+          id,
+        ));
       } catch {
         toast(
           "Account-holder labels couldn't be saved right now. Check your connection and try again.",
@@ -27,12 +34,10 @@
       if (selectedMemberIds.length) {
         let error;
         try {
-          ({ error } = await state.client.from("pd_property_holders").insert(
-            selectedMemberIds.map((member_user_id) => ({
-              user_id: state.workspaceOwnerId,
-              property_id: id,
-              member_user_id,
-            })),
+          ({ error } = await repository.addPropertyHolders(
+            state.workspaceOwnerId,
+            id,
+            selectedMemberIds,
           ));
         } catch {
           toast(

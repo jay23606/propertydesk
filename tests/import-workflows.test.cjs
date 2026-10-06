@@ -535,6 +535,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/property-document-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/property-holder-repository.js") <
+      html.indexOf("features/property-holder-management.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-holder-management.js") <
       html.indexOf("features/property-detail-actions-workflow.js"),
   );
@@ -744,6 +748,7 @@ test("the browser loads tested import and backup workflows before the app and pr
     /'\.\/features\/property-portfolio-account-row-model\.js'/,
   );
   assert.match(worker, /'\.\/features\/property-holder-management\.js'/);
+  assert.match(worker, /'\.\/features\/property-holder-repository\.js'/);
   assert.match(worker, /'\.\/features\/property-archive\.js'/);
   assert.match(worker, /'\.\/features\/overview\.js'/);
   assert.match(worker, /'\.\/features\/account-financial-summary\.js'/);
@@ -817,6 +822,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/auth\.js'/);
   assert.match(worker, /'\.\/features\/workspace\.js'/);
   assert.match(worker, /'\.\/features\/property-holder-management\.js'/);
+  assert.match(worker, /'\.\/features\/property-holder-repository\.js'/);
   assert.match(worker, /'\.\/features\/property-archive\.js'/);
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/deposit-maintenance\.js'/);
