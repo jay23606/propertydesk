@@ -481,8 +481,17 @@ test("account CSV export keeps rental balances blank and escapes spreadsheet fie
     context,
   );
   const downloads = [];
+  let exportClick;
   const feature = context.window.PropertyDeskReportExport.create({
-    $: () => ({ addEventListener() {} }),
+    $: (id) => {
+      assert.equal(id, "export-report");
+      return {
+        addEventListener(eventName, handler) {
+          assert.equal(eventName, "click");
+          exportClick = handler;
+        },
+      };
+    },
     state: {
       properties: [{ id: "property-1", name: "Main House, East" }],
       accounts: [
@@ -514,7 +523,9 @@ test("account CSV export keeps rental balances blank and escapes spreadsheet fie
     downloadBlob: (blob, filename) => downloads.push({ blob, filename }),
   });
 
-  feature.exportReport();
+  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
+  feature.attachEvents();
+  exportClick();
 
   assert.equal(downloads[0].filename, "propertydesk-accounts-2026-10-05.csv");
   assert.equal(
