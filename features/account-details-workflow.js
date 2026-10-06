@@ -27,7 +27,7 @@
       editAccount,
       openPayment,
     } = context;
-    const maintenance = window.PropertyDeskAccountMaintenanceWorkflow.create({
+    const depositWorkflow = window.PropertyDeskDepositWorkflow.create({
       $,
       state,
       depositLedger,
@@ -36,6 +36,12 @@
       esc,
       moneyInput,
       todayIso,
+      toast,
+      fetchAll,
+    });
+    const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
+      $,
+      state,
       toast,
       fetchAll,
       closeModal,
@@ -72,7 +78,7 @@
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-      depositSectionHTML: maintenance.depositSectionHTML,
+      depositSectionHTML: depositWorkflow.depositSectionHTML,
       renderAccountHistory,
       renderAccountDetails,
       openModal,
@@ -85,11 +91,11 @@
         closeModal,
         editAccount,
         openPayment,
-        closeAccount: maintenance.closeAccount,
+        closeAccount,
       });
 
     function attachEvents() {
-      maintenance.attachEvents();
+      depositWorkflow.attachEvents();
       attachAccountDetailEvents();
     }
 
