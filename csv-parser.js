@@ -2,47 +2,46 @@
 (() => {
   "use strict";
 
-  function parseCSV(text) {
-    const rows = [];
-    let row = [],
-      field = "",
-      quoted = false,
-      afterQuote = false;
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i],
-        next = text[i + 1];
-      if (quoted) {
-        if (char === '"' && next === '"') {
-          field += '"';
-          i++;
-        } else if (char === '"') {
-          quoted = false;
-          afterQuote = true;
-        } else field += char;
-      } else if (afterQuote && char !== "," && char !== "\n" && char !== "\r") {
-        throw new Error("CSV has unexpected characters after a quoted field.");
-      } else if (char === '"') {
-        if (field.length)
-          throw new Error("CSV has a quote inside an unquoted field.");
-        quoted = true;
-      } else if (char === ",") {
-        row.push(field);
-        field = "";
-        afterQuote = false;
-      } else if (char === "\n") {
-        row.push(field);
-        rows.push(row);
-        row = [];
-        field = "";
-        afterQuote = false;
-      } else if (char !== "\r") field += char;
-    }
-    if (quoted) throw new Error("CSV has an unclosed quoted field.");
-    if (field || row.length) {
-      row.push(field);
-      rows.push(row);
-    }
+  function appendField(context) {
+    context.row.push(context.field);
+    context.field = "";
+    context.afterQuote = false;
+  }
 
+  function appendRow(context) {
+    appendField(context);
+    context.rows.push(context.row);
+    context.row = [];
+  }
+
+  function consumeQuotedCharacter(context, char, next, index) {
+    if (char === '"' && next === '"') {
+      context.field += '"';
+      return index + 1;
+    }
+    if (char === '"') {
+      context.quoted = false;
+      context.afterQuote = true;
+      return index;
+    }
+    context.field += char;
+    return index;
+  }
+
+  function consumeUnquotedCharacter(context, char, next, index) {
+    if (context.afterQuote && char !== "," && char !== "\n" && char !== "\r")
+      throw new Error("CSV has unexpected characters after a quoted field.");
+    if (char === '"') {
+      if (context.field.length)
+        throw new Error("CSV has a quote inside an unquoted field.");
+      context.quoted = true;
+    } else if (char === ",") appendField(context);
+    else if (char === "\n") appendRow(context);
+    else if (char !== "\r") context.field += char;
+    return index;
+  }
+
+  function recordsFromRows(rows) {
     const headers = (rows.shift() || []).map((value) => value.trim());
     if (headers.length) headers[0] = headers[0].replace(/^\uFEFF/, "");
     if (headers.some((value) => !value))
@@ -70,6 +69,26 @@
         return record;
       })
       .filter(Boolean);
+  }
+
+  function parseCSV(text) {
+    const context = {
+      rows: [],
+      row: [],
+      field: "",
+      quoted: false,
+      afterQuote: false,
+    };
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i],
+        next = text[i + 1];
+      i = context.quoted
+        ? consumeQuotedCharacter(context, char, next, i)
+        : consumeUnquotedCharacter(context, char, next, i);
+    }
+    if (context.quoted) throw new Error("CSV has an unclosed quoted field.");
+    if (context.field || context.row.length) appendRow(context);
+    return recordsFromRows(context.rows);
   }
 
   const parser = Object.freeze({ parseCSV });
