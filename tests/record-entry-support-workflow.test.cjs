@@ -12,24 +12,33 @@ test("app wires modal, form options, and reminder features directly", () => {
   const createOrder = [
     "PropertyDeskModalController.create(",
     "PropertyDeskFormOptions.create(",
-    "PropertyDeskReminderWorkflow.create(",
+    "PropertyDeskReminderActivityModel.create(",
+    "PropertyDeskReminderActivityView.create(",
+    "PropertyDeskReminderPreview.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(createOrder.every((position) => position >= 0));
-  assert.ok(createOrder[0] < createOrder[1]);
-  assert.ok(createOrder[1] < createOrder[2]);
+  assert.deepEqual(
+    createOrder,
+    [...createOrder].sort((left, right) => left - right),
+  );
   assert.match(
     app,
-    /PropertyDeskReminderWorkflow\.create\(\{[\s\S]*?openModal: modal\.openModal/,
+    /PropertyDeskReminderPreview\.create\(\{[\s\S]*?openModal: modal\.openModal/,
   );
   assert.match(app, /attachEvents: attachModalEvents/);
-  assert.match(app, /renderReminderActivity,/);
+  assert.match(
+    app,
+    /workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+  );
   assert.match(app, /previewReminderEmail,/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntrySupportWorkflow/);
 
   for (const feature of [
     "features/modal-controller.js",
     "features/form-options.js",
-    "features/reminder-workflow.js",
+    "features/reminder-activity-model.js",
+    "features/reminder-activity-view.js",
+    "features/reminder-preview.js",
   ]) {
     assert.ok(
       html.indexOf(feature) >= 0 &&

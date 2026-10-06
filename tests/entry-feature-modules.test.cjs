@@ -194,56 +194,32 @@ test("app root composes independent property screens and shares detail actions",
   );
 });
 
-test("reminder workflow composes the activity view and email preview", () => {
-  const passed = {};
-  const reminderActivity = () => "activity";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskReminderActivityModel: {
-        create: (options) => {
-          passed.activityModel = options;
-          return { buildRows: () => [] };
-        },
-      },
-      PropertyDeskReminderActivityView: {
-        create: (options) => {
-          passed.activityView = options;
-          return { renderReminderActivity: reminderActivity };
-        },
-      },
-      PropertyDeskReminderPreview: {
-        create: (options) => {
-          passed.preview = options;
-          return { previewReminderEmail: () => "preview" };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "reminder-workflow.js"),
-      "utf8",
-    ),
-    context,
+test("app wires reminder activity and email preview separately", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const createOrder = [
+    "PropertyDeskReminderActivityModel.create(",
+    "PropertyDeskReminderActivityView.create(",
+    "PropertyDeskReminderPreview.create(",
+  ].map((marker) => app.indexOf(marker));
+  assert.ok(createOrder.every((position) => position >= 0));
+  assert.deepEqual(
+    createOrder,
+    [...createOrder].sort((left, right) => left - right),
   );
-  const openModal = () => {};
-  const state = { accounts: [], properties: [], reminderLogs: [] };
-  const workflow = context.window.PropertyDeskReminderWorkflow.create({
-    openModal,
-    state,
-  });
-
-  assert.equal(passed.preview.openModal, openModal);
-  assert.equal(passed.activityModel.state, state);
-  assert.deepEqual(Object.keys(passed.activityView).sort(), [
-    "$",
-    "esc",
-    "fmtDate",
-    "model",
-    "money",
-  ]);
-  assert.equal(workflow.renderReminderActivity, reminderActivity);
-  assert.equal(workflow.previewReminderEmail(), "preview");
+  assert.match(
+    app,
+    /PropertyDeskReminderActivityView.create\(\{[\s\S]*?model: reminderActivityModel/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskReminderPreview.create\(\{[\s\S]*?openModal: modal\.openModal/,
+  );
+  assert.match(
+    app,
+    /function renderWorkspaceSettings\(\)\s*\{\s*workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+  );
+  assert.match(app, /previewReminderEmail,/);
+  assert.doesNotMatch(app, /PropertyDeskReminderWorkflow/);
 });
 
 test("app coordinator delegates shared setup to the app services workflow", () => {
