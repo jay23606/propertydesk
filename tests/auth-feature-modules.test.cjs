@@ -56,6 +56,7 @@ test("password reset requests keep generic feedback and restore the submit contr
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
@@ -63,6 +64,8 @@ test("password reset requests keep generic feedback and restore the submit contr
         disabled: false,
         textContent: "",
         reportValidity: () => true,
+        addEventListener: (event, handler) =>
+          handlers.set(`${id}:${event}`, handler),
       });
     }
     return elements.get(id);
@@ -91,7 +94,13 @@ test("password reset requests keep generic feedback and restore the submit contr
     documentRef: {},
   });
 
-  await feature.requestPasswordReset();
+  assert.deepEqual(Object.keys(feature).sort(), [
+    "attachEvents",
+    "isPasswordRecoverySession",
+    "showPasswordReset",
+  ]);
+  feature.attachEvents();
+  await handlers.get("forgot-password:click")();
 
   assert.equal(resetCalls.length, 1);
   assert.equal(resetCalls[0][0], "owner@example.com");
@@ -122,12 +131,16 @@ test("password recovery saves the new password before resuming workspace access"
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
         value: "",
         disabled: false,
         textContent: "",
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
       });
     }
     return elements.get(id);
@@ -160,7 +173,8 @@ test("password recovery saves the new password before resuming workspace access"
     },
   });
 
-  await feature.submitPasswordReset({ preventDefault() {} });
+  feature.attachEvents();
+  await handlers.get("password-reset-form:submit")({ preventDefault() {} });
 
   assert.equal(calls[0][0], "update");
   assert.equal(calls[0][1].password, "new-password-value");
@@ -177,12 +191,16 @@ test("password recovery restores its submit control when the auth request reject
   const context = vm.createContext({ window: {}, document: {} });
   loadAuthFeatures(context);
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id))
       elements.set(id, {
         value: "new-password-value",
         disabled: false,
         textContent: "",
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
       });
     return elements.get(id);
   };
@@ -207,8 +225,9 @@ test("password recovery restores its submit control when the auth request reject
     windowRef: { location: { pathname: "/propertydesk/", search: "" } },
   });
 
+  feature.attachEvents();
   await assert.doesNotReject(
-    feature.submitPasswordReset({ preventDefault() {} }),
+    handlers.get("password-reset-form:submit")({ preventDefault() {} }),
   );
   assert.equal(element("reset-password-submit").disabled, false);
   assert.equal(element("reset-password-submit").textContent, "Update password");

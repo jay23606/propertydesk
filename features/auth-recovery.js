@@ -104,8 +104,6 @@
 
     return {
       showPasswordReset,
-      requestPasswordReset,
-      submitPasswordReset,
       isPasswordRecoverySession,
       attachEvents,
     };
