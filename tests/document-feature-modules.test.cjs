@@ -128,6 +128,116 @@ test("document upload stores objects privately and removes an orphan after metad
   assert.match(messages[0], /metadata insert failed/);
 });
 
+test("document upload saves metadata before refreshing and reopening the property", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from: () => ({ upload: async () => ({ error: null }) }),
+      },
+      from: () => ({
+        insert: async (record) => {
+          state.document = record;
+          return { error: null };
+        },
+      }),
+    },
+  };
+  const calls = [];
+  const feature = context.window.PropertyDeskDocuments.create({
+    state,
+    toast: (message) => calls.push(["toast", message]),
+    fetchAll: async () => calls.push(["refresh"]),
+    openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
+    makeId: () => "file-id",
+  });
+
+  await feature.uploadPropertyDocument({
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  });
+
+  assert.equal(state.document.user_id, "workspace-1");
+  assert.equal(state.document.property_id, "property-1");
+  assert.equal(
+    state.document.storage_path,
+    "workspace-1/property-1/file-id-Agreement.pdf",
+  );
+  assert.deepEqual(calls, [
+    ["toast", "Agreement uploaded privately"],
+    ["refresh"],
+    ["open", "property-1"],
+  ]);
+});
+
+test("agreement deletion removes only the selected workspace file before refreshing", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [
+      {
+        id: "doc-1",
+        user_id: "workspace-1",
+        property_id: "property-1",
+        storage_path: "workspace-1/property-1/file.pdf",
+        file_name: "file.pdf",
+      },
+      {
+        id: "doc-2",
+        user_id: "workspace-1",
+        property_id: "property-2",
+        storage_path: "workspace-1/property-2/other.pdf",
+        file_name: "other.pdf",
+      },
+    ],
+  };
+  const calls = [];
+  const feature = context.window.PropertyDeskDocuments.create({
+    state,
+    toast: (message) => calls.push(["toast", message]),
+    fetchAll: async () => calls.push(["refresh"]),
+    openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
+    confirm: (message) => {
+      calls.push(["confirm", message]);
+      return true;
+    },
+    repository: {
+      remove: async (storagePath) => {
+        calls.push(["remove", storagePath]);
+        return { error: null };
+      },
+      deleteMetadata: async (...args) => {
+        calls.push(["deleteMetadata", ...args]);
+        return { error: null };
+      },
+    },
+  });
+
+  await feature.deletePropertyDocument("doc-2");
+  assert.deepEqual(calls, []);
+
+  await feature.deletePropertyDocument("doc-1");
+
+  assert.deepEqual(
+    calls.map(([name]) => name),
+    ["confirm", "remove", "deleteMetadata", "toast", "refresh", "open"],
+  );
+  assert.deepEqual(calls[1], ["remove", "workspace-1/property-1/file.pdf"]);
+  assert.deepEqual(calls[2], [
+    "deleteMetadata",
+    "doc-1",
+    "workspace-1",
+    "property-1",
+  ]);
+  assert.deepEqual(calls.at(-1), ["open", "property-1"]);
+});
+
 test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);

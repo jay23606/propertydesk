@@ -13,36 +13,36 @@
       () => state.client,
     ),
   }) {
-    async function deletePropertyDocument(id) {
+    function documentForDeletion(id, propertyId) {
       const doc = state.documents.find((item) => item.id === id);
-      const propertyId = state.selectedPropertyId;
       if (
-        !doc ||
-        !propertyId ||
-        doc.property_id !== propertyId ||
-        doc.user_id !== state.workspaceOwnerId
+        doc &&
+        propertyId &&
+        doc.property_id === propertyId &&
+        doc.user_id === state.workspaceOwnerId
       )
-        return;
-      if (
-        !confirm(
-          `Permanently delete “${doc.file_name}” from this property? This cannot be undone.`,
-        )
-      )
-        return;
+        return doc;
+      return null;
+    }
 
-      let storageError;
+    async function removeStoredAgreement(doc) {
+      let error;
       try {
-        ({ error: storageError } = await repository.remove(doc.storage_path));
-      } catch (error) {
+        ({ error } = await repository.remove(doc.storage_path));
+      } catch (requestError) {
         toast(
-          `Agreement removal failed: ${error.message || "Check your connection and try again."}`,
+          `Agreement removal failed: ${requestError.message || "Check your connection and try again."}`,
         );
-        return;
+        return false;
       }
-      if (storageError) {
-        toast(`Agreement removal failed: ${storageError.message}`);
-        return;
+      if (error) {
+        toast(`Agreement removal failed: ${error.message}`);
+        return false;
       }
+      return true;
+    }
+
+    async function deleteDocumentRecord(doc, propertyId) {
       let error;
       try {
         ({ error } = await repository.deleteMetadata(
@@ -54,15 +54,18 @@
         toast(
           `File deleted, but its document record could not be removed: ${requestError.message || "Check your connection and try again."}`,
         );
-        return;
+        return false;
       }
       if (error) {
         toast(
           `File deleted, but its document record could not be removed: ${error.message}`,
         );
-        return;
+        return false;
       }
+      return true;
+    }
 
+    async function refreshDeletedProperty(propertyId) {
       toast("Agreement deleted");
       try {
         await fetchAll();
@@ -70,6 +73,21 @@
         return;
       }
       openPropertyDetails(propertyId);
+    }
+
+    async function deletePropertyDocument(id) {
+      const propertyId = state.selectedPropertyId;
+      const doc = documentForDeletion(id, propertyId);
+      if (!doc) return;
+      if (
+        !confirm(
+          `Permanently delete “${doc.file_name}” from this property? This cannot be undone.`,
+        )
+      )
+        return;
+      if (!(await removeStoredAgreement(doc))) return;
+      if (!(await deleteDocumentRecord(doc, propertyId))) return;
+      await refreshDeletedProperty(propertyId);
     }
 
     async function openPropertyDocument(id) {

@@ -12,38 +12,24 @@
       () => state.client,
     ),
   }) {
-    async function uploadPropertyDocument(input) {
-      const file = input.files?.[0];
-      const propertyId = state.selectedPropertyId;
-      input.value = "";
-      if (!file || !propertyId) return;
-
-      const upload = window.PropertyDeskDocumentUploadPolicy.describe(file);
-      if (!upload) {
-        toast("Choose a PDF, DOCX, or JPEG agreement under 15 MB");
-        return;
-      }
-
-      const { contentType, safeName } = upload;
-      const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
-      let uploadError;
+    async function uploadFile(path, file, contentType) {
+      let error;
       try {
-        ({ error: uploadError } = await repository.upload(
-          path,
-          file,
-          contentType,
-        ));
-      } catch (error) {
+        ({ error } = await repository.upload(path, file, contentType));
+      } catch (requestError) {
         toast(
-          `Agreement upload failed: ${error.message || "Check your connection and try again."}`,
+          `Agreement upload failed: ${requestError.message || "Check your connection and try again."}`,
         );
-        return;
+        return false;
       }
-      if (uploadError) {
-        toast(`Agreement upload failed: ${uploadError.message}`);
-        return;
+      if (error) {
+        toast(`Agreement upload failed: ${error.message}`);
+        return false;
       }
+      return true;
+    }
 
+    async function saveDocumentMetadata(propertyId, file, path, contentType) {
       let error;
       try {
         ({ error } = await repository.insertMetadata({
@@ -59,16 +45,19 @@
         toast(
           `Agreement record status couldn't be confirmed. Reload the property details before retrying; the private file was kept to avoid breaking a saved record. ${requestError.message || "Check your connection and try again."}`,
         );
-        return;
+        return false;
       }
       if (error) {
         const cleaned = await removeUploadedFile(path);
         toast(
           `Agreement record failed${cleaned ? "; uploaded file removed" : "; uploaded file may need cleanup"}. ${error.message}`,
         );
-        return;
+        return false;
       }
+      return true;
+    }
 
+    async function reopenPropertyDetails(propertyId) {
       toast("Agreement uploaded privately");
       try {
         await fetchAll();
@@ -76,6 +65,26 @@
         return;
       }
       openPropertyDetails(propertyId);
+    }
+
+    async function uploadPropertyDocument(input) {
+      const file = input.files?.[0];
+      const propertyId = state.selectedPropertyId;
+      input.value = "";
+      if (!file || !propertyId) return;
+
+      const upload = window.PropertyDeskDocumentUploadPolicy.describe(file);
+      if (!upload) {
+        toast("Choose a PDF, DOCX, or JPEG agreement under 15 MB");
+        return;
+      }
+
+      const { contentType, safeName } = upload;
+      const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
+      if (!(await uploadFile(path, file, contentType))) return;
+      if (!(await saveDocumentMetadata(propertyId, file, path, contentType)))
+        return;
+      await reopenPropertyDetails(propertyId);
     }
 
     async function removeUploadedFile(path) {
