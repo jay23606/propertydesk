@@ -6,10 +6,6 @@
     state,
     dateOnly,
     expenseCategoryLabel,
-    isPosted,
-    monthStart,
-    sumIncome,
-    sumOperatingExpenses,
   }) {
     function associateTransaction(row) {
       const account = state.accounts.find(
@@ -99,29 +95,8 @@
         .map(toDisplayRow);
     }
 
-    function currentMonthTotals() {
-      const currentMonthStart = monthStart();
-      const monthPayments = state.payments.filter(
-        (payment) =>
-          isPosted(payment) &&
-          String(payment.received_date) >= currentMonthStart,
-      );
-      const monthExpenses = state.expenses.filter(
-        (expense) =>
-          String(expense.expense_date) >= currentMonthStart &&
-          isPosted(expense),
-      );
-      const collected = sumIncome(monthPayments);
-      const expenses = sumOperatingExpenses(monthExpenses);
-
-      return { collected, expenses, netCashFlow: collected - expenses };
-    }
-
     function buildTransactionList(filters) {
-      return {
-        rows: buildRows(filters),
-        totals: currentMonthTotals(),
-      };
+      return buildRows(filters);
     }
 
     return { buildTransactionList };

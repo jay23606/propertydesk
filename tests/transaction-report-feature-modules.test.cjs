@@ -30,6 +30,7 @@ test("property and transaction views own their search and filter bindings", () =
     if (file === "transaction-views.js") {
       for (const dependency of [
         "transaction-list-model.js",
+        "transaction-summary-model.js",
         "transaction-row-view.js",
       ]) {
         vm.runInContext(
@@ -63,6 +64,86 @@ test("property and transaction views own their search and filter bindings", () =
       [...handlers.values()].every((handler) => typeof handler === "function"),
     );
   }
+});
+
+test("transaction view renders filtered rows and independent month totals", () => {
+  const context = vm.createContext({ window: {} });
+  for (const dependency of [
+    "transaction-list-model.js",
+    "transaction-summary-model.js",
+    "transaction-row-view.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", dependency),
+        "utf8",
+      ),
+      context,
+    );
+  }
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-views.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, { value: "", textContent: "", innerHTML: "" });
+    }
+    return elements.get(id);
+  };
+  $("payment-period").value = "all";
+  $("payment-search").value = "";
+  $("transaction-type").value = "all";
+  $("payments-empty").classList = { toggle() {} };
+  const state = {
+    accounts: [
+      {
+        id: "account-1",
+        property_id: "property-1",
+        account_type: "rental",
+        name: "Unit A",
+        party_name: "Tenant A",
+      },
+    ],
+    properties: [{ id: "property-1", name: "Oak House" }],
+    payments: [
+      {
+        id: "payment-1",
+        account_id: "account-1",
+        amount: 500,
+        received_date: "2026-10-05",
+        income_category: "rent",
+        payment_method: "check",
+        status: "posted",
+      },
+    ],
+    expenses: [],
+  };
+  const feature = context.window.PropertyDeskTransactionViews.create({
+    $,
+    state,
+    dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
+    fmtDate: (value) => value,
+    esc: String,
+    expenseCategoryLabel: (value) => value,
+    money: (value) => `$${Number(value).toFixed(2)}`,
+    isPosted: (row) => row.status === "posted",
+    monthStart: () => "2026-10-01",
+    sumIncome: (rows) => rows.reduce((sum, row) => sum + Number(row.amount), 0),
+    sumOperatingExpenses: (rows) =>
+      rows.reduce((sum, row) => sum + Number(row.amount), 0),
+  });
+
+  feature.renderPayments();
+
+  assert.match($("payments-table").innerHTML, /Oak House/);
+  assert.equal($("payments-collected").textContent, "$500.00");
+  assert.equal($("expenses-total").textContent, "$0.00");
+  assert.equal($("net-cash-flow").textContent, "$500.00");
 });
 
 test("transaction action router loads after its view and is precached", () => {

@@ -8,6 +8,7 @@ function loadTransactionModules() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-list-model.js",
+    "transaction-summary-model.js",
     "transaction-row-view.js",
   ]) {
     vm.runInContext(
@@ -18,7 +19,7 @@ function loadTransactionModules() {
   return context;
 }
 
-test("transaction list model scopes filters, resolves associations, and totals posted cash flow", () => {
+test("transaction list model filters rows and resolves their display associations", () => {
   const context = loadTransactionModules();
   const state = {
     accounts: [
@@ -102,6 +103,9 @@ test("transaction list model scopes filters, resolves associations, and totals p
     state,
     dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
     expenseCategoryLabel: (value) => value,
+  });
+  const summary = context.window.PropertyDeskTransactionSummaryModel.create({
+    state,
     isPosted: (record) => record.status === "posted",
     monthStart: () => "2026-10-01",
     sumIncome: (rows) =>
@@ -110,28 +114,30 @@ test("transaction list model scopes filters, resolves associations, and totals p
       rows.reduce((total, row) => total + Number(row.amount || 0), 0),
   });
 
-  const result = model.buildTransactionList({
+  const rows = model.buildTransactionList({
     period: "month",
     query: "",
     type: "all",
     now: new Date("2026-10-05T12:00:00"),
   });
 
-  assert.equal(result.rows.length, 4);
-  assert.equal(result.rows[0].item.id, "payment-1");
-  assert.equal(result.rows[0].propertyName, "Oak House");
-  assert.equal(result.rows[0].partyName, "Tenant A");
-  assert.equal(result.rows[0].paymentMethod, "bank transfer");
-  assert.equal(Object.hasOwn(result.rows[0], "searchText"), false);
-  assert.equal(Object.hasOwn(result.rows[0], "account"), false);
-  assert.equal(Object.hasOwn(result.rows[0], "property"), false);
-  assert.equal(result.rows[1].item.id, "expense-2");
-  assert.equal(result.rows[1].correctionOf, "expense-original");
-  assert.equal(result.rows[2].item.id, "expense-1");
-  assert.equal(result.rows[3].item.id, "payment-2");
-  assert.equal(result.totals.collected, 500);
-  assert.equal(result.totals.expenses, 200);
-  assert.equal(result.totals.netCashFlow, 300);
+  assert.equal(rows.length, 4);
+  assert.equal(rows[0].item.id, "payment-1");
+  assert.equal(rows[0].propertyName, "Oak House");
+  assert.equal(rows[0].partyName, "Tenant A");
+  assert.equal(rows[0].paymentMethod, "bank transfer");
+  assert.equal(Object.hasOwn(rows[0], "searchText"), false);
+  assert.equal(Object.hasOwn(rows[0], "account"), false);
+  assert.equal(Object.hasOwn(rows[0], "property"), false);
+  assert.equal(rows[1].item.id, "expense-2");
+  assert.equal(rows[1].correctionOf, "expense-original");
+  assert.equal(rows[2].item.id, "expense-1");
+  assert.equal(rows[3].item.id, "payment-2");
+
+  const totals = summary.currentMonthTotals();
+  assert.equal(totals.collected, 500);
+  assert.equal(totals.expenses, 200);
+  assert.equal(totals.netCashFlow, 300);
 
   const searchResult = model.buildTransactionList({
     period: "all",
@@ -139,8 +145,8 @@ test("transaction list model scopes filters, resolves associations, and totals p
     type: "expense",
     now: new Date("2026-10-05T12:00:00"),
   });
-  assert.equal(searchResult.rows.length, 1);
-  assert.equal(searchResult.rows[0].item.id, "expense-1");
+  assert.equal(searchResult.length, 1);
+  assert.equal(searchResult[0].item.id, "expense-1");
 });
 
 test("transaction row view escapes displayed values and preserves void and correction markers", () => {
