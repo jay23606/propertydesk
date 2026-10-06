@@ -12,13 +12,19 @@
       fetchAll,
       depositSectionHTML,
     } = context;
-    const { recordDepositAdjustment } =
+    const { saveDepositAdjustment } =
       window.PropertyDeskDepositMaintenance.create({
         state,
-        moneyInput,
         todayIso,
         toast,
         fetchAll,
+      });
+    const { recordDepositAdjustment } =
+      window.PropertyDeskDepositAdjustmentEntry.create({
+        state,
+        moneyInput,
+        toast,
+        saveDepositAdjustment,
       });
     const { attachEvents } = window.PropertyDeskDepositDetailEvents.create({
       $,

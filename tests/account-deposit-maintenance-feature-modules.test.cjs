@@ -162,6 +162,12 @@ test("deposit maintenance workflow composes adjustments with detail events", () 
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.maintenance = options;
+          return { saveDepositAdjustment: recordDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositAdjustmentEntry: {
+        create: (options) => {
+          passed.entry = options;
           return { recordDepositAdjustment };
         },
       },
@@ -193,7 +199,10 @@ test("deposit maintenance workflow composes adjustments with detail events", () 
     context.window.PropertyDeskDepositMaintenanceWorkflow.create(dependencies);
 
   assert.equal(passed.maintenance.state, dependencies.state);
-  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.maintenance.moneyInput, undefined);
+  assert.equal(passed.entry.state, dependencies.state);
+  assert.equal(passed.entry.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.entry.saveDepositAdjustment, recordDepositAdjustment);
   assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
   assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
@@ -471,6 +480,13 @@ test("deposit maintenance retains adjustment audit details", async () => {
     ),
     context,
   );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-entry.js"),
+      "utf8",
+    ),
+    context,
+  );
   const prompts = ["250.00", "Deposit retention per move-out inspection"];
   const inserts = [];
   const messages = [];
@@ -489,20 +505,24 @@ test("deposit maintenance retains adjustment audit details", async () => {
       },
     },
   };
-  const feature = context.window.PropertyDeskDepositMaintenance.create({
+  const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
-    moneyInput: Number,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       refreshes += 1;
     },
-    confirmAction: () => true,
+  });
+  const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
+    state,
+    moneyInput: Number,
+    toast: (message) => messages.push(message),
+    saveDepositAdjustment: maintenance.saveDepositAdjustment,
     promptAction: () => prompts.shift(),
   });
 
   assert.equal(
-    await feature.recordDepositAdjustment("rental-1", "retained"),
+    await entry.recordDepositAdjustment("rental-1", "retained"),
     true,
   );
 
@@ -533,33 +553,89 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     ),
     context,
   );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-entry.js"),
+      "utf8",
+    ),
+    context,
+  );
   const prompts = ["25.00", "Retention correction"];
   const messages = [];
-  const feature = context.window.PropertyDeskDepositMaintenance.create({
-    state: {
-      workspaceOwnerId: "workspace-1",
-      accounts: [{ id: "rental-1", account_type: "rental" }],
-      client: {
-        from: () => ({
-          insert: async () => {
-            throw new Error("offline");
-          },
-        }),
-      },
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+    client: {
+      from: () => ({
+        insert: async () => {
+          throw new Error("offline");
+        },
+      }),
     },
-    moneyInput: Number,
+  };
+  const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    state,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
+  });
+  const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
+    state,
+    moneyInput: Number,
+    toast: (message) => messages.push(message),
+    saveDepositAdjustment: maintenance.saveDepositAdjustment,
     promptAction: () => prompts.shift(),
   });
 
   assert.equal(
-    await feature.recordDepositAdjustment("rental-1", "retained"),
+    await entry.recordDepositAdjustment("rental-1", "retained"),
     false,
   );
   assert.deepEqual(messages, [
     "Deposit adjustment failed. Check your connection and try again.",
+  ]);
+});
+
+test("deposit adjustment entry validates the amount before asking for an audit reason", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-entry.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const prompts = ["0"];
+  const messages = [];
+  const state = {
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+  };
+  const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
+    state,
+    moneyInput: Number,
+    toast: (message) => messages.push(message),
+    saveDepositAdjustment: () =>
+      assert.fail("invalid amount should not reach persistence"),
+    promptAction: (message) => {
+      messages.push(message);
+      return prompts.shift();
+    },
+  });
+
+  assert.equal(
+    await entry.recordDepositAdjustment("rental-1", "retained"),
+    false,
+  );
+  assert.deepEqual(messages, [
+    "Amount retained from the deposit?",
+    "Enter an amount greater than zero",
   ]);
 });
 

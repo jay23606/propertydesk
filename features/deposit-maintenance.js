@@ -4,31 +4,14 @@
 
   function create({
     state,
-    moneyInput,
     todayIso,
     toast,
     fetchAll,
-    promptAction = (message, initialValue) =>
-      window.prompt(message, initialValue),
-    validateAdjustment = window.PropertyDeskDepositAdjustmentModel.validate,
     prepareAdjustment = window.PropertyDeskDepositAdjustmentModel.prepare,
   }) {
-    async function recordDepositAdjustment(accountId, type) {
+    async function saveDepositAdjustment(accountId, type, amount, reason) {
       const account = state.accounts.find((row) => row.id === accountId);
       if (!account || account.account_type !== "rental") return false;
-      const action =
-        type === "retained"
-          ? "retained from the deposit"
-          : "restored to the held balance";
-      const amount = moneyInput(promptAction(`Amount ${action}?`, "0.00"));
-      const validation = validateAdjustment({ account, amount });
-      if (validation.status === "invalid-amount") {
-        toast("Enter an amount greater than zero");
-        return false;
-      }
-      if (validation.status !== "ready") return false;
-      const reason = promptAction("Add a reason for the deposit ledger:");
-      if (reason === null) return false;
       const prepared = prepareAdjustment({
         account,
         userId: state.workspaceOwnerId,
@@ -72,7 +55,7 @@
       return true;
     }
 
-    return { recordDepositAdjustment };
+    return { saveDepositAdjustment };
   }
 
   window.PropertyDeskDepositMaintenance = Object.freeze({ create });
