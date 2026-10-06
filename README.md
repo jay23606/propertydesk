@@ -1,6 +1,10 @@
 # PropertyDesk
 
-Static HTML, CSS, and JavaScript app designed for GitHub Pages, with Supabase Auth and a private Postgres schema.
+PropertyDesk helps property owners manage rentals and seller-financed accounts, including land contracts and private notes, in one workspace. Use it to keep property and tenant/buyer records, log payments received, track unpaid monthly amounts, record expenses, and store agreement files. It records payments; it does not process them.
+
+**Live app:** [jay23606.github.io/propertydesk](https://jay23606.github.io/propertydesk/)
+
+Built with HTML, CSS, and JavaScript for GitHub Pages, with Supabase Auth and a private Postgres schema.
 
 The source code is licensed under the [MIT License](LICENSE).
 
