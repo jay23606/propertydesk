@@ -75,7 +75,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
+    /PropertyDesk(?:AccountDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
@@ -106,6 +106,7 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /window\.PropertyDeskAccountDetailContentWorkflow\.create\(/,
   );
+  assert.match(app, /window\.PropertyDeskAccountHistoryDetails\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(

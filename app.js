@@ -216,6 +216,13 @@
       editAccount,
       openPayment,
     });
+  const { renderAccountHistory } =
+    window.PropertyDeskAccountHistoryDetails.create({
+      state,
+      esc,
+      money,
+      fmtDate,
+    });
   const { openAccountDetails } =
     window.PropertyDeskAccountDetailContentWorkflow.create({
       $,
@@ -232,6 +239,7 @@
       unpaidDueAccrualStart,
       todayIso,
       depositSectionHTML,
+      renderAccountHistory,
       openModal,
       propertyAddress,
     });

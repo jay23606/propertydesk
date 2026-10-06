@@ -144,7 +144,7 @@ test("account detail actions workflow composes account closure with edit and pay
   assert.equal(attached, 1);
 });
 
-test("account detail content workflow composes schedule, history, and selected account", () => {
+test("account detail content workflow composes schedule and selected account", () => {
   const passed = {};
   const accountLoanScheduleHTML = () => "schedule";
   const renderAccountDetails = () => "details";
@@ -162,12 +162,6 @@ test("account detail content workflow composes schedule, history, and selected a
         create: (options) => {
           passed.view = options;
           return { renderAccountDetails };
-        },
-      },
-      PropertyDeskAccountHistoryDetails: {
-        create: (options) => {
-          passed.history = options;
-          return { renderAccountHistory };
         },
       },
       PropertyDeskAccountDetails: {
@@ -207,6 +201,7 @@ test("account detail content workflow composes schedule, history, and selected a
     openModal() {},
     propertyAddress() {},
     depositSectionHTML() {},
+    renderAccountHistory,
   };
   const workflow =
     context.window.PropertyDeskAccountDetailContentWorkflow.create(
@@ -214,15 +209,58 @@ test("account detail content workflow composes schedule, history, and selected a
     );
 
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
-  assert.equal(passed.history.state, dependencies.state);
   assert.equal(passed.details.renderAccountDetails, renderAccountDetails);
-  assert.equal(passed.details.renderAccountHistory, renderAccountHistory);
+  assert.equal(
+    passed.details.renderAccountHistory,
+    dependencies.renderAccountHistory,
+  );
   assert.equal(
     passed.details.depositSectionHTML,
     dependencies.depositSectionHTML,
   );
   assert.deepEqual(Object.keys(workflow), ["openAccountDetails"]);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
+});
+
+test("account history details connect the history query and rendering", async () => {
+  const passed = {};
+  const accountHistoryHTML = (history) => history;
+  const history = { auditError: false };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountHistoryModel: {
+        create: (options) => {
+          passed.model = options;
+          return { loadAccountHistory: async () => history };
+        },
+      },
+      PropertyDeskAccountHistoryView: {
+        create: (options) => {
+          passed.view = options;
+          return { accountHistoryHTML };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-history-details.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    state: {},
+    esc() {},
+    money() {},
+    fmtDate() {},
+  };
+  const feature =
+    context.window.PropertyDeskAccountHistoryDetails.create(dependencies);
+
+  assert.equal(passed.model.state, dependencies.state);
+  assert.equal(await feature.renderAccountHistory({}, []), history);
+  assert.equal(passed.view.esc, dependencies.esc);
 });
 
 test("deposit maintenance retains adjustment audit details", async () => {
