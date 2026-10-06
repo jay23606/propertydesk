@@ -6,8 +6,6 @@ const {
   csvMoney,
   csvRate,
   createImportLookup,
-  findImportAccount,
-  findImportProperty,
   markPossibleDuplicates,
   parseCSV,
   selectImportRows,
@@ -132,28 +130,6 @@ test("date validator accepts real ISO dates and rejects impossible dates", () =>
   assert.equal(validIsoDate("2025-02-29"), false);
   assert.equal(validIsoDate("10/01/2025"), false);
   assert.equal(validIsoDate("2025-13-01"), false);
-});
-
-test("CSV property and account lookup is case-insensitive and property-scoped", () => {
-  const properties = [
-    { id: "p1", name: "Oak House", address: "10 Oak St" },
-    { id: "p2", name: "Oak House", address: "20 Oak St" },
-  ];
-  const accounts = [
-    { id: "a1", property_id: "p1", name: "Oak Rental" },
-    { id: "a2", property_id: "p2", name: "Oak Rental" },
-  ];
-
-  assert.equal(
-    findImportProperty(properties, "OAK HOUSE", "10 OAK ST"),
-    properties[0],
-  );
-  assert.equal(
-    findImportProperty(properties, "Oak House", "unknown"),
-    undefined,
-  );
-  assert.equal(findImportAccount(accounts, "p2", "oAk ReNtAl"), accounts[1]);
-  assert.equal(findImportAccount(accounts, "p3", "Oak Rental"), undefined);
 });
 
 test("indexed CSV lookup preserves normalized and exact first-match behavior", () => {

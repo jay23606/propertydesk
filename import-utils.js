@@ -50,25 +50,6 @@
     );
   }
 
-  function findImportProperty(properties, name, address) {
-    const normalizedName = String(name || "").toLowerCase();
-    const normalizedAddress = String(address || "").toLowerCase();
-    return properties.find(
-      (property) =>
-        property.name.toLowerCase() === normalizedName &&
-        property.address.toLowerCase() === normalizedAddress,
-    );
-  }
-
-  function findImportAccount(accounts, propertyId, name) {
-    const normalizedName = String(name || "").toLowerCase();
-    return accounts.find(
-      (account) =>
-        account.property_id === propertyId &&
-        account.name.toLowerCase() === normalizedName,
-    );
-  }
-
   function createImportLookup(properties, accounts) {
     const propertiesByNormalizedAddress = new Map();
     const propertiesByAddress = new Map();
@@ -228,8 +209,6 @@
     csvMoney,
     csvRate,
     createImportLookup,
-    findImportAccount,
-    findImportProperty,
     markPossibleDuplicates,
     parseCSV,
     selectImportRows,
