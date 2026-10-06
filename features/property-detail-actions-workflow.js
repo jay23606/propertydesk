@@ -16,7 +16,6 @@
       openExpense,
       openAccountForProperty,
       openAccountDetails,
-      documentRef = document,
     } = context;
     const { savePropertyHolders } =
       window.PropertyDeskPropertyHolderManagement.create({
@@ -24,7 +23,6 @@
         toast,
         fetchAll,
         openPropertyDetails,
-        documentRef,
       });
     const { attachEvents: attachPropertyHolderEvents } =
       window.PropertyDeskPropertyHolderEvents.create({

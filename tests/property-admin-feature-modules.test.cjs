@@ -160,6 +160,78 @@ test("property holder and archive workflows report rejected writes without runni
   ]);
 });
 
+test("property holder save persists the member IDs supplied by the event layer", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-holder-management.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const calls = [];
+  const messages = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    selectedPropertyId: "property-1",
+    client: {
+      from(table) {
+        assert.equal(table, "pd_property_holders");
+        return {
+          delete() {
+            return {
+              eq(column, value) {
+                calls.push(["delete-filter", column, value]);
+                return {
+                  eq: async (propertyColumn, propertyId) => {
+                    calls.push(["delete-filter", propertyColumn, propertyId]);
+                    return { error: null };
+                  },
+                };
+              },
+            };
+          },
+          async insert(rows) {
+            calls.push(["insert", rows]);
+            return { error: null };
+          },
+        };
+      },
+    },
+  };
+  const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => calls.push(["refresh"]),
+    openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
+  });
+
+  await workflow.savePropertyHolders(["member-1", "member-2"]);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ["delete-filter", "user_id", "workspace-1"],
+    ["delete-filter", "property_id", "property-1"],
+    [
+      "insert",
+      [
+        {
+          user_id: "workspace-1",
+          property_id: "property-1",
+          member_user_id: "member-1",
+        },
+        {
+          user_id: "workspace-1",
+          property_id: "property-1",
+          member_user_id: "member-2",
+        },
+      ],
+    ],
+    ["refresh"],
+    ["open", "property-1"],
+  ]);
+  assert.deepEqual(messages, ["Account-holder labels saved"]);
+});
+
 test("quick note feature loads before portfolio actions and is precached", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),

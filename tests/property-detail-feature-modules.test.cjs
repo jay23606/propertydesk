@@ -462,12 +462,19 @@ test("property detail events own editing and quick-action bindings", () => {
   }
   const handlers = new Map();
   const elements = new Map();
+  const holderChoices = [{ value: "member-1" }, { value: "member-2" }];
   const calls = [];
   const getElement = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
         id,
         value: "",
+        querySelectorAll(selector) {
+          return id === "property-detail-content" &&
+            selector === "[data-holder-choice]:checked"
+            ? holderChoices
+            : [];
+        },
         addEventListener(event, handler) {
           const key = `${id}:${event}`;
           handlers.set(key, [...(handlers.get(key) || []), handler]);
@@ -489,7 +496,8 @@ test("property detail events own editing and quick-action bindings", () => {
   });
   const holderEvents = context.window.PropertyDeskPropertyHolderEvents.create({
     $: getElement,
-    savePropertyHolders: () => calls.push("save-holders"),
+    savePropertyHolders: (memberIds) =>
+      calls.push(`save-holders:${memberIds.join(",")}`),
   });
   const quickActionState = { selectedPropertyId: "property-1" };
   const quickActions =
@@ -543,7 +551,7 @@ test("property detail events own editing and quick-action bindings", () => {
   assert.deepEqual(calls, [
     "close:property-detail-modal",
     "edit:account-1",
-    "save-holders",
+    "save-holders:member-1,member-2",
     "close:property-detail-modal",
     "open-account:account-1",
     "close:property-detail-modal",

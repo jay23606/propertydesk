@@ -6,7 +6,12 @@
     function attachEvents() {
       $("property-detail-content").addEventListener("click", (event) => {
         if (event.target.closest("[data-save-holders]")) {
-          savePropertyHolders();
+          const selectedMemberIds = [
+            ...$("property-detail-content").querySelectorAll(
+              "[data-holder-choice]:checked",
+            ),
+          ].map((input) => input.value);
+          savePropertyHolders(selectedMemberIds);
         }
       });
     }

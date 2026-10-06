@@ -2,18 +2,9 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    fetchAll,
-    openPropertyDetails,
-    documentRef = document,
-  }) {
-    async function savePropertyHolders() {
+  function create({ state, toast, fetchAll, openPropertyDetails }) {
+    async function savePropertyHolders(selectedMemberIds = []) {
       const id = state.selectedPropertyId;
-      const selected = [
-        ...documentRef.querySelectorAll("[data-holder-choice]:checked"),
-      ].map((input) => input.value);
       if (!id) return;
 
       let deleteError;
@@ -33,11 +24,11 @@
         toast(deleteError.message);
         return;
       }
-      if (selected.length) {
+      if (selectedMemberIds.length) {
         let error;
         try {
           ({ error } = await state.client.from("pd_property_holders").insert(
-            selected.map((member_user_id) => ({
+            selectedMemberIds.map((member_user_id) => ({
               user_id: state.workspaceOwnerId,
               property_id: id,
               member_user_id,
