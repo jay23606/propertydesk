@@ -10,6 +10,7 @@
     resolveVoidTarget = window.PropertyDeskTransactionVoidModel
       .resolveVoidTarget,
     buildVoidPayload = window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+    repository = window.PropertyDeskTransactionRepository,
   }) {
     async function saveVoidTransaction(kind, id, reason) {
       const target = resolveVoidTarget(kind);
@@ -19,13 +20,11 @@
       }
       let result;
       try {
-        result = await state.client
-          .from(target.table)
-          .update(buildVoidPayload(reason, timestamp()))
-          .eq("id", id)
-          .eq("status", "posted")
-          .select("id")
-          .maybeSingle();
+        result = await repository.voidPosted(state.client, {
+          target,
+          id,
+          payload: buildVoidPayload(reason, timestamp()),
+        });
       } catch {
         toast("Transaction couldn't be voided right now. Please try again.");
         return;

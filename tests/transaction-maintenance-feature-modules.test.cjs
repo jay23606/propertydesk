@@ -290,6 +290,13 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-maintenance.js"),
       "utf8",
     ),
@@ -351,6 +358,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
+    "transaction-repository.js",
     "transaction-maintenance.js",
   ]) {
     vm.runInContext(
@@ -382,6 +390,13 @@ test("transaction maintenance reports rejected void requests without refreshing"
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-void-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-repository.js"),
       "utf8",
     ),
     context,
@@ -426,6 +441,13 @@ test("transaction maintenance reports rejected void requests without refreshing"
 
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-corrections.js"),
@@ -496,6 +518,13 @@ test("transaction corrections save payment and expense changes with their audit 
 
 test("transaction correction failures preserve the open form and pending correction", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-corrections.js"),

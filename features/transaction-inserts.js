@@ -2,11 +2,15 @@
 (() => {
   "use strict";
 
-  function create({ state, toast }) {
+  function create({
+    state,
+    toast,
+    repository = window.PropertyDeskTransactionRepository,
+  }) {
     async function insertTransaction({ table, payload, failureMessage }) {
       let error;
       try {
-        ({ error } = await state.client.from(table).insert(payload));
+        ({ error } = await repository.insert(state.client, table, payload));
       } catch {
         toast(failureMessage);
         return false;

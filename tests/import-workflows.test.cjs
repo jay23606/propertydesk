@@ -56,6 +56,18 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf("features/app-state.js") < html.indexOf("app.js"));
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf("app.js"));
   assert.ok(
+    html.indexOf("features/transaction-repository.js") <
+      html.indexOf("features/transaction-inserts.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-repository.js") <
+      html.indexOf("features/transaction-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-repository.js") <
+      html.indexOf("features/transaction-corrections.js"),
+  );
+  assert.ok(
     html.indexOf("features/transaction-inserts.js") <
       html.indexOf("features/payment-entry-form.js"),
   );

@@ -8,6 +8,13 @@ function loadTransactionInserts(client, messages = []) {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-inserts.js"),
       "utf8",
     ),

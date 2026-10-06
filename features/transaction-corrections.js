@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ $, state, toast, fetchAll, closeModal }) {
+  function create({
+    $,
+    state,
+    toast,
+    fetchAll,
+    closeModal,
+    repository = window.PropertyDeskTransactionRepository,
+  }) {
     async function saveCorrection(kind, correction) {
       const pending = state.pendingCorrection;
       if (!pending || pending.kind !== kind) {
@@ -11,11 +18,11 @@
       }
       let error;
       try {
-        ({ error } = await state.client.rpc("pd_correct_transaction", {
-          p_kind: kind,
-          p_transaction_id: pending.id,
-          p_correction: correction,
-          p_reason: pending.reason,
+        ({ error } = await repository.correct(state.client, {
+          kind,
+          transactionId: pending.id,
+          correction,
+          reason: pending.reason,
         }));
       } catch {
         toast(
