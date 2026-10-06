@@ -1,4 +1,4 @@
-/* Render staged CSV rows, validation corrections, and the commit button. */
+/* Render staged CSV rows and update the import commit control. */
 (() => {
   "use strict";
 
