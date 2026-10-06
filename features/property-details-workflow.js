@@ -26,7 +26,6 @@
       openExpense,
       openAccountForProperty,
       openAccountDetails,
-      documentRef = document,
     } = context;
     const { openPropertyDetails } =
       window.PropertyDeskPropertyDetailContentWorkflow.create({
@@ -59,7 +58,6 @@
         openExpense,
         openAccountForProperty,
         openAccountDetails,
-        documentRef,
       });
     const { attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDocumentWorkflow.create({

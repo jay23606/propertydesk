@@ -225,7 +225,6 @@
     openExpense,
     openAccountForProperty,
     openAccountDetails,
-    documentRef: document,
   });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({

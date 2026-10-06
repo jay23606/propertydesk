@@ -819,7 +819,6 @@ test("property details workflow connects content with action and document routes
     openExpense() {},
     openAccountForProperty() {},
     openAccountDetails() {},
-    documentRef: {},
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailsWorkflow.create(dependencies);
@@ -832,7 +831,6 @@ test("property details workflow connects content with action and document routes
     [
       "$",
       "closeModal",
-      "documentRef",
       "editAccount",
       "fetchAll",
       "openAccountDetails",
@@ -918,10 +916,9 @@ test("property detail actions workflow composes administration and modal actions
     openAccountForProperty: action,
   };
   const workflow =
-    context.window.PropertyDeskPropertyDetailActionsWorkflow.create({
-      ...quickActionDependencies,
-      documentRef: {},
-    });
+    context.window.PropertyDeskPropertyDetailActionsWorkflow.create(
+      quickActionDependencies,
+    );
 
   assert.equal(passed.holderEvents.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
