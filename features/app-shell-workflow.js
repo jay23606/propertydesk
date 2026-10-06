@@ -1,17 +1,9 @@
-/* Compose workspace settings with app navigation and theme controls. */
+/* Compose workspace settings with navigation to the settings view. */
 (() => {
   "use strict";
 
   function create(context) {
-    const {
-      $,
-      state,
-      esc,
-      toast,
-      fetchAll,
-      renderReminderActivity,
-      previewReminderEmail,
-    } = context;
+    const { $, state, esc, toast, fetchAll, renderReminderActivity } = context;
     const settings = window.PropertyDeskWorkspace.create({
       $,
       state,
@@ -29,10 +21,7 @@
       state,
       renderWorkspaceSettings,
     });
-    const theme = window.PropertyDeskTheme.create();
-
     function attachEvents() {
-      theme.attachEvents();
       navigation.attachEvents();
       settings.attachEvents();
     }
@@ -40,7 +29,6 @@
     return {
       updateGreeting,
       navigate: navigation.navigate,
-      previewReminderEmail,
       attachEvents,
     };
   }

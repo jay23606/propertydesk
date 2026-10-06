@@ -107,6 +107,7 @@
       propertyAddress,
       openModal,
     });
+  const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const {
     updateGreeting,
     navigate,
@@ -118,7 +119,6 @@
     toast,
     fetchAll,
     renderReminderActivity,
-    previewReminderEmail,
   });
   const { entries: recordEntryWorkflow, transactions } =
     window.PropertyDeskLedgerWorkflow.create({
@@ -341,6 +341,7 @@
     ],
     eventBinders: [
       attachModalEvents,
+      attachThemeEvents,
       attachAppShellEvents,
       attachOverviewEvents,
       attachPropertyPortfolioEvents,

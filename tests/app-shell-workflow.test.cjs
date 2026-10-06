@@ -19,13 +19,9 @@ test("app shell workflow owns settings and groups shell event binding", () => {
     renderReminderActivity() {
       calls.push("reminder activity rendered");
     },
-    previewReminderEmail() {},
     navigate() {},
     attachNavigationEvents() {
       calls.push("navigation events attached");
-    },
-    attachThemeEvents() {
-      calls.push("theme events attached");
     },
   };
   const context = vm.createContext({
@@ -49,12 +45,6 @@ test("app shell workflow owns settings and groups shell event binding", () => {
           };
         },
       },
-      PropertyDeskTheme: {
-        create() {
-          calls.push(["theme"]);
-          return { attachEvents: handlers.attachThemeEvents };
-        },
-      },
     },
   });
   vm.runInContext(
@@ -72,7 +62,6 @@ test("app shell workflow owns settings and groups shell event binding", () => {
     toast() {},
     fetchAll() {},
     renderReminderActivity: handlers.renderReminderActivity,
-    previewReminderEmail: handlers.previewReminderEmail,
     unrelatedDependency() {},
   };
   const shell = context.window.PropertyDeskAppShellWorkflow.create(options);
@@ -80,7 +69,6 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   assert.deepEqual(Object.keys(shell).sort(), [
     "attachEvents",
     "navigate",
-    "previewReminderEmail",
     "updateGreeting",
   ]);
   assert.equal(calls[0][0], "settings");
@@ -93,18 +81,16 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   assert.equal(typeof calls[1][1].renderWorkspaceSettings, "function");
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["settings", "navigation", "theme"],
+    ["settings", "navigation"],
   );
   assert.equal(shell.updateGreeting, handlers.updateGreeting);
-  assert.equal(shell.previewReminderEmail, handlers.previewReminderEmail);
   calls[1][1].renderWorkspaceSettings();
   assert.deepEqual(calls.slice(-2), [
     "workspace settings rendered",
     "reminder activity rendered",
   ]);
   shell.attachEvents();
-  assert.deepEqual(calls.slice(-3), [
-    "theme events attached",
+  assert.deepEqual(calls.slice(-2), [
     "navigation events attached",
     "workspace events attached",
   ]);
@@ -147,5 +133,13 @@ test("app shell receives reminder callbacks and is precached", () => {
     /PropertyDesk(?:ReminderActivityView|ReminderPreview)\.create/,
   );
   assert.doesNotMatch(app, /PropertyDeskNavigation\.create/);
-  assert.doesNotMatch(app, /PropertyDeskTheme\.create/);
+  assert.match(app, /PropertyDeskTheme\.create/);
+  assert.match(app, /attachThemeEvents,/);
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(root, "features", "app-shell-workflow.js"),
+      "utf8",
+    ),
+    /PropertyDeskTheme\.create|previewReminderEmail/,
+  );
 });
