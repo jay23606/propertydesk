@@ -4,6 +4,61 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("account maintenance workflow composes account closure and deposit actions", () => {
+  const passed = {};
+  const depositSectionHTML = () => "deposit html";
+  const closeAccount = () => "closed";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositWorkflow: {
+        create: (dependencies) => {
+          passed.deposit = dependencies;
+          return {
+            depositSectionHTML,
+            attachEvents: () => attached++,
+          };
+        },
+      },
+      PropertyDeskAccountMaintenance: {
+        create: (dependencies) => {
+          passed.account = dependencies;
+          return { closeAccount };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-maintenance-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $: () => {},
+    state: {},
+    depositLedger: () => [],
+    money: () => "$0.00",
+    fmtDate: () => "Oct 1",
+    esc: String,
+    moneyInput: Number,
+    todayIso: () => "2026-10-01",
+    toast: () => {},
+    fetchAll: async () => {},
+    closeModal: () => {},
+  };
+  const workflow =
+    context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
+
+  assert.equal(passed.deposit.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.account.closeModal, dependencies.closeModal);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.equal(workflow.closeAccount, closeAccount);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
+});
+
 test("deposit workflow composes its ledger view, maintenance, and event binding", () => {
   const passed = {};
   const depositSectionHTML = () => "deposit HTML";

@@ -136,7 +136,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details workflow composes its deposit, history, and maintenance features", () => {
+test("account details workflow delegates account and deposit maintenance", () => {
   const created = [];
   const passed = {};
   const closeAccount = () => "closed";
@@ -144,21 +144,15 @@ test("account details workflow composes its deposit, history, and maintenance fe
   let depositAttached = 0;
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositWorkflow: {
+      PropertyDeskAccountMaintenanceWorkflow: {
         create: (options) => {
-          created.push("deposit workflow");
-          passed.deposit = options;
+          created.push("maintenance workflow");
+          passed.maintenance = options;
           return {
             depositSectionHTML,
+            closeAccount,
             attachEvents: () => depositAttached++,
           };
-        },
-      },
-      PropertyDeskAccountMaintenance: {
-        create: (options) => {
-          created.push("account maintenance");
-          passed.accountMaintenance = options;
-          return { closeAccount };
         },
       },
       PropertyDeskAccountDetailsView: {
@@ -225,8 +219,7 @@ test("account details workflow composes its deposit, history, and maintenance fe
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, [
-    "deposit workflow",
-    "account maintenance",
+    "maintenance workflow",
     "schedule view",
     "account view",
     "history",
@@ -240,8 +233,9 @@ test("account details workflow composes its deposit, history, and maintenance fe
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
-  assert.equal(passed.deposit.depositLedger, dependencies.depositLedger);
-  assert.equal(passed.deposit.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.maintenance.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.maintenance.closeModal, dependencies.closeModal);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "openAccountDetails",
