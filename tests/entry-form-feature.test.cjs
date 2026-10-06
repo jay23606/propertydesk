@@ -29,6 +29,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   const passed = {};
   const buildPaymentPayload = () => ({ payment_payload: true });
   const buildExpensePayload = () => ({ expense_payload: true });
+  const insertTransaction = () => true;
   const paymentActions = {
     updateAllocationPreview: () => "preview",
     openPayment: () => "open payment",
@@ -44,6 +45,12 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       PropertyDeskTransactionPayloads: {
         buildPayment: buildPaymentPayload,
         buildExpense: buildExpensePayload,
+      },
+      PropertyDeskTransactionInserts: {
+        create: (options) => {
+          passed.persistenceOptions = options;
+          return { insertTransaction };
+        },
       },
       PropertyDeskPaymentEntryForm: {
         create: (options) => {
@@ -109,6 +116,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "closeModal",
       "fetchAll",
       "fillSelect",
+      "insertTransaction",
       "moneyInput",
       "openModal",
       "populateFormOptions",
@@ -127,6 +135,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "closeModal",
       "fetchAll",
       "fillSelect",
+      "insertTransaction",
       "moneyInput",
       "openModal",
       "populateFormOptions",
@@ -141,6 +150,10 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.equal(passed.expense.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.payment.buildPaymentPayload, buildPaymentPayload);
   assert.equal(passed.expense.buildExpensePayload, buildExpensePayload);
+  assert.equal(passed.payment.insertTransaction, insertTransaction);
+  assert.equal(passed.expense.insertTransaction, insertTransaction);
+  assert.equal(passed.persistenceOptions.state, dependencies.state);
+  assert.equal(passed.persistenceOptions.toast, dependencies.toast);
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });

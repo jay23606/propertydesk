@@ -38,6 +38,7 @@ function loadWorkspaceFeatures(context) {
 function loadLedgerEntryForms(context) {
   for (const filename of [
     "transaction-payloads.js",
+    "transaction-inserts.js",
     "payment-entry-view.js",
     "payment-entry-form.js",
     "expense-entry-view.js",

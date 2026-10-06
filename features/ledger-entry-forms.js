@@ -17,6 +17,10 @@
       openModal,
       saveCorrection,
     } = context;
+    const { insertTransaction } = window.PropertyDeskTransactionInserts.create({
+      state,
+      toast,
+    });
     const payments = window.PropertyDeskPaymentEntryForm.create({
       $,
       state,
@@ -30,6 +34,7 @@
       prettyType,
       openModal,
       saveCorrection,
+      insertTransaction,
       buildPaymentPayload: window.PropertyDeskTransactionPayloads.buildPayment,
     });
     const expenses = window.PropertyDeskExpenseEntryForm.create({
@@ -45,6 +50,7 @@
       prettyType,
       openModal,
       saveCorrection,
+      insertTransaction,
       buildExpensePayload: window.PropertyDeskTransactionPayloads.buildExpense,
     });
 

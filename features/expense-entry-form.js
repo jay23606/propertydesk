@@ -10,6 +10,7 @@
       closeModal,
       fetchAll,
       saveCorrection,
+      insertTransaction,
       buildExpensePayload,
     } = context;
     const expenseView = window.PropertyDeskExpenseEntryView.create({
@@ -67,19 +68,13 @@
         return;
       }
 
-      let error;
-      try {
-        ({ error } = await state.client.from("pd_expenses").insert(payload));
-      } catch {
-        toast(
+      const saved = await insertTransaction({
+        table: "pd_expenses",
+        payload,
+        failureMessage:
           "Expense couldn't be saved right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      });
+      if (!saved) return;
       expenseView.resetAfterSave();
       try {
         await fetchAll();

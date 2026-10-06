@@ -10,6 +10,7 @@
       closeModal,
       fetchAll,
       saveCorrection,
+      insertTransaction,
       buildPaymentPayload,
     } = context;
     const paymentView = window.PropertyDeskPaymentEntryView.create({
@@ -65,19 +66,13 @@
         return;
       }
 
-      let error;
-      try {
-        ({ error } = await state.client.from("pd_payments").insert(payload));
-      } catch {
-        toast(
+      const saved = await insertTransaction({
+        table: "pd_payments",
+        payload,
+        failureMessage:
           "Payment couldn't be saved right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      });
+      if (!saved) return;
       paymentView.resetAfterSave(account.id);
       try {
         await fetchAll();
