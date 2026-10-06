@@ -121,11 +121,11 @@
 
     function attachEvents() {
       $("import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) importAccounts(event.target.files[0]);
+        if (event.target.files[0]) return importAccounts(event.target.files[0]);
       });
     }
 
-    return { importAccounts, attachEvents };
+    return { attachEvents };
   }
 
   window.PropertyDeskAccountImport = Object.freeze({

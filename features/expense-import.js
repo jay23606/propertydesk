@@ -111,11 +111,11 @@
 
     function attachEvents() {
       $("expense-import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) importExpenses(event.target.files[0]);
+        if (event.target.files[0]) return importExpenses(event.target.files[0]);
       });
     }
 
-    return { importExpenses, attachEvents };
+    return { attachEvents };
   }
 
   window.PropertyDeskExpenseImport = Object.freeze({

@@ -50,12 +50,7 @@
       expenses.attachEvents();
     }
 
-    return {
-      importAccounts: accounts.importAccounts,
-      importPayments: payments.importPayments,
-      importExpenses: expenses.importExpenses,
-      attachEvents,
-    };
+    return { attachEvents };
   }
 
   window.PropertyDeskImportFeature = Object.freeze({

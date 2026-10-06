@@ -31,9 +31,7 @@ test("CSV import feature loads as an isolated browser module", () => {
     stageImport: preview.stageImport,
   });
   assert.equal(typeof feature.attachEvents, "function");
-  assert.equal(typeof feature.importAccounts, "function");
-  assert.equal(typeof feature.importExpenses, "function");
-  assert.equal(typeof feature.importPayments, "function");
+  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
   assert.equal(typeof previewEvents.attachEvents, "function");
   feature.attachEvents();
   assert.deepEqual(
@@ -85,21 +83,12 @@ test("CSV preview renderer receives only rendering dependencies", () => {
   assert.equal(typeof preview.stageImport, "function");
 });
 
-test("import workflow publishes explicit account, payment, and expense actions", () => {
+test("import workflow keeps file import handlers inside its event bindings", () => {
   const calls = [];
   const passed = {};
-  const accounts = {
-    importAccounts: () => "accounts",
-    attachEvents: () => calls.push("account events"),
-  };
-  const payments = {
-    importPayments: () => "payments",
-    attachEvents: () => calls.push("payment events"),
-  };
-  const expenses = {
-    importExpenses: () => "expenses",
-    attachEvents: () => calls.push("expense events"),
-  };
+  const accounts = { attachEvents: () => calls.push("account events") };
+  const payments = { attachEvents: () => calls.push("payment events") };
+  const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
       PropertyDeskAccountImport: {
@@ -144,18 +133,7 @@ test("import workflow publishes explicit account, payment, and expense actions",
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
-  assert.deepEqual(
-    Object.keys(imports).sort(),
-    [
-      "attachEvents",
-      "importAccounts",
-      "importExpenses",
-      "importPayments",
-    ].sort(),
-  );
-  assert.equal(imports.importAccounts, accounts.importAccounts);
-  assert.equal(imports.importPayments, payments.importPayments);
-  assert.equal(imports.importExpenses, expenses.importExpenses);
+  assert.deepEqual(Object.keys(imports), ["attachEvents"]);
   assert.deepEqual(
     Object.keys(passed.account).sort(),
     [
@@ -304,8 +282,15 @@ test("payment and expense CSV importers save their own validated transaction pay
   };
   const calls = [];
   const staged = [];
+  const fileHandlers = new Map();
+  const elements = formElements();
   const feature = context.window.PropertyDeskImportFeature.create({
-    $: formElements(),
+    $: (id) => {
+      const element = elements(id);
+      element.addEventListener = (event, handler) =>
+        fileHandlers.set(`${id}:${event}`, handler);
+      return element;
+    },
     state,
     stageImport: (title, rows, commit, note, report) =>
       staged.push({ title, rows, commit, note, report }),
@@ -335,9 +320,16 @@ test("payment and expense CSV importers save their own validated transaction pay
     payment_method: "check",
     memo: "Leak repair",
   };
-  await feature.importExpenses({
-    name: "expenses.csv",
-    text: async () => JSON.stringify([expense]),
+  feature.attachEvents();
+  await fileHandlers.get("expense-import-file:change")({
+    target: {
+      files: [
+        {
+          name: "expenses.csv",
+          text: async () => JSON.stringify([expense]),
+        },
+      ],
+    },
   });
   await staged[0].commit(staged[0].rows, { total: 1 });
   assert.equal(staged[0].title, "Review expense import");
@@ -363,9 +355,15 @@ test("payment and expense CSV importers save their own validated transaction pay
     unapplied_amount: 0,
     memo: "October rent",
   };
-  await feature.importPayments({
-    name: "payments.csv",
-    text: async () => JSON.stringify([payment]),
+  await fileHandlers.get("payment-import-file:change")({
+    target: {
+      files: [
+        {
+          name: "payments.csv",
+          text: async () => JSON.stringify([payment]),
+        },
+      ],
+    },
   });
   await staged[1].commit(staged[1].rows, { total: 1 });
   assert.equal(staged[1].title, "Review payment import");
@@ -567,6 +565,7 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
   loadImportFeatures(context);
 
   const elements = new Map();
+  const fileHandlers = new Map();
   const element = (id) => {
     if (!elements.has(id)) {
       elements.set(id, {
@@ -575,6 +574,8 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
         disabled: false,
         textContent: "",
         value: "",
+        addEventListener: (event, handler) =>
+          fileHandlers.set(`${id}:${event}`, handler),
       });
     }
     return elements.get(id);
@@ -606,7 +607,10 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     toast() {},
   });
 
-  await feature.importAccounts({ name: "accounts.csv", text: async () => "" });
+  feature.attachEvents();
+  await fileHandlers.get("import-file:change")({
+    target: { files: [{ name: "accounts.csv", text: async () => "" }] },
+  });
   await state.pendingImport.commit(
     state.pendingImport.rows,
     state.pendingImport,

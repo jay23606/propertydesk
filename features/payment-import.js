@@ -107,11 +107,11 @@
 
     function attachEvents() {
       $("payment-import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) importPayments(event.target.files[0]);
+        if (event.target.files[0]) return importPayments(event.target.files[0]);
       });
     }
 
-    return { importPayments, attachEvents };
+    return { attachEvents };
   }
 
   window.PropertyDeskPaymentImport = Object.freeze({
