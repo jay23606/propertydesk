@@ -17,12 +17,18 @@
     paymentStatusInMonth,
     money,
   }) {
+    const { summarizeAccount } =
+      window.PropertyDeskAccountFinancialSummary.create({
+        accountBalance,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+      });
+
     function buildAccountRow(property, account, street) {
-      const unpaidDue = amountDueSince(
-        [account],
+      const { unpaidDue, loanBalance, hasLoanBalance } = summarizeAccount(
+        account,
         state.payments,
-        unpaidDueAccrualStart(),
-        todayIso(),
       );
       const scheduledPayment = monthlyScheduledEstimate([
         { ...account, status: "active" },
@@ -58,8 +64,6 @@
         monthStart(),
         scheduledThisMonth,
       );
-      const hasLoanBalance = account.account_type !== "rental";
-
       return {
         hasAccount: true,
         party: partyName,
@@ -71,7 +75,7 @@
         street,
         unpaidDue,
         scheduledPayment,
-        loanBalance: hasLoanBalance ? accountBalance(account) : 0,
+        loanBalance,
         hasLoanBalance,
         partyName,
         paymentStatus,

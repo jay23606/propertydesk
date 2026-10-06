@@ -10,6 +10,14 @@
     unpaidDueAccrualStart,
     todayIso,
   }) {
+    const { summarizeAccount } =
+      window.PropertyDeskAccountFinancialSummary.create({
+        accountBalance,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+      });
+
     function summarizeProperty(property) {
       const related = state.accounts.filter(
         (account) => account.property_id === property.id,
@@ -17,19 +25,8 @@
       const active = related.filter(
         (account) => (account.status || "active") === "active",
       );
-      const loanAccounts = active.filter(
-        (account) => account.account_type !== "rental",
-      );
-      const amountDue = active.reduce(
-        (sum, account) =>
-          sum +
-          amountDueSince(
-            [account],
-            state.payments,
-            unpaidDueAccrualStart(),
-            todayIso(),
-          ),
-        0,
+      const financials = active.map((account) =>
+        summarizeAccount(account, state.payments),
       );
 
       return {
@@ -38,12 +35,15 @@
         hasNonMonthly: active.some(
           (account) => account.payment_frequency !== "monthly",
         ),
-        loanBalance: loanAccounts.reduce(
-          (sum, account) => sum + accountBalance(account),
+        loanBalance: financials.reduce(
+          (sum, summary) => sum + summary.loanBalance,
           0,
         ),
-        hasLoanAccount: loanAccounts.length > 0,
-        amountDue,
+        hasLoanAccount: financials.some((summary) => summary.hasLoanBalance),
+        amountDue: financials.reduce(
+          (sum, summary) => sum + summary.unpaidDue,
+          0,
+        ),
         parties: [
           ...new Set(
             active.map((account) => account.party_name).filter(Boolean),

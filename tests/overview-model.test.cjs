@@ -6,6 +6,13 @@ const vm = require("node:vm");
 
 test("overview model aggregates current counts, upcoming accounts, activity, and property cards", () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-financial-summary.js"),
+      "utf8",
+    ),
+    context,
+  );
   for (const moduleName of [
     "overview-property-summary-model.js",
     "overview-model.js",
