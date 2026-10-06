@@ -27,28 +27,18 @@
       editAccount,
       openPayment,
     } = context;
-    const depositWorkflow = window.PropertyDeskDepositWorkflow.create({
+    const depositWorkflow = window.PropertyDeskDepositDetailsWorkflow.create({
+      $,
       state,
       depositLedger,
       money,
       fmtDate,
       esc,
+      moneyInput,
+      todayIso,
+      toast,
+      fetchAll,
     });
-    const { recordDepositAdjustment } =
-      window.PropertyDeskDepositMaintenance.create({
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        fetchAll,
-      });
-    const { attachEvents: attachDepositEvents } =
-      window.PropertyDeskDepositDetailEvents.create({
-        $,
-        state,
-        depositSectionHTML: depositWorkflow.depositSectionHTML,
-        recordDepositAdjustment,
-      });
     const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
       $,
       state,
@@ -111,7 +101,7 @@
     return {
       openAccountDetails,
       attachEvents: attachAccountEvents,
-      attachDepositEvents,
+      attachDepositEvents: depositWorkflow.attachEvents,
     };
   }
 

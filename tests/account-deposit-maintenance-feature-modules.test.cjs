@@ -40,6 +40,65 @@ test("deposit workflow composes only its read-only ledger view", () => {
   assert.deepEqual(Object.keys(workflow), ["depositSectionHTML"]);
 });
 
+test("deposit details workflow composes the view, maintenance, and action router", () => {
+  const passed = {};
+  const depositSectionHTML = () => "deposit HTML";
+  const recordDepositAdjustment = () => "adjusted";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositWorkflow: {
+        create: (options) => {
+          passed.view = options;
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          passed.maintenance = options;
+          return { recordDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: () => attached++ };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    depositLedger() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    moneyInput() {},
+    todayIso() {},
+    toast() {},
+    fetchAll() {},
+  };
+  const workflow =
+    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
+
+  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.maintenance.state, dependencies.state);
+  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
+  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

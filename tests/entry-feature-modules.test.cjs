@@ -151,25 +151,14 @@ test("account details keeps account actions separate from deposit maintenance", 
   let depositAttached = 0;
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositWorkflow: {
+      PropertyDeskDepositDetailsWorkflow: {
         create: (options) => {
-          created.push("deposit workflow");
-          passed.deposit = options;
-          return { depositSectionHTML };
-        },
-      },
-      PropertyDeskDepositMaintenance: {
-        create: (options) => {
-          created.push("deposit maintenance");
-          passed.depositMaintenance = options;
-          return { recordDepositAdjustment: () => "deposit adjusted" };
-        },
-      },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          created.push("deposit events");
-          passed.depositEvents = options;
-          return { attachEvents: () => depositAttached++ };
+          created.push("deposit details workflow");
+          passed.depositWorkflow = options;
+          return {
+            depositSectionHTML,
+            attachEvents: () => depositAttached++,
+          };
         },
       },
       PropertyDeskAccountMaintenance: {
@@ -243,9 +232,7 @@ test("account details keeps account actions separate from deposit maintenance", 
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, [
-    "deposit workflow",
-    "deposit maintenance",
-    "deposit events",
+    "deposit details workflow",
     "account maintenance",
     "schedule view",
     "account view",
@@ -260,10 +247,11 @@ test("account details keeps account actions separate from deposit maintenance", 
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
-  assert.equal(passed.deposit.depositLedger, dependencies.depositLedger);
-  assert.equal(passed.depositMaintenance.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
-  assert.equal(typeof passed.depositEvents.recordDepositAdjustment, "function");
+  assert.equal(
+    passed.depositWorkflow.depositLedger,
+    dependencies.depositLedger,
+  );
+  assert.equal(passed.depositWorkflow.moneyInput, dependencies.moneyInput);
   assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachDepositEvents",
