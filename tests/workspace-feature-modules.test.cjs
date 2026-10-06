@@ -154,11 +154,15 @@ test("adding a workspace member clears the address only after successful refresh
   const context = vm.createContext({ window: {} });
   loadWorkspaceFeatures(context);
   const elements = new Map();
+  const handlers = new Map();
   const element = (id) => {
     if (!elements.has(id))
       elements.set(id, {
         value: id === "member-email" ? " spouse@example.test " : "",
         classList: { toggle() {} },
+        addEventListener(eventName, handler) {
+          handlers.set(`${id}:${eventName}`, handler);
+        },
       });
     return elements.get(id);
   };
@@ -183,7 +187,12 @@ test("adding a workspace member clears the address only after successful refresh
     refreshWorkspaceSettings: () => calls.push(["render-reminders"]),
   });
 
-  await feature.addWorkspaceMember({ preventDefault() {} });
+  assert.deepEqual(Object.keys(feature).sort(), [
+    "attachEvents",
+    "renderWorkspaceMembers",
+  ]);
+  feature.attachEvents();
+  await handlers.get("member-add-form:submit")({ preventDefault() {} });
 
   assert.equal(calls.length, 3);
   assert.equal(calls[0][0], "pd_add_workspace_member");
@@ -202,15 +211,25 @@ test("workspace setting writes report rejected requests and retain entered value
     ["member-email", { value: " spouse@example.test " }],
   ]);
   let saveProfile;
-  const $ = (id) =>
-    id === "display-name-form"
-      ? {
-          addEventListener(eventName, handler) {
-            assert.equal(eventName, "submit");
-            saveProfile = handler;
-          },
-        }
-      : elements.get(id);
+  const memberHandlers = new Map();
+  const $ = (id) => {
+    if (id === "display-name-form") {
+      return {
+        addEventListener(eventName, handler) {
+          assert.equal(eventName, "submit");
+          saveProfile = handler;
+        },
+      };
+    }
+    if (id === "member-add-form" || id === "workspace-members") {
+      return {
+        addEventListener(eventName, handler) {
+          memberHandlers.set(`${id}:${eventName}`, handler);
+        },
+      };
+    }
+    return elements.get(id);
+  };
   const messages = [];
   const state = {
     client: {
@@ -250,11 +269,21 @@ test("workspace setting writes report rejected requests and retain entered value
   });
 
   profile.attachEvents();
+  feature.attachEvents();
   await assert.doesNotReject(saveProfile({ preventDefault() {} }));
   await assert.doesNotReject(
-    feature.addWorkspaceMember({ preventDefault() {} }),
+    memberHandlers.get("member-add-form:submit")({ preventDefault() {} }),
   );
-  await assert.doesNotReject(feature.removeWorkspaceMember("member-1"));
+  await assert.doesNotReject(
+    memberHandlers.get("workspace-members:click")({
+      target: {
+        closest: (selector) =>
+          selector === "[data-remove-member]"
+            ? { dataset: { removeMember: "member-1" } }
+            : null,
+      },
+    }),
+  );
   assert.equal(state.user.user_metadata.display_name, "Owner");
   assert.equal($("member-email").value, " spouse@example.test ");
   assert.deepEqual(messages, [

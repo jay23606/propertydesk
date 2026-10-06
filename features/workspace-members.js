@@ -90,18 +90,18 @@
     }
 
     function attachEvents() {
-      $("member-add-form").addEventListener("submit", addWorkspaceMember);
+      $("member-add-form").addEventListener("submit", (event) =>
+        addWorkspaceMember(event),
+      );
       $("workspace-members").addEventListener("click", (event) => {
         const removeButton = event.target.closest("[data-remove-member]");
         if (removeButton) {
-          removeWorkspaceMember(removeButton.dataset.removeMember);
+          return removeWorkspaceMember(removeButton.dataset.removeMember);
         }
       });
     }
 
     return {
-      addWorkspaceMember,
-      removeWorkspaceMember,
       renderWorkspaceMembers,
       attachEvents,
     };
