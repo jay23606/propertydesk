@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("every local deferred script loads before app.js and is included in the PWA shell", () => {
+test("every feature module loads before app.js and every local script is precached", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -28,6 +28,16 @@ test("every local deferred script loads before app.js and is included in the PWA
     localScripts.length - 1,
     "app.js is the last local deferred script",
   );
+  const featureModules = fs
+    .readdirSync(path.join(__dirname, "..", "features"))
+    .filter((filename) => filename.endsWith(".js"))
+    .map((filename) => `features/${filename}`);
+  for (const featureModule of featureModules) {
+    assert.ok(
+      localScripts.includes(featureModule),
+      `${featureModule} is loaded by index.html`,
+    );
+  }
   for (const source of localScripts) {
     assert.ok(
       shellFiles.has(source),
