@@ -61,6 +61,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf("app.js"));
   assert.ok(html.indexOf("csv-parser.js") < html.indexOf("import-utils.js"));
   assert.ok(
+    html.indexOf("features/repository-query-utils.js") <
+      html.indexOf("features/property-repository.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-repository.js") <
       html.indexOf("features/property-maintenance.js"),
   );
@@ -68,6 +72,7 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/account-repository.js") <
       html.indexOf("features/account-maintenance.js"),
   );
+  assert.match(worker, /'\.\/features\/repository-query-utils\.js'/);
   assert.ok(
     html.indexOf("features/deposit-repository.js") <
       html.indexOf("features/deposit-maintenance.js"),

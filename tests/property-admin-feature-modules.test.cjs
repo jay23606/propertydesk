@@ -7,6 +7,7 @@ const vm = require("node:vm");
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {} });
   for (const source of [
+    "repository-query-utils.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-quick-note.js",
@@ -71,6 +72,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
 test("property quick notes enforce the character limit before writing", async () => {
   const context = vm.createContext({ window: {} });
   for (const source of [
+    "repository-query-utils.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-quick-note.js",
@@ -105,6 +107,7 @@ test("property holder and archive workflows report rejected writes without runni
   for (const source of [
     "property-holder-repository.js",
     "property-holder-management.js",
+    "repository-query-utils.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-archive.js",
@@ -172,6 +175,7 @@ test("property holder and archive workflows report rejected writes without runni
 test("archive and restore writes share property maintenance and reopen updated details", async () => {
   const context = vm.createContext({ window: {} });
   for (const source of [
+    "repository-query-utils.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-archive.js",

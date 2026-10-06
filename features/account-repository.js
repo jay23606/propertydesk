@@ -2,17 +2,16 @@
 (() => {
   "use strict";
 
+  const { saveById, updateById } = window.PropertyDeskRepositoryQueryUtils;
+
   function save(client, payload, accountId) {
-    return accountId
-      ? client.from("pd_accounts").update(payload).eq("id", accountId)
-      : client.from("pd_accounts").insert(payload);
+    return saveById(client, "pd_accounts", payload, accountId);
   }
 
   function close(client, accountId) {
-    return client
-      .from("pd_accounts")
-      .update({ status: "closed" })
-      .eq("id", accountId);
+    return updateById(client, "pd_accounts", accountId, {
+      status: "closed",
+    });
   }
 
   window.PropertyDeskAccountRepository = Object.freeze({ save, close });

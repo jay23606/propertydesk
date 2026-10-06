@@ -7,6 +7,13 @@ const vm = require("node:vm");
 function loadRepository(filename, key) {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-query-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
     context,
   );

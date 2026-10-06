@@ -667,6 +667,13 @@ test("account maintenance closes an account while preserving its history", async
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-query-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "account-repository.js"),
       "utf8",
     ),
@@ -717,6 +724,13 @@ test("account maintenance closes an account while preserving its history", async
 
 test("account maintenance reports rejected requests and skips success actions", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-query-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "account-repository.js"),

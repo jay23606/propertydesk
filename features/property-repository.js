@@ -2,18 +2,20 @@
 (() => {
   "use strict";
 
+  const { saveById, updateOwnedById } = window.PropertyDeskRepositoryQueryUtils;
+
   function save(client, payload, propertyId) {
-    return propertyId
-      ? client.from("pd_properties").update(payload).eq("id", propertyId)
-      : client.from("pd_properties").insert(payload);
+    return saveById(client, "pd_properties", payload, propertyId);
   }
 
   function updateOwned(client, propertyId, ownerId, values) {
-    return client
-      .from("pd_properties")
-      .update(values)
-      .eq("id", propertyId)
-      .eq("user_id", ownerId);
+    return updateOwnedById(
+      client,
+      "pd_properties",
+      propertyId,
+      ownerId,
+      values,
+    );
   }
 
   window.PropertyDeskPropertyRepository = Object.freeze({
