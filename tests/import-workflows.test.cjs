@@ -905,5 +905,8 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/reminder-activity-view\.js'/);
   assert.doesNotMatch(worker, /features\/reminder-workflow\.js/);
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
-  assert.match(app, /attachImportPreviewEvents,\s*attachImportFileEvents,/);
+  assert.match(
+    app,
+    /attachImportPreviewEvents,\s*attachAccountImportEvents,\s*attachPaymentImportEvents,\s*attachExpenseImportEvents,/,
+  );
 });

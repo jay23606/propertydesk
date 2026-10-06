@@ -37,10 +37,15 @@ test("CSV import feature loads as an isolated browser module", () => {
     stageImport: preview.stageImport,
     createImportLookup() {},
   });
-  assert.equal(typeof feature.attachEvents, "function");
-  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
+  assert.deepEqual(Object.keys(feature), [
+    "attachAccountEvents",
+    "attachPaymentEvents",
+    "attachExpenseEvents",
+  ]);
   assert.equal(typeof previewEvents.attachEvents, "function");
-  feature.attachEvents();
+  feature.attachAccountEvents();
+  feature.attachPaymentEvents();
+  feature.attachExpenseEvents();
   assert.deepEqual(
     [...handlers.keys()],
     [
@@ -228,7 +233,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
-  assert.deepEqual(Object.keys(imports), ["attachEvents"]);
+  assert.deepEqual(Object.keys(imports), [
+    "attachAccountEvents",
+    "attachPaymentEvents",
+    "attachExpenseEvents",
+  ]);
   assert.deepEqual(
     Object.keys(passed.account).sort(),
     [
@@ -278,7 +287,9 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
-  imports.attachEvents();
+  imports.attachAccountEvents();
+  imports.attachPaymentEvents();
+  imports.attachExpenseEvents();
   assert.deepEqual(calls, [
     "account events",
     "payment events",
@@ -473,7 +484,8 @@ test("payment and expense CSV importers save their own validated transaction pay
     payment_method: "check",
     memo: "Leak repair",
   };
-  feature.attachEvents();
+  feature.attachPaymentEvents();
+  feature.attachExpenseEvents();
   await fileHandlers.get("expense-import-file:change")({
     target: {
       files: [
@@ -762,7 +774,7 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     toast() {},
   });
 
-  feature.attachEvents();
+  feature.attachAccountEvents();
   await fileHandlers.get("import-file:change")({
     target: { files: [{ name: "accounts.csv", text: async () => "" }] },
   });

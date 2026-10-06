@@ -24,7 +24,10 @@ test("app wires CSV import and private backup export independently", () => {
     app,
     /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,
   );
-  assert.match(app, /attachImportPreviewEvents,\s*attachImportFileEvents,/);
+  assert.match(
+    app,
+    /attachImportPreviewEvents,\s*attachAccountImportEvents,\s*attachPaymentImportEvents,\s*attachExpenseImportEvents,/,
+  );
   assert.match(app, /attachEvents: attachExportEvents/);
   assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
 

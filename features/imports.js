@@ -62,13 +62,11 @@
         window.PropertyDeskTransactionImportWorkflow.create,
     });
 
-    function attachEvents() {
-      accounts.attachEvents();
-      payments.attachEvents();
-      expenses.attachEvents();
-    }
-
-    return { attachEvents };
+    return {
+      attachAccountEvents: accounts.attachEvents,
+      attachPaymentEvents: payments.attachEvents,
+      attachExpenseEvents: expenses.attachEvents,
+    };
   }
 
   window.PropertyDeskImportFeature = Object.freeze({

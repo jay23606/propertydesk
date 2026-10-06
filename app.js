@@ -400,20 +400,23 @@
       closeModal,
       toast,
     });
-  const { attachEvents: attachImportFileEvents } =
-    window.PropertyDeskImportFeature.create({
-      $,
-      state,
-      stageImport: importPreview.stageImport,
-      parseCSV,
-      createImportLookup,
-      validateAccountRows,
-      validatePaymentRows,
-      validateExpenseRows,
-      todayIso,
-      fetchAll,
-      toast,
-    });
+  const {
+    attachAccountEvents: attachAccountImportEvents,
+    attachPaymentEvents: attachPaymentImportEvents,
+    attachExpenseEvents: attachExpenseImportEvents,
+  } = window.PropertyDeskImportFeature.create({
+    $,
+    state,
+    stageImport: importPreview.stageImport,
+    parseCSV,
+    createImportLookup,
+    validateAccountRows,
+    validatePaymentRows,
+    validateExpenseRows,
+    todayIso,
+    fetchAll,
+    toast,
+  });
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskBackupExport.create({
       $,
@@ -471,7 +474,9 @@
       attachPropertyDocumentEvents,
       attachAuthEvents,
       attachImportPreviewEvents,
-      attachImportFileEvents,
+      attachAccountImportEvents,
+      attachPaymentImportEvents,
+      attachExpenseImportEvents,
       attachExportEvents,
       attachReportExportEvents,
     ],
