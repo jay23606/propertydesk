@@ -8,6 +8,89 @@
     if (!monthDateWithAnchor)
       throw new Error("PropertyDeskDateUtils must load before loan utils.");
 
+    function validPrincipalAndTerm(originalPrincipal, termMonths) {
+      const principal = Number(originalPrincipal || 0),
+        months = Number(termMonths || 0);
+      if (
+        !Number.isFinite(principal) ||
+        principal <= 0 ||
+        !Number.isInteger(months) ||
+        months <= 0
+      )
+        return null;
+      return { principal, months };
+    }
+
+    function monthlyRateFor(annualRate) {
+      const rate = Number(annualRate || 0) / 100 / 12;
+      return Number.isFinite(rate) && rate >= 0 ? rate : null;
+    }
+
+    function paymentForTerms(principal, months, rate, specifiedAmount) {
+      const specifiedPayment = Number(specifiedAmount || 0);
+      const payment =
+        specifiedPayment > 0
+          ? specifiedPayment
+          : rate
+            ? (principal * rate) / (1 - Math.pow(1 + rate, -months))
+            : principal / months;
+      return Number.isFinite(payment) && payment > 0 ? payment : null;
+    }
+
+    function amortizationTerms(
+      originalPrincipal,
+      annualRate,
+      termMonths,
+      principalInterestAmount,
+    ) {
+      const base = validPrincipalAndTerm(originalPrincipal, termMonths);
+      if (!base) return null;
+      const rate = monthlyRateFor(annualRate);
+      if (rate === null) return null;
+      const payment = paymentForTerms(
+        base.principal,
+        base.months,
+        rate,
+        principalInterestAmount,
+      );
+      if (payment === null) return null;
+      return { ...base, rate, payment };
+    }
+
+    function dueDateFormatter(startDate) {
+      const anchor = /^\d{4}-\d{2}-\d{2}$/.test(String(startDate || ""))
+        ? new Date(`${startDate}T12:00:00`)
+        : new Date();
+      return (offset) => {
+        const date = monthDateWithAnchor(anchor, offset, anchor.getDate());
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${date.getFullYear()}-${month}-${day}`;
+      };
+    }
+
+    function rowsForTerms({ principal, months, rate, payment }, dueDate) {
+      const cents = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
+      let balance = cents(principal),
+        rows = [];
+      for (let i = 1; i <= Math.min(months, 600) && balance > 0.005; i++) {
+        const interest = cents(balance * rate);
+        const principalPart = cents(
+          Math.min(balance, Math.max(0, payment - interest)),
+        );
+        balance = cents(Math.max(0, balance - principalPart));
+        rows.push({
+          i,
+          date: dueDate(i - 1),
+          payment: cents(interest + principalPart),
+          principal: principalPart,
+          interest,
+          balance,
+        });
+      }
+      return rows;
+    }
+
     function scheduledLoanBalance(
       account,
       asOf = new Date().toISOString().slice(0, 10),
@@ -61,53 +144,14 @@
       startDate,
       principalInterestAmount = null,
     ) {
-      const principal = Number(originalPrincipal || 0),
-        months = Number(termMonths || 0);
-      if (
-        !Number.isFinite(principal) ||
-        principal <= 0 ||
-        !Number.isInteger(months) ||
-        months <= 0
-      )
-        return [];
-      const rate = Number(annualRate || 0) / 100 / 12;
-      if (!Number.isFinite(rate) || rate < 0) return [];
-      const specifiedPayment = Number(principalInterestAmount || 0);
-      const payment =
-        specifiedPayment > 0
-          ? specifiedPayment
-          : rate
-            ? (principal * rate) / (1 - Math.pow(1 + rate, -months))
-            : principal / months;
-      if (!Number.isFinite(payment) || payment <= 0) return [];
-      const anchor = /^\d{4}-\d{2}-\d{2}$/.test(String(startDate || ""))
-        ? new Date(`${startDate}T12:00:00`)
-        : new Date();
-      const dueDate = (offset) => {
-        const date = monthDateWithAnchor(anchor, offset, anchor.getDate());
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${date.getFullYear()}-${month}-${day}`;
-      };
-      const cents = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
-      let balance = cents(principal),
-        rows = [];
-      for (let i = 1; i <= Math.min(months, 600) && balance > 0.005; i++) {
-        const interest = cents(balance * rate);
-        const principalPart = cents(
-          Math.min(balance, Math.max(0, payment - interest)),
-        );
-        balance = cents(Math.max(0, balance - principalPart));
-        rows.push({
-          i,
-          date: dueDate(i - 1),
-          payment: cents(interest + principalPart),
-          principal: principalPart,
-          interest,
-          balance,
-        });
-      }
-      return rows;
+      const terms = amortizationTerms(
+        originalPrincipal,
+        annualRate,
+        termMonths,
+        principalInterestAmount,
+      );
+      if (!terms) return [];
+      return rowsForTerms(terms, dueDateFormatter(startDate));
     }
 
     return Object.freeze({
