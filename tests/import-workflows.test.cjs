@@ -129,6 +129,18 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/import-preview.js") <
       html.indexOf("features/imports.js"),
   );
+  for (const importer of [
+    "account-import.js",
+    "payment-import.js",
+    "expense-import.js",
+  ]) {
+    assert.ok(
+      html.indexOf("features/import-review.js") <
+        html.indexOf(`features/${importer}`),
+      `shared import review should load before ${importer}`,
+    );
+  }
+  assert.match(worker, /'\.\/features\/import-review\.js'/);
   assert.ok(
     html.indexOf("features/account-import.js") <
       html.indexOf("features/imports.js"),
