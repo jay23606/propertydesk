@@ -2,57 +2,36 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
-const vm = require("node:vm");
 
-test("data transfer workflow connects import and backup export actions", () => {
-  const calls = [];
-  const attachCsvImportEvents = () => {};
-  const attachExportEvents = () => {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskCsvImportWorkflow: {
-        create: (options) => {
-          calls.push(["import", options]);
-          return { attachEvents: attachCsvImportEvents };
-        },
-      },
-      PropertyDeskBackupExport: {
-        create: (options) => {
-          calls.push(["export", options]);
-          return { attachEvents: attachExportEvents };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "data-transfer-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const services = { state: { properties: [] }, createBackup: () => ({}) };
-  const dependencies = { $: () => {}, ...services };
-  const workflow =
-    context.window.PropertyDeskDataTransferWorkflow.create(dependencies);
-
-  assert.deepEqual(
-    calls.map(([name]) => name),
-    ["import", "export"],
-  );
-  assert.equal(calls[0][1], dependencies);
-  assert.equal(calls[1][1], dependencies);
-  assert.equal(workflow.attachCsvImportEvents, attachCsvImportEvents);
-  assert.equal(workflow.attachExportEvents, attachExportEvents);
-});
-
-test("data transfer workflow loads before app and is precached", () => {
+test("app wires CSV import and private backup export independently", () => {
   const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.ok(
-    html.indexOf("features/data-transfer-workflow.js") < html.indexOf("app.js"),
+  assert.match(
+    app,
+    /PropertyDeskCsvImportWorkflow\.create\(\{[\s\S]*?fetchAll,[\s\S]*?\}\);/,
   );
-  assert.match(worker, /'\.\/features\/data-transfer-workflow\.js'/);
+  assert.match(
+    app,
+    /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,
+  );
+  assert.match(app, /attachEvents: attachCsvImportEvents/);
+  assert.match(app, /attachEvents: attachExportEvents/);
+  assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
+
+  for (const script of [
+    "features/csv-import-workflow.js",
+    "features/backup-export.js",
+  ]) {
+    assert.ok(
+      html.indexOf(script) >= 0 &&
+        html.indexOf(script) < html.indexOf("app.js"),
+      `${script} loads before app.js`,
+    );
+    assert.match(worker, new RegExp(`'\\./${script.replaceAll("/", "\\/")}'`));
+  }
+  assert.doesNotMatch(html, /data-transfer-workflow\.js/);
+  assert.doesNotMatch(worker, /data-transfer-workflow\.js/);
 });

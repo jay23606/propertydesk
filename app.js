@@ -249,8 +249,8 @@
       openPropertyDetails,
       openAccountForProperty,
     });
-  const { attachCsvImportEvents, attachExportEvents } =
-    window.PropertyDeskDataTransferWorkflow.create({
+  const { attachEvents: attachCsvImportEvents } =
+    window.PropertyDeskCsvImportWorkflow.create({
       $,
       state,
       esc,
@@ -259,7 +259,14 @@
       toast,
       todayIso,
       fetchAll,
+    });
+  const { attachEvents: attachExportEvents } =
+    window.PropertyDeskBackupExport.create({
+      $,
+      state,
       createBackup,
+      todayIso,
+      toast,
     });
   const {
     showConfigError,
