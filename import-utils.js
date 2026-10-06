@@ -69,6 +69,57 @@
     );
   }
 
+  function createImportLookup(properties, accounts) {
+    const propertiesByNormalizedAddress = new Map();
+    const propertiesByAddress = new Map();
+    for (const property of properties) {
+      const exactKey = JSON.stringify([property.name, property.address]);
+      const normalizedKey = JSON.stringify([
+        property.name.toLowerCase(),
+        property.address.toLowerCase(),
+      ]);
+      if (!propertiesByAddress.has(exactKey))
+        propertiesByAddress.set(exactKey, property);
+      if (!propertiesByNormalizedAddress.has(normalizedKey))
+        propertiesByNormalizedAddress.set(normalizedKey, property);
+    }
+
+    const accountsByNormalizedName = new Map();
+    const accountsByName = new Map();
+    for (const account of accounts) {
+      const exactKey = JSON.stringify([account.property_id, account.name]);
+      const normalizedKey = JSON.stringify([
+        account.property_id,
+        account.name.toLowerCase(),
+      ]);
+      if (!accountsByName.has(exactKey)) accountsByName.set(exactKey, account);
+      if (!accountsByNormalizedName.has(normalizedKey))
+        accountsByNormalizedName.set(normalizedKey, account);
+    }
+
+    return Object.freeze({
+      findProperty(name, address) {
+        return propertiesByNormalizedAddress.get(
+          JSON.stringify([
+            String(name || "").toLowerCase(),
+            String(address || "").toLowerCase(),
+          ]),
+        );
+      },
+      findExactProperty(name, address) {
+        return propertiesByAddress.get(JSON.stringify([name, address]));
+      },
+      findAccount(propertyId, name) {
+        return accountsByNormalizedName.get(
+          JSON.stringify([propertyId, String(name || "").toLowerCase()]),
+        );
+      },
+      findExactAccount(propertyId, name) {
+        return accountsByName.get(JSON.stringify([propertyId, name]));
+      },
+    });
+  }
+
   function markPossibleDuplicates(rows, existingKeys, keyForRow) {
     const seen = new Set(existingKeys);
     return rows.map((row) => {
@@ -176,6 +227,7 @@
   const helpers = Object.freeze({
     csvMoney,
     csvRate,
+    createImportLookup,
     findImportAccount,
     findImportProperty,
     markPossibleDuplicates,

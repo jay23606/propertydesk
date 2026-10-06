@@ -5,6 +5,7 @@ const path = require("node:path");
 const {
   csvMoney,
   csvRate,
+  createImportLookup,
   findImportAccount,
   findImportProperty,
   markPossibleDuplicates,
@@ -153,6 +154,33 @@ test("CSV property and account lookup is case-insensitive and property-scoped", 
   );
   assert.equal(findImportAccount(accounts, "p2", "oAk ReNtAl"), accounts[1]);
   assert.equal(findImportAccount(accounts, "p3", "Oak Rental"), undefined);
+});
+
+test("indexed CSV lookup preserves normalized and exact first-match behavior", () => {
+  const firstProperty = { id: "p1", name: "Oak House", address: "10 Oak St" };
+  const secondProperty = { id: "p2", name: "OAK HOUSE", address: "10 OAK ST" };
+  const firstAccount = {
+    id: "a1",
+    property_id: "p1",
+    name: "Oak Rental",
+  };
+  const secondAccount = {
+    id: "a2",
+    property_id: "p1",
+    name: "OAK RENTAL",
+  };
+  const lookup = createImportLookup(
+    [firstProperty, secondProperty],
+    [firstAccount, secondAccount],
+  );
+
+  assert.equal(lookup.findProperty("oAk HoUsE", "10 oAk St"), firstProperty);
+  assert.equal(
+    lookup.findExactProperty("OAK HOUSE", "10 OAK ST"),
+    secondProperty,
+  );
+  assert.equal(lookup.findAccount("p1", "OAK RENTAL"), firstAccount);
+  assert.equal(lookup.findExactAccount("p1", "OAK RENTAL"), secondAccount);
 });
 
 test("re-imported and repeated rows are flagged and excluded unless explicitly included", () => {

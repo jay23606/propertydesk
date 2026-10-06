@@ -4,14 +4,14 @@
 
   const {
     csvMoney,
-    findImportAccount,
-    findImportProperty,
+    createImportLookup,
     markPossibleDuplicates,
     validIsoDate,
     validateImportRows,
   } = globalThis.PropertyDeskImportUtils;
 
   function validatePaymentRows(rows, properties, accounts, payments) {
+    const lookup = createImportLookup(properties, accounts);
     const paymentKey = (accountId, date, amount, memo) =>
       JSON.stringify([
         accountId,
@@ -35,8 +35,7 @@
         throw new Error(
           "Each payment row needs property_name, property_address, account_name, received_date, and amount.",
         );
-      const property = findImportProperty(
-        properties,
+      const property = lookup.findProperty(
         row.property_name,
         row.property_address,
       );
@@ -44,11 +43,7 @@
         throw new Error(
           `Property not found: ${row.property_name} at ${row.property_address}. Import properties and accounts first.`,
         );
-      const account = findImportAccount(
-        accounts,
-        property.id,
-        row.account_name,
-      );
+      const account = lookup.findAccount(property.id, row.account_name);
       if (!account)
         throw new Error(
           `Account not found: ${row.account_name} at ${row.property_name}.`,
@@ -165,15 +160,11 @@
       validation.valid,
       existingKeys,
       (row) => {
-        const property = properties.find(
-            (x) =>
-              x.name === row.property_name &&
-              x.address === row.property_address,
-          ),
-          account = accounts.find(
-            (x) =>
-              x.property_id === property?.id && x.name === row.account_name,
-          );
+        const property = lookup.findExactProperty(
+          row.property_name,
+          row.property_address,
+        );
+        const account = lookup.findExactAccount(property?.id, row.account_name);
         return paymentKey(account?.id, row.received_date, row.amount, row.memo);
       },
     );

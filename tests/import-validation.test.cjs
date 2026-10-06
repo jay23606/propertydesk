@@ -354,3 +354,54 @@ test("payment import rejects rental and financing categories on the wrong accoun
   assert.match(result.errors[0].message, /rental/);
   assert.match(result.errors[1].message, /land_contract/);
 });
+
+test("payment and expense imports build property and account lookups once", () => {
+  const track = (rows, counter) => ({
+    [Symbol.iterator]: function* () {
+      counter.count++;
+      yield* rows;
+    },
+  });
+  const sourceProperty = {
+    id: "p1",
+    name: "Oak House",
+    address: "10 Oak St",
+  };
+  const sourceAccount = {
+    id: "n1",
+    property_id: "p1",
+    name: "Oak Contract",
+    account_type: "land_contract",
+  };
+  const rows = parseCSV(
+    "property_name,property_address,account_name,received_date,amount,memo\nOak House,10 Oak St,Oak Contract,2026-10-01,100,October 1\nOak House,10 Oak St,Oak Contract,2026-10-02,100,October 2",
+  );
+  const paymentPropertyIterations = { count: 0 };
+  const paymentAccountIterations = { count: 0 };
+  const payments = validatePaymentRows(
+    rows,
+    track([sourceProperty], paymentPropertyIterations),
+    track([sourceAccount], paymentAccountIterations),
+    [],
+  );
+  assert.equal(payments.valid.length, 2);
+  assert.deepEqual(payments.errors, []);
+  assert.equal(paymentPropertyIterations.count, 1);
+  assert.equal(paymentAccountIterations.count, 1);
+
+  const expenseRows = parseCSV(
+    "property_name,property_address,account_name,expense_date,amount,category\nOak House,10 Oak St,Oak Contract,2026-10-01,25,repairs\nOak House,10 Oak St,Oak Contract,2026-10-02,30,repairs",
+  );
+  const expensePropertyIterations = { count: 0 };
+  const expenseAccountIterations = { count: 0 };
+  const expenses = validateExpenseRows(
+    expenseRows,
+    track([sourceProperty], expensePropertyIterations),
+    track([sourceAccount], expenseAccountIterations),
+    [],
+  );
+  assert.equal(expenses.valid.length, 2);
+  assert.deepEqual(expenses.errors, []);
+  assert.equal(expensePropertyIterations.count, 1);
+  assert.equal(expenseAccountIterations.count, 1);
+});
