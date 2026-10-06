@@ -286,6 +286,13 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/property-detail-events.js") < html.indexOf("app.js"),
   );
   assert.ok(
+    html.indexOf("features/property-holder-events.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-holder-events.js") <
+      html.indexOf("features/property-detail-actions-workflow.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-detail-document-events.js") <
       html.indexOf("features/property-document-workflow.js"),
   );
@@ -510,6 +517,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/property-activity-model\.js'/);
   assert.match(worker, /'\.\/features\/property-activity-view\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-events\.js'/);
+  assert.match(worker, /'\.\/features\/property-holder-events\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-document-events\.js'/);
   assert.match(worker, /'\.\/features\/account-details\.js'/);
   assert.match(worker, /'\.\/features\/account-details-view\.js'/);

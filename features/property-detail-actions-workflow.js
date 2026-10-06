@@ -28,6 +28,11 @@
         openPropertyDetails,
         documentRef,
       });
+    const { attachEvents: attachPropertyHolderEvents } =
+      window.PropertyDeskPropertyHolderEvents.create({
+        $,
+        savePropertyHolders,
+      });
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
         state,
@@ -43,7 +48,6 @@
         state,
         closeModal,
         editAccount,
-        savePropertyHolders,
         openAccountDetails,
       });
     const { attachEvents: attachPropertyQuickActions } =
@@ -61,6 +65,7 @@
 
     function attachPropertyDetailEvents() {
       attachPropertyDetailContentEvents();
+      attachPropertyHolderEvents();
       attachPropertyQuickActions();
     }
 

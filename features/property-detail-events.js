@@ -1,4 +1,4 @@
-/* Property detail modal actions and delegated account editing. */
+/* Route delegated account edit and detail actions in the property modal. */
 (() => {
   "use strict";
 
@@ -7,7 +7,6 @@
     state,
     closeModal,
     editAccount,
-    savePropertyHolders,
     openAccountDetails,
   }) {
     function attachEvents() {
@@ -22,10 +21,6 @@
           event.preventDefault();
           closeModal($("property-detail-modal"));
           editAccount(account);
-          return;
-        }
-        if (event.target.closest("[data-save-holders]")) {
-          savePropertyHolders();
           return;
         }
         const accountDetail = event.target.closest("[data-detail]");

@@ -378,6 +378,7 @@ test("property detail events own editing and quick-action bindings", () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "property-detail-events.js",
+    "property-holder-events.js",
     "property-detail-quick-actions.js",
   ]) {
     vm.runInContext(
@@ -394,7 +395,8 @@ test("property detail events own editing and quick-action bindings", () => {
         id,
         value: "",
         addEventListener(event, handler) {
-          handlers.set(`${id}:${event}`, handler);
+          const key = `${id}:${event}`;
+          handlers.set(key, [...(handlers.get(key) || []), handler]);
         },
       });
     }
@@ -409,8 +411,11 @@ test("property detail events own editing and quick-action bindings", () => {
     },
     closeModal: (modal) => calls.push(`close:${modal.id}`),
     editAccount: (account) => calls.push(`edit:${account.id}`),
-    savePropertyHolders: () => calls.push("save-holders"),
     openAccountDetails: (id) => calls.push(`open-account:${id}`),
+  });
+  const holderEvents = context.window.PropertyDeskPropertyHolderEvents.create({
+    $: getElement,
+    savePropertyHolders: () => calls.push("save-holders"),
   });
   const quickActionState = { selectedPropertyId: "property-1" };
   const quickActions =
@@ -427,25 +432,28 @@ test("property detail events own editing and quick-action bindings", () => {
     });
 
   feature.attachEvents();
+  holderEvents.attachEvents();
   quickActions.attachEvents();
-  handlers.get("property-detail-content:click")({
+  const dispatch = (key, event) => {
+    for (const handler of handlers.get(key) || []) handler(event);
+  };
+  dispatch("property-detail-content:click", {
     target: {
       closest: (selector) =>
         ({
           "[data-edit-account]": { dataset: { editAccount: "account-1" } },
-          "[data-save-holders]": { dataset: {} },
           "[data-detail]": { dataset: { detail: "account-1" } },
         })[selector] || null,
     },
     preventDefault() {},
   });
-  handlers.get("property-detail-content:click")({
+  dispatch("property-detail-content:click", {
     target: {
       closest: (selector) =>
         selector === "[data-save-holders]" ? { dataset: {} } : null,
     },
   });
-  handlers.get("property-detail-content:click")({
+  dispatch("property-detail-content:click", {
     target: {
       closest: (selector) =>
         selector === "[data-detail]"
@@ -453,10 +461,10 @@ test("property detail events own editing and quick-action bindings", () => {
           : null,
     },
   });
-  handlers.get("property-detail-add-income:click")();
-  handlers.get("property-detail-add-expense:click")();
-  handlers.get("property-detail-add-account:click")();
-  handlers.get("property-archive-toggle:click")();
+  dispatch("property-detail-add-income:click");
+  dispatch("property-detail-add-expense:click");
+  dispatch("property-detail-add-account:click");
+  dispatch("property-archive-toggle:click");
 
   assert.equal(propertyModal.id, "property-detail-modal");
   assert.equal(getElement("account-property").value, "property-1");
@@ -478,9 +486,9 @@ test("property detail events own editing and quick-action bindings", () => {
   ]);
   const callsBeforeNoSelection = calls.length;
   quickActionState.selectedPropertyId = null;
-  handlers.get("property-detail-add-income:click")();
-  handlers.get("property-detail-add-expense:click")();
-  handlers.get("property-detail-add-account:click")();
+  dispatch("property-detail-add-income:click");
+  dispatch("property-detail-add-expense:click");
+  dispatch("property-detail-add-account:click");
   assert.equal(calls.length, callsBeforeNoSelection);
 });
 
@@ -687,6 +695,12 @@ test("property detail actions workflow composes administration and modal actions
       PropertyDeskPropertyHolderManagement: {
         create: () => ({ savePropertyHolders: action }),
       },
+      PropertyDeskPropertyHolderEvents: {
+        create: (options) => {
+          passed.holderEvents = options;
+          return { attachEvents: () => attachCalls.push("holders") };
+        },
+      },
       PropertyDeskPropertyArchive: {
         create: () => ({ toggleArchiveProperty: action }),
       },
@@ -734,13 +748,13 @@ test("property detail actions workflow composes administration and modal actions
       documentRef: {},
     });
 
-  assert.equal(passed.events.savePropertyHolders, action);
+  assert.equal(passed.holderEvents.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
   assert.equal(passed.quickActions.toggleArchiveProperty, action);
   assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
   workflow.attachPropertyDetailEvents();
-  assert.deepEqual(attachCalls, ["content", action]);
+  assert.deepEqual(attachCalls, ["content", "holders", action]);
 });
 
 test("property document workflow composes private file actions and event routing", () => {
