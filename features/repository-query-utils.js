@@ -13,7 +13,7 @@
   function saveById(client, table, payload, recordId) {
     return recordId
       ? updateById(client, table, recordId, payload)
-      : client.from(table).insert(payload);
+      : insert(client, table, payload);
   }
 
   function updateOwnedById(client, table, recordId, ownerId, payload) {
