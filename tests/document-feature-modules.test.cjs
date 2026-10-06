@@ -8,6 +8,7 @@ function loadDocumentModules(context) {
   for (const filename of [
     "document-repository.js",
     "document-upload-policy.js",
+    "document-upload.js",
     "documents.js",
   ]) {
     vm.runInContext(

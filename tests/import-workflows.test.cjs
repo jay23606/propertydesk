@@ -323,8 +323,17 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/document-upload-policy.js") <
+      html.indexOf("features/document-upload.js"),
+  );
+  assert.ok(
+    html.indexOf("features/document-repository.js") <
+      html.indexOf("features/document-upload.js"),
+  );
+  assert.ok(
+    html.indexOf("features/document-upload.js") <
       html.indexOf("features/documents.js"),
   );
+  assert.match(worker, /'\.\/features\/document-upload\.js'/);
   assert.ok(
     html.indexOf("features/documents.js") <
       html.indexOf("features/property-document-workflow.js"),
