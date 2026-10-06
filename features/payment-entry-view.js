@@ -104,7 +104,6 @@
 
     return {
       updateAllocationPreview,
-      prefillPaymentAmount,
       openPayment,
       openPropertyPayment,
       attachEvents,
