@@ -6,6 +6,7 @@
     const {
       $,
       state,
+      depositLedger,
       money,
       fmtDate,
       esc,
@@ -19,9 +20,21 @@
       todayIso,
       openModal,
       propertyAddress,
-      depositSectionHTML,
-      renderAccountHistory,
     } = context;
+    const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+    });
+    const { renderAccountHistory } =
+      window.PropertyDeskAccountHistoryDetails.create({
+        state,
+        esc,
+        money,
+        fmtDate,
+      });
     const { accountLoanScheduleHTML } =
       window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
     const { renderAccountDetails } =
@@ -57,7 +70,7 @@
       openModal,
     });
 
-    return { openAccountDetails };
+    return { openAccountDetails, depositSectionHTML };
   }
 
   window.PropertyDeskAccountDetailContentWorkflow = Object.freeze({ create });

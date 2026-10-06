@@ -189,13 +189,25 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
-    state,
-    depositLedger,
-    money,
-    fmtDate,
-    esc,
-  });
+  const { openAccountDetails, depositSectionHTML } =
+    window.PropertyDeskAccountDetailContentWorkflow.create({
+      $,
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+      sumPosted,
+      prettyType,
+      paymentFrequencyLabel,
+      accountBalance,
+      amortizationSchedule,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      openModal,
+      propertyAddress,
+    });
   const { attachEvents: attachDepositEvents } =
     window.PropertyDeskDepositMaintenanceWorkflow.create({
       $,
@@ -215,33 +227,6 @@
       closeModal,
       editAccount,
       openPayment,
-    });
-  const { renderAccountHistory } =
-    window.PropertyDeskAccountHistoryDetails.create({
-      state,
-      esc,
-      money,
-      fmtDate,
-    });
-  const { openAccountDetails } =
-    window.PropertyDeskAccountDetailContentWorkflow.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      sumPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      openModal,
-      propertyAddress,
-      depositSectionHTML,
-      renderAccountHistory,
     });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailContentWorkflow.create({
