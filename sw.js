@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v234';
+const CACHE_NAME = 'propertydesk-shell-v235';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -99,6 +99,7 @@ const SHELL_FILES = [
   './features/backup-records.js',
   './features/backup-export.js',
   './features/auth-screens.js',
+  './features/auth-recovery-view.js',
   './features/auth-recovery.js',
   './features/auth-session.js',
   './features/auth-form.js',

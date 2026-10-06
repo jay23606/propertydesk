@@ -6,6 +6,7 @@ function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
     "auth-screens.js",
+    "auth-recovery-view.js",
     "auth-recovery.js",
     "auth-session.js",
     "auth-form.js",

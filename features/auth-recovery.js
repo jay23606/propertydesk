@@ -12,62 +12,57 @@
     windowRef = window,
     documentRef = document,
   }) {
+    const view = window.PropertyDeskAuthRecoveryView.create({ $, documentRef });
+
     function showPasswordReset() {
       state.passwordRecoveryInProgress = true;
-      $("auth-title").textContent = "Choose a new password";
-      documentRef.querySelector(".auth-intro").textContent =
-        "Your reset link is verified. Set a new password for your private workspace.";
-      $("auth-form").classList.add("hidden");
-      $("password-reset-form").classList.remove("hidden");
-      $("forgot-password").classList.add("hidden");
-      $("auth-toggle").classList.add("hidden");
-      $("auth-message").textContent = "";
+      view.showPasswordReset();
       showAuth();
     }
 
     async function requestPasswordReset() {
-      const email = $("auth-email").value.trim();
-      if (!$("auth-email").reportValidity()) return;
-      $("forgot-password").disabled = true;
+      const email = view.requestEmail();
+      if (!view.requestEmailIsValid()) return;
+      view.setRequestDisabled(true);
       try {
         const redirectTo = `${windowRef.location.origin}${windowRef.location.pathname}`;
         const { error } = await state.client.auth.resetPasswordForEmail(email, {
           redirectTo,
         });
-        $("auth-message").textContent = error
-          ? "Unable to request a reset right now. Try again later."
-          : "If that email has a PropertyDesk account, a reset link is on its way.";
+        view.setMessage(
+          error
+            ? "Unable to request a reset right now. Try again later."
+            : "If that email has a PropertyDesk account, a reset link is on its way.",
+        );
       } catch {
-        $("auth-message").textContent =
-          "Unable to request a reset right now. Try again later.";
+        view.setMessage(
+          "Unable to request a reset right now. Try again later.",
+        );
       } finally {
-        $("forgot-password").disabled = false;
+        view.setRequestDisabled(false);
       }
     }
 
     async function submitPasswordReset(event) {
       event.preventDefault();
-      const password = $("reset-password").value;
-      if (password !== $("reset-password-confirm").value) {
-        $("auth-message").textContent = "Those passwords do not match.";
+      const { password, confirmation } = view.passwordValues();
+      if (password !== confirmation) {
+        view.setMessage("Those passwords do not match.");
         return;
       }
-      $("reset-password-submit").disabled = true;
-      $("reset-password-submit").textContent = "Updating…";
+      view.setSubmitBusy(true);
       let result;
       try {
         result = await state.client.auth.updateUser({ password });
       } catch {
-        $("auth-message").textContent =
-          "Unable to update your password right now. Try again.";
+        view.setMessage("Unable to update your password right now. Try again.");
         return;
       } finally {
-        $("reset-password-submit").disabled = false;
-        $("reset-password-submit").textContent = "Update password";
+        view.setSubmitBusy(false);
       }
       const { data, error } = result;
       if (error) {
-        $("auth-message").textContent = error.message;
+        view.setMessage(error.message);
         return;
       }
       state.user = data.user || state.user;
@@ -92,13 +87,17 @@
       );
     }
 
+    function cancelPasswordReset() {
+      state.passwordRecoveryInProgress = false;
+      setAuthMode(false);
+      showAuth();
+    }
+
     function attachEvents() {
-      $("forgot-password").addEventListener("click", requestPasswordReset);
-      $("password-reset-form").addEventListener("submit", submitPasswordReset);
-      $("reset-password-cancel").addEventListener("click", () => {
-        state.passwordRecoveryInProgress = false;
-        setAuthMode(false);
-        showAuth();
+      view.attachEvents({
+        requestPasswordReset,
+        submitPasswordReset,
+        cancelPasswordReset,
       });
     }
 
