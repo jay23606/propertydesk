@@ -8,14 +8,13 @@
     esc,
     toast,
     fetchAll,
+    view: suppliedView,
     refreshWorkspaceSettings,
     confirmAction = (message) => window.confirm(message),
   }) {
-    const view = window.PropertyDeskWorkspaceMembersView.create({
-      $,
-      state,
-      esc,
-    });
+    const view =
+      suppliedView ||
+      window.PropertyDeskWorkspaceMembersView.create({ $, state, esc });
 
     async function addWorkspaceMember(event) {
       event.preventDefault();

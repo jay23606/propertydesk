@@ -7,6 +7,14 @@ const vm = require("node:vm");
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
   loadWorkspaceFeatures(context);
+  let memberOptions;
+  const workspaceMembers = context.window.PropertyDeskWorkspaceMembers;
+  context.window.PropertyDeskWorkspaceMembers = {
+    create(options) {
+      memberOptions = options;
+      return workspaceMembers.create(options);
+    },
+  };
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id))
@@ -73,6 +81,14 @@ test("workspace settings render member labels and escape untrusted text", () => 
     "hidden",
     false,
   ]);
+  assert.equal(remindersRendered, true);
+  assert.equal(typeof memberOptions.view.renderWorkspaceMembers, "function");
+  assert.equal(typeof memberOptions.refreshWorkspaceSettings, "function");
+
+  remindersRendered = false;
+  element("display-name").value = "Unsaved label";
+  memberOptions.refreshWorkspaceSettings();
+  assert.equal(element("display-name").value, "Owner");
   assert.equal(remindersRendered, true);
 });
 

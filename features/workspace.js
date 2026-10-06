@@ -18,21 +18,28 @@
       toast,
       updateGreeting,
     });
+    const memberView = window.PropertyDeskWorkspaceMembersView.create({
+      $,
+      state,
+      esc,
+    });
+
+    function renderWorkspaceSettings() {
+      $("display-name").value = state.user?.user_metadata?.display_name || "";
+      memberView.renderWorkspaceMembers();
+      renderReminderActivity();
+    }
+
     const members = window.PropertyDeskWorkspaceMembers.create({
       $,
       state,
       esc,
       toast,
       fetchAll,
-      refreshWorkspaceSettings: () => renderWorkspaceSettings(),
+      view: memberView,
+      refreshWorkspaceSettings: renderWorkspaceSettings,
       confirmAction,
     });
-
-    function renderWorkspaceSettings() {
-      $("display-name").value = state.user?.user_metadata?.display_name || "";
-      members.renderWorkspaceMembers();
-      renderReminderActivity();
-    }
 
     function attachEvents() {
       profile.attachEvents();
