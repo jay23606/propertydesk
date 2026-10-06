@@ -3,11 +3,10 @@
   "use strict";
 
   function create({
-    $,
     state,
     toast,
     fetchAll,
-    closeModal,
+    closeAccountDetails,
     confirmAction = (message) => window.confirm(message),
   }) {
     async function closeAccount(account) {
@@ -31,7 +30,7 @@
         toast(error.message);
         return;
       }
-      closeModal($("detail-modal"));
+      closeAccountDetails();
       try {
         await fetchAll();
       } catch {

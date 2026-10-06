@@ -6,11 +6,10 @@
     const { $, state, toast, fetchAll, closeModal, editAccount, openPayment } =
       context;
     const { closeAccount } = window.PropertyDeskAccountMaintenance.create({
-      $,
       state,
       toast,
       fetchAll,
-      closeModal,
+      closeAccountDetails: () => closeModal($("detail-modal")),
     });
     const { attachEvents } = window.PropertyDeskAccountDetailEvents.create({
       $,

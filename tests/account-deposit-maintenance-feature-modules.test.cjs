@@ -205,6 +205,7 @@ test("account detail actions workflow composes account closure with edit and pay
   const passed = {};
   const closeAccount = () => "closed";
   let attached = 0;
+  const modalCloses = [];
   const context = vm.createContext({
     window: {
       PropertyDeskAccountMaintenance: {
@@ -234,11 +235,11 @@ test("account detail actions workflow composes account closure with edit and pay
     context,
   );
   const dependencies = {
-    $() {},
+    $: (id) => ({ id }),
     state: {},
     toast() {},
     fetchAll() {},
-    closeModal() {},
+    closeModal: (modal) => modalCloses.push(modal.id),
     editAccount() {},
     openPayment() {},
   };
@@ -249,6 +250,10 @@ test("account detail actions workflow composes account closure with edit and pay
 
   assert.equal(passed.maintenance.state, dependencies.state);
   assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
+  assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
+  assert.equal(passed.maintenance.$, undefined);
+  passed.maintenance.closeAccountDetails();
+  assert.deepEqual(modalCloses, ["detail-modal"]);
   assert.equal(passed.events.closeAccount, closeAccount);
   assert.equal(passed.events.editAccount, dependencies.editAccount);
   assert.equal(passed.events.openPayment, dependencies.openPayment);
@@ -588,10 +593,9 @@ test("account maintenance closes an account while preserving its history", async
     },
   };
   const feature = context.window.PropertyDeskAccountMaintenance.create({
-    $: (id) => ({ id }),
     state,
     confirmAction: () => true,
-    closeModal: (modal) => calls.push(["close", modal.id]),
+    closeAccountDetails: () => calls.push(["close-details"]),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),
   });
@@ -601,7 +605,7 @@ test("account maintenance closes an account while preserving its history", async
   assert.equal(updates[0][0], "pd_accounts");
   assert.equal(updates[0][1].status, "closed");
   assert.deepEqual(updates[1], ["id", "account-1"]);
-  assert.deepEqual(calls, [["close", "detail-modal"], "refresh"]);
+  assert.deepEqual(calls, [["close-details"], "refresh"]);
   assert.equal(messages.at(-1), "Account closed");
 });
 
@@ -617,7 +621,6 @@ test("account maintenance reports rejected requests and skips success actions", 
   const calls = [];
   const messages = [];
   const feature = context.window.PropertyDeskAccountMaintenance.create({
-    $: (id) => ({ id }),
     state: {
       client: {
         from: () => ({
@@ -630,7 +633,7 @@ test("account maintenance reports rejected requests and skips success actions", 
       },
     },
     confirmAction: () => true,
-    closeModal: () => calls.push("close"),
+    closeAccountDetails: () => calls.push("close-details"),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),
   });
