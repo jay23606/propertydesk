@@ -9,6 +9,7 @@ function loadAuthFeatures(context) {
     "auth-recovery-view.js",
     "auth-recovery.js",
     "auth-session.js",
+    "auth-form-view.js",
     "auth-form.js",
     "auth.js",
   ]) {

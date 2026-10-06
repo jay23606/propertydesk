@@ -454,6 +454,13 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "auth-form-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "auth-form.js"),
       "utf8",
     ),
