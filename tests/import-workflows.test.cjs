@@ -841,6 +841,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/reminder-preview.js") < html.indexOf("app.js"),
   );
+  assert.ok(
+    html.indexOf("features/reminder-preview-model.js") <
+      html.indexOf("features/reminder-preview.js"),
+  );
   assert.ok(html.indexOf("features/workspace.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/reminder-activity-model.js") <
@@ -963,6 +967,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/pwa-registration\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
+  assert.match(worker, /'\.\/features\/reminder-preview-model\.js'/);
   assert.match(worker, /'\.\/features\/reminder-activity-model\.js'/);
   assert.match(worker, /'\.\/features\/reminder-activity-view\.js'/);
   assert.match(worker, /'\.\/features\/reminder-activity-workflow\.js'/);

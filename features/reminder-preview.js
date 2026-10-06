@@ -17,7 +17,20 @@
     money,
     esc,
     openModal,
+    model,
   }) {
+    const previewModel =
+      model ||
+      window.PropertyDeskReminderPreviewModel.create({
+        amountDueSince,
+        unpaidDueAccrualStart,
+        monthEnd,
+        dateOnly,
+        monthStart,
+        propertyAddress,
+        money,
+      });
+
     function previewReminderEmail() {
       const property = state.properties.find(
         (item) => item.id === $("account-property").value,
@@ -42,39 +55,19 @@
         .value.split(/[;,]/)
         .map((email) => email.trim())
         .filter(Boolean);
-      const amount = amountDueSince(
-        [account],
-        state.payments,
-        unpaidDueAccrualStart(),
-        monthEnd(),
-      );
-      const label = dateOnly(monthStart()).toLocaleDateString(undefined, {
-        month: "long",
-        year: "numeric",
+      const preview = previewModel.build({
+        property,
+        account,
+        recipients,
+        payments: state.payments,
       });
-      const address = propertyAddress(property);
-      const name = account.party_name || "there";
-      const subject = `Payment reminder for ${property.address} · ${label}`;
-      const body = [
-        `Hello ${name},`,
-        "",
-        `Our records show no rent or installment payment recorded for ${label}.`,
-        "",
-        `Unpaid due as of ${monthEnd()}: ${money(amount)}`,
-        `Property: ${address}`,
-        "",
-        "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
-        "",
-        "Thank you,",
-        "PropertyDesk",
-      ].join("\n");
       $("reminder-preview-content").innerHTML = `
         <div class="reminder-preview-meta">
-          <div><small>To</small><strong>${esc(recipients.join(", ") || "No recipient email saved")}</strong></div>
-          <div><small>Subject</small><strong>${esc(subject)}</strong></div>
-          <div><small>Schedule</small><strong>Last day of ${esc(label)}, only when no rent or installment payment is recorded that month</strong></div>
+          <div><small>To</small><strong>${esc(preview.recipients.join(", ") || "No recipient email saved")}</strong></div>
+          <div><small>Subject</small><strong>${esc(preview.subject)}</strong></div>
+          <div><small>Schedule</small><strong>${esc(preview.schedule)}</strong></div>
         </div>
-        <div class="reminder-preview-body">${esc(body).replaceAll("\n", "<br>")}</div>
+        <div class="reminder-preview-body">${esc(preview.body).replaceAll("\n", "<br>")}</div>
         <p class="field-hint">Preview only. No email is sent from this window. Each saved address receives an individual copy. Estimated loan balance is not included.</p>`;
       openModal("reminder-preview-modal");
     }
