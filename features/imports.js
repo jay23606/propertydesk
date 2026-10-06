@@ -31,6 +31,7 @@
       todayIso,
       fetchAll,
       toast,
+      buildPayloads: window.PropertyDeskAccountImportPayload.build,
     });
     const payments = window.PropertyDeskPaymentImport.create({
       $,
