@@ -851,13 +851,11 @@ test("property details workflow connects content with action and document routes
     "toast",
   ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachPropertyDetailEvents",
-    "attachPropertyDocumentEvents",
+    "attachEvents",
     "openPropertyDetails",
   ]);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
-  workflow.attachPropertyDetailEvents();
-  workflow.attachPropertyDocumentEvents();
+  workflow.attachEvents();
   assert.deepEqual(attached, ["detail events", "document events"]);
 });
 
