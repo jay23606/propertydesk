@@ -228,6 +228,15 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-maintenance-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/transaction-void-model.js") <
+      html.indexOf("features/transaction-void-entry.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-void-entry.js") <
+      html.indexOf("features/transaction-maintenance-workflow.js"),
+  );
+  assert.match(worker, /'\.\/features\/transaction-void-entry\.js'/);
+  assert.ok(
     html.indexOf("features/transaction-maintenance-workflow.js") <
       html.indexOf("features/transaction-workflow.js"),
   );

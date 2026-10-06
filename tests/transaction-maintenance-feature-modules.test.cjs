@@ -36,6 +36,70 @@ test("transaction void model maps supported kinds and preserves audit defaults",
   );
 });
 
+test("transaction void entry confirms, collects a reason, then delegates persistence", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "transaction-void-entry.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const calls = [];
+  const entry = context.window.PropertyDeskTransactionVoidEntry.create({
+    toast: (message) => calls.push(["toast", message]),
+    confirmAction: (message) => {
+      calls.push(["confirm", message]);
+      return true;
+    },
+    promptAction: (message, initialValue) => {
+      calls.push(["prompt", message, initialValue]);
+      return "Entered in error";
+    },
+    saveVoidTransaction: (...args) => {
+      calls.push(["save", ...args]);
+      return true;
+    },
+  });
+
+  assert.equal(await entry.voidTransaction("income", "payment-1"), true);
+  assert.deepEqual(calls, [
+    [
+      "confirm",
+      "Void this income entry? It will remain in the audit history but stop affecting balances and reports.",
+    ],
+    ["prompt", "Optional reason for the audit record:", "Entered in error"],
+    ["save", "income", "payment-1", "Entered in error"],
+  ]);
+});
+
+test("transaction void entry rejects unsupported kinds before asking for confirmation", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "transaction-void-entry.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const calls = [];
+  const entry = context.window.PropertyDeskTransactionVoidEntry.create({
+    toast: (message) => calls.push(["toast", message]),
+    confirmAction: () => assert.fail("unsupported kinds must not prompt"),
+    saveVoidTransaction: () => assert.fail("unsupported kinds must not write"),
+  });
+
+  assert.equal(
+    await entry.voidTransaction("unexpected", "transaction-1"),
+    false,
+  );
+  assert.deepEqual(calls, [["toast", "This transaction type can't be voided"]]);
+});
+
 test("transaction workflow connects history and maintenance interfaces", () => {
   const created = [];
   const passed = {};
@@ -144,6 +208,12 @@ test("transaction maintenance workflow composes correction and void actions", ()
       PropertyDeskTransactionMaintenance: {
         create: (options) => {
           passed.void = options;
+          return { saveVoidTransaction: voidTransaction };
+        },
+      },
+      PropertyDeskTransactionVoidEntry: {
+        create: (options) => {
+          passed.voidEntry = options;
           return { voidTransaction };
         },
       },
@@ -193,6 +263,9 @@ test("transaction maintenance workflow composes correction and void actions", ()
 
   assert.equal(passed.void.state, dependencies.state);
   assert.equal(passed.void.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.void.confirmAction, undefined);
+  assert.equal(passed.voidEntry.toast, dependencies.toast);
+  assert.equal(passed.voidEntry.saveVoidTransaction, voidTransaction);
   assert.equal(
     passed.correction.updateAllocationPreview,
     dependencies.updateAllocationPreview,
@@ -258,10 +331,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
     },
   };
   const feature = context.window.PropertyDeskTransactionMaintenance.create({
-    $() {},
     state,
-    confirmAction: () => true,
-    promptAction: () => "Entered in error",
     timestamp: () => "2026-10-04T12:00:00.000Z",
     fetchAll: async () => {
       refreshes += 1;
@@ -269,7 +339,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
     toast: (message) => messages.push(message),
   });
 
-  await feature.voidTransaction("income", "payment-1");
+  await feature.saveVoidTransaction("income", "payment-1", "Entered in error");
 
   assert.equal(updates[0][0], "pd_payments");
   assert.equal(updates[0][1].status, "voided");
@@ -297,12 +367,11 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
         from: () => assert.fail("unsupported kind must not write"),
       },
     },
-    confirmAction: () => assert.fail("unsupported kind must not prompt"),
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
   });
 
-  await feature.voidTransaction("unexpected", "transaction-1");
+  await feature.saveVoidTransaction("unexpected", "transaction-1", "reason");
   assert.deepEqual(messages, ["This transaction type can't be voided"]);
 });
 
@@ -328,7 +397,6 @@ test("transaction maintenance reports rejected void requests without refreshing"
   );
   const messages = [];
   const feature = context.window.PropertyDeskTransactionMaintenance.create({
-    $() {},
     state: {
       client: {
         from: () => ({
@@ -346,13 +414,13 @@ test("transaction maintenance reports rejected void requests without refreshing"
         }),
       },
     },
-    confirmAction: () => true,
-    promptAction: () => "Entered in error",
     fetchAll: async () => assert.fail("failed void request must not refresh"),
     toast: (message) => messages.push(message),
   });
 
-  await assert.doesNotReject(feature.voidTransaction("income", "payment-1"));
+  await assert.doesNotReject(
+    feature.saveVoidTransaction("income", "payment-1", "Entered in error"),
+  );
   assert.deepEqual(messages, [
     "Transaction couldn't be voided right now. Please try again.",
   ]);

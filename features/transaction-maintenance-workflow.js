@@ -16,12 +16,16 @@
       OptionClass,
       documentRef = document,
     } = context;
-    const { voidTransaction } =
+    const { saveVoidTransaction } =
       window.PropertyDeskTransactionMaintenance.create({
         state,
         toast,
         fetchAll,
       });
+    const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
+      toast,
+      saveVoidTransaction,
+    });
     const { correctTransaction } =
       window.PropertyDeskTransactionCorrectionForm.create({
         $,
