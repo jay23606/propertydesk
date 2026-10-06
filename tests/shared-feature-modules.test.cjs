@@ -86,6 +86,7 @@ test("form options are populated from shared domain and transaction catalogs", (
   assert.match($("payment-method").innerHTML, /value="money_order"/);
   assert.match($("income-category").innerHTML, /Other income/);
   assert.match($("expense-category").innerHTML, /Security deposit refund/);
+  assert.doesNotMatch($("expense-method").innerHTML, /value="money_order"/);
   assert.doesNotMatch($("expense-method").innerHTML, /value="other"/);
 });
 

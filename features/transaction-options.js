@@ -26,11 +26,7 @@
     { value: "card", label: "Card" },
   ]);
   const expensePaymentMethods = freezeOptions([
-    { value: "manual", label: "Manual / other" },
-    { value: "check", label: "Check" },
-    { value: "cash", label: "Cash" },
-    { value: "bank_transfer", label: "Bank transfer" },
-    { value: "card", label: "Card" },
+    ...paymentMethods.filter(({ value }) => value !== "money_order"),
     { value: "other", label: "Other", formVisible: false },
   ]);
   const expenseCategories = freezeOptions([
