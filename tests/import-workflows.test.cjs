@@ -608,10 +608,24 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/documents.js"),
   );
   assert.ok(
+    html.indexOf("features/document-repository.js") <
+      html.indexOf("features/document-delete.js"),
+  );
+  assert.ok(
+    html.indexOf("features/document-delete.js") <
+      html.indexOf("features/document-actions.js"),
+  );
+  assert.ok(
+    html.indexOf("features/document-open.js") <
+      html.indexOf("features/document-actions.js"),
+  );
+  assert.ok(
     html.indexOf("features/document-actions.js") <
       html.indexOf("features/documents.js"),
   );
   assert.match(worker, /'\.\/features\/document-actions\.js'/);
+  assert.match(worker, /'\.\/features\/document-delete\.js'/);
+  assert.match(worker, /'\.\/features\/document-open\.js'/);
   assert.match(worker, /'\.\/features\/document-upload\.js'/);
   assert.ok(
     html.indexOf("features/documents.js") <

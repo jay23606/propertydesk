@@ -9,6 +9,8 @@ function loadDocumentModules(context) {
     "document-repository.js",
     "document-upload-policy.js",
     "document-upload.js",
+    "document-delete.js",
+    "document-open.js",
     "document-actions.js",
     "documents.js",
   ]) {
@@ -63,6 +65,59 @@ test("private document module exposes upload, delete, and open workflows", () =>
   ]) {
     assert.equal(typeof feature[action], "function", action);
   }
+});
+
+test("document actions separate deletion and signed-link dependencies", () => {
+  const passed = {};
+  const deleteAction = () => "deleted";
+  const openAction = () => "opened";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDocumentDelete: {
+        create: (options) => {
+          passed.deletion = options;
+          return { deletePropertyDocument: deleteAction };
+        },
+      },
+      PropertyDeskDocumentOpen: {
+        create: (options) => {
+          passed.open = options;
+          return { openPropertyDocument: openAction };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "document-actions.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    state: {},
+    toast() {},
+    fetchAll() {},
+    openPropertyDetails() {},
+    confirm() {},
+    openWindow() {},
+    repository: {},
+  };
+
+  const actions =
+    context.window.PropertyDeskDocumentActions.create(dependencies);
+
+  assert.equal(passed.deletion.state, dependencies.state);
+  assert.equal(passed.deletion.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.deletion.confirm, dependencies.confirm);
+  assert.equal(passed.deletion.repository, dependencies.repository);
+  assert.equal(passed.deletion.openWindow, undefined);
+  assert.equal(passed.open.state, dependencies.state);
+  assert.equal(passed.open.openWindow, dependencies.openWindow);
+  assert.equal(passed.open.repository, dependencies.repository);
+  assert.equal(passed.open.fetchAll, undefined);
+  assert.equal(actions.deletePropertyDocument, deleteAction);
+  assert.equal(actions.openPropertyDocument, openAction);
 });
 
 test("document upload stores objects privately and removes an orphan after metadata failure", async () => {
