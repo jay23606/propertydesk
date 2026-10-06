@@ -430,6 +430,7 @@ test("backup export aborts before download when a private document path escapes 
     "document-repository.js",
     "backup-agreement-files.js",
     "backup-records.js",
+    "backup-archive.js",
     "download-utils.js",
     "backup-export.js",
   ]) {
@@ -524,6 +525,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     "document-repository.js",
     "backup-agreement-files.js",
     "backup-records.js",
+    "backup-archive.js",
     "download-utils.js",
     "backup-export.js",
   ]) {

@@ -10,11 +10,16 @@
       todayIso,
       toast,
       downloadBlob = window.PropertyDeskDownloadUtils.downloadBlob,
-      zipUtils = window.PropertyDeskZipUtils,
-      loadBackupRecords = window.PropertyDeskBackupRecords.load,
-      collectBackupAgreementFiles = window.PropertyDeskBackupAgreementFiles
-        .collect,
+      zipUtils,
+      loadBackupRecords,
+      collectBackupAgreementFiles,
     } = context;
+    const archive = window.PropertyDeskBackupArchive.create({
+      createBackup,
+      zipUtils,
+      loadBackupRecords,
+      collectBackupAgreementFiles,
+    });
 
     async function exportAll() {
       if (!state.user || !state.client) {
@@ -28,30 +33,13 @@
       toast("Preparing a private backup with agreement files…");
 
       try {
-        const records = await loadBackupRecords(state.client);
-        const { entries, includedFiles } = await collectBackupAgreementFiles({
-          documents: records.pd_documents,
+        const { blob, recordCount, agreementCount } = await archive.prepare({
           client: state.client,
           workspaceOwnerId: state.workspaceOwnerId,
         });
-
-        const backup = createBackup(
-          records,
-          new Date().toISOString(),
-          includedFiles,
-        );
-        entries.unshift({
-          name: "propertydesk-backup.json",
-          data: JSON.stringify(backup, null, 2),
-        });
-        const blob = zipUtils.createZip(entries);
         downloadBlob(blob, `propertydesk-backup-${todayIso()}.zip`);
-        const recordCount = Object.values(records).reduce(
-          (sum, tableRows) => sum + tableRows.length,
-          0,
-        );
         toast(
-          `Private ZIP backup exported · ${recordCount} records · ${includedFiles.length} agreement files`,
+          `Private ZIP backup exported · ${recordCount} records · ${agreementCount} agreement files`,
         );
       } catch (error) {
         toast(

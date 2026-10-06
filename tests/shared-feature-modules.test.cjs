@@ -437,6 +437,7 @@ test("backup and report exports own separate button bindings", () => {
       for (const dependency of [
         "backup-records.js",
         "backup-agreement-files.js",
+        "backup-archive.js",
       ]) {
         vm.runInContext(
           fs.readFileSync(
