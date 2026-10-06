@@ -655,6 +655,15 @@ test("record-entry feature owns create actions and handles empty workspace state
     "open:account-modal",
     "open-expense",
   ]);
+
+  calls.length = 0;
+  feature.openAccountForProperty("property-1");
+  assert.equal(getElement("account-property").value, "property-1");
+  assert.deepEqual(calls, [
+    "reset:account-form",
+    "populate-options",
+    "open:account-modal",
+  ]);
 });
 
 test("opening a payment for an account prefills its scheduled installment without overwriting typed amount", () => {

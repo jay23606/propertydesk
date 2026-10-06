@@ -297,9 +297,7 @@ test("property view actions route payment, note, address, and add-account action
     openPayment: (id) => calls.push(["payment", id]),
     editPropertyQuickNote: (id) => calls.push(["note", id]),
     openPropertyDetails: (id) => calls.push(["open", id]),
-    resetAccountForm: () => calls.push(["reset"]),
-    populateFormOptions: () => calls.push(["populate"]),
-    openModal: (id) => calls.push(["modal", id]),
+    openAccountForProperty: (id) => calls.push(["open-account", id]),
   });
   feature.attachEvents();
 
@@ -316,14 +314,11 @@ test("property view actions route payment, note, address, and add-account action
     });
   }
 
-  assert.equal($("account-property").value, "property-3");
   assert.deepEqual(calls, [
     ["payment", "account-1"],
     ["note", "property-1"],
     ["open", "property-2"],
-    ["reset"],
-    ["populate"],
-    ["modal", "account-modal"],
+    ["open-account", "property-3"],
   ]);
 });
 
@@ -439,9 +434,8 @@ test("property detail events own editing and quick-action bindings", () => {
       closeModal: (modal) => calls.push(`close:${modal.id}`),
       openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
       openExpense: (propertyId) => calls.push(`expense:${propertyId}`),
-      resetAccountForm: () => calls.push("reset-account"),
-      populateFormOptions: () => calls.push("populate-options"),
-      openModal: (id) => calls.push(`open:${id}`),
+      openAccountForProperty: (propertyId) =>
+        calls.push(`open-account:${propertyId}`),
       toggleArchiveProperty: () => calls.push("archive"),
     });
 
@@ -481,7 +475,6 @@ test("property detail events own editing and quick-action bindings", () => {
   dispatch("property-archive-toggle:click");
 
   assert.equal(propertyModal.id, "property-detail-modal");
-  assert.equal(getElement("account-property").value, "property-1");
   assert.deepEqual(calls, [
     "close:property-detail-modal",
     "edit:account-1",
@@ -493,9 +486,7 @@ test("property detail events own editing and quick-action bindings", () => {
     "close:property-detail-modal",
     "expense:property-1",
     "close:property-detail-modal",
-    "reset-account",
-    "populate-options",
-    "open:account-modal",
+    "open-account:property-1",
     "archive",
   ]);
   const callsBeforeNoSelection = calls.length;
@@ -740,8 +731,7 @@ test("property details workflow connects content with action and document routes
     editAccount() {},
     openPayment() {},
     openExpense() {},
-    resetAccountForm() {},
-    populateFormOptions() {},
+    openAccountForProperty() {},
     openAccountDetails() {},
     documentRef: {},
   };
@@ -760,12 +750,10 @@ test("property details workflow connects content with action and document routes
       "editAccount",
       "fetchAll",
       "openAccountDetails",
+      "openAccountForProperty",
       "openExpense",
-      "openModal",
       "openPayment",
       "openPropertyDetails",
-      "populateFormOptions",
-      "resetAccountForm",
       "state",
       "toast",
       "todayIso",
@@ -841,9 +829,7 @@ test("property detail actions workflow composes administration and modal actions
     closeModal: action,
     openPayment: action,
     openExpense: action,
-    resetAccountForm: action,
-    populateFormOptions: action,
-    openModal: action,
+    openAccountForProperty: action,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailActionsWorkflow.create({
@@ -854,6 +840,7 @@ test("property detail actions workflow composes administration and modal actions
   assert.equal(passed.holderEvents.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
+  assert.equal(passed.quickActions.openAccountForProperty, action);
   assert.equal(passed.quickActions.toggleArchiveProperty, action);
   assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
   workflow.attachPropertyDetailEvents();

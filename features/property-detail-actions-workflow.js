@@ -14,9 +14,7 @@
       editAccount,
       openPayment,
       openExpense,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
+      openAccountForProperty,
       openAccountDetails,
       documentRef = document,
     } = context;
@@ -57,9 +55,7 @@
         closeModal,
         openPayment,
         openExpense,
-        resetAccountForm,
-        populateFormOptions,
-        openModal,
+        openAccountForProperty,
         toggleArchiveProperty,
       });
 

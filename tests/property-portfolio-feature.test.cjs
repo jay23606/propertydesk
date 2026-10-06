@@ -338,9 +338,7 @@ test("property portfolio actions workflow owns quick-note and grid action routin
       streetAddress: action,
       openPayment: action,
       openPropertyDetails: action,
-      resetAccountForm: action,
-      populateFormOptions: action,
-      openModal: action,
+      openAccountForProperty: action,
     });
 
   assert.equal(passed.quickNoteOptions.state, state);
@@ -349,6 +347,7 @@ test("property portfolio actions workflow owns quick-note and grid action routin
   assert.equal(passed.quickNoteOptions.streetAddress, action);
   assert.equal(passed.actionOptions.openPayment, action);
   assert.equal(passed.actionOptions.editPropertyQuickNote, action);
+  assert.equal(passed.actionOptions.openAccountForProperty, action);
   assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
   workflow.attachEvents();
   assert.equal(attached, 1);

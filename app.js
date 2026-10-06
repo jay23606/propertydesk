@@ -155,7 +155,7 @@
     attachAccountFormEvents,
     attachLedgerEntryFormEvents,
   } = recordEntryWorkflow;
-  const { attachEvents: attachCreateActions } =
+  const { attachEvents: attachCreateActions, openAccountForProperty } =
     window.PropertyDeskCreateActions.create({
       $,
       state,
@@ -258,8 +258,7 @@
     editAccount,
     openPayment,
     openExpense,
-    resetAccountForm,
-    populateFormOptions,
+    openAccountForProperty,
     openAccountDetails,
     documentRef: document,
   });
@@ -314,9 +313,7 @@
       streetAddress,
       openPayment,
       openPropertyDetails,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
+      openAccountForProperty,
     });
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({

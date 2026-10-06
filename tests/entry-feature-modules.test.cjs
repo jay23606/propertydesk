@@ -27,6 +27,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   assert.match(app, /attachAccountFormEvents,/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachCreateActions,/);
+  assert.match(app, /openAccountForProperty,/);
   assert.match(app, /attachDepositEvents,/);
   assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);

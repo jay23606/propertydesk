@@ -7,9 +7,7 @@
     openPayment,
     editPropertyQuickNote,
     openPropertyDetails,
-    resetAccountForm,
-    populateFormOptions,
-    openModal,
+    openAccountForProperty,
   }) {
     function attachEvents() {
       $("properties-table").addEventListener("click", (event) => {
@@ -34,10 +32,7 @@
         }
         const addAccount = event.target.closest("[data-property-account]");
         if (addAccount) {
-          resetAccountForm();
-          populateFormOptions();
-          $("account-property").value = addAccount.dataset.propertyAccount;
-          openModal("account-modal");
+          openAccountForProperty(addAccount.dataset.propertyAccount);
         }
       });
     }

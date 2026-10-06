@@ -17,6 +17,13 @@
       documentRef,
     } = context;
 
+    function openAccountForProperty(propertyId) {
+      resetAccountForm();
+      populateFormOptions();
+      if (propertyId) $("account-property").value = propertyId;
+      openModal("account-modal");
+    }
+
     function attachCreateActions() {
       const browserDocument = documentRef || document;
       browserDocument
@@ -36,9 +43,7 @@
               navigate("properties");
               return;
             }
-            resetAccountForm();
-            populateFormOptions();
-            openModal("account-modal");
+            openAccountForProperty();
           });
         });
 
@@ -70,7 +75,7 @@
         });
     }
 
-    return { attachEvents: attachCreateActions };
+    return { attachEvents: attachCreateActions, openAccountForProperty };
   }
 
   window.PropertyDeskCreateActions = Object.freeze({ create: createActions });

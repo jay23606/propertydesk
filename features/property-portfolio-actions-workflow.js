@@ -11,9 +11,7 @@
       streetAddress,
       openPayment,
       openPropertyDetails,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
+      openAccountForProperty,
     } = context;
     const { editPropertyQuickNote } =
       window.PropertyDeskPropertyQuickNote.create({
@@ -27,9 +25,7 @@
       openPayment,
       editPropertyQuickNote,
       openPropertyDetails,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
+      openAccountForProperty,
     });
 
     return { attachEvents };

@@ -8,9 +8,7 @@
     closeModal,
     openPayment,
     openExpense,
-    resetAccountForm,
-    populateFormOptions,
-    openModal,
+    openAccountForProperty,
     toggleArchiveProperty,
   }) {
     function attachEvents() {
@@ -30,10 +28,7 @@
         const propertyId = state.selectedPropertyId;
         if (!propertyId) return;
         closeModal($("property-detail-modal"));
-        resetAccountForm();
-        populateFormOptions();
-        $("account-property").value = propertyId;
-        openModal("account-modal");
+        openAccountForProperty(propertyId);
       });
       $("property-archive-toggle").addEventListener(
         "click",
