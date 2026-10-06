@@ -2,6 +2,14 @@
 (() => {
   "use strict";
 
+  function adjustmentIsReady(prepared, toast) {
+    if (prepared.status === "missing-reason") {
+      toast("Enter a reason so this adjustment can be audited");
+      return false;
+    }
+    return prepared.status === "ready";
+  }
+
   function create({
     state,
     todayIso,
@@ -22,12 +30,7 @@
         reason,
         movementDate: reason.trim() ? todayIso() : null,
       });
-      if (prepared.status === "cancelled") return false;
-      if (prepared.status === "missing-reason") {
-        toast("Enter a reason so this adjustment can be audited");
-        return false;
-      }
-      if (prepared.status !== "ready") return false;
+      if (!adjustmentIsReady(prepared, toast)) return false;
       let error;
       try {
         ({ error } = await repository.insert(state.client, prepared.payload));

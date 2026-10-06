@@ -561,6 +561,72 @@ test("deposit maintenance retains adjustment audit details", async () => {
   assert.equal(refreshes, 1);
 });
 
+test("deposit maintenance only proceeds with a ready audited adjustment", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const outcomes = [
+    { status: "cancelled" },
+    { status: "missing-reason" },
+    { status: "invalid-amount" },
+  ];
+  const messages = [];
+  let inserts = 0;
+  const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    state: {
+      workspaceOwnerId: "workspace-1",
+      accounts: [{ id: "rental-1", account_type: "rental" }],
+    },
+    todayIso: () => "2026-10-04",
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("rejected adjustments must not refresh"),
+    prepareAdjustment: () => outcomes.shift(),
+    repository: {
+      insert: async () => {
+        inserts++;
+        return { error: null };
+      },
+    },
+  });
+
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "retained",
+      25,
+      "Reason",
+    ),
+    false,
+  );
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "retained",
+      25,
+      "Reason",
+    ),
+    false,
+  );
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "retained",
+      25,
+      "Reason",
+    ),
+    false,
+  );
+  assert.equal(inserts, 0);
+  assert.deepEqual(messages, [
+    "Enter a reason so this adjustment can be audited",
+  ]);
+});
+
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
