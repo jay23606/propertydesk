@@ -69,32 +69,38 @@
       todayIso,
       prettyType,
     });
-  const {
-    attachModalEvents,
-    openModal,
-    closeModal,
-    fillSelect,
-    populateFormOptions,
-    renderReminderActivity,
-    previewReminderEmail,
-  } = window.PropertyDeskRecordEntrySupportWorkflow.create({
+  const modal = window.PropertyDeskModalController.create({
     $,
     state,
-    esc,
-    propertyAddress,
-    prettyType,
     documentRef: document,
-    fmtDate,
-    money,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
-    monthEnd,
-    moneyInput,
-    toast,
-    dateOnly,
-    monthStart,
   });
+  const { fillSelect, populateFormOptions } =
+    window.PropertyDeskFormOptions.create({
+      $,
+      state,
+      esc,
+      propertyAddress,
+      prettyType,
+    });
+  const { renderReminderActivity, previewReminderEmail } =
+    window.PropertyDeskReminderWorkflow.create({
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal: modal.openModal,
+    });
+  const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const {
     updateGreeting,
