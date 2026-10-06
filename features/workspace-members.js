@@ -1,4 +1,4 @@
-/* PropertyDesk workspace member access and roster workflows. */
+/* PropertyDesk workspace member access and persistence workflows. */
 (() => {
   "use strict";
 
@@ -11,9 +11,15 @@
     refreshWorkspaceSettings,
     confirmAction = (message) => window.confirm(message),
   }) {
+    const view = window.PropertyDeskWorkspaceMembersView.create({
+      $,
+      state,
+      esc,
+    });
+
     async function addWorkspaceMember(event) {
       event.preventDefault();
-      const email = $("member-email").value.trim();
+      const email = view.memberEmail();
       if (!email) return;
       let error;
       try {
@@ -30,7 +36,7 @@
         toast(error.message);
         return;
       }
-      $("member-email").value = "";
+      view.clearMemberEmail();
       try {
         await fetchAll();
       } catch {
@@ -75,34 +81,12 @@
       toast("Workspace access removed");
     }
 
-    function renderWorkspaceMembers() {
-      $("workspace-members").innerHTML = state.workspaceMembers
-        .map(
-          (member) => `
-        <div class="member-row"><div><strong>${esc(member.display_name || member.email)}</strong><small>${esc(member.email)}${member.is_owner ? " · Owner" : " · Full workspace access"}</small></div>
-        ${member.is_owner ? '<span class="kind-pill">Owner</span>' : `<button class="text-button" type="button" data-remove-member="${esc(member.member_user_id)}">Remove</button>`}</div>`,
-        )
-        .join("");
-      $("member-add-form").classList.toggle(
-        "hidden",
-        state.workspaceOwnerId !== state.user?.id,
-      );
-    }
-
     function attachEvents() {
-      $("member-add-form").addEventListener("submit", (event) =>
-        addWorkspaceMember(event),
-      );
-      $("workspace-members").addEventListener("click", (event) => {
-        const removeButton = event.target.closest("[data-remove-member]");
-        if (removeButton) {
-          return removeWorkspaceMember(removeButton.dataset.removeMember);
-        }
-      });
+      view.attachEvents({ addWorkspaceMember, removeWorkspaceMember });
     }
 
     return {
-      renderWorkspaceMembers,
+      renderWorkspaceMembers: view.renderWorkspaceMembers,
       attachEvents,
     };
   }
