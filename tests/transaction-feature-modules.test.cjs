@@ -122,6 +122,9 @@ test("transaction list model scopes filters, resolves associations, and totals p
   assert.equal(result.rows[0].propertyName, "Oak House");
   assert.equal(result.rows[0].partyName, "Tenant A");
   assert.equal(result.rows[0].paymentMethod, "bank transfer");
+  assert.equal(Object.hasOwn(result.rows[0], "searchText"), false);
+  assert.equal(Object.hasOwn(result.rows[0], "account"), false);
+  assert.equal(Object.hasOwn(result.rows[0], "property"), false);
   assert.equal(result.rows[1].item.id, "expense-2");
   assert.equal(result.rows[1].correctionOf, "expense-original");
   assert.equal(result.rows[2].item.id, "expense-1");
