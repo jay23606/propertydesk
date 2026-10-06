@@ -770,9 +770,9 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /function attachPropertyDetailsEvents\(\) \{\s*attachPropertyDetailEvents\(\);\s*attachPropertyDocumentEvents\(\);/,
+    /attachPropertyDetailEvents,\s*attachPropertyDocumentEvents,/,
   );
-  assert.match(app, /eventBinders:[\s\S]*?attachPropertyDetailsEvents/);
+  assert.match(app, /eventBinders:[\s\S]*?attachPropertyDetailEvents/);
   assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
 });
 

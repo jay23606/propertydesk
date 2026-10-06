@@ -172,12 +172,6 @@
       navigate,
       documentRef: document,
     });
-  function attachEntryEvents() {
-    attachCreateActionEvents();
-    attachPropertyFormEvents();
-    attachAccountFormEvents();
-    attachLedgerEntryFormEvents();
-  }
   const { renderPayments, attachEvents: attachTransactionViewEvents } =
     window.PropertyDeskTransactionViews.create({
       $,
@@ -299,10 +293,6 @@
       fetchAll,
       openPropertyDetails,
     });
-  function attachPropertyDetailsEvents() {
-    attachPropertyDetailEvents();
-    attachPropertyDocumentEvents();
-  }
   const propertySummaryModel =
     window.PropertyDeskOverviewPropertySummaryModel.create({
       state,
@@ -383,10 +373,6 @@
       openPropertyDetails,
       openAccountForProperty,
     });
-  function attachPropertyPortfolioEvents() {
-    attachPropertyGridEvents();
-    attachPropertyActionEvents();
-  }
   const { selectImportRows, parseCSV, createImportLookup } =
     window.PropertyDeskImportUtils;
   const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
@@ -424,10 +410,6 @@
       fetchAll,
       toast,
     });
-  function attachCsvImportEvents() {
-    attachImportPreviewEvents();
-    attachImportFileEvents();
-  }
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskBackupExport.create({
       $,
@@ -468,15 +450,21 @@
       attachNavigationEvents,
       workspace.attachEvents,
       attachOverviewEvents,
-      attachPropertyPortfolioEvents,
+      attachPropertyGridEvents,
+      attachPropertyActionEvents,
       attachTransactionViewEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,
       attachDepositEvents,
-      attachEntryEvents,
-      attachPropertyDetailsEvents,
+      attachCreateActionEvents,
+      attachPropertyFormEvents,
+      attachAccountFormEvents,
+      attachLedgerEntryFormEvents,
+      attachPropertyDetailEvents,
+      attachPropertyDocumentEvents,
       attachAuthEvents,
-      attachCsvImportEvents,
+      attachImportPreviewEvents,
+      attachImportFileEvents,
       attachExportEvents,
       attachReportExportEvents,
     ],

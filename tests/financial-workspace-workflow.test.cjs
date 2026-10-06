@@ -49,7 +49,10 @@ test("app root composes financial screens and maintenance boundaries directly", 
     app,
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule,[\s\S]*?depositSectionHTML,[\s\S]*?renderAccountHistory,/,
   );
-  assert.match(app, /function attachEntryEvents\(\)/);
+  assert.match(
+    app,
+    /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
+  );
   assert.doesNotMatch(app, /function attachTransactionEvents\(/);
   assert.doesNotMatch(app, /function attachAccountDetailsEvents\(/);
 

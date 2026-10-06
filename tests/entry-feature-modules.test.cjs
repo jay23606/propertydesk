@@ -26,10 +26,9 @@ test("app root wires record entry forms and create actions directly", () => {
     app,
     /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow)\.create\(/,
   );
-  assert.match(app, /function attachEntryEvents\(\)/);
   assert.match(
     app,
-    /attachCreateActionEvents\(\);\s*attachPropertyFormEvents\(\);\s*attachAccountFormEvents\(\);\s*attachLedgerEntryFormEvents\(\);/,
+    /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
   );
   assert.match(app, /openAccountForProperty,/);
   assert.match(
@@ -88,11 +87,14 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
   assert.match(app, /PropertyDeskPropertyViews\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
-  assert.match(app, /function attachPropertyPortfolioEvents\(\)/);
+  assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
-  assert.match(app, /function attachPropertyDetailsEvents\(\)/);
+  assert.match(
+    app,
+    /attachPropertyDetailEvents,\s*attachPropertyDocumentEvents,/,
+  );
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,

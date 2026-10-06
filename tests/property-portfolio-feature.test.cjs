@@ -26,10 +26,7 @@ test("app composes the Properties grid and action workflows explicitly", () => {
     /PropertyDeskPropertyViews.create\(\{\s*\$,\s*state,\s*esc,\s*portfolioTable,\s*portfolioModel,/,
   );
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
-  assert.match(
-    app,
-    /function attachPropertyPortfolioEvents\(\) \{\s*attachPropertyGridEvents\(\);\s*attachPropertyActionEvents\(\);/,
-  );
+  assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   assert.doesNotMatch(
     app,
     /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/,
