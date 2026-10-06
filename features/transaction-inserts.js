@@ -7,19 +7,12 @@
     toast,
     repository = window.PropertyDeskTransactionRepository,
   }) {
-    async function insertTransaction({ table, payload, failureMessage }) {
-      let error;
-      try {
-        ({ error } = await repository.insert(state.client, table, payload));
-      } catch {
-        toast(failureMessage);
-        return false;
-      }
-      if (error) {
-        toast(error.message);
-        return false;
-      }
-      return true;
+    function insertTransaction({ table, payload, failureMessage }) {
+      return window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.insert(state.client, table, payload),
+        toast,
+        failureMessage,
+      });
     }
 
     return { insertTransaction };

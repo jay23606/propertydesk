@@ -7,41 +7,22 @@
     toast,
     repository = window.PropertyDeskPropertyRepository,
   }) {
-    async function updateProperty(propertyId, ownerId, values, failureMessage) {
-      let error;
-      try {
-        ({ error } = await repository.updateOwned(
-          state.client,
-          propertyId,
-          ownerId,
-          values,
-        ));
-      } catch {
-        toast(failureMessage);
-        return false;
-      }
-      if (error) {
-        toast(error.message);
-        return false;
-      }
-      return true;
+    function updateProperty(propertyId, ownerId, values, failureMessage) {
+      return window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () =>
+          repository.updateOwned(state.client, propertyId, ownerId, values),
+        toast,
+        failureMessage,
+      });
     }
 
-    async function saveProperty(payload, propertyId) {
-      let error;
-      try {
-        ({ error } = await repository.save(state.client, payload, propertyId));
-      } catch {
-        toast(
+    function saveProperty(payload, propertyId) {
+      return window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.save(state.client, payload, propertyId),
+        toast,
+        failureMessage:
           "Property couldn't be saved right now. Check your connection and try again.",
-        );
-        return false;
-      }
-      if (error) {
-        toast(error.message);
-        return false;
-      }
-      return true;
+      });
     }
 
     function savePropertyQuickNote(propertyId, ownerId, note) {

@@ -42,6 +42,7 @@ function loadLedgerEntryForms(context) {
     "transaction-options.js",
     "transaction-payloads.js",
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "transaction-repository.js",
     "transaction-inserts.js",
     "payment-entry-view.js",
@@ -61,6 +62,7 @@ function loadLedgerEntryForms(context) {
 function loadPropertyAndAccountForms(context) {
   for (const filename of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-form-view.js",
     "property-repository.js",
     "property-maintenance.js",

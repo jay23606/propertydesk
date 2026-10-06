@@ -8,6 +8,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   const context = vm.createContext({ window: {} });
   for (const source of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-quick-note.js",
@@ -73,6 +74,7 @@ test("property quick notes enforce the character limit before writing", async ()
   const context = vm.createContext({ window: {} });
   for (const source of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-quick-note.js",
@@ -106,6 +108,7 @@ test("property holder and archive workflows report rejected writes without runni
   });
   for (const source of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-holder-repository.js",
     "property-holder-management.js",
     "property-repository.js",
@@ -176,6 +179,7 @@ test("archive and restore writes share property maintenance and reopen updated d
   const context = vm.createContext({ window: {} });
   for (const source of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-archive.js",

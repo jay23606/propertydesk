@@ -7,21 +7,13 @@
     toast,
     repository = window.PropertyDeskAccountRepository,
   }) {
-    async function saveAccount(payload, accountId) {
-      let error;
-      try {
-        ({ error } = await repository.save(state.client, payload, accountId));
-      } catch {
-        toast(
+    function saveAccount(payload, accountId) {
+      return window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.save(state.client, payload, accountId),
+        toast,
+        failureMessage:
           "Account couldn't be saved right now. Check your connection and try again.",
-        );
-        return false;
-      }
-      if (error) {
-        toast(error.message);
-        return false;
-      }
-      return true;
+      });
     }
 
     return { saveAccount };

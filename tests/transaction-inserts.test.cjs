@@ -15,6 +15,13 @@ function loadTransactionInserts(client, messages = []) {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-repository.js"),
       "utf8",
     ),

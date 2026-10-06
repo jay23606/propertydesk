@@ -102,6 +102,22 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/property-repository.js"),
   );
   assert.ok(
+    html.indexOf("features/repository-query-utils.js") <
+      html.indexOf("features/repository-write-feedback.js"),
+  );
+  assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/property-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/account-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/transaction-inserts.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-repository.js") <
       html.indexOf("features/property-maintenance.js"),
   );
