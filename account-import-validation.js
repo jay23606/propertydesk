@@ -7,6 +7,19 @@
 
   function validateAccountRows(rows, properties, accounts, today) {
     const seenAccounts = new Set();
+    const propertyById = new Map(
+      properties.map((property) => [property.id, property]),
+    );
+    const accountKey = (name, propertyName, propertyAddress) =>
+      `${name.toLowerCase()}|${propertyName.toLowerCase()}|${propertyAddress.toLowerCase()}`;
+    const existingAccounts = new Set(
+      accounts.flatMap((account) => {
+        const property = propertyById.get(account.property_id);
+        return property
+          ? [accountKey(account.name, property.name, property.address)]
+          : [];
+      }),
+    );
     return validateImportRows(rows, (row) => {
       const required = [
         "property_name",
@@ -21,20 +34,12 @@
         throw new Error(
           `Invalid account_type “${row.account_type}”. Use rental, land_contract, or note.`,
         );
-      const accountKey = `${row.account_name.toLowerCase()}|${row.property_name.toLowerCase()}|${row.property_address.toLowerCase()}`;
-      if (
-        accounts.some(
-          (a) =>
-            a.name.toLowerCase() === row.account_name.toLowerCase() &&
-            properties
-              .find((p) => p.id === a.property_id)
-              ?.name.toLowerCase() === row.property_name.toLowerCase() &&
-            properties
-              .find((p) => p.id === a.property_id)
-              ?.address.toLowerCase() === row.property_address.toLowerCase(),
-        ) ||
-        seenAccounts.has(accountKey)
-      )
+      const key = accountKey(
+        row.account_name,
+        row.property_name,
+        row.property_address,
+      );
+      if (existingAccounts.has(key) || seenAccounts.has(key))
         throw new Error(
           `Possible duplicate account: ${row.account_name} at ${row.property_address}.`,
         );
@@ -118,7 +123,7 @@
         .filter(Boolean);
       if (partyEmail.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
         throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
-      seenAccounts.add(accountKey);
+      seenAccounts.add(key);
       return {
         property_name: row.property_name,
         property_address: row.property_address,

@@ -80,6 +80,29 @@ test("account import reports bad values and revalidates edits against existing a
   assert.equal(corrected.valid[0].party_phone, "555-0100");
 });
 
+test("account import duplicate checks normalize case and stay scoped to the property", () => {
+  const rows = parseCSV(
+    "property_name,property_address,account_type,account_name,start_date\nOAK HOUSE,10 OAK ST,rental,OAK RENTAL,2026-01-01\nPine House,20 Pine St,rental,Oak Rental,2026-01-01",
+  );
+  const result = validateAccountRows(
+    rows,
+    [
+      { id: "p1", name: "Oak House", address: "10 Oak St" },
+      { id: "p2", name: "Pine House", address: "20 Pine St" },
+    ],
+    [{ id: "a1", property_id: "p1", name: "Oak Rental" }],
+    "2026-10-03",
+  );
+
+  assert.deepEqual(
+    result.errors.map((error) => error.row),
+    [2],
+  );
+  assert.match(result.errors[0].message, /Possible duplicate account/);
+  assert.equal(result.valid[0].property_name, "Pine House");
+  assert.equal(result.valid[0].account_name, "Oak Rental");
+});
+
 test("expense import matches property/account, combines source notes, and skips possible duplicates", () => {
   const rows = parseCSV(
     fs.readFileSync(
