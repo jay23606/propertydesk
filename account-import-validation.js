@@ -4,7 +4,7 @@
 
   const { csvMoney, csvRate, validIsoDate, validateImportRows } =
     globalThis.PropertyDeskImportUtils;
-  const { accountTypes, paymentFrequencies, propertyKinds } =
+  const { accountTypes, paymentFrequencies, propertyKinds, defaults } =
     globalThis.PropertyDeskDomainOptions;
   const accountTypeValues = new Set(accountTypes.map(({ value }) => value));
   const paymentFrequencyValues = new Set(
@@ -43,7 +43,7 @@
       const type = row.account_type.toLowerCase();
       if (!accountTypeValues.has(type))
         throw new Error(
-          `Invalid account_type “${row.account_type}”. Use rental, land_contract, or note.`,
+          `Invalid account_type “${row.account_type}”. Use ${[...accountTypeValues].join(", ")}.`,
         );
       const key = accountKey(
         row.account_name,
@@ -94,7 +94,7 @@
         `${row.account_name} interest rate`,
         { optional: true },
       );
-      const frequency = row.payment_frequency || "monthly",
+      const frequency = row.payment_frequency || defaults.paymentFrequency,
         startDate = row.start_date || today;
       if (
         !paymentFrequencyValues.has(frequency) ||
@@ -116,7 +116,7 @@
         throw new Error(
           `Grace days must be a nonnegative whole number for ${row.account_name}.`,
         );
-      const propertyKind = row.property_kind || "residential";
+      const propertyKind = row.property_kind || defaults.propertyKind;
       if (!propertyKindValues.has(propertyKind))
         throw new Error(
           `Invalid property_kind “${row.property_kind}” for ${row.property_name}.`,
