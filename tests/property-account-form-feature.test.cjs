@@ -20,11 +20,30 @@ test("property and account form modules expose separate APIs", () => {
     openModal() {},
   };
   const property = context.window.PropertyDeskPropertyForm.create(dependencies);
+  let accountViewDependencies;
+  context.window.PropertyDeskAccountFormView = {
+    create: (viewDependencies) => {
+      accountViewDependencies = viewDependencies;
+      return {
+        resetAccountForm() {},
+        readValues() {},
+        editAccount() {},
+        attachEvents() {},
+      };
+    },
+  };
   const account = context.window.PropertyDeskAccountForm.create({
     ...dependencies,
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
   });
+
+  assert.deepEqual(Object.keys(accountViewDependencies).sort(), [
+    "$",
+    "openModal",
+    "populateFormOptions",
+    "todayIso",
+  ]);
 
   assert.deepEqual(Object.keys(property).sort(), [
     "attachEvents",

@@ -14,7 +14,12 @@
       formModel,
       previewReminderEmail,
     } = context;
-    const formView = window.PropertyDeskAccountFormView.create(context);
+    const formView = window.PropertyDeskAccountFormView.create({
+      $,
+      todayIso: context.todayIso,
+      populateFormOptions: context.populateFormOptions,
+      openModal: context.openModal,
+    });
     const { resetAccountForm, readValues, editAccount } = formView;
 
     async function saveAccount(event) {

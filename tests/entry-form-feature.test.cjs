@@ -194,6 +194,33 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
 test("payment and expense form workflows publish explicit view operations", () => {
   const context = vm.createContext({ window: {} });
   loadLedgerEntryForms(context);
+  const viewDependencies = {};
+  context.window.PropertyDeskPaymentEntryView = {
+    create: (options) => {
+      viewDependencies.payment = options;
+      return {
+        updateAllocationPreview() {},
+        readValues() {},
+        resetAfterSave() {},
+        prepareNextPayment() {},
+        openPayment() {},
+        openPropertyPayment() {},
+        attachEvents() {},
+      };
+    },
+  };
+  context.window.PropertyDeskExpenseEntryView = {
+    create: (options) => {
+      viewDependencies.expense = options;
+      return {
+        openExpense() {},
+        prepareNextExpense() {},
+        readValues() {},
+        resetAfterSave() {},
+        attachEvents() {},
+      };
+    },
+  };
   const elements = new Map();
   const $ = (id) => {
     if (!elements.has(id)) {
@@ -223,6 +250,28 @@ test("payment and expense form workflows publish explicit view operations", () =
     context.window.PropertyDeskPaymentEntryForm.create(dependencies);
   const expense =
     context.window.PropertyDeskExpenseEntryForm.create(dependencies);
+
+  assert.deepEqual(Object.keys(viewDependencies.payment).sort(), [
+    "$",
+    "fillSelect",
+    "moneyInput",
+    "openModal",
+    "populateFormOptions",
+    "prettyType",
+    "state",
+    "toast",
+    "todayIso",
+  ]);
+  assert.deepEqual(Object.keys(viewDependencies.expense).sort(), [
+    "$",
+    "fillSelect",
+    "moneyInput",
+    "openModal",
+    "populateFormOptions",
+    "prettyType",
+    "state",
+    "todayIso",
+  ]);
 
   assert.deepEqual(Object.keys(payment).sort(), [
     "attachEvents",

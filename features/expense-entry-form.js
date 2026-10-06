@@ -12,7 +12,16 @@
       saveCorrection,
       buildExpensePayload,
     } = context;
-    const expenseView = window.PropertyDeskExpenseEntryView.create(context);
+    const expenseView = window.PropertyDeskExpenseEntryView.create({
+      $,
+      state,
+      moneyInput: context.moneyInput,
+      todayIso: context.todayIso,
+      fillSelect: context.fillSelect,
+      populateFormOptions: context.populateFormOptions,
+      prettyType: context.prettyType,
+      openModal: context.openModal,
+    });
 
     async function saveExpense(event) {
       event.preventDefault();

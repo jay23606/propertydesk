@@ -12,7 +12,17 @@
       saveCorrection,
       buildPaymentPayload,
     } = context;
-    const paymentView = window.PropertyDeskPaymentEntryView.create(context);
+    const paymentView = window.PropertyDeskPaymentEntryView.create({
+      $,
+      state,
+      moneyInput: context.moneyInput,
+      todayIso: context.todayIso,
+      toast,
+      fillSelect: context.fillSelect,
+      populateFormOptions: context.populateFormOptions,
+      prettyType: context.prettyType,
+      openModal: context.openModal,
+    });
 
     async function savePayment(event) {
       event.preventDefault();
