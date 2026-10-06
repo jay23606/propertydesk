@@ -233,8 +233,8 @@
     lateReminderMailto,
     paymentStatusInMonth,
   });
-  const { attachEvents: attachCsvImportEvents } =
-    window.PropertyDeskCsvImportWorkflow.create({
+  const { attachCsvImportEvents, attachExportEvents } =
+    window.PropertyDeskDataTransferWorkflow.create({
       $,
       state,
       esc,
@@ -243,14 +243,7 @@
       toast,
       todayIso,
       fetchAll,
-    });
-  const { attachEvents: attachExportEvents } =
-    window.PropertyDeskBackupExport.create({
-      $,
-      state,
       createBackup,
-      todayIso,
-      toast,
     });
   const {
     showConfigError,
