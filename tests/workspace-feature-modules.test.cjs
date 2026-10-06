@@ -404,6 +404,12 @@ test("workspace member feature loads before settings and is precached", () => {
     html.indexOf("features/workspace-member-repository.js") <
       html.indexOf("features/workspace-members.js"),
   );
+  assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/workspace-members.js"),
+    "shared write feedback should load before workspace member writes",
+  );
+  assert.match(worker, /'\.\/features\/repository-write-feedback\.js'/);
   assert.match(worker, /'\.\/features\/workspace-member-repository\.js'/);
   assert.ok(
     html.indexOf("features/workspace-members.js") <

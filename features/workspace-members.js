@@ -16,19 +16,13 @@
 
     async function addWorkspaceMember(email) {
       if (!email) return;
-      let error;
-      try {
-        ({ error } = await repository.addMember(email));
-      } catch {
-        toast(
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.addMember(email),
+        toast,
+        failureMessage:
           "Workspace member couldn't be added right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      });
+      if (!saved) return;
       try {
         await fetchAll();
       } catch {
@@ -50,19 +44,13 @@
         )
       )
         return;
-      let error;
-      try {
-        ({ error } = await repository.removeMember(memberId));
-      } catch {
-        toast(
+      const removed = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.removeMember(memberId),
+        toast,
+        failureMessage:
           "Workspace member couldn't be removed right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      });
+      if (!removed) return;
       try {
         await fetchAll();
       } catch {
