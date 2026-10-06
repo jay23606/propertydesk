@@ -41,23 +41,19 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
-  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskOverview(?:Events)?\.create/);
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:PropertyDetails|Overview|PropertyPortfolio)Workflow\.create/,
+  );
   assert.doesNotMatch(
     app,
     /attachPropertyViewEvents|attachPropertyActionEvents/,
-  );
-  assert.match(app, /attachEvents: attachPropertyPortfolioEvents/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskProperty(?:PortfolioTable|PortfolioModel|Views|ViewEvents)\.create/,
   );
   assert.doesNotMatch(
     app,
     /attachPropertyDetailEvents|attachPropertyDocumentEvents/,
   );
-  assert.match(app, /attachEvents: attachPropertyDetailsEvents/);
   assert.doesNotMatch(
     app,
     /PropertyDeskProperty(?:DetailActions|Document)Workflow\.create\(/,
@@ -95,13 +91,15 @@ test("app coordinator passes the amortization helper into account details", () =
 
 test("app coordinator creates cross-linked property views after their actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const propertyWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    "utf8",
+  );
   const order = [
-    "PropertyDeskRecordEntryWorkflow.create(",
-    "PropertyDeskAccountDetailsWorkflow.create(",
     "PropertyDeskPropertyDetailsWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
-  ].map((marker) => app.indexOf(marker));
+  ].map((marker) => propertyWorkflow.indexOf(marker));
 
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -111,6 +109,10 @@ test("app coordinator creates cross-linked property views after their actions", 
   assert.doesNotMatch(
     app,
     /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/,
+  );
+  assert.ok(
+    app.indexOf("PropertyDeskAccountDetailsWorkflow.create(") <
+      app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
   );
 });
 

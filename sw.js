@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v243';
+const CACHE_NAME = 'propertydesk-shell-v244';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -134,6 +134,7 @@ const SHELL_FILES = [
   './features/pwa-registration.js',
   './features/app-lifecycle.js',
   './features/record-entry-workflow.js',
+  './features/property-workspace-workflow.js',
   './app.js',
   './propertydesk.webmanifest',
   './icons/propertydesk.svg',
