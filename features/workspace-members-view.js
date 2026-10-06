@@ -3,10 +3,6 @@
   "use strict";
 
   function create({ $, state, esc }) {
-    function memberEmail() {
-      return $("member-email").value.trim();
-    }
-
     function clearMemberEmail() {
       $("member-email").value = "";
     }
@@ -26,7 +22,10 @@
     }
 
     function attachEvents({ addWorkspaceMember, removeWorkspaceMember }) {
-      $("member-add-form").addEventListener("submit", addWorkspaceMember);
+      $("member-add-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        return addWorkspaceMember($("member-email").value.trim());
+      });
       $("workspace-members").addEventListener("click", (event) => {
         const removeButton = event.target.closest("[data-remove-member]");
         if (removeButton)
@@ -37,7 +36,6 @@
     return {
       attachEvents,
       clearMemberEmail,
-      memberEmail,
       renderWorkspaceMembers,
     };
   }

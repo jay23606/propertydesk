@@ -10,9 +10,7 @@
     refreshWorkspaceSettings,
     confirmAction = (message) => window.confirm(message),
   }) {
-    async function addWorkspaceMember(event) {
-      event.preventDefault();
-      const email = view.memberEmail();
+    async function addWorkspaceMember(email) {
       if (!email) return;
       let error;
       try {
