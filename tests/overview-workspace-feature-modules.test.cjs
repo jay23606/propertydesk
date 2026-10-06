@@ -62,6 +62,26 @@ test("overview renderer displays its summary model and quick-payment card", () =
     address: "1 Oak St",
     property_kind: "residential",
   };
+  const summary = {
+    propertyCount: 1,
+    accountCount: 2,
+    collected: 800,
+    expected: 1300,
+    recordedPaymentCount: 1,
+    upcoming: [],
+    recent: [],
+    propertyCards: [
+      {
+        property,
+        parties: "Alice Buyer",
+        scheduledMonthly: 550,
+        hasNonMonthly: false,
+        loanBalance: 42000,
+        hasLoanAccount: true,
+        amountDue: 550,
+      },
+    ],
+  };
   const feature = context.window.PropertyDeskOverview.create({
     $,
     esc: String,
@@ -71,26 +91,7 @@ test("overview renderer displays its summary model and quick-payment card", () =
     prettyType: String,
     fmtDate: String,
     overviewModel: {
-      buildOverview: () => ({
-        propertyCount: 1,
-        accountCount: 2,
-        collected: 800,
-        expected: 1300,
-        recordedPaymentCount: 1,
-        upcoming: [],
-        recent: [],
-        propertyCards: [
-          {
-            property,
-            parties: "Alice Buyer",
-            scheduledMonthly: 550,
-            hasNonMonthly: false,
-            loanBalance: 42000,
-            hasLoanAccount: true,
-            amountDue: 550,
-          },
-        ],
-      }),
+      buildOverview: () => summary,
     },
   });
 
@@ -108,6 +109,36 @@ test("overview renderer displays its summary model and quick-payment card", () =
   );
   assert.match($("overview-properties").innerHTML, /\$42000\.00/);
   assert.match($("upcoming-list").innerHTML, /No upcoming payments yet/);
+
+  summary.upcoming = [
+    {
+      account: {
+        account_type: "rental",
+        party_name: "Tenant One",
+        payment_amount: 825,
+        next_due_date: "2026-11-01",
+      },
+      property,
+    },
+  ];
+  summary.recent = [
+    {
+      payment: {
+        amount: 800,
+        received_date: "2026-10-03",
+        payment_method: "manual_check",
+      },
+      account: { party_name: "Tenant One" },
+      property,
+    },
+  ];
+  feature.renderOverview();
+
+  assert.match($("upcoming-list").innerHTML, /Tenant One/);
+  assert.match($("upcoming-list").innerHTML, /Due 2026-11-01/);
+  assert.match($("activity-list").innerHTML, /Tenant One/);
+  assert.match($("activity-list").innerHTML, /manual check/);
+  assert.match($("activity-list").innerHTML, /2026-10-03/);
 });
 
 test("overview workflow composes dashboard rendering with property actions", () => {
