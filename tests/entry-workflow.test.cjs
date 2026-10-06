@@ -80,10 +80,10 @@ test("entry workflow joins record forms to their create actions", () => {
     "openExpense",
     "openPayment",
     "openPropertyPayment",
-    "resetAccountForm",
-    "resetPropertyForm",
     "updateAllocationPreview",
   ]);
+  assert.equal(workflow.resetAccountForm, undefined);
+  assert.equal(workflow.resetPropertyForm, undefined);
   assert.equal(workflow.attachCreateActions, methods.attachCreateActions);
   assert.equal(workflow.openAccountForProperty, methods.openAccountForProperty);
   assert.equal(

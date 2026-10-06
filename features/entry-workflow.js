@@ -49,7 +49,14 @@
       });
 
     return {
-      ...recordEntry,
+      editAccount: recordEntry.editAccount,
+      updateAllocationPreview: recordEntry.updateAllocationPreview,
+      openPayment: recordEntry.openPayment,
+      openPropertyPayment: recordEntry.openPropertyPayment,
+      openExpense: recordEntry.openExpense,
+      attachPropertyFormEvents: recordEntry.attachPropertyFormEvents,
+      attachAccountFormEvents: recordEntry.attachAccountFormEvents,
+      attachLedgerEntryFormEvents: recordEntry.attachLedgerEntryFormEvents,
       attachCreateActions,
       openAccountForProperty,
     };
