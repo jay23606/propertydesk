@@ -333,20 +333,16 @@
       propertyAddress,
       openModal,
     });
-  const {
-    navigate,
-    attachWorkspaceEvents,
-    attachNavigationEvents,
-    attachThemeEvents,
-  } = window.PropertyDeskAppShellWorkflow.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    updateGreeting,
-    renderReminderActivity,
-  });
+  const { navigate, attachEvents: attachAppShellEvents } =
+    window.PropertyDeskAppShellWorkflow.create({
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
+      updateGreeting,
+      renderReminderActivity,
+    });
   appLifecycle = window.PropertyDeskAppLifecycle.create({
     $,
     state,
@@ -368,8 +364,7 @@
     ],
     eventBinders: [
       attachModalEvents,
-      attachThemeEvents,
-      attachNavigationEvents,
+      attachAppShellEvents,
       attachOverviewEvents,
       attachPropertyViewEvents,
       attachPropertyActionEvents,
@@ -380,7 +375,6 @@
       () => attachAccountFormEvents(previewReminderEmail),
       attachLedgerEntryFormEvents,
       attachPropertyDetailsEvents,
-      attachWorkspaceEvents,
       attachAuthEvents,
       attachCsvImportEvents,
       attachExportEvents,

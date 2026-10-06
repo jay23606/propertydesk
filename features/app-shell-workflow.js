@@ -28,11 +28,15 @@
     });
     const theme = window.PropertyDeskTheme.create();
 
+    function attachEvents() {
+      theme.attachEvents();
+      navigation.attachEvents();
+      settings.attachEvents();
+    }
+
     return {
       navigate: navigation.navigate,
-      attachWorkspaceEvents: settings.attachEvents,
-      attachNavigationEvents: navigation.attachEvents,
-      attachThemeEvents: theme.attachEvents,
+      attachEvents,
     };
   }
 

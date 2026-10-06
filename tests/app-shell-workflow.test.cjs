@@ -6,15 +6,21 @@ const vm = require("node:vm");
 
 const root = path.join(__dirname, "..");
 
-test("app shell workflow exposes settings and keeps event binders explicit", () => {
+test("app shell workflow owns settings and groups shell event binding", () => {
   const calls = [];
   const handlers = {
     renderWorkspaceSettings() {},
-    attachWorkspaceEvents() {},
+    attachWorkspaceEvents() {
+      calls.push("workspace events attached");
+    },
     renderReminderActivity() {},
     navigate() {},
-    attachNavigationEvents() {},
-    attachThemeEvents() {},
+    attachNavigationEvents() {
+      calls.push("navigation events attached");
+    },
+    attachThemeEvents() {
+      calls.push("theme events attached");
+    },
   };
   const context = vm.createContext({
     window: {
@@ -64,15 +70,7 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
   };
   const shell = context.window.PropertyDeskAppShellWorkflow.create(options);
 
-  assert.deepEqual(
-    Object.keys(shell).sort(),
-    [
-      "attachNavigationEvents",
-      "attachThemeEvents",
-      "attachWorkspaceEvents",
-      "navigate",
-    ].sort(),
-  );
+  assert.deepEqual(Object.keys(shell).sort(), ["attachEvents", "navigate"]);
   assert.equal(calls[0][0], "settings");
   assert.notEqual(calls[0][1], options);
   assert.deepEqual(
@@ -100,9 +98,12 @@ test("app shell workflow exposes settings and keeps event binders explicit", () 
     calls.map(([name]) => name),
     ["settings", "navigation", "theme"],
   );
-  assert.equal(shell.attachWorkspaceEvents, handlers.attachWorkspaceEvents);
-  assert.equal(shell.attachNavigationEvents, handlers.attachNavigationEvents);
-  assert.equal(shell.attachThemeEvents, handlers.attachThemeEvents);
+  shell.attachEvents();
+  assert.deepEqual(calls.slice(-3), [
+    "theme events attached",
+    "navigation events attached",
+    "workspace events attached",
+  ]);
 });
 
 test("app shell workflow loads before the coordinator and is precached", () => {
