@@ -181,14 +181,13 @@
     attachTransactionViewEvents();
     attachTransactionActionEvents();
   }
-  const { depositSectionHTML } =
-    window.PropertyDeskDepositDetailsWorkflow.create({
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-    });
+  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+    state,
+    depositLedger,
+    money,
+    fmtDate,
+    esc,
+  });
   const { attachEvents: attachDepositEvents } =
     window.PropertyDeskDepositMaintenanceWorkflow.create({
       $,

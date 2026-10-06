@@ -6,7 +6,7 @@ const vm = require("node:vm");
 
 test("app composes account detail and deposit features without a broad wrapper", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositDetails\.create\(/);
   assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountHistoryDetails\.create\(/);
@@ -16,41 +16,6 @@ test("app composes account detail and deposit features without a broad wrapper",
     /attachAccountDetailActionEvents\(\);[\s\S]*?attachDepositEvents\(\);/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
-});
-
-test("deposit details workflow composes ledger data and rendering", () => {
-  const passed = {};
-  const depositSectionHTML = () => "deposit HTML";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDepositDetails: {
-        create: (options) => {
-          passed.view = options;
-          return { depositSectionHTML };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    state: {},
-    depositLedger() {},
-    money() {},
-    fmtDate() {},
-    esc() {},
-  };
-  const workflow =
-    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
-
-  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
-  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
-  assert.deepEqual(Object.keys(workflow), ["depositSectionHTML"]);
 });
 
 test("deposit maintenance workflow composes adjustments with detail events", () => {

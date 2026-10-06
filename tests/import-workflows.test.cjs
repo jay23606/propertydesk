@@ -143,10 +143,6 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/expense-entry-form.js"),
   );
   assert.ok(
-    html.indexOf("features/deposit-details.js") <
-      html.indexOf("features/deposit-details-workflow.js"),
-  );
-  assert.ok(
     html.indexOf("features/deposit-maintenance.js") <
       html.indexOf("features/deposit-maintenance-workflow.js"),
   );
@@ -160,8 +156,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.match(worker, /'\.\/features\/deposit-adjustment-entry\.js'/);
   assert.ok(
-    html.indexOf("features/deposit-details-workflow.js") <
-      html.indexOf("features/deposit-maintenance-workflow.js"),
+    html.indexOf("features/deposit-details.js") < html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/deposit-maintenance-workflow.js") <
@@ -681,10 +676,6 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/deposit-detail-events.js"),
   );
   assert.ok(
-    html.indexOf("features/deposit-details-workflow.js") <
-      html.indexOf("app.js"),
-  );
-  assert.ok(
     html.indexOf("features/account-detail-content-workflow.js") <
       html.indexOf("app.js"),
   );
@@ -906,7 +897,8 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-detail-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/account-close-entry\.js'/);
   assert.match(worker, /'\.\/features\/account-detail-content-workflow\.js'/);
-  assert.match(worker, /'\.\/features\/deposit-details-workflow\.js'/);
+  assert.doesNotMatch(html, /features\/deposit-details-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/deposit-details-workflow\.js/);
   assert.match(worker, /'\.\/features\/transaction-list-model\.js'/);
   assert.match(worker, /'\.\/features\/transaction-summary-model\.js'/);
   assert.match(worker, /'\.\/features\/transaction-row-view\.js'/);

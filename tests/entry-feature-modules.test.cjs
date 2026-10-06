@@ -79,7 +79,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
+    /PropertyDesk(?:AccountDetailEvents|DepositDetailEvents)\.create/,
   );
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/);
