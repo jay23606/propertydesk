@@ -298,6 +298,12 @@ test("auth feature delegates session restoration and state changes to its sessio
   feature.handleAuthStateChange("SIGNED_IN", { user: { id: "owner-2" } });
   assert.equal(state.user.id, "owner-2");
   assert.deepEqual(calls, ["fetch-workspace"]);
+
+  feature.handleAuthStateChange("TOKEN_REFRESHED", {
+    user: { id: "owner-2", refreshed: true },
+  });
+  assert.equal(state.user.refreshed, true);
+  assert.deepEqual(calls, ["fetch-workspace"]);
 });
 
 test("auth feature owns login controls and clears workspace data on sign-out", async () => {

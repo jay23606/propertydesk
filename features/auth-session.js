@@ -12,26 +12,34 @@
     startWorkspace,
     resetWorkspaceState,
   }) {
-    function handleAuthStateChange(event, session) {
-      if (event === "SIGNED_OUT") {
-        resetWorkspaceState(state);
-        showAuth();
-        setAuthMode(false);
-        return;
-      }
-      if (event === "PASSWORD_RECOVERY" && session?.user) {
-        state.user = session.user;
-        showPasswordReset();
-        return;
-      }
-      if (!session?.user) return;
+    function handleSignedOut() {
+      resetWorkspaceState(state);
+      showAuth();
+      setAuthMode(false);
+    }
 
+    function handlePasswordRecovery(session) {
+      if (!session?.user) return false;
+      state.user = session.user;
+      showPasswordReset();
+      return true;
+    }
+
+    function handleAuthenticatedSession(event, session) {
+      if (!session?.user) return;
       const previousUserId = state.user?.id;
       state.user = session.user;
       const signedIntoNewUser =
         event === "SIGNED_IN" && previousUserId !== session.user.id;
       if (signedIntoNewUser && !state.passwordRecoveryInProgress)
         startWorkspace();
+    }
+
+    function handleAuthStateChange(event, session) {
+      if (event === "SIGNED_OUT") return handleSignedOut();
+      if (event === "PASSWORD_RECOVERY" && handlePasswordRecovery(session))
+        return;
+      handleAuthenticatedSession(event, session);
     }
 
     async function restoreAuthSession() {
