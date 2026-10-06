@@ -10,6 +10,7 @@
       validateExpenseRows,
       commitTransactions,
       importReview,
+      references = window.PropertyDeskImportReferences.create(),
       createFileWorkflow,
     } = context;
 
@@ -46,10 +47,10 @@
           file,
           mapRows(rowsToImport) {
             return rowsToImport.map((row) => {
-              const property = state.properties.find(
-                (item) =>
-                  item.name === row.property_name &&
-                  item.address === row.property_address,
+              const property = references.findProperty(
+                state.properties,
+                row.property_name,
+                row.property_address,
               );
               if (!property) {
                 throw new Error(
@@ -57,10 +58,10 @@
                 );
               }
               const account = row.account_name
-                ? state.accounts.find(
-                    (item) =>
-                      item.property_id === property.id &&
-                      item.name === row.account_name,
+                ? references.findAccount(
+                    state.accounts,
+                    property.id,
+                    row.account_name,
                   )
                 : null;
               if (row.account_name && !account) {

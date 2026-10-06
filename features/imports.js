@@ -22,6 +22,7 @@
         status: $("import-status"),
         toast,
       });
+    const references = window.PropertyDeskImportReferences.create();
     const importReview = window.PropertyDeskImportReview.create({
       stageImport,
     });
@@ -43,6 +44,7 @@
       validatePaymentRows,
       commitTransactions,
       importReview,
+      references,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
@@ -52,6 +54,7 @@
       validateExpenseRows,
       commitTransactions,
       importReview,
+      references,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
 

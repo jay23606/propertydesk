@@ -10,6 +10,7 @@
       validatePaymentRows,
       commitTransactions,
       importReview,
+      references = window.PropertyDeskImportReferences.create(),
       createFileWorkflow,
     } = context;
 
@@ -49,15 +50,14 @@
           file,
           mapRows(rowsToImport) {
             const rowsToInsert = rowsToImport.map((row) => ({
-              account_id: state.accounts.find(
-                (account) =>
-                  account.name === row.account_name &&
-                  state.properties.find(
-                    (property) => property.id === account.property_id,
-                  )?.name === row.property_name &&
-                  state.properties.find(
-                    (property) => property.id === account.property_id,
-                  )?.address === row.property_address,
+              account_id: references.findAccount(
+                state.accounts,
+                references.findProperty(
+                  state.properties,
+                  row.property_name,
+                  row.property_address,
+                )?.id,
+                row.account_name,
               )?.id,
               received_date: row.received_date,
               amount: row.amount,

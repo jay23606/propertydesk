@@ -72,6 +72,7 @@ function loadImportFeatures(context) {
     "account-import-payload.js",
     "csv-import-file.js",
     "import-review.js",
+    "import-references.js",
     "account-import.js",
     "payment-import.js",
     "expense-import.js",

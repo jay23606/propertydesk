@@ -17,6 +17,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
+      PropertyDeskImportReferences: { create: () => ({}) },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
     },
   });
@@ -48,6 +49,32 @@ test("CSV import feature loads as an isolated browser module", () => {
       "expense-import-file:change",
     ],
   );
+});
+
+test("import references resolve accounts within the exact property", () => {
+  const context = vm.createContext({ window: {} });
+  loadImportFeatures(context);
+  const references = context.window.PropertyDeskImportReferences.create();
+  const properties = [
+    { id: "one", name: "Duplex", address: "1 Main St" },
+    { id: "two", name: "Duplex", address: "2 Main St" },
+  ];
+  const accounts = [
+    { id: "first", property_id: "one", name: "Lease" },
+    { id: "second", property_id: "two", name: "Lease" },
+  ];
+
+  const property = references.findProperty(properties, "Duplex", "2 Main St");
+  assert.equal(property.id, "two");
+  assert.equal(
+    references.findAccount(accounts, property.id, "Lease").id,
+    "second",
+  );
+  assert.equal(
+    references.findProperty(properties, "Duplex", "3 Main St"),
+    undefined,
+  );
+  assert.equal(references.findAccount(accounts, "missing", "Lease"), undefined);
 });
 
 test("CSV preview renderer receives only rendering dependencies", () => {
@@ -137,6 +164,7 @@ test("CSV correction view escapes raw values and validation messages", () => {
 test("import workflow keeps file import handlers inside its event bindings", () => {
   const calls = [];
   const passed = {};
+  const references = {};
   const accounts = { attachEvents: () => calls.push("account events") };
   const payments = { attachEvents: () => calls.push("payment events") };
   const expenses = { attachEvents: () => calls.push("expense events") };
@@ -146,6 +174,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
+      PropertyDeskImportReferences: { create: () => references },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskImportReview: {
         create: (options) => {
@@ -218,6 +247,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "createFileWorkflow",
       "importReview",
       "parseCSV",
+      "references",
       "state",
       "validatePaymentRows",
     ].sort(),
@@ -230,12 +260,15 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "createFileWorkflow",
       "importReview",
       "parseCSV",
+      "references",
       "state",
       "validateExpenseRows",
     ].sort(),
   );
   assert.equal(passed.account.importReview, passed.payment.importReview);
   assert.equal(passed.payment.importReview, passed.expense.importReview);
+  assert.equal(passed.payment.references, references);
+  assert.equal(passed.expense.references, references);
   assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
