@@ -23,7 +23,16 @@ test("workspace workflow owns profile display alongside profile settings", () =>
       PropertyDeskProfileSettings: {
         create(options) {
           passed.profileSettings = options;
-          return { attachEvents: attachProfileEvents };
+          return { saveProfile: () => {} };
+        },
+      },
+      PropertyDeskProfileSettingsView: {
+        create(options) {
+          passed.profileSettingsView = options;
+          return {
+            setDisplayName: (value) => (passed.displayName = value),
+            attachEvents: () => attachProfileEvents(),
+          };
         },
       },
       PropertyDeskWorkspaceMembersView: {
@@ -58,8 +67,11 @@ test("workspace workflow owns profile display alongside profile settings", () =>
 
   assert.equal(passed.profileDisplay.state, state);
   assert.equal(passed.profileSettings.updateGreeting, updateGreeting);
+  assert.equal(passed.profileSettings.state, state);
+  assert.equal(typeof passed.profileSettingsView.$, "function");
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();
+  assert.equal(passed.displayName, "Owner");
   workflow.attachEvents();
   assert.equal(
     passed.members.view.renderWorkspaceMembers,

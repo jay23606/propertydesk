@@ -2,10 +2,8 @@
 (() => {
   "use strict";
 
-  function createProfileSettings({ $, state, toast, updateGreeting }) {
-    async function saveProfile(event) {
-      event.preventDefault();
-      const displayName = $("display-name").value.trim();
+  function createProfileSettings({ state, toast, updateGreeting }) {
+    async function saveProfile(displayName) {
       if (!displayName) {
         toast("Enter a display name");
         return;
@@ -33,11 +31,7 @@
       toast("Display name saved");
     }
 
-    function attachEvents() {
-      $("display-name-form").addEventListener("submit", saveProfile);
-    }
-
-    return { attachEvents };
+    return { saveProfile };
   }
 
   window.PropertyDeskProfileSettings = Object.freeze({

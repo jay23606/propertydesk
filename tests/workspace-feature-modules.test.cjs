@@ -84,6 +84,40 @@ test("workspace settings render member labels and escape untrusted text", () => 
   assert.equal(element("display-name").value, "Owner");
 });
 
+test("profile settings view reads a trimmed name and prevents a page submit", () => {
+  const context = vm.createContext({ window: {} });
+  loadWorkspaceFeatures(context);
+  const handlers = new Map();
+  const elements = new Map([
+    ["display-name", { value: "  Workspace label  " }],
+    [
+      "display-name-form",
+      {
+        addEventListener(eventName, handler) {
+          handlers.set(eventName, handler);
+        },
+      },
+    ],
+  ]);
+  const view = context.window.PropertyDeskProfileSettingsView.create({
+    $: (id) => elements.get(id),
+  });
+  const received = [];
+  let prevented = false;
+
+  view.attachEvents((name) => received.push(name));
+  handlers.get("submit")({
+    preventDefault() {
+      prevented = true;
+    },
+  });
+
+  assert.equal(prevented, true);
+  assert.deepEqual(received, ["Workspace label"]);
+  view.setDisplayName("Saved label");
+  assert.equal(elements.get("display-name").value, "Saved label");
+});
+
 test("reminder activity view summarizes delivery results and escapes log data", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -317,30 +351,15 @@ test("workspace setting writes report rejected requests and retain entered value
     properties: [],
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
   };
-  const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    state,
-    view: context.window.PropertyDeskWorkspaceMembersView.create({
-      $,
-      state,
-      esc: String,
-    }),
-    fmtDate: () => "",
-    money: () => "",
-    toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("a rejected request must not refresh"),
-    updateGreeting: () =>
-      assert.fail("a rejected profile save must not update the greeting"),
-    confirmAction: () => true,
-  });
-  const profile = context.window.PropertyDeskProfileSettings.create({
+  const feature = context.window.PropertyDeskWorkspace.create({
     $,
     state,
+    esc: String,
     toast: (message) => messages.push(message),
-    updateGreeting: () =>
-      assert.fail("a rejected profile save must not update the greeting"),
+    fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    confirmAction: () => true,
   });
 
-  profile.attachEvents();
   feature.attachEvents();
   await assert.doesNotReject(saveProfile({ preventDefault() {} }));
   await assert.doesNotReject(
@@ -357,6 +376,7 @@ test("workspace setting writes report rejected requests and retain entered value
     }),
   );
   assert.equal(state.user.user_metadata.display_name, "Owner");
+  assert.equal($("display-name").value, "New Label");
   assert.equal($("member-email").value, " spouse@example.test ");
   assert.deepEqual(messages, [
     "Display name couldn't be saved right now. Check your connection and try again.",
@@ -382,6 +402,12 @@ test("workspace member feature loads before settings and is precached", () => {
       html.indexOf("features/workspace.js"),
     "workspace members should load before the settings coordinator",
   );
+  assert.ok(
+    html.indexOf("features/profile-settings-view.js") <
+      html.indexOf("features/workspace.js"),
+    "profile settings view should load before the workspace coordinator",
+  );
+  assert.match(worker, /'\.\/features\/profile-settings-view\.js'/);
   assert.ok(
     html.indexOf("features/profile-display.js") <
       html.indexOf("features/workspace.js"),

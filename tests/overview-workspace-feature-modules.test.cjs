@@ -338,6 +338,13 @@ test("profile settings save the display label and refresh the shared shell", asy
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "profile-settings-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "profile-settings.js"),
       "utf8",
     ),
@@ -375,9 +382,12 @@ test("profile settings save the display label and refresh the shared shell", asy
     toast: (message) => messages.push(message),
     updateGreeting: () => calls.push("refresh-greeting"),
   });
+  const view = context.window.PropertyDeskProfileSettingsView.create({
+    $: (id) => elements[id],
+  });
 
-  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
-  feature.attachEvents();
+  assert.deepEqual(Object.keys(feature), ["saveProfile"]);
+  view.attachEvents(feature.saveProfile);
   await saveProfile({ preventDefault() {} });
 
   assert.equal(calls[0].data.display_name, "Property Manager");

@@ -15,8 +15,8 @@
       state,
     });
     const { updateGreeting } = profileDisplay;
+    const profileView = window.PropertyDeskProfileSettingsView.create({ $ });
     const profile = window.PropertyDeskProfileSettings.create({
-      $,
       state,
       toast,
       updateGreeting,
@@ -28,7 +28,7 @@
     });
 
     function renderWorkspaceSettings() {
-      $("display-name").value = state.user?.user_metadata?.display_name || "";
+      profileView.setDisplayName(state.user?.user_metadata?.display_name || "");
       memberView.renderWorkspaceMembers();
     }
 
@@ -42,7 +42,7 @@
     });
 
     function attachEvents() {
-      profile.attachEvents();
+      profileView.attachEvents(profile.saveProfile);
       members.attachEvents();
     }
 

@@ -23,6 +23,7 @@ function loadAuthFeatures(context) {
 function loadWorkspaceFeatures(context) {
   for (const filename of [
     "profile-display.js",
+    "profile-settings-view.js",
     "profile-settings.js",
     "workspace-members-view.js",
     "workspace-members.js",
