@@ -1,28 +1,9 @@
-/* Compose security-deposit ledger maintenance, rendering, and events. */
+/* Compose read-only security-deposit ledger details. */
 (() => {
   "use strict";
 
   function create(context) {
-    const {
-      $,
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
-    } = context;
-    const { recordDepositAdjustment } =
-      window.PropertyDeskDepositMaintenance.create({
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        fetchAll,
-      });
+    const { state, depositLedger, money, fmtDate, esc } = context;
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state,
       depositLedger,
@@ -30,14 +11,7 @@
       fmtDate,
       esc,
     });
-    const { attachEvents } = window.PropertyDeskDepositDetailEvents.create({
-      $,
-      state,
-      depositSectionHTML,
-      recordDepositAdjustment,
-    });
-
-    return { depositSectionHTML, attachEvents };
+    return { depositSectionHTML };
   }
 
   window.PropertyDeskDepositWorkflow = Object.freeze({ create });

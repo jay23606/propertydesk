@@ -20,6 +20,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create\(/,
   );
   assert.match(app, /attachAccountFormEvents,/);
+  assert.match(app, /attachDepositEvents,/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
@@ -142,7 +143,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details workflow composes account closure and deposit separately", () => {
+test("account details keeps account actions separate from deposit maintenance", () => {
   const created = [];
   const passed = {};
   const closeAccount = () => "closed";
@@ -154,10 +155,21 @@ test("account details workflow composes account closure and deposit separately",
         create: (options) => {
           created.push("deposit workflow");
           passed.deposit = options;
-          return {
-            depositSectionHTML,
-            attachEvents: () => depositAttached++,
-          };
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          created.push("deposit maintenance");
+          passed.depositMaintenance = options;
+          return { recordDepositAdjustment: () => "deposit adjusted" };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          created.push("deposit events");
+          passed.depositEvents = options;
+          return { attachEvents: () => depositAttached++ };
         },
       },
       PropertyDeskAccountMaintenance: {
@@ -232,6 +244,8 @@ test("account details workflow composes account closure and deposit separately",
 
   assert.deepEqual(created, [
     "deposit workflow",
+    "deposit maintenance",
+    "deposit events",
     "account maintenance",
     "schedule view",
     "account view",
@@ -247,14 +261,18 @@ test("account details workflow composes account closure and deposit separately",
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.deposit.depositLedger, dependencies.depositLedger);
-  assert.equal(passed.deposit.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.depositMaintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
+  assert.equal(typeof passed.depositEvents.recordDepositAdjustment, "function");
   assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
   assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachDepositEvents",
     "attachEvents",
     "openAccountDetails",
   ]);
   assert.equal(workflow.openAccountDetails(), "opened");
   workflow.attachEvents();
+  workflow.attachDepositEvents();
   assert.equal(depositAttached, 1);
 });
 
