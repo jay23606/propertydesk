@@ -3,7 +3,7 @@
   "use strict";
 
   function create({ state, toast, fetchAll, closeAccountDetails }) {
-    async function closeAccount(account) {
+    async function saveCloseAccount(account) {
       let error;
       try {
         ({ error } = await state.client
@@ -27,7 +27,7 @@
       toast("Account closed");
     }
 
-    return { closeAccount };
+    return { saveCloseAccount };
   }
 
   window.PropertyDeskAccountMaintenance = Object.freeze({ create });

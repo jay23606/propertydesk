@@ -221,7 +221,7 @@ test("account detail actions workflow composes account closure with edit and pay
       PropertyDeskAccountMaintenance: {
         create: (options) => {
           passed.maintenance = options;
-          return { closeAccount: saveCloseAccount };
+          return { saveCloseAccount };
         },
       },
       PropertyDeskAccountCloseEntry: {
@@ -683,7 +683,7 @@ test("account maintenance closes an account while preserving its history", async
     toast: (message) => messages.push(message),
   });
 
-  await feature.closeAccount({ id: "account-1", name: "Rental" });
+  await feature.saveCloseAccount({ id: "account-1", name: "Rental" });
 
   assert.equal(updates[0][0], "pd_accounts");
   assert.equal(updates[0][1].status, "closed");
@@ -721,7 +721,7 @@ test("account maintenance reports rejected requests and skips success actions", 
   });
 
   await assert.doesNotReject(
-    feature.closeAccount({ id: "account-1", name: "Rental" }),
+    feature.saveCloseAccount({ id: "account-1", name: "Rental" }),
   );
   assert.deepEqual(calls, []);
   assert.deepEqual(messages, [
