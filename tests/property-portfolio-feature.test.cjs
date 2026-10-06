@@ -4,33 +4,104 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 test("app composes the Properties grid and action workflows explicitly", () => {
-  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const workflow = fs.readFileSync(
+    path.join(root, "features/property-portfolio-workflow.js"),
+    "utf8",
+  );
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+
   const order = [
     "PropertyDeskPropertyPortfolioTable.create(",
     "PropertyDeskPropertyPortfolioAccountRowModel.create(",
     "PropertyDeskPropertyPortfolioModel.create(",
     "PropertyDeskPropertyViews.create(",
     "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
-  ].map((marker) => app.indexOf(marker));
+  ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
     order,
     [...order].sort((left, right) => left - right),
   );
-  assert.match(
-    app,
-    /PropertyDeskPropertyPortfolioModel.create\(\{\s*state,\s*accountRowModel: portfolioAccountRowModel,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskPropertyViews.create\(\{\s*\$,\s*state,\s*esc,\s*portfolioTable,\s*portfolioModel,/,
-  );
-  assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
-  assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
+  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/,
+    /PropertyDeskPropertyPortfolio(?:Table|Model|ActionsWorkflow)\.create\(/,
   );
+  assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
+  const script = "features/property-portfolio-workflow.js";
+  assert.ok(
+    html.indexOf(script) < html.indexOf("app.js"),
+    "Properties workflow loads before app.js",
+  );
+  assert.ok(
+    worker.includes(`'./${script}'`),
+    "Properties workflow is precached",
+  );
+});
+
+test("Properties workflow returns explicit view and action operations", () => {
+  const calls = [];
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyPortfolioTable: {
+        create: () => {
+          calls.push("table");
+          return {};
+        },
+      },
+      PropertyDeskPropertyPortfolioAccountRowModel: {
+        create: () => {
+          calls.push("account rows");
+          return {};
+        },
+      },
+      PropertyDeskPropertyPortfolioModel: {
+        create: () => {
+          calls.push("portfolio model");
+          return {};
+        },
+      },
+      PropertyDeskPropertyViews: {
+        create: () => {
+          calls.push("property views");
+          return { renderProperties() {}, attachEvents() {} };
+        },
+      },
+      PropertyDeskPropertyPortfolioActionsWorkflow: {
+        create: () => {
+          calls.push("portfolio actions");
+          return { attachEvents() {} };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features/property-portfolio-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+
+  const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create(
+    {},
+  );
+
+  assert.deepEqual(calls, [
+    "table",
+    "account rows",
+    "portfolio model",
+    "property views",
+    "portfolio actions",
+  ]);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachPropertyActionEvents",
+    "attachPropertyGridEvents",
+    "renderProperties",
+  ]);
 });
 
 test("Properties account-row model derives balances and reminder details", () => {

@@ -470,8 +470,13 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/property-view-events.js") < html.indexOf("app.js"),
   );
-  assert.doesNotMatch(html, /features\/property-portfolio-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/property-portfolio-workflow\.js/);
+  assert.ok(
+    html.indexOf("features/property-portfolio-actions-workflow.js") <
+      html.indexOf("features/property-portfolio-workflow.js") &&
+      html.indexOf("features/property-portfolio-workflow.js") <
+        html.indexOf("app.js"),
+  );
+  assert.match(worker, /'\.\/features\/property-portfolio-workflow\.js'/);
   assert.ok(
     html.indexOf("features/property-portfolio-actions-workflow.js") <
       html.indexOf("app.js"),

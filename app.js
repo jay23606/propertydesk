@@ -328,52 +328,34 @@
       openPropertyDetails,
       openPropertyPayment,
     });
-  const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
+  const {
+    renderProperties,
+    attachPropertyGridEvents,
+    attachPropertyActionEvents,
+  } = window.PropertyDeskPropertyPortfolioWorkflow.create({
+    $,
+    state,
     esc,
     money,
     paymentFrequencyLabel,
-  });
-  const portfolioAccountRowModel =
-    window.PropertyDeskPropertyPortfolioAccountRowModel.create({
-      state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      propertyAddress,
-      monthStart,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentStatusInMonth,
-      money,
-    });
-  const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
-    state,
-    accountRowModel: portfolioAccountRowModel,
+    monthlyScheduledEstimate,
+    accountBalance,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
     propertyAddress,
     streetAddress,
+    monthStart,
+    dateOnly,
+    monthEnd,
+    lateReminderMailto,
+    paymentStatusInMonth,
+    toast,
+    fetchAll,
+    openPayment,
+    openPropertyDetails,
+    openAccountForProperty,
   });
-  const { renderProperties, attachEvents: attachPropertyGridEvents } =
-    window.PropertyDeskPropertyViews.create({
-      $,
-      state,
-      esc,
-      portfolioTable,
-      portfolioModel,
-    });
-  const { attachEvents: attachPropertyActionEvents } =
-    window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      streetAddress,
-      openPayment,
-      openPropertyDetails,
-      openAccountForProperty,
-    });
   const { selectImportRows, parseCSV, createImportLookup } =
     window.PropertyDeskImportUtils;
   const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
