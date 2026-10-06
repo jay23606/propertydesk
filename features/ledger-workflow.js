@@ -78,22 +78,7 @@
       OptionClass,
       documentRef,
     });
-    const transactionMaintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create({
-        $,
-        state,
-        toast,
-        fetchAll,
-        prettyType,
-        openPayment: entries.openPayment,
-        openExpense: entries.openExpense,
-        updateAllocationPreview: entries.updateAllocationPreview,
-        EventClass,
-        OptionClass,
-        documentRef,
-      });
-
-    return { entries, transactions, transactionMaintenance };
+    return { entries, transactions };
   }
 
   window.PropertyDeskLedgerWorkflow = Object.freeze({ create });

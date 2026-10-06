@@ -21,6 +21,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   );
   assert.match(app, /attachAccountFormEvents,/);
   assert.match(app, /attachDepositEvents,/);
+  assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
@@ -41,7 +42,6 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     "PropertyDeskTransactionCorrections.create(",
     "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskTransactionWorkflow.create(",
-    "PropertyDeskTransactionMaintenanceWorkflow.create(",
   ].map((marker) => ledgerWorkflow.indexOf(marker));
   assert.ok(creationOrder.every((position) => position >= 0));
   assert.deepEqual(
@@ -88,9 +88,9 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /window\.PropertyDeskLedgerWorkflow\.create\(/);
-  assert.doesNotMatch(
+  assert.match(
     app,
-    /window\.PropertyDeskTransaction(?:Views|MaintenanceWorkflow)\.create\(/,
+    /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
   assert.doesNotMatch(app, /window\.PropertyDeskDepositWorkflow\.create\(/);
@@ -151,23 +151,12 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details delegates account and deposit actions to separate workflows", () => {
+test("account details consumes a separately composed deposit renderer", () => {
   const created = [];
   const passed = {};
   const depositSectionHTML = () => "deposit html";
-  let depositAttached = 0;
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositDetailsWorkflow: {
-        create: (options) => {
-          created.push("deposit details workflow");
-          passed.depositWorkflow = options;
-          return {
-            depositSectionHTML,
-            attachEvents: () => depositAttached++,
-          };
-        },
-      },
       PropertyDeskAccountDetailActionsWorkflow: {
         create: (options) => {
           created.push("account maintenance workflow");
@@ -197,7 +186,7 @@ test("account details delegates account and deposit actions to separate workflow
     money: () => 0,
     fmtDate: () => "",
     moneyInput: Number,
-    depositLedger: () => [],
+    depositSectionHTML,
     esc: String,
     toast() {},
     fetchAll() {},
@@ -210,29 +199,23 @@ test("account details delegates account and deposit actions to separate workflow
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, [
-    "deposit details workflow",
     "account maintenance workflow",
     "account detail content workflow",
   ]);
   assert.equal(passed.accountContent.money, dependencies.money);
-  assert.equal(passed.accountContent.depositSectionHTML, depositSectionHTML);
+  assert.equal(
+    passed.accountContent.depositSectionHTML,
+    dependencies.depositSectionHTML,
+  );
   assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
   assert.equal(passed.accountMaintenance.editAccount, dependencies.editAccount);
   assert.equal(passed.accountMaintenance.openPayment, dependencies.openPayment);
-  assert.equal(
-    passed.depositWorkflow.depositLedger,
-    dependencies.depositLedger,
-  );
-  assert.equal(passed.depositWorkflow.moneyInput, dependencies.moneyInput);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachDepositEvents",
     "attachEvents",
     "openAccountDetails",
   ]);
   assert.equal(workflow.openAccountDetails(), "opened");
   workflow.attachEvents();
-  workflow.attachDepositEvents();
-  assert.equal(depositAttached, 1);
 });
 
 test("reminder workflow composes the activity view and email preview", () => {

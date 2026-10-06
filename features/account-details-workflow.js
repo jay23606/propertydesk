@@ -1,4 +1,4 @@
-/* Connect account-detail content with account-action and deposit workflows. */
+/* Connect account-detail content with its separate action workflow. */
 (() => {
   "use strict";
 
@@ -19,26 +19,13 @@
       todayIso,
       toast,
       fetchAll,
-      depositLedger,
-      moneyInput,
+      depositSectionHTML,
       openModal,
       propertyAddress,
       closeModal,
       editAccount,
       openPayment,
     } = context;
-    const depositWorkflow = window.PropertyDeskDepositDetailsWorkflow.create({
-      $,
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
-    });
     const accountMaintenance =
       window.PropertyDeskAccountDetailActionsWorkflow.create({
         $,
@@ -64,14 +51,13 @@
         amountDueSince,
         unpaidDueAccrualStart,
         todayIso,
-        depositSectionHTML: depositWorkflow.depositSectionHTML,
+        depositSectionHTML,
         openModal,
         propertyAddress,
       });
     return {
       openAccountDetails,
       attachEvents: accountMaintenance.attachEvents,
-      attachDepositEvents: depositWorkflow.attachEvents,
     };
   }
 
