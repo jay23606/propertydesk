@@ -60,6 +60,78 @@
     };
   }
 
+  function zipEntryData(entry, names) {
+    const name = entryName(entry?.name),
+      nameBytes = encoder.encode(name);
+    if (nameBytes.length > 65535) throw new Error("ZIP entry name is too long");
+    if (names.has(name)) throw new Error(`Duplicate ZIP entry: ${name}`);
+    const bytes = toBytes(entry?.data);
+    if (bytes.byteLength > 0xffffffff)
+      throw new Error("ZIP entries cannot exceed 4 GiB");
+    names.add(name);
+    return { nameBytes, bytes, checksum: crc32(bytes) };
+  }
+
+  function localFileHeader(checksum, size, nameLength, stamp) {
+    const header = new Uint8Array(30),
+      view = new DataView(header.buffer);
+    view.setUint32(0, 0x04034b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 0x0800, true);
+    view.setUint16(8, 0, true);
+    view.setUint16(10, stamp.time, true);
+    view.setUint16(12, stamp.day, true);
+    view.setUint32(14, checksum, true);
+    view.setUint32(18, size, true);
+    view.setUint32(22, size, true);
+    view.setUint16(26, nameLength, true);
+    view.setUint16(28, 0, true);
+    return header;
+  }
+
+  function centralDirectoryHeader(
+    checksum,
+    size,
+    nameLength,
+    localOffset,
+    stamp,
+  ) {
+    const header = new Uint8Array(46),
+      view = new DataView(header.buffer);
+    view.setUint32(0, 0x02014b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 20, true);
+    view.setUint16(8, 0x0800, true);
+    view.setUint16(10, 0, true);
+    view.setUint16(12, stamp.time, true);
+    view.setUint16(14, stamp.day, true);
+    view.setUint32(16, checksum, true);
+    view.setUint32(20, size, true);
+    view.setUint32(24, size, true);
+    view.setUint16(28, nameLength, true);
+    view.setUint16(30, 0, true);
+    view.setUint16(32, 0, true);
+    view.setUint16(34, 0, true);
+    view.setUint16(36, 0, true);
+    view.setUint32(38, 0, true);
+    view.setUint32(42, localOffset, true);
+    return header;
+  }
+
+  function endOfCentralDirectory(entryCount, centralSize, localOffset) {
+    const header = new Uint8Array(22),
+      view = new DataView(header.buffer);
+    view.setUint32(0, 0x06054b50, true);
+    view.setUint16(4, 0, true);
+    view.setUint16(6, 0, true);
+    view.setUint16(8, entryCount, true);
+    view.setUint16(10, entryCount, true);
+    view.setUint32(12, centralSize, true);
+    view.setUint32(16, localOffset, true);
+    view.setUint16(20, 0, true);
+    return header;
+  }
+
   function createZip(entries, timestamp = new Date()) {
     if (!Array.isArray(entries) || entries.length > 65535)
       throw new Error("ZIP archive supports up to 65,535 entries");
@@ -70,67 +142,24 @@
     let localOffset = 0,
       centralSize = 0;
     for (const entry of entries) {
-      const name = entryName(entry?.name),
-        nameBytes = encoder.encode(name),
-        bytes = toBytes(entry?.data);
-      if (nameBytes.length > 65535)
-        throw new Error("ZIP entry name is too long");
-      if (names.has(name)) throw new Error(`Duplicate ZIP entry: ${name}`);
-      names.add(name);
-      if (bytes.byteLength > 0xffffffff)
-        throw new Error("ZIP entries cannot exceed 4 GiB");
-      const checksum = crc32(bytes),
-        flags = 0x0800;
-      const localHeader = new Uint8Array(30),
-        local = new DataView(localHeader.buffer);
-      local.setUint32(0, 0x04034b50, true);
-      local.setUint16(4, 20, true);
-      local.setUint16(6, flags, true);
-      local.setUint16(8, 0, true);
-      local.setUint16(10, stamp.time, true);
-      local.setUint16(12, stamp.day, true);
-      local.setUint32(14, checksum, true);
-      local.setUint32(18, bytes.byteLength, true);
-      local.setUint32(22, bytes.byteLength, true);
-      local.setUint16(26, nameBytes.length, true);
-      local.setUint16(28, 0, true);
+      const { nameBytes, bytes, checksum } = zipEntryData(entry, names),
+        size = bytes.byteLength,
+        localHeader = localFileHeader(checksum, size, nameBytes.length, stamp),
+        centralHeader = centralDirectoryHeader(
+          checksum,
+          size,
+          nameBytes.length,
+          localOffset,
+          stamp,
+        );
       localParts.push(localHeader, nameBytes, bytes);
-
-      const centralHeader = new Uint8Array(46),
-        central = new DataView(centralHeader.buffer);
-      central.setUint32(0, 0x02014b50, true);
-      central.setUint16(4, 20, true);
-      central.setUint16(6, 20, true);
-      central.setUint16(8, flags, true);
-      central.setUint16(10, 0, true);
-      central.setUint16(12, stamp.time, true);
-      central.setUint16(14, stamp.day, true);
-      central.setUint32(16, checksum, true);
-      central.setUint32(20, bytes.byteLength, true);
-      central.setUint32(24, bytes.byteLength, true);
-      central.setUint16(28, nameBytes.length, true);
-      central.setUint16(30, 0, true);
-      central.setUint16(32, 0, true);
-      central.setUint16(34, 0, true);
-      central.setUint16(36, 0, true);
-      central.setUint32(38, 0, true);
-      central.setUint32(42, localOffset, true);
       centralParts.push(centralHeader, nameBytes);
-      localOffset += localHeader.length + nameBytes.length + bytes.byteLength;
+      localOffset += localHeader.length + nameBytes.length + size;
       centralSize += centralHeader.length + nameBytes.length;
       if (localOffset > 0xffffffff || centralSize > 0xffffffff)
         throw new Error("ZIP archive exceeds the standard ZIP32 size limit");
     }
-    const end = new Uint8Array(22),
-      endView = new DataView(end.buffer);
-    endView.setUint32(0, 0x06054b50, true);
-    endView.setUint16(4, 0, true);
-    endView.setUint16(6, 0, true);
-    endView.setUint16(8, entries.length, true);
-    endView.setUint16(10, entries.length, true);
-    endView.setUint32(12, centralSize, true);
-    endView.setUint32(16, localOffset, true);
-    endView.setUint16(20, 0, true);
+    const end = endOfCentralDirectory(entries.length, centralSize, localOffset);
     return new Blob([...localParts, ...centralParts, end], {
       type: "application/zip",
     });
