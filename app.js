@@ -148,6 +148,18 @@
       OptionClass: Option,
       documentRef: document,
     });
+  const depositWorkflow = window.PropertyDeskDepositWorkflow.create({
+    $,
+    state,
+    depositLedger,
+    money,
+    fmtDate,
+    esc,
+    moneyInput,
+    todayIso,
+    toast,
+    fetchAll,
+  });
   const { openAccountDetails, attachEvents: attachAccountDetailsEvents } =
     window.PropertyDeskAccountDetailsWorkflow.create({
       $,
@@ -163,10 +175,10 @@
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-      depositLedger,
-      moneyInput,
       toast,
       fetchAll,
+      depositSectionHTML: depositWorkflow.depositSectionHTML,
+      attachDepositEvents: depositWorkflow.attachEvents,
       openModal,
       propertyAddress,
       closeModal,

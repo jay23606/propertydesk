@@ -114,13 +114,12 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details workflow composes account, deposit, history, and maintenance actions", () => {
+test("account details workflow composes account details, history, and account maintenance", () => {
   const created = [];
   const passed = {};
   const closeAccount = () => "closed";
-  const recordDepositAdjustment = () => "adjusted";
   const depositSectionHTML = () => "deposit html";
-  const attached = [];
+  let depositAttached = 0;
   const context = vm.createContext({
     window: {
       PropertyDeskAccountMaintenance: {
@@ -128,29 +127,6 @@ test("account details workflow composes account, deposit, history, and maintenan
           created.push("account maintenance");
           passed.accountMaintenance = options;
           return { closeAccount };
-        },
-      },
-      PropertyDeskDepositMaintenance: {
-        create: (options) => {
-          created.push("deposit maintenance");
-          passed.depositMaintenance = options;
-          return { recordDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositDetails: {
-        create: (options) => {
-          created.push("deposit view");
-          passed.depositView = options;
-          return { depositSectionHTML };
-        },
-      },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          created.push("deposit events");
-          passed.depositEvents = options;
-          return {
-            attachEvents: () => attached.push("deposit events attached"),
-          };
         },
       },
       PropertyDeskAccountDetailsView: {
@@ -178,7 +154,7 @@ test("account details workflow composes account, deposit, history, and maintenan
           created.push("account events");
           passed.accountEvents = options;
           return {
-            attachEvents: () => attached.push("account events attached"),
+            attachEvents: () => {},
           };
         },
       },
@@ -195,12 +171,12 @@ test("account details workflow composes account, deposit, history, and maintenan
     $() {},
     state: {},
     money: () => 0,
-    moneyInput: Number,
     fmtDate: () => "",
     esc: String,
     toast() {},
     fetchAll() {},
-    depositLedger() {},
+    depositSectionHTML,
+    attachDepositEvents: () => depositAttached++,
     prettyType: String,
     paymentFrequencyLabel: () => "monthly",
     closeModal() {},
@@ -211,9 +187,6 @@ test("account details workflow composes account, deposit, history, and maintenan
 
   assert.deepEqual(created, [
     "account maintenance",
-    "deposit maintenance",
-    "deposit view",
-    "deposit events",
     "account view",
     "history",
     "account details",
@@ -224,22 +197,13 @@ test("account details workflow composes account, deposit, history, and maintenan
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
-  assert.equal(
-    passed.depositEvents.recordDepositAdjustment,
-    recordDepositAdjustment,
-  );
-  assert.equal(passed.depositEvents.depositSectionHTML, depositSectionHTML);
-  assert.equal(passed.depositMaintenance.fetchAll, dependencies.fetchAll);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "openAccountDetails",
   ]);
   assert.equal(workflow.openAccountDetails(), "opened");
   workflow.attachEvents();
-  assert.deepEqual(attached, [
-    "deposit events attached",
-    "account events attached",
-  ]);
+  assert.equal(depositAttached, 1);
 });
 
 test("reminder workflow composes the activity view and email preview", () => {

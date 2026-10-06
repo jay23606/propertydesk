@@ -4,6 +4,65 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("deposit workflow composes its ledger view, maintenance, and event binding", () => {
+  const passed = {};
+  const depositSectionHTML = () => "deposit HTML";
+  const recordDepositAdjustment = () => "deposit adjusted";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositMaintenance: {
+        create: (dependencies) => {
+          passed.maintenance = dependencies;
+          return { recordDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositDetails: {
+        create: (dependencies) => {
+          passed.view = dependencies;
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (dependencies) => {
+          passed.events = dependencies;
+          return { attachEvents: () => attached++ };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $: () => {},
+    state: {},
+    depositLedger: () => [],
+    money: () => "$0.00",
+    fmtDate: () => "Oct 1",
+    esc: String,
+    moneyInput: Number,
+    todayIso: () => "2026-10-01",
+    toast: () => {},
+    fetchAll: async () => {},
+  };
+
+  const workflow =
+    context.window.PropertyDeskDepositWorkflow.create(dependencies);
+
+  assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
+  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
