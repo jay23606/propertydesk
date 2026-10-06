@@ -1,4 +1,4 @@
-/* CSV account import review and commit workflow. */
+/* CSV account import review and row-mapping workflow. */
 (() => {
   "use strict";
 
@@ -12,15 +12,16 @@
       todayIso,
       buildPayloads = window.PropertyDeskAccountImportPayload.build,
       commitAccounts,
+      createFileWorkflow,
     } = context;
 
-    async function importAccounts(file) {
-      const status = $("import-status");
-      status.textContent = "";
-      status.classList.remove("success");
-      try {
-        const rows = parseCSV(await file.text());
-        if (!rows.length) throw new Error("The CSV file has no account rows.");
+    const fileWorkflow = createFileWorkflow({
+      input: $("import-file"),
+      status: $("import-status"),
+      parseCSV,
+      emptyMessage: "The CSV file has no account rows.",
+      failurePrefix: "Import failed: ",
+      handleRows(file, rows) {
         const validateRows = (sourceRows) =>
           validateAccountRows(
             sourceRows,
@@ -76,19 +77,10 @@
             revalidate: validateRows,
           },
         );
-      } catch (error) {
-        status.textContent = `Import failed: ${error.message}`;
-      }
-      $("import-file").value = "";
-    }
+      },
+    });
 
-    function attachEvents() {
-      $("import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) return importAccounts(event.target.files[0]);
-      });
-    }
-
-    return { attachEvents };
+    return fileWorkflow;
   }
 
   window.PropertyDeskAccountImport = Object.freeze({

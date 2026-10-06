@@ -31,6 +31,7 @@
       todayIso,
       buildPayloads: window.PropertyDeskAccountImportPayload.build,
       commitAccounts,
+      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
     const payments = window.PropertyDeskPaymentImport.create({
       $,
@@ -39,6 +40,7 @@
       parseCSV,
       validatePaymentRows,
       commitTransactions,
+      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
       $,
@@ -47,6 +49,7 @@
       parseCSV,
       validateExpenseRows,
       commitTransactions,
+      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
 
     function attachEvents() {

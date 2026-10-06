@@ -1,4 +1,4 @@
-/* CSV expense import review and commit workflow. */
+/* CSV expense import review and row-mapping workflow. */
 (() => {
   "use strict";
 
@@ -10,15 +10,16 @@
       parseCSV,
       validateExpenseRows,
       commitTransactions,
+      createFileWorkflow,
     } = context;
 
-    async function importExpenses(file) {
-      const status = $("import-status");
-      status.textContent = "";
-      status.classList.remove("success");
-      try {
-        const rows = parseCSV(await file.text());
-        if (!rows.length) throw new Error("The CSV file has no expense rows.");
+    const fileWorkflow = createFileWorkflow({
+      input: $("expense-import-file"),
+      status: $("import-status"),
+      parseCSV,
+      emptyMessage: "The CSV file has no expense rows.",
+      failurePrefix: "Import needs review: ",
+      handleRows(file, rows) {
         const validateRows = (sourceRows) =>
           validateExpenseRows(
             sourceRows,
@@ -93,19 +94,10 @@
             revalidate: validateRows,
           },
         );
-      } catch (error) {
-        status.textContent = `Import needs review: ${error.message}`;
-      }
-      $("expense-import-file").value = "";
-    }
+      },
+    });
 
-    function attachEvents() {
-      $("expense-import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) return importExpenses(event.target.files[0]);
-      });
-    }
-
-    return { attachEvents };
+    return fileWorkflow;
   }
 
   window.PropertyDeskExpenseImport = Object.freeze({

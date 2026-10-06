@@ -17,6 +17,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
+      PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
     },
   });
   loadImportPreview(context);
@@ -100,6 +101,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
+      PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskAccountImport: {
         create: (options) => {
           passed.account = options;
@@ -149,6 +151,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "$",
       "buildPayloads",
       "commitAccounts",
+      "createFileWorkflow",
       "parseCSV",
       "stageImport",
       "state",
@@ -161,6 +164,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     [
       "$",
       "commitTransactions",
+      "createFileWorkflow",
       "parseCSV",
       "stageImport",
       "state",
@@ -172,6 +176,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     [
       "$",
       "commitTransactions",
+      "createFileWorkflow",
       "parseCSV",
       "stageImport",
       "state",

@@ -1,4 +1,4 @@
-/* CSV payment import review and commit workflow. */
+/* CSV payment import review and row-mapping workflow. */
 (() => {
   "use strict";
 
@@ -10,15 +10,16 @@
       parseCSV,
       validatePaymentRows,
       commitTransactions,
+      createFileWorkflow,
     } = context;
 
-    async function importPayments(file) {
-      const status = $("import-status");
-      status.textContent = "";
-      status.classList.remove("success");
-      try {
-        const rows = parseCSV(await file.text());
-        if (!rows.length) throw new Error("The CSV file has no payment rows.");
+    const fileWorkflow = createFileWorkflow({
+      input: $("payment-import-file"),
+      status: $("import-status"),
+      parseCSV,
+      emptyMessage: "The CSV file has no payment rows.",
+      failurePrefix: "Payment import needs review: ",
+      handleRows(file, rows) {
         const validateRows = (sourceRows) =>
           validatePaymentRows(
             sourceRows,
@@ -89,19 +90,10 @@
             revalidate: validateRows,
           },
         );
-      } catch (error) {
-        status.textContent = `Payment import needs review: ${error.message}`;
-      }
-      $("payment-import-file").value = "";
-    }
+      },
+    });
 
-    function attachEvents() {
-      $("payment-import-file").addEventListener("change", (event) => {
-        if (event.target.files[0]) return importPayments(event.target.files[0]);
-      });
-    }
-
-    return { attachEvents };
+    return fileWorkflow;
   }
 
   window.PropertyDeskPaymentImport = Object.freeze({
