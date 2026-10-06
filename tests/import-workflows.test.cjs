@@ -336,8 +336,22 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(html.indexOf("features/report-model.js") < html.indexOf("app.js"));
   assert.ok(html.indexOf("features/report-export.js") < html.indexOf("app.js"));
-  assert.doesNotMatch(html, /features\/report-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/report-workflow\.js/);
+  assert.ok(
+    html.indexOf("features/report-model.js") <
+      html.indexOf("features/report-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-views.js") <
+      html.indexOf("features/report-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-export.js") <
+      html.indexOf("features/report-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/report-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.match(worker, /'\.\/features\/report-workflow\.js'/);
   for (const utility of [
     "date-utils.js",
     "display-utils.js",

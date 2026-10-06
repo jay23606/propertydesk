@@ -469,19 +469,18 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
-test("app wires report rendering and export actions independently", () => {
+test("report workflow exposes rendering and export actions to the app root", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskReportModel\.create\(\{[\s\S]*?accountBalance,[\s\S]*?\}\);\s*const \{ renderReports \} = window\.PropertyDeskReportViews\.create\(\{[\s\S]*?buildReportModel,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskReportExport\.create\(\{[\s\S]*?todayIso,[\s\S]*?prettyType,[\s\S]*?accountBalance,/,
+    /const \{ renderReports, attachReportExportEvents \} =\s*window\.PropertyDeskReportWorkflow\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?accountBalance,[\s\S]*?\}\);/,
   );
   assert.match(app, /renderers:[\s\S]*?renderReports/);
   assert.match(app, /eventBinders:[\s\S]*?attachReportExportEvents/);
-  assert.doesNotMatch(app, /PropertyDeskReportWorkflow/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
+  );
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {

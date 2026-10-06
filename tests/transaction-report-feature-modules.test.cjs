@@ -4,6 +4,81 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("report workflow connects model, renderer, and export action", () => {
+  const passed = {};
+  const buildReportModel = () => ({ income: 50 });
+  const renderReports = () => "rendered";
+  const attachEvents = () => "attached";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReportModel: {
+        create: (options) => {
+          passed.model = options;
+          return { buildReportModel };
+        },
+      },
+      PropertyDeskReportViews: {
+        create: (options) => {
+          passed.view = options;
+          return { renderReports };
+        },
+      },
+      PropertyDeskReportExport: {
+        create: (options) => {
+          passed.export = options;
+          return { attachEvents };
+        },
+      },
+    },
+  });
+  const file = path.join(__dirname, "..", "features", "report-workflow.js");
+  vm.runInContext(fs.readFileSync(file, "utf8"), context);
+  const dependencies = {
+    $() {},
+    state: {},
+    dateOnly() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    accountBalance() {},
+    todayIso() {},
+    prettyType() {},
+    esc() {},
+    money() {},
+  };
+
+  const workflow =
+    context.window.PropertyDeskReportWorkflow.create(dependencies);
+
+  for (const key of [
+    "state",
+    "dateOnly",
+    "sumIncome",
+    "sumOperatingExpenses",
+    "accountBalance",
+  ]) {
+    assert.equal(passed.model[key], dependencies[key]);
+  }
+  assert.equal(passed.view.$, dependencies.$);
+  assert.equal(passed.view.esc, dependencies.esc);
+  assert.equal(passed.view.money, dependencies.money);
+  assert.equal(passed.view.buildReportModel, buildReportModel);
+  for (const key of [
+    "$",
+    "state",
+    "todayIso",
+    "prettyType",
+    "accountBalance",
+  ]) {
+    assert.equal(passed.export[key], dependencies[key]);
+  }
+  assert.deepEqual(Object.keys(workflow), [
+    "renderReports",
+    "attachReportExportEvents",
+  ]);
+  assert.equal(workflow.renderReports, renderReports);
+  assert.equal(workflow.attachReportExportEvents, attachEvents);
+});
+
 test("property and transaction views own their search and filter bindings", () => {
   for (const [file, globalName, expected] of [
     [
