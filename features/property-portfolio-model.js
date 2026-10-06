@@ -8,79 +8,116 @@
     propertyAddress,
     streetAddress,
   }) {
-    function buildRows({ query, type, holderId, showArchived }) {
-      const rows = [];
-      const accountsByProperty =
-        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
+    function holdersByProperty() {
       const holdersByProperty = new Map();
       for (const row of state.propertyHolders) {
         const holders = holdersByProperty.get(row.property_id) || new Set();
         holders.add(row.member_user_id);
         holdersByProperty.set(row.property_id, holders);
       }
+      return holdersByProperty;
+    }
 
-      for (const property of state.properties) {
-        if (property.archived_at && !showArchived) continue;
-        if (
-          holderId !== "all" &&
-          !holdersByProperty.get(property.id)?.has(holderId)
-        )
-          continue;
+    function accountMatches(property, account, { query, type }) {
+      return (
+        (type === "all" || account.account_type === type) &&
+        (!query ||
+          `${property.name} ${propertyAddress(property)} ${property.notes || ""} ${account.name} ${account.party_name || ""}`
+            .toLowerCase()
+            .includes(query))
+      );
+    }
 
-        const allRelated = accountsByProperty.get(property.id) || [],
-          related = allRelated.filter(
-            (account) =>
-              showArchived || (account.status || "active") === "active",
-          ),
-          matches = related.filter(
-            (account) =>
-              (type === "all" || account.account_type === type) &&
-              (!query ||
-                `${property.name} ${propertyAddress(property)} ${property.notes || ""} ${account.name} ${account.party_name || ""}`
-                  .toLowerCase()
-                  .includes(query)),
-          );
-        const street = streetAddress(property);
+    function propertyMatchesQuery(property, query) {
+      return (
+        !query ||
+        `${property.name} ${propertyAddress(property)} ${property.notes || ""}`
+          .toLowerCase()
+          .includes(query)
+      );
+    }
 
-        if (matches.length) {
-          for (const account of matches) {
-            rows.push(
-              accountRowModel.buildAccountRow(property, account, street),
-            );
-          }
-        } else if (
-          allRelated.length === 0 &&
-          type === "all" &&
-          (!query ||
-            `${property.name} ${propertyAddress(property)} ${property.notes || ""}`
-              .toLowerCase()
-              .includes(query))
-        ) {
-          rows.push({
-            hasAccount: false,
-            party: "",
-            account: "",
-            address: street,
-            id: property.id,
-            property,
-            street,
-          });
-        }
-      }
+    function emptyPropertyRow(property, street) {
+      return {
+        hasAccount: false,
+        party: "",
+        account: "",
+        address: street,
+        id: property.id,
+        property,
+        street,
+      };
+    }
 
-      const compare = (a, b) =>
-        String(a || "").localeCompare(String(b || ""), undefined, {
+    function compareRows(a, b) {
+      const compare = (left, right) =>
+        String(left || "").localeCompare(String(right || ""), undefined, {
           sensitivity: "base",
           numeric: true,
         });
-      return rows.sort(
-        (a, b) =>
-          Number(b.hasAccount) - Number(a.hasAccount) ||
-          compare(a.party, b.party) ||
-          compare(a.account, b.account) ||
-          compare(a.address, b.address) ||
-          compare(a.id, b.id),
+      return (
+        Number(b.hasAccount) - Number(a.hasAccount) ||
+        compare(a.party, b.party) ||
+        compare(a.account, b.account) ||
+        compare(a.address, b.address) ||
+        compare(a.id, b.id)
       );
+    }
+
+    function rowsForProperty(
+      property,
+      { query, type, holderId, showArchived },
+      accountsByProperty,
+      assignedHolders,
+    ) {
+      if (property.archived_at && !showArchived) return [];
+      if (
+        holderId !== "all" &&
+        !assignedHolders.get(property.id)?.has(holderId)
+      )
+        return [];
+
+      const allRelated = accountsByProperty.get(property.id) || [];
+      const visible = allRelated.filter(
+        (account) => showArchived || (account.status || "active") === "active",
+      );
+      const street = streetAddress(property);
+      const matches = visible.filter((account) =>
+        accountMatches(property, account, { query, type }),
+      );
+
+      if (matches.length) {
+        return matches.map((account) =>
+          accountRowModel.buildAccountRow(property, account, street),
+        );
+      }
+      if (
+        allRelated.length === 0 &&
+        type === "all" &&
+        propertyMatchesQuery(property, query)
+      )
+        return [emptyPropertyRow(property, street)];
+      return [];
+    }
+
+    function buildRows({ query, type, holderId, showArchived }) {
+      const accountsByProperty =
+        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
+      const assignedHolders = holdersByProperty();
+      const rows = [];
+
+      for (const property of state.properties) {
+        rows.push(
+          ...rowsForProperty(
+            property,
+            { query, type, holderId, showArchived },
+            accountsByProperty,
+            assignedHolders,
+          ),
+        );
+      }
+
+      return rows.sort(compareRows);
     }
 
     function totalsFor(rows) {
