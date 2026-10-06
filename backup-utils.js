@@ -2,20 +2,10 @@
 (() => {
   "use strict";
 
-  const tables = Object.freeze([
-    "pd_properties",
-    "pd_accounts",
-    "pd_agreement_versions",
-    "pd_payments",
-    "pd_expenses",
-    "pd_deposit_entries",
-    "pd_documents",
-    "pd_import_batches",
-    "pd_audit_events",
-    "pd_workspace_members",
-    "pd_property_holders",
-    "pd_reminder_logs",
-  ]);
+  const workspaceTables = globalThis.PropertyDeskWorkspaceTables;
+  if (!workspaceTables)
+    throw new Error("The workspace table catalog is not loaded.");
+  const tables = Object.freeze(Object.values(workspaceTables));
 
   function createBackup(
     records,

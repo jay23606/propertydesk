@@ -2,20 +2,21 @@
 (() => {
   "use strict";
 
+  const tables = window.PropertyDeskWorkspaceTables;
   const WORKSPACE_READS = [
     {
       key: "properties",
-      table: "pd_properties",
+      table: tables.properties,
       order: [["created_at", false]],
     },
     {
       key: "accounts",
-      table: "pd_accounts",
+      table: tables.accounts,
       order: [["created_at", false]],
     },
     {
       key: "payments",
-      table: "pd_payments",
+      table: tables.payments,
       order: [
         ["received_date", false],
         ["recorded_at", false],
@@ -23,7 +24,7 @@
     },
     {
       key: "expenses",
-      table: "pd_expenses",
+      table: tables.expenses,
       order: [
         ["expense_date", false],
         ["recorded_at", false],
@@ -31,24 +32,24 @@
     },
     {
       key: "importBatches",
-      table: "pd_import_batches",
+      table: tables.importBatches,
       order: [["created_at", false]],
     },
     {
       key: "documents",
-      table: "pd_documents",
+      table: tables.documents,
       order: [["created_at", false]],
     },
     {
       key: "agreementVersions",
-      table: "pd_agreement_versions",
+      table: tables.agreementVersions,
       order: [["replaced_on", false]],
     },
-    { key: "propertyHolders", table: "pd_property_holders" },
+    { key: "propertyHolders", table: tables.propertyHolders },
     { key: "workspaceMembers", rpc: "pd_list_workspace_members" },
     {
       key: "depositEntries",
-      table: "pd_deposit_entries",
+      table: tables.depositEntries,
       order: [
         ["movement_date", false],
         ["created_at", false],
@@ -56,7 +57,7 @@
     },
     {
       key: "reminderLogs",
-      table: "pd_reminder_logs",
+      table: tables.reminderLogs,
       order: [["attempted_at", false]],
       limit: 300,
     },

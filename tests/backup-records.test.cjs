@@ -6,7 +6,13 @@ const vm = require("node:vm");
 
 test("backup record loader paginates each workspace table into named records", async () => {
   const context = vm.createContext({ window: {} });
+  const workspaceTables = require("../workspace-table-catalog.js");
+  context.window.PropertyDeskWorkspaceTables = workspaceTables;
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
+  assert.deepEqual(
+    Array.from(context.window.PropertyDeskBackupUtils.tables),
+    Object.values(workspaceTables),
+  );
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
     context,
@@ -57,6 +63,10 @@ test("backup record loader paginates each workspace table into named records", a
       (table) => table in records,
     ),
   );
+  assert.deepEqual(
+    Array.from(context.window.PropertyDeskBackupRecords.tables),
+    Object.values(workspaceTables),
+  );
   const backup = context.window.PropertyDeskBackupUtils.createBackup(records);
   assert.deepEqual(
     backup.manifest.included_tables,
@@ -67,6 +77,7 @@ test("backup record loader paginates each workspace table into named records", a
 
 test("backup record loader stops when a table query fails", async () => {
   const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskWorkspaceTables = require("../workspace-table-catalog.js");
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),

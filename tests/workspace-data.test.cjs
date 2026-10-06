@@ -7,6 +7,13 @@ const vm = require("node:vm");
 function loadModule() {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "workspace-table-catalog.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
     context,
   );
@@ -174,7 +181,16 @@ test("workspace data module loads before the coordinator and is precached", () =
 
   assert.ok(html.indexOf("workspace-data.js") < html.indexOf("app.js"));
   assert.ok(
+    html.indexOf("workspace-table-catalog.js") <
+      html.indexOf("workspace-data.js"),
+  );
+  assert.ok(
     html.indexOf("workspace-query.js") < html.indexOf("workspace-data.js"),
+  );
+  assert.match(worker, /'\.\/workspace-table-catalog\.js'/);
+  assert.ok(
+    worker.indexOf("./workspace-table-catalog.js") <
+      worker.indexOf("./workspace-data.js"),
   );
   assert.match(worker, /'\.\/workspace-query\.js'/);
   assert.ok(

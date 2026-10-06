@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+require("../workspace-table-catalog.js");
 const { createBackup } = require("../backup-utils.js");
 const dateUtils = require("../features/date-utils.js");
 const scheduleFactory = require("../ledger-schedule-utils.js");
