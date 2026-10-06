@@ -4,19 +4,27 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("app root connects separate property, account, ledger, and create-action features", () => {
+test("app root delegates record-entry composition to its workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
-  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
-  assert.match(app, /PropertyDeskAccountForm\.create\(/);
   assert.match(
     app,
-    /PropertyDeskLedgerEntryForms\.create\(\{[\s\S]*?saveCorrection/,
+    /PropertyDeskRecordEntryWorkflow\.create\(\{[\s\S]*?saveCorrection/,
   );
-  assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
-  assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
+  const workflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "record-entry-workflow.js"),
+    "utf8",
+  );
+  for (const feature of [
+    "PropertyForm",
+    "AccountForm",
+    "LedgerEntryForms",
+    "CreateActions",
+  ]) {
+    assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
+  }
 });
 
 test("app coordinator passes the amortization helper into account details", () => {
@@ -77,10 +85,8 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskTransaction(?:ViewEvents|CorrectionForm)\.create/,
   );
-  assert.match(
-    app,
-    /PropertyDesk(?:TransactionCorrections|PropertyForm|AccountForm|LedgerEntryForms|CreateActions)\.create/,
-  );
+  assert.match(app, /PropertyDeskTransactionCorrections\.create/);
+  assert.match(app, /PropertyDeskRecordEntryWorkflow\.create/);
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:Deposit|Transaction)Maintenance\.create/,
@@ -90,7 +96,7 @@ test("app coordinator passes the amortization helper into account details", () =
 test("app coordinator creates cross-linked property views after their actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const order = [
-    "PropertyDeskCreateActions.create(",
+    "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskAccountDetailsWorkflow.create(",
     "PropertyDeskPropertyDetailsWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",

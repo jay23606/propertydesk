@@ -98,14 +98,7 @@
     fetchAll,
     closeModal,
   });
-  const propertyForm = window.PropertyDeskPropertyForm.create({
-    $,
-    state,
-    toast,
-    closeModal,
-    fetchAll,
-  });
-  const accountForm = window.PropertyDeskAccountForm.create({
+  const recordEntryWorkflow = window.PropertyDeskRecordEntryWorkflow.create({
     $,
     state,
     moneyInput,
@@ -114,49 +107,24 @@
     closeModal,
     fetchAll,
     populateFormOptions,
-    openModal,
-    buildAccountPayload: window.PropertyDeskAccountPayload.build,
-    formModel: window.PropertyDeskAccountFormModel,
-  });
-  const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
     fillSelect,
-    populateFormOptions,
     prettyType,
     openModal,
     saveCorrection,
+    documentRef: document,
   });
-  const resetPropertyForm = propertyForm.resetPropertyForm;
-  const resetAccountForm = accountForm.resetAccountForm;
-  const editAccount = accountForm.editAccount;
   const {
+    resetAccountForm,
+    editAccount,
     updateAllocationPreview,
     openPayment,
     openPropertyPayment,
     openExpense,
-  } = ledgerEntryForms;
-  const { attachEvents: attachCreateActions } =
-    window.PropertyDeskCreateActions.create({
-      $,
-      state,
-      toast,
-      resetPropertyForm,
-      resetAccountForm,
-      populateFormOptions,
-      openModal,
-      openPayment,
-      openExpense,
-      documentRef: document,
-    });
-  const attachPropertyFormEvents = propertyForm.attachEvents;
-  const attachAccountFormEvents = accountForm.attachEvents;
-  const attachLedgerEntryFormEvents = ledgerEntryForms.attachEvents;
+    attachCreateActions,
+    attachPropertyFormEvents,
+    attachAccountFormEvents,
+    attachLedgerEntryFormEvents,
+  } = recordEntryWorkflow;
   const { renderPayments, attachEvents: attachTransactionEvents } =
     window.PropertyDeskTransactionWorkflow.create({
       $,
