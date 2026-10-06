@@ -407,13 +407,18 @@ test("backup and report exports own separate button bindings", () => {
   ]) {
     const context = vm.createContext({ window: {} });
     if (file === "backup-export.js") {
-      vm.runInContext(
-        fs.readFileSync(
-          path.join(__dirname, "..", "features", "backup-records.js"),
-          "utf8",
-        ),
-        context,
-      );
+      for (const dependency of [
+        "backup-records.js",
+        "backup-agreement-files.js",
+      ]) {
+        vm.runInContext(
+          fs.readFileSync(
+            path.join(__dirname, "..", "features", dependency),
+            "utf8",
+          ),
+          context,
+        );
+      }
     }
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", file), "utf8"),

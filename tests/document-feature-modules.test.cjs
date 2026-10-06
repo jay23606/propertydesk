@@ -487,6 +487,9 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   let backupContents;
   let zipEntries;
   let download;
+  let agreementCollectionCalls = 0;
+  const collectBackupAgreementFiles =
+    context.window.PropertyDeskBackupAgreementFiles.collect;
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
@@ -498,6 +501,10 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     toast() {},
     downloadBlob(blob, filename) {
       download = { blob, filename };
+    },
+    collectBackupAgreementFiles(options) {
+      agreementCollectionCalls += 1;
+      return collectBackupAgreementFiles(options);
     },
     zipUtils: {
       createZip(entries) {
@@ -511,6 +518,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   await button.handler();
 
   assert.equal(backupContents.records.pd_documents[0].id, "doc-1");
+  assert.equal(agreementCollectionCalls, 1);
   assert.equal(
     backupContents.includedFiles[0].path,
     "agreements/property-1/doc-1-Agreement.pdf",

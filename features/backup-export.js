@@ -19,6 +19,8 @@
       },
       zipUtils = window.PropertyDeskZipUtils,
       loadBackupRecords = window.PropertyDeskBackupRecords.load,
+      collectBackupAgreementFiles = window.PropertyDeskBackupAgreementFiles
+        .collect,
     } = context;
 
     async function exportAll() {
@@ -34,12 +36,11 @@
 
       try {
         const records = await loadBackupRecords(state.client);
-        const { entries, includedFiles } =
-          await window.PropertyDeskBackupAgreementFiles.collect({
-            documents: records.pd_documents,
-            client: state.client,
-            workspaceOwnerId: state.workspaceOwnerId,
-          });
+        const { entries, includedFiles } = await collectBackupAgreementFiles({
+          documents: records.pd_documents,
+          client: state.client,
+          workspaceOwnerId: state.workspaceOwnerId,
+        });
 
         const backup = createBackup(
           records,
