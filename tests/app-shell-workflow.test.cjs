@@ -10,11 +10,15 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   const calls = [];
   const handlers = {
     updateGreeting() {},
-    renderWorkspaceSettings() {},
+    renderWorkspaceSettings() {
+      calls.push("workspace settings rendered");
+    },
     attachWorkspaceEvents() {
       calls.push("workspace events attached");
     },
-    renderReminderActivity() {},
+    renderReminderActivity() {
+      calls.push("reminder activity rendered");
+    },
     previewReminderEmail() {},
     navigate() {},
     attachNavigationEvents() {
@@ -103,23 +107,21 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   assert.notEqual(calls[1][1], options);
   assert.deepEqual(
     Object.keys(calls[1][1]).sort(),
-    ["$", "esc", "fetchAll", "renderReminderActivity", "state", "toast"].sort(),
+    ["$", "esc", "fetchAll", "state", "toast"].sort(),
   );
   assert.equal(calls[1][1].state, options.state);
-  assert.equal(
-    calls[1][1].renderReminderActivity,
-    handlers.renderReminderActivity,
-  );
-  assert.equal(
-    calls[2][1].renderWorkspaceSettings,
-    handlers.renderWorkspaceSettings,
-  );
+  assert.equal(typeof calls[2][1].renderWorkspaceSettings, "function");
   assert.deepEqual(
     calls.map(([name]) => name),
     ["reminders", "settings", "navigation", "theme"],
   );
   assert.equal(shell.updateGreeting, handlers.updateGreeting);
   assert.equal(shell.previewReminderEmail, handlers.previewReminderEmail);
+  calls[2][1].renderWorkspaceSettings();
+  assert.deepEqual(calls.slice(-2), [
+    "workspace settings rendered",
+    "reminder activity rendered",
+  ]);
   shell.attachEvents();
   assert.deepEqual(calls.slice(-3), [
     "theme events attached",

@@ -48,27 +48,18 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   );
 
   const state = { user: { user_metadata: { display_name: "Owner" } } };
-  const calls = [];
   const workflow = context.window.PropertyDeskWorkspace.create({
-    $: (id) => ({
-      set value(value) {
-        calls.push([id, value]);
-      },
-    }),
+    $: () => ({ value: "" }),
     state,
     esc() {},
     toast() {},
     fetchAll() {},
-    renderReminderActivity() {
-      calls.push("render reminders");
-    },
   });
 
   assert.equal(passed.profileDisplay.state, state);
   assert.equal(passed.profileSettings.updateGreeting, updateGreeting);
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();
-  assert.deepEqual(calls, [["display-name", "Owner"], "render reminders"]);
   workflow.attachEvents();
   assert.equal(
     passed.members.view.renderWorkspaceMembers,

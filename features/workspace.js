@@ -8,7 +8,6 @@
     esc,
     toast,
     fetchAll,
-    renderReminderActivity,
     confirmAction = (message) => window.confirm(message),
   }) {
     const profileDisplay = window.PropertyDeskProfileDisplay.create({
@@ -31,7 +30,6 @@
     function renderWorkspaceSettings() {
       $("display-name").value = state.user?.user_metadata?.display_name || "";
       memberView.renderWorkspaceMembers();
-      renderReminderActivity();
     }
 
     const members = window.PropertyDeskWorkspaceMembers.create({

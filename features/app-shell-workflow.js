@@ -44,13 +44,16 @@
       esc,
       toast,
       fetchAll,
-      renderReminderActivity: reminders.renderReminderActivity,
     });
     const { updateGreeting } = settings;
+    function renderWorkspaceSettings() {
+      settings.renderWorkspaceSettings();
+      reminders.renderReminderActivity();
+    }
     const navigation = window.PropertyDeskNavigation.create({
       $,
       state,
-      renderWorkspaceSettings: settings.renderWorkspaceSettings,
+      renderWorkspaceSettings,
     });
     const theme = window.PropertyDeskTheme.create();
 

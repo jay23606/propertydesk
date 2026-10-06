@@ -47,7 +47,6 @@ test("workspace settings render member labels and escape untrusted text", () => 
       },
     ],
   };
-  let remindersRendered = false;
   const feature = context.window.PropertyDeskWorkspace.create({
     $: element,
     state,
@@ -65,9 +64,6 @@ test("workspace settings render member labels and escape untrusted text", () => 
       ),
     toast() {},
     fetchAll: async () => {},
-    renderReminderActivity: () => {
-      remindersRendered = true;
-    },
     confirmAction: () => true,
   });
 
@@ -80,15 +76,12 @@ test("workspace settings render member labels and escape untrusted text", () => 
     "hidden",
     false,
   ]);
-  assert.equal(remindersRendered, true);
   assert.equal(typeof memberOptions.view.renderWorkspaceMembers, "function");
   assert.equal(typeof memberOptions.refreshWorkspaceSettings, "function");
 
-  remindersRendered = false;
   element("display-name").value = "Unsaved label";
   memberOptions.refreshWorkspaceSettings();
   assert.equal(element("display-name").value, "Owner");
-  assert.equal(remindersRendered, true);
 });
 
 test("reminder activity view summarizes delivery results and escapes log data", () => {
