@@ -2,8 +2,33 @@
 (() => {
   "use strict";
 
+  function accountLoanFields(values, moneyInput) {
+    if (values.accountType === "rental") {
+      return {
+        original_principal: 0,
+        principal_interest_amount: null,
+        escrow_amount: 0,
+        balance_adjustment: 0,
+        interest_rate: 0,
+        term_months: null,
+        balloon_date: null,
+      };
+    }
+
+    return {
+      original_principal: moneyInput(values.originalPrincipal),
+      principal_interest_amount: values.principalInterestAmount
+        ? moneyInput(values.principalInterestAmount)
+        : null,
+      escrow_amount: moneyInput(values.escrowAmount),
+      balance_adjustment: moneyInput(values.balanceAdjustment),
+      interest_rate: Number(values.interestRate || 0),
+      term_months: values.termMonths ? Number(values.termMonths) : null,
+      balloon_date: values.balloonDate || null,
+    };
+  }
+
   function buildAccountPayload(values, moneyInput) {
-    const isRental = values.accountType === "rental";
     return {
       user_id: values.ownerId,
       property_id: values.propertyId,
@@ -17,17 +42,7 @@
       next_due_date: values.nextDueDate || null,
       payment_amount: moneyInput(values.paymentAmount),
       payment_frequency: values.paymentFrequency,
-      original_principal: isRental ? 0 : moneyInput(values.originalPrincipal),
-      principal_interest_amount:
-        isRental || !values.principalInterestAmount
-          ? null
-          : moneyInput(values.principalInterestAmount),
-      escrow_amount: isRental ? 0 : moneyInput(values.escrowAmount),
-      balance_adjustment: isRental ? 0 : moneyInput(values.balanceAdjustment),
-      interest_rate: isRental ? 0 : Number(values.interestRate || 0),
-      term_months:
-        isRental || !values.termMonths ? null : Number(values.termMonths),
-      balloon_date: isRental ? null : values.balloonDate || null,
+      ...accountLoanFields(values, moneyInput),
       agreement_effective_date: values.agreementEffectiveDate || null,
       agreement_change_reason: values.agreementChangeReason || null,
       late_fee: moneyInput(values.lateFee),
