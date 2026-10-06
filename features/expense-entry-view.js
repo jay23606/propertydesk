@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { depositRefundCategory } = window.PropertyDeskTransactionOptions;
+
   function createExpenseEntryView(context) {
     const {
       $,
@@ -81,7 +83,7 @@
       $("expense-category").addEventListener("change", () => {
         $("deposit-refund-hint").classList.toggle(
           "hidden",
-          $("expense-category").value !== "deposit_refund",
+          $("expense-category").value !== depositRefundCategory,
         );
       });
     }

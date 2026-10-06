@@ -45,6 +45,9 @@
     paymentMethods,
     expensePaymentMethods,
     expenseCategories,
+    depositRefundCategory: expenseCategories.find(
+      ({ value }) => value === "deposit_refund",
+    ).value,
     defaults: Object.freeze({
       paymentMethod: paymentMethods[0].value,
       expensePaymentMethod: expensePaymentMethods[0].value,

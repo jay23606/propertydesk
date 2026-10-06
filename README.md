@@ -1,6 +1,6 @@
 # PropertyDesk
 
-**Live portal:** [Open PropertyDesk](https://jay23606.github.io/propertydesk/)
+**Live app:** [Open PropertyDesk](https://jay23606.github.io/propertydesk/)
 
 PropertyDesk helps property owners manage rentals and seller-financed accounts, including land contracts and private notes, in one workspace. Use it to keep property and tenant/buyer records, log payments received, track unpaid monthly amounts, record expenses, and store agreement files. It records payments; it does not process them.
 
