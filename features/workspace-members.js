@@ -27,7 +27,6 @@
         toast(error.message);
         return;
       }
-      view.clearMemberEmail();
       try {
         await fetchAll();
       } catch {
@@ -35,6 +34,7 @@
       }
       refreshWorkspaceSettings();
       toast("Workspace member added");
+      return true;
     }
 
     async function removeWorkspaceMember(memberId) {

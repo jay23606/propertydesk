@@ -227,6 +227,51 @@ test("adding a workspace member clears the address only after successful refresh
   assert.equal(messages.at(-1), "Workspace member added");
 });
 
+test("adding a workspace member keeps the address when refresh fails", async () => {
+  const context = vm.createContext({ window: {} });
+  loadWorkspaceFeatures(context);
+  const elements = new Map();
+  const handlers = new Map();
+  const element = (id) => {
+    if (!elements.has(id))
+      elements.set(id, {
+        value: id === "member-email" ? " spouse@example.test " : "",
+        classList: { toggle() {} },
+        addEventListener(eventName, handler) {
+          handlers.set(`${id}:${eventName}`, handler);
+        },
+      });
+    return elements.get(id);
+  };
+  const feature = context.window.PropertyDeskWorkspaceMembers.create({
+    state: {
+      client: { rpc: async () => ({ error: null }) },
+      workspaceMembers: [],
+      user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+      workspaceOwnerId: "owner-1",
+    },
+    view: context.window.PropertyDeskWorkspaceMembersView.create({
+      $: element,
+      state: {
+        workspaceMembers: [],
+        user: { id: "owner-1" },
+        workspaceOwnerId: "owner-1",
+      },
+      esc: String,
+    }),
+    toast() {},
+    fetchAll: async () => {
+      throw new Error("offline");
+    },
+    refreshWorkspaceSettings() {},
+  });
+
+  feature.attachEvents();
+  await handlers.get("member-add-form:submit")({ preventDefault() {} });
+
+  assert.equal(element("member-email").value, " spouse@example.test ");
+});
+
 test("workspace setting writes report rejected requests and retain entered values", async () => {
   const context = vm.createContext({ window: {} });
   loadWorkspaceFeatures(context);

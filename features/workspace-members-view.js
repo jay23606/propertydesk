@@ -24,7 +24,11 @@
     function attachEvents({ addWorkspaceMember, removeWorkspaceMember }) {
       $("member-add-form").addEventListener("submit", (event) => {
         event.preventDefault();
-        return addWorkspaceMember($("member-email").value.trim());
+        const email = $("member-email").value.trim();
+        if (!email) return;
+        return addWorkspaceMember(email).then((added) => {
+          if (added) clearMemberEmail();
+        });
       });
       $("workspace-members").addEventListener("click", (event) => {
         const removeButton = event.target.closest("[data-remove-member]");
