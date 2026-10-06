@@ -442,6 +442,7 @@ test("the browser loads tested import and backup workflows before the app and pr
     "features/overview-model.js",
     "features/overview.js",
     "features/overview-events.js",
+    "features/overview-workflow.js",
   ]) {
     assert.ok(
       html.indexOf(script) >= 0 &&
@@ -449,8 +450,12 @@ test("the browser loads tested import and backup workflows before the app and pr
       `${script} loads before the app composition root`,
     );
   }
-  assert.doesNotMatch(html, /features\/overview-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/overview-workflow\.js/);
+  assert.ok(
+    html.indexOf("features/overview-events.js") <
+      html.indexOf("features/overview-workflow.js"),
+    "overview components load before their workflow",
+  );
+  assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
   assert.ok(
     html.indexOf("features/property-portfolio-table.js") <
       html.indexOf("features/property-views.js"),

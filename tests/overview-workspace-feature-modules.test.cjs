@@ -141,26 +141,106 @@ test("overview renderer displays its summary model and quick-payment card", () =
   assert.match($("activity-list").innerHTML, /2026-10-03/);
 });
 
-test("app composes dashboard models, rendering, and actions directly", () => {
-  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+test("overview workflow composes dashboard models, rendering, and actions", () => {
+  const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const workflow = fs.readFileSync(
+    path.join(root, "features/overview-workflow.js"),
+    "utf8",
+  );
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const order = [
     "PropertyDeskOverviewPropertySummaryModel.create(",
     "PropertyDeskOverviewModel.create(",
     "PropertyDeskOverview.create(",
     "PropertyDeskOverviewEvents.create(",
-  ].map((marker) => app.indexOf(marker));
+  ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
     order,
     [...order].sort((left, right) => left - right),
   );
+  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskOverview(?:Model|Events)?\.create\(/);
   assert.match(
-    app,
+    workflow,
     /PropertyDeskOverviewModel.create\(\{\s*state,\s*propertySummaryModel,[\s\S]*?postedOnOrAfter,/,
   );
   assert.match(app, /renderers:[\s\S]*?renderOverview/);
   assert.match(app, /eventBinders:[\s\S]*?attachOverviewEvents/);
-  assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  const script = "features/overview-workflow.js";
+  assert.ok(
+    html.indexOf(script) < html.indexOf("app.js"),
+    "overview workflow loads before app.js",
+  );
+  assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
+});
+
+test("overview workflow exposes its renderer and event binder directly", () => {
+  const calls = [];
+  const propertySummaryModel = {};
+  const overviewModel = {};
+  const renderOverview = () => {};
+  const attachEvents = () => {};
+  const passed = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskOverviewPropertySummaryModel: {
+        create: () => {
+          calls.push("property summary");
+          return propertySummaryModel;
+        },
+      },
+      PropertyDeskOverviewModel: {
+        create: (options) => {
+          calls.push("summary");
+          passed.model = options;
+          return overviewModel;
+        },
+      },
+      PropertyDeskOverview: {
+        create: (options) => {
+          calls.push("view");
+          passed.view = options;
+          return { renderOverview };
+        },
+      },
+      PropertyDeskOverviewEvents: {
+        create: (options) => {
+          calls.push("events");
+          passed.events = options;
+          return { attachEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features/overview-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+
+  const openPropertyDetails = () => {};
+  const openPropertyPayment = () => {};
+  const workflow = context.window.PropertyDeskOverviewWorkflow.create({
+    openPropertyDetails,
+    openPropertyPayment,
+  });
+
+  assert.deepEqual(calls, ["property summary", "summary", "view", "events"]);
+  assert.equal(passed.model.propertySummaryModel, propertySummaryModel);
+  assert.equal(passed.view.overviewModel, overviewModel);
+  assert.equal(passed.events.openPropertyDetails, openPropertyDetails);
+  assert.equal(passed.events.openPropertyPayment, openPropertyPayment);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachOverviewEvents",
+    "renderOverview",
+  ]);
+  assert.equal(workflow.renderOverview, renderOverview);
+  assert.equal(workflow.attachOverviewEvents, attachEvents);
 });
 
 test("profile display updates the shared app shell from the current workspace user", () => {
@@ -220,17 +300,17 @@ test("profile display loads before overview and is precached", () => {
   );
   assert.ok(
     html.indexOf("features/overview-model.js") <
-      html.indexOf("features/overview.js") &&
-      html.indexOf("features/overview-events.js") < html.indexOf("app.js") &&
-      html.indexOf("features/overview.js") < html.indexOf("app.js"),
-    "overview modules should load before the app",
+      html.indexOf("features/overview-workflow.js") &&
+      html.indexOf("features/overview-events.js") <
+        html.indexOf("features/overview-workflow.js") &&
+      html.indexOf("features/overview-workflow.js") < html.indexOf("app.js"),
+    "overview modules should load before the workflow and app",
   );
   assert.match(worker, /'\.\/features\/profile-display\.js'/);
   assert.match(worker, /'\.\/features\/overview-model\.js'/);
   assert.match(worker, /'\.\/features\/overview-events\.js'/);
   assert.match(worker, /'\.\/features\/overview-property-summary-model\.js'/);
-  assert.doesNotMatch(html, /features\/overview-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/overview-workflow\.js/);
+  assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
 });
 
 test("profile settings save the display label and refresh the shared shell", async () => {

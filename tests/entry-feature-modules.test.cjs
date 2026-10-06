@@ -78,10 +78,7 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:AccountDetailEvents|DepositDetailEvents)\.create/,
   );
-  assert.match(app, /PropertyDeskOverviewPropertySummaryModel\.create\(/);
-  assert.match(app, /PropertyDeskOverviewModel\.create\(/);
-  assert.match(app, /PropertyDeskOverview\.create\(/);
-  assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
+  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
@@ -143,10 +140,7 @@ test("app root composes independent property screens and shares detail actions",
     "PropertyDeskPropertyDetailContentWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
     "PropertyDeskPropertyDocumentWorkflow.create(",
-    "PropertyDeskOverviewPropertySummaryModel.create(",
-    "PropertyDeskOverviewModel.create(",
-    "PropertyDeskOverview.create(",
-    "PropertyDeskOverviewEvents.create(",
+    "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
 
@@ -166,6 +160,7 @@ test("app root composes independent property screens and shares detail actions",
     "features/overview-model.js",
     "features/overview.js",
     "features/overview-events.js",
+    "features/overview-workflow.js",
     "features/property-portfolio-table.js",
     "features/property-portfolio-account-row-model.js",
     "features/property-portfolio-model.js",

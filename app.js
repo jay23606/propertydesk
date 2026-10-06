@@ -294,37 +294,26 @@
       fetchAll,
       openPropertyDetails,
     });
-  const propertySummaryModel =
-    window.PropertyDeskOverviewPropertySummaryModel.create({
+  const { renderOverview, attachOverviewEvents } =
+    window.PropertyDeskOverviewWorkflow.create({
+      $,
       state,
       monthlyScheduledEstimate,
       accountBalance,
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-    });
-  const overviewModel = window.PropertyDeskOverviewModel.create({
-    state,
-    propertySummaryModel,
-    collectedSince,
-    scheduledMonthlyRunRate,
-    monthStart,
-    isPosted,
-    postedOnOrAfter,
-  });
-  const { renderOverview } = window.PropertyDeskOverview.create({
-    $,
-    esc,
-    prettyKind,
-    money,
-    propertyAddress,
-    prettyType,
-    fmtDate,
-    overviewModel,
-  });
-  const { attachEvents: attachOverviewEvents } =
-    window.PropertyDeskOverviewEvents.create({
-      $,
+      collectedSince,
+      scheduledMonthlyRunRate,
+      monthStart,
+      isPosted,
+      postedOnOrAfter,
+      esc,
+      money,
+      propertyAddress,
+      prettyKind,
+      prettyType,
+      fmtDate,
       openPropertyDetails,
       openPropertyPayment,
     });
