@@ -9,7 +9,6 @@
       esc,
       toast,
       fetchAll,
-      updateGreeting,
       fmtDate,
       money,
       amountDueSince,
@@ -22,6 +21,10 @@
       propertyAddress,
       openModal,
     } = context;
+    const { updateGreeting } = window.PropertyDeskProfileDisplay.create({
+      $,
+      state,
+    });
     const reminders = window.PropertyDeskReminderWorkflow.create({
       $,
       state,
@@ -62,6 +65,7 @@
     }
 
     return {
+      updateGreeting,
       navigate: navigation.navigate,
       previewReminderEmail: reminders.previewReminderEmail,
       attachEvents,

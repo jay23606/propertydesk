@@ -57,10 +57,6 @@
     securityDepositBalance,
   });
   // Feature modules receive shared state and helpers; app.js connects the workflows.
-  const { updateGreeting } = window.PropertyDeskProfileDisplay.create({
-    $,
-    state,
-  });
   const { renderReports, attachReportExportEvents } =
     window.PropertyDeskReportWorkflow.create({
       $,
@@ -227,6 +223,7 @@
     attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
   const {
+    updateGreeting,
     navigate,
     previewReminderEmail,
     attachEvents: attachAppShellEvents,
@@ -238,7 +235,6 @@
     money,
     toast,
     fetchAll,
-    updateGreeting,
     amountDueSince,
     unpaidDueAccrualStart,
     todayIso,
