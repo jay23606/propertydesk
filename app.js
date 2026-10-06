@@ -259,37 +259,34 @@
       openPropertyDetails,
       openPropertyPayment,
     });
-  const { renderProperties, attachEvents: attachPropertyPortfolioEvents } =
-    window.PropertyDeskPropertyPortfolioWorkflow.create({
-      $,
-      state,
-      esc,
-      money,
-      paymentFrequencyLabel,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      propertyAddress,
-      streetAddress,
-      monthStart,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentStatusInMonth,
-    });
-  const { attachEvents: attachPropertyPortfolioActionEvents } =
-    window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      streetAddress,
-      openPayment,
-      openPropertyDetails,
-      openAccountForProperty,
-    });
+  const {
+    renderProperties,
+    attachPortfolioEvents: attachPropertyPortfolioEvents,
+    attachPortfolioActionEvents: attachPropertyPortfolioActionEvents,
+  } = window.PropertyDeskPropertyPortfolioScreenWorkflow.create({
+    $,
+    state,
+    esc,
+    money,
+    paymentFrequencyLabel,
+    monthlyScheduledEstimate,
+    accountBalance,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    propertyAddress,
+    streetAddress,
+    monthStart,
+    dateOnly,
+    monthEnd,
+    lateReminderMailto,
+    paymentStatusInMonth,
+    toast,
+    fetchAll,
+    openPayment,
+    openPropertyDetails,
+    openAccountForProperty,
+  });
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({
       $,

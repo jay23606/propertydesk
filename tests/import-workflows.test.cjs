@@ -355,6 +355,14 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/property-portfolio-workflow.js") <
+      html.indexOf("features/property-portfolio-screen-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-actions-workflow.js") <
+      html.indexOf("features/property-portfolio-screen-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-portfolio-screen-workflow.js") <
       html.indexOf("app.js"),
   );
   assert.ok(
@@ -647,6 +655,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/expense-import\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/property-portfolio-workflow\.js'/);
+  assert.match(
+    worker,
+    /'\.\/features\/property-portfolio-screen-workflow\.js'/,
+  );
   assert.match(
     worker,
     /'\.\/features\/property-portfolio-account-row-model\.js'/,

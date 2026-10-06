@@ -3,6 +3,64 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+test("Properties screen workflow connects the grid and quick-action binders", () => {
+  const created = [];
+  const passed = {};
+  const renderProperties = () => "properties";
+  const attachPortfolioEvents = () => "grid events";
+  const attachPortfolioActionEvents = () => "action events";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyPortfolioWorkflow: {
+        create: (options) => {
+          created.push("grid");
+          passed.grid = options;
+          return { renderProperties, attachEvents: attachPortfolioEvents };
+        },
+      },
+      PropertyDeskPropertyPortfolioActionsWorkflow: {
+        create: (options) => {
+          created.push("actions");
+          passed.actions = options;
+          return { attachEvents: attachPortfolioActionEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-screen-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = { state: {}, openPayment() {}, toast() {} };
+  const workflow =
+    context.window.PropertyDeskPropertyPortfolioScreenWorkflow.create(
+      dependencies,
+    );
+
+  assert.deepEqual(created, ["grid", "actions"]);
+  assert.equal(passed.grid, dependencies);
+  assert.equal(passed.actions, dependencies);
+  assert.deepEqual(Object.keys(workflow), [
+    "renderProperties",
+    "attachPortfolioEvents",
+    "attachPortfolioActionEvents",
+  ]);
+  assert.equal(workflow.renderProperties, renderProperties);
+  assert.equal(workflow.attachPortfolioEvents, attachPortfolioEvents);
+  assert.equal(
+    workflow.attachPortfolioActionEvents,
+    attachPortfolioActionEvents,
+  );
+});
+
 test("Properties account-row model derives balances and reminder details", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(

@@ -77,8 +77,7 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:AccountDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/);
   assert.match(app, /attachPropertyPortfolioActionEvents,/);
   assert.match(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
   assert.doesNotMatch(
@@ -132,7 +131,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
   const overviewPosition = app.indexOf("PropertyDeskOverviewWorkflow.create(");
   const portfolioPosition = app.indexOf(
-    "PropertyDeskPropertyPortfolioWorkflow.create(",
+    "PropertyDeskPropertyPortfolioScreenWorkflow.create(",
   );
 
   assert.ok(detailPosition >= 0);
