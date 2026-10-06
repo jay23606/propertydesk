@@ -107,7 +107,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/ledger-workflow.js"),
   );
   assert.ok(
-    html.indexOf("features/ledger-workflow.js") < html.indexOf("app.js"),
+    html.indexOf("features/ledger-workflow.js") <
+      html.indexOf("features/entry-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/entry-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/backend-client.js") < html.indexOf("app.js"),
@@ -294,10 +298,16 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
+    html.indexOf("features/create-actions.js") <
+      html.indexOf("features/entry-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/entry-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
     html.indexOf("features/transaction-corrections.js") <
       html.indexOf("app.js"),
   );
-  assert.doesNotMatch(html, /features\/entry-workflow\.js/);
   assert.ok(
     html.indexOf("features/imports.js") <
       html.indexOf("features/csv-import-workflow.js"),
