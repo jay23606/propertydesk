@@ -392,17 +392,47 @@
     attachPropertyGridEvents();
     attachPropertyActionEvents();
   }
-  const { attachEvents: attachCsvImportEvents } =
-    window.PropertyDeskCsvImportWorkflow.create({
+  const { selectImportRows, parseCSV, createImportLookup } =
+    window.PropertyDeskImportUtils;
+  const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
+    window.PropertyDeskImportWorkflows;
+  const importPreview = window.PropertyDeskImportPreview.create({
+    $,
+    state,
+    selectImportRows,
+    esc,
+    openModal,
+    closeModal,
+    toast,
+  });
+  const { attachEvents: attachImportPreviewEvents } =
+    window.PropertyDeskImportPreviewEvents.create({
       $,
       state,
-      esc,
-      openModal,
+      selectImportRows,
+      renderImportPreview: importPreview.renderImportPreview,
+      updateImportCommitButton: importPreview.updateImportCommitButton,
       closeModal,
       toast,
+    });
+  const { attachEvents: attachImportFileEvents } =
+    window.PropertyDeskImportFeature.create({
+      $,
+      state,
+      stageImport: importPreview.stageImport,
+      parseCSV,
+      createImportLookup,
+      validateAccountRows,
+      validatePaymentRows,
+      validateExpenseRows,
       todayIso,
       fetchAll,
+      toast,
     });
+  function attachCsvImportEvents() {
+    attachImportPreviewEvents();
+    attachImportFileEvents();
+  }
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskBackupExport.create({
       $,

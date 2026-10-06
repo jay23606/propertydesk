@@ -399,12 +399,9 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/transaction-corrections.js") <
       html.indexOf("app.js"),
   );
+  assert.ok(html.indexOf("features/imports.js") < html.indexOf("app.js"));
   assert.ok(
-    html.indexOf("features/imports.js") <
-      html.indexOf("features/csv-import-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/csv-import-workflow.js") < html.indexOf("app.js"),
+    html.indexOf("features/import-preview.js") < html.indexOf("app.js"),
   );
   assert.doesNotMatch(app, /PropertyDesk(?:ImportUtils|ImportWorkflows)\./);
   assert.ok(
@@ -853,7 +850,9 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/ledger-entry-forms\.js'/);
   assert.match(worker, /'\.\/features\/create-actions\.js'/);
   assert.match(worker, /'\.\/features\/imports\.js'/);
-  assert.match(worker, /'\.\/features\/csv-import-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/import-preview\.js'/);
+  assert.match(worker, /'\.\/features\/import-preview-events\.js'/);
+  assert.match(worker, /'\.\/features\/imports\.js'/);
   assert.match(worker, /'\.\/features\/property-details\.js'/);
   assert.match(worker, /'\.\/features\/property-details-view\.js'/);
   assert.doesNotMatch(worker, /features\/property-details-workflow\.js/);

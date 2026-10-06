@@ -9,22 +9,30 @@ test("app wires CSV import and private backup export independently", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(
-    app,
-    /PropertyDeskCsvImportWorkflow\.create\(\{[\s\S]*?fetchAll,[\s\S]*?\}\);/,
+  const importOrder = [
+    "PropertyDeskImportPreview.create(",
+    "PropertyDeskImportPreviewEvents.create(",
+    "PropertyDeskImportFeature.create(",
+  ].map((marker) => app.indexOf(marker));
+  assert.ok(importOrder.every((position) => position >= 0));
+  assert.deepEqual(
+    importOrder,
+    [...importOrder].sort((left, right) => left - right),
   );
+  assert.match(app, /stageImport: importPreview\.stageImport/);
   assert.match(
     app,
     /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,
   );
-  assert.match(app, /attachEvents: attachCsvImportEvents/);
+  assert.match(
+    app,
+    /function attachCsvImportEvents\(\)\s*\{\s*attachImportPreviewEvents\(\);\s*attachImportFileEvents\(\);\s*\}/,
+  );
+  assert.match(app, /\battachCsvImportEvents,/);
   assert.match(app, /attachEvents: attachExportEvents/);
   assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
 
-  for (const script of [
-    "features/csv-import-workflow.js",
-    "features/backup-export.js",
-  ]) {
+  for (const script of ["features/imports.js", "features/backup-export.js"]) {
     assert.ok(
       html.indexOf(script) >= 0 &&
         html.indexOf(script) < html.indexOf("app.js"),
@@ -32,6 +40,9 @@ test("app wires CSV import and private backup export independently", () => {
     );
     assert.match(worker, new RegExp(`'\\./${script.replaceAll("/", "\\/")}'`));
   }
+  assert.doesNotMatch(app, /PropertyDeskCsvImportWorkflow/);
+  assert.doesNotMatch(html, /features\/csv-import-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/csv-import-workflow\.js/);
   assert.doesNotMatch(html, /data-transfer-workflow\.js/);
   assert.doesNotMatch(worker, /data-transfer-workflow\.js/);
 });
