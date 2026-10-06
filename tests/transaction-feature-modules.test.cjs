@@ -166,6 +166,17 @@ test("transaction list model filters rows and resolves their display association
   });
   assert.equal(searchResult.length, 1);
   assert.equal(searchResult[0].item.id, "expense-1");
+
+  const yearIncome = model.buildTransactionList({
+    period: "year",
+    query: "",
+    type: "income",
+    now: new Date("2026-10-05T12:00:00"),
+  });
+  assert.deepEqual(
+    Array.from(yearIncome, (row) => row.item.id),
+    ["payment-1", "payment-2", "payment-4", "payment-3"],
+  );
 });
 
 test("transaction row view escapes displayed values and preserves void and correction markers", () => {

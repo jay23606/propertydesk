@@ -65,7 +65,26 @@
       };
     }
 
-    function buildRows({ period, query, type, now = new Date() }) {
+    function matchesDatePeriod(date, period, now) {
+      if (period === "all") return true;
+      if (period === "month") {
+        return (
+          date?.getMonth() === now.getMonth() &&
+          date?.getFullYear() === now.getFullYear()
+        );
+      }
+      return period === "year" && date?.getFullYear() === now.getFullYear();
+    }
+
+    function matchesPeriodAndType(row, period, type, now) {
+      const date = dateOnly(row.date);
+      return (
+        (type === "all" || type === row.kind) &&
+        matchesDatePeriod(date, period, now)
+      );
+    }
+
+    function buildTransactionList({ period, query, type, now = new Date() }) {
       const normalizedQuery = query.trim().toLowerCase();
       return [
         ...state.payments.map((item) => ({
@@ -81,17 +100,7 @@
           item,
         })),
       ]
-        .filter((row) => {
-          const date = dateOnly(row.date);
-          return (
-            (type === "all" || type === row.kind) &&
-            (period === "all" ||
-              (period === "month" &&
-                date?.getMonth() === now.getMonth() &&
-                date?.getFullYear() === now.getFullYear()) ||
-              (period === "year" && date?.getFullYear() === now.getFullYear()))
-          );
-        })
+        .filter((row) => matchesPeriodAndType(row, period, type, now))
         .map(associateTransaction)
         .filter(
           (row) => !normalizedQuery || row.searchText.includes(normalizedQuery),
@@ -100,10 +109,6 @@
           String(right.date).localeCompare(String(left.date)),
         )
         .map(toDisplayRow);
-    }
-
-    function buildTransactionList(filters) {
-      return buildRows(filters);
     }
 
     return { buildTransactionList };
