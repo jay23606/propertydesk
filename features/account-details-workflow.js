@@ -34,6 +34,8 @@
       fetchAll,
       closeModal,
     });
+    const { accountLoanScheduleHTML } =
+      window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
     const { renderAccountDetails } =
       window.PropertyDeskAccountDetailsView.create({
         money,
@@ -41,6 +43,7 @@
         esc,
         prettyType,
         paymentFrequencyLabel,
+        accountLoanScheduleHTML,
       });
     const { renderAccountHistory } =
       window.PropertyDeskAccountHistoryDetails.create({

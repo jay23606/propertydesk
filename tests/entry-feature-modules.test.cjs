@@ -138,6 +138,13 @@ test("account details workflow composes account details, history, and account ma
           return { renderAccountDetails: () => "account html" };
         },
       },
+      PropertyDeskAccountLoanScheduleView: {
+        create: (options) => {
+          created.push("schedule view");
+          passed.scheduleView = options;
+          return { accountLoanScheduleHTML: () => "schedule html" };
+        },
+      },
       PropertyDeskAccountHistoryDetails: {
         create: () => {
           created.push("history");
@@ -189,6 +196,7 @@ test("account details workflow composes account details, history, and account ma
 
   assert.deepEqual(created, [
     "account maintenance",
+    "schedule view",
     "account view",
     "history",
     "account details",
@@ -196,6 +204,8 @@ test("account details workflow composes account details, history, and account ma
   ]);
   assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
   assert.equal(passed.view.money, dependencies.money);
+  assert.equal(passed.scheduleView.money, dependencies.money);
+  assert.equal(passed.view.accountLoanScheduleHTML instanceof Function, true);
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);

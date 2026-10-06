@@ -6,7 +6,11 @@ const vm = require("node:vm");
 
 test("account details render action targets without owning action listeners", async () => {
   const context = vm.createContext({ window: {} });
-  for (const filename of ["account-details-view.js", "account-details.js"]) {
+  for (const filename of [
+    "account-loan-schedule-view.js",
+    "account-details-view.js",
+    "account-details.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -61,6 +65,7 @@ test("account details render action targets without owning action listeners", as
       esc: String,
       prettyType: (type) => type,
       paymentFrequencyLabel: () => "Monthly",
+      accountLoanScheduleHTML: () => "",
     }).renderAccountDetails,
   });
 
@@ -83,11 +88,23 @@ test("account detail view renders estimates and escapes payment history text", (
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-loan-schedule-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "account-details-view.js"),
       "utf8",
     ),
     context,
   );
+  const scheduleView =
+    context.window.PropertyDeskAccountLoanScheduleView.create({
+      money: (value) => `$${Number(value).toFixed(2)}`,
+      fmtDate: (value) => value || "—",
+    });
   const view = context.window.PropertyDeskAccountDetailsView.create({
     money: (value) => `$${Number(value).toFixed(2)}`,
     fmtDate: (value) => value || "—",
@@ -105,6 +122,7 @@ test("account detail view renders estimates and escapes payment history text", (
       ),
     prettyType: () => "Private note",
     paymentFrequencyLabel: () => "Monthly",
+    accountLoanScheduleHTML: scheduleView.accountLoanScheduleHTML,
   });
 
   const html = view.renderAccountDetails({

@@ -439,6 +439,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/account-details-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/account-loan-schedule-view.js") <
+      html.indexOf("features/account-details-view.js"),
+  );
+  assert.match(worker, /'\.\/features\/account-loan-schedule-view\.js'/);
+  assert.ok(
     html.indexOf("features/account-detail-events.js") <
       html.indexOf("features/account-details-workflow.js"),
   );
