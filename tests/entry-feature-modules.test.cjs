@@ -4,13 +4,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("app root delegates record-entry composition to its workflow", () => {
+test("app root delegates ledger and record-entry composition to one workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
-  assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
-  assert.match(
+  assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.doesNotMatch(
     app,
-    /PropertyDeskRecordEntryWorkflow\.create\(\{[\s\S]*?saveCorrection/,
+    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create\(/,
   );
   assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
   const workflow = fs.readFileSync(
@@ -25,6 +25,23 @@ test("app root delegates record-entry composition to its workflow", () => {
   ]) {
     assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
   }
+  const ledgerWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "ledger-workflow.js"),
+    "utf8",
+  );
+  const creationOrder = [
+    "PropertyDeskTransactionCorrections.create(",
+    "PropertyDeskRecordEntryWorkflow.create(",
+    "PropertyDeskTransactionWorkflow.create(",
+  ].map((marker) => ledgerWorkflow.indexOf(marker));
+  assert.ok(creationOrder.every((position) => position >= 0));
+  assert.deepEqual(
+    creationOrder,
+    [...creationOrder].sort((left, right) => left - right),
+  );
+  assert.match(ledgerWorkflow, /saveCorrection/);
+  assert.match(ledgerWorkflow, /openPayment: entries\.openPayment/);
+  assert.match(ledgerWorkflow, /openExpense: entries\.openExpense/);
 });
 
 test("app coordinator passes the amortization helper into account details", () => {
@@ -62,7 +79,7 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
   );
-  assert.match(app, /window\.PropertyDeskTransactionWorkflow\.create\(/);
+  assert.match(app, /window\.PropertyDeskLedgerWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
     /window\.PropertyDeskTransaction(?:Views|MaintenanceWorkflow)\.create\(/,
@@ -81,8 +98,10 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskTransaction(?:ViewEvents|CorrectionForm)\.create/,
   );
-  assert.match(app, /PropertyDeskTransactionCorrections\.create/);
-  assert.match(app, /PropertyDeskRecordEntryWorkflow\.create/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:Deposit|Transaction)Maintenance\.create/,

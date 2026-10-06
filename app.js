@@ -91,44 +91,19 @@
       propertyAddress,
       prettyType,
     });
-  const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
-    $,
-    state,
-    toast,
-    fetchAll,
-    closeModal,
-  });
-  const recordEntryWorkflow = window.PropertyDeskRecordEntryWorkflow.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
-    populateFormOptions,
-    fillSelect,
-    prettyType,
-    openModal,
-    saveCorrection,
-    documentRef: document,
-  });
-  const {
-    resetAccountForm,
-    editAccount,
-    updateAllocationPreview,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachCreateActions,
-    attachPropertyFormEvents,
-    attachAccountFormEvents,
-    attachLedgerEntryFormEvents,
-  } = recordEntryWorkflow;
-  const { renderPayments, attachEvents: attachTransactionEvents } =
-    window.PropertyDeskTransactionWorkflow.create({
+  const { entries: recordEntryWorkflow, transactions } =
+    window.PropertyDeskLedgerWorkflow.create({
       $,
       state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      populateFormOptions,
+      fillSelect,
+      prettyType,
+      openModal,
       dateOnly,
       fmtDate,
       esc,
@@ -138,16 +113,23 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      toast,
-      fetchAll,
-      prettyType,
-      openPayment,
-      openExpense,
-      updateAllocationPreview,
       EventClass: Event,
       OptionClass: Option,
       documentRef: document,
     });
+  const {
+    resetAccountForm,
+    editAccount,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachCreateActions,
+    attachPropertyFormEvents,
+    attachAccountFormEvents,
+    attachLedgerEntryFormEvents,
+  } = recordEntryWorkflow;
+  const { renderPayments, attachEvents: attachTransactionEvents } =
+    transactions;
   const depositWorkflow = window.PropertyDeskDepositWorkflow.create({
     $,
     state,

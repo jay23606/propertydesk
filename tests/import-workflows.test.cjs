@@ -53,6 +53,17 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("app.js"),
   );
   assert.ok(
+    html.indexOf("features/transaction-workflow.js") <
+      html.indexOf("features/ledger-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/record-entry-workflow.js") <
+      html.indexOf("features/ledger-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/ledger-workflow.js") < html.indexOf("app.js"),
+  );
+  assert.ok(
     html.indexOf("features/backend-client.js") < html.indexOf("app.js"),
   );
   assert.ok(
