@@ -68,6 +68,10 @@ test("app root delegates entry forms and create actions to one workflow", () => 
 
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const propertyWorkspace = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    "utf8",
+  );
   assert.match(
     app,
     /amortizationSchedule,[\s\S]*?\} = window\.PropertyDeskLedgerUtils;/,
@@ -80,15 +84,25 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:AccountDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
-  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/);
-  assert.match(app, /attachEvents: attachPropertyPortfolioEvents/);
-  assert.match(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(propertyWorkspace, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.match(
+    propertyWorkspace,
+    /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/,
+  );
+  assert.match(
+    propertyWorkspace,
+    /attachEvents: attachPropertyPortfolioEvents/,
+  );
+  assert.match(
+    propertyWorkspace,
+    /PropertyDeskPropertyDetailsWorkflow\.create\(/,
+  );
   assert.doesNotMatch(
     app,
     /attachPropertyViewEvents|attachPropertyActionEvents/,
   );
-  assert.match(app, /attachEvents: attachPropertyDetailsEvents/);
+  assert.match(propertyWorkspace, /attachEvents: attachPropertyDetailsEvents/);
   assert.doesNotMatch(
     app,
     /PropertyDeskProperty(?:DetailActions|Document)Workflow\.create\(/,
@@ -127,34 +141,34 @@ test("app coordinator passes the amortization helper into account details", () =
   );
 });
 
-test("app coordinator creates cross-linked property views after their actions", () => {
+test("property workspace coordinator owns cross-linked property views", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  const detailPosition = app.indexOf(
-    "PropertyDeskPropertyDetailsWorkflow.create(",
-  );
-  const overviewPosition = app.indexOf("PropertyDeskOverviewWorkflow.create(");
-  const portfolioPosition = app.indexOf(
-    "PropertyDeskPropertyPortfolioScreenWorkflow.create(",
+  const workflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    "utf8",
   );
 
-  assert.ok(detailPosition >= 0);
-  assert.ok(detailPosition < overviewPosition);
-  assert.ok(overviewPosition < portfolioPosition);
-  const overviewWiring = app.slice(overviewPosition, portfolioPosition);
-  const portfolioWiring = app.slice(portfolioPosition);
-  assert.match(overviewWiring, /openPropertyDetails,/);
-  assert.match(portfolioWiring, /openPropertyDetails,/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
+    /PropertyDesk(?:PropertyDetails|Overview|PropertyPortfolioScreen)Workflow\.create\(/,
+  );
+  assert.ok(
+    workflow.indexOf("PropertyDeskPropertyDetailsWorkflow.create(") <
+      workflow.indexOf("PropertyDeskOverviewWorkflow.create("),
+  );
+  assert.ok(
+    workflow.indexOf("PropertyDeskOverviewWorkflow.create(") <
+      workflow.indexOf("PropertyDeskPropertyPortfolioScreenWorkflow.create("),
+  );
+  assert.match(workflow, /openPropertyDetails,/);
+  assert.doesNotMatch(
+    workflow,
     /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/,
   );
   assert.ok(
     app.indexOf("PropertyDeskAccountDetailContentWorkflow.create(") <
-      app.indexOf("PropertyDeskPropertyDetailsWorkflow.create("),
-  );
-  assert.ok(
-    app.indexOf("PropertyDeskPropertyDetailsWorkflow.create(") <
-      app.indexOf("PropertyDeskOverviewWorkflow.create("),
+      app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
   );
 });
 
