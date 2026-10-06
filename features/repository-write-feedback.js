@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  async function run({ operation, toast, failureMessage }) {
+  async function run({
+    operation,
+    toast,
+    failureMessage,
+    errorMessage = (error) => error.message,
+  }) {
     let error;
     try {
       ({ error } = await operation());
@@ -11,7 +16,7 @@
       return false;
     }
     if (error) {
-      toast(error.message);
+      toast(errorMessage(error));
       return false;
     }
     return true;

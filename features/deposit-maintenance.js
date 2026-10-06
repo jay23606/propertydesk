@@ -31,19 +31,14 @@
         movementDate: reason.trim() ? todayIso() : null,
       });
       if (!adjustmentIsReady(prepared, toast)) return false;
-      let error;
-      try {
-        ({ error } = await repository.insert(state.client, prepared.payload));
-      } catch {
-        toast(
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.insert(state.client, prepared.payload),
+        toast,
+        failureMessage:
           "Deposit adjustment failed. Check your connection and try again.",
-        );
-        return false;
-      }
-      if (error) {
-        toast(`Deposit adjustment failed: ${error.message}`);
-        return false;
-      }
+        errorMessage: (error) => `Deposit adjustment failed: ${error.message}`,
+      });
+      if (!saved) return false;
       try {
         await fetchAll();
       } catch {

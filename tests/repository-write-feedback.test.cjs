@@ -48,6 +48,22 @@ test("repository write feedback shows returned database errors", async () => {
   assert.deepEqual(messages, ["Database rejected write"]);
 });
 
+test("repository write feedback supports domain-specific database messages", async () => {
+  const messages = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.run({
+      operation: async () => ({ error: { message: "Permission denied" } }),
+      toast: (message) => messages.push(message),
+      failureMessage: "Unavailable",
+      errorMessage: (error) => `Deposit adjustment failed: ${error.message}`,
+    }),
+    false,
+  );
+  assert.deepEqual(messages, ["Deposit adjustment failed: Permission denied"]);
+});
+
 test("repository write feedback reports rejected requests with domain fallback", async () => {
   const messages = [];
   const feedback = createFeedback();

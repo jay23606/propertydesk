@@ -10,17 +10,13 @@
     repository = window.PropertyDeskAccountRepository,
   }) {
     async function saveCloseAccount(account) {
-      let error;
-      try {
-        ({ error } = await repository.close(state.client, account.id));
-      } catch {
-        toast("Account couldn't be closed right now. Please try again.");
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.close(state.client, account.id),
+        toast,
+        failureMessage:
+          "Account couldn't be closed right now. Please try again.",
+      });
+      if (!saved) return;
       closeAccountDetails();
       try {
         await fetchAll();

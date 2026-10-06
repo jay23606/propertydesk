@@ -118,6 +118,14 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-inserts.js"),
   );
   assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/account-close-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/repository-write-feedback.js") <
+      html.indexOf("features/deposit-maintenance.js"),
+  );
+  assert.ok(
     html.indexOf("features/property-repository.js") <
       html.indexOf("features/property-maintenance.js"),
   );
@@ -134,6 +142,7 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-repository.js"),
   );
   assert.match(worker, /'\.\/features\/repository-query-utils\.js'/);
+  assert.match(worker, /'\.\/features\/repository-write-feedback\.js'/);
   assert.ok(
     html.indexOf("features/deposit-repository.js") <
       html.indexOf("features/deposit-maintenance.js"),

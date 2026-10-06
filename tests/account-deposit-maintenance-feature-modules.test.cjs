@@ -4,6 +4,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function loadRepositoryWriteFeedback(context) {
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+}
+
 test("app composes account detail and deposit features without a broad wrapper", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
@@ -355,6 +365,7 @@ test("deposit adjustment model validates inputs and prepares audited payloads", 
 
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-query-utils.js"),
@@ -442,6 +453,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
 
 test("deposit maintenance only proceeds with a ready audited adjustment", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-maintenance.js"),
@@ -508,6 +520,7 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
 
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-query-utils.js"),
@@ -624,6 +637,7 @@ test("deposit adjustment entry validates the amount before asking for an audit r
 
 test("account close maintenance preserves the account history", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-query-utils.js"),
@@ -683,6 +697,7 @@ test("account close maintenance preserves the account history", async () => {
 
 test("account close maintenance reports rejected requests without closing details", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-query-utils.js"),
@@ -734,6 +749,7 @@ test("account close maintenance reports rejected requests without closing detail
 
 test("account close maintenance reports database errors before closing details", async () => {
   const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "account-close-maintenance.js"),
