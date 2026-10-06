@@ -27,6 +27,10 @@ test("document repository centralizes private storage and workspace-scoped metad
             calls.push(["remove", ...args]);
             return { error: null };
           },
+          download: async (...args) => {
+            calls.push(["download", ...args]);
+            return { data: "file", error: null };
+          },
           createSignedUrl: async (...args) => {
             calls.push(["sign", ...args]);
             return { data: { signedUrl: "https://signed.test" }, error: null };
@@ -63,6 +67,7 @@ test("document repository centralizes private storage and workspace-scoped metad
     property_id: "property",
   });
   await repository.remove("owner/property/file.pdf");
+  await repository.download("owner/property/file.pdf");
   await repository.deleteMetadata("document", "owner", "property");
   const signed = await repository.signedUrl("owner/property/file.pdf", 60);
 
@@ -87,6 +92,11 @@ test("document repository centralizes private storage and workspace-scoped metad
     ],
   );
   assert.ok(calls.some((call) => call[0] === "sign" && call[2] === 60));
+  assert.ok(
+    calls.some(
+      (call) => call[0] === "download" && call[1] === "owner/property/file.pdf",
+    ),
+  );
 });
 
 test("document repository resolves the client lazily after workspace sign-in", async () => {

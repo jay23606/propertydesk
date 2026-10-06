@@ -657,6 +657,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/backup-export.js"),
   );
   assert.match(worker, /'\.\/features\/backup-records\.js'/);
+  assert.match(worker, /'\.\/features\/document-repository\.js'/);
+  assert.ok(
+    html.indexOf("features/document-repository.js") <
+      html.indexOf("features/backup-agreement-files.js"),
+  );
   assert.ok(html.indexOf("features/backup-export.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/auth-recovery-view.js") <

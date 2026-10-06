@@ -248,6 +248,13 @@ test("backup agreement collector downloads only workspace-scoped files into the 
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "document-repository.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "backup-agreement-files.js"),
       "utf8",
     ),
@@ -305,6 +312,7 @@ test("backup export aborts before download when a private document path escapes 
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   for (const moduleName of [
+    "document-repository.js",
     "backup-agreement-files.js",
     "backup-records.js",
     "download-utils.js",
@@ -393,6 +401,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   for (const moduleName of [
+    "document-repository.js",
     "backup-agreement-files.js",
     "backup-records.js",
     "download-utils.js",

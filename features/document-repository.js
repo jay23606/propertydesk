@@ -26,6 +26,9 @@
       remove(path) {
         return client().storage.from(BUCKET).remove([path]);
       },
+      download(path) {
+        return client().storage.from(BUCKET).download(path);
+      },
       deleteMetadata(id, ownerId, propertyId) {
         return client()
           .from(TABLE)

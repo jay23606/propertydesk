@@ -6,6 +6,7 @@
     const includedFiles = [];
     const entries = [];
     const ownerPrefix = `${workspaceOwnerId}/`;
+    const repository = window.PropertyDeskDocumentRepository.create(client);
 
     for (const doc of documents) {
       if (!doc.storage_path || !doc.storage_path.startsWith(ownerPrefix)) {
@@ -13,9 +14,7 @@
           "An agreement record has an invalid private storage path. No backup was downloaded.",
         );
       }
-      const { data, error } = await client.storage
-        .from("pd-private-agreements")
-        .download(doc.storage_path);
+      const { data, error } = await repository.download(doc.storage_path);
       if (error || !data) {
         throw new Error(
           `Could not download agreement “${doc.file_name || "file"}”. ${error?.message || ""}`,
