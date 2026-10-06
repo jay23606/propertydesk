@@ -76,10 +76,14 @@
         openModal,
       });
 
+    function attachEvents() {
+      attachPropertyViewEvents();
+      attachPropertyActionEvents();
+    }
+
     return {
       renderProperties,
-      attachPropertyViewEvents,
-      attachPropertyActionEvents,
+      attachEvents,
     };
   }
 

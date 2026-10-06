@@ -122,6 +122,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
 test("property portfolio workflow connects its model, table, and action routers", () => {
   const passed = {};
   const action = () => {};
+  const attached = [];
   const state = {};
   const context = vm.createContext({
     window: {
@@ -148,14 +149,14 @@ test("property portfolio workflow connects its model, table, and action routers"
           passed.viewOptions = options;
           return {
             renderProperties: () => "properties",
-            attachEvents: () => "filters",
+            attachEvents: () => attached.push("filters"),
           };
         },
       },
       PropertyDeskPropertyViewEvents: {
         create: (options) => {
           passed.actionOptions = options;
-          return { attachEvents: () => "actions" };
+          return { attachEvents: () => attached.push("actions") };
         },
       },
     },
@@ -201,7 +202,11 @@ test("property portfolio workflow connects its model, table, and action routers"
   assert.equal(passed.quickNoteOptions.streetAddress, action);
   assert.equal(passed.actionOptions.openPayment, action);
   assert.equal(passed.actionOptions.editPropertyQuickNote, action);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachEvents",
+    "renderProperties",
+  ]);
   assert.equal(workflow.renderProperties(), "properties");
-  assert.equal(workflow.attachPropertyViewEvents(), "filters");
-  assert.equal(workflow.attachPropertyActionEvents(), "actions");
+  workflow.attachEvents();
+  assert.deepEqual(attached, ["filters", "actions"]);
 });
