@@ -78,6 +78,8 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     populateFormOptions() {},
     prettyType() {},
     openModal() {},
+    navigate: () => {},
+    previewReminderEmail: () => {},
     saveCorrection() {},
     unrelatedDependency() {},
   };
@@ -160,6 +162,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     toast() {},
     closeModal() {},
     fetchAll() {},
+    navigate: () => {},
     moneyInput: Number,
     todayIso: () => "2026-10-05",
     populateFormOptions() {},
@@ -168,6 +171,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   const property = context.window.PropertyDeskPropertyForm.create(formContext);
   const account = context.window.PropertyDeskAccountForm.create({
     ...formContext,
+    previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
   });
@@ -387,6 +391,7 @@ test("record-entry feature owns form event bindings and category hints", () => {
     toast() {},
     closeModal() {},
     fetchAll() {},
+    previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
   });
@@ -394,7 +399,7 @@ test("record-entry feature owns form event bindings and category hints", () => {
     context.window.PropertyDeskLedgerEntryForms.create(formContext);
 
   propertyForm.attachEvents();
-  accountForm.attachEvents(() => {});
+  accountForm.attachEvents();
   entryForms.attachEvents();
   assert.equal(typeof handlers.get("property-form:submit"), "function");
   assert.equal(typeof handlers.get("payment-form:submit"), "function");
@@ -560,6 +565,7 @@ test("record-entry feature owns create actions and handles empty workspace state
     '[data-open="expense-modal"]': [button("expense")],
   };
   const state = { properties: [], accounts: [] };
+  const navigate = (view) => calls.push(`navigate:${view}`);
   const feature = context.window.PropertyDeskCreateActions.create({
     $: getElement,
     state,
@@ -572,10 +578,9 @@ test("record-entry feature owns create actions and handles empty workspace state
     openModal: (id) => calls.push(`open:${id}`),
     openPayment: () => calls.push("open-payment"),
     openExpense: () => calls.push("open-expense"),
+    navigate,
   });
-  const navigate = (view) => calls.push(`navigate:${view}`);
-
-  feature.attachEvents(navigate);
+  feature.attachEvents();
   handlers.get("account:click")();
   handlers.get("payment:click")();
   handlers.get("expense:click")();

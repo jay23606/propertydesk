@@ -56,6 +56,8 @@ test("ledger workflow wires correction writes, entry forms, and transaction acti
     toast() {},
     fetchAll() {},
     closeModal() {},
+    navigate() {},
+    previewReminderEmail() {},
     moneyInput() {},
     dateOnly() {},
     documentRef: {},
@@ -68,6 +70,11 @@ test("ledger workflow wires correction writes, entry forms, and transaction acti
   assert.equal(passed.corrections.closeModal, dependencies.closeModal);
   assert.equal(passed.entries.state, dependencies.state);
   assert.equal(passed.entries.saveCorrection, saveCorrection);
+  assert.equal(passed.entries.navigate, dependencies.navigate);
+  assert.equal(
+    passed.entries.previewReminderEmail,
+    dependencies.previewReminderEmail,
+  );
   assert.equal(passed.entries.documentRef, dependencies.documentRef);
   assert.equal(passed.transactions.openPayment, entries.openPayment);
   assert.equal(passed.transactions.openExpense, entries.openExpense);

@@ -12,6 +12,7 @@
       fetchAll,
       buildAccountPayload,
       formModel,
+      previewReminderEmail,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create(context);
     const { resetAccountForm, readValues, editAccount } = formView;
@@ -82,7 +83,7 @@
       toast(form.id ? "Account updated" : "Account added");
     }
 
-    function attachEvents(previewReminderEmail) {
+    function attachEvents() {
       formView.attachEvents(saveAccount, previewReminderEmail);
     }
 

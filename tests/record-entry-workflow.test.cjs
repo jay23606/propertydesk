@@ -18,6 +18,7 @@ test("record entry workflow composes forms and exposes their actions and binders
   const accountAttach = (preview) => calls.push(["account events", preview]);
   const ledgerAttach = () => calls.push("ledger events");
   const navigate = () => calls.push("navigate");
+  const preview = () => {};
   const context = vm.createContext({
     document: {},
     window: {
@@ -36,7 +37,8 @@ test("record entry workflow composes forms and exposes their actions and binders
           return {
             resetAccountForm: accountReset,
             editAccount,
-            attachEvents: accountAttach,
+            attachEvents: () =>
+              accountAttach(dependencies.previewReminderEmail),
           };
         },
       },
@@ -56,7 +58,8 @@ test("record entry workflow composes forms and exposes their actions and binders
         create(dependencies) {
           passed.actions = dependencies;
           return {
-            attachEvents: (handler) => calls.push(["create events", handler]),
+            attachEvents: () =>
+              calls.push(["create events", dependencies.navigate]),
           };
         },
       },
@@ -84,6 +87,8 @@ test("record entry workflow composes forms and exposes their actions and binders
     populateFormOptions: () => {},
     prettyType: () => {},
     openModal: () => {},
+    navigate,
+    previewReminderEmail: preview,
     saveCorrection: () => {},
     documentRef: { marker: "doc" },
   };
@@ -100,6 +105,8 @@ test("record entry workflow composes forms and exposes their actions and binders
     context.window.PropertyDeskAccountFormModel,
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
+  assert.equal(passed.account.previewReminderEmail, preview);
+  assert.equal(passed.actions.navigate, navigate);
   assert.equal(passed.actions.resetPropertyForm, propertyReset);
   assert.equal(passed.actions.resetAccountForm, accountReset);
   assert.equal(passed.actions.openPayment, openPayment);
@@ -116,11 +123,10 @@ test("record entry workflow composes forms and exposes their actions and binders
     assert.equal(workflow[name], expected, name);
   }
 
-  const preview = () => {};
   workflow.attachPropertyFormEvents();
-  workflow.attachAccountFormEvents(preview);
+  workflow.attachAccountFormEvents();
   workflow.attachLedgerEntryFormEvents();
-  workflow.attachCreateActions(navigate);
+  workflow.attachCreateActions();
   assert.deepEqual(calls, [
     "property events",
     ["account events", preview],

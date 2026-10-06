@@ -8,11 +8,15 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.ok(
+    app.indexOf("PropertyDeskAppShellWorkflow.create(") <
+      app.indexOf("PropertyDeskLedgerWorkflow.create("),
+  );
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create\(/,
   );
-  assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
+  assert.match(app, /attachAccountFormEvents,/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",

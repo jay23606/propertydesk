@@ -203,12 +203,13 @@ test("property and account forms report rejected saves without running success a
     todayIso: () => "2026-10-05",
     populateFormOptions() {},
     openModal() {},
+    previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
   });
 
   property.attachEvents();
-  account.attachEvents(() => {});
+  account.attachEvents();
   await assert.doesNotReject(
     handlers.get("property-form:submit")({ preventDefault() {} }),
   );

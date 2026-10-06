@@ -158,7 +158,7 @@ test("app shell workflow composes reminders before the coordinator and is precac
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.doesNotMatch(app, /PropertyDeskReminderWorkflow\.create/);
   assert.doesNotMatch(app, /PropertyDeskProfileDisplay\.create/);
-  assert.match(app, /attachAccountFormEvents\(previewReminderEmail\)/);
+  assert.match(app, /attachAccountFormEvents,/);
   assert.match(html, /features\/reminder-workflow\.js/);
   assert.match(html, /features\/profile-display\.js/);
   assert.ok(

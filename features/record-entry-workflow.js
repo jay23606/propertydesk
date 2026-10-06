@@ -15,6 +15,8 @@
       populateFormOptions,
       prettyType,
       openModal,
+      navigate,
+      previewReminderEmail,
       saveCorrection,
       documentRef = document,
     } = context;
@@ -35,6 +37,7 @@
       fetchAll,
       populateFormOptions,
       openModal,
+      previewReminderEmail,
       buildAccountPayload: window.PropertyDeskAccountPayload.build,
       formModel: window.PropertyDeskAccountFormModel,
     });
@@ -60,6 +63,7 @@
       resetAccountForm: accountForm.resetAccountForm,
       populateFormOptions,
       openModal,
+      navigate,
       openPayment: ledgerEntryForms.openPayment,
       openExpense: ledgerEntryForms.openExpense,
       documentRef,
@@ -72,10 +76,9 @@
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,
       openExpense: ledgerEntryForms.openExpense,
-      attachCreateActions: (navigate) => createActions.attachEvents(navigate),
+      attachCreateActions: createActions.attachEvents,
       attachPropertyFormEvents: propertyForm.attachEvents,
-      attachAccountFormEvents: (previewReminderEmail) =>
-        accountForm.attachEvents(previewReminderEmail),
+      attachAccountFormEvents: accountForm.attachEvents,
       attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
     };
   }

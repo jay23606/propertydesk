@@ -13,10 +13,11 @@
       openModal,
       openPayment,
       openExpense,
+      navigate,
       documentRef,
     } = context;
 
-    function attachCreateActions(navigate) {
+    function attachCreateActions() {
       const browserDocument = documentRef || document;
       browserDocument
         .querySelectorAll('[data-open="property-modal"]')

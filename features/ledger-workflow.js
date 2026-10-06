@@ -15,6 +15,8 @@
       fillSelect,
       prettyType,
       openModal,
+      navigate,
+      previewReminderEmail,
       dateOnly,
       fmtDate,
       esc,
@@ -49,6 +51,8 @@
       fillSelect,
       prettyType,
       openModal,
+      navigate,
+      previewReminderEmail,
       saveCorrection,
       documentRef,
     });
