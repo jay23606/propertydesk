@@ -69,7 +69,6 @@ test("property workspace workflow connects details, overview, and portfolio acti
   assert.equal(passed.portfolio.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.portfolio.openPayment, openPayment);
   assert.equal(passed.details.openExpense, openExpense);
-  assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.equal(
     workflow.attachPropertyDetailsEvents,
     attachPropertyDetailsEvents,

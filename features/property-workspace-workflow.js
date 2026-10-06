@@ -120,7 +120,6 @@
       });
 
     return {
-      openPropertyDetails,
       attachPropertyDetailsEvents,
       renderOverview,
       attachOverviewEvents,

@@ -66,7 +66,6 @@
     });
 
     return {
-      resetPropertyForm: propertyForm.resetPropertyForm,
       resetAccountForm: accountForm.resetAccountForm,
       editAccount: accountForm.editAccount,
       updateAllocationPreview: ledgerEntryForms.updateAllocationPreview,
