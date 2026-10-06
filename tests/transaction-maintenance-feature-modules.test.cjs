@@ -409,6 +409,13 @@ test("transaction correction form reopens posted payments and expenses with audi
   });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-correction-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-correction-form.js"),
       "utf8",
     ),

@@ -112,6 +112,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-maintenance-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/transaction-correction-view.js") <
+      html.indexOf("features/transaction-correction-form.js"),
+  );
+  assert.match(worker, /'\.\/features\/transaction-correction-view\.js'/);
+  assert.ok(
     html.indexOf("features/transaction-correction-form.js") <
       html.indexOf("features/transaction-maintenance-workflow.js"),
   );
