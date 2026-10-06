@@ -3,10 +3,6 @@
   "use strict";
 
   function create(context) {
-    return createWorkflows(context);
-  }
-
-  function createWorkflows(context) {
     const {
       $,
       state,
