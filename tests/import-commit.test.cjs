@@ -6,13 +6,12 @@ const vm = require("node:vm");
 
 function loadCommitFeature() {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "import-commit.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const source of ["import-repository.js", "import-commit.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
   return context.window.PropertyDeskImportCommit;
 }
 

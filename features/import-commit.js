@@ -1,8 +1,12 @@
-/* Persist approved account, payment, and expense import batches. */
+/* Refresh the workspace and report results after persisted import batches. */
 (() => {
   "use strict";
 
   function createImportCommit({ state, fetchAll, status, toast }) {
+    const repository = window.PropertyDeskImportRepository.create({
+      getClient: () => state.client,
+    });
+
     async function finish({ data, fallbackCount, total, label, toastMessage }) {
       await fetchAll();
       const imported = Number(data?.rows_accepted ?? fallbackCount);
@@ -16,15 +20,7 @@
     }
 
     async function commitAccounts({ rows, sourceName, total }) {
-      const { data, error } = await state.client.rpc(
-        "pd_import_propertydesk_accounts",
-        {
-          p_rows: rows,
-          p_source_name: sourceName,
-          p_rows_total: total,
-        },
-      );
-      if (error) throw error;
+      const data = await repository.commitAccounts({ rows, sourceName, total });
       await finish({
         data,
         fallbackCount: rows.length,
@@ -41,16 +37,12 @@
       total,
       label,
     }) {
-      const { data, error } = await state.client.rpc(
-        "pd_import_propertydesk_transactions",
-        {
-          p_kind: kind,
-          p_rows: rows,
-          p_source_name: sourceName,
-          p_rows_total: total,
-        },
-      );
-      if (error) throw error;
+      const data = await repository.commitTransactions({
+        kind,
+        rows,
+        sourceName,
+        total,
+      });
       await finish({ data, fallbackCount: rows.length, total, label });
     }
 

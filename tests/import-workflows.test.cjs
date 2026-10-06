@@ -207,6 +207,10 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/expense-import.js") <
       html.indexOf("features/imports.js"),
   );
+  assert.ok(
+    html.indexOf("features/import-repository.js") <
+      html.indexOf("features/import-commit.js"),
+  );
   assert.ok(html.indexOf("zip-utils.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/property-views.js") < html.indexOf("app.js"),
@@ -737,6 +741,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-import\.js'/);
   assert.match(worker, /'\.\/features\/payment-import\.js'/);
   assert.match(worker, /'\.\/features\/expense-import\.js'/);
+  assert.match(worker, /'\.\/features\/import-repository\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
   assert.match(worker, /'\.\/features\/property-portfolio-workflow\.js'/);
   assert.match(

@@ -81,6 +81,7 @@ function loadImportFeatures(context) {
     "account-import.js",
     "payment-import.js",
     "expense-import.js",
+    "import-repository.js",
     "import-commit.js",
     "imports.js",
   ]) {
