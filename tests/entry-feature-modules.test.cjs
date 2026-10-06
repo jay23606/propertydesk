@@ -68,15 +68,16 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:PropertyDetails|Overview|PropertyPortfolio)Workflow\.create/,
+    /PropertyDesk(?:Overview|PropertyPortfolio)Workflow\.create/,
   );
   assert.doesNotMatch(
     app,
     /attachPropertyViewEvents|attachPropertyActionEvents/,
   );
-  assert.doesNotMatch(app, /attachPropertyDetailEvents/);
+  assert.match(app, /attachPropertyDetailEvents: attachPropertyDetailsEvents/);
   assert.match(app, /attachPropertyDocumentEvents,/);
   assert.doesNotMatch(
     app,
@@ -122,16 +123,19 @@ test("app coordinator creates cross-linked property views after their actions", 
     path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
     "utf8",
   );
-  const order = [
-    "PropertyDeskPropertyDetailsWorkflow.create(",
+  const workspaceOrder = [
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
   ].map((marker) => propertyWorkflow.indexOf(marker));
 
-  assert.ok(order.every((position) => position >= 0));
+  assert.ok(workspaceOrder.every((position) => position >= 0));
   assert.deepEqual(
-    order,
-    [...order].sort((left, right) => left - right),
+    workspaceOrder,
+    [...workspaceOrder].sort((left, right) => left - right),
+  );
+  assert.doesNotMatch(
+    propertyWorkflow,
+    /PropertyDeskPropertyDetailsWorkflow\.create\(/,
   );
   assert.doesNotMatch(
     app,
@@ -139,6 +143,10 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
   assert.ok(
     app.indexOf("PropertyDeskAccountDetailsWorkflow.create(") <
+      app.indexOf("PropertyDeskPropertyDetailsWorkflow.create("),
+  );
+  assert.ok(
+    app.indexOf("PropertyDeskPropertyDetailsWorkflow.create(") <
       app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
   );
 });
