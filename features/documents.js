@@ -8,6 +8,7 @@
       toast,
       fetchAll,
       openPropertyDetails,
+      makeId,
       confirm = (message) => window.confirm(message),
       openWindow = (...args) => window.open(...args),
       repository = window.PropertyDeskDocumentRepository.create(
@@ -20,7 +21,7 @@
         toast,
         fetchAll,
         openPropertyDetails,
-        makeId: context.makeId,
+        makeId,
         repository,
       },
     );

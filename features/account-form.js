@@ -10,15 +10,18 @@
       toast,
       closeModal,
       fetchAll,
+      todayIso,
+      populateFormOptions,
+      openModal,
       buildAccountPayload,
       formModel,
       previewReminderEmail,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create({
       $,
-      todayIso: context.todayIso,
-      populateFormOptions: context.populateFormOptions,
-      openModal: context.openModal,
+      todayIso,
+      populateFormOptions,
+      openModal,
     });
     const { resetAccountForm, readValues, editAccount } = formView;
 

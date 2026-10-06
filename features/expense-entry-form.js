@@ -12,16 +12,22 @@
       saveCorrection,
       insertTransaction,
       buildExpensePayload,
+      moneyInput,
+      todayIso,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
     } = context;
     const expenseView = window.PropertyDeskExpenseEntryView.create({
       $,
       state,
-      moneyInput: context.moneyInput,
-      todayIso: context.todayIso,
-      fillSelect: context.fillSelect,
-      populateFormOptions: context.populateFormOptions,
-      prettyType: context.prettyType,
-      openModal: context.openModal,
+      moneyInput,
+      todayIso,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
     });
 
     async function saveExpense(event) {

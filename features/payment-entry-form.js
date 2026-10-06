@@ -12,17 +12,23 @@
       saveCorrection,
       insertTransaction,
       buildPaymentPayload,
+      moneyInput,
+      todayIso,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
     } = context;
     const paymentView = window.PropertyDeskPaymentEntryView.create({
       $,
       state,
-      moneyInput: context.moneyInput,
-      todayIso: context.todayIso,
+      moneyInput,
+      todayIso,
       toast,
-      fillSelect: context.fillSelect,
-      populateFormOptions: context.populateFormOptions,
-      prettyType: context.prettyType,
-      openModal: context.openModal,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
     });
 
     async function savePayment(event) {
