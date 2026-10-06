@@ -6,6 +6,13 @@ const vm = require("node:vm");
 
 test("date, display, and money-input utilities preserve their shared contracts", () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "domain-options.js"),
+      "utf8",
+    ),
+    context,
+  );
   for (const filename of [
     "date-utils.js",
     "display-utils.js",
@@ -42,6 +49,35 @@ test("date, display, and money-input utilities preserve their shared contracts",
   assert.match(dates.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
   assert.match(dates.monthStart(), /^\d{4}-\d{2}-01$/);
   assert.match(dates.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
+});
+
+test("form options are populated from the shared domain catalog", () => {
+  const context = vm.createContext({
+    window: {},
+    Object,
+    Map,
+  });
+  for (const filename of ["domain-options.js", "form-options.js"])
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) elements.set(id, { innerHTML: "" });
+    return elements.get(id);
+  };
+  context.window.PropertyDeskFormOptions.create({
+    $,
+    state: { properties: [], accounts: [] },
+    esc: String,
+    propertyAddress: String,
+    prettyType: String,
+  });
+
+  assert.match($("account-type").innerHTML, /value="land_contract"/);
+  assert.match($("account-frequency").innerHTML, /Every two weeks/);
+  assert.match($("property-kind").innerHTML, /value="commercial"/);
 });
 
 test("property address utilities format full and street addresses", () => {

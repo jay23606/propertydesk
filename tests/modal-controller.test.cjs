@@ -43,6 +43,13 @@ function createController() {
   const context = vm.createContext({ window: {}, document });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "domain-options.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "modal-controller.js"),
       "utf8",
     ),

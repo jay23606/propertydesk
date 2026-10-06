@@ -5,6 +5,7 @@ const path = require("node:path");
 
 const { parseCSV } = require("../csv-parser.js");
 require("../features/money-input-utils.js");
+require("../features/domain-options.js");
 const { selectImportRows } = require("../import-utils.js");
 require("../account-import-validation.js");
 require("../expense-import-validation.js");

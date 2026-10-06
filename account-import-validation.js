@@ -4,6 +4,13 @@
 
   const { csvMoney, csvRate, validIsoDate, validateImportRows } =
     globalThis.PropertyDeskImportUtils;
+  const { accountTypes, paymentFrequencies, propertyKinds } =
+    globalThis.PropertyDeskDomainOptions;
+  const accountTypeValues = new Set(accountTypes.map(({ value }) => value));
+  const paymentFrequencyValues = new Set(
+    paymentFrequencies.map(({ value }) => value),
+  );
+  const propertyKindValues = new Set(propertyKinds.map(({ value }) => value));
 
   function validateAccountRows(rows, properties, accounts, today) {
     const seenAccounts = new Set();
@@ -34,7 +41,7 @@
       for (const key of required)
         if (!row[key]) throw new Error(`Missing required value “${key}”.`);
       const type = row.account_type.toLowerCase();
-      if (!["rental", "land_contract", "note"].includes(type))
+      if (!accountTypeValues.has(type))
         throw new Error(
           `Invalid account_type “${row.account_type}”. Use rental, land_contract, or note.`,
         );
@@ -90,9 +97,7 @@
       const frequency = row.payment_frequency || "monthly",
         startDate = row.start_date || today;
       if (
-        !["monthly", "weekly", "biweekly", "quarterly", "annual"].includes(
-          frequency,
-        ) ||
+        !paymentFrequencyValues.has(frequency) ||
         !validIsoDate(startDate) ||
         (row.next_due_date && !validIsoDate(row.next_due_date)) ||
         (row.balloon_date && !validIsoDate(row.balloon_date)) ||
@@ -112,9 +117,7 @@
           `Grace days must be a nonnegative whole number for ${row.account_name}.`,
         );
       const propertyKind = row.property_kind || "residential";
-      if (
-        !["residential", "land", "commercial", "other"].includes(propertyKind)
-      )
+      if (!propertyKindValues.has(propertyKind))
         throw new Error(
           `Invalid property_kind “${row.property_kind}” for ${row.property_name}.`,
         );

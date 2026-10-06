@@ -2,6 +2,13 @@
 (() => {
   "use strict";
 
+  const { accountTypes, paymentFrequencies, propertyKinds } =
+    window.PropertyDeskDomainOptions;
+  const optionLabel = (options, value, fallback) => {
+    const option = options.find((item) => item.value === value);
+    return option?.displayLabel || option?.label || fallback;
+  };
+
   const money = (value) => {
     const amount = Number(value || 0);
     return new Intl.NumberFormat(undefined, {
@@ -24,32 +31,11 @@
     );
   };
   const prettyType = (type) =>
-    ({
-      rental: "Rental",
-      land_contract: "Land contract",
-      note: "Private note",
-    })[type] ||
-    type ||
-    "Account";
+    optionLabel(accountTypes, type, null) || type || "Account";
   const prettyKind = (kind) =>
-    ({
-      residential: "Residential",
-      land: "Land",
-      commercial: "Commercial",
-      other: "Other",
-    })[kind] ||
-    kind ||
-    "Property";
-  const paymentFrequencyLabel = (frequency) => {
-    const labels = {
-      monthly: "Monthly",
-      weekly: "Weekly",
-      biweekly: "Every 2 weeks",
-      quarterly: "Quarterly",
-      annual: "Annually",
-    };
-    return labels[frequency] || "Monthly";
-  };
+    optionLabel(propertyKinds, kind, null) || kind || "Property";
+  const paymentFrequencyLabel = (frequency) =>
+    optionLabel(paymentFrequencies, frequency, "Monthly");
   const expenseCategoryLabel = (category) =>
     category === "deposit_refund"
       ? "Security deposit refund"

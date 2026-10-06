@@ -37,6 +37,7 @@
     <script defer src="features/backend-client.js"></script>
     <script defer src="features/money-input-utils.js"></script>
     <script defer src="features/date-utils.js"></script>
+    <script defer src="features/domain-options.js"></script>
     <script defer src="csv-parser.js"></script>
     <script defer src="import-utils.js"></script>
     <script defer src="account-import-validation.js"></script>
@@ -928,13 +929,7 @@
                 placeholder="ST" /></label
             ><label>ZIP<input id="property-zip" placeholder="00000" /></label>
           </div>
-          <label
-            >Property type<select id="property-kind">
-              <option value="residential">Residential</option>
-              <option value="land">Land</option>
-              <option value="commercial">Commercial</option>
-              <option value="other">Other</option>
-            </select></label
+          <label>Property type<select id="property-kind"></select></label
           ><label
             >Quick note (shown under address)<textarea
               id="property-notes"
@@ -971,12 +966,7 @@
         <form id="account-form" class="modal-form">
           <input type="hidden" id="account-id" />
           <div class="form-row">
-            <label
-              >Account type<select id="account-type">
-                <option value="rental">Rental</option>
-                <option value="land_contract">Land contract</option>
-                <option value="note">Private note</option>
-              </select></label
+            <label>Account type<select id="account-type"></select></label
             ><label
               >Property<select id="account-property" required></select
             ></label>
@@ -1053,14 +1043,8 @@
                 step="0.01"
                 value="0" /></label
             ><label
-              >Payment frequency<select id="account-frequency">
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Every two weeks</option>
-                <option value="quarterly">Quarterly</option>
-                <option value="annual">Annually</option>
-              </select></label
-            >
+              >Payment frequency<select id="account-frequency"></select
+            ></label>
           </div>
           <fieldset id="loan-fields" class="loan-fields">
             <legend>Loan and contract terms</legend>
