@@ -77,7 +77,7 @@
       $("auth-form").addEventListener("submit", submitAuth);
     }
 
-    return { setAuthMode, submitAuth, attachEvents };
+    return { setAuthMode, attachEvents };
   }
 
   window.PropertyDeskAuthForm = Object.freeze({ create: createAuthForm });

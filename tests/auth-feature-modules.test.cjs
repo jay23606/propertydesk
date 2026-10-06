@@ -485,6 +485,7 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
     documentRef: { querySelector: () => element("auth-intro") },
   });
   form.attachEvents();
+  assert.deepEqual(Object.keys(form).sort(), ["attachEvents", "setAuthMode"]);
 
   await handlers.get("auth-form:submit")({ preventDefault() {} });
   assert.equal(state.user.id, "owner-1");
