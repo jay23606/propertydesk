@@ -235,6 +235,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/csv-import-workflow.js") < html.indexOf("app.js"),
   );
+  assert.doesNotMatch(app, /PropertyDesk(?:ImportUtils|ImportWorkflows)\./);
   assert.ok(
     html.indexOf("features/overview-property-summary-model.js") <
       html.indexOf("features/overview-model.js"),

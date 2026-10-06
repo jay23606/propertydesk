@@ -3,18 +3,11 @@
   "use strict";
 
   function create(context) {
-    const {
-      $,
-      state,
-      selectImportRows,
-      esc,
-      openModal,
-      closeModal,
-      toast,
-      parseCSV,
-      todayIso,
-      fetchAll,
-    } = context;
+    const { $, state, esc, openModal, closeModal, toast, todayIso, fetchAll } =
+      context;
+    const { selectImportRows, parseCSV } = window.PropertyDeskImportUtils;
+    const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
+      window.PropertyDeskImportWorkflows;
     const preview = window.PropertyDeskImportPreview.create({
       $,
       state,
@@ -39,12 +32,9 @@
       state,
       stageImport: preview.stageImport,
       parseCSV,
-      validateAccountRows:
-        window.PropertyDeskImportWorkflows.validateAccountRows,
-      validatePaymentRows:
-        window.PropertyDeskImportWorkflows.validatePaymentRows,
-      validateExpenseRows:
-        window.PropertyDeskImportWorkflows.validateExpenseRows,
+      validateAccountRows,
+      validatePaymentRows,
+      validateExpenseRows,
       todayIso,
       fetchAll,
       toast,

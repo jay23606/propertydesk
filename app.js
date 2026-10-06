@@ -204,14 +204,6 @@
     window.PropertyDeskCsvImportWorkflow.create({
       $,
       state,
-      selectImportRows: window.PropertyDeskImportUtils.selectImportRows,
-      parseCSV: window.PropertyDeskImportUtils.parseCSV,
-      validateAccountRows:
-        window.PropertyDeskImportWorkflows.validateAccountRows,
-      validatePaymentRows:
-        window.PropertyDeskImportWorkflows.validatePaymentRows,
-      validateExpenseRows:
-        window.PropertyDeskImportWorkflows.validateExpenseRows,
       esc,
       openModal,
       closeModal,

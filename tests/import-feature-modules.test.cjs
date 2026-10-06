@@ -244,6 +244,10 @@ test("CSV import workflow stages preview before attaching review and file handle
     validatePaymentRows() {},
     validateExpenseRows() {},
   };
+  const importUtils = {
+    parseCSV() {},
+    selectImportRows() {},
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskImportPreview: {
@@ -270,6 +274,7 @@ test("CSV import workflow stages preview before attaching review and file handle
           return { attachEvents: () => sequence.push("attach import feature") };
         },
       },
+      PropertyDeskImportUtils: importUtils,
       PropertyDeskImportWorkflows: validators,
     },
   });
@@ -294,6 +299,7 @@ test("CSV import workflow stages preview before attaching review and file handle
     "attach import feature",
   ]);
   assert.equal(typeof passed.importFeature.stageImport, "function");
+  assert.equal(passed.importFeature.parseCSV, importUtils.parseCSV);
   assert.equal(
     passed.importFeature.validateAccountRows,
     validators.validateAccountRows,
@@ -305,6 +311,10 @@ test("CSV import workflow stages preview before attaching review and file handle
   assert.equal(
     passed.importFeature.validateExpenseRows,
     validators.validateExpenseRows,
+  );
+  assert.equal(
+    passed.previewEvents.selectImportRows,
+    importUtils.selectImportRows,
   );
   assert.equal(
     passed.previewEvents.renderImportPreview instanceof Function,
