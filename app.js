@@ -35,11 +35,11 @@
     paymentFrequencyLabel,
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
-  const { backend, state, toast, fetchAll } =
-    window.PropertyDeskAppServices.create({
-      $,
-      render,
-    });
+  const { toast } = window.PropertyDeskNotifications.create({ $ });
+  const { backend, state, fetchAll } = window.PropertyDeskAppServices.create({
+    render,
+    toast,
+  });
   const {
     accountBalance,
     scheduledMonthlyRunRate,

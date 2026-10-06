@@ -162,12 +162,6 @@ test("app services compose shared state and workspace refresh", () => {
         },
       },
       PropertyDeskAppState: { create: () => state },
-      PropertyDeskNotifications: {
-        create: (options) => {
-          received.notifications = options;
-          return { toast };
-        },
-      },
       PropertyDeskWorkspaceRefresh: {
         create: (options) => {
           received.refresh = options;
@@ -184,8 +178,8 @@ test("app services compose shared state and workspace refresh", () => {
     context,
   );
   const dependencies = {
-    $() {},
     render() {},
+    toast,
     config,
     supabase,
   };
@@ -193,17 +187,15 @@ test("app services compose shared state and workspace refresh", () => {
 
   assert.equal(received.backend.config, config);
   assert.equal(received.backend.supabase, supabase);
-  assert.equal(received.notifications.$, dependencies.$);
   assert.equal(received.refresh.state, state);
   assert.equal(received.refresh.toast, toast);
   assert.equal(received.refresh.render, dependencies.render);
   assert.equal(services.backend.configured, true);
   assert.equal(services.state, state);
-  assert.equal(services.toast, toast);
   assert.equal(services.fetchAll, fetchAll);
   assert.deepEqual(
     Object.keys(services).sort(),
-    ["backend", "fetchAll", "state", "toast"].sort(),
+    ["backend", "fetchAll", "state"].sort(),
   );
 });
 

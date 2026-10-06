@@ -7,6 +7,11 @@ const vm = require("node:vm");
 test("app root delegates ledger and record-entry composition to one workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
+  assert.ok(
+    app.indexOf("PropertyDeskNotifications.create(") <
+      app.indexOf("PropertyDeskAppServices.create("),
+  );
+  assert.match(app, /PropertyDeskAppServices\.create\(\{[\s\S]*?toast,/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportExport\.create\(/);
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
@@ -185,6 +190,6 @@ test("app coordinator delegates shared setup to the app services workflow", () =
   assert.match(app, /PropertyDeskLedgerContext\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh)\.create/,
+    /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
   );
 });
