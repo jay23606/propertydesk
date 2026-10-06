@@ -324,21 +324,15 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/transaction-views.js") <
       html.indexOf("features/ledger-workflow.js"),
   );
-  assert.ok(
-    html.indexOf("features/report-views.js") <
-      html.indexOf("features/report-workflow.js"),
-  );
+  assert.ok(html.indexOf("features/report-views.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/report-model.js") <
       html.indexOf("features/report-views.js"),
   );
-  assert.ok(
-    html.indexOf("features/report-export.js") <
-      html.indexOf("features/report-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/report-workflow.js") < html.indexOf("app.js"),
-  );
+  assert.ok(html.indexOf("features/report-model.js") < html.indexOf("app.js"));
+  assert.ok(html.indexOf("features/report-export.js") < html.indexOf("app.js"));
+  assert.doesNotMatch(html, /features\/report-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/report-workflow\.js/);
   for (const utility of [
     "date-utils.js",
     "display-utils.js",
@@ -837,7 +831,8 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/report-views\.js'/);
   assert.match(worker, /'\.\/features\/report-model\.js'/);
   assert.match(worker, /'\.\/features\/report-export\.js'/);
-  assert.match(worker, /'\.\/features\/report-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/report-model\.js'/);
+  assert.match(worker, /'\.\/features\/report-views\.js'/);
   assert.doesNotMatch(html, /features\/reports-workflow\.js/);
   assert.doesNotMatch(worker, /features\/reports-workflow\.js/);
   assert.match(worker, /'\.\/features\/date-utils\.js'/);
