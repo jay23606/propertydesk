@@ -88,6 +88,13 @@ test("reminder activity view summarizes delivery results and escapes log data", 
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "reminder-activity-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "reminder-activity-view.js"),
       "utf8",
     ),
@@ -98,26 +105,30 @@ test("reminder activity view summarizes delivery results and escapes log data", 
     if (!elements.has(id)) elements.set(id, { innerHTML: "" });
     return elements.get(id);
   };
+  const state = {
+    accounts: [
+      { id: "account-1", property_id: "property-1", party_name: "<Buyer>" },
+    ],
+    properties: [{ id: "property-1", address: "<10 Main St>" }],
+    reminderLogs: [
+      {
+        account_id: "account-1",
+        reminder_month: "2026-10-01",
+        recipient_index: 1,
+        recipient_email: "buyer@example.test",
+        status: "failed",
+        reason: "mailersend_http_403",
+        unpaid_due: 550,
+        attempted_at: "2026-10-31T12:00:00Z",
+      },
+    ],
+  };
+  const model = context.window.PropertyDeskReminderActivityModel.create({
+    state,
+  });
   const feature = context.window.PropertyDeskReminderActivityView.create({
     $,
-    state: {
-      accounts: [
-        { id: "account-1", property_id: "property-1", party_name: "<Buyer>" },
-      ],
-      properties: [{ id: "property-1", address: "<10 Main St>" }],
-      reminderLogs: [
-        {
-          account_id: "account-1",
-          reminder_month: "2026-10-01",
-          recipient_index: 1,
-          recipient_email: "buyer@example.test",
-          status: "failed",
-          reason: "mailersend_http_403",
-          unpaid_due: 550,
-          attempted_at: "2026-10-31T12:00:00Z",
-        },
-      ],
-    },
+    model,
     esc: (value) =>
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     fmtDate: () => "Oct 2026",

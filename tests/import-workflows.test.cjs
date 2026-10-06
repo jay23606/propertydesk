@@ -676,6 +676,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/app-shell-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/reminder-activity-model.js") <
+      html.indexOf("features/reminder-activity-view.js"),
+  );
+  assert.ok(
     html.indexOf("features/reminder-activity-view.js") <
       html.indexOf("features/app-shell-workflow.js"),
   );
@@ -780,6 +784,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(worker, /'\.\/features\/reminder-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/reminder-activity-model\.js'/);
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(app, /attachCsvImportEvents,/);
 });

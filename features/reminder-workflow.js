@@ -20,13 +20,15 @@
       propertyAddress,
       openModal,
     } = context;
+    const reminderActivityModel =
+      window.PropertyDeskReminderActivityModel.create({ state });
     const { renderReminderActivity } =
       window.PropertyDeskReminderActivityView.create({
         $,
-        state,
         esc,
         fmtDate,
         money,
+        model: reminderActivityModel,
       });
     const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
       $,

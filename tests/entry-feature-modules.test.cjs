@@ -165,8 +165,17 @@ test("reminder workflow composes the activity view and email preview", () => {
   const reminderActivity = () => "activity";
   const context = vm.createContext({
     window: {
+      PropertyDeskReminderActivityModel: {
+        create: (options) => {
+          passed.activityModel = options;
+          return { buildRows: () => [] };
+        },
+      },
       PropertyDeskReminderActivityView: {
-        create: () => ({ renderReminderActivity: reminderActivity }),
+        create: (options) => {
+          passed.activityView = options;
+          return { renderReminderActivity: reminderActivity };
+        },
       },
       PropertyDeskReminderPreview: {
         create: (options) => {
@@ -184,11 +193,21 @@ test("reminder workflow composes the activity view and email preview", () => {
     context,
   );
   const openModal = () => {};
+  const state = { accounts: [], properties: [], reminderLogs: [] };
   const workflow = context.window.PropertyDeskReminderWorkflow.create({
     openModal,
+    state,
   });
 
   assert.equal(passed.preview.openModal, openModal);
+  assert.equal(passed.activityModel.state, state);
+  assert.deepEqual(Object.keys(passed.activityView).sort(), [
+    "$",
+    "esc",
+    "fmtDate",
+    "model",
+    "money",
+  ]);
   assert.equal(workflow.renderReminderActivity, reminderActivity);
   assert.equal(workflow.previewReminderEmail(), "preview");
 });
