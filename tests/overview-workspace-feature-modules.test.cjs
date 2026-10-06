@@ -154,6 +154,7 @@ test("overview workflow composes dashboard rendering with property actions", () 
     scheduledMonthlyRunRate: () => 0,
     monthStart: () => "2026-10-01",
     isPosted: () => true,
+    postedOnOrAfter: () => [],
   };
   const viewContext = {
     $: () => {},
@@ -241,6 +242,7 @@ test("overview workflow composes dashboard rendering with property actions", () 
       "scheduledMonthlyRunRate",
       "monthStart",
       "isPosted",
+      "postedOnOrAfter",
     ].sort(),
   );
   assert.equal(received.model.propertySummaryModel, propertySummaryModel);

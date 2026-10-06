@@ -19,6 +19,7 @@
       scheduledMonthlyRunRate,
       monthStart,
       isPosted,
+      postedOnOrAfter,
       prettyType,
       fmtDate,
       openPropertyDetails,
@@ -40,6 +41,7 @@
       scheduledMonthlyRunRate,
       monthStart,
       isPosted,
+      postedOnOrAfter,
     });
     const { renderOverview } = window.PropertyDeskOverview.create({
       $,

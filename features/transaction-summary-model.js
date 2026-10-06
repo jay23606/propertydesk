@@ -4,22 +4,22 @@
 
   function createTransactionSummaryModel({
     state,
-    isPosted,
+    postedOnOrAfter,
     monthStart,
     sumIncome,
     sumOperatingExpenses,
   }) {
     function currentMonthTotals() {
       const currentMonthStart = monthStart();
-      const monthPayments = state.payments.filter(
-        (payment) =>
-          isPosted(payment) &&
-          String(payment.received_date) >= currentMonthStart,
+      const monthPayments = postedOnOrAfter(
+        state.payments,
+        "received_date",
+        currentMonthStart,
       );
-      const monthExpenses = state.expenses.filter(
-        (expense) =>
-          String(expense.expense_date) >= currentMonthStart &&
-          isPosted(expense),
+      const monthExpenses = postedOnOrAfter(
+        state.expenses,
+        "expense_date",
+        currentMonthStart,
       );
       const collected = sumIncome(monthPayments);
       const expenses = sumOperatingExpenses(monthExpenses);

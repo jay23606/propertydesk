@@ -9,6 +9,7 @@
     scheduledMonthlyRunRate,
     monthStart,
     isPosted,
+    postedOnOrAfter,
   }) {
     function buildOverview() {
       const currentMonthStart = monthStart();
@@ -21,10 +22,10 @@
       const accountById = new Map(
         state.accounts.map((account) => [account.id, account]),
       );
-      const postedThisMonth = state.payments.filter(
-        (payment) =>
-          isPosted(payment) &&
-          String(payment.received_date) >= currentMonthStart,
+      const postedThisMonth = postedOnOrAfter(
+        state.payments,
+        "received_date",
+        currentMonthStart,
       );
       const upcoming = state.accounts
         .filter(

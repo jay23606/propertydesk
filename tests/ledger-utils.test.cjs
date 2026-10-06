@@ -19,6 +19,7 @@ const {
   isPosted,
   monthlyScheduledEstimate,
   paymentStatusInMonth,
+  postedOnOrAfter,
   postedPaymentTotalInMonth,
   principalBalance,
   scheduledLoanBalance,
@@ -61,6 +62,7 @@ test("due schedule and loan amortization utilities load before the stable ledger
       "isPosted",
       "monthlyScheduledEstimate",
       "paymentStatusInMonth",
+      "postedOnOrAfter",
       "postedPaymentTotalInMonth",
       "principalBalance",
       "scheduledLoanBalance",
@@ -70,6 +72,20 @@ test("due schedule and loan amortization utilities load before the stable ledger
       "sumPosted",
       "unpaidDueAccrualStart",
     ].sort(),
+  );
+});
+
+test("postedOnOrAfter shares date filtering and excludes voided rows", () => {
+  const rows = [
+    { id: "prior", received_date: "2026-09-30", status: "posted" },
+    { id: "current", received_date: "2026-10-01", status: "posted" },
+    { id: "later", received_date: "2026-10-06" },
+    { id: "voided", received_date: "2026-10-07", status: "voided" },
+  ];
+
+  assert.deepEqual(
+    postedOnOrAfter(rows, "received_date", "2026-10-01").map(({ id }) => id),
+    ["current", "later"],
   );
 });
 

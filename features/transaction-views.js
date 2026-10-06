@@ -11,7 +11,7 @@
       esc,
       expenseCategoryLabel,
       money,
-      isPosted,
+      postedOnOrAfter,
       monthStart,
       sumIncome,
       sumOperatingExpenses,
@@ -25,7 +25,7 @@
     const { currentMonthTotals } =
       window.PropertyDeskTransactionSummaryModel.create({
         state,
-        isPosted,
+        postedOnOrAfter,
         monthStart,
         sumIncome,
         sumOperatingExpenses,

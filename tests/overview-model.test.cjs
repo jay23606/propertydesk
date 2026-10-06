@@ -113,6 +113,10 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
     scheduledMonthlyRunRate: () => 1300,
     monthStart: () => "2026-10-01",
     isPosted: (payment) => payment.status !== "voided",
+    postedOnOrAfter: (rows, field, start) =>
+      rows.filter(
+        (row) => row.status !== "voided" && String(row[field]) >= start,
+      ),
   });
 
   const summary = model.buildOverview();

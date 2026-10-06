@@ -333,6 +333,12 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
       return account.id === "a1" ? 500 : 300;
     },
     monthlyScheduledEstimate: (rows) => rows.length * 600,
+    postedOnOrAfter: (rows, field, start) =>
+      rows.filter(
+        (row) =>
+          (!row.status || row.status === "posted") &&
+          String(row[field]) >= start,
+      ),
     sumPosted: (rows) => rows.reduce((sum, row) => sum + row.amount, 0),
     securityDepositBalance: (entries) => ({
       active: entries,

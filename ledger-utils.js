@@ -6,6 +6,13 @@
     return !transaction?.status || transaction.status === "posted";
   }
 
+  function postedOnOrAfter(transactions, dateField, startDate) {
+    return transactions.filter(
+      (transaction) =>
+        isPosted(transaction) && String(transaction[dateField]) >= startDate,
+    );
+  }
+
   function hasPostedPaymentInMonth(payments, accountId, month) {
     const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return false;
@@ -106,6 +113,7 @@
     isPosted,
     monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
     paymentStatusInMonth,
+    postedOnOrAfter,
     postedPaymentTotalInMonth,
     principalBalance: loans.principalBalance,
     scheduledLoanBalance: loans.scheduledLoanBalance,

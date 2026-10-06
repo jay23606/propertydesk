@@ -131,7 +131,10 @@ test("transaction view renders filtered rows and independent month totals", () =
     esc: String,
     expenseCategoryLabel: (value) => value,
     money: (value) => `$${Number(value).toFixed(2)}`,
-    isPosted: (row) => row.status === "posted",
+    postedOnOrAfter: (rows, field, start) =>
+      rows.filter(
+        (row) => row.status === "posted" && String(row[field]) >= start,
+      ),
     monthStart: () => "2026-10-01",
     sumIncome: (rows) => rows.reduce((sum, row) => sum + Number(row.amount), 0),
     sumOperatingExpenses: (rows) =>

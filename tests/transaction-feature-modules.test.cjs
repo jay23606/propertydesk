@@ -106,7 +106,10 @@ test("transaction list model filters rows and resolves their display association
   });
   const summary = context.window.PropertyDeskTransactionSummaryModel.create({
     state,
-    isPosted: (record) => record.status === "posted",
+    postedOnOrAfter: (rows, field, start) =>
+      rows.filter(
+        (row) => row.status === "posted" && String(row[field]) >= start,
+      ),
     monthStart: () => "2026-10-01",
     sumIncome: (rows) =>
       rows.reduce((total, row) => total + Number(row.amount || 0), 0),

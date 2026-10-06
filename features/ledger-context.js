@@ -7,6 +7,7 @@
     todayIso,
     scheduledLoanBalance,
     monthlyScheduledEstimate,
+    postedOnOrAfter,
     sumPosted,
     securityDepositBalance,
   }) {
@@ -19,9 +20,7 @@
     }
 
     function collectedSince(date) {
-      const payments = state.payments.filter(
-        (payment) => String(payment.received_date) >= date,
-      );
+      const payments = postedOnOrAfter(state.payments, "received_date", date);
       return sumPosted(payments);
     }
 
