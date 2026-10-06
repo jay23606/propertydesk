@@ -119,7 +119,14 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
 
 test("app composes transaction history and maintenance without a broad wrapper", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  const ledgerWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "ledger-workflow.js"),
+    "utf8",
+  );
+  assert.match(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /renderPayments,/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(
     app,

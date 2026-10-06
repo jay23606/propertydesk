@@ -14,7 +14,7 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.match(app, /PropertyDeskAppServices\.create\(\{[\s\S]*?toast,/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportModel\.create\(/);
@@ -60,7 +60,7 @@ test("app root wires record entry forms and create actions directly", () => {
     [...creationOrder].sort((left, right) => left - right),
   );
   assert.match(ledgerWorkflow, /saveCorrection/);
-  assert.doesNotMatch(ledgerWorkflow, /PropertyDeskTransactionViews/);
+  assert.match(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 
@@ -102,7 +102,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
@@ -232,7 +232,7 @@ test("app coordinator delegates shared setup to the app services workflow", () =
     app,
     /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
   );
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);

@@ -20,7 +20,6 @@ test("app root composes financial screens and maintenance boundaries directly", 
   const creationOrder = [
     "PropertyDeskLedgerWorkflow.create(",
     "PropertyDeskCreateActions.create(",
-    "PropertyDeskTransactionViews.create(",
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
     "PropertyDeskDepositDetails.create(",
     "PropertyDeskDepositMaintenanceWorkflow.create(",
@@ -38,6 +37,7 @@ test("app root composes financial screens and maintenance boundaries directly", 
     app,
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*\$,\s*state,[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,/,
   );
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(
     app,
     /PropertyDeskAccountDetailActionsWorkflow\.create\(\{[\s\S]*?editAccount,[\s\S]*?openPayment,/,

@@ -146,6 +146,15 @@
     prettyType,
     openModal,
     previewReminderEmail,
+    dateOnly,
+    fmtDate,
+    esc,
+    expenseCategoryLabel,
+    money,
+    postedOnOrAfter,
+    monthStart,
+    sumIncome,
+    sumOperatingExpenses,
   });
   const {
     editAccount,
@@ -156,6 +165,8 @@
     attachPropertyFormEvents,
     attachAccountFormEvents,
     attachLedgerEntryFormEvents,
+    renderPayments,
+    attachTransactionViewEvents,
     resetPropertyForm,
     resetAccountForm,
   } = recordEntry;
@@ -172,20 +183,6 @@
       openExpense,
       navigate,
       documentRef: document,
-    });
-  const { renderPayments, attachEvents: attachTransactionViewEvents } =
-    window.PropertyDeskTransactionViews.create({
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-      postedOnOrAfter,
     });
   const { attachTransactionActionEvents } =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({

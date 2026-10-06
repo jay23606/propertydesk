@@ -12,6 +12,17 @@ test("ledger workflow injects audited corrections into entry forms", () => {
     openPayment: () => "payment form",
     openExpense: () => "expense form",
     updatePaymentGuidance: () => "preview updated",
+    resetPropertyForm() {},
+    resetAccountForm() {},
+    editAccount() {},
+    openPropertyPayment() {},
+    attachPropertyFormEvents() {},
+    attachAccountFormEvents() {},
+    attachLedgerEntryFormEvents() {},
+  };
+  const transactionViews = {
+    renderPayments() {},
+    attachEvents() {},
   };
   const context = vm.createContext({
     window: {
@@ -27,6 +38,13 @@ test("ledger workflow injects audited corrections into entry forms", () => {
           calls.push("entries");
           passed.entries = options;
           return entries;
+        },
+      },
+      PropertyDeskTransactionViews: {
+        create: (options) => {
+          calls.push("transaction views");
+          passed.transactionViews = options;
+          return transactionViews;
         },
       },
     },
@@ -47,11 +65,20 @@ test("ledger workflow injects audited corrections into entry forms", () => {
     closeModal() {},
     previewReminderEmail() {},
     moneyInput() {},
+    dateOnly() {},
+    fmtDate() {},
+    esc() {},
+    expenseCategoryLabel() {},
+    money() {},
+    postedOnOrAfter() {},
+    monthStart() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
   };
   const workflow =
     context.window.PropertyDeskLedgerWorkflow.create(dependencies);
 
-  assert.deepEqual(calls, ["corrections", "entries"]);
+  assert.deepEqual(calls, ["corrections", "entries", "transaction views"]);
   assert.equal(passed.corrections.state, dependencies.state);
   assert.equal(passed.corrections.closeModal, dependencies.closeModal);
   assert.equal(passed.entries.state, dependencies.state);
@@ -60,6 +87,28 @@ test("ledger workflow injects audited corrections into entry forms", () => {
     passed.entries.previewReminderEmail,
     dependencies.previewReminderEmail,
   );
-  assert.deepEqual(Object.keys(workflow).sort(), Object.keys(entries).sort());
-  assert.equal(workflow, entries);
+  assert.equal(passed.transactionViews.state, dependencies.state);
+  assert.equal(passed.transactionViews.dateOnly, dependencies.dateOnly);
+  assert.deepEqual(
+    Object.keys(workflow).sort(),
+    [
+      "resetPropertyForm",
+      "resetAccountForm",
+      "editAccount",
+      "updatePaymentGuidance",
+      "openPayment",
+      "openPropertyPayment",
+      "openExpense",
+      "attachPropertyFormEvents",
+      "attachAccountFormEvents",
+      "attachLedgerEntryFormEvents",
+      "renderPayments",
+      "attachTransactionViewEvents",
+    ].sort(),
+  );
+  assert.equal(workflow.renderPayments, transactionViews.renderPayments);
+  assert.equal(
+    workflow.attachTransactionViewEvents,
+    transactionViews.attachEvents,
+  );
 });

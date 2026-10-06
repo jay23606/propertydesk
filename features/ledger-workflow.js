@@ -16,6 +16,15 @@
       prettyType,
       openModal,
       previewReminderEmail,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
     } = context;
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
       {
@@ -41,7 +50,34 @@
       previewReminderEmail,
       saveCorrection,
     });
-    return entries;
+    const transactionViews = window.PropertyDeskTransactionViews.create({
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    });
+
+    return {
+      resetPropertyForm: entries.resetPropertyForm,
+      resetAccountForm: entries.resetAccountForm,
+      editAccount: entries.editAccount,
+      updatePaymentGuidance: entries.updatePaymentGuidance,
+      openPayment: entries.openPayment,
+      openPropertyPayment: entries.openPropertyPayment,
+      openExpense: entries.openExpense,
+      attachPropertyFormEvents: entries.attachPropertyFormEvents,
+      attachAccountFormEvents: entries.attachAccountFormEvents,
+      attachLedgerEntryFormEvents: entries.attachLedgerEntryFormEvents,
+      renderPayments: transactionViews.renderPayments,
+      attachTransactionViewEvents: transactionViews.attachEvents,
+    };
   }
 
   window.PropertyDeskLedgerWorkflow = Object.freeze({ create });
