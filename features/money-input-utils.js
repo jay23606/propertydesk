@@ -11,5 +11,9 @@
     return Math.round((amount + Number.EPSILON) * 100) / 100;
   };
 
-  window.PropertyDeskMoneyInputUtils = Object.freeze({ moneyInput });
+  const utils = Object.freeze({ moneyInput });
+  globalThis.PropertyDeskMoneyInputUtils = utils;
+  if (typeof window !== "undefined")
+    window.PropertyDeskMoneyInputUtils = Object.freeze({ moneyInput });
+  if (typeof module !== "undefined" && module.exports) module.exports = utils;
 })();

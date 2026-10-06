@@ -4,16 +4,9 @@
 
   const csvParser = globalThis.PropertyDeskCsvParser;
   if (!csvParser) throw new Error("The PropertyDesk CSV parser is not loaded.");
-
-  function moneyInput(value) {
-    const raw = String(value ?? "").trim();
-    const negative = /^\(.*\)$/.test(raw);
-    const normalized = raw.replace(/[,$\s()]/g, "");
-    const amount = Number(normalized) * (negative ? -1 : 1);
-    return Number.isFinite(amount)
-      ? Math.round((amount + Number.EPSILON) * 100) / 100
-      : 0;
-  }
+  const moneyInput = globalThis.PropertyDeskMoneyInputUtils?.moneyInput;
+  if (!moneyInput)
+    throw new Error("The PropertyDesk money input helper is not loaded.");
 
   function csvMoney(value, label, { optional = false, minimum = 0 } = {}) {
     const raw = String(value ?? "").trim();

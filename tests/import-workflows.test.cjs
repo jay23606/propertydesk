@@ -28,6 +28,10 @@ test("every feature module loads before app.js and every local script is precach
     localScripts.length - 1,
     "app.js is the last local deferred script",
   );
+  assert.ok(
+    localScripts.indexOf("features/money-input-utils.js") <
+      localScripts.indexOf("import-utils.js"),
+  );
   const featureModules = fs
     .readdirSync(path.join(__dirname, "..", "features"))
     .filter((filename) => filename.endsWith(".js"))

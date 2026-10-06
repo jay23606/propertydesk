@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const { parseCSV } = require("../csv-parser.js");
+require("../features/money-input-utils.js");
 const { selectImportRows } = require("../import-utils.js");
 require("../account-import-validation.js");
 require("../expense-import-validation.js");
