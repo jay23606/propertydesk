@@ -189,8 +189,7 @@ test("app root composes independent property screens and shares detail actions",
 test("app wires reminder activity and email preview separately", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const createOrder = [
-    "PropertyDeskReminderActivityModel.create(",
-    "PropertyDeskReminderActivityView.create(",
+    "PropertyDeskReminderActivityWorkflow.create(",
     "PropertyDeskReminderPreview.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(createOrder.every((position) => position >= 0));
@@ -198,9 +197,9 @@ test("app wires reminder activity and email preview separately", () => {
     createOrder,
     [...createOrder].sort((left, right) => left - right),
   );
-  assert.match(
+  assert.doesNotMatch(
     app,
-    /PropertyDeskReminderActivityView.create\(\{[\s\S]*?model: reminderActivityModel/,
+    /PropertyDeskReminderActivity(Model|View)\.create\(/,
   );
   assert.match(
     app,

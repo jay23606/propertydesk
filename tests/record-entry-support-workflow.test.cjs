@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app wires modal, form options, and reminder features directly", () => {
+test("app composes reminder activity separately from modal and form options", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -12,8 +12,7 @@ test("app wires modal, form options, and reminder features directly", () => {
   const createOrder = [
     "PropertyDeskModalController.create(",
     "PropertyDeskFormOptions.create(",
-    "PropertyDeskReminderActivityModel.create(",
-    "PropertyDeskReminderActivityView.create(",
+    "PropertyDeskReminderActivityWorkflow.create(",
     "PropertyDeskReminderPreview.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(createOrder.every((position) => position >= 0));
@@ -31,6 +30,10 @@ test("app wires modal, form options, and reminder features directly", () => {
     /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(app, /previewReminderEmail,/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskReminderActivity(Model|View)\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskRecordEntrySupportWorkflow/);
 
   for (const feature of [
@@ -38,6 +41,7 @@ test("app wires modal, form options, and reminder features directly", () => {
     "features/form-options.js",
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",
+    "features/reminder-activity-workflow.js",
     "features/reminder-preview.js",
   ]) {
     assert.ok(

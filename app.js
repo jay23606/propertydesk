@@ -82,16 +82,13 @@
       propertyAddress,
       prettyType,
     });
-  const reminderActivityModel = window.PropertyDeskReminderActivityModel.create(
-    { state },
-  );
   const { renderReminderActivity } =
-    window.PropertyDeskReminderActivityView.create({
+    window.PropertyDeskReminderActivityWorkflow.create({
       $,
+      state,
       esc,
       fmtDate,
       money,
-      model: reminderActivityModel,
     });
   const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
     $,

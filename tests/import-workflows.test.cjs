@@ -845,6 +845,12 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/reminder-activity-view.js") < html.indexOf("app.js"),
   );
+  assert.ok(
+    html.indexOf("features/reminder-activity-view.js") <
+      html.indexOf("features/reminder-activity-workflow.js") &&
+      html.indexOf("features/reminder-activity-workflow.js") <
+        html.indexOf("app.js"),
+  );
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/import-preview\.js'/);
@@ -955,6 +961,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/reminder-preview\.js'/);
   assert.match(worker, /'\.\/features\/reminder-activity-model\.js'/);
   assert.match(worker, /'\.\/features\/reminder-activity-view\.js'/);
+  assert.match(worker, /'\.\/features\/reminder-activity-workflow\.js'/);
   assert.doesNotMatch(worker, /features\/reminder-workflow\.js/);
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(
