@@ -84,6 +84,11 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/import-preview.js"),
   );
   assert.ok(
+    html.indexOf("features/import-correction-view.js") <
+      html.indexOf("features/import-preview-rendering.js"),
+  );
+  assert.match(worker, /'\.\/features\/import-correction-view\.js'/);
+  assert.ok(
     html.indexOf("features/import-preview.js") <
       html.indexOf("features/import-preview-events.js"),
   );

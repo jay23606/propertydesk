@@ -4,12 +4,15 @@
 
   function createImportPreview(context) {
     const { $, state, selectImportRows, esc, openModal } = context;
+    const { renderImportCorrections } =
+      window.PropertyDeskImportCorrectionView.create({ $, state, esc });
     const { renderImportPreview, updateImportCommitButton } =
       window.PropertyDeskImportPreviewRendering.create({
         $,
         state,
         selectImportRows,
         esc,
+        renderImportCorrections,
       });
 
     function stageImport(title, rows, commit, note = "", report = {}) {

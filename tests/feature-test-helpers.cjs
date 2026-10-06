@@ -85,6 +85,7 @@ function loadImportFeatures(context) {
 
 function loadImportPreview(context) {
   for (const filename of [
+    "import-correction-view.js",
     "import-preview-rendering.js",
     "import-preview.js",
     "import-preview-events.js",

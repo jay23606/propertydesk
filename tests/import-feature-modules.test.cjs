@@ -54,6 +54,9 @@ test("CSV preview renderer receives only rendering dependencies", () => {
   const passed = {};
   const context = vm.createContext({
     window: {
+      PropertyDeskImportCorrectionView: {
+        create: () => ({ renderImportCorrections() {} }),
+      },
       PropertyDeskImportPreviewRendering: {
         create: (options) => {
           passed.renderer = options;
@@ -83,10 +86,52 @@ test("CSV preview renderer receives only rendering dependencies", () => {
 
   assert.deepEqual(
     Object.keys(passed.renderer).sort(),
-    ["$", "esc", "selectImportRows", "state"].sort(),
+    ["$", "esc", "renderImportCorrections", "selectImportRows", "state"].sort(),
   );
   assert.equal(passed.renderer.selectImportRows, dependencies.selectImportRows);
   assert.equal(typeof preview.stageImport, "function");
+});
+
+test("CSV correction view escapes raw values and validation messages", () => {
+  const context = vm.createContext({ window: {} });
+  loadImportPreview(context);
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        innerHTML: "",
+        classList: { toggle() {} },
+      });
+    }
+    return elements.get(id);
+  };
+  const state = {
+    pendingImport: {
+      correctionKeys: ["party_name"],
+      rawRows: [{ _source_row: 2, party_name: "<Oak House>" }],
+      errors: [{ row: 2, message: "<Party is required>" }],
+    },
+  };
+  const corrections = context.window.PropertyDeskImportCorrectionView.create({
+    $,
+    state,
+    esc: (value) =>
+      String(value ?? "")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;"),
+  });
+
+  corrections.renderImportCorrections();
+
+  assert.match($("import-correction-head").innerHTML, /party name/);
+  assert.match(
+    $("import-correction-body").innerHTML,
+    /value="&lt;Oak House&gt;"/,
+  );
+  assert.match(
+    $("import-correction-body").innerHTML,
+    /&lt;Party is required&gt;/,
+  );
 });
 
 test("import workflow keeps file import handlers inside its event bindings", () => {
