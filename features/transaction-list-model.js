@@ -28,10 +28,32 @@
       };
     }
 
+    function displayFields(row) {
+      const { account, item } = row;
+      if (row.kind === "expense") {
+        return {
+          transactionType: "Expense",
+          detailsType: expenseCategoryLabel(item.category),
+          paymentMethod: item.payee || item.payment_method,
+          correctionOf: item.correction_of_expense_id,
+        };
+      }
+
+      return {
+        transactionType:
+          item.income_category === "deposit" ? "Security deposit" : "Income",
+        detailsType:
+          account?.account_type === "rental"
+            ? item.income_category
+            : "Installment receipt",
+        paymentMethod: item.payment_method.replace("_", " "),
+        correctionOf: item.correction_of_payment_id,
+      };
+    }
+
     function toDisplayRow(row) {
       const { account, property } = row;
       const item = row.item;
-      const isExpense = row.kind === "expense";
       return {
         kind: row.kind,
         date: row.date,
@@ -39,22 +61,7 @@
         item,
         propertyName: property?.name || "—",
         partyName: account?.party_name || account?.name || "Property",
-        transactionType: isExpense
-          ? "Expense"
-          : item.income_category === "deposit"
-            ? "Security deposit"
-            : "Income",
-        detailsType: isExpense
-          ? expenseCategoryLabel(item.category)
-          : account?.account_type === "rental"
-            ? item.income_category
-            : "Installment receipt",
-        paymentMethod: isExpense
-          ? item.payee || item.payment_method
-          : item.payment_method.replace("_", " "),
-        correctionOf: isExpense
-          ? item.correction_of_expense_id
-          : item.correction_of_payment_id,
+        ...displayFields(row),
       };
     }
 

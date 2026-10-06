@@ -64,6 +64,16 @@ test("transaction list model filters rows and resolves their display association
         memo: "Old receipt",
       },
       {
+        id: "payment-4",
+        account_id: "rental",
+        amount: 40,
+        received_date: "2026-10-01",
+        income_category: "deposit",
+        payment_method: "cash",
+        status: "posted",
+        memo: "Security deposit",
+      },
+      {
         id: "payment-3",
         account_id: "note",
         amount: 300,
@@ -124,10 +134,12 @@ test("transaction list model filters rows and resolves their display association
     now: new Date("2026-10-05T12:00:00"),
   });
 
-  assert.equal(rows.length, 4);
+  assert.equal(rows.length, 5);
   assert.equal(rows[0].item.id, "payment-1");
   assert.equal(rows[0].propertyName, "Oak House");
   assert.equal(rows[0].partyName, "Tenant A");
+  assert.equal(rows[0].transactionType, "Income");
+  assert.equal(rows[0].detailsType, "rent");
   assert.equal(rows[0].paymentMethod, "bank transfer");
   assert.equal(Object.hasOwn(rows[0], "searchText"), false);
   assert.equal(Object.hasOwn(rows[0], "account"), false);
@@ -136,11 +148,15 @@ test("transaction list model filters rows and resolves their display association
   assert.equal(rows[1].correctionOf, "expense-original");
   assert.equal(rows[2].item.id, "expense-1");
   assert.equal(rows[3].item.id, "payment-2");
+  assert.equal(rows[4].item.id, "payment-4");
+  assert.equal(rows[4].transactionType, "Security deposit");
+  assert.equal(rows[4].detailsType, "deposit");
+  assert.equal(rows[4].paymentMethod, "cash");
 
   const totals = summary.currentMonthTotals();
-  assert.equal(totals.collected, 500);
+  assert.equal(totals.collected, 540);
   assert.equal(totals.expenses, 200);
-  assert.equal(totals.netCashFlow, 300);
+  assert.equal(totals.netCashFlow, 340);
 
   const searchResult = model.buildTransactionList({
     period: "all",
