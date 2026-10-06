@@ -16,26 +16,21 @@
         toast("This correction is no longer available.");
         return false;
       }
-      let error;
-      try {
-        ({ error } = await repository.correct(state.client, {
-          kind,
-          transactionId: pending.id,
-          correction,
-          reason: pending.reason,
-        }));
-      } catch {
-        toast(
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () =>
+          repository.correct(state.client, {
+            kind,
+            transactionId: pending.id,
+            correction,
+            reason: pending.reason,
+          }),
+        toast,
+        failureMessage:
           "Correction failed; original entry is unchanged. Check your connection and try again.",
-        );
-        return false;
-      }
-      if (error) {
-        toast(
+        errorMessage: (error) =>
           `Correction failed; original entry is unchanged. ${error.message}`,
-        );
-        return false;
-      }
+      });
+      if (!saved) return false;
       closeModal($(kind === "payment" ? "payment-modal" : "expense-modal"));
       try {
         await fetchAll();

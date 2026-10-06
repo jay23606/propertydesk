@@ -369,6 +369,13 @@ test("transaction maintenance reports rejected void requests without refreshing"
 
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
@@ -440,6 +447,13 @@ test("transaction corrections save payment and expense changes with their audit 
 
 test("transaction correction failures preserve the open form and pending correction", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
@@ -479,6 +493,51 @@ test("transaction correction failures preserve the open form and pending correct
   assert.deepEqual(messages, [
     "Correction failed; original entry is unchanged. Check your connection and try again.",
     "This correction is no longer available.",
+  ]);
+});
+
+test("transaction correction database errors keep the correction open", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+  loadTransactionRepository(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  let closes = 0;
+  let refreshes = 0;
+  const feature = context.window.PropertyDeskTransactionCorrections.create({
+    $: () => ({}),
+    state: {
+      pendingCorrection: {
+        kind: "payment",
+        id: "payment-1",
+        reason: "Fix date",
+      },
+      client: {
+        rpc: async () => ({ error: { message: "permission denied" } }),
+      },
+    },
+    closeModal: () => closes++,
+    fetchAll: async () => refreshes++,
+    toast: (message) => messages.push(message),
+  });
+
+  assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
+  assert.equal(closes, 0);
+  assert.equal(refreshes, 0);
+  assert.deepEqual(messages, [
+    "Correction failed; original entry is unchanged. permission denied",
   ]);
 });
 
