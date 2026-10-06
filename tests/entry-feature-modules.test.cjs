@@ -167,30 +167,10 @@ test("account details delegates account and deposit actions to separate workflow
           return { attachEvents: () => {} };
         },
       },
-      PropertyDeskAccountDetailsView: {
+      PropertyDeskAccountDetailContentWorkflow: {
         create: (options) => {
-          created.push("account view");
-          passed.view = options;
-          return { renderAccountDetails: () => "account html" };
-        },
-      },
-      PropertyDeskAccountLoanScheduleView: {
-        create: (options) => {
-          created.push("schedule view");
-          passed.scheduleView = options;
-          return { accountLoanScheduleHTML: () => "schedule html" };
-        },
-      },
-      PropertyDeskAccountHistoryDetails: {
-        create: () => {
-          created.push("history");
-          return { renderAccountHistory: () => "history html" };
-        },
-      },
-      PropertyDeskAccountDetails: {
-        create: (options) => {
-          created.push("account details");
-          passed.accountDetails = options;
+          created.push("account detail content workflow");
+          passed.accountContent = options;
           return { openAccountDetails: () => "opened" };
         },
       },
@@ -224,19 +204,13 @@ test("account details delegates account and deposit actions to separate workflow
   assert.deepEqual(created, [
     "deposit details workflow",
     "account maintenance workflow",
-    "schedule view",
-    "account view",
-    "history",
-    "account details",
+    "account detail content workflow",
   ]);
-  assert.equal(passed.accountDetails.renderAccountDetails(), "account html");
-  assert.equal(passed.view.money, dependencies.money);
-  assert.equal(passed.scheduleView.money, dependencies.money);
-  assert.equal(passed.view.accountLoanScheduleHTML instanceof Function, true);
+  assert.equal(passed.accountContent.money, dependencies.money);
+  assert.equal(passed.accountContent.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
   assert.equal(passed.accountMaintenance.editAccount, dependencies.editAccount);
   assert.equal(passed.accountMaintenance.openPayment, dependencies.openPayment);
-  assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
   assert.equal(
     passed.depositWorkflow.depositLedger,
     dependencies.depositLedger,

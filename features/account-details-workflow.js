@@ -49,44 +49,25 @@
         editAccount,
         openPayment,
       });
-    const { accountLoanScheduleHTML } =
-      window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
-    const { renderAccountDetails } =
-      window.PropertyDeskAccountDetailsView.create({
+    const { openAccountDetails } =
+      window.PropertyDeskAccountDetailContentWorkflow.create({
+        $,
+        state,
         money,
         fmtDate,
         esc,
+        isPosted,
         prettyType,
         paymentFrequencyLabel,
-        accountLoanScheduleHTML,
+        accountBalance,
+        amortizationSchedule,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+        depositSectionHTML: depositWorkflow.depositSectionHTML,
+        openModal,
+        propertyAddress,
       });
-    const { renderAccountHistory } =
-      window.PropertyDeskAccountHistoryDetails.create({
-        state,
-        esc,
-        money,
-        fmtDate,
-      });
-    const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
-      $,
-      state,
-      isPosted,
-      money,
-      fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      depositSectionHTML: depositWorkflow.depositSectionHTML,
-      renderAccountHistory,
-      renderAccountDetails,
-      openModal,
-      propertyAddress,
-    });
     return {
       openAccountDetails,
       attachEvents: accountMaintenance.attachEvents,

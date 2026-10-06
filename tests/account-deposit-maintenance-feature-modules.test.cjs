@@ -148,6 +148,87 @@ test("account maintenance workflow composes account closure with detail actions"
   assert.equal(attached, 1);
 });
 
+test("account detail content workflow composes schedule, history, and selected account", () => {
+  const passed = {};
+  const accountLoanScheduleHTML = () => "schedule";
+  const renderAccountDetails = () => "details";
+  const renderAccountHistory = () => "history";
+  const openAccountDetails = () => "opened";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountLoanScheduleView: {
+        create: (options) => {
+          passed.schedule = options;
+          return { accountLoanScheduleHTML };
+        },
+      },
+      PropertyDeskAccountDetailsView: {
+        create: (options) => {
+          passed.view = options;
+          return { renderAccountDetails };
+        },
+      },
+      PropertyDeskAccountHistoryDetails: {
+        create: (options) => {
+          passed.history = options;
+          return { renderAccountHistory };
+        },
+      },
+      PropertyDeskAccountDetails: {
+        create: (options) => {
+          passed.details = options;
+          return { openAccountDetails };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "account-detail-content-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    isPosted() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    accountBalance() {},
+    amortizationSchedule() {},
+    amountDueSince() {},
+    unpaidDueAccrualStart() {},
+    todayIso() {},
+    openModal() {},
+    propertyAddress() {},
+    depositSectionHTML() {},
+  };
+  const workflow =
+    context.window.PropertyDeskAccountDetailContentWorkflow.create(
+      dependencies,
+    );
+
+  assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
+  assert.equal(passed.history.state, dependencies.state);
+  assert.equal(passed.details.renderAccountDetails, renderAccountDetails);
+  assert.equal(passed.details.renderAccountHistory, renderAccountHistory);
+  assert.equal(
+    passed.details.depositSectionHTML,
+    dependencies.depositSectionHTML,
+  );
+  assert.deepEqual(Object.keys(workflow), ["openAccountDetails"]);
+  assert.equal(workflow.openAccountDetails, openAccountDetails);
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
