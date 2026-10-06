@@ -66,6 +66,7 @@ function loadImportFeatures(context) {
     "account-import.js",
     "payment-import.js",
     "expense-import.js",
+    "transaction-import-commit.js",
     "imports.js",
   ]) {
     vm.runInContext(

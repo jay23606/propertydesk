@@ -9,8 +9,7 @@
       stageImport,
       parseCSV,
       validatePaymentRows,
-      fetchAll,
-      toast,
+      commitTransactionImport,
     } = context;
 
     async function importPayments(file) {
@@ -59,22 +58,13 @@
                 "An account is no longer available for one or more payments. Reload and select the CSV again.",
               );
             }
-            const { data, error } = await state.client.rpc(
-              "pd_import_propertydesk_transactions",
-              {
-                p_kind: "payments",
-                p_rows: rowsToInsert,
-                p_source_name: file.name,
-                p_rows_total: review.total,
-              },
-            );
-            if (error) throw error;
-            await fetchAll();
-            const imported = Number(data?.rows_accepted ?? rowsToInsert.length);
-            const rejected = review.total - imported;
-            status.textContent = `Imported ${imported} payment${imported === 1 ? "" : "s"}; ${rejected} row${rejected === 1 ? " was" : "s were"} skipped or need correction. Source saved to import history.`;
-            status.classList.add("success");
-            toast("Payment import complete");
+            await commitTransactionImport({
+              kind: "payments",
+              rows: rowsToInsert,
+              sourceName: file.name,
+              total: review.total,
+              label: "payment",
+            });
           },
           "",
           {

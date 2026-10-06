@@ -9,8 +9,7 @@
       stageImport,
       parseCSV,
       validateExpenseRows,
-      fetchAll,
-      toast,
+      commitTransactionImport,
     } = context;
 
     async function importExpenses(file) {
@@ -66,22 +65,13 @@
                 memo: row.memo || null,
               };
             });
-            const { data, error } = await state.client.rpc(
-              "pd_import_propertydesk_transactions",
-              {
-                p_kind: "expenses",
-                p_rows: payload,
-                p_source_name: file.name,
-                p_rows_total: review.total,
-              },
-            );
-            if (error) throw error;
-            await fetchAll();
-            const imported = Number(data?.rows_accepted ?? payload.length);
-            const rejected = review.total - imported;
-            status.textContent = `Imported ${imported} expense${imported === 1 ? "" : "s"}; ${rejected} row${rejected === 1 ? " was" : "s were"} skipped or need correction. Source saved to import history.`;
-            status.classList.add("success");
-            toast("Expense import complete");
+            await commitTransactionImport({
+              kind: "expenses",
+              rows: payload,
+              sourceName: file.name,
+              total: review.total,
+              label: "expense",
+            });
           },
           "",
           {

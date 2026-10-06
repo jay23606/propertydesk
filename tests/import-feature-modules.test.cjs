@@ -12,7 +12,12 @@ const vm = require("node:vm");
 test("CSV import feature loads as an isolated browser module", () => {
   const validators = Object.freeze({ validateAccountRows() {} });
   const context = vm.createContext({
-    window: { PropertyDeskImportWorkflows: validators },
+    window: {
+      PropertyDeskImportWorkflows: validators,
+      PropertyDeskTransactionImportCommit: {
+        create: () => ({ commit() {} }),
+      },
+    },
   });
   loadImportPreview(context);
   loadImportFeatures(context);
@@ -91,6 +96,9 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
+      PropertyDeskTransactionImportCommit: {
+        create: () => ({ commit() {} }),
+      },
       PropertyDeskAccountImport: {
         create: (options) => {
           passed.account = options;
@@ -151,11 +159,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.payment).sort(),
     [
       "$",
-      "fetchAll",
+      "commitTransactionImport",
       "parseCSV",
       "stageImport",
       "state",
-      "toast",
       "validatePaymentRows",
     ].sort(),
   );
@@ -163,11 +170,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.expense).sort(),
     [
       "$",
-      "fetchAll",
+      "commitTransactionImport",
       "parseCSV",
       "stageImport",
       "state",
-      "toast",
       "validateExpenseRows",
     ].sort(),
   );
