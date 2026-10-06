@@ -55,6 +55,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.ok(html.indexOf("features/app-state.js") < html.indexOf("app.js"));
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf("app.js"));
+  assert.ok(html.indexOf("csv-parser.js") < html.indexOf("import-utils.js"));
   assert.ok(
     html.indexOf("features/property-repository.js") <
       html.indexOf("features/property-maintenance.js"),

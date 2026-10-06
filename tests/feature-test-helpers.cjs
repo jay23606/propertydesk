@@ -76,6 +76,7 @@ function loadPropertyAndAccountForms(context) {
 }
 
 function loadImportFeatures(context) {
+  context.window.PropertyDeskCsvParser = require("../csv-parser.js");
   context.window.PropertyDeskImportUtils = require("../import-utils.js");
   for (const filename of [
     "account-import-payload.js",

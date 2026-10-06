@@ -3,7 +3,8 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const { parseCSV, selectImportRows } = require("../import-utils.js");
+const { parseCSV } = require("../csv-parser.js");
+const { selectImportRows } = require("../import-utils.js");
 require("../account-import-validation.js");
 require("../expense-import-validation.js");
 require("../payment-import-validation.js");
