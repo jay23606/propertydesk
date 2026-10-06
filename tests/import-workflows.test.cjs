@@ -181,7 +181,16 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/report-workflow.js") < html.indexOf("app.js"),
   );
-  assert.ok(html.indexOf("features/app-utils.js") < html.indexOf("app.js"));
+  for (const utility of [
+    "date-utils.js",
+    "display-utils.js",
+    "money-input-utils.js",
+  ]) {
+    assert.ok(
+      html.indexOf(`features/${utility}`) < html.indexOf("app.js"),
+      `${utility} loads before app.js`,
+    );
+  }
   assert.ok(
     html.indexOf("features/ledger-context.js") < html.indexOf("app.js"),
   );
@@ -608,7 +617,9 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/report-model\.js'/);
   assert.match(worker, /'\.\/features\/report-export\.js'/);
   assert.match(worker, /'\.\/features\/report-workflow\.js'/);
-  assert.match(worker, /'\.\/features\/app-utils\.js'/);
+  assert.match(worker, /'\.\/features\/date-utils\.js'/);
+  assert.match(worker, /'\.\/features\/display-utils\.js'/);
+  assert.match(worker, /'\.\/features\/money-input-utils\.js'/);
   assert.match(worker, /'\.\/features\/account-payload\.js'/);
   assert.match(worker, /'\.\/features\/transaction-payloads\.js'/);
   assert.match(worker, /'\.\/features\/property-address-utils\.js'/);

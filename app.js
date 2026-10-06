@@ -24,20 +24,17 @@
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
+  const { dateOnly, fmtDate, todayIso, monthStart, monthEnd } =
+    window.PropertyDeskDateUtils;
+  const { moneyInput } = window.PropertyDeskMoneyInputUtils;
   const {
     money,
-    dateOnly,
-    fmtDate,
-    todayIso,
     esc,
     prettyType,
     prettyKind,
-    monthStart,
-    monthEnd,
-    moneyInput,
     paymentFrequencyLabel,
     expenseCategoryLabel,
-  } = window.PropertyDeskAppUtils;
+  } = window.PropertyDeskDisplayUtils;
   const {
     backend,
     state,

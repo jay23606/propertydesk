@@ -4,36 +4,44 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("shared app utilities preserve formatting, labels, and money input", () => {
+test("date, display, and money-input utilities preserve their shared contracts", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "app-utils.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const utils = context.window.PropertyDeskAppUtils;
+  for (const filename of [
+    "date-utils.js",
+    "display-utils.js",
+    "money-input-utils.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const dates = context.window.PropertyDeskDateUtils;
+  const display = context.window.PropertyDeskDisplayUtils;
+  const inputs = context.window.PropertyDeskMoneyInputUtils;
 
-  assert.equal(utils.esc(`<a x="'">&`), "&lt;a x=&quot;&#39;&quot;&gt;&amp;");
-  assert.equal(utils.moneyInput("$1,234.567"), 1234.57);
-  assert.equal(utils.moneyInput("(15.50)"), -15.5);
-  assert.equal(utils.moneyInput("not a number"), 0);
-  assert.equal(utils.prettyType("land_contract"), "Land contract");
-  assert.equal(utils.prettyKind("residential"), "Residential");
-  assert.equal(utils.paymentFrequencyLabel("biweekly"), "Every 2 weeks");
-  assert.equal(utils.paymentFrequencyLabel("unknown"), "Monthly");
+  assert.match(display.money(12), /12\.00/);
+  assert.equal(display.esc(`<a x="'">&`), "&lt;a x=&quot;&#39;&quot;&gt;&amp;");
+  assert.equal(inputs.moneyInput("$1,234.567"), 1234.57);
+  assert.equal(inputs.moneyInput("(15.50)"), -15.5);
+  assert.equal(inputs.moneyInput("not a number"), 0);
+  assert.equal(display.prettyType("land_contract"), "Land contract");
+  assert.equal(display.prettyKind("residential"), "Residential");
+  assert.equal(display.paymentFrequencyLabel("biweekly"), "Every 2 weeks");
+  assert.equal(display.paymentFrequencyLabel("unknown"), "Monthly");
   assert.equal(
-    utils.expenseCategoryLabel("deposit_refund"),
+    display.expenseCategoryLabel("deposit_refund"),
     "Security deposit refund",
   );
   assert.equal(
-    utils.expenseCategoryLabel("contractor_labor"),
+    display.expenseCategoryLabel("contractor_labor"),
     "contractor labor",
   );
-  assert.match(utils.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
-  assert.match(utils.monthStart(), /^\d{4}-\d{2}-01$/);
-  assert.match(utils.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(dates.dateOnly("2026-10-05").getDate(), 5);
+  assert.equal(dates.fmtDate(null), "—");
+  assert.match(dates.todayIso(), /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(dates.monthStart(), /^\d{4}-\d{2}-01$/);
+  assert.match(dates.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
 test("property address utilities format full and street addresses", () => {
