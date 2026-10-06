@@ -514,62 +514,19 @@ test("report workflow composes portfolio report rendering only", () => {
   assert.deepEqual(Object.keys(workflow), ["renderReports"]);
 });
 
-test("reports workflow groups the view and account export callbacks", () => {
-  const passed = {};
-  const renderReports = () => "rendered";
-  const attachReportExportEvents = () => "export events";
-  const dependencies = { state: {}, todayIso() {}, accountBalance() {} };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskReportWorkflow: {
-        create: (options) => {
-          passed.view = options;
-          return { renderReports };
-        },
-      },
-      PropertyDeskReportExport: {
-        create: (options) => {
-          passed.export = options;
-          return { attachEvents: attachReportExportEvents };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "reports-workflow.js"),
-      "utf8",
-    ),
-    context,
+test("app wires report rendering and export actions independently", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(
+    app,
+    /PropertyDeskReportWorkflow\.create\(\{[\s\S]*?accountBalance,/,
   );
-  const workflow =
-    context.window.PropertyDeskReportsWorkflow.create(dependencies);
-
-  assert.notEqual(passed.view, dependencies);
-  assert.notEqual(passed.export, dependencies);
-  assert.deepEqual(Object.keys(passed.view), [
-    "$",
-    "state",
-    "dateOnly",
-    "esc",
-    "money",
-    "sumIncome",
-    "sumOperatingExpenses",
-    "accountBalance",
-  ]);
-  assert.deepEqual(Object.keys(passed.export), [
-    "$",
-    "state",
-    "todayIso",
-    "prettyType",
-    "accountBalance",
-  ]);
-  assert.deepEqual(Object.keys(workflow), [
-    "renderReports",
-    "attachReportExportEvents",
-  ]);
-  assert.equal(workflow.renderReports, renderReports);
-  assert.equal(workflow.attachReportExportEvents, attachReportExportEvents);
+  assert.match(
+    app,
+    /PropertyDeskReportExport\.create\(\{[\s\S]*?todayIso,[\s\S]*?prettyType,[\s\S]*?accountBalance,/,
+  );
+  assert.match(app, /renderers:[\s\S]*?renderReports/);
+  assert.match(app, /eventBinders:[\s\S]*?attachReportExportEvents/);
+  assert.doesNotMatch(app, /PropertyDeskReportsWorkflow\.create\(/);
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {

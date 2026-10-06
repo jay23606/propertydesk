@@ -17,8 +17,8 @@ test("app root delegates entry forms and create actions to one workflow", () => 
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskReportsWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskReportExport\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskReportExport\.create\(/);
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
   assert.doesNotMatch(
