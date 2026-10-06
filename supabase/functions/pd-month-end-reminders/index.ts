@@ -1,7 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   calculateUnpaidDue,
-  hasQualifyingPaymentInMonth,
   isLastCalendarDayInNewYork,
   monthWindowInNewYork,
   parseReminderRecipients,
@@ -10,6 +9,7 @@ import {
 import { reminderMessage } from "../_shared/reminder-message.mjs";
 import { createReminderLogStore } from "../_shared/reminder-log.mjs";
 import { sendReminderEmail } from "../_shared/mailersend.mjs";
+import { deliverReminderRecipient } from "../_shared/reminder-delivery.mjs";
 
 const FROM_EMAIL =
   Deno.env.get("MAILERSEND_FROM_EMAIL") ??
@@ -131,70 +131,26 @@ Deno.serve(async (request) => {
         }))
       : [{ recipient: null, recipient_index: 0 }];
     for (const { recipient, recipient_index } of rows) {
-      let reason: string | null = null;
-      if (!recipient) reason = "missing_recipient_email";
-      else if (
-        hasQualifyingPaymentInMonth(accountPayments, monthStart, monthEnd)
-      )
-        reason = "payment_recorded_this_month";
-      else if (due.total <= 0) reason = "no_unpaid_scheduled_amount";
-      const logRow = {
-        user_id: account.user_id,
-        account_id: account.id,
-        reminder_month: reminderMonth,
-        recipient_index,
-        reason,
-        unpaid_due: due.total,
-        status: reason ? "skipped" : "sending",
-        attempted_at: new Date().toISOString(),
-      };
-      if (reason) {
-        try {
-          await reminderLog.recordSkipped(logRow);
-          skipped++;
-        } catch {
-          failed++;
-        }
-        continue;
-      }
-      const logId = await reminderLog.claim(logRow);
-      if (!logId) continue;
-      try {
-        const message = reminderMessage(
-          account,
-          property,
-          monthStart,
-          monthEnd,
-          due.total,
-        );
-        const response = await sendReminderEmail({
-          token: mailerSendToken,
-          fromEmail: FROM_EMAIL,
-          fromName: FROM_NAME,
-          recipient,
-          message,
-        });
-        if (response.status === 202) {
-          await reminderLog.saveResult(logId, {
-            status: "accepted",
-            reason: null,
-            provider_message_id: response.headers.get("x-message-id"),
-          });
-          accepted++;
-        } else {
-          await reminderLog.saveResult(logId, {
-            status: "failed",
-            reason: `mailersend_http_${response.status}`,
-          });
-          failed++;
-        }
-      } catch {
-        await reminderLog.saveResult(logId, {
-          status: "failed",
-          reason: "mailersend_request_failed",
-        });
-        failed++;
-      }
+      const outcome = await deliverReminderRecipient({
+        account,
+        property,
+        accountPayments,
+        recipient,
+        recipientIndex: recipient_index,
+        reminderMonth,
+        monthStart,
+        monthEnd,
+        unpaidDue: due.total,
+        reminderLog,
+        reminderMessage,
+        sendReminderEmail,
+        mailerSendToken,
+        fromEmail: FROM_EMAIL,
+        fromName: FROM_NAME,
+      });
+      if (outcome === "accepted") accepted++;
+      else if (outcome === "failed") failed++;
+      else if (outcome === "skipped") skipped++;
     }
   }
   return Response.json({
