@@ -3,7 +3,8 @@
   "use strict";
 
   function createAccountHistoryModel({ state }) {
-    const { loadAccountAuditEvents } = window.PropertyDeskAccountHistoryAudit;
+    const { loadAccountAuditEvents } =
+      window.PropertyDeskAccountHistoryRepository;
 
     async function loadAccountHistory(account, payments) {
       const auditIds = [

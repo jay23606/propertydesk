@@ -19,7 +19,7 @@
     }
   }
 
-  window.PropertyDeskAccountHistoryAudit = Object.freeze({
+  window.PropertyDeskAccountHistoryRepository = Object.freeze({
     loadAccountAuditEvents,
   });
 })();
