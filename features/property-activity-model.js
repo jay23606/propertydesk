@@ -13,16 +13,18 @@
       const accountById = new Map(
         accounts.map((account) => [account.id, account]),
       );
-      const income = state.payments.filter(
-        (payment) => accountIds.has(payment.account_id) && isPosted(payment),
-      );
-      const accountPayments = state.payments.filter((payment) =>
-        accountIds.has(payment.account_id),
-      );
-      const allExpenses = state.expenses.filter(
-        (expense) => expense.property_id === propertyId,
-      );
-      const expenses = allExpenses.filter(isPosted);
+      const income = [],
+        voidedPayments = [],
+        expenses = [],
+        voidedExpenses = [];
+      for (const payment of state.payments) {
+        if (!accountIds.has(payment.account_id)) continue;
+        (isPosted(payment) ? income : voidedPayments).push(payment);
+      }
+      for (const expense of state.expenses) {
+        if (expense.property_id !== propertyId) continue;
+        (isPosted(expense) ? expenses : voidedExpenses).push(expense);
+      }
       const transactions = [
         ...income.map((item) => ({
           date: item.received_date,
@@ -33,16 +35,14 @@
           memo: item.memo,
           status: item.status,
         })),
-        ...accountPayments
-          .filter((payment) => !isPosted(payment))
-          .map((item) => ({
-            date: item.received_date,
-            kind: "Income · voided",
-            label: accountById.get(item.account_id)?.name || "Payment",
-            amount: Number(item.amount || 0),
-            memo: item.memo,
-            status: item.status,
-          })),
+        ...voidedPayments.map((item) => ({
+          date: item.received_date,
+          kind: "Income · voided",
+          label: accountById.get(item.account_id)?.name || "Payment",
+          amount: Number(item.amount || 0),
+          memo: item.memo,
+          status: item.status,
+        })),
         ...expenses.map((item) => ({
           date: item.expense_date,
           kind: "Expense",
@@ -51,16 +51,14 @@
           memo: item.memo,
           status: item.status,
         })),
-        ...allExpenses
-          .filter((expense) => !isPosted(expense))
-          .map((item) => ({
-            date: item.expense_date,
-            kind: "Expense · voided",
-            label: item.payee || item.category || "Expense",
-            amount: -Number(item.amount || 0),
-            memo: item.memo,
-            status: item.status,
-          })),
+        ...voidedExpenses.map((item) => ({
+          date: item.expense_date,
+          kind: "Expense · voided",
+          label: item.payee || item.category || "Expense",
+          amount: -Number(item.amount || 0),
+          memo: item.memo,
+          status: item.status,
+        })),
       ]
         .sort((a, b) => String(b.date).localeCompare(String(a.date)))
         .slice(0, 8);

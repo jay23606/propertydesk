@@ -247,9 +247,13 @@ test("property activity model aggregates posted cash flow and sorts eight recent
       payee: `Vendor ${index + 1}`,
     })),
   };
+  const statusChecks = [];
   const model = context.window.PropertyDeskPropertyActivityModel.create({
     state,
-    isPosted: (record) => record.status === "posted",
+    isPosted: (record) => {
+      statusChecks.push(record);
+      return record.status === "posted";
+    },
     sumIncome: (rows) =>
       rows.reduce((total, row) => total + Number(row.amount || 0), 0),
     sumOperatingExpenses: (rows) =>
@@ -266,6 +270,7 @@ test("property activity model aggregates posted cash flow and sorts eight recent
   assert.equal(result.transactions[0].date, "2026-10-09");
   assert.equal(result.transactions[0].amount, -9);
   assert.equal(result.transactions.at(-1).date, "2026-10-03");
+  assert.equal(statusChecks.length, 10);
 });
 
 test("property view actions route payment, note, address, and add-account actions", () => {
