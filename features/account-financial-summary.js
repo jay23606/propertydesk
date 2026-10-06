@@ -10,13 +10,12 @@
   }) {
     function summarizeAccount(account, payments) {
       const hasLoanBalance = account.account_type !== "rental";
+      const unpaidStart = unpaidDueAccrualStart();
+      const asOf = todayIso();
       return {
-        unpaidDue: amountDueSince(
-          [account],
-          payments,
-          unpaidDueAccrualStart(),
-          todayIso(),
-        ),
+        unpaidDue: amountDueSince([account], payments, unpaidStart, asOf),
+        unpaidStart,
+        unpaidAsOf: asOf,
         loanBalance: hasLoanBalance ? accountBalance(account) : 0,
         hasLoanBalance,
       };

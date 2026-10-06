@@ -5,11 +5,8 @@
   function createAccountDetailsModel({
     state,
     sumPosted,
-    accountBalance,
+    summarizeAccount,
     amortizationSchedule,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
     propertyAddress,
   }) {
     function buildAccountDetailData(id) {
@@ -30,7 +27,7 @@
               account.start_date,
               account.principal_interest_amount,
             );
-      const unpaidStart = unpaidDueAccrualStart();
+      const financials = summarizeAccount(account, state.payments);
 
       return {
         account,
@@ -38,15 +35,11 @@
         propertyAddressText: propertyAddress(property || {}),
         payments,
         postedPaymentTotal: sumPosted(payments),
-        estimatedLoanBalance:
-          account.account_type === "rental" ? null : accountBalance(account),
-        unpaidDue: amountDueSince(
-          [account],
-          state.payments,
-          unpaidStart,
-          todayIso(),
-        ),
-        unpaidStart,
+        estimatedLoanBalance: financials.hasLoanBalance
+          ? financials.loanBalance
+          : null,
+        unpaidDue: financials.unpaidDue,
+        unpaidStart: financials.unpaidStart,
         schedule,
       };
     }

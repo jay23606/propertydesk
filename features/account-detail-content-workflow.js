@@ -37,11 +37,13 @@
       window.PropertyDeskAccountDetailsModel.create({
         state,
         sumPosted,
-        accountBalance,
+        summarizeAccount: window.PropertyDeskAccountFinancialSummary.create({
+          accountBalance,
+          amountDueSince,
+          unpaidDueAccrualStart,
+          todayIso,
+        }).summarizeAccount,
         amortizationSchedule,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        todayIso,
         propertyAddress,
       });
     const { openAccountDetails } = window.PropertyDeskAccountDetails.create({

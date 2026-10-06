@@ -32,11 +32,23 @@ test("shared account financial summary keeps due and loan rules consistent", () 
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(model.summarizeAccount(note, payments))),
-    { unpaidDue: 550, loanBalance: 12000, hasLoanBalance: true },
+    {
+      unpaidDue: 550,
+      unpaidStart: "2026-10-01",
+      unpaidAsOf: "2026-10-06",
+      loanBalance: 12000,
+      hasLoanBalance: true,
+    },
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(model.summarizeAccount(rental, payments))),
-    { unpaidDue: 550, loanBalance: 0, hasLoanBalance: false },
+    {
+      unpaidDue: 550,
+      unpaidStart: "2026-10-01",
+      unpaidAsOf: "2026-10-06",
+      loanBalance: 0,
+      hasLoanBalance: false,
+    },
   );
   assert.deepEqual(
     calls.filter(([kind]) => kind === "balance"),

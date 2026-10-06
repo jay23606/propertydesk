@@ -133,11 +133,13 @@ async function main() {
                 (payment) => !payment.status || payment.status === "posted",
               )
               .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
-          accountBalance: () => 10000,
+          summarizeAccount: window.PropertyDeskAccountFinancialSummary.create({
+            accountBalance: () => 10000,
+            amountDueSince: () => 0,
+            unpaidDueAccrualStart: () => "2026-01-01",
+            todayIso: () => "2026-01-01",
+          }).summarizeAccount,
           amortizationSchedule: utilities.amortizationSchedule,
-          amountDueSince: () => 0,
-          unpaidDueAccrualStart: () => "2026-01-01",
-          todayIso: () => "2026-01-01",
           propertyAddress: (property) => property.name,
         });
       const feature = details.create({

@@ -42,17 +42,16 @@ test("account detail model separates rental totals from loan schedule data", () 
       rows
         .filter((row) => row.status === "posted")
         .reduce((total, row) => total + row.amount, 0),
-    accountBalance: (account) => (account === note ? 700 : 0),
+    summarizeAccount: (account) => ({
+      unpaidDue: account === rental ? "2026-10-01:2026-10-06" : 0,
+      unpaidStart: "2026-10-01",
+      loanBalance: account === note ? 700 : 0,
+      hasLoanBalance: account !== rental,
+    }),
     amortizationSchedule: (...args) => {
       scheduleCalls.push(args);
       return ["on-time schedule"];
     },
-    amountDueSince: (accounts, payments, start, end) =>
-      accounts[0] === rental && payments === state.payments
-        ? `${start}:${end}`
-        : "wrong scope",
-    unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-06",
     propertyAddress: (property) => property.name || "No property",
   });
 
@@ -129,11 +128,13 @@ test("account details render action targets without owning action listeners", as
       rows
         .filter((payment) => payment.status !== "voided")
         .reduce((total, payment) => total + Number(payment.amount || 0), 0),
-    accountBalance: () => 0,
+    summarizeAccount: () => ({
+      unpaidDue: 0,
+      unpaidStart: "2026-10-01",
+      loanBalance: 0,
+      hasLoanBalance: false,
+    }),
     amortizationSchedule: () => [],
-    amountDueSince: () => 0,
-    unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-05",
     propertyAddress: (property) => property.name,
   });
   const feature = context.window.PropertyDeskAccountDetails.create({
