@@ -25,6 +25,8 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow)\.create\(/,
   );
   assert.match(app, /attachAccountFormEvents,/);
+  assert.match(app, /PropertyDeskCreateActions\.create\(/);
+  assert.match(app, /attachCreateActions,/);
   assert.match(app, /attachDepositEvents,/);
   assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
@@ -32,14 +34,10 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
   );
-  for (const feature of [
-    "PropertyForm",
-    "AccountForm",
-    "LedgerEntryForms",
-    "CreateActions",
-  ]) {
+  for (const feature of ["PropertyForm", "AccountForm", "LedgerEntryForms"]) {
     assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
   }
+  assert.doesNotMatch(workflow, /PropertyDeskCreateActions/);
   const ledgerWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "ledger-workflow.js"),
     "utf8",

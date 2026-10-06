@@ -56,11 +56,9 @@ test("ledger workflow wires entry forms and transaction history", () => {
     toast() {},
     fetchAll() {},
     closeModal() {},
-    navigate() {},
     previewReminderEmail() {},
     moneyInput() {},
     dateOnly() {},
-    documentRef: {},
   };
   const workflow =
     context.window.PropertyDeskLedgerWorkflow.create(dependencies);
@@ -70,12 +68,10 @@ test("ledger workflow wires entry forms and transaction history", () => {
   assert.equal(passed.corrections.closeModal, dependencies.closeModal);
   assert.equal(passed.entries.state, dependencies.state);
   assert.equal(passed.entries.saveCorrection, saveCorrection);
-  assert.equal(passed.entries.navigate, dependencies.navigate);
   assert.equal(
     passed.entries.previewReminderEmail,
     dependencies.previewReminderEmail,
   );
-  assert.equal(passed.entries.documentRef, dependencies.documentRef);
   assert.equal(passed.transactions.state, dependencies.state);
   assert.equal("openPayment" in passed.transactions, false);
   assert.equal("moneyInput" in passed.transactions, false);

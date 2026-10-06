@@ -144,19 +144,32 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      documentRef: document,
     });
   const {
+    resetPropertyForm,
     resetAccountForm,
     editAccount,
     openPayment,
     openPropertyPayment,
     openExpense,
-    attachCreateActions,
     attachPropertyFormEvents,
     attachAccountFormEvents,
     attachLedgerEntryFormEvents,
   } = recordEntryWorkflow;
+  const { attachEvents: attachCreateActions } =
+    window.PropertyDeskCreateActions.create({
+      $,
+      state,
+      toast,
+      resetPropertyForm,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+      navigate,
+      openPayment,
+      openExpense,
+      documentRef: document,
+    });
   const { renderPayments, attachEvents: attachTransactionEvents } =
     transactions;
   const { attachTransactionActionEvents } =

@@ -15,7 +15,6 @@
       fillSelect,
       prettyType,
       openModal,
-      navigate,
       previewReminderEmail,
       dateOnly,
       fmtDate,
@@ -26,7 +25,6 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      documentRef = document,
     } = context;
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
       {
@@ -49,10 +47,8 @@
       fillSelect,
       prettyType,
       openModal,
-      navigate,
       previewReminderEmail,
       saveCorrection,
-      documentRef,
     });
     const transactions = window.PropertyDeskTransactionViews.create({
       $,

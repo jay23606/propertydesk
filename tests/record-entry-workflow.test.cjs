@@ -17,10 +17,8 @@ test("record entry workflow composes forms and exposes their actions and binders
   const propertyAttach = () => calls.push("property events");
   const accountAttach = (preview) => calls.push(["account events", preview]);
   const ledgerAttach = () => calls.push("ledger events");
-  const navigate = () => calls.push("navigate");
   const preview = () => {};
   const context = vm.createContext({
-    document: {},
     window: {
       PropertyDeskPropertyForm: {
         create(dependencies) {
@@ -54,15 +52,6 @@ test("record entry workflow composes forms and exposes their actions and binders
           };
         },
       },
-      PropertyDeskCreateActions: {
-        create(dependencies) {
-          passed.actions = dependencies;
-          return {
-            attachEvents: () =>
-              calls.push(["create events", dependencies.navigate]),
-          };
-        },
-      },
       PropertyDeskAccountPayload: { build: () => "account payload" },
       PropertyDeskAccountFormModel: { validate: () => true },
     },
@@ -87,10 +76,8 @@ test("record entry workflow composes forms and exposes their actions and binders
     populateFormOptions: () => {},
     prettyType: () => {},
     openModal: () => {},
-    navigate,
     previewReminderEmail: preview,
     saveCorrection: () => {},
-    documentRef: { marker: "doc" },
   };
   const workflow =
     context.window.PropertyDeskRecordEntryWorkflow.create(dependencies);
@@ -106,13 +93,8 @@ test("record entry workflow composes forms and exposes their actions and binders
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.account.previewReminderEmail, preview);
-  assert.equal(passed.actions.navigate, navigate);
-  assert.equal(passed.actions.resetPropertyForm, propertyReset);
-  assert.equal(passed.actions.resetAccountForm, accountReset);
-  assert.equal(passed.actions.openPayment, openPayment);
-  assert.equal(passed.actions.openExpense, openExpense);
-  assert.equal(passed.actions.documentRef, dependencies.documentRef);
   for (const [name, expected] of Object.entries({
+    resetPropertyForm: propertyReset,
     resetAccountForm: accountReset,
     editAccount,
     updateAllocationPreview,
@@ -126,11 +108,9 @@ test("record entry workflow composes forms and exposes their actions and binders
   workflow.attachPropertyFormEvents();
   workflow.attachAccountFormEvents();
   workflow.attachLedgerEntryFormEvents();
-  workflow.attachCreateActions();
   assert.deepEqual(calls, [
     "property events",
     ["account events", preview],
     "ledger events",
-    ["create events", navigate],
   ]);
 });

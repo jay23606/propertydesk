@@ -1,4 +1,4 @@
-/* Compose property, account, payment, and expense entry workflows. */
+/* Compose property, account, payment, and expense form workflows. */
 (() => {
   "use strict";
 
@@ -15,10 +15,8 @@
       populateFormOptions,
       prettyType,
       openModal,
-      navigate,
       previewReminderEmail,
       saveCorrection,
-      documentRef = document,
     } = context;
     const propertyForm = window.PropertyDeskPropertyForm.create({
       $,
@@ -55,28 +53,14 @@
       openModal,
       saveCorrection,
     });
-    const createActions = window.PropertyDeskCreateActions.create({
-      $,
-      state,
-      toast,
-      resetPropertyForm: propertyForm.resetPropertyForm,
-      resetAccountForm: accountForm.resetAccountForm,
-      populateFormOptions,
-      openModal,
-      navigate,
-      openPayment: ledgerEntryForms.openPayment,
-      openExpense: ledgerEntryForms.openExpense,
-      documentRef,
-    });
-
     return {
+      resetPropertyForm: propertyForm.resetPropertyForm,
       resetAccountForm: accountForm.resetAccountForm,
       editAccount: accountForm.editAccount,
       updateAllocationPreview: ledgerEntryForms.updateAllocationPreview,
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,
       openExpense: ledgerEntryForms.openExpense,
-      attachCreateActions: createActions.attachEvents,
       attachPropertyFormEvents: propertyForm.attachEvents,
       attachAccountFormEvents: accountForm.attachEvents,
       attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
