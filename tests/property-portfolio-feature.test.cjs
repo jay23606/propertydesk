@@ -3,6 +3,81 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+test("Properties account-row model derives balances and reminder details", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-account-row-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const state = {
+    payments: [{ id: "payment-1" }],
+    user: { user_metadata: { display_name: "Owner" } },
+  };
+  let reminderOptions;
+  const model =
+    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
+      state,
+      monthlyScheduledEstimate: ([account]) => account.payment_amount,
+      accountBalance: () => 5000,
+      amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
+      unpaidDueAccrualStart: () => "2026-10-01",
+      todayIso: () => "2026-10-05",
+      propertyAddress: (property) => property.address,
+      monthStart: () => "2026-10-01",
+      dateOnly: () => new Date("2026-10-01T12:00:00"),
+      monthEnd: () => "2026-10-31",
+      lateReminderMailto: (options) => {
+        reminderOptions = options;
+        return `mailto:${options.email || ""}`;
+      },
+      paymentStatusInMonth: (_payments, _id, _monthStart, scheduled) =>
+        scheduled === 100 ? "partial" : "none",
+      money: (amount) => `$${amount.toFixed(2)}`,
+    });
+  const property = { address: "1 Oak St" };
+  const landContract = {
+    id: "account-1",
+    name: "Contract",
+    party_name: "Buyer",
+    party_email: "buyer@example.com",
+    account_type: "land_contract",
+    payment_amount: 250,
+  };
+  const row = model.buildAccountRow(property, landContract, "1 Oak St");
+
+  assert.equal(row.unpaidDue, 35);
+  assert.equal(row.scheduledPayment, 250);
+  assert.equal(row.loanBalance, 5000);
+  assert.equal(row.hasLoanBalance, true);
+  assert.equal(row.paymentStatus, "partial");
+  assert.equal(row.reminderHref, "mailto:buyer@example.com");
+  assert.equal(row.recipientHint, "Draft late reminder email");
+  assert.equal(reminderOptions.senderName, "Owner");
+  assert.equal(reminderOptions.recipientName, "Buyer");
+  assert.equal(reminderOptions.unpaidDue, "$35.00");
+
+  const rental = model.buildAccountRow(
+    property,
+    { id: "account-2", name: "Rental", account_type: "rental" },
+    "1 Oak St",
+  );
+  assert.equal(rental.loanBalance, 0);
+  assert.equal(rental.hasLoanBalance, false);
+  assert.equal(rental.partyName, "Rental");
+  assert.equal(
+    rental.recipientHint,
+    "No email saved; opens an unaddressed late reminder draft",
+  );
+});
+
 test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
   const elements = new Map();
   const getElement = (id) => {
@@ -21,6 +96,18 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-portfolio-table.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-account-row-model.js",
+      ),
       "utf8",
     ),
     context,
@@ -93,8 +180,17 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
       money,
       paymentFrequencyLabel: () => "Monthly",
     });
+  const accountRowModel =
+    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create(
+      dependencies,
+    );
   const portfolioModel =
-    context.window.PropertyDeskPropertyPortfolioModel.create(dependencies);
+    context.window.PropertyDeskPropertyPortfolioModel.create({
+      state,
+      accountRowModel,
+      propertyAddress: dependencies.propertyAddress,
+      streetAddress: dependencies.streetAddress,
+    });
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
     state,
@@ -140,6 +236,12 @@ test("property portfolio workflow connects its model, table, and action routers"
         create: (options) => {
           passed.tableOptions = options;
           return "table";
+        },
+      },
+      PropertyDeskPropertyPortfolioAccountRowModel: {
+        create: (options) => {
+          passed.accountRowOptions = options;
+          return "account rows";
         },
       },
       PropertyDeskPropertyPortfolioModel: {
@@ -199,6 +301,9 @@ test("property portfolio workflow connects its model, table, and action routers"
   });
 
   assert.equal(passed.viewOptions.portfolioTable, "table");
+  assert.equal(passed.modelOptions.accountRowModel, "account rows");
+  assert.equal(passed.accountRowOptions.state, state);
+  assert.equal(passed.accountRowOptions.amountDueSince, action);
   assert.equal(passed.viewOptions.portfolioModel, "model");
   assert.equal(passed.quickNoteOptions.state, state);
   assert.equal(passed.quickNoteOptions.toast, action);

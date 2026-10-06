@@ -41,21 +41,27 @@
       money,
       paymentFrequencyLabel,
     });
+    const accountRowModel =
+      window.PropertyDeskPropertyPortfolioAccountRowModel.create({
+        state,
+        monthlyScheduledEstimate,
+        accountBalance,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+        propertyAddress,
+        monthStart,
+        dateOnly,
+        monthEnd,
+        lateReminderMailto,
+        paymentStatusInMonth,
+        money,
+      });
     const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
       state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
+      accountRowModel,
       propertyAddress,
-      monthStart,
       streetAddress,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentStatusInMonth,
-      money,
     });
     const { renderProperties, attachEvents: attachPropertyViewEvents } =
       window.PropertyDeskPropertyViews.create({

@@ -4,19 +4,9 @@
 
   function createPropertyPortfolioModel({
     state,
-    monthlyScheduledEstimate,
-    accountBalance,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
+    accountRowModel,
     propertyAddress,
-    monthStart,
     streetAddress,
-    dateOnly,
-    monthEnd,
-    lateReminderMailto,
-    paymentStatusInMonth,
-    money,
   }) {
     function buildRows({ query, type, holderId, showArchived }) {
       const rows = [];
@@ -46,66 +36,9 @@
 
         if (matches.length) {
           for (const account of matches) {
-            const unpaidDue = amountDueSince(
-              [account],
-              state.payments,
-              unpaidDueAccrualStart(),
-              todayIso(),
+            rows.push(
+              accountRowModel.buildAccountRow(property, account, street),
             );
-            const scheduledPayment = monthlyScheduledEstimate([
-              { ...account, status: "active" },
-            ]);
-            const partyName = account.party_name || account.name;
-            const address = propertyAddress(property);
-            const reminderHref = lateReminderMailto({
-              email: account.party_email,
-              address,
-              unpaidDue: money(unpaidDue),
-              senderName:
-                state.user?.user_metadata?.display_name?.trim() ||
-                "PropertyDesk",
-              recipientName: partyName,
-              month: dateOnly(monthStart()).toLocaleDateString(undefined, {
-                month: "long",
-                year: "numeric",
-              }),
-              asOf: monthEnd(),
-            });
-            const recipientHint = account.party_email
-              ? "Draft late reminder email"
-              : "No email saved; opens an unaddressed late reminder draft";
-            const scheduledThisMonth =
-              amountDueSince(
-                [{ ...account, status: "active" }],
-                [],
-                monthStart(),
-                monthEnd(),
-              ) || Number(account.payment_amount || 0);
-            const paymentStatus = paymentStatusInMonth(
-              state.payments,
-              account.id,
-              monthStart(),
-              scheduledThisMonth,
-            );
-            const hasLoanBalance = account.account_type !== "rental";
-            rows.push({
-              hasAccount: true,
-              party: partyName,
-              account: account.name,
-              address: street,
-              id: account.id,
-              property,
-              accountRecord: account,
-              street,
-              unpaidDue,
-              scheduledPayment,
-              loanBalance: hasLoanBalance ? accountBalance(account) : 0,
-              hasLoanBalance,
-              partyName,
-              paymentStatus,
-              reminderHref,
-              recipientHint,
-            });
           }
         } else if (
           allRelated.length === 0 &&
