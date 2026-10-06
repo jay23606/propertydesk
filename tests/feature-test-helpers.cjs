@@ -36,6 +36,7 @@ function loadLedgerEntryForms(context) {
     "transaction-payloads.js",
     "payment-entry-view.js",
     "payment-entry-form.js",
+    "expense-entry-view.js",
     "expense-entry-form.js",
     "ledger-entry-forms.js",
   ]) {

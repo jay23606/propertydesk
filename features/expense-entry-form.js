@@ -11,13 +11,10 @@
       toast,
       closeModal,
       fetchAll,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
       saveCorrection,
       buildExpensePayload,
     } = context;
+    const expenseView = window.PropertyDeskExpenseEntryView.create(context);
 
     async function saveExpense(event) {
       event.preventDefault();
@@ -93,46 +90,12 @@
       toast("Expense recorded");
     }
 
-    function openExpense(propertyId) {
-      state.pendingCorrection = null;
-      populateFormOptions();
-      $("expense-form").reset();
-      $("expense-modal-title").textContent = "Record expense";
-      $("expense-modal").querySelector(".eyebrow").textContent =
-        "PROPERTY EXPENSE";
-      $("expense-save-button").textContent = "Save expense";
-      $("expense-save-next").classList.remove("hidden");
-      $("expense-date").value = todayIso();
-      $("deposit-refund-hint").classList.add("hidden");
-      if (propertyId) $("expense-property").value = propertyId;
-      openModal("expense-modal");
-    }
-
     function attachEvents() {
       $("expense-form").addEventListener("submit", saveExpense);
-      $("expense-property").addEventListener("change", () => {
-        const propertyId = $("expense-property").value;
-        const relatedAccounts = state.accounts.filter(
-          (account) => account.property_id === propertyId,
-        );
-        fillSelect(
-          "expense-account",
-          relatedAccounts.map((account) => ({
-            value: account.id,
-            label: `${account.name} — ${prettyType(account.account_type)}`,
-          })),
-          "Property level",
-        );
-      });
-      $("expense-category").addEventListener("change", () => {
-        $("deposit-refund-hint").classList.toggle(
-          "hidden",
-          $("expense-category").value !== "deposit_refund",
-        );
-      });
+      expenseView.attachEvents();
     }
 
-    return { openExpense, attachEvents };
+    return { ...expenseView, attachEvents };
   }
 
   window.PropertyDeskExpenseEntryForm = Object.freeze({
