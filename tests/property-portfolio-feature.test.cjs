@@ -103,6 +103,10 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     portfolioModel,
   });
 
+  assert.deepEqual(Object.keys(feature).sort(), [
+    "attachEvents",
+    "renderProperties",
+  ]);
   feature.renderProperties();
 
   const totals = getElement("properties-totals");

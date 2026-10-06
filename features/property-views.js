@@ -72,7 +72,6 @@
     return {
       renderProperties,
       attachEvents,
-      renderPropertyRows,
     };
   }
 
