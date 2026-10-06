@@ -103,6 +103,23 @@ test("account import duplicate checks normalize case and stay scoped to the prop
   assert.equal(result.valid[0].account_name, "Oak Rental");
 });
 
+test("account import duplicate keys do not collide on separator characters", () => {
+  const rows = parseCSV(
+    "property_name,property_address,account_type,account_name,start_date\nB,C|D,rental,A,2026-01-01",
+  );
+  const result = validateAccountRows(
+    rows,
+    [{ id: "p1", name: "C", address: "D" }],
+    [{ id: "a1", property_id: "p1", name: "A|B" }],
+    "2026-10-03",
+  );
+
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.valid[0].account_name, "A");
+  assert.equal(result.valid[0].property_name, "B");
+  assert.equal(result.valid[0].property_address, "C|D");
+});
+
 test("expense import matches property/account, combines source notes, and skips possible duplicates", () => {
   const rows = parseCSV(
     fs.readFileSync(

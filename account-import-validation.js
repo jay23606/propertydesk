@@ -11,7 +11,11 @@
       properties.map((property) => [property.id, property]),
     );
     const accountKey = (name, propertyName, propertyAddress) =>
-      `${name.toLowerCase()}|${propertyName.toLowerCase()}|${propertyAddress.toLowerCase()}`;
+      JSON.stringify([
+        name.toLowerCase(),
+        propertyName.toLowerCase(),
+        propertyAddress.toLowerCase(),
+      ]);
     const existingAccounts = new Set(
       accounts.flatMap((account) => {
         const property = propertyById.get(account.property_id);
