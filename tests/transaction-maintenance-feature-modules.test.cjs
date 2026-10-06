@@ -4,12 +4,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("transaction workflow connects the ledger screen with maintenance actions", () => {
+test("transaction workflow connects only the transaction history view", () => {
   const passed = {};
   const calls = [];
   const renderPayments = () => "payments rendered";
   const attachViewEvents = () => "view events attached";
-  const attachActionEvents = () => "action events attached";
   const context = vm.createContext({
     document: {},
     window: {
@@ -21,17 +20,6 @@ test("transaction workflow connects the ledger screen with maintenance actions",
             attachEvents: () => {
               calls.push("view events");
               return attachViewEvents();
-            },
-          };
-        },
-      },
-      PropertyDeskTransactionMaintenanceWorkflow: {
-        create: (options) => {
-          passed.maintenance = options;
-          return {
-            attachTransactionActionEvents: () => {
-              calls.push("action events");
-              return attachActionEvents();
             },
           };
         },
@@ -57,44 +45,19 @@ test("transaction workflow connects the ledger screen with maintenance actions",
     monthStart() {},
     sumIncome() {},
     sumOperatingExpenses() {},
-    toast() {},
-    fetchAll() {},
-    prettyType() {},
-    openPayment() {},
-    openExpense() {},
-    updateAllocationPreview() {},
-    EventClass: class {},
-    OptionClass: class {},
-    documentRef: {},
   };
   const workflow =
     context.window.PropertyDeskTransactionWorkflow.create(dependencies);
 
-  assert.deepEqual(Object.keys(passed.maintenance).sort(), [
-    "$",
-    "EventClass",
-    "OptionClass",
-    "documentRef",
-    "fetchAll",
-    "openExpense",
-    "openPayment",
-    "prettyType",
-    "state",
-    "toast",
-    "updateAllocationPreview",
-  ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "renderPayments",
   ]);
   assert.equal(passed.views.state, dependencies.state);
   assert.equal(passed.views.monthStart, dependencies.monthStart);
-  assert.equal(passed.maintenance.state, dependencies.state);
-  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.maintenance.documentRef, dependencies.documentRef);
   assert.equal(workflow.renderPayments, renderPayments);
-  assert.equal(workflow.attachEvents(), undefined);
-  assert.deepEqual(calls, ["view events", "action events"]);
+  assert.equal(workflow.attachEvents(), attachViewEvents());
+  assert.deepEqual(calls, ["view events"]);
 });
 
 test("transaction maintenance workflow composes correction and void actions", () => {

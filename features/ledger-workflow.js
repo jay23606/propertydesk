@@ -1,4 +1,4 @@
-/* Coordinate record entry with transaction history and maintenance. */
+/* Coordinate record entry, transaction history, and transaction maintenance. */
 (() => {
   "use strict";
 
@@ -78,8 +78,22 @@
       OptionClass,
       documentRef,
     });
+    const transactionMaintenance =
+      window.PropertyDeskTransactionMaintenanceWorkflow.create({
+        $,
+        state,
+        toast,
+        fetchAll,
+        prettyType,
+        openPayment: entries.openPayment,
+        openExpense: entries.openExpense,
+        updateAllocationPreview: entries.updateAllocationPreview,
+        EventClass,
+        OptionClass,
+        documentRef,
+      });
 
-    return { entries, transactions };
+    return { entries, transactions, transactionMaintenance };
   }
 
   window.PropertyDeskLedgerWorkflow = Object.freeze({ create });

@@ -1,4 +1,4 @@
-/* Compose the transaction table with its audited correction and void actions. */
+/* Compose the transaction history view. */
 (() => {
   "use strict";
 
@@ -15,30 +15,7 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      toast,
-      fetchAll,
-      prettyType,
-      openPayment,
-      openExpense,
-      updateAllocationPreview,
-      EventClass,
-      OptionClass,
-      documentRef = document,
     } = context;
-    const maintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create({
-        $,
-        state,
-        toast,
-        fetchAll,
-        prettyType,
-        openPayment,
-        openExpense,
-        updateAllocationPreview,
-        EventClass,
-        OptionClass,
-        documentRef,
-      });
     const views = window.PropertyDeskTransactionViews.create({
       $,
       state,
@@ -53,14 +30,9 @@
       sumOperatingExpenses,
     });
 
-    function attachEvents() {
-      views.attachEvents();
-      maintenance.attachTransactionActionEvents();
-    }
-
     return {
       renderPayments: views.renderPayments,
-      attachEvents,
+      attachEvents: views.attachEvents,
     };
   }
 

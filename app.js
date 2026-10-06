@@ -115,34 +115,37 @@
     renderReminderActivity,
     previewReminderEmail,
   });
-  const { entries: recordEntryWorkflow, transactions } =
-    window.PropertyDeskLedgerWorkflow.create({
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      closeModal,
-      fetchAll,
-      populateFormOptions,
-      fillSelect,
-      prettyType,
-      openModal,
-      navigate,
-      previewReminderEmail,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      isPosted,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-      EventClass: Event,
-      OptionClass: Option,
-      documentRef: document,
-    });
+  const {
+    entries: recordEntryWorkflow,
+    transactions,
+    transactionMaintenance,
+  } = window.PropertyDeskLedgerWorkflow.create({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    populateFormOptions,
+    fillSelect,
+    prettyType,
+    openModal,
+    navigate,
+    previewReminderEmail,
+    dateOnly,
+    fmtDate,
+    esc,
+    expenseCategoryLabel,
+    money,
+    isPosted,
+    monthStart,
+    sumIncome,
+    sumOperatingExpenses,
+    EventClass: Event,
+    OptionClass: Option,
+    documentRef: document,
+  });
   const {
     resetAccountForm,
     editAccount,
@@ -156,6 +159,7 @@
   } = recordEntryWorkflow;
   const { renderPayments, attachEvents: attachTransactionEvents } =
     transactions;
+  const { attachTransactionActionEvents } = transactionMaintenance;
   const { openAccountDetails, attachEvents: attachAccountDetailsEvents } =
     window.PropertyDeskAccountDetailsWorkflow.create({
       $,
@@ -277,6 +281,7 @@
       attachOverviewEvents,
       attachPropertyPortfolioEvents,
       attachTransactionEvents,
+      attachTransactionActionEvents,
       attachAccountDetailsEvents,
       attachCreateActions,
       attachPropertyFormEvents,

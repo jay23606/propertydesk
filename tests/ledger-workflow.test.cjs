@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("ledger workflow wires correction writes, entry forms, and transaction actions", () => {
+test("ledger workflow wires entry forms, transaction history, and maintenance separately", () => {
   const calls = [];
   const passed = {};
   const saveCorrection = () => "saved correction";
@@ -40,6 +40,13 @@ test("ledger workflow wires correction writes, entry forms, and transaction acti
           return transactions;
         },
       },
+      PropertyDeskTransactionMaintenanceWorkflow: {
+        create: (options) => {
+          calls.push("maintenance");
+          passed.maintenance = options;
+          return { attachTransactionActionEvents: () => "maintenance events" };
+        },
+      },
     },
   });
   vm.runInContext(
@@ -65,7 +72,12 @@ test("ledger workflow wires correction writes, entry forms, and transaction acti
   const workflow =
     context.window.PropertyDeskLedgerWorkflow.create(dependencies);
 
-  assert.deepEqual(calls, ["corrections", "entries", "transactions"]);
+  assert.deepEqual(calls, [
+    "corrections",
+    "entries",
+    "transactions",
+    "maintenance",
+  ]);
   assert.equal(passed.corrections.state, dependencies.state);
   assert.equal(passed.corrections.closeModal, dependencies.closeModal);
   assert.equal(passed.entries.state, dependencies.state);
@@ -84,7 +96,22 @@ test("ledger workflow wires correction writes, entry forms, and transaction acti
   );
   assert.equal(passed.transactions.documentRef, dependencies.documentRef);
   assert.equal("moneyInput" in passed.transactions, false);
-  assert.deepEqual(Object.keys(workflow).sort(), ["entries", "transactions"]);
+  assert.equal(passed.maintenance.openPayment, entries.openPayment);
+  assert.equal(passed.maintenance.openExpense, entries.openExpense);
+  assert.equal(
+    passed.maintenance.updateAllocationPreview,
+    entries.updateAllocationPreview,
+  );
+  assert.equal(passed.maintenance.documentRef, dependencies.documentRef);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "entries",
+    "transactionMaintenance",
+    "transactions",
+  ]);
   assert.equal(workflow.entries, entries);
   assert.equal(workflow.transactions, transactions);
+  assert.equal(
+    typeof workflow.transactionMaintenance.attachTransactionActionEvents,
+    "function",
+  );
 });

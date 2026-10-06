@@ -39,6 +39,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     "PropertyDeskTransactionCorrections.create(",
     "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskTransactionWorkflow.create(",
+    "PropertyDeskTransactionMaintenanceWorkflow.create(",
   ].map((marker) => ledgerWorkflow.indexOf(marker));
   assert.ok(creationOrder.every((position) => position >= 0));
   assert.deepEqual(
