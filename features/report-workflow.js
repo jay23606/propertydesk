@@ -1,4 +1,4 @@
-/* Compose portfolio report rendering and CSV export controls. */
+/* Compose portfolio report model and rendering. */
 (() => {
   "use strict";
 
@@ -12,8 +12,6 @@
       sumIncome,
       sumOperatingExpenses,
       accountBalance,
-      todayIso,
-      prettyType,
     } = context;
     const { buildReportModel } = window.PropertyDeskReportModel.create({
       state,
@@ -28,16 +26,7 @@
       money,
       buildReportModel,
     });
-    const { attachEvents: attachReportExportEvents } =
-      window.PropertyDeskReportExport.create({
-        $,
-        state,
-        todayIso,
-        prettyType,
-        accountBalance,
-      });
-
-    return { renderReports, attachReportExportEvents };
+    return { renderReports };
   }
 
   window.PropertyDeskReportWorkflow = Object.freeze({ create });

@@ -8,6 +8,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskReportExport\.create\(/);
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
   assert.ok(

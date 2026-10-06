@@ -415,7 +415,7 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
-test("report workflow composes portfolio rendering and account export actions", () => {
+test("report workflow composes portfolio report rendering only", () => {
   const passed = {};
   const context = vm.createContext({
     window: {
@@ -429,12 +429,6 @@ test("report workflow composes portfolio rendering and account export actions", 
         create: (options) => {
           passed.view = options;
           return { renderReports: () => "reports" };
-        },
-      },
-      PropertyDeskReportExport: {
-        create: (options) => {
-          passed.export = options;
-          return { attachEvents: () => "export events" };
         },
       },
     },
@@ -462,9 +456,8 @@ test("report workflow composes portfolio rendering and account export actions", 
   assert.equal(passed.model.accountBalance, accountBalance);
   assert.equal(passed.model.state, state);
   assert.equal(typeof passed.view.buildReportModel, "function");
-  assert.equal(passed.export.accountBalance, accountBalance);
   assert.equal(workflow.renderReports(), "reports");
-  assert.equal(workflow.attachReportExportEvents(), "export events");
+  assert.deepEqual(Object.keys(workflow), ["renderReports"]);
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
