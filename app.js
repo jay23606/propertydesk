@@ -125,7 +125,8 @@
     toast,
     fetchAll,
   });
-  const { updateGreeting } = workspace;
+  const { updateGreeting, attachProfileEvents, attachWorkspaceMemberEvents } =
+    workspace;
   function renderWorkspaceSettings() {
     workspace.renderWorkspaceSettings();
     renderReminderActivity();
@@ -451,7 +452,8 @@
       attachModalEvents,
       attachThemeEvents,
       attachNavigationEvents,
-      workspace.attachEvents,
+      attachProfileEvents,
+      attachWorkspaceMemberEvents,
       attachOverviewEvents,
       attachPropertyGridEvents,
       attachPropertyActionEvents,

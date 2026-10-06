@@ -72,7 +72,8 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();
   assert.equal(passed.displayName, "Owner");
-  workflow.attachEvents();
+  workflow.attachProfileEvents();
+  workflow.attachWorkspaceMemberEvents();
   assert.equal(
     passed.members.view.renderWorkspaceMembers,
     renderWorkspaceMembers,

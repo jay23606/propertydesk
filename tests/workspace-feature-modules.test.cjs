@@ -192,10 +192,12 @@ test("workspace feature owns profile and member form bindings", () => {
     }),
   });
 
-  feature.attachEvents();
+  feature.attachProfileEvents();
+  feature.attachWorkspaceMemberEvents();
 
   assert.deepEqual(Object.keys(feature).sort(), [
-    "attachEvents",
+    "attachProfileEvents",
+    "attachWorkspaceMemberEvents",
     "renderWorkspaceSettings",
     "updateGreeting",
   ]);
@@ -360,7 +362,8 @@ test("workspace setting writes report rejected requests and retain entered value
     confirmAction: () => true,
   });
 
-  feature.attachEvents();
+  feature.attachProfileEvents();
+  feature.attachWorkspaceMemberEvents();
   await assert.doesNotReject(saveProfile({ preventDefault() {} }));
   await assert.doesNotReject(
     memberHandlers.get("member-add-form:submit")({ preventDefault() {} }),

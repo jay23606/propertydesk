@@ -41,15 +41,19 @@
       confirmAction,
     });
 
-    function attachEvents() {
+    function attachProfileEvents() {
       profileView.attachEvents(profile.saveProfile);
+    }
+
+    function attachWorkspaceMemberEvents() {
       members.attachEvents();
     }
 
     return {
       updateGreeting,
       renderWorkspaceSettings,
-      attachEvents,
+      attachProfileEvents,
+      attachWorkspaceMemberEvents,
     };
   }
 

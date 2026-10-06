@@ -18,7 +18,7 @@ test("app root wires theme, workspace settings, and navigation separately", () =
   );
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachNavigationEvents,\s*workspace\.attachEvents,/,
+    /eventBinders:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
   );
   assert.match(app, /attachEvents: attachThemeEvents/);
   assert.doesNotMatch(app, /PropertyDeskAppChromeWorkflow/);
