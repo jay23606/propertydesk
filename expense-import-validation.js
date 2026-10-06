@@ -1,25 +1,21 @@
 /* Validate and normalize expense import rows before import review. */
 (() => {
-  'use strict';
+  "use strict";
 
-  const {
-    csvMoney,
-    markPossibleDuplicates,
-    validIsoDate,
-    validateImportRows,
-  } = globalThis.PropertyDeskImportUtils;
+  const { csvMoney, markPossibleDuplicates, validIsoDate, validateImportRows } =
+    globalThis.PropertyDeskImportUtils;
 
   function validateExpenseRows(rows, properties, accounts, expenses) {
     const expenseKey = (propertyId, accountId, date, amount, payee, memo) =>
       JSON.stringify([
         propertyId,
-        accountId || '',
+        accountId || "",
         date,
         Number(amount).toFixed(2),
-        String(payee || '')
+        String(payee || "")
           .trim()
           .toLowerCase(),
-        String(memo || '')
+        String(memo || "")
           .trim()
           .toLowerCase(),
       ]);
@@ -41,7 +37,7 @@
         !row.amount
       )
         throw new Error(
-          'Each expense row needs property_name, property_address, expense_date, and amount.',
+          "Each expense row needs property_name, property_address, expense_date, and amount.",
         );
       const property = properties.find(
         (x) =>
@@ -68,28 +64,28 @@
       });
       if (!validIsoDate(row.expense_date))
         throw new Error(`Invalid expense date ${row.expense_date}.`);
-      const category = row.category || 'other',
-        method = row.payment_method || 'manual';
+      const category = row.category || "other",
+        method = row.payment_method || "manual";
       if (
         ![
-          'repairs',
-          'contractor',
-          'materials',
-          'taxes',
-          'insurance',
-          'utilities',
-          'management',
-          'deposit_refund',
-          'other',
+          "repairs",
+          "contractor",
+          "materials",
+          "taxes",
+          "insurance",
+          "utilities",
+          "management",
+          "deposit_refund",
+          "other",
         ].includes(category)
       )
         throw new Error(`Invalid expense category “${category}”.`);
-      if (category === 'deposit_refund' && account?.account_type !== 'rental')
+      if (category === "deposit_refund" && account?.account_type !== "rental")
         throw new Error(
-          'A security deposit refund must be linked to a rental account.',
+          "A security deposit refund must be linked to a rental account.",
         );
       if (
-        !['manual', 'check', 'cash', 'bank_transfer', 'card', 'other'].includes(
+        !["manual", "check", "cash", "bank_transfer", "card", "other"].includes(
           method,
         )
       )
@@ -97,13 +93,13 @@
       return {
         property_name: property.name,
         property_address: property.address,
-        account_name: account?.name || '',
+        account_name: account?.name || "",
         expense_date: row.expense_date,
         amount,
         category,
-        payee: row.payee || '',
+        payee: row.payee || "",
         payment_method: method,
-        memo: [row.memo, row.source_note].filter(Boolean).join(' · '),
+        memo: [row.memo, row.source_note].filter(Boolean).join(" · "),
       };
     });
     const valid = markPossibleDuplicates(
@@ -136,6 +132,6 @@
 
   const validation = Object.freeze({ validateExpenseRows });
   globalThis.PropertyDeskExpenseImportValidation = validation;
-  if (typeof module !== 'undefined' && module.exports)
+  if (typeof module !== "undefined" && module.exports)
     module.exports = validation;
 })();

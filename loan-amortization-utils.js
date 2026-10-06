@@ -123,7 +123,9 @@
     });
   }
 
-  const loanAmortization = Object.freeze({ create: createLoanAmortizationUtils });
+  const loanAmortization = Object.freeze({
+    create: createLoanAmortizationUtils,
+  });
   globalThis.PropertyDeskLoanAmortizationUtils = loanAmortization;
   if (typeof module !== "undefined" && module.exports)
     module.exports = loanAmortization;

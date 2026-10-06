@@ -1,13 +1,9 @@
 /* Validate and normalize payment import rows before import review. */
 (() => {
-  'use strict';
+  "use strict";
 
-  const {
-    csvMoney,
-    markPossibleDuplicates,
-    validIsoDate,
-    validateImportRows,
-  } = globalThis.PropertyDeskImportUtils;
+  const { csvMoney, markPossibleDuplicates, validIsoDate, validateImportRows } =
+    globalThis.PropertyDeskImportUtils;
 
   function validatePaymentRows(rows, properties, accounts, payments) {
     const paymentKey = (accountId, date, amount, memo) =>
@@ -15,7 +11,7 @@
         accountId,
         date,
         Number(amount).toFixed(2),
-        String(memo || '')
+        String(memo || "")
           .trim()
           .toLowerCase(),
       ]);
@@ -31,7 +27,7 @@
         !row.amount
       )
         throw new Error(
-          'Each payment row needs property_name, property_address, account_name, received_date, and amount.',
+          "Each payment row needs property_name, property_address, account_name, received_date, and amount.",
         );
       const property = properties.find(
         (x) =>
@@ -59,39 +55,39 @@
         throw new Error(`Invalid payment date ${row.received_date}.`);
       const incomeCategory =
         row.income_category ||
-        (account.account_type === 'rental' ? 'rent' : 'installment');
+        (account.account_type === "rental" ? "rent" : "installment");
       const allowedCategories =
-        account.account_type === 'rental'
-          ? ['rent', 'late_fee', 'deposit', 'other']
-          : ['installment', 'late_fee', 'other'];
+        account.account_type === "rental"
+          ? ["rent", "late_fee", "deposit", "other"]
+          : ["installment", "late_fee", "other"];
       if (!allowedCategories.includes(incomeCategory))
         throw new Error(
           `Invalid income category “${incomeCategory}” for ${account.account_type}.`,
         );
-      const method = row.payment_method || 'manual';
+      const method = row.payment_method || "manual";
       if (
         ![
-          'manual',
-          'check',
-          'cash',
-          'bank_transfer',
-          'money_order',
-          'card',
+          "manual",
+          "check",
+          "cash",
+          "bank_transfer",
+          "money_order",
+          "card",
         ].includes(method)
       )
         throw new Error(`Invalid payment method “${method}”.`);
       const allocationColumns = [
-        'principal_amount',
-        'interest_amount',
-        'fee_amount',
-        'escrow_amount',
-        'unapplied_amount',
+        "principal_amount",
+        "interest_amount",
+        "fee_amount",
+        "escrow_amount",
+        "unapplied_amount",
       ];
       const hasLegacyAllocation = allocationColumns.some(
-        (column) => String(row[column] ?? '').trim() !== '',
+        (column) => String(row[column] ?? "").trim() !== "",
       );
       const allocation =
-        account.account_type === 'rental'
+        account.account_type === "rental"
           ? { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: 0 }
           : hasLegacyAllocation
             ? {
@@ -129,7 +125,7 @@
                 unapplied: amount,
               };
       if (
-        account.account_type !== 'rental' &&
+        account.account_type !== "rental" &&
         hasLegacyAllocation &&
         Math.round(
           (allocation.principal +
@@ -141,7 +137,7 @@
         ) !== Math.round(amount * 100)
       )
         throw new Error(
-          `Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(amount)}.`,
+          `Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(amount)}.`,
         );
       return {
         property_name: property.name,
@@ -156,7 +152,7 @@
         fee_amount: allocation.fee,
         escrow_amount: allocation.escrow,
         unapplied_amount: allocation.unapplied,
-        memo: row.memo || '',
+        memo: row.memo || "",
       };
     });
     const valid = markPossibleDuplicates(
@@ -180,6 +176,6 @@
 
   const validation = Object.freeze({ validatePaymentRows });
   globalThis.PropertyDeskPaymentImportValidation = validation;
-  if (typeof module !== 'undefined' && module.exports)
+  if (typeof module !== "undefined" && module.exports)
     module.exports = validation;
 })();

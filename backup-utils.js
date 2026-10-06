@@ -1,6 +1,6 @@
 /* Build the versioned manifest for a private PropertyDesk backup. */
 (() => {
-  'use strict';
+  "use strict";
 
   function createBackup(
     records,
@@ -8,18 +8,18 @@
     includedFiles = [],
   ) {
     const tables = [
-      'pd_properties',
-      'pd_accounts',
-      'pd_agreement_versions',
-      'pd_payments',
-      'pd_expenses',
-      'pd_deposit_entries',
-      'pd_documents',
-      'pd_import_batches',
-      'pd_audit_events',
-      'pd_workspace_members',
-      'pd_property_holders',
-      'pd_reminder_logs',
+      "pd_properties",
+      "pd_accounts",
+      "pd_agreement_versions",
+      "pd_payments",
+      "pd_expenses",
+      "pd_deposit_entries",
+      "pd_documents",
+      "pd_import_batches",
+      "pd_audit_events",
+      "pd_workspace_members",
+      "pd_property_holders",
+      "pd_reminder_logs",
     ];
     const data = Object.fromEntries(
       tables.map((table) => [
@@ -29,7 +29,7 @@
     );
     return {
       manifest: {
-        format: 'propertydesk-backup',
+        format: "propertydesk-backup",
         format_version: 7,
         schema_version: 7,
         exported_at: exportedAt,
@@ -54,5 +54,5 @@
 
   const helpers = Object.freeze({ createBackup });
   globalThis.PropertyDeskBackupUtils = helpers;
-  if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
+  if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();

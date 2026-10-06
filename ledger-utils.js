@@ -1,33 +1,33 @@
 /* Pure posted-ledger calculations shared by the app and its tests. */
 (() => {
-  'use strict';
+  "use strict";
 
   function isPosted(transaction) {
-    return !transaction?.status || transaction.status === 'posted';
+    return !transaction?.status || transaction.status === "posted";
   }
 
   function hasPostedPaymentInMonth(payments, accountId, month) {
-    const yearMonth = String(month || '').slice(0, 7);
+    const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return false;
     return payments.some(
       (payment) =>
         payment.account_id === accountId &&
         isPosted(payment) &&
-        !['deposit', 'late_fee'].includes(payment.income_category) &&
-        String(payment.received_date || '').slice(0, 7) === yearMonth,
+        !["deposit", "late_fee"].includes(payment.income_category) &&
+        String(payment.received_date || "").slice(0, 7) === yearMonth,
     );
   }
 
   function postedPaymentTotalInMonth(payments, accountId, month) {
-    const yearMonth = String(month || '').slice(0, 7);
+    const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return 0;
     const total = payments
       .filter(
         (payment) =>
           payment.account_id === accountId &&
           isPosted(payment) &&
-          !['deposit', 'late_fee'].includes(payment.income_category) &&
-          String(payment.received_date || '').slice(0, 7) === yearMonth,
+          !["deposit", "late_fee"].includes(payment.income_category) &&
+          String(payment.received_date || "").slice(0, 7) === yearMonth,
       )
       .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
     return Math.round((total + Number.EPSILON) * 100) / 100;
@@ -35,12 +35,12 @@
 
   function paymentStatusInMonth(payments, accountId, month, scheduledAmount) {
     const total = postedPaymentTotalInMonth(payments, accountId, month);
-    if (total <= 0) return 'none';
+    if (total <= 0) return "none";
     const expected = Number(scheduledAmount || 0);
-    return expected > 0 && total + 0.004 >= expected ? 'full' : 'partial';
+    return expected > 0 && total + 0.004 >= expected ? "full" : "partial";
   }
 
-  function sumPosted(transactions, amountField = 'amount') {
+  function sumPosted(transactions, amountField = "amount") {
     return transactions
       .filter(isPosted)
       .reduce(
@@ -49,19 +49,19 @@
       );
   }
 
-  function sumIncome(transactions, amountField = 'amount') {
+  function sumIncome(transactions, amountField = "amount") {
     return sumPosted(
       transactions.filter(
-        (transaction) => transaction.income_category !== 'deposit',
+        (transaction) => transaction.income_category !== "deposit",
       ),
       amountField,
     );
   }
 
-  function sumOperatingExpenses(transactions, amountField = 'amount') {
+  function sumOperatingExpenses(transactions, amountField = "amount") {
     return sumPosted(
       transactions.filter(
-        (transaction) => transaction.category !== 'deposit_refund',
+        (transaction) => transaction.category !== "deposit_refund",
       ),
       amountField,
     );
@@ -72,11 +72,11 @@
       expenseById = new Map(expenses.map((row) => [row.id, row]));
     const active = entries.filter(
       (row) =>
-        row.entry_type === 'retained' ||
-        row.entry_type === 'restored' ||
-        (row.entry_type === 'received' &&
+        row.entry_type === "retained" ||
+        row.entry_type === "restored" ||
+        (row.entry_type === "received" &&
           isPosted(paymentById.get(row.source_payment_id))) ||
-        (row.entry_type === 'refunded' &&
+        (row.entry_type === "refunded" &&
           isPosted(expenseById.get(row.source_expense_id))),
     );
     const totals = { received: 0, refunded: 0, retained: 0, restored: 0 };
@@ -88,9 +88,15 @@
   }
 
   const scheduleFactory = globalThis.PropertyDeskScheduleUtils;
-  if (!scheduleFactory) throw new Error('PropertyDeskScheduleUtils must load before PropertyDeskLedgerUtils.');
+  if (!scheduleFactory)
+    throw new Error(
+      "PropertyDeskScheduleUtils must load before PropertyDeskLedgerUtils.",
+    );
   const loanFactory = globalThis.PropertyDeskLoanAmortizationUtils;
-  if (!loanFactory) throw new Error('PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.');
+  if (!loanFactory)
+    throw new Error(
+      "PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.",
+    );
   const schedule = scheduleFactory.create({ isPosted });
   const loans = loanFactory.create({ sumPosted });
   const helpers = Object.freeze({
@@ -110,5 +116,5 @@
     unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
   });
   globalThis.PropertyDeskLedgerUtils = helpers;
-  if (typeof module !== 'undefined' && module.exports) module.exports = helpers;
+  if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();

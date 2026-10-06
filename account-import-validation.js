@@ -1,27 +1,23 @@
 /* Validate and normalize account import rows before import review. */
 (() => {
-  'use strict';
+  "use strict";
 
-  const {
-    csvMoney,
-    csvRate,
-    validIsoDate,
-    validateImportRows,
-  } = globalThis.PropertyDeskImportUtils;
+  const { csvMoney, csvRate, validIsoDate, validateImportRows } =
+    globalThis.PropertyDeskImportUtils;
 
   function validateAccountRows(rows, properties, accounts, today) {
     const seenAccounts = new Set();
     return validateImportRows(rows, (row) => {
       const required = [
-        'property_name',
-        'property_address',
-        'account_type',
-        'account_name',
+        "property_name",
+        "property_address",
+        "account_type",
+        "account_name",
       ];
       for (const key of required)
         if (!row[key]) throw new Error(`Missing required value “${key}”.`);
       const type = row.account_type.toLowerCase();
-      if (!['rental', 'land_contract', 'note'].includes(type))
+      if (!["rental", "land_contract", "note"].includes(type))
         throw new Error(
           `Invalid account_type “${row.account_type}”. Use rental, land_contract, or note.`,
         );
@@ -48,26 +44,26 @@
         { optional: true },
       );
       const principal =
-        type === 'rental'
+        type === "rental"
           ? 0
           : csvMoney(row.original_principal, `${row.account_name} principal`, {
               optional: true,
             });
       const principalInterestAmount =
-        type === 'rental' || !row.principal_interest_amount
+        type === "rental" || !row.principal_interest_amount
           ? null
           : csvMoney(
               row.principal_interest_amount,
               `${row.account_name} P&I payment`,
             );
       const escrowAmount =
-        type === 'rental'
+        type === "rental"
           ? 0
           : csvMoney(row.escrow_amount, `${row.account_name} monthly escrow`, {
               optional: true,
             });
       const openingBalance =
-        (row.ledger_opening_balance || '').trim() === ''
+        (row.ledger_opening_balance || "").trim() === ""
           ? null
           : csvMoney(
               row.ledger_opening_balance,
@@ -82,10 +78,10 @@
         `${row.account_name} interest rate`,
         { optional: true },
       );
-      const frequency = row.payment_frequency || 'monthly',
+      const frequency = row.payment_frequency || "monthly",
         startDate = row.start_date || today;
       if (
-        !['monthly', 'weekly', 'biweekly', 'quarterly', 'annual'].includes(
+        !["monthly", "weekly", "biweekly", "quarterly", "annual"].includes(
           frequency,
         ) ||
         !validIsoDate(startDate) ||
@@ -106,9 +102,9 @@
         throw new Error(
           `Grace days must be a nonnegative whole number for ${row.account_name}.`,
         );
-      const propertyKind = row.property_kind || 'residential';
+      const propertyKind = row.property_kind || "residential";
       if (
-        !['residential', 'land', 'commercial', 'other'].includes(propertyKind)
+        !["residential", "land", "commercial", "other"].includes(propertyKind)
       )
         throw new Error(
           `Invalid property_kind “${row.property_kind}” for ${row.property_name}.`,
@@ -116,7 +112,7 @@
       const lateFee = csvMoney(row.late_fee, `${row.account_name} late fee`, {
         optional: true,
       });
-      const partyEmail = (row.party_email || '')
+      const partyEmail = (row.party_email || "")
         .split(/[;,]/)
         .map((email) => email.trim())
         .filter(Boolean);
@@ -128,24 +124,24 @@
         property_address: row.property_address,
         account_type: type,
         account_name: row.account_name,
-        party_name: row.party_name || '',
-        party_email: partyEmail.join(', '),
-        party_phone: (row.party_phone || '').trim(),
+        party_name: row.party_name || "",
+        party_email: partyEmail.join(", "),
+        party_phone: (row.party_phone || "").trim(),
         start_date: startDate,
-        next_due_date: row.next_due_date || '',
+        next_due_date: row.next_due_date || "",
         payment_amount: amount,
         payment_frequency: frequency,
         original_principal: principal,
         principal_interest_amount: principalInterestAmount,
         escrow_amount: escrowAmount,
         ledger_opening_balance: openingBalance,
-        ledger_opening_date: row.ledger_opening_date || '',
+        ledger_opening_date: row.ledger_opening_date || "",
         interest_rate: rate,
-        term_months: row.term_months || '',
-        balloon_date: row.balloon_date || '',
+        term_months: row.term_months || "",
+        balloon_date: row.balloon_date || "",
         late_fee: lateFee,
         grace_days: graceDays,
-        notes: row.notes || '',
+        notes: row.notes || "",
         city: row.city || null,
         state: row.state || null,
         postal_code: row.postal_code || null,
@@ -156,6 +152,6 @@
 
   const validation = Object.freeze({ validateAccountRows });
   globalThis.PropertyDeskAccountImportValidation = validation;
-  if (typeof module !== 'undefined' && module.exports)
+  if (typeof module !== "undefined" && module.exports)
     module.exports = validation;
 })();

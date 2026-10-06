@@ -1,0 +1,10 @@
+{
+  "overrides": [
+    {
+      "files": "sw.js",
+      "options": {
+        "singleQuote": true
+      }
+    }
+  ]
+}
