@@ -22,6 +22,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   assert.match(app, /attachAccountFormEvents,/);
   assert.match(app, /attachDepositEvents,/);
   assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
@@ -151,19 +152,12 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details consumes a separately composed deposit renderer", () => {
+test("account detail content consumes the separate deposit renderer", () => {
   const created = [];
   const passed = {};
   const depositSectionHTML = () => "deposit html";
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountDetailActionsWorkflow: {
-        create: (options) => {
-          created.push("account maintenance workflow");
-          passed.accountMaintenance = options;
-          return { attachEvents: () => {} };
-        },
-      },
       PropertyDeskAccountDetailContentWorkflow: {
         create: (options) => {
           created.push("account detail content workflow");
@@ -188,34 +182,21 @@ test("account details consumes a separately composed deposit renderer", () => {
     moneyInput: Number,
     depositSectionHTML,
     esc: String,
-    toast() {},
-    fetchAll() {},
     prettyType: String,
     paymentFrequencyLabel: () => "monthly",
-    closeModal() {},
     todayIso() {},
   };
   const workflow =
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
-  assert.deepEqual(created, [
-    "account maintenance workflow",
-    "account detail content workflow",
-  ]);
+  assert.deepEqual(created, ["account detail content workflow"]);
   assert.equal(passed.accountContent.money, dependencies.money);
   assert.equal(
     passed.accountContent.depositSectionHTML,
     dependencies.depositSectionHTML,
   );
-  assert.equal(passed.accountMaintenance.closeModal, dependencies.closeModal);
-  assert.equal(passed.accountMaintenance.editAccount, dependencies.editAccount);
-  assert.equal(passed.accountMaintenance.openPayment, dependencies.openPayment);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
-    "openAccountDetails",
-  ]);
+  assert.deepEqual(Object.keys(workflow).sort(), ["openAccountDetails"]);
   assert.equal(workflow.openAccountDetails(), "opened");
-  workflow.attachEvents();
 });
 
 test("reminder workflow composes the activity view and email preview", () => {

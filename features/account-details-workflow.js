@@ -1,4 +1,4 @@
-/* Connect account-detail content with its separate action workflow. */
+/* Compose account-detail content from its renderer and selected-account workflow. */
 (() => {
   "use strict";
 
@@ -17,25 +17,10 @@
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-      toast,
-      fetchAll,
       depositSectionHTML,
       openModal,
       propertyAddress,
-      closeModal,
-      editAccount,
-      openPayment,
     } = context;
-    const accountMaintenance =
-      window.PropertyDeskAccountDetailActionsWorkflow.create({
-        $,
-        state,
-        toast,
-        fetchAll,
-        closeModal,
-        editAccount,
-        openPayment,
-      });
     const { openAccountDetails } =
       window.PropertyDeskAccountDetailContentWorkflow.create({
         $,
@@ -55,10 +40,7 @@
         openModal,
         propertyAddress,
       });
-    return {
-      openAccountDetails,
-      attachEvents: accountMaintenance.attachEvents,
-    };
+    return { openAccountDetails };
   }
 
   window.PropertyDeskAccountDetailsWorkflow = Object.freeze({ create });

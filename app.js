@@ -188,7 +188,17 @@
       toast,
       fetchAll,
     });
-  const { openAccountDetails, attachEvents: attachAccountDetailsEvents } =
+  const { attachEvents: attachAccountDetailActionEvents } =
+    window.PropertyDeskAccountDetailActionsWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+      editAccount,
+      openPayment,
+    });
+  const { openAccountDetails } =
     window.PropertyDeskAccountDetailsWorkflow.create({
       $,
       state,
@@ -203,14 +213,9 @@
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
-      toast,
-      fetchAll,
       depositSectionHTML,
       openModal,
       propertyAddress,
-      closeModal,
-      editAccount,
-      openPayment,
     });
   const {
     openPropertyDetails,
@@ -332,7 +337,7 @@
       attachPropertyPortfolioEvents,
       attachTransactionEvents,
       attachTransactionActionEvents,
-      attachAccountDetailsEvents,
+      attachAccountDetailActionEvents,
       attachDepositEvents,
       attachCreateActions,
       attachPropertyFormEvents,
