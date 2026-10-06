@@ -303,6 +303,7 @@ test("backup agreement collector downloads only workspace-scoped files into the 
 
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   for (const moduleName of [
     "backup-agreement-files.js",
     "backup-records.js",
@@ -317,19 +318,7 @@ test("backup export aborts before download when a private document path escapes 
       context,
     );
   }
-  const tables = [
-    "pd_properties",
-    "pd_accounts",
-    "pd_agreement_versions",
-    "pd_payments",
-    "pd_expenses",
-    "pd_deposit_entries",
-    "pd_documents",
-    "pd_import_batches",
-    "pd_audit_events",
-    "pd_workspace_members",
-    "pd_property_holders",
-  ];
+  const tables = context.window.PropertyDeskBackupRecords.tables;
   let exportHandler;
   const button = {
     textContent: "Export backup",
@@ -402,6 +391,7 @@ test("backup export aborts before download when a private document path escapes 
 
 test("backup export adds the validated private agreement to the ZIP and manifest", async () => {
   const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   for (const moduleName of [
     "backup-agreement-files.js",
     "backup-records.js",
@@ -416,19 +406,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
       context,
     );
   }
-  const tables = [
-    "pd_properties",
-    "pd_accounts",
-    "pd_agreement_versions",
-    "pd_payments",
-    "pd_expenses",
-    "pd_deposit_entries",
-    "pd_documents",
-    "pd_import_batches",
-    "pd_audit_events",
-    "pd_workspace_members",
-    "pd_property_holders",
-  ];
+  const tables = context.window.PropertyDeskBackupRecords.tables;
   const agreement = {
     id: "doc-1",
     user_id: "workspace-1",

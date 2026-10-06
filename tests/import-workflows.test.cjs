@@ -566,6 +566,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/backup-export.js"),
   );
   assert.ok(
+    html.indexOf("backup-utils.js") <
+      html.indexOf("features/backup-records.js"),
+  );
+  assert.ok(
     html.indexOf("features/backup-records.js") <
       html.indexOf("features/backup-export.js"),
   );

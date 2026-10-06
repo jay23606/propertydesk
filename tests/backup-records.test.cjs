@@ -6,6 +6,7 @@ const vm = require("node:vm");
 
 test("backup record loader paginates each workspace table into named records", async () => {
   const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "backup-records.js"),
@@ -52,10 +53,17 @@ test("backup record loader paginates each workspace table into named records", a
       (table) => table in records,
     ),
   );
+  const backup = context.window.PropertyDeskBackupUtils.createBackup(records);
+  assert.deepEqual(
+    backup.manifest.included_tables,
+    context.window.PropertyDeskBackupRecords.tables,
+  );
+  assert.ok(Array.isArray(backup.data.pd_reminder_logs));
 });
 
 test("backup record loader stops when a table query fails", async () => {
   const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "backup-records.js"),

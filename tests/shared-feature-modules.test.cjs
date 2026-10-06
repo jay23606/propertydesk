@@ -373,6 +373,7 @@ test("backup and report exports own separate button bindings", () => {
       context,
     );
     if (file === "backup-export.js") {
+      context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
       for (const dependency of [
         "backup-records.js",
         "backup-agreement-files.js",

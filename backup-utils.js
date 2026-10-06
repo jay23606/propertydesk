@@ -2,25 +2,26 @@
 (() => {
   "use strict";
 
+  const tables = Object.freeze([
+    "pd_properties",
+    "pd_accounts",
+    "pd_agreement_versions",
+    "pd_payments",
+    "pd_expenses",
+    "pd_deposit_entries",
+    "pd_documents",
+    "pd_import_batches",
+    "pd_audit_events",
+    "pd_workspace_members",
+    "pd_property_holders",
+    "pd_reminder_logs",
+  ]);
+
   function createBackup(
     records,
     exportedAt = new Date().toISOString(),
     includedFiles = [],
   ) {
-    const tables = [
-      "pd_properties",
-      "pd_accounts",
-      "pd_agreement_versions",
-      "pd_payments",
-      "pd_expenses",
-      "pd_deposit_entries",
-      "pd_documents",
-      "pd_import_batches",
-      "pd_audit_events",
-      "pd_workspace_members",
-      "pd_property_holders",
-      "pd_reminder_logs",
-    ];
     const data = Object.fromEntries(
       tables.map((table) => [
         table,
@@ -52,7 +53,7 @@
     };
   }
 
-  const helpers = Object.freeze({ createBackup });
+  const helpers = Object.freeze({ tables, createBackup });
   globalThis.PropertyDeskBackupUtils = helpers;
   if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();
