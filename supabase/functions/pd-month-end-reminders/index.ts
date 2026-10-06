@@ -9,6 +9,7 @@ import {
 } from "../_shared/reminder-schedule.mjs";
 import { reminderMessage } from "../_shared/reminder-message.mjs";
 import { createReminderLogStore } from "../_shared/reminder-log.mjs";
+import { sendReminderEmail } from "../_shared/mailersend.mjs";
 
 const FROM_EMAIL =
   Deno.env.get("MAILERSEND_FROM_EMAIL") ??
@@ -166,20 +167,12 @@ Deno.serve(async (request) => {
           monthEnd,
           due.total,
         );
-        const response = await fetch("https://api.mailersend.com/v1/email", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${mailerSendToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            from: { email: FROM_EMAIL, name: FROM_NAME },
-            to: [{ email: recipient }],
-            subject: message.subject,
-            text: message.text,
-            html: message.html,
-          }),
+        const response = await sendReminderEmail({
+          token: mailerSendToken,
+          fromEmail: FROM_EMAIL,
+          fromName: FROM_NAME,
+          recipient,
+          message,
         });
         if (response.status === 202) {
           await reminderLog.saveResult(logId, {
