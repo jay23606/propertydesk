@@ -108,19 +108,20 @@ async function main() {
         },
       };
       const money = (amount) => `$${Number(amount || 0).toFixed(2)}`;
+      const fmtDate = (value, options) =>
+        value
+          ? new Date(`${value}T12:00:00`).toLocaleDateString("en-US", options)
+          : "—";
+      const { accountLoanScheduleHTML } =
+        window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
       const renderAccountDetails = window.PropertyDeskAccountDetailsView.create(
         {
           money,
-          fmtDate: (value, options) =>
-            value
-              ? new Date(`${value}T12:00:00`).toLocaleDateString(
-                  "en-US",
-                  options,
-                )
-              : "—",
+          fmtDate,
           esc: (value) => String(value ?? ""),
           prettyType: (type) => type,
           paymentFrequencyLabel: () => "Monthly",
+          accountLoanScheduleHTML,
         },
       ).renderAccountDetails;
       const feature = details.create({
