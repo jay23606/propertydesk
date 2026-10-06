@@ -88,13 +88,11 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
   assert.match(app, /function attachPropertyPortfolioEvents\(\)/);
-  assert.match(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
+  assert.match(app, /function attachPropertyDetailsEvents\(\)/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
-  assert.match(app, /attachEvents: attachPropertyDetailsEvents/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskProperty(?:DetailActions|Document)Workflow\.create\(/,
-  );
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
@@ -142,7 +140,9 @@ test("app root composes independent property screens and shares detail actions",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
-    "PropertyDeskPropertyDetailsWorkflow.create(",
+    "PropertyDeskPropertyDetailContentWorkflow.create(",
+    "PropertyDeskPropertyDetailActionsWorkflow.create(",
+    "PropertyDeskPropertyDocumentWorkflow.create(",
     "PropertyDeskOverviewPropertySummaryModel.create(",
     "PropertyDeskOverviewModel.create(",
     "PropertyDeskOverview.create(",
@@ -160,7 +160,9 @@ test("app root composes independent property screens and shares detail actions",
     /openPayment,\s*openPropertyDetails,\s*openAccountForProperty,/,
   );
   for (const script of [
-    "features/property-details-workflow.js",
+    "features/property-detail-content-workflow.js",
+    "features/property-detail-actions-workflow.js",
+    "features/property-document-workflow.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview.js",
@@ -180,7 +182,7 @@ test("app root composes independent property screens and shares detail actions",
   assert.doesNotMatch(worker, /property-workspace-workflow\.js/);
   assert.ok(
     app.indexOf("PropertyDeskAccountDetailContentWorkflow.create(") <
-      app.indexOf("PropertyDeskPropertyDetailsWorkflow.create("),
+      app.indexOf("PropertyDeskPropertyDetailContentWorkflow.create("),
   );
 });
 

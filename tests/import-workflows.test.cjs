@@ -530,30 +530,21 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/property-activity-view.js") <
       html.indexOf("features/property-activity-details.js"),
   );
-  assert.ok(
-    html.indexOf("features/property-activity-details.js") <
-      html.indexOf("features/property-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-detail-content-workflow.js") <
-      html.indexOf("features/property-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-details.js") <
-      html.indexOf("features/property-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-detail-quick-actions.js") <
-      html.indexOf("features/property-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-document-workflow.js") <
-      html.indexOf("features/property-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-details-workflow.js") <
-      html.indexOf("app.js"),
-  );
+  for (const script of [
+    "features/property-activity-details.js",
+    "features/property-detail-content-workflow.js",
+    "features/property-detail-actions-workflow.js",
+    "features/property-documents-view.js",
+    "features/property-document-workflow.js",
+  ]) {
+    assert.ok(
+      html.indexOf(script) >= 0 &&
+        html.indexOf(script) < html.indexOf("app.js"),
+      `${script} loads before the app composition root`,
+    );
+  }
+  assert.doesNotMatch(html, /features\/property-details-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/property-details-workflow\.js/);
   assert.ok(
     html.indexOf("features/property-activity-details.js") <
       html.indexOf("features/property-details.js"),
@@ -883,7 +874,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/csv-import-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-details\.js'/);
   assert.match(worker, /'\.\/features\/property-details-view\.js'/);
-  assert.match(worker, /'\.\/features\/property-details-workflow\.js'/);
+  assert.doesNotMatch(worker, /features\/property-details-workflow\.js/);
   assert.match(worker, /'\.\/features\/property-activity-details\.js'/);
   assert.match(worker, /'\.\/features\/property-activity-model\.js'/);
   assert.match(worker, /'\.\/features\/property-activity-view\.js'/);

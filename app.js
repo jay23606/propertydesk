@@ -239,8 +239,8 @@
     attachAccountDetailActionEvents();
     attachDepositEvents();
   }
-  const { openPropertyDetails, attachEvents: attachPropertyDetailsEvents } =
-    window.PropertyDeskPropertyDetailsWorkflow.create({
+  const { openPropertyDetails } =
+    window.PropertyDeskPropertyDetailContentWorkflow.create({
       $,
       state,
       isPosted,
@@ -254,9 +254,15 @@
       accountBalance,
       openModal,
       propertyAddress,
+    });
+  const { attachPropertyDetailEvents } =
+    window.PropertyDeskPropertyDetailActionsWorkflow.create({
+      $,
+      state,
       toast,
       fetchAll,
       todayIso,
+      openPropertyDetails,
       closeModal,
       editAccount,
       openPayment,
@@ -264,6 +270,18 @@
       openAccountForProperty,
       openAccountDetails,
     });
+  const { attachPropertyDocumentEvents } =
+    window.PropertyDeskPropertyDocumentWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+    });
+  function attachPropertyDetailsEvents() {
+    attachPropertyDetailEvents();
+    attachPropertyDocumentEvents();
+  }
   const propertySummaryModel =
     window.PropertyDeskOverviewPropertySummaryModel.create({
       state,

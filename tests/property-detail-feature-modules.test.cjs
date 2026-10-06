@@ -752,111 +752,28 @@ test("property detail content workflow connects activity summaries to property r
   assert.equal(workflow.openPropertyDetails(), "property details");
 });
 
-test("property details workflow connects content with action and document routes", () => {
-  const passed = {};
-  const openPropertyDetails = () => "property details";
-  const attachPropertyDetailEvents = () => "detail events";
-  const attachPropertyDocumentEvents = () => "document events";
-  const attached = [];
-  let detailActionsContext;
-  let documentContext;
-  const context = vm.createContext({
-    document: {},
-    window: {
-      PropertyDeskPropertyDetailContentWorkflow: {
-        create: (options) => {
-          passed.content = options;
-          return { openPropertyDetails };
-        },
-      },
-      PropertyDeskPropertyDetailActionsWorkflow: {
-        create: (options) => {
-          detailActionsContext = options;
-          return {
-            attachPropertyDetailEvents: () =>
-              attached.push(attachPropertyDetailEvents()),
-          };
-        },
-      },
-      PropertyDeskPropertyDocumentWorkflow: {
-        create: (options) => {
-          documentContext = options;
-          return {
-            attachPropertyDocumentEvents: () =>
-              attached.push(attachPropertyDocumentEvents()),
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-details-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    isPosted() {},
-    sumIncome() {},
-    sumOperatingExpenses() {},
-    money() {},
-    fmtDate() {},
-    esc() {},
-    prettyType() {},
-    paymentFrequencyLabel() {},
-    accountBalance() {},
-    openModal() {},
-    propertyAddress() {},
-    toast() {},
-    fetchAll() {},
-    todayIso() {},
-    closeModal() {},
-    editAccount() {},
-    openPayment() {},
-    openExpense() {},
-    openAccountForProperty() {},
-    openAccountDetails() {},
-  };
-  const workflow =
-    context.window.PropertyDeskPropertyDetailsWorkflow.create(dependencies);
-
-  assert.equal(passed.content.state, dependencies.state);
-  assert.equal(detailActionsContext.openPropertyDetails, openPropertyDetails);
-  assert.equal(documentContext.openPropertyDetails, openPropertyDetails);
+test("app composes property detail content, actions, and document routes", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const order = [
+    "PropertyDeskPropertyDetailContentWorkflow.create(",
+    "PropertyDeskPropertyDetailActionsWorkflow.create(",
+    "PropertyDeskPropertyDocumentWorkflow.create(",
+  ].map((marker) => app.indexOf(marker));
+  assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
-    Object.keys(detailActionsContext).sort(),
-    [
-      "$",
-      "closeModal",
-      "editAccount",
-      "fetchAll",
-      "openAccountDetails",
-      "openAccountForProperty",
-      "openExpense",
-      "openPayment",
-      "openPropertyDetails",
-      "state",
-      "toast",
-      "todayIso",
-    ].sort(),
+    order,
+    [...order].sort((left, right) => left - right),
   );
-  assert.deepEqual(Object.keys(documentContext).sort(), [
-    "$",
-    "fetchAll",
-    "openPropertyDetails",
-    "state",
-    "toast",
-  ]);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
-    "openPropertyDetails",
-  ]);
-  assert.equal(workflow.openPropertyDetails, openPropertyDetails);
-  workflow.attachEvents();
-  assert.deepEqual(attached, ["detail events", "document events"]);
+  assert.match(
+    app,
+    /PropertyDeskPropertyDocumentWorkflow.create\(\{[\s\S]*?openPropertyDetails,/,
+  );
+  assert.match(
+    app,
+    /function attachPropertyDetailsEvents\(\) \{\s*attachPropertyDetailEvents\(\);\s*attachPropertyDocumentEvents\(\);/,
+  );
+  assert.match(app, /eventBinders:[\s\S]*?attachPropertyDetailsEvents/);
+  assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
 });
 
 test("property detail actions workflow composes administration and modal actions", () => {
