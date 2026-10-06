@@ -59,10 +59,14 @@
         openAccountForProperty,
       });
 
+    function attachEvents() {
+      attachPortfolioEvents();
+      attachPortfolioActionEvents();
+    }
+
     return {
       renderProperties,
-      attachPortfolioEvents,
-      attachPortfolioActionEvents,
+      attachEvents,
     };
   }
 

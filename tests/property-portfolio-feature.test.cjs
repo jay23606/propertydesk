@@ -6,9 +6,10 @@ const vm = require("node:vm");
 test("Properties screen workflow connects the grid and quick-action binders", () => {
   const created = [];
   const passed = {};
+  const attached = [];
   const renderProperties = () => "properties";
-  const attachPortfolioEvents = () => "grid events";
-  const attachPortfolioActionEvents = () => "action events";
+  const attachPortfolioEvents = () => attached.push("grid events");
+  const attachPortfolioActionEvents = () => attached.push("action events");
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyPortfolioWorkflow: {
@@ -100,17 +101,10 @@ test("Properties screen workflow connects the grid and quick-action binders", ()
     "openPropertyDetails",
     "openAccountForProperty",
   ]);
-  assert.deepEqual(Object.keys(workflow), [
-    "renderProperties",
-    "attachPortfolioEvents",
-    "attachPortfolioActionEvents",
-  ]);
+  assert.deepEqual(Object.keys(workflow), ["renderProperties", "attachEvents"]);
   assert.equal(workflow.renderProperties, renderProperties);
-  assert.equal(workflow.attachPortfolioEvents, attachPortfolioEvents);
-  assert.equal(
-    workflow.attachPortfolioActionEvents,
-    attachPortfolioActionEvents,
-  );
+  workflow.attachEvents();
+  assert.deepEqual(attached, ["grid events", "action events"]);
 });
 
 test("Properties account-row model derives balances and reminder details", () => {
