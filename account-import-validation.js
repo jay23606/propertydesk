@@ -12,17 +12,197 @@
   );
   const propertyKindValues = new Set(propertyKinds.map(({ value }) => value));
 
+  function accountKey(name, propertyName, propertyAddress) {
+    return JSON.stringify([
+      name.toLowerCase(),
+      propertyName.toLowerCase(),
+      propertyAddress.toLowerCase(),
+    ]);
+  }
+
+  function accountIdentity(row, existingAccounts, seenAccounts) {
+    const required = [
+      "property_name",
+      "property_address",
+      "account_type",
+      "account_name",
+    ];
+    for (const key of required)
+      if (!row[key]) throw new Error(`Missing required value “${key}”.`);
+    const type = row.account_type.toLowerCase();
+    if (!accountTypeValues.has(type))
+      throw new Error(
+        `Invalid account_type “${row.account_type}”. Use ${[...accountTypeValues].join(", ")}.`,
+      );
+    const key = accountKey(
+      row.account_name,
+      row.property_name,
+      row.property_address,
+    );
+    if (existingAccounts.has(key) || seenAccounts.has(key))
+      throw new Error(
+        `Possible duplicate account: ${row.account_name} at ${row.property_address}.`,
+      );
+    return { type, key };
+  }
+
+  function accountFinancialFields(row, type) {
+    const amount = csvMoney(
+      row.payment_amount,
+      `${row.account_name} payment amount`,
+      { optional: true },
+    );
+    const principal =
+      type === "rental"
+        ? 0
+        : csvMoney(row.original_principal, `${row.account_name} principal`, {
+            optional: true,
+          });
+    const principalInterestAmount =
+      type === "rental" || !row.principal_interest_amount
+        ? null
+        : csvMoney(
+            row.principal_interest_amount,
+            `${row.account_name} P&I payment`,
+          );
+    const escrowAmount =
+      type === "rental"
+        ? 0
+        : csvMoney(row.escrow_amount, `${row.account_name} monthly escrow`, {
+            optional: true,
+          });
+    const openingBalance =
+      (row.ledger_opening_balance || "").trim() === ""
+        ? null
+        : csvMoney(
+            row.ledger_opening_balance,
+            `${row.account_name} opening balance`,
+          );
+    if (openingBalance !== null && !row.ledger_opening_date)
+      throw new Error(
+        `A ledger opening date is required when an opening balance is set for ${row.account_name}.`,
+      );
+    const rate = csvRate(
+      row.interest_rate,
+      `${row.account_name} interest rate`,
+      { optional: true },
+    );
+    return {
+      amount,
+      principal,
+      principalInterestAmount,
+      escrowAmount,
+      openingBalance,
+      rate,
+    };
+  }
+
+  function validateAccountDates(row, frequency, startDate) {
+    if (
+      !paymentFrequencyValues.has(frequency) ||
+      !validIsoDate(startDate) ||
+      (row.next_due_date && !validIsoDate(row.next_due_date)) ||
+      (row.balloon_date && !validIsoDate(row.balloon_date)) ||
+      (row.ledger_opening_date && !validIsoDate(row.ledger_opening_date))
+    )
+      throw new Error(
+        `Invalid payment frequency or date for ${row.account_name}.`,
+      );
+  }
+
+  function accountTermFields(row) {
+    const term = row.term_months ? Number(row.term_months) : null,
+      graceDays = Number(row.grace_days || 0);
+    if (term !== null && (!Number.isInteger(term) || term < 1))
+      throw new Error(
+        `Term months must be a positive whole number for ${row.account_name}.`,
+      );
+    if (!Number.isInteger(graceDays) || graceDays < 0)
+      throw new Error(
+        `Grace days must be a nonnegative whole number for ${row.account_name}.`,
+      );
+    return { term, graceDays };
+  }
+
+  function accountPropertyKind(row) {
+    const propertyKind = row.property_kind || defaults.propertyKind;
+    if (!propertyKindValues.has(propertyKind))
+      throw new Error(
+        `Invalid property_kind “${row.property_kind}” for ${row.property_name}.`,
+      );
+    return propertyKind;
+  }
+
+  function accountScheduleFields(row, today) {
+    const frequency = row.payment_frequency || defaults.paymentFrequency,
+      startDate = row.start_date || today;
+    validateAccountDates(row, frequency, startDate);
+    const { term, graceDays } = accountTermFields(row);
+    const propertyKind = accountPropertyKind(row);
+    return { frequency, startDate, term, graceDays, propertyKind };
+  }
+
+  function accountContactFields(row) {
+    const partyEmail = (row.party_email || "")
+      .split(/[;,]/)
+      .map((email) => email.trim())
+      .filter(Boolean);
+    if (partyEmail.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
+      throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
+    return {
+      partyEmail: partyEmail.join(", "),
+      partyPhone: (row.party_phone || "").trim(),
+    };
+  }
+
+  function normalizeAccountRow(row, context) {
+    const { type, key } = accountIdentity(
+      row,
+      context.existingAccounts,
+      context.seenAccounts,
+    );
+    const financial = accountFinancialFields(row, type);
+    const schedule = accountScheduleFields(row, context.today);
+    const lateFee = csvMoney(row.late_fee, `${row.account_name} late fee`, {
+      optional: true,
+    });
+    const contact = accountContactFields(row);
+    context.seenAccounts.add(key);
+    return {
+      property_name: row.property_name,
+      property_address: row.property_address,
+      account_type: type,
+      account_name: row.account_name,
+      party_name: row.party_name || "",
+      party_email: contact.partyEmail,
+      party_phone: contact.partyPhone,
+      start_date: schedule.startDate,
+      next_due_date: row.next_due_date || "",
+      payment_amount: financial.amount,
+      payment_frequency: schedule.frequency,
+      original_principal: financial.principal,
+      principal_interest_amount: financial.principalInterestAmount,
+      escrow_amount: financial.escrowAmount,
+      ledger_opening_balance: financial.openingBalance,
+      ledger_opening_date: row.ledger_opening_date || "",
+      interest_rate: financial.rate,
+      term_months: row.term_months || "",
+      balloon_date: row.balloon_date || "",
+      late_fee: lateFee,
+      grace_days: schedule.graceDays,
+      notes: row.notes || "",
+      city: row.city || null,
+      state: row.state || null,
+      postal_code: row.postal_code || null,
+      property_kind: schedule.propertyKind,
+    };
+  }
+
   function validateAccountRows(rows, properties, accounts, today) {
     const seenAccounts = new Set();
     const propertyById = new Map(
       properties.map((property) => [property.id, property]),
     );
-    const accountKey = (name, propertyName, propertyAddress) =>
-      JSON.stringify([
-        name.toLowerCase(),
-        propertyName.toLowerCase(),
-        propertyAddress.toLowerCase(),
-      ]);
     const existingAccounts = new Set(
       accounts.flatMap((account) => {
         const property = propertyById.get(account.property_id);
@@ -31,135 +211,9 @@
           : [];
       }),
     );
-    return validateImportRows(rows, (row) => {
-      const required = [
-        "property_name",
-        "property_address",
-        "account_type",
-        "account_name",
-      ];
-      for (const key of required)
-        if (!row[key]) throw new Error(`Missing required value “${key}”.`);
-      const type = row.account_type.toLowerCase();
-      if (!accountTypeValues.has(type))
-        throw new Error(
-          `Invalid account_type “${row.account_type}”. Use ${[...accountTypeValues].join(", ")}.`,
-        );
-      const key = accountKey(
-        row.account_name,
-        row.property_name,
-        row.property_address,
-      );
-      if (existingAccounts.has(key) || seenAccounts.has(key))
-        throw new Error(
-          `Possible duplicate account: ${row.account_name} at ${row.property_address}.`,
-        );
-      const amount = csvMoney(
-        row.payment_amount,
-        `${row.account_name} payment amount`,
-        { optional: true },
-      );
-      const principal =
-        type === "rental"
-          ? 0
-          : csvMoney(row.original_principal, `${row.account_name} principal`, {
-              optional: true,
-            });
-      const principalInterestAmount =
-        type === "rental" || !row.principal_interest_amount
-          ? null
-          : csvMoney(
-              row.principal_interest_amount,
-              `${row.account_name} P&I payment`,
-            );
-      const escrowAmount =
-        type === "rental"
-          ? 0
-          : csvMoney(row.escrow_amount, `${row.account_name} monthly escrow`, {
-              optional: true,
-            });
-      const openingBalance =
-        (row.ledger_opening_balance || "").trim() === ""
-          ? null
-          : csvMoney(
-              row.ledger_opening_balance,
-              `${row.account_name} opening balance`,
-            );
-      if (openingBalance !== null && !row.ledger_opening_date)
-        throw new Error(
-          `A ledger opening date is required when an opening balance is set for ${row.account_name}.`,
-        );
-      const rate = csvRate(
-        row.interest_rate,
-        `${row.account_name} interest rate`,
-        { optional: true },
-      );
-      const frequency = row.payment_frequency || defaults.paymentFrequency,
-        startDate = row.start_date || today;
-      if (
-        !paymentFrequencyValues.has(frequency) ||
-        !validIsoDate(startDate) ||
-        (row.next_due_date && !validIsoDate(row.next_due_date)) ||
-        (row.balloon_date && !validIsoDate(row.balloon_date)) ||
-        (row.ledger_opening_date && !validIsoDate(row.ledger_opening_date))
-      )
-        throw new Error(
-          `Invalid payment frequency or date for ${row.account_name}.`,
-        );
-      const term = row.term_months ? Number(row.term_months) : null,
-        graceDays = Number(row.grace_days || 0);
-      if (term !== null && (!Number.isInteger(term) || term < 1))
-        throw new Error(
-          `Term months must be a positive whole number for ${row.account_name}.`,
-        );
-      if (!Number.isInteger(graceDays) || graceDays < 0)
-        throw new Error(
-          `Grace days must be a nonnegative whole number for ${row.account_name}.`,
-        );
-      const propertyKind = row.property_kind || defaults.propertyKind;
-      if (!propertyKindValues.has(propertyKind))
-        throw new Error(
-          `Invalid property_kind “${row.property_kind}” for ${row.property_name}.`,
-        );
-      const lateFee = csvMoney(row.late_fee, `${row.account_name} late fee`, {
-        optional: true,
-      });
-      const partyEmail = (row.party_email || "")
-        .split(/[;,]/)
-        .map((email) => email.trim())
-        .filter(Boolean);
-      if (partyEmail.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
-        throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
-      seenAccounts.add(key);
-      return {
-        property_name: row.property_name,
-        property_address: row.property_address,
-        account_type: type,
-        account_name: row.account_name,
-        party_name: row.party_name || "",
-        party_email: partyEmail.join(", "),
-        party_phone: (row.party_phone || "").trim(),
-        start_date: startDate,
-        next_due_date: row.next_due_date || "",
-        payment_amount: amount,
-        payment_frequency: frequency,
-        original_principal: principal,
-        principal_interest_amount: principalInterestAmount,
-        escrow_amount: escrowAmount,
-        ledger_opening_balance: openingBalance,
-        ledger_opening_date: row.ledger_opening_date || "",
-        interest_rate: rate,
-        term_months: row.term_months || "",
-        balloon_date: row.balloon_date || "",
-        late_fee: lateFee,
-        grace_days: graceDays,
-        notes: row.notes || "",
-        city: row.city || null,
-        state: row.state || null,
-        postal_code: row.postal_code || null,
-        property_kind: propertyKind,
-      };
-    });
+    return validateImportRows(rows, (row) =>
+      normalizeAccountRow(row, { existingAccounts, seenAccounts, today }),
+    );
   }
 
   const validation = Object.freeze({ validateAccountRows });
