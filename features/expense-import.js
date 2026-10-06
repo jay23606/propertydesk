@@ -6,10 +6,9 @@
     const {
       $,
       state,
-      stageImport,
       parseCSV,
       validateExpenseRows,
-      commitTransactions,
+      transactionImportReview,
       createFileWorkflow,
     } = context;
 
@@ -27,12 +26,27 @@
             state.accounts,
             state.expenses,
           );
-        const validation = validateRows(rows);
-        stageImport(
-          "Review expense import",
-          validation.valid,
-          async (rowsToImport, review) => {
-            const payload = rowsToImport.map((row) => {
+        transactionImportReview.stage({
+          title: "Review expense import",
+          rows,
+          validateRows,
+          correctionKeys: [
+            "property_name",
+            "property_address",
+            "account_name",
+            "expense_date",
+            "amount",
+            "category",
+            "payee",
+            "payment_method",
+            "memo",
+            "source_note",
+          ],
+          file,
+          kind: "expenses",
+          label: "expense",
+          mapRows(rowsToImport) {
+            return rowsToImport.map((row) => {
               const property = state.properties.find(
                 (item) =>
                   item.name === row.property_name &&
@@ -66,34 +80,8 @@
                 memo: row.memo || null,
               };
             });
-            await commitTransactions({
-              kind: "expenses",
-              rows: payload,
-              sourceName: file.name,
-              total: review.total,
-              label: "expense",
-            });
           },
-          "",
-          {
-            total: validation.total,
-            errors: validation.errors,
-            rawRows: rows,
-            correctionKeys: [
-              "property_name",
-              "property_address",
-              "account_name",
-              "expense_date",
-              "amount",
-              "category",
-              "payee",
-              "payment_method",
-              "memo",
-              "source_note",
-            ],
-            revalidate: validateRows,
-          },
-        );
+        });
       },
     });
 

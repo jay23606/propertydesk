@@ -147,6 +147,12 @@ test("import workflow keeps file import handlers inside its event bindings", () 
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
+      PropertyDeskTransactionImportReview: {
+        create: (options) => {
+          passed.transactionReview = options;
+          return { stage() {} };
+        },
+      },
       PropertyDeskAccountImport: {
         create: (options) => {
           passed.account = options;
@@ -208,11 +214,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.payment).sort(),
     [
       "$",
-      "commitTransactions",
       "createFileWorkflow",
       "parseCSV",
-      "stageImport",
       "state",
+      "transactionImportReview",
       "validatePaymentRows",
     ].sort(),
   );
@@ -220,14 +225,21 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.expense).sort(),
     [
       "$",
-      "commitTransactions",
       "createFileWorkflow",
       "parseCSV",
-      "stageImport",
       "state",
+      "transactionImportReview",
       "validateExpenseRows",
     ].sort(),
   );
+  assert.equal(
+    passed.payment.transactionImportReview,
+    passed.expense.transactionImportReview,
+  );
+  assert.deepEqual(Object.keys(passed.transactionReview).sort(), [
+    "commitTransactions",
+    "stageImport",
+  ]);
   imports.attachEvents();
   assert.deepEqual(calls, [
     "account events",

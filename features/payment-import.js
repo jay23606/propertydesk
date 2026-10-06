@@ -6,10 +6,9 @@
     const {
       $,
       state,
-      stageImport,
       parseCSV,
       validatePaymentRows,
-      commitTransactions,
+      transactionImportReview,
       createFileWorkflow,
     } = context;
 
@@ -27,11 +26,29 @@
             state.accounts,
             state.payments,
           );
-        const validation = validateRows(rows);
-        stageImport(
-          "Review payment import",
-          validation.valid,
-          async (rowsToImport, review) => {
+        transactionImportReview.stage({
+          title: "Review payment import",
+          rows,
+          validateRows,
+          correctionKeys: [
+            "property_name",
+            "property_address",
+            "account_name",
+            "received_date",
+            "amount",
+            "income_category",
+            "payment_method",
+            "principal_amount",
+            "interest_amount",
+            "fee_amount",
+            "escrow_amount",
+            "unapplied_amount",
+            "memo",
+          ],
+          file,
+          kind: "payments",
+          label: "payment",
+          mapRows(rowsToImport) {
             const rowsToInsert = rowsToImport.map((row) => ({
               account_id: state.accounts.find(
                 (account) =>
@@ -59,37 +76,9 @@
                 "An account is no longer available for one or more payments. Reload and select the CSV again.",
               );
             }
-            await commitTransactions({
-              kind: "payments",
-              rows: rowsToInsert,
-              sourceName: file.name,
-              total: review.total,
-              label: "payment",
-            });
+            return rowsToInsert;
           },
-          "",
-          {
-            total: validation.total,
-            errors: validation.errors,
-            rawRows: rows,
-            correctionKeys: [
-              "property_name",
-              "property_address",
-              "account_name",
-              "received_date",
-              "amount",
-              "income_category",
-              "payment_method",
-              "principal_amount",
-              "interest_amount",
-              "fee_amount",
-              "escrow_amount",
-              "unapplied_amount",
-              "memo",
-            ],
-            revalidate: validateRows,
-          },
-        );
+        });
       },
     });
 

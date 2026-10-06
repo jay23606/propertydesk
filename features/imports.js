@@ -22,6 +22,11 @@
         status: $("import-status"),
         toast,
       });
+    const transactionImportReview =
+      window.PropertyDeskTransactionImportReview.create({
+        stageImport,
+        commitTransactions,
+      });
     const accounts = window.PropertyDeskAccountImport.create({
       $,
       state,
@@ -36,19 +41,17 @@
     const payments = window.PropertyDeskPaymentImport.create({
       $,
       state,
-      stageImport,
       parseCSV,
       validatePaymentRows,
-      commitTransactions,
+      transactionImportReview,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
       $,
       state,
-      stageImport,
       parseCSV,
       validateExpenseRows,
-      commitTransactions,
+      transactionImportReview,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
 
