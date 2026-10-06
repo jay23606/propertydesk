@@ -28,7 +28,7 @@ test("app wires modal, form options, and reminder features directly", () => {
   assert.match(app, /attachEvents: attachModalEvents/);
   assert.match(
     app,
-    /workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(app, /previewReminderEmail,/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntrySupportWorkflow/);
