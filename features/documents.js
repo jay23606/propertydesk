@@ -22,25 +22,13 @@
       input.value = "";
       if (!file || !propertyId) return;
 
-      const extension = file.name.split(".").pop().toLowerCase();
-      const contentTypes = {
-        pdf: "application/pdf",
-        docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        jpg: "image/jpeg",
-        jpeg: "image/jpeg",
-      };
-      const contentType = contentTypes[extension];
-      if (!contentType || file.size > 15 * 1024 * 1024) {
+      const upload = window.PropertyDeskDocumentUploadPolicy.describe(file);
+      if (!upload) {
         toast("Choose a PDF, DOCX, or JPEG agreement under 15 MB");
         return;
       }
 
-      const safeName =
-        file.name
-          .normalize("NFKC")
-          .replace(/[^\w.() -]/g, "_")
-          .replace(/\s+/g, "_")
-          .slice(-100) || `agreement.${extension}`;
+      const { contentType, safeName } = upload;
       const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
       let uploadError;
       try {

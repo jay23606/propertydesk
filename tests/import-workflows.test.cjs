@@ -305,6 +305,10 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/documents.js"),
   );
   assert.ok(
+    html.indexOf("features/document-upload-policy.js") <
+      html.indexOf("features/documents.js"),
+  );
+  assert.ok(
     html.indexOf("features/documents.js") <
       html.indexOf("features/property-document-workflow.js"),
   );
@@ -534,6 +538,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.doesNotMatch(worker, /account-maintenance-workflow\.js/);
   assert.match(worker, /'\.\/features\/transaction-maintenance-workflow\.js'/);
   assert.match(worker, /'\.\/features\/transaction-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/document-upload-policy\.js'/);
   assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/property-document-workflow\.js'/);

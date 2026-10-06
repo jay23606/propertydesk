@@ -5,13 +5,47 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function loadDocumentModules(context) {
-  for (const filename of ["document-repository.js", "documents.js"]) {
+  for (const filename of [
+    "document-repository.js",
+    "document-upload-policy.js",
+    "documents.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
     );
   }
 }
+
+test("agreement upload policy accepts supported files and rejects unsupported or oversized files", () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const policy = context.window.PropertyDeskDocumentUploadPolicy;
+
+  assert.equal(policy.describe(null), null);
+  assert.equal(policy.describe({ name: "lease.txt", size: 10 }), null);
+  assert.equal(
+    policy.describe({ name: "lease.pdf", size: 15 * 1024 * 1024 + 1 }),
+    null,
+  );
+  const pdf = policy.describe({ name: "signed.PDF", size: 10 });
+  assert.equal(pdf.contentType, "application/pdf");
+  assert.equal(pdf.safeName, "signed.PDF");
+  assert.equal(
+    policy.describe({ name: "photo.jpeg", size: 15 * 1024 * 1024 }).contentType,
+    "image/jpeg",
+  );
+  assert.equal(
+    policy.describe({ name: "lease.docx", size: 10 }).contentType,
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  );
+  const safeName = policy.describe({
+    name: `${"x".repeat(110)} # signed agreement.pdf`,
+    size: 10,
+  }).safeName;
+  assert.equal(safeName.length, 100);
+  assert.doesNotMatch(safeName, /[#\s/]/);
+});
 
 test("private document module exposes upload, delete, and open workflows", () => {
   const context = vm.createContext({ window: {} });
