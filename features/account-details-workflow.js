@@ -86,7 +86,6 @@
     return {
       attachAccountDetailActionEvents,
       attachDepositEvents,
-      depositSectionHTML,
       openAccountDetails,
     };
   }

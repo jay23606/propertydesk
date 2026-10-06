@@ -39,15 +39,67 @@ test("Properties screen workflow connects the grid and quick-action binders", ()
     ),
     context,
   );
-  const dependencies = { state: {}, openPayment() {}, toast() {} };
+  const dependencies = {
+    $() {},
+    state: {},
+    esc() {},
+    money() {},
+    paymentFrequencyLabel() {},
+    monthlyScheduledEstimate() {},
+    accountBalance() {},
+    amountDueSince() {},
+    unpaidDueAccrualStart() {},
+    todayIso() {},
+    propertyAddress() {},
+    streetAddress() {},
+    monthStart() {},
+    dateOnly() {},
+    monthEnd() {},
+    lateReminderMailto() {},
+    paymentStatusInMonth() {},
+    toast() {},
+    fetchAll() {},
+    openPayment() {},
+    openPropertyDetails() {},
+    openAccountForProperty() {},
+  };
   const workflow =
     context.window.PropertyDeskPropertyPortfolioScreenWorkflow.create(
       dependencies,
     );
 
   assert.deepEqual(created, ["grid", "actions"]);
-  assert.equal(passed.grid, dependencies);
-  assert.equal(passed.actions, dependencies);
+  assert.notEqual(passed.grid, dependencies);
+  assert.notEqual(passed.actions, dependencies);
+  assert.deepEqual(Object.keys(passed.grid), [
+    "$",
+    "state",
+    "esc",
+    "money",
+    "paymentFrequencyLabel",
+    "monthlyScheduledEstimate",
+    "accountBalance",
+    "amountDueSince",
+    "unpaidDueAccrualStart",
+    "todayIso",
+    "propertyAddress",
+    "streetAddress",
+    "monthStart",
+    "dateOnly",
+    "monthEnd",
+    "lateReminderMailto",
+    "paymentStatusInMonth",
+  ]);
+  assert.deepEqual(Object.keys(passed.actions), [
+    "$",
+    "state",
+    "toast",
+    "fetchAll",
+    "streetAddress",
+    "openPayment",
+    "openPropertyDetails",
+    "openAccountForProperty",
+  ]);
   assert.deepEqual(Object.keys(workflow), [
     "renderProperties",
     "attachPortfolioEvents",

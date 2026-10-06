@@ -112,7 +112,7 @@ test("account details workflow composes detail, history, and deposit actions", (
     methods.attachAccountDetailActionEvents,
   );
   assert.equal(workflow.attachDepositEvents, methods.attachDepositEvents);
-  assert.equal(workflow.depositSectionHTML, methods.depositSectionHTML);
+  assert.equal(workflow.depositSectionHTML, undefined);
   assert.equal(workflow.openAccountDetails, methods.openAccountDetails);
 });
 

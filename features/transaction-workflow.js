@@ -6,6 +6,15 @@
     const {
       $,
       state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      isPosted,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
       toast,
       fetchAll,
       prettyType,
@@ -17,7 +26,19 @@
       documentRef,
     } = context;
     const { renderPayments, attachEvents: attachTransactionEvents } =
-      window.PropertyDeskTransactionViews.create(context);
+      window.PropertyDeskTransactionViews.create({
+        $,
+        state,
+        dateOnly,
+        fmtDate,
+        esc,
+        expenseCategoryLabel,
+        money,
+        isPosted,
+        monthStart,
+        sumIncome,
+        sumOperatingExpenses,
+      });
     const { attachTransactionActionEvents } =
       window.PropertyDeskTransactionMaintenanceWorkflow.create({
         $,

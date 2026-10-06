@@ -483,8 +483,25 @@ test("reports workflow groups the view and account export callbacks", () => {
   const workflow =
     context.window.PropertyDeskReportsWorkflow.create(dependencies);
 
-  assert.equal(passed.view, dependencies);
-  assert.equal(passed.export, dependencies);
+  assert.notEqual(passed.view, dependencies);
+  assert.notEqual(passed.export, dependencies);
+  assert.deepEqual(Object.keys(passed.view), [
+    "$",
+    "state",
+    "dateOnly",
+    "esc",
+    "money",
+    "sumIncome",
+    "sumOperatingExpenses",
+    "accountBalance",
+  ]);
+  assert.deepEqual(Object.keys(passed.export), [
+    "$",
+    "state",
+    "todayIso",
+    "prettyType",
+    "accountBalance",
+  ]);
   assert.deepEqual(Object.keys(workflow), [
     "renderReports",
     "attachReportExportEvents",

@@ -69,7 +69,22 @@ test("transaction workflow connects history and maintenance interfaces", () => {
     context.window.PropertyDeskTransactionWorkflow.create(dependencies);
 
   assert.deepEqual(created, ["views", "maintenance"]);
-  assert.equal(passed.views, dependencies);
+  assert.notEqual(passed.views, dependencies);
+  assert.deepEqual(Object.keys(passed.views), [
+    "$",
+    "state",
+    "dateOnly",
+    "fmtDate",
+    "esc",
+    "expenseCategoryLabel",
+    "money",
+    "isPosted",
+    "monthStart",
+    "sumIncome",
+    "sumOperatingExpenses",
+  ]);
+  assert.equal(passed.views.state, dependencies.state);
+  assert.equal(passed.views.toast, undefined);
   assert.equal(passed.maintenance.state, dependencies.state);
   assert.equal(
     passed.maintenance.updateAllocationPreview,
