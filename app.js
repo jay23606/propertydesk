@@ -138,8 +138,8 @@
     navigate,
     documentRef: document,
   });
-  const { renderPayments, attachEvents: attachTransactionEvents } =
-    window.PropertyDeskTransactionWorkflow.create({
+  const { renderPayments, attachEvents: attachTransactionViewEvents } =
+    window.PropertyDeskTransactionViews.create({
       $,
       state,
       dateOnly,
@@ -151,6 +151,11 @@
       sumIncome,
       sumOperatingExpenses,
       postedOnOrAfter,
+    });
+  const { attachTransactionActionEvents } =
+    window.PropertyDeskTransactionMaintenanceWorkflow.create({
+      $,
+      state,
       toast,
       fetchAll,
       prettyType,
@@ -161,21 +166,52 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { attachEvents: attachAccountDetailsEvents, openAccountDetails } =
-    window.PropertyDeskAccountDetailsWorkflow.create({
+  function attachTransactionEvents() {
+    attachTransactionViewEvents();
+    attachTransactionActionEvents();
+  }
+  const { depositSectionHTML } =
+    window.PropertyDeskDepositDetailsWorkflow.create({
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
+    });
+  const { attachEvents: attachDepositEvents } =
+    window.PropertyDeskDepositMaintenanceWorkflow.create({
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      fetchAll,
+      depositSectionHTML,
+    });
+  const { attachEvents: attachAccountDetailActionEvents } =
+    window.PropertyDeskAccountDetailActionsWorkflow.create({
       $,
       state,
       toast,
       fetchAll,
-      money,
-      moneyInput,
-      todayIso,
-      depositLedger,
-      fmtDate,
-      esc,
       closeModal,
       editAccount,
       openPayment,
+    });
+  const { renderAccountHistory } =
+    window.PropertyDeskAccountHistoryDetails.create({
+      state,
+      esc,
+      money,
+      fmtDate,
+    });
+  const { openAccountDetails } =
+    window.PropertyDeskAccountDetailContentWorkflow.create({
+      $,
+      state,
+      money,
+      fmtDate,
+      esc,
       sumPosted,
       prettyType,
       paymentFrequencyLabel,
@@ -183,9 +219,16 @@
       amortizationSchedule,
       amountDueSince,
       unpaidDueAccrualStart,
+      todayIso,
       openModal,
       propertyAddress,
+      depositSectionHTML,
+      renderAccountHistory,
     });
+  function attachAccountDetailsEvents() {
+    attachAccountDetailActionEvents();
+    attachDepositEvents();
+  }
   const { openPropertyDetails, attachEvents: attachPropertyDetailsEvents } =
     window.PropertyDeskPropertyDetailsWorkflow.create({
       $,

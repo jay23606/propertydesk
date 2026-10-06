@@ -117,101 +117,15 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
   assert.deepEqual(calls, [["toast", "This transaction type can't be voided"]]);
 });
 
-test("transaction workflow connects history and maintenance interfaces", () => {
-  const created = [];
-  const passed = {};
-  const attached = [];
-  const methods = {
-    attachEvents() {
-      attached.push("history");
-    },
-    attachTransactionActionEvents() {
-      attached.push("maintenance");
-    },
-    renderPayments() {},
-  };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskTransactionViews: {
-        create: (options) => {
-          created.push("views");
-          passed.views = options;
-          return {
-            attachEvents: methods.attachEvents,
-            renderPayments: methods.renderPayments,
-          };
-        },
-      },
-      PropertyDeskTransactionMaintenanceWorkflow: {
-        create: (options) => {
-          created.push("maintenance");
-          passed.maintenance = options;
-          return {
-            attachTransactionActionEvents:
-              methods.attachTransactionActionEvents,
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-workflow.js"),
-      "utf8",
-    ),
-    context,
+test("app composes transaction history and maintenance without a broad wrapper", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /attachTransactionViewEvents\(\);[\s\S]*?attachTransactionActionEvents\(\);/,
   );
-  const dependencies = {
-    $() {},
-    state: {},
-    dateOnly() {},
-    fmtDate() {},
-    esc() {},
-    expenseCategoryLabel() {},
-    money() {},
-    postedOnOrAfter() {},
-    monthStart() {},
-    sumIncome() {},
-    sumOperatingExpenses() {},
-    toast() {},
-    fetchAll() {},
-    prettyType() {},
-    openPayment() {},
-    openExpense() {},
-    updatePaymentGuidance() {},
-    EventClass: class {},
-    OptionClass: class {},
-    documentRef: {},
-  };
-  const workflow =
-    context.window.PropertyDeskTransactionWorkflow.create(dependencies);
-
-  assert.deepEqual(created, ["views", "maintenance"]);
-  assert.notEqual(passed.views, dependencies);
-  assert.deepEqual(Object.keys(passed.views), [
-    "$",
-    "state",
-    "dateOnly",
-    "fmtDate",
-    "esc",
-    "expenseCategoryLabel",
-    "money",
-    "postedOnOrAfter",
-    "monthStart",
-    "sumIncome",
-    "sumOperatingExpenses",
-  ]);
-  assert.equal(passed.views.state, dependencies.state);
-  assert.equal(passed.views.toast, undefined);
-  assert.equal(passed.maintenance.state, dependencies.state);
-  assert.equal(
-    passed.maintenance.updatePaymentGuidance,
-    dependencies.updatePaymentGuidance,
-  );
-  assert.deepEqual(Object.keys(workflow), ["renderPayments", "attachEvents"]);
-  assert.equal(workflow.renderPayments, methods.renderPayments);
-  workflow.attachEvents();
-  assert.deepEqual(attached, ["history", "maintenance"]);
+  assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);
 });
 
 test("transaction maintenance workflow composes correction and void actions", () => {

@@ -169,10 +169,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/deposit-maintenance-workflow.js") <
-      html.indexOf("features/account-details-workflow.js"),
+      html.indexOf("app.js"),
   );
   assert.ok(
-    html.indexOf("features/account-details-workflow.js") <
+    html.indexOf("features/account-detail-content-workflow.js") <
       html.indexOf("app.js"),
   );
   assert.ok(
@@ -325,10 +325,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/transaction-void-entry\.js'/);
   assert.ok(
     html.indexOf("features/transaction-maintenance-workflow.js") <
-      html.indexOf("features/transaction-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/transaction-workflow.js") < html.indexOf("app.js"),
+      html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/transaction-views.js") <

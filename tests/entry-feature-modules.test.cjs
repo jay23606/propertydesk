@@ -13,8 +13,9 @@ test("app root delegates entry forms and create actions to one workflow", () => 
   );
   assert.match(app, /PropertyDeskAppServices\.create\(\{[\s\S]*?toast,/);
   assert.match(app, /PropertyDeskEntryWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskReportExport\.create\(/);
@@ -29,11 +30,11 @@ test("app root delegates entry forms and create actions to one workflow", () => 
   assert.match(app, /openAccountForProperty,/);
   assert.match(
     app,
-    /PropertyDeskTransactionWorkflow\.create\(\{[\s\S]*?updatePaymentGuidance,/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{[\s\S]*?updatePaymentGuidance,/,
   );
   assert.doesNotMatch(app, /entryWorkflow\./);
-  assert.match(app, /attachEvents: attachAccountDetailsEvents/);
-  assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
+  assert.match(app, /function attachAccountDetailsEvents\(\)/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
@@ -74,7 +75,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
   );
   assert.doesNotMatch(
     app,
@@ -98,13 +99,18 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /PropertyDeskEntryWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:TransactionViews|TransactionMaintenanceWorkflow)\.create\(/,
+    /PropertyDesk(?:TransactionViewEvents|TransactionCorrectionForm)\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
-  assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);
+  assert.match(
+    app,
+    /window\.PropertyDeskAccountDetailActionsWorkflow\.create\(/,
+  );
+  assert.match(app, /window\.PropertyDeskDepositMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(
@@ -228,5 +234,14 @@ test("app coordinator delegates shared setup to the app services workflow", () =
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
+  );
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:Transaction|AccountDetails)Workflow\.create\(/,
   );
 });
