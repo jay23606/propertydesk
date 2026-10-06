@@ -396,8 +396,69 @@ test("account history details connect the history query and rendering", async ()
   assert.equal(passed.view.esc, dependencies.esc);
 });
 
+test("deposit adjustment model validates inputs and prepares audited payloads", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const model = context.window.PropertyDeskDepositAdjustmentModel;
+  const account = { id: "rental-1", account_type: "rental" };
+  const common = {
+    account,
+    userId: "workspace-1",
+    accountId: account.id,
+    type: "retained",
+    amount: 250,
+    movementDate: "2026-10-04",
+  };
+
+  assert.equal(
+    model.validate({ account: null, amount: 1 }).status,
+    "unavailable",
+  );
+  assert.equal(
+    model.validate({ account: { account_type: "note" }, amount: 1 }).status,
+    "unavailable",
+  );
+  assert.equal(model.validate({ account, amount: 0 }).status, "invalid-amount");
+  assert.equal(model.prepare({ ...common, reason: null }).status, "cancelled");
+  assert.equal(
+    model.prepare({ ...common, reason: "   " }).status,
+    "missing-reason",
+  );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        model.prepare({ ...common, reason: "  Inspection retention  " }),
+      ),
+    ),
+    {
+      status: "ready",
+      payload: {
+        user_id: "workspace-1",
+        account_id: "rental-1",
+        entry_type: "retained",
+        amount: 250,
+        movement_date: "2026-10-04",
+        reason: "Inspection retention",
+      },
+    },
+  );
+});
+
 test("deposit maintenance retains adjustment audit details", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-maintenance.js"),
@@ -453,6 +514,13 @@ test("deposit maintenance retains adjustment audit details", async () => {
 
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-maintenance.js"),
