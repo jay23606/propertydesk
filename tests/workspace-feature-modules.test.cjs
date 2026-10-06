@@ -201,7 +201,16 @@ test("workspace setting writes report rejected requests and retain entered value
     ["display-name", { value: "New Label" }],
     ["member-email", { value: " spouse@example.test " }],
   ]);
-  const $ = (id) => elements.get(id);
+  let saveProfile;
+  const $ = (id) =>
+    id === "display-name-form"
+      ? {
+          addEventListener(eventName, handler) {
+            assert.equal(eventName, "submit");
+            saveProfile = handler;
+          },
+        }
+      : elements.get(id);
   const messages = [];
   const state = {
     client: {
@@ -240,7 +249,8 @@ test("workspace setting writes report rejected requests and retain entered value
       assert.fail("a rejected profile save must not update the greeting"),
   });
 
-  await assert.doesNotReject(profile.saveProfile({ preventDefault() {} }));
+  profile.attachEvents();
+  await assert.doesNotReject(saveProfile({ preventDefault() {} }));
   await assert.doesNotReject(
     feature.addWorkspaceMember({ preventDefault() {} }),
   );

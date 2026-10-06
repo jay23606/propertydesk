@@ -37,7 +37,7 @@
       $("display-name-form").addEventListener("submit", saveProfile);
     }
 
-    return { saveProfile, attachEvents };
+    return { attachEvents };
   }
 
   window.PropertyDeskProfileSettings = Object.freeze({

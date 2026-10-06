@@ -277,6 +277,16 @@ test("profile settings save the display label and refresh the shared shell", asy
   );
   const messages = [];
   const calls = [];
+  let saveProfile;
+  const elements = {
+    "display-name": { value: "  Property Manager  " },
+    "display-name-form": {
+      addEventListener(eventName, handler) {
+        assert.equal(eventName, "submit");
+        saveProfile = handler;
+      },
+    },
+  };
   const state = {
     user: { id: "owner-1", user_metadata: { display_name: "Old label" } },
     client: {
@@ -292,13 +302,15 @@ test("profile settings save the display label and refresh the shared shell", asy
     },
   };
   const feature = context.window.PropertyDeskProfileSettings.create({
-    $: () => ({ value: "  Property Manager  " }),
+    $: (id) => elements[id],
     state,
     toast: (message) => messages.push(message),
     updateGreeting: () => calls.push("refresh-greeting"),
   });
 
-  await feature.saveProfile({ preventDefault() {} });
+  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
+  feature.attachEvents();
+  await saveProfile({ preventDefault() {} });
 
   assert.equal(calls[0].data.display_name, "Property Manager");
   assert.equal(calls[1], "refresh-greeting");
