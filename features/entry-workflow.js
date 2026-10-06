@@ -48,16 +48,20 @@
         documentRef,
       });
 
+    function attachEvents() {
+      attachCreateActions();
+      recordEntry.attachPropertyFormEvents();
+      recordEntry.attachAccountFormEvents();
+      recordEntry.attachLedgerEntryFormEvents();
+    }
+
     return {
       editAccount: recordEntry.editAccount,
       updateAllocationPreview: recordEntry.updateAllocationPreview,
       openPayment: recordEntry.openPayment,
       openPropertyPayment: recordEntry.openPropertyPayment,
       openExpense: recordEntry.openExpense,
-      attachPropertyFormEvents: recordEntry.attachPropertyFormEvents,
-      attachAccountFormEvents: recordEntry.attachAccountFormEvents,
-      attachLedgerEntryFormEvents: recordEntry.attachLedgerEntryFormEvents,
-      attachCreateActions,
+      attachEvents,
       openAccountForProperty,
     };
   }

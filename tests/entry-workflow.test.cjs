@@ -6,11 +6,20 @@ const vm = require("node:vm");
 
 test("entry workflow joins record forms to their create actions", () => {
   const passed = {};
+  const attached = [];
   const methods = {
-    attachAccountFormEvents() {},
-    attachCreateActions() {},
-    attachLedgerEntryFormEvents() {},
-    attachPropertyFormEvents() {},
+    attachAccountFormEvents() {
+      attached.push("account");
+    },
+    attachCreateActions() {
+      attached.push("create actions");
+    },
+    attachLedgerEntryFormEvents() {
+      attached.push("ledger");
+    },
+    attachPropertyFormEvents() {
+      attached.push("property");
+    },
     editAccount() {},
     openAccountForProperty() {},
     openExpense() {},
@@ -71,10 +80,7 @@ test("entry workflow joins record forms to their create actions", () => {
   assert.equal(passed.actions.resetPropertyForm, methods.resetPropertyForm);
   assert.equal(passed.actions.openPayment, methods.openPayment);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachAccountFormEvents",
-    "attachCreateActions",
-    "attachLedgerEntryFormEvents",
-    "attachPropertyFormEvents",
+    "attachEvents",
     "editAccount",
     "openAccountForProperty",
     "openExpense",
@@ -84,7 +90,13 @@ test("entry workflow joins record forms to their create actions", () => {
   ]);
   assert.equal(workflow.resetAccountForm, undefined);
   assert.equal(workflow.resetPropertyForm, undefined);
-  assert.equal(workflow.attachCreateActions, methods.attachCreateActions);
+  workflow.attachEvents();
+  assert.deepEqual(attached, [
+    "create actions",
+    "property",
+    "account",
+    "ledger",
+  ]);
   assert.equal(workflow.openAccountForProperty, methods.openAccountForProperty);
   assert.equal(
     workflow.updateAllocationPreview,

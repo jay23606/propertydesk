@@ -27,9 +27,8 @@ test("app root delegates entry forms and create actions to one workflow", () => 
     app,
     /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow)\.create\(/,
   );
-  assert.match(app, /attachAccountFormEvents,/);
+  assert.match(app, /attachEvents: attachEntryEvents/);
   assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
-  assert.match(app, /attachCreateActions,/);
   assert.match(app, /openAccountForProperty,/);
   assert.match(app, /updateAllocationPreview,/);
   assert.doesNotMatch(app, /entryWorkflow\./);
