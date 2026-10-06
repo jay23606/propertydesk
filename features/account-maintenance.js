@@ -2,20 +2,8 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    fetchAll,
-    closeAccountDetails,
-    confirmAction = (message) => window.confirm(message),
-  }) {
+  function create({ state, toast, fetchAll, closeAccountDetails }) {
     async function closeAccount(account) {
-      if (
-        !confirmAction(
-          `Close “${account.name}”? Its payment history will remain in your records.`,
-        )
-      )
-        return;
       let error;
       try {
         ({ error } = await state.client
