@@ -3,25 +3,15 @@
   "use strict";
 
   function createAccountHistoryModel({ state }) {
+    const { loadAccountAuditEvents } = window.PropertyDeskAccountHistoryAudit;
+
     async function loadAccountHistory(account, payments) {
       const auditIds = [
         account.id,
         ...payments.slice(0, 50).map((payment) => payment.id),
       ];
-      let history = [];
-      let auditError = false;
-      try {
-        const result = await state.client
-          .from("pd_audit_events")
-          .select("id,entity_type,entity_id,action,created_at")
-          .in("entity_id", auditIds)
-          .order("created_at", { ascending: false })
-          .limit(100);
-        history = result.data || [];
-        auditError = Boolean(result.error);
-      } catch {
-        auditError = true;
-      }
+      const { events: history, error: auditError } =
+        await loadAccountAuditEvents(state.client, auditIds);
 
       const accountVersions = state.agreementVersions.filter(
         (version) => version.account_id === account.id,

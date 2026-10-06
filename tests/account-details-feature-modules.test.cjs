@@ -223,6 +223,7 @@ test("account detail event router dispatches edit, payment, and close actions", 
 test("account history renders scoped prior terms and escaped void reasons", async () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "account-history-audit.js",
     "account-history-model.js",
     "account-history-view.js",
     "account-history-details.js",
