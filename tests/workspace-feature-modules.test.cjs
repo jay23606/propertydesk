@@ -393,10 +393,15 @@ test("workspace member feature loads before settings and is precached", () => {
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
     html.indexOf("features/workspace-members-view.js") <
-      html.indexOf("features/workspace-members.js"),
+      html.indexOf("features/workspace-member-repository.js"),
     "workspace member view should load before its RPC workflow",
   );
   assert.match(worker, /'\.\/features\/workspace-members-view\.js'/);
+  assert.ok(
+    html.indexOf("features/workspace-member-repository.js") <
+      html.indexOf("features/workspace-members.js"),
+  );
+  assert.match(worker, /'\.\/features\/workspace-member-repository\.js'/);
   assert.ok(
     html.indexOf("features/workspace-members.js") <
       html.indexOf("features/workspace.js"),

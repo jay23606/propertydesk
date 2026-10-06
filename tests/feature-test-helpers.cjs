@@ -26,6 +26,7 @@ function loadWorkspaceFeatures(context) {
     "profile-settings-view.js",
     "profile-settings.js",
     "workspace-members-view.js",
+    "workspace-member-repository.js",
     "workspace-members.js",
     "workspace.js",
   ]) {

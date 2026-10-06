@@ -10,13 +10,15 @@
     refreshWorkspaceSettings,
     confirmAction = (message) => window.confirm(message),
   }) {
+    const repository = window.PropertyDeskWorkspaceMemberRepository.create({
+      getClient: () => state.client,
+    });
+
     async function addWorkspaceMember(email) {
       if (!email) return;
       let error;
       try {
-        ({ error } = await state.client.rpc("pd_add_workspace_member", {
-          p_email: email,
-        }));
+        ({ error } = await repository.addMember(email));
       } catch {
         toast(
           "Workspace member couldn't be added right now. Check your connection and try again.",
@@ -50,9 +52,7 @@
         return;
       let error;
       try {
-        ({ error } = await state.client.rpc("pd_remove_workspace_member", {
-          p_member_user_id: memberId,
-        }));
+        ({ error } = await repository.removeMember(memberId));
       } catch {
         toast(
           "Workspace member couldn't be removed right now. Check your connection and try again.",
