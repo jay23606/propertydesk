@@ -13,6 +13,24 @@ function loadModule() {
   return context.window.PropertyDeskWorkspaceData.create();
 }
 
+test("workspace data delegates active workspace lookup to its data adapter", async () => {
+  const calls = [];
+  const client = {
+    rpc: async (name) => {
+      calls.push(name);
+      return { data: "workspace-1", error: null };
+    },
+  };
+
+  const result = await loadModule().loadWorkspaceId(client);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), {
+    data: "workspace-1",
+    error: null,
+  });
+  assert.deepEqual(calls, ["pd_workspace_id"]);
+});
+
 test("workspace data reads every owner table in parallel and maps named results", async () => {
   const requests = [];
   const rpcCalls = [];

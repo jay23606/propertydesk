@@ -3,6 +3,10 @@
   "use strict";
 
   function create() {
+    function loadWorkspaceId(client) {
+      return client.rpc("pd_workspace_id");
+    }
+
     async function loadWorkspaceRecords(client, workspaceId) {
       const requests = [
         [
@@ -112,7 +116,7 @@
       );
     }
 
-    return { loadWorkspaceRecords };
+    return { loadWorkspaceId, loadWorkspaceRecords };
   }
 
   window.PropertyDeskWorkspaceData = Object.freeze({ create });

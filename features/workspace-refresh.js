@@ -5,7 +5,7 @@
   function create({ state, workspaceData, toast, render }) {
     async function fetchAll() {
       const { data: workspaceId, error: workspaceError } =
-        await state.client.rpc("pd_workspace_id");
+        await workspaceData.loadWorkspaceId(state.client);
       if (workspaceError || !workspaceId) {
         const error = workspaceError || new Error("Missing workspace");
         toast(workspaceError?.message || "Could not load this workspace");

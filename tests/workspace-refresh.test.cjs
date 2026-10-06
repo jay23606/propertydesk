@@ -33,6 +33,10 @@ test("workspace refresh resolves workspace, hydrates state, and rerenders", asyn
   const refresh = createRefresh({
     state,
     workspaceData: {
+      loadWorkspaceId: async (receivedClient) => {
+        assert.equal(receivedClient, client);
+        return { data: "workspace-1", error: null };
+      },
       loadWorkspaceRecords: async (receivedClient, workspaceId) => {
         calls.push(["load", receivedClient, workspaceId]);
         return { properties: [{ id: "property-1" }], payments: [] };
@@ -57,7 +61,10 @@ test("workspace lookup failures show feedback and stop before loading records", 
   };
   const refresh = createRefresh({
     state,
-    workspaceData: { loadWorkspaceRecords: async () => calls.push("load") },
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: null, error: failure }),
+      loadWorkspaceRecords: async () => calls.push("load"),
+    },
     toast: (message) => calls.push(["toast", message]),
     render: () => calls.push("render"),
   });
@@ -79,6 +86,7 @@ test("record loading failures show feedback, rethrow, and skip rendering", async
   const refresh = createRefresh({
     state,
     workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
       loadWorkspaceRecords: async () => {
         throw failure;
       },
@@ -112,7 +120,10 @@ test("workspace render failures are logged, shown to the user, and rethrown", as
     state: {
       client: { rpc: async () => ({ data: "workspace-1", error: null }) },
     },
-    workspaceData: { loadWorkspaceRecords: async () => ({ properties: [] }) },
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
+      loadWorkspaceRecords: async () => ({ properties: [] }),
+    },
     toast: (message) => calls.push(["toast", message]),
     render: () => {
       throw failure;
