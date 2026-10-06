@@ -237,7 +237,7 @@ test("reminder controls remain off by default and the preview stylesheet is in t
     /monthly_reminder_enabled boolean not null default false/,
   );
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
-  assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
+  assert.match(app, /PropertyDeskAppChromeWorkflow\.create/);
   assert.match(
     preview,
     /function previewReminderEmail\(\)[\s\S]*?openModal\("reminder-preview-modal"\)/,

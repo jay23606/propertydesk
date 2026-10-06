@@ -95,19 +95,15 @@
     dateOnly,
     monthStart,
   });
-  const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
-  const {
-    updateGreeting,
-    navigate,
-    attachEvents: attachAppShellEvents,
-  } = window.PropertyDeskAppShellWorkflow.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    renderReminderActivity,
-  });
+  const { updateGreeting, navigate, attachThemeEvents, attachAppShellEvents } =
+    window.PropertyDeskAppChromeWorkflow.create({
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
+      renderReminderActivity,
+    });
   const {
     editAccount,
     openPayment,
