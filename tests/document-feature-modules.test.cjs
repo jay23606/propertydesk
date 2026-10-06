@@ -9,6 +9,7 @@ function loadDocumentModules(context) {
     "document-repository.js",
     "document-upload-policy.js",
     "document-upload.js",
+    "document-actions.js",
     "documents.js",
   ]) {
     vm.runInContext(

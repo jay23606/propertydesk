@@ -333,6 +333,11 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/document-upload.js") <
       html.indexOf("features/documents.js"),
   );
+  assert.ok(
+    html.indexOf("features/document-actions.js") <
+      html.indexOf("features/documents.js"),
+  );
+  assert.match(worker, /'\.\/features\/document-actions\.js'/);
   assert.match(worker, /'\.\/features\/document-upload\.js'/);
   assert.ok(
     html.indexOf("features/documents.js") <
