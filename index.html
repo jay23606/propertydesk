@@ -38,6 +38,7 @@
     <script defer src="features/money-input-utils.js"></script>
     <script defer src="features/date-utils.js"></script>
     <script defer src="features/domain-options.js"></script>
+    <script defer src="features/transaction-options.js"></script>
     <script defer src="csv-parser.js"></script>
     <script defer src="import-utils.js"></script>
     <script defer src="account-import-validation.js"></script>
@@ -1201,21 +1202,8 @@
             /></label>
           </div>
           <label id="income-category-wrap"
-            >Income category<select id="income-category">
-              <option value="rent">Rent</option>
-              <option value="late_fee">Late fee</option>
-              <option value="deposit">Deposit</option>
-              <option value="other">Other income</option>
-            </select></label
-          ><label
-            >Payment method<select id="payment-method">
-              <option value="manual">Manual / other</option>
-              <option value="check">Check</option>
-              <option value="cash">Cash</option>
-              <option value="bank_transfer">Bank transfer</option>
-              <option value="money_order">Money order</option>
-              <option value="card">Card</option>
-            </select></label
+            >Income category<select id="income-category"></select></label
+          ><label>Payment method<select id="payment-method"></select></label
           ><label
             >Reference / memo<input
               id="payment-memo"
@@ -1277,18 +1265,7 @@
             /></label>
           </div>
           <div class="form-row">
-            <label
-              >Category<select id="expense-category">
-                <option value="repairs">Repairs</option>
-                <option value="contractor">Contractor labor</option>
-                <option value="materials">Materials</option>
-                <option value="taxes">Taxes</option>
-                <option value="insurance">Insurance</option>
-                <option value="utilities">Utilities</option>
-                <option value="management">Management</option>
-                <option value="deposit_refund">Security deposit refund</option>
-                <option value="other">Other</option>
-              </select></label
+            <label>Category<select id="expense-category"></select></label
             ><label
               >Related account<select id="expense-account">
                 <option value="">Property level</option>
@@ -1305,15 +1282,7 @@
               >Payee / contractor<input
                 id="expense-payee"
                 placeholder="Company or person" /></label
-            ><label
-              >Payment method<select id="expense-method">
-                <option value="manual">Manual / other</option>
-                <option value="check">Check</option>
-                <option value="cash">Cash</option>
-                <option value="bank_transfer">Bank transfer</option>
-                <option value="card">Card</option>
-              </select></label
-            >
+            ><label>Payment method<select id="expense-method"></select></label>
           </div>
           <label
             >Memo<input

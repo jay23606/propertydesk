@@ -9,6 +9,16 @@
     validIsoDate,
     validateImportRows,
   } = globalThis.PropertyDeskImportUtils;
+  const {
+    incomeCategories,
+    paymentMethods,
+    defaults: { paymentMethod: defaultPaymentMethod },
+  } = globalThis.PropertyDeskTransactionOptions;
+  const paymentMethodValues = new Set(paymentMethods.map(({ value }) => value));
+  const incomeCategoryValues = {
+    rental: new Set(incomeCategories.rental.map(({ value }) => value)),
+    loan: new Set(incomeCategories.loan.map(({ value }) => value)),
+  };
 
   function validatePaymentRows(rows, properties, accounts, payments) {
     const lookup = createImportLookup(properties, accounts);
@@ -56,26 +66,19 @@
         throw new Error(`Invalid payment date ${row.received_date}.`);
       const incomeCategory =
         row.income_category ||
-        (account.account_type === "rental" ? "rent" : "installment");
+        incomeCategories[
+          account.account_type === "rental" ? "rental" : "loan"
+        ][0].value;
       const allowedCategories =
-        account.account_type === "rental"
-          ? ["rent", "late_fee", "deposit", "other"]
-          : ["installment", "late_fee", "other"];
-      if (!allowedCategories.includes(incomeCategory))
+        incomeCategoryValues[
+          account.account_type === "rental" ? "rental" : "loan"
+        ];
+      if (!allowedCategories.has(incomeCategory))
         throw new Error(
           `Invalid income category “${incomeCategory}” for ${account.account_type}.`,
         );
-      const method = row.payment_method || "manual";
-      if (
-        ![
-          "manual",
-          "check",
-          "cash",
-          "bank_transfer",
-          "money_order",
-          "card",
-        ].includes(method)
-      )
+      const method = row.payment_method || defaultPaymentMethod;
+      if (!paymentMethodValues.has(method))
         throw new Error(`Invalid payment method “${method}”.`);
       const allocationColumns = [
         "principal_amount",

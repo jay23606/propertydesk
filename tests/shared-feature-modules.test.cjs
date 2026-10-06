@@ -14,6 +14,7 @@ test("date, display, and money-input utilities preserve their shared contracts",
     context,
   );
   for (const filename of [
+    "transaction-options.js",
     "date-utils.js",
     "display-utils.js",
     "money-input-utils.js",
@@ -51,13 +52,17 @@ test("date, display, and money-input utilities preserve their shared contracts",
   assert.match(dates.monthEnd(), /^\d{4}-\d{2}-\d{2}$/);
 });
 
-test("form options are populated from the shared domain catalog", () => {
+test("form options are populated from shared domain and transaction catalogs", () => {
   const context = vm.createContext({
     window: {},
     Object,
     Map,
   });
-  for (const filename of ["domain-options.js", "form-options.js"])
+  for (const filename of [
+    "domain-options.js",
+    "transaction-options.js",
+    "form-options.js",
+  ])
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
       context,
@@ -78,6 +83,10 @@ test("form options are populated from the shared domain catalog", () => {
   assert.match($("account-type").innerHTML, /value="land_contract"/);
   assert.match($("account-frequency").innerHTML, /Every two weeks/);
   assert.match($("property-kind").innerHTML, /value="commercial"/);
+  assert.match($("payment-method").innerHTML, /value="money_order"/);
+  assert.match($("income-category").innerHTML, /Other income/);
+  assert.match($("expense-category").innerHTML, /Security deposit refund/);
+  assert.doesNotMatch($("expense-method").innerHTML, /value="other"/);
 });
 
 test("property address utilities format full and street addresses", () => {

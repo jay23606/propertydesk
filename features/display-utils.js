@@ -4,6 +4,7 @@
 
   const { accountTypes, paymentFrequencies, propertyKinds } =
     window.PropertyDeskDomainOptions;
+  const { expenseCategories } = window.PropertyDeskTransactionOptions;
   const optionLabel = (options, value, fallback) => {
     const option = options.find((item) => item.value === value);
     return option?.displayLabel || option?.label || fallback;
@@ -37,9 +38,8 @@
   const paymentFrequencyLabel = (frequency) =>
     optionLabel(paymentFrequencies, frequency, "Monthly");
   const expenseCategoryLabel = (category) =>
-    category === "deposit_refund"
-      ? "Security deposit refund"
-      : String(category || "other").replaceAll("_", " ");
+    optionLabel(expenseCategories, category, null) ||
+    String(category || "other").replaceAll("_", " ");
 
   window.PropertyDeskDisplayUtils = Object.freeze({
     money,

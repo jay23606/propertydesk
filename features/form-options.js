@@ -5,12 +5,27 @@
   function create({ $, state, esc, propertyAddress, prettyType }) {
     const { accountTypes, paymentFrequencies, propertyKinds } =
       window.PropertyDeskDomainOptions;
+    const {
+      incomeCategories,
+      paymentMethods,
+      expensePaymentMethods,
+      expenseCategories,
+    } = window.PropertyDeskTransactionOptions;
 
-    function populateDomainOptions() {
+    function populateSelectOptions() {
       for (const [id, options] of [
         ["account-type", accountTypes],
         ["account-frequency", paymentFrequencies],
         ["property-kind", propertyKinds],
+        ["income-category", incomeCategories.rental],
+        ["payment-method", paymentMethods],
+        ["expense-category", expenseCategories],
+        [
+          "expense-method",
+          expensePaymentMethods.filter(
+            (option) => option.formVisible !== false,
+          ),
+        ],
       ])
         $(id).innerHTML = options
           .map(
@@ -53,7 +68,7 @@
       fillSelect("expense-account", expenseAccountOptions, "Property level");
     }
 
-    populateDomainOptions();
+    populateSelectOptions();
     return { fillSelect, populateFormOptions };
   }
 

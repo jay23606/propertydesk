@@ -73,11 +73,27 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("account-import-validation.js"),
   );
   assert.ok(
+    html.indexOf("features/transaction-options.js") <
+      html.indexOf("expense-import-validation.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-options.js") <
+      html.indexOf("payment-import-validation.js"),
+  );
+  assert.ok(
     html.indexOf("features/domain-options.js") <
       html.indexOf("features/display-utils.js"),
   );
   assert.ok(
     html.indexOf("features/domain-options.js") <
+      html.indexOf("features/form-options.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-options.js") <
+      html.indexOf("features/display-utils.js"),
+  );
+  assert.ok(
+    html.indexOf("features/transaction-options.js") <
       html.indexOf("features/form-options.js"),
   );
   assert.match(worker, /'\.\/workspace-table-catalog\.js'/);

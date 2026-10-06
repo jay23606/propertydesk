@@ -50,6 +50,13 @@ function createController() {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-options.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "modal-controller.js"),
       "utf8",
     ),

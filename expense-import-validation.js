@@ -9,6 +9,20 @@
     validIsoDate,
     validateImportRows,
   } = globalThis.PropertyDeskImportUtils;
+  const {
+    expenseCategories,
+    expensePaymentMethods,
+    defaults: {
+      expenseImportCategory,
+      expensePaymentMethod: defaultPaymentMethod,
+    },
+  } = globalThis.PropertyDeskTransactionOptions;
+  const expenseCategoryValues = new Set(
+    expenseCategories.map(({ value }) => value),
+  );
+  const expensePaymentMethodValues = new Set(
+    expensePaymentMethods.map(({ value }) => value),
+  );
 
   function validateExpenseRows(rows, properties, accounts, expenses) {
     const lookup = createImportLookup(properties, accounts);
@@ -65,31 +79,15 @@
       });
       if (!validIsoDate(row.expense_date))
         throw new Error(`Invalid expense date ${row.expense_date}.`);
-      const category = row.category || "other",
-        method = row.payment_method || "manual";
-      if (
-        ![
-          "repairs",
-          "contractor",
-          "materials",
-          "taxes",
-          "insurance",
-          "utilities",
-          "management",
-          "deposit_refund",
-          "other",
-        ].includes(category)
-      )
+      const category = row.category || expenseImportCategory,
+        method = row.payment_method || defaultPaymentMethod;
+      if (!expenseCategoryValues.has(category))
         throw new Error(`Invalid expense category “${category}”.`);
       if (category === "deposit_refund" && account?.account_type !== "rental")
         throw new Error(
           "A security deposit refund must be linked to a rental account.",
         );
-      if (
-        !["manual", "check", "cash", "bank_transfer", "card", "other"].includes(
-          method,
-        )
-      )
+      if (!expensePaymentMethodValues.has(method))
         throw new Error(`Invalid payment method “${method}” for expense.`);
       return {
         property_name: property.name,
