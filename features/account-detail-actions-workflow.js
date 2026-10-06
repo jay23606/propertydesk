@@ -24,5 +24,5 @@
     return { attachEvents };
   }
 
-  window.PropertyDeskAccountMaintenanceWorkflow = Object.freeze({ create });
+  window.PropertyDeskAccountDetailActionsWorkflow = Object.freeze({ create });
 })();
