@@ -48,6 +48,13 @@ function createController() {
     ),
     context,
   );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "form-options.js"),
+      "utf8",
+    ),
+    context,
+  );
   const state = {
     properties: [{ id: "p1", name: "<Oak>", address: "1 Oak St" }],
     accounts: [
@@ -67,12 +74,24 @@ function createController() {
   const controller = context.window.PropertyDeskModalController.create({
     $: getElement,
     state,
+  });
+  const formOptions = context.window.PropertyDeskFormOptions.create({
+    $: getElement,
+    state,
     esc: (value) =>
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     propertyAddress: (property) => property.address,
     prettyType: (type) => type,
   });
-  return { controller, document, elements, getElement, listeners, state };
+  return {
+    controller,
+    document,
+    elements,
+    formOptions,
+    getElement,
+    listeners,
+    state,
+  };
 }
 
 test("modal controller clears workflow state and resets payment forms when closing", () => {
@@ -98,15 +117,18 @@ test("modal controller clears workflow state and resets payment forms when closi
   assert.equal(getElement("payment-save-next").classList.lastRemoved, "hidden");
 });
 
-test("modal controller cleans up import/detail state and escapes populated selects", () => {
+test("modal controller cleans up import and detail state", () => {
   const { controller, document, getElement, state } = createController();
   controller.closeModal(getElement("import-preview-modal"));
   controller.closeModal(getElement("detail-modal"));
   assert.equal(state.pendingImport, null);
   assert.equal(state.auditRequestId, 5);
   assert.equal(document.body.style.overflow, "");
+});
 
-  controller.populateFormOptions();
+test("form options escape labels and limit payment accounts to active rows", () => {
+  const { formOptions, getElement } = createController();
+  formOptions.populateFormOptions();
   assert.match(getElement("account-property").innerHTML, /&lt;Oak&gt;/);
   assert.match(getElement("payment-account").innerHTML, /&lt;Tenant&gt;/);
   assert.doesNotMatch(getElement("payment-account").innerHTML, /Old lease/);
@@ -156,6 +178,9 @@ test("modal controller is loaded before app startup and precached", () => {
   assert.ok(
     html.indexOf("features/modal-controller.js") < html.indexOf("app.js"),
   );
+  assert.ok(html.indexOf("features/form-options.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/modal-controller\.js'/);
+  assert.match(worker, /'\.\/features\/form-options\.js'/);
   assert.match(app, /PropertyDeskModalController\.create/);
+  assert.match(app, /PropertyDeskFormOptions\.create/);
 });

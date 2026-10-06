@@ -78,16 +78,19 @@
     attachEvents: attachModalEvents,
     openModal,
     closeModal,
-    fillSelect,
-    populateFormOptions,
   } = window.PropertyDeskModalController.create({
     $,
     state,
-    esc,
-    propertyAddress,
-    prettyType,
     documentRef: document,
   });
+  const { fillSelect, populateFormOptions } =
+    window.PropertyDeskFormOptions.create({
+      $,
+      state,
+      esc,
+      propertyAddress,
+      prettyType,
+    });
   const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
     $,
     state,
