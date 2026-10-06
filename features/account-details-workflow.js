@@ -1,4 +1,4 @@
-/* Compose account details, payment history, deposit ledger, and modal actions. */
+/* Connect account-detail content with account-action and deposit workflows. */
 (() => {
   "use strict";
 

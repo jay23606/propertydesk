@@ -1,4 +1,4 @@
-/* Connect property details, overview, and portfolio actions. */
+/* Connect overview and Properties portfolio actions. */
 (() => {
   "use strict";
 
