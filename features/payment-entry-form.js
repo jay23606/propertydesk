@@ -89,7 +89,12 @@
     }
 
     return {
-      ...paymentView,
+      updateAllocationPreview: paymentView.updateAllocationPreview,
+      readValues: paymentView.readValues,
+      resetAfterSave: paymentView.resetAfterSave,
+      prepareNextPayment: paymentView.prepareNextPayment,
+      openPayment: paymentView.openPayment,
+      openPropertyPayment: paymentView.openPropertyPayment,
       attachEvents,
     };
   }

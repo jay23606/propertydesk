@@ -187,6 +187,57 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   }
 });
 
+test("payment and expense form workflows publish explicit view operations", () => {
+  const context = vm.createContext({ window: {} });
+  loadLedgerEntryForms(context);
+  const elements = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        addEventListener() {},
+      });
+    }
+    return elements.get(id);
+  };
+  const dependencies = {
+    $,
+    state: { accounts: [] },
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    moneyInput: Number,
+    todayIso: () => "2026-10-05",
+    fillSelect() {},
+    populateFormOptions() {},
+    prettyType: String,
+    openModal() {},
+    saveCorrection() {},
+    buildPaymentPayload() {},
+    buildExpensePayload() {},
+  };
+  const payment =
+    context.window.PropertyDeskPaymentEntryForm.create(dependencies);
+  const expense =
+    context.window.PropertyDeskExpenseEntryForm.create(dependencies);
+
+  assert.deepEqual(Object.keys(payment).sort(), [
+    "attachEvents",
+    "openPayment",
+    "openPropertyPayment",
+    "prepareNextPayment",
+    "readValues",
+    "resetAfterSave",
+    "updateAllocationPreview",
+  ]);
+  assert.deepEqual(Object.keys(expense).sort(), [
+    "attachEvents",
+    "openExpense",
+    "prepareNextExpense",
+    "readValues",
+    "resetAfterSave",
+  ]);
+});
+
 test("payment and expense forms report rejected saves without clearing the entries", async () => {
   const context = vm.createContext({ window: {}, Event });
   loadLedgerEntryForms(context);

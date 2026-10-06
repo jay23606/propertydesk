@@ -25,19 +25,21 @@
       },
     );
 
-    const documentActions = window.PropertyDeskDocumentActions.create({
-      state,
-      toast,
-      fetchAll,
-      openPropertyDetails,
-      confirm,
-      openWindow,
-      repository,
-    });
+    const { deletePropertyDocument, openPropertyDocument } =
+      window.PropertyDeskDocumentActions.create({
+        state,
+        toast,
+        fetchAll,
+        openPropertyDetails,
+        confirm,
+        openWindow,
+        repository,
+      });
 
     return {
       uploadPropertyDocument,
-      ...documentActions,
+      deletePropertyDocument,
+      openPropertyDocument,
     };
   }
 
