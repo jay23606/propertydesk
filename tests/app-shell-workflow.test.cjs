@@ -117,7 +117,13 @@ test("app shell receives reminder callbacks and is precached", () => {
     /PropertyDeskReminderWorkflow\.create/,
   );
   assert.doesNotMatch(app, /PropertyDeskProfileDisplay\.create/);
-  assert.match(app, /attachEvents: attachEntryEvents/);
+  assert.match(
+    fs.readFileSync(
+      path.join(root, "features", "financial-workspace-workflow.js"),
+      "utf8",
+    ),
+    /attachEntryEvents: entry\.attachEvents/,
+  );
   assert.match(html, /features\/reminder-workflow\.js/);
   assert.match(html, /features\/profile-display\.js/);
   assert.ok(
