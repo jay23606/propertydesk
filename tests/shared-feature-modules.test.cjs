@@ -452,6 +452,47 @@ test("report workflow composes portfolio report rendering only", () => {
   assert.deepEqual(Object.keys(workflow), ["renderReports"]);
 });
 
+test("reports workflow groups the view and account export callbacks", () => {
+  const passed = {};
+  const renderReports = () => "rendered";
+  const attachReportExportEvents = () => "export events";
+  const dependencies = { state: {}, todayIso() {}, accountBalance() {} };
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReportWorkflow: {
+        create: (options) => {
+          passed.view = options;
+          return { renderReports };
+        },
+      },
+      PropertyDeskReportExport: {
+        create: (options) => {
+          passed.export = options;
+          return { attachEvents: attachReportExportEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "reports-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const workflow =
+    context.window.PropertyDeskReportsWorkflow.create(dependencies);
+
+  assert.equal(passed.view, dependencies);
+  assert.equal(passed.export, dependencies);
+  assert.deepEqual(Object.keys(workflow), [
+    "renderReports",
+    "attachReportExportEvents",
+  ]);
+  assert.equal(workflow.renderReports, renderReports);
+  assert.equal(workflow.attachReportExportEvents, attachReportExportEvents);
+});
+
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
   const context = vm.createContext({ window: {}, Blob });
   vm.runInContext(

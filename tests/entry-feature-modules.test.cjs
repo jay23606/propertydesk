@@ -14,7 +14,8 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   assert.match(app, /PropertyDeskAppServices\.create\(\{[\s\S]*?toast,/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskReportExport\.create\(/);
+  assert.match(app, /PropertyDeskReportsWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskReportExport\.create\(/);
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
   assert.ok(

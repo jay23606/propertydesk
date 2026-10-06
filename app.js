@@ -53,24 +53,19 @@
     sumPosted,
     securityDepositBalance,
   });
-  // Feature modules receive shared state and helpers; app.js connects the workflows.
-  const { renderReports } = window.PropertyDeskReportWorkflow.create({
-    $,
-    state,
-    dateOnly,
-    esc,
-    money,
-    sumIncome,
-    sumOperatingExpenses,
-    accountBalance,
-  });
-  const { attachEvents: attachReportExportEvents } =
-    window.PropertyDeskReportExport.create({
+  // Feature modules receive shared state and helpers; app.js connects workflows.
+  const { renderReports, attachReportExportEvents } =
+    window.PropertyDeskReportsWorkflow.create({
       $,
       state,
+      dateOnly,
+      esc,
+      money,
+      sumIncome,
+      sumOperatingExpenses,
+      accountBalance,
       todayIso,
       prettyType,
-      accountBalance,
     });
   const {
     attachEvents: attachModalEvents,
