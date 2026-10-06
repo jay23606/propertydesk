@@ -14,8 +14,8 @@ test("CSV import feature loads as an isolated browser module", () => {
   const context = vm.createContext({
     window: {
       PropertyDeskImportWorkflows: validators,
-      PropertyDeskTransactionImportCommit: {
-        create: () => ({ commit() {} }),
+      PropertyDeskImportCommit: {
+        create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
     },
   });
@@ -97,8 +97,8 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const context = vm.createContext({
     window: {
       PropertyDeskAccountImportPayload: { build() {} },
-      PropertyDeskTransactionImportCommit: {
-        create: () => ({ commit() {} }),
+      PropertyDeskImportCommit: {
+        create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
       PropertyDeskAccountImport: {
         create: (options) => {
@@ -148,11 +148,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     [
       "$",
       "buildPayloads",
-      "fetchAll",
+      "commitAccounts",
       "parseCSV",
       "stageImport",
       "state",
-      "toast",
       "todayIso",
       "validateAccountRows",
     ].sort(),
@@ -161,7 +160,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.payment).sort(),
     [
       "$",
-      "commitTransactionImport",
+      "commitTransactions",
       "parseCSV",
       "stageImport",
       "state",
@@ -172,7 +171,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.expense).sort(),
     [
       "$",
-      "commitTransactionImport",
+      "commitTransactions",
       "parseCSV",
       "stageImport",
       "state",

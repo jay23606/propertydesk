@@ -9,7 +9,7 @@
       stageImport,
       parseCSV,
       validatePaymentRows,
-      commitTransactionImport,
+      commitTransactions,
     } = context;
 
     async function importPayments(file) {
@@ -58,7 +58,7 @@
                 "An account is no longer available for one or more payments. Reload and select the CSV again.",
               );
             }
-            await commitTransactionImport({
+            await commitTransactions({
               kind: "payments",
               rows: rowsToInsert,
               sourceName: file.name,

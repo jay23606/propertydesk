@@ -10,9 +10,8 @@
       parseCSV,
       validateAccountRows,
       todayIso,
-      fetchAll,
-      toast,
       buildPayloads = window.PropertyDeskAccountImportPayload.build,
+      commitAccounts,
     } = context;
 
     async function importAccounts(file) {
@@ -35,21 +34,11 @@
           validation.valid,
           async (rowsToImport, review) => {
             const payload = buildPayloads(rowsToImport);
-            const { data, error } = await state.client.rpc(
-              "pd_import_propertydesk_accounts",
-              {
-                p_rows: payload,
-                p_source_name: file.name,
-                p_rows_total: review.total,
-              },
-            );
-            if (error) throw error;
-            await fetchAll();
-            const imported = Number(data?.rows_accepted ?? payload.length);
-            const rejected = review.total - imported;
-            status.textContent = `Imported ${imported} account${imported === 1 ? "" : "s"}; ${rejected} row${rejected === 1 ? " was" : "s were"} skipped or need correction. Source saved to import history.`;
-            status.classList.add("success");
-            toast("Import complete");
+            await commitAccounts({
+              rows: payload,
+              sourceName: file.name,
+              total: review.total,
+            });
           },
           "",
           {

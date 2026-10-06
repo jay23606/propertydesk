@@ -9,7 +9,7 @@
       stageImport,
       parseCSV,
       validateExpenseRows,
-      commitTransactionImport,
+      commitTransactions,
     } = context;
 
     async function importExpenses(file) {
@@ -65,7 +65,7 @@
                 memo: row.memo || null,
               };
             });
-            await commitTransactionImport({
+            await commitTransactions({
               kind: "expenses",
               rows: payload,
               sourceName: file.name,

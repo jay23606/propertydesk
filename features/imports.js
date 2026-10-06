@@ -15,13 +15,13 @@
       fetchAll,
       toast,
     } = context;
-    const commitTransactionImport =
-      window.PropertyDeskTransactionImportCommit.create({
+    const { commitAccounts, commitTransactions } =
+      window.PropertyDeskImportCommit.create({
         state,
         fetchAll,
         status: $("import-status"),
         toast,
-      }).commit;
+      });
     const accounts = window.PropertyDeskAccountImport.create({
       $,
       state,
@@ -29,9 +29,8 @@
       parseCSV,
       validateAccountRows,
       todayIso,
-      fetchAll,
-      toast,
       buildPayloads: window.PropertyDeskAccountImportPayload.build,
+      commitAccounts,
     });
     const payments = window.PropertyDeskPaymentImport.create({
       $,
@@ -39,7 +38,7 @@
       stageImport,
       parseCSV,
       validatePaymentRows,
-      commitTransactionImport,
+      commitTransactions,
     });
     const expenses = window.PropertyDeskExpenseImport.create({
       $,
@@ -47,7 +46,7 @@
       stageImport,
       parseCSV,
       validateExpenseRows,
-      commitTransactionImport,
+      commitTransactions,
     });
 
     function attachEvents() {
