@@ -1,4 +1,4 @@
-/* Compose workspace settings, navigation, and app theme controls. */
+/* Compose workspace settings, reminders, navigation, and app theme controls. */
 (() => {
   "use strict";
 
@@ -10,8 +10,35 @@
       toast,
       fetchAll,
       updateGreeting,
-      renderReminderActivity,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal,
     } = context;
+    const reminders = window.PropertyDeskReminderWorkflow.create({
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal,
+    });
     const settings = window.PropertyDeskWorkspace.create({
       $,
       state,
@@ -19,11 +46,11 @@
       toast,
       fetchAll,
       updateGreeting,
-      renderReminderActivity,
+      renderReminderActivity: reminders.renderReminderActivity,
     });
     const navigation = window.PropertyDeskNavigation.create({
-      $: context.$,
-      state: context.state,
+      $,
+      state,
       renderWorkspaceSettings: settings.renderWorkspaceSettings,
     });
     const theme = window.PropertyDeskTheme.create();
@@ -36,6 +63,7 @@
 
     return {
       navigate: navigation.navigate,
+      previewReminderEmail: reminders.previewReminderEmail,
       attachEvents,
     };
   }

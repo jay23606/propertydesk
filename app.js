@@ -234,34 +234,29 @@
     restoreAuthSession,
     attachEvents: attachAuthEvents,
   } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
-  const { renderReminderActivity, previewReminderEmail } =
-    window.PropertyDeskReminderWorkflow.create({
-      $,
-      state,
-      esc,
-      fmtDate,
-      money,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      monthEnd,
-      moneyInput,
-      toast,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      openModal,
-    });
-  const { navigate, attachEvents: attachAppShellEvents } =
-    window.PropertyDeskAppShellWorkflow.create({
-      $,
-      state,
-      esc,
-      toast,
-      fetchAll,
-      updateGreeting,
-      renderReminderActivity,
-    });
+  const {
+    navigate,
+    previewReminderEmail,
+    attachEvents: attachAppShellEvents,
+  } = window.PropertyDeskAppShellWorkflow.create({
+    $,
+    state,
+    esc,
+    fmtDate,
+    money,
+    toast,
+    fetchAll,
+    updateGreeting,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    monthEnd,
+    moneyInput,
+    dateOnly,
+    monthStart,
+    propertyAddress,
+    openModal,
+  });
   appLifecycle = window.PropertyDeskAppLifecycle.create({
     $,
     state,
