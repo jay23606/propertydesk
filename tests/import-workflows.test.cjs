@@ -60,6 +60,18 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/deposit-details-workflow.js"),
   );
   assert.ok(
+    html.indexOf("features/deposit-maintenance.js") <
+      html.indexOf("features/deposit-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-details-workflow.js") <
+      html.indexOf("features/deposit-maintenance-workflow.js"),
+  );
+  assert.ok(
+    html.indexOf("features/deposit-maintenance-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.ok(
     html.indexOf("features/account-maintenance.js") <
       html.indexOf("features/account-detail-actions-workflow.js"),
   );

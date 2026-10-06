@@ -29,6 +29,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   assert.match(app, /attachCreateActions,/);
   assert.match(app, /attachDepositEvents,/);
   assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),

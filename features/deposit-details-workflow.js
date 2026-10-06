@@ -1,20 +1,9 @@
-/* Compose the security-deposit details view and its separate maintenance path. */
+/* Compose security-deposit ledger data and its account-detail renderer. */
 (() => {
   "use strict";
 
   function create(context) {
-    const {
-      $,
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
-    } = context;
+    const { state, depositLedger, money, fmtDate, esc } = context;
     const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state,
       depositLedger,
@@ -22,22 +11,7 @@
       fmtDate,
       esc,
     });
-    const { recordDepositAdjustment } =
-      window.PropertyDeskDepositMaintenance.create({
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        fetchAll,
-      });
-    const { attachEvents } = window.PropertyDeskDepositDetailEvents.create({
-      $,
-      state,
-      depositSectionHTML,
-      recordDepositAdjustment,
-    });
-
-    return { depositSectionHTML, attachEvents };
+    return { depositSectionHTML };
   }
 
   window.PropertyDeskDepositDetailsWorkflow = Object.freeze({ create });

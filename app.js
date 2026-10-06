@@ -186,7 +186,7 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { depositSectionHTML, attachEvents: attachDepositEvents } =
+  const { depositSectionHTML } =
     window.PropertyDeskDepositDetailsWorkflow.create({
       $,
       state,
@@ -194,10 +194,16 @@
       money,
       fmtDate,
       esc,
+    });
+  const { attachEvents: attachDepositEvents } =
+    window.PropertyDeskDepositMaintenanceWorkflow.create({
+      $,
+      state,
       moneyInput,
       todayIso,
       toast,
       fetchAll,
+      depositSectionHTML,
     });
   const { attachEvents: attachAccountDetailActionEvents } =
     window.PropertyDeskAccountDetailActionsWorkflow.create({

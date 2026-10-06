@@ -4,11 +4,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("deposit details workflow composes the view, maintenance, and action router", () => {
+test("deposit details workflow composes ledger data and rendering", () => {
   const passed = {};
   const depositSectionHTML = () => "deposit HTML";
-  const recordDepositAdjustment = () => "adjusted";
-  let attached = 0;
   const context = vm.createContext({
     window: {
       PropertyDeskDepositDetails: {
@@ -17,6 +15,37 @@ test("deposit details workflow composes the view, maintenance, and action router
           return { depositSectionHTML };
         },
       },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    state: {},
+    depositLedger() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+  };
+  const workflow =
+    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
+
+  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.deepEqual(Object.keys(workflow), ["depositSectionHTML"]);
+});
+
+test("deposit maintenance workflow composes adjustments with detail events", () => {
+  const passed = {};
+  const depositSectionHTML = () => "deposit HTML";
+  const recordDepositAdjustment = () => "adjusted";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.maintenance = options;
@@ -33,7 +62,7 @@ test("deposit details workflow composes the view, maintenance, and action router
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "deposit-details-workflow.js"),
+      path.join(__dirname, "..", "features", "deposit-maintenance-workflow.js"),
       "utf8",
     ),
     context,
@@ -41,24 +70,20 @@ test("deposit details workflow composes the view, maintenance, and action router
   const dependencies = {
     $() {},
     state: {},
-    depositLedger() {},
-    money() {},
-    fmtDate() {},
-    esc() {},
     moneyInput() {},
     todayIso() {},
     toast() {},
     fetchAll() {},
+    depositSectionHTML,
   };
   const workflow =
-    context.window.PropertyDeskDepositDetailsWorkflow.create(dependencies);
+    context.window.PropertyDeskDepositMaintenanceWorkflow.create(dependencies);
 
-  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
   assert.equal(passed.maintenance.state, dependencies.state);
   assert.equal(passed.maintenance.moneyInput, dependencies.moneyInput);
   assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
   assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
-  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
   workflow.attachEvents();
   assert.equal(attached, 1);
 });
