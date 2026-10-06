@@ -103,4 +103,14 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Check the deployed app in Chromium
-        run: npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"
+        run: |
+          for attempt in 1 2 3; do
+            if npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Live smoke attempt $attempt failed; retrying after Pages propagation."
+              sleep 10
+            fi
+          done
+          exit 1
