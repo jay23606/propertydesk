@@ -33,7 +33,7 @@ test("ledger workflow wires entry forms and transaction history", () => {
           return entries;
         },
       },
-      PropertyDeskTransactionWorkflow: {
+      PropertyDeskTransactionViews: {
         create: (options) => {
           calls.push("transactions");
           passed.transactions = options;
@@ -76,13 +76,8 @@ test("ledger workflow wires entry forms and transaction history", () => {
     dependencies.previewReminderEmail,
   );
   assert.equal(passed.entries.documentRef, dependencies.documentRef);
-  assert.equal(passed.transactions.openPayment, entries.openPayment);
-  assert.equal(passed.transactions.openExpense, entries.openExpense);
-  assert.equal(
-    passed.transactions.updateAllocationPreview,
-    entries.updateAllocationPreview,
-  );
-  assert.equal(passed.transactions.documentRef, dependencies.documentRef);
+  assert.equal(passed.transactions.state, dependencies.state);
+  assert.equal("openPayment" in passed.transactions, false);
   assert.equal("moneyInput" in passed.transactions, false);
   assert.deepEqual(Object.keys(workflow).sort(), ["entries", "transactions"]);
   assert.equal(workflow.entries, entries);

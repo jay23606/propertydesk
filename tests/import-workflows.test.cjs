@@ -79,7 +79,7 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
-    html.indexOf("features/transaction-workflow.js") <
+    html.indexOf("features/transaction-views.js") <
       html.indexOf("features/ledger-workflow.js"),
   );
   assert.ok(
@@ -186,15 +186,8 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/transaction-maintenance-workflow.js"),
   );
   assert.ok(
-    html.indexOf("features/transaction-maintenance-workflow.js") <
-      html.indexOf("features/transaction-workflow.js"),
-  );
-  assert.ok(
     html.indexOf("features/transaction-views.js") <
-      html.indexOf("features/transaction-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/transaction-workflow.js") < html.indexOf("app.js"),
+      html.indexOf("features/ledger-workflow.js"),
   );
   assert.ok(
     html.indexOf("features/report-views.js") <
@@ -645,7 +638,6 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/app-lifecycle\.js'/);
   assert.match(worker, /'\.\/features\/backend-client\.js'/);
   assert.match(worker, /'\.\/features\/transaction-views\.js'/);
-  assert.match(worker, /'\.\/features\/transaction-workflow\.js'/);
   assert.match(worker, /'\.\/features\/report-views\.js'/);
   assert.match(worker, /'\.\/features\/report-model\.js'/);
   assert.match(worker, /'\.\/features\/report-export\.js'/);
@@ -695,7 +687,6 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance-workflow\.js'/);
-  assert.match(worker, /'\.\/features\/transaction-workflow\.js'/);
   assert.match(worker, /'\.\/features\/document-upload-policy\.js'/);
   assert.match(worker, /'\.\/features\/documents\.js'/);
   assert.match(worker, /'\.\/features\/property-detail-actions-workflow\.js'/);

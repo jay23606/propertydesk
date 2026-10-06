@@ -4,62 +4,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("transaction workflow connects only the transaction history view", () => {
-  const passed = {};
-  const calls = [];
-  const renderPayments = () => "payments rendered";
-  const attachViewEvents = () => "view events attached";
-  const context = vm.createContext({
-    document: {},
-    window: {
-      PropertyDeskTransactionViews: {
-        create: (options) => {
-          passed.views = options;
-          return {
-            renderPayments,
-            attachEvents: () => {
-              calls.push("view events");
-              return attachViewEvents();
-            },
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    dateOnly() {},
-    fmtDate() {},
-    esc() {},
-    expenseCategoryLabel() {},
-    money() {},
-    isPosted() {},
-    monthStart() {},
-    sumIncome() {},
-    sumOperatingExpenses() {},
-  };
-  const workflow =
-    context.window.PropertyDeskTransactionWorkflow.create(dependencies);
-
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
-    "renderPayments",
-  ]);
-  assert.equal(passed.views.state, dependencies.state);
-  assert.equal(passed.views.monthStart, dependencies.monthStart);
-  assert.equal(workflow.renderPayments, renderPayments);
-  assert.equal(workflow.attachEvents(), attachViewEvents());
-  assert.deepEqual(calls, ["view events"]);
-});
-
 test("transaction maintenance workflow composes correction and void actions", () => {
   const passed = {};
   const correctTransaction = () => "corrected";

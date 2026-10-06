@@ -17,7 +17,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   );
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create\(/,
+    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow)\.create\(/,
   );
   assert.match(app, /attachAccountFormEvents,/);
   assert.match(app, /attachDepositEvents,/);
@@ -42,7 +42,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   const creationOrder = [
     "PropertyDeskTransactionCorrections.create(",
     "PropertyDeskRecordEntryWorkflow.create(",
-    "PropertyDeskTransactionWorkflow.create(",
+    "PropertyDeskTransactionViews.create(",
   ].map((marker) => ledgerWorkflow.indexOf(marker));
   assert.ok(creationOrder.every((position) => position >= 0));
   assert.deepEqual(
@@ -50,8 +50,6 @@ test("app root delegates ledger and record-entry composition to one workflow", (
     [...creationOrder].sort((left, right) => left - right),
   );
   assert.match(ledgerWorkflow, /saveCorrection/);
-  assert.match(ledgerWorkflow, /openPayment: entries\.openPayment/);
-  assert.match(ledgerWorkflow, /openExpense: entries\.openExpense/);
 });
 
 test("app coordinator passes the amortization helper into account details", () => {
@@ -107,7 +105,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow|TransactionWorkflow)\.create/,
+    /PropertyDesk(?:TransactionCorrections|RecordEntryWorkflow)\.create/,
   );
   assert.doesNotMatch(
     app,

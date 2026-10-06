@@ -144,8 +144,6 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      EventClass: Event,
-      OptionClass: Option,
       documentRef: document,
     });
   const {

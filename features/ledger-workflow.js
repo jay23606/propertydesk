@@ -1,4 +1,4 @@
-/* Coordinate record entry, transaction history, and transaction maintenance. */
+/* Coordinate record entry with the transaction history view. */
 (() => {
   "use strict";
 
@@ -26,8 +26,6 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      EventClass,
-      OptionClass,
       documentRef = document,
     } = context;
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
@@ -56,7 +54,7 @@
       saveCorrection,
       documentRef,
     });
-    const transactions = window.PropertyDeskTransactionWorkflow.create({
+    const transactions = window.PropertyDeskTransactionViews.create({
       $,
       state,
       dateOnly,
@@ -68,15 +66,6 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
-      toast,
-      fetchAll,
-      prettyType,
-      openPayment: entries.openPayment,
-      openExpense: entries.openExpense,
-      updateAllocationPreview: entries.updateAllocationPreview,
-      EventClass,
-      OptionClass,
-      documentRef,
     });
     return { entries, transactions };
   }
