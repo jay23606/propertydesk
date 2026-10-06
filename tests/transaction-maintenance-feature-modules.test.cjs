@@ -398,6 +398,42 @@ test("transaction correction failures preserve the open form and pending correct
   ]);
 });
 
+test("transaction correction model resolves only posted payments and expenses", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-correction-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const payment = {
+    id: "payment-1",
+    account_id: "account-1",
+    status: "posted",
+  };
+  const expense = { id: "expense-1", status: "posted" };
+  const state = {
+    payments: [payment, { id: "voided-payment", status: "voided" }],
+    expenses: [expense, { id: "voided-expense", status: "voided" }],
+    accounts: [{ id: "account-1" }],
+  };
+  const findTarget =
+    context.window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget;
+
+  const paymentTarget = findTarget(state, "income", payment.id);
+  assert.equal(paymentTarget.kind, "payment");
+  assert.equal(paymentTarget.record, payment);
+  assert.equal(paymentTarget.account, state.accounts[0]);
+  const expenseTarget = findTarget(state, "expense", expense.id);
+  assert.equal(expenseTarget.kind, "expense");
+  assert.equal(expenseTarget.record, expense);
+  assert.equal(findTarget(state, "income", "voided-payment"), null);
+  assert.equal(findTarget(state, "expense", "voided-expense"), null);
+  assert.equal(findTarget(state, "income", "missing"), null);
+  assert.equal(findTarget(state, "unknown", payment.id), null);
+});
+
 test("transaction correction form reopens posted payments and expenses with audit reasons", () => {
   const context = vm.createContext({
     window: {},
@@ -416,6 +452,13 @@ test("transaction correction form reopens posted payments and expenses with audi
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-correction-view.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-correction-model.js"),
       "utf8",
     ),
     context,

@@ -14,6 +14,8 @@
     updateAllocationPreview,
     EventClass = Event,
     OptionClass = Option,
+    findCorrectionTarget = window.PropertyDeskTransactionCorrectionModel
+      .findCorrectionTarget,
   }) {
     const view = window.PropertyDeskTransactionCorrectionView.create({
       $,
@@ -24,16 +26,8 @@
     });
 
     function correctTransaction(kind, id) {
-      const payment =
-          kind === "income"
-            ? state.payments.find((item) => item.id === id)
-            : null,
-        expense =
-          kind === "expense"
-            ? state.expenses.find((item) => item.id === id)
-            : null,
-        item = payment || expense;
-      if (!item || item.status !== "posted") {
+      const target = findCorrectionTarget(state, kind, id);
+      if (!target) {
         toast("Only posted transactions can be corrected");
         return;
       }
@@ -45,18 +39,15 @@
       if (reason === null) return;
       const auditReason = reason.trim() || "Corrected by owner";
 
-      if (payment) {
+      if (target.kind === "payment") {
         openPayment();
-        const account = state.accounts.find(
-          (accountItem) => accountItem.id === payment.account_id,
-        );
-        view.populatePayment(payment, account);
+        view.populatePayment(target.record, target.account);
         state.pendingCorrection = { kind: "payment", id, reason: auditReason };
         return;
       }
 
       openExpense();
-      view.populateExpense(expense);
+      view.populateExpense(target.record);
       state.pendingCorrection = { kind: "expense", id, reason: auditReason };
     }
 
