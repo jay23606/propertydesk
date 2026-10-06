@@ -3,7 +3,7 @@
   "use strict";
 
   function create({ state, workspaceData, toast, render }) {
-    async function fetchAll() {
+    async function resolveWorkspaceId() {
       const { data: workspaceId, error: workspaceError } =
         await workspaceData.loadWorkspaceId(state.client);
       if (workspaceError || !workspaceId) {
@@ -11,7 +11,10 @@
         toast(workspaceError?.message || "Could not load this workspace");
         throw error;
       }
+      return workspaceId;
+    }
 
+    async function hydrateWorkspace(workspaceId) {
       state.workspaceOwnerId = workspaceId;
       try {
         Object.assign(
@@ -22,6 +25,9 @@
         toast(error?.message || "Could not load this workspace");
         throw error;
       }
+    }
+
+    function renderWorkspace() {
       try {
         render();
       } catch (error) {
@@ -34,6 +40,12 @@
         );
         throw error;
       }
+    }
+
+    async function fetchAll() {
+      const workspaceId = await resolveWorkspaceId();
+      await hydrateWorkspace(workspaceId);
+      renderWorkspace();
     }
 
     return { fetchAll };
