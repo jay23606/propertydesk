@@ -35,18 +35,18 @@
     paymentFrequencyLabel,
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
+  const { backend, state, toast, fetchAll } =
+    window.PropertyDeskAppServices.create({
+      $,
+      render,
+    });
   const {
-    backend,
-    state,
-    toast,
-    fetchAll,
     accountBalance,
     scheduledMonthlyRunRate,
     collectedSince,
     depositLedger,
-  } = window.PropertyDeskAppServices.create({
-    $,
-    render,
+  } = window.PropertyDeskLedgerContext.create({
+    state,
     todayIso,
     scheduledLoanBalance,
     monthlyScheduledEstimate,

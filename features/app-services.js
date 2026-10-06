@@ -1,15 +1,10 @@
-/* Initialize shared backend, workspace, notification, and ledger services. */
+/* Initialize backend, shared state, notifications, and workspace services. */
 (() => {
   "use strict";
 
   function create({
     $,
     render,
-    todayIso,
-    scheduledLoanBalance,
-    monthlyScheduledEstimate,
-    sumPosted,
-    securityDepositBalance,
     config = window.PROPERTYDESK_CONFIG || {},
     supabase = window.supabase,
   }) {
@@ -26,24 +21,11 @@
       toast,
       render,
     });
-    const ledger = window.PropertyDeskLedgerContext.create({
-      state,
-      todayIso,
-      scheduledLoanBalance,
-      monthlyScheduledEstimate,
-      sumPosted,
-      securityDepositBalance,
-    });
-
     return {
       backend,
       state,
       toast,
       fetchAll,
-      accountBalance: ledger.accountBalance,
-      scheduledMonthlyRunRate: ledger.scheduledMonthlyRunRate,
-      collectedSince: ledger.collectedSince,
-      depositLedger: ledger.depositLedger,
     };
   }
 

@@ -287,8 +287,9 @@ test("reminder workflow composes the activity view and email preview", () => {
 test("app coordinator delegates shared setup to the app services workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAppServices\.create\(/);
+  assert.match(app, /PropertyDeskLedgerContext\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh|LedgerContext)\.create/,
+    /PropertyDesk(?:WorkspaceData|BackendClient|AppState|Notifications|WorkspaceRefresh)\.create/,
   );
 });

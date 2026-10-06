@@ -140,17 +140,11 @@ test("backend client only initializes with complete public Supabase config", () 
   });
 });
 
-test("app services compose shared state, workspace refresh, and ledger helpers", () => {
+test("app services compose shared state and workspace refresh", () => {
   const received = {};
   const state = {};
   const toast = () => {};
   const fetchAll = () => {};
-  const ledger = {
-    accountBalance: () => {},
-    scheduledMonthlyRunRate: () => {},
-    collectedSince: () => {},
-    depositLedger: () => {},
-  };
   const config = {
     supabaseUrl: "https://example.test",
     supabaseAnonKey: "public-key",
@@ -180,12 +174,6 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
           return { fetchAll };
         },
       },
-      PropertyDeskLedgerContext: {
-        create: (options) => {
-          received.ledger = options;
-          return ledger;
-        },
-      },
     },
   });
   vm.runInContext(
@@ -198,11 +186,6 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
   const dependencies = {
     $() {},
     render() {},
-    todayIso() {},
-    scheduledLoanBalance() {},
-    monthlyScheduledEstimate() {},
-    sumPosted() {},
-    securityDepositBalance() {},
     config,
     supabase,
   };
@@ -214,29 +197,13 @@ test("app services compose shared state, workspace refresh, and ledger helpers",
   assert.equal(received.refresh.state, state);
   assert.equal(received.refresh.toast, toast);
   assert.equal(received.refresh.render, dependencies.render);
-  assert.equal(received.ledger.state, state);
-  assert.equal(received.ledger.todayIso, dependencies.todayIso);
-  assert.equal(
-    received.ledger.scheduledLoanBalance,
-    dependencies.scheduledLoanBalance,
-  );
   assert.equal(services.backend.configured, true);
   assert.equal(services.state, state);
   assert.equal(services.toast, toast);
   assert.equal(services.fetchAll, fetchAll);
-  assert.equal(services.depositLedger, ledger.depositLedger);
   assert.deepEqual(
     Object.keys(services).sort(),
-    [
-      "accountBalance",
-      "backend",
-      "collectedSince",
-      "depositLedger",
-      "fetchAll",
-      "scheduledMonthlyRunRate",
-      "state",
-      "toast",
-    ].sort(),
+    ["backend", "fetchAll", "state", "toast"].sort(),
   );
 });
 
