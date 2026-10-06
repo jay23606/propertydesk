@@ -6,7 +6,7 @@
     const {
       $,
       state,
-      isPosted,
+      sumPosted,
       accountBalance,
       amortizationSchedule,
       amountDueSince,
@@ -42,16 +42,12 @@
       if (auditRequestId !== state.auditRequestId) return;
 
       const unpaidStart = unpaidDueAccrualStart();
-      const postedPayments = payments.filter(isPosted);
       $("detail-title").textContent = account.name;
       $("detail-content").innerHTML = renderAccountDetails({
         account,
         propertyName: property?.name || "—",
         propertyAddressText: propertyAddress(property || {}),
-        postedPaymentTotal: postedPayments.reduce(
-          (total, payment) => total + Number(payment.amount),
-          0,
-        ),
+        postedPaymentTotal: sumPosted(payments),
         estimatedLoanBalance:
           account.account_type === "rental" ? null : accountBalance(account),
         unpaidDue: amountDueSince(

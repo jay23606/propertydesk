@@ -189,7 +189,7 @@
     closeModal,
     editAccount,
     openPayment,
-    isPosted,
+    sumPosted,
     prettyType,
     paymentFrequencyLabel,
     accountBalance,

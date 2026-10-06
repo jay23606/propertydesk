@@ -9,7 +9,7 @@
       money,
       fmtDate,
       esc,
-      isPosted,
+      sumPosted,
       prettyType,
       paymentFrequencyLabel,
       accountBalance,
@@ -36,7 +36,7 @@
     const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
       $,
       state,
-      isPosted,
+      sumPosted,
       money,
       fmtDate,
       esc,

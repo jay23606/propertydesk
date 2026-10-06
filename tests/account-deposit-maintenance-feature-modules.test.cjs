@@ -73,7 +73,7 @@ test("account details workflow composes detail, history, and deposit actions", (
     closeModal() {},
     editAccount() {},
     openPayment() {},
-    isPosted() {},
+    sumPosted() {},
     prettyType() {},
     paymentFrequencyLabel() {},
     accountBalance() {},
@@ -103,6 +103,7 @@ test("account details workflow composes detail, history, and deposit actions", (
     passed.accountContent.renderAccountHistory,
     methods.renderAccountHistory,
   );
+  assert.equal(passed.accountContent.sumPosted, dependencies.sumPosted);
   assert.equal(
     passed.accountContent.depositSectionHTML,
     methods.depositSectionHTML,
@@ -302,7 +303,7 @@ test("account detail content workflow composes schedule and selected account", (
     money() {},
     fmtDate() {},
     esc() {},
-    isPosted() {},
+    sumPosted() {},
     prettyType() {},
     paymentFrequencyLabel() {},
     accountBalance() {},

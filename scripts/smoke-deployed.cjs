@@ -127,7 +127,10 @@ async function main() {
       const feature = details.create({
         $: (id) => document.getElementById(id),
         state,
-        isPosted: () => true,
+        sumPosted: (rows) =>
+          rows
+            .filter((payment) => !payment.status || payment.status === "posted")
+            .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
         sumIncome: () => 0,
         sumOperatingExpenses: () => 0,
         money,

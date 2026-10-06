@@ -42,9 +42,20 @@ test("account details render action targets without owning action listeners", as
       auditRequestId: 0,
       accounts: [account],
       properties: [{ id: "property-1", name: "Main House" }],
-      payments: [],
+      payments: [
+        { id: "paid", account_id: "account-1", amount: 20, status: "posted" },
+        {
+          id: "voided",
+          account_id: "account-1",
+          amount: 500,
+          status: "voided",
+        },
+      ],
     },
-    isPosted: () => true,
+    sumPosted: (rows) =>
+      rows
+        .filter((payment) => payment.status !== "voided")
+        .reduce((total, payment) => total + Number(payment.amount || 0), 0),
     money: (value) => `$${value}`,
     fmtDate: () => "today",
     esc: String,
@@ -70,6 +81,8 @@ test("account details render action targets without owning action listeners", as
   });
 
   await feature.openAccountDetails(account.id);
+  assert.match(elements.get("detail-content").innerHTML, /\$20/);
+  assert.doesNotMatch(elements.get("detail-content").innerHTML, /\$520/);
   assert.match(
     elements.get("detail-content").innerHTML,
     /data-account-detail-edit="account-1"/,
