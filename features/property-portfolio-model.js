@@ -10,16 +10,28 @@
   }) {
     function buildRows({ query, type, holderId, showArchived }) {
       const rows = [];
-      for (const property of state.properties) {
-        const tags = state.propertyHolders
-          .filter((row) => row.property_id === property.id)
-          .map((row) => row.member_user_id);
-        if (property.archived_at && !showArchived) continue;
-        if (holderId !== "all" && !tags.includes(holderId)) continue;
+      const accountsByProperty = new Map();
+      for (const account of state.accounts) {
+        const related = accountsByProperty.get(account.property_id) || [];
+        related.push(account);
+        accountsByProperty.set(account.property_id, related);
+      }
+      const holdersByProperty = new Map();
+      for (const row of state.propertyHolders) {
+        const holders = holdersByProperty.get(row.property_id) || new Set();
+        holders.add(row.member_user_id);
+        holdersByProperty.set(row.property_id, holders);
+      }
 
-        const allRelated = state.accounts.filter(
-            (account) => account.property_id === property.id,
-          ),
+      for (const property of state.properties) {
+        if (property.archived_at && !showArchived) continue;
+        if (
+          holderId !== "all" &&
+          !holdersByProperty.get(property.id)?.has(holderId)
+        )
+          continue;
+
+        const allRelated = accountsByProperty.get(property.id) || [],
           related = allRelated.filter(
             (account) =>
               showArchived || (account.status || "active") === "active",
