@@ -90,11 +90,14 @@
         openPropertyDetails,
       });
 
+    function attachEvents() {
+      attachPropertyDetailEvents();
+      attachPropertyDocumentEvents();
+    }
+
     return {
-      renderPropertyActivity,
       openPropertyDetails,
-      attachPropertyDetailEvents,
-      attachPropertyDocumentEvents,
+      attachEvents,
     };
   }
 

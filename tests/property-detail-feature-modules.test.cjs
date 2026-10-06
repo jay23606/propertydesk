@@ -567,6 +567,7 @@ test("property details workflow connects activity summaries to the property view
   const propertyDetailsHTML = () => "property details html";
   const attachPropertyDetailEvents = () => "detail events";
   const attachPropertyDocumentEvents = () => "document events";
+  const attached = [];
   let detailActionsContext;
   let documentContext;
   const context = vm.createContext({
@@ -589,13 +590,19 @@ test("property details workflow connects activity summaries to the property view
       PropertyDeskPropertyDetailActionsWorkflow: {
         create: (options) => {
           detailActionsContext = options;
-          return { attachPropertyDetailEvents };
+          return {
+            attachPropertyDetailEvents: () =>
+              attached.push(attachPropertyDetailEvents()),
+          };
         },
       },
       PropertyDeskPropertyDocumentWorkflow: {
         create: (options) => {
           documentContext = options;
-          return { attachPropertyDocumentEvents };
+          return {
+            attachPropertyDocumentEvents: () =>
+              attached.push(attachPropertyDocumentEvents()),
+          };
         },
       },
     },
@@ -626,7 +633,11 @@ test("property details workflow connects activity summaries to the property view
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
-  assert.equal(workflow.renderPropertyActivity, renderPropertyActivity);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachEvents",
+    "openPropertyDetails",
+  ]);
+  assert.equal(Object.hasOwn(workflow, "renderPropertyActivity"), false);
   assert.equal(workflow.openPropertyDetails(), "property details");
   assert.equal(
     detailActionsContext.openPropertyDetails,
@@ -663,11 +674,8 @@ test("property details workflow connects activity summaries to the property view
     "state",
     "toast",
   ]);
-  assert.equal(workflow.attachPropertyDetailEvents, attachPropertyDetailEvents);
-  assert.equal(
-    workflow.attachPropertyDocumentEvents,
-    attachPropertyDocumentEvents,
-  );
+  workflow.attachEvents();
+  assert.deepEqual(attached, ["detail events", "document events"]);
 });
 
 test("property detail actions workflow composes administration and modal actions", () => {
