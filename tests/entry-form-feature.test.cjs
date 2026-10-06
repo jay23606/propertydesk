@@ -118,8 +118,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "$",
       "buildPaymentPayload",
       "buildPaymentCorrection",
-      "closeModal",
-      "fetchAll",
+      "finishSuccessfulEntry",
       "fillSelect",
       "insertTransaction",
       "moneyInput",
@@ -138,8 +137,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
       "$",
       "buildExpensePayload",
       "buildExpenseCorrection",
-      "closeModal",
-      "fetchAll",
+      "finishSuccessfulEntry",
       "fillSelect",
       "insertTransaction",
       "moneyInput",
@@ -164,6 +162,82 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
   forms.attachEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
+});
+
+test("shared ledger completion resets, refreshes, then continues or closes", async () => {
+  const passed = {};
+  const calls = [];
+  let failRefresh = false;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionPayloads: {},
+      PropertyDeskTransactionInserts: { create: () => ({}) },
+      PropertyDeskPaymentEntryForm: {
+        create: (options) => {
+          passed.payment = options;
+          return {};
+        },
+      },
+      PropertyDeskExpenseEntryForm: {
+        create: (options) => {
+          passed.expense = options;
+          return {};
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
+      "utf8",
+    ),
+    context,
+  );
+  context.window.PropertyDeskLedgerEntryForms.create({
+    $: (id) => id,
+    closeModal: (id) => calls.push(`close:${id}`),
+    fetchAll: async () => {
+      calls.push("refresh");
+      if (failRefresh) throw new Error("refresh failed");
+    },
+    toast: (message) => calls.push(`toast:${message}`),
+  });
+
+  await passed.payment.finishSuccessfulEntry({
+    label: "Payment",
+    addAnother: false,
+    modalId: "payment-modal",
+    resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
+    resetArguments: ["account-1"],
+  });
+  await passed.expense.finishSuccessfulEntry({
+    label: "Expense",
+    addAnother: true,
+    modalId: "expense-modal",
+    resetAfterSave: () => calls.push("reset-expense"),
+    prepareNext: (values) => calls.push(`next-expense:${values.propertyId}`),
+    nextArguments: [{ propertyId: "property-1" }],
+  });
+
+  assert.deepEqual(calls, [
+    "reset-payment:account-1",
+    "refresh",
+    "close:payment-modal",
+    "toast:Payment recorded",
+    "reset-expense",
+    "refresh",
+    "next-expense:property-1",
+    "toast:Expense recorded. Ready for the next entry",
+  ]);
+  failRefresh = true;
+  await passed.payment.finishSuccessfulEntry({
+    label: "Payment",
+    addAnother: false,
+    modalId: "payment-modal",
+    resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
+    resetArguments: ["account-2"],
+  });
+  assert.deepEqual(calls.slice(-2), ["reset-payment:account-2", "refresh"]);
 });
 
 test("property/account forms and ledger-entry forms expose separate workflows", () => {

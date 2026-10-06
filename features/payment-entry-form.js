@@ -7,9 +7,8 @@
       $,
       state,
       toast,
-      closeModal,
-      fetchAll,
       saveCorrection,
+      finishSuccessfulEntry,
       insertTransaction,
       buildPaymentPayload,
       buildPaymentCorrection,
@@ -68,19 +67,14 @@
           "Payment couldn't be saved right now. Check your connection and try again.",
       });
       if (!saved) return;
-      paymentView.resetAfterSave(account.id);
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      if (addAnother) {
-        paymentView.prepareNextPayment();
-        toast("Payment recorded. Ready for the next entry");
-        return;
-      }
-      closeModal($("payment-modal"));
-      toast("Payment recorded");
+      await finishSuccessfulEntry({
+        label: "Payment",
+        addAnother,
+        modalId: "payment-modal",
+        resetAfterSave: paymentView.resetAfterSave,
+        resetArguments: [account.id],
+        prepareNext: paymentView.prepareNextPayment,
+      });
     }
 
     function attachEvents() {

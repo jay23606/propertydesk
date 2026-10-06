@@ -27,19 +27,41 @@
       state,
       toast,
     });
+    async function finishSuccessfulEntry({
+      label,
+      addAnother,
+      modalId,
+      resetAfterSave,
+      resetArguments = [],
+      prepareNext,
+      nextArguments = [],
+    }) {
+      resetAfterSave(...resetArguments);
+      try {
+        await fetchAll();
+      } catch {
+        return;
+      }
+      if (addAnother) {
+        prepareNext(...nextArguments);
+        toast(`${label} recorded. Ready for the next entry`);
+        return;
+      }
+      closeModal($(modalId));
+      toast(`${label} recorded`);
+    }
     const payments = window.PropertyDeskPaymentEntryForm.create({
       $,
       state,
       moneyInput,
       todayIso,
       toast,
-      closeModal,
-      fetchAll,
       fillSelect,
       populateFormOptions,
       prettyType,
       openModal,
       saveCorrection,
+      finishSuccessfulEntry,
       insertTransaction,
       buildPaymentPayload: buildPayment,
       buildPaymentCorrection,
@@ -50,13 +72,12 @@
       moneyInput,
       todayIso,
       toast,
-      closeModal,
-      fetchAll,
       fillSelect,
       populateFormOptions,
       prettyType,
       openModal,
       saveCorrection,
+      finishSuccessfulEntry,
       insertTransaction,
       buildExpensePayload: buildExpense,
       buildExpenseCorrection,

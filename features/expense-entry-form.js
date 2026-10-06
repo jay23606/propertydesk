@@ -7,9 +7,8 @@
       $,
       state,
       toast,
-      closeModal,
-      fetchAll,
       saveCorrection,
+      finishSuccessfulEntry,
       insertTransaction,
       buildExpensePayload,
       buildExpenseCorrection,
@@ -73,25 +72,16 @@
           "Expense couldn't be saved right now. Check your connection and try again.",
       });
       if (!saved) return;
-      expenseView.resetAfterSave();
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      if (addAnother) {
-        expenseView.prepareNextExpense({
-          propertyId,
-          accountId,
-          category,
-          payee,
-          paymentMethod,
-        });
-        toast("Expense recorded. Ready for the next entry");
-        return;
-      }
-      closeModal($("expense-modal"));
-      toast("Expense recorded");
+      await finishSuccessfulEntry({
+        label: "Expense",
+        addAnother,
+        modalId: "expense-modal",
+        resetAfterSave: expenseView.resetAfterSave,
+        prepareNext: expenseView.prepareNextExpense,
+        nextArguments: [
+          { propertyId, accountId, category, payee, paymentMethod },
+        ],
+      });
     }
 
     function attachEvents() {
