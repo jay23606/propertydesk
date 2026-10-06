@@ -2,6 +2,11 @@
 (() => {
   "use strict";
   function createScheduleUtils({ isPosted }) {
+    const monthDateWithAnchor =
+      globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
+    if (!monthDateWithAnchor)
+      throw new Error("PropertyDeskDateUtils must load before schedule utils.");
+
     function monthlyScheduledEstimate(accounts) {
       const multipliers = {
         monthly: 1,
@@ -97,46 +102,22 @@
       return "2026-10-01";
     }
 
-    function advanceDueDate(date, months, days, anchorDay = date.getDate()) {
+    function shiftDueDate(date, months, days, anchorDay, direction) {
       if (days) {
-        date.setDate(date.getDate() + days);
+        date.setDate(date.getDate() + days * direction);
         return;
       }
-      const first = new Date(
-        date.getFullYear(),
-        date.getMonth() + months,
-        1,
-        12,
+      date.setTime(
+        monthDateWithAnchor(date, months * direction, anchorDay).getTime(),
       );
-      const lastDay = new Date(
-        first.getFullYear(),
-        first.getMonth() + 1,
-        0,
-        12,
-      ).getDate();
-      first.setDate(Math.min(anchorDay, lastDay));
-      date.setTime(first.getTime());
+    }
+
+    function advanceDueDate(date, months, days, anchorDay = date.getDate()) {
+      shiftDueDate(date, months, days, anchorDay, 1);
     }
 
     function retreatDueDate(date, months, days, anchorDay = date.getDate()) {
-      if (days) {
-        date.setDate(date.getDate() - days);
-        return;
-      }
-      const first = new Date(
-        date.getFullYear(),
-        date.getMonth() - months,
-        1,
-        12,
-      );
-      const lastDay = new Date(
-        first.getFullYear(),
-        first.getMonth() + 1,
-        0,
-        12,
-      ).getDate();
-      first.setDate(Math.min(anchorDay, lastDay));
-      date.setTime(first.getTime());
+      shiftDueDate(date, months, days, anchorDay, -1);
     }
 
     return Object.freeze({

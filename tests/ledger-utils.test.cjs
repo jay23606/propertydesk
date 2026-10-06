@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { createBackup } = require("../backup-utils.js");
+const dateUtils = require("../features/date-utils.js");
 const scheduleFactory = require("../ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../loan-amortization-utils.js");
 const ledgerUtils = require("../ledger-utils.js");
@@ -42,6 +43,10 @@ test("due schedule and loan amortization utilities load before the stable ledger
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
+    html.indexOf("features/date-utils.js") <
+      html.indexOf("ledger-schedule-utils.js"),
+  );
+  assert.ok(
     html.indexOf("ledger-schedule-utils.js") < html.indexOf("ledger-utils.js"),
   );
   assert.ok(
@@ -73,6 +78,28 @@ test("due schedule and loan amortization utilities load before the stable ledger
       "unpaidDueAccrualStart",
     ].sort(),
   );
+});
+
+test("shared month-anchor dates clamp at month end without mutating the anchor", () => {
+  const jan31 = new Date("2026-01-31T12:00:00");
+  const february = dateUtils.monthDateWithAnchor(jan31, 1, 31);
+  const march = dateUtils.monthDateWithAnchor(jan31, 2, 31);
+  const leapFebruary = dateUtils.monthDateWithAnchor(
+    new Date("2024-01-31T12:00:00"),
+    1,
+    31,
+  );
+  const previousFebruary = dateUtils.monthDateWithAnchor(
+    new Date("2026-03-31T12:00:00"),
+    -1,
+    31,
+  );
+
+  assert.equal(february.toISOString().slice(0, 10), "2026-02-28");
+  assert.equal(march.toISOString().slice(0, 10), "2026-03-31");
+  assert.equal(leapFebruary.toISOString().slice(0, 10), "2024-02-29");
+  assert.equal(previousFebruary.toISOString().slice(0, 10), "2026-02-28");
+  assert.equal(jan31.toISOString().slice(0, 10), "2026-01-31");
 });
 
 test("postedOnOrAfter shares date filtering and excludes voided rows", () => {

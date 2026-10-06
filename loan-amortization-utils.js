@@ -3,6 +3,11 @@
   "use strict";
 
   function createLoanAmortizationUtils({ sumPosted }) {
+    const monthDateWithAnchor =
+      globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
+    if (!monthDateWithAnchor)
+      throw new Error("PropertyDeskDateUtils must load before loan utils.");
+
     function scheduledLoanBalance(
       account,
       asOf = new Date().toISOString().slice(0, 10),
@@ -79,21 +84,10 @@
         ? new Date(`${startDate}T12:00:00`)
         : new Date();
       const dueDate = (offset) => {
-        const day = anchor.getDate(),
-          first = new Date(
-            anchor.getFullYear(),
-            anchor.getMonth() + offset,
-            1,
-            12,
-          );
-        const lastDay = new Date(
-          first.getFullYear(),
-          first.getMonth() + 1,
-          0,
-          12,
-        ).getDate();
-        first.setDate(Math.min(day, lastDay));
-        return `${first.getFullYear()}-${String(first.getMonth() + 1).padStart(2, "0")}-${String(first.getDate()).padStart(2, "0")}`;
+        const date = monthDateWithAnchor(anchor, offset, anchor.getDate());
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${date.getFullYear()}-${month}-${day}`;
       };
       const cents = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
       let balance = cents(principal),

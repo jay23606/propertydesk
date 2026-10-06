@@ -30,11 +30,49 @@
     return `${date.getFullYear()}-${month}-${day}`;
   };
 
-  window.PropertyDeskDateUtils = Object.freeze({
+  const monthDateWithAnchor = (
+    date,
+    monthOffset,
+    anchorDay = date.getDate(),
+  ) => {
+    const first = new Date(
+      date.getFullYear(),
+      date.getMonth() + monthOffset,
+      1,
+      12,
+    );
+    const lastDay = new Date(
+      first.getFullYear(),
+      first.getMonth() + 1,
+      0,
+      12,
+    ).getDate();
+    return new Date(
+      first.getFullYear(),
+      first.getMonth(),
+      Math.min(anchorDay, lastDay),
+      12,
+    );
+  };
+
+  const dateUtils = Object.freeze({
     dateOnly,
     fmtDate,
     todayIso,
     monthStart,
     monthEnd,
+    monthDateWithAnchor,
   });
+  globalThis.PropertyDeskDateUtils = dateUtils;
+  if (typeof window !== "undefined")
+    window.PropertyDeskDateUtils = Object.freeze({
+      dateOnly,
+      fmtDate,
+      todayIso,
+      monthStart,
+      monthEnd,
+      monthDateWithAnchor,
+    });
+  if (typeof module !== "undefined" && module.exports)
+    module.exports = dateUtils;
 })();
