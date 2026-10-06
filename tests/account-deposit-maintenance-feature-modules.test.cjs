@@ -4,6 +4,118 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("account details workflow composes detail, history, and deposit actions", () => {
+  const created = [];
+  const passed = {};
+  const methods = {
+    attachAccountDetailActionEvents() {},
+    attachDepositEvents() {},
+    depositSectionHTML() {},
+    openAccountDetails() {},
+    renderAccountHistory() {},
+  };
+  const factories = {
+    PropertyDeskDepositDetailsWorkflow: {
+      create: (context) => {
+        created.push("deposit details");
+        passed.depositDetails = context;
+        return { depositSectionHTML: methods.depositSectionHTML };
+      },
+    },
+    PropertyDeskDepositMaintenanceWorkflow: {
+      create: (context) => {
+        created.push("deposit maintenance");
+        passed.depositMaintenance = context;
+        return { attachEvents: methods.attachDepositEvents };
+      },
+    },
+    PropertyDeskAccountDetailActionsWorkflow: {
+      create: (context) => {
+        created.push("account actions");
+        passed.accountActions = context;
+        return { attachEvents: methods.attachAccountDetailActionEvents };
+      },
+    },
+    PropertyDeskAccountHistoryDetails: {
+      create: (context) => {
+        created.push("account history");
+        passed.accountHistory = context;
+        return { renderAccountHistory: methods.renderAccountHistory };
+      },
+    },
+    PropertyDeskAccountDetailContentWorkflow: {
+      create: (context) => {
+        created.push("account content");
+        passed.accountContent = context;
+        return { openAccountDetails: methods.openAccountDetails };
+      },
+    },
+  };
+  const context = vm.createContext({ window: factories });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-details-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    money() {},
+    moneyInput() {},
+    todayIso() {},
+    depositLedger() {},
+    fmtDate() {},
+    esc() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+    isPosted() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    accountBalance() {},
+    amortizationSchedule() {},
+    amountDueSince() {},
+    unpaidDueAccrualStart() {},
+    openModal() {},
+    propertyAddress() {},
+  };
+  const workflow =
+    context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
+
+  assert.deepEqual(created, [
+    "deposit details",
+    "deposit maintenance",
+    "account actions",
+    "account history",
+    "account content",
+  ]);
+  assert.equal(passed.depositDetails.state, dependencies.state);
+  assert.equal(
+    passed.depositMaintenance.depositSectionHTML,
+    methods.depositSectionHTML,
+  );
+  assert.equal(passed.accountHistory.state, dependencies.state);
+  assert.equal(
+    passed.accountContent.renderAccountHistory,
+    methods.renderAccountHistory,
+  );
+  assert.equal(
+    passed.accountContent.depositSectionHTML,
+    methods.depositSectionHTML,
+  );
+  assert.equal(
+    workflow.attachAccountDetailActionEvents,
+    methods.attachAccountDetailActionEvents,
+  );
+  assert.equal(workflow.attachDepositEvents, methods.attachDepositEvents);
+  assert.equal(workflow.depositSectionHTML, methods.depositSectionHTML);
+  assert.equal(workflow.openAccountDetails, methods.openAccountDetails);
+});
+
 test("deposit details workflow composes ledger data and rendering", () => {
   const passed = {};
   const depositSectionHTML = () => "deposit HTML";

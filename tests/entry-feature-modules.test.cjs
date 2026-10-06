@@ -30,9 +30,7 @@ test("app root delegates ledger and record-entry composition to one workflow", (
   assert.match(app, /attachCreateActions,/);
   assert.match(app, /openAccountForProperty,/);
   assert.match(app, /attachDepositEvents,/);
-  assert.match(app, /PropertyDeskDepositDetailsWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
   const ledgerWorkflowCall = app.match(
     /PropertyDeskLedgerWorkflow\.create\(\{([\s\S]*?)\}\);/,
   )?.[1];
@@ -71,7 +69,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
+    /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
   );
   assert.doesNotMatch(
     app,
@@ -102,11 +100,7 @@ test("app coordinator passes the amortization helper into account details", () =
     /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
-  assert.match(
-    app,
-    /window\.PropertyDeskAccountDetailContentWorkflow\.create\(/,
-  );
-  assert.match(app, /window\.PropertyDeskAccountHistoryDetails\.create\(/);
+  assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(

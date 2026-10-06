@@ -187,62 +187,34 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { depositSectionHTML } =
-    window.PropertyDeskDepositDetailsWorkflow.create({
-      $,
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-    });
-  const { attachEvents: attachDepositEvents } =
-    window.PropertyDeskDepositMaintenanceWorkflow.create({
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      fetchAll,
-      depositSectionHTML,
-    });
-  const { attachEvents: attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountDetailActionsWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      editAccount,
-      openPayment,
-    });
-  const { renderAccountHistory } =
-    window.PropertyDeskAccountHistoryDetails.create({
-      state,
-      esc,
-      money,
-      fmtDate,
-    });
-  const { openAccountDetails } =
-    window.PropertyDeskAccountDetailContentWorkflow.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      isPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      depositSectionHTML,
-      renderAccountHistory,
-      openModal,
-      propertyAddress,
-    });
+  const {
+    attachAccountDetailActionEvents,
+    attachDepositEvents,
+    openAccountDetails,
+  } = window.PropertyDeskAccountDetailsWorkflow.create({
+    $,
+    state,
+    toast,
+    fetchAll,
+    money,
+    moneyInput,
+    todayIso,
+    depositLedger,
+    fmtDate,
+    esc,
+    closeModal,
+    editAccount,
+    openPayment,
+    isPosted,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
+    amortizationSchedule,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    openModal,
+    propertyAddress,
+  });
   const {
     openPropertyDetails,
     attachPropertyDetailEvents: attachPropertyDetailsEvents,
