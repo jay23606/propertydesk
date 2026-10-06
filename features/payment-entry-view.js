@@ -49,6 +49,28 @@
       return true;
     }
 
+    function readValues() {
+      return {
+        accountId: $("payment-account").value,
+        amount: moneyInput($("payment-amount").value),
+        receivedDate: $("payment-date").value,
+        paymentMethod: $("payment-method").value,
+        incomeCategory: $("income-category").value,
+        memo: $("payment-memo").value.trim(),
+      };
+    }
+
+    function resetAfterSave(accountId) {
+      $("payment-form").reset();
+      $("payment-date").value = todayIso();
+      $("payment-account").value = accountId;
+    }
+
+    function prepareNextPayment() {
+      updateAllocationPreview();
+      $("payment-amount").focus();
+    }
+
     function openPayment(accountId, propertyId = null) {
       state.pendingCorrection = null;
       populateFormOptions();
@@ -104,6 +126,9 @@
 
     return {
       updateAllocationPreview,
+      readValues,
+      resetAfterSave,
+      prepareNextPayment,
       openPayment,
       openPropertyPayment,
       attachEvents,

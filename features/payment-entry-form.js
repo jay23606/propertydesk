@@ -6,8 +6,6 @@
     const {
       $,
       state,
-      moneyInput,
-      todayIso,
       toast,
       closeModal,
       fetchAll,
@@ -19,20 +17,25 @@
     async function savePayment(event) {
       event.preventDefault();
       const addAnother = event.submitter?.id === "payment-save-next";
-      const account = state.accounts.find(
-        (item) => item.id === $("payment-account").value,
-      );
-      const amount = moneyInput($("payment-amount").value);
+      const {
+        accountId,
+        amount,
+        receivedDate,
+        paymentMethod,
+        incomeCategory,
+        memo,
+      } = paymentView.readValues();
+      const account = state.accounts.find((item) => item.id === accountId);
       if (!account || !amount) return;
 
       const payload = buildPaymentPayload({
         ownerId: state.workspaceOwnerId,
         account,
         amount,
-        receivedDate: $("payment-date").value,
-        paymentMethod: $("payment-method").value,
-        incomeCategory: $("income-category").value,
-        memo: $("payment-memo").value.trim(),
+        receivedDate,
+        paymentMethod,
+        incomeCategory,
+        memo,
       });
 
       if (state.pendingCorrection?.kind === "payment") {
@@ -65,17 +68,14 @@
         toast(error.message);
         return;
       }
-      $("payment-form").reset();
-      $("payment-date").value = todayIso();
-      $("payment-account").value = account.id;
+      paymentView.resetAfterSave(account.id);
       try {
         await fetchAll();
       } catch {
         return;
       }
       if (addAnother) {
-        paymentView.updateAllocationPreview();
-        $("payment-amount").focus();
+        paymentView.prepareNextPayment();
         toast("Payment recorded. Ready for the next entry");
         return;
       }

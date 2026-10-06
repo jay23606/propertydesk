@@ -6,6 +6,7 @@
     const {
       $,
       state,
+      moneyInput,
       todayIso,
       fillSelect,
       populateFormOptions,
@@ -26,6 +27,40 @@
       $("deposit-refund-hint").classList.add("hidden");
       if (propertyId) $("expense-property").value = propertyId;
       openModal("expense-modal");
+    }
+
+    function readValues() {
+      return {
+        propertyId: $("expense-property").value,
+        accountId: $("expense-account").value,
+        amount: moneyInput($("expense-amount").value),
+        expenseDate: $("expense-date").value,
+        category: $("expense-category").value,
+        payee: $("expense-payee").value.trim(),
+        paymentMethod: $("expense-method").value,
+        memo: $("expense-memo").value.trim(),
+      };
+    }
+
+    function resetAfterSave() {
+      $("expense-form").reset();
+      $("expense-date").value = todayIso();
+    }
+
+    function prepareNextExpense({
+      propertyId,
+      accountId,
+      category,
+      payee,
+      paymentMethod,
+    }) {
+      $("expense-property").value = propertyId;
+      $("expense-property").dispatchEvent(new Event("change"));
+      $("expense-account").value = accountId;
+      $("expense-category").value = category;
+      $("expense-payee").value = payee;
+      $("expense-method").value = paymentMethod;
+      $("expense-amount").focus();
     }
 
     function attachEvents() {
@@ -51,7 +86,13 @@
       });
     }
 
-    return { openExpense, attachEvents };
+    return {
+      attachEvents,
+      openExpense,
+      prepareNextExpense,
+      readValues,
+      resetAfterSave,
+    };
   }
 
   window.PropertyDeskExpenseEntryView = Object.freeze({

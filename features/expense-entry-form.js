@@ -6,8 +6,6 @@
     const {
       $,
       state,
-      moneyInput,
-      todayIso,
       toast,
       closeModal,
       fetchAll,
@@ -19,11 +17,16 @@
     async function saveExpense(event) {
       event.preventDefault();
       const addAnother = event.submitter?.id === "expense-save-next";
-      const propertyId = $("expense-property").value;
-      const accountId = $("expense-account").value;
-      const category = $("expense-category").value;
-      const payee = $("expense-payee").value.trim();
-      const method = $("expense-method").value;
+      const {
+        propertyId,
+        accountId,
+        amount,
+        expenseDate,
+        category,
+        payee,
+        paymentMethod,
+        memo,
+      } = expenseView.readValues();
       const account = state.accounts.find((item) => item.id === accountId);
       if (category === "deposit_refund" && account?.account_type !== "rental") {
         toast("Choose a rental account for a security deposit refund");
@@ -34,12 +37,12 @@
         ownerId: state.workspaceOwnerId,
         propertyId,
         accountId,
-        amount: moneyInput($("expense-amount").value),
-        expenseDate: $("expense-date").value,
+        amount,
+        expenseDate,
         category,
         payee,
-        paymentMethod: method,
-        memo: $("expense-memo").value.trim(),
+        paymentMethod,
+        memo,
       });
       if (state.pendingCorrection?.kind === "expense") {
         await saveCorrection("expense", {
@@ -68,21 +71,20 @@
         toast(error.message);
         return;
       }
-      $("expense-form").reset();
-      $("expense-date").value = todayIso();
+      expenseView.resetAfterSave();
       try {
         await fetchAll();
       } catch {
         return;
       }
       if (addAnother) {
-        $("expense-property").value = propertyId;
-        $("expense-property").dispatchEvent(new Event("change"));
-        $("expense-account").value = accountId;
-        $("expense-category").value = category;
-        $("expense-payee").value = payee;
-        $("expense-method").value = method;
-        $("expense-amount").focus();
+        expenseView.prepareNextExpense({
+          propertyId,
+          accountId,
+          category,
+          payee,
+          paymentMethod,
+        });
         toast("Expense recorded. Ready for the next entry");
         return;
       }
