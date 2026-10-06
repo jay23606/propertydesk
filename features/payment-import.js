@@ -10,7 +10,7 @@
       validatePaymentRows,
       commitTransactions,
       importReview,
-      references = window.PropertyDeskImportReferences.create(),
+      createImportLookup,
       createFileWorkflow,
       createTransactionImportWorkflow,
     } = context;
@@ -47,14 +47,11 @@
         "memo",
       ],
       mapRows(rowsToImport) {
+        const lookup = createImportLookup(state.properties, state.accounts);
         const rowsToInsert = rowsToImport.map((row) => ({
-          account_id: references.findAccount(
-            state.accounts,
-            references.findProperty(
-              state.properties,
-              row.property_name,
-              row.property_address,
-            )?.id,
+          account_id: lookup.findExactAccount(
+            lookup.findExactProperty(row.property_name, row.property_address)
+              ?.id,
             row.account_name,
           )?.id,
           received_date: row.received_date,

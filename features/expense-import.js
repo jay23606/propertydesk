@@ -10,7 +10,7 @@
       validateExpenseRows,
       commitTransactions,
       importReview,
-      references = window.PropertyDeskImportReferences.create(),
+      createImportLookup,
       createFileWorkflow,
       createTransactionImportWorkflow,
     } = context;
@@ -44,9 +44,9 @@
         "source_note",
       ],
       mapRows(rowsToImport) {
+        const lookup = createImportLookup(state.properties, state.accounts);
         return rowsToImport.map((row) => {
-          const property = references.findProperty(
-            state.properties,
+          const property = lookup.findExactProperty(
             row.property_name,
             row.property_address,
           );
@@ -56,11 +56,7 @@
             );
           }
           const account = row.account_name
-            ? references.findAccount(
-                state.accounts,
-                property.id,
-                row.account_name,
-              )
+            ? lookup.findExactAccount(property.id, row.account_name)
             : null;
           if (row.account_name && !account) {
             throw new Error(

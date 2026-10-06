@@ -17,7 +17,6 @@ test("CSV import feature loads as an isolated browser module", () => {
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
-      PropertyDeskImportReferences: { create: () => ({}) },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
     },
   });
@@ -36,6 +35,7 @@ test("CSV import feature loads as an isolated browser module", () => {
         handlers.set(`${id}:${event}`, handler),
     }),
     stageImport: preview.stageImport,
+    createImportLookup() {},
   });
   assert.equal(typeof feature.attachEvents, "function");
   assert.deepEqual(Object.keys(feature), ["attachEvents"]);
@@ -49,32 +49,6 @@ test("CSV import feature loads as an isolated browser module", () => {
       "expense-import-file:change",
     ],
   );
-});
-
-test("import references resolve accounts within the exact property", () => {
-  const context = vm.createContext({ window: {} });
-  loadImportFeatures(context);
-  const references = context.window.PropertyDeskImportReferences.create();
-  const properties = [
-    { id: "one", name: "Duplex", address: "1 Main St" },
-    { id: "two", name: "Duplex", address: "2 Main St" },
-  ];
-  const accounts = [
-    { id: "first", property_id: "one", name: "Lease" },
-    { id: "second", property_id: "two", name: "Lease" },
-  ];
-
-  const property = references.findProperty(properties, "Duplex", "2 Main St");
-  assert.equal(property.id, "two");
-  assert.equal(
-    references.findAccount(accounts, property.id, "Lease").id,
-    "second",
-  );
-  assert.equal(
-    references.findProperty(properties, "Duplex", "3 Main St"),
-    undefined,
-  );
-  assert.equal(references.findAccount(accounts, "missing", "Lease"), undefined);
 });
 
 test("CSV preview renderer receives only rendering dependencies", () => {
@@ -164,7 +138,7 @@ test("CSV correction view escapes raw values and validation messages", () => {
 test("import workflow keeps file import handlers inside its event bindings", () => {
   const calls = [];
   const passed = {};
-  const references = {};
+  const createImportLookup = () => ({});
   const accounts = { attachEvents: () => calls.push("account events") };
   const payments = { attachEvents: () => calls.push("payment events") };
   const expenses = { attachEvents: () => calls.push("expense events") };
@@ -174,7 +148,6 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
-      PropertyDeskImportReferences: { create: () => references },
       PropertyDeskTransactionImportWorkflow: { create() {} },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskImportReview: {
@@ -219,6 +192,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     validateAccountRows() {},
     validatePaymentRows() {},
     validateExpenseRows() {},
+    createImportLookup,
     fetchAll() {},
     toast() {},
     unrelatedDependency() {},
@@ -246,10 +220,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "$",
       "commitTransactions",
       "createFileWorkflow",
+      "createImportLookup",
       "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
-      "references",
       "state",
       "validatePaymentRows",
     ].sort(),
@@ -260,18 +234,18 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "$",
       "commitTransactions",
       "createFileWorkflow",
+      "createImportLookup",
       "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
-      "references",
       "state",
       "validateExpenseRows",
     ].sort(),
   );
   assert.equal(passed.account.importReview, passed.payment.importReview);
   assert.equal(passed.payment.importReview, passed.expense.importReview);
-  assert.equal(passed.payment.references, references);
-  assert.equal(passed.expense.references, references);
+  assert.equal(passed.payment.createImportLookup, createImportLookup);
+  assert.equal(passed.expense.createImportLookup, createImportLookup);
   assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
@@ -407,6 +381,7 @@ test("CSV import workflow stages preview before attaching review and file handle
   };
   const importUtils = {
     parseCSV() {},
+    createImportLookup() {},
     selectImportRows() {},
   };
   const context = vm.createContext({
@@ -461,6 +436,10 @@ test("CSV import workflow stages preview before attaching review and file handle
   ]);
   assert.equal(typeof passed.importFeature.stageImport, "function");
   assert.equal(passed.importFeature.parseCSV, importUtils.parseCSV);
+  assert.equal(
+    passed.importFeature.createImportLookup,
+    importUtils.createImportLookup,
+  );
   assert.equal(
     passed.importFeature.validateAccountRows,
     validators.validateAccountRows,
@@ -518,6 +497,7 @@ test("payment and expense CSV importers save their own validated transaction pay
   const staged = [];
   const fileHandlers = new Map();
   const elements = formElements();
+  let lookupBuilds = 0;
   const feature = context.window.PropertyDeskImportFeature.create({
     $: (id) => {
       const element = elements(id);
@@ -529,6 +509,13 @@ test("payment and expense CSV importers save their own validated transaction pay
     stageImport: (title, rows, commit, note, report) =>
       staged.push({ title, rows, commit, note, report }),
     parseCSV: (content) => JSON.parse(content),
+    createImportLookup(properties, accounts) {
+      lookupBuilds++;
+      return context.window.PropertyDeskImportUtils.createImportLookup(
+        properties,
+        accounts,
+      );
+    },
     validateAccountRows: () => ({ valid: [], total: 0, errors: [] }),
     validateExpenseRows: (rows) => ({
       valid: rows,
@@ -573,6 +560,7 @@ test("payment and expense CSV importers save their own validated transaction pay
   assert.equal(calls[0].args.p_rows[0].account_id, account.id);
   assert.equal(calls[0].args.p_rows[0].amount, 45);
   assert.equal(calls[0].args.p_source_name, "expenses.csv");
+  assert.equal(lookupBuilds, 1);
 
   const payment = {
     property_name: property.name,
@@ -607,6 +595,7 @@ test("payment and expense CSV importers save their own validated transaction pay
   assert.equal(calls[1].args.p_rows[0].amount, 825);
   assert.equal(calls[1].args.p_rows[0].received_date, "2026-10-05");
   assert.equal(calls[1].args.p_source_name, "payments.csv");
+  assert.equal(lookupBuilds, 2);
 });
 
 test("CSV import preview escapes staged data and excludes possible duplicates by default", () => {

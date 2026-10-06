@@ -69,11 +69,11 @@ function loadPropertyAndAccountForms(context) {
 }
 
 function loadImportFeatures(context) {
+  context.window.PropertyDeskImportUtils = require("../import-utils.js");
   for (const filename of [
     "account-import-payload.js",
     "csv-import-file.js",
     "import-review.js",
-    "import-references.js",
     "transaction-import-workflow.js",
     "account-import.js",
     "payment-import.js",

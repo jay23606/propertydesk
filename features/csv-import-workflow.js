@@ -5,7 +5,8 @@
   function create(context) {
     const { $, state, esc, openModal, closeModal, toast, todayIso, fetchAll } =
       context;
-    const { selectImportRows, parseCSV } = window.PropertyDeskImportUtils;
+    const { selectImportRows, parseCSV, createImportLookup } =
+      window.PropertyDeskImportUtils;
     const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
       window.PropertyDeskImportWorkflows;
     const preview = window.PropertyDeskImportPreview.create({
@@ -33,6 +34,7 @@
         state,
         stageImport: preview.stageImport,
         parseCSV,
+        createImportLookup,
         validateAccountRows,
         validatePaymentRows,
         validateExpenseRows,

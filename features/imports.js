@@ -8,6 +8,7 @@
       state,
       stageImport,
       parseCSV,
+      createImportLookup,
       validateAccountRows,
       validatePaymentRows,
       validateExpenseRows,
@@ -22,7 +23,6 @@
         status: $("import-status"),
         toast,
       });
-    const references = window.PropertyDeskImportReferences.create();
     const importReview = window.PropertyDeskImportReview.create({
       stageImport,
     });
@@ -44,7 +44,7 @@
       validatePaymentRows,
       commitTransactions,
       importReview,
-      references,
+      createImportLookup,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
       createTransactionImportWorkflow:
         window.PropertyDeskTransactionImportWorkflow.create,
@@ -56,7 +56,7 @@
       validateExpenseRows,
       commitTransactions,
       importReview,
-      references,
+      createImportLookup,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
       createTransactionImportWorkflow:
         window.PropertyDeskTransactionImportWorkflow.create,
