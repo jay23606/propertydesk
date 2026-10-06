@@ -398,6 +398,15 @@ test("backup and report exports own separate button bindings", () => {
     ["report-export.js", "PropertyDeskReportExport", ["export-report:click"]],
   ]) {
     const context = vm.createContext({ window: {} });
+    if (file === "backup-export.js") {
+      vm.runInContext(
+        fs.readFileSync(
+          path.join(__dirname, "..", "features", "backup-records.js"),
+          "utf8",
+        ),
+        context,
+      );
+    }
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", file), "utf8"),
       context,

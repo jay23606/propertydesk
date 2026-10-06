@@ -301,7 +301,11 @@ test("backup agreement collector downloads only workspace-scoped files into the 
 
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
-  for (const moduleName of ["backup-agreement-files.js", "backup-export.js"]) {
+  for (const moduleName of [
+    "backup-agreement-files.js",
+    "backup-records.js",
+    "backup-export.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(
         path.join(__dirname, "..", "features", moduleName),
@@ -395,7 +399,11 @@ test("backup export aborts before download when a private document path escapes 
 
 test("backup export adds the validated private agreement to the ZIP and manifest", async () => {
   const context = vm.createContext({ window: {} });
-  for (const moduleName of ["backup-agreement-files.js", "backup-export.js"]) {
+  for (const moduleName of [
+    "backup-agreement-files.js",
+    "backup-records.js",
+    "backup-export.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(
         path.join(__dirname, "..", "features", moduleName),

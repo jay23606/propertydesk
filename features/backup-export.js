@@ -18,6 +18,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       },
       zipUtils = window.PropertyDeskZipUtils,
+      loadBackupRecords = window.PropertyDeskBackupRecords.load,
     } = context;
 
     async function exportAll() {
@@ -25,19 +26,6 @@
         toast("Sign in before exporting your private records.");
         return;
       }
-      const tables = [
-        "pd_properties",
-        "pd_accounts",
-        "pd_agreement_versions",
-        "pd_payments",
-        "pd_expenses",
-        "pd_deposit_entries",
-        "pd_documents",
-        "pd_import_batches",
-        "pd_audit_events",
-        "pd_workspace_members",
-        "pd_property_holders",
-      ];
       const button = $("export-all");
       const originalLabel = button.textContent;
       button.disabled = true;
@@ -45,24 +33,7 @@
       toast("Preparing a private backup with agreement files…");
 
       try {
-        const exportTable = async (table) => {
-          const pageSize = 500;
-          const rows = [];
-          for (let offset = 0; ; offset += pageSize) {
-            const { data, error } = await state.client
-              .from(table)
-              .select("*")
-              .range(offset, offset + pageSize - 1);
-            if (error) throw error;
-            rows.push(...(data || []));
-            if (!data || data.length < pageSize) break;
-          }
-          return rows;
-        };
-        const values = await Promise.all(tables.map(exportTable));
-        const records = Object.fromEntries(
-          tables.map((table, index) => [table, values[index]]),
-        );
+        const records = await loadBackupRecords(state.client);
         const { entries, includedFiles } =
           await window.PropertyDeskBackupAgreementFiles.collect({
             documents: records.pd_documents,
@@ -81,8 +52,8 @@
         });
         const blob = zipUtils.createZip(entries);
         downloadBlob(blob, `propertydesk-backup-${todayIso()}.zip`);
-        const recordCount = tables.reduce(
-          (sum, table) => sum + records[table].length,
+        const recordCount = Object.values(records).reduce(
+          (sum, tableRows) => sum + tableRows.length,
           0,
         );
         toast(
