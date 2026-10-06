@@ -105,9 +105,9 @@ test("property holder and archive workflows report rejected writes without runni
     document: { querySelectorAll: () => [] },
   });
   for (const source of [
+    "repository-query-utils.js",
     "property-holder-repository.js",
     "property-holder-management.js",
-    "repository-query-utils.js",
     "property-repository.js",
     "property-maintenance.js",
     "property-archive.js",
@@ -251,6 +251,7 @@ test("archive and restore writes share property maintenance and reopen updated d
 test("property holder save persists the member IDs supplied by the event layer", async () => {
   const context = vm.createContext({ window: {} });
   for (const source of [
+    "repository-query-utils.js",
     "property-holder-repository.js",
     "property-holder-management.js",
   ]) {

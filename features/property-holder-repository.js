@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
+
   function create({ getClient }) {
     async function clearPropertyHolders(ownerId, propertyId) {
       return getClient()
@@ -12,15 +14,12 @@
     }
 
     async function addPropertyHolders(ownerId, propertyId, memberIds) {
-      return getClient()
-        .from("pd_property_holders")
-        .insert(
-          memberIds.map((member_user_id) => ({
-            user_id: ownerId,
-            property_id: propertyId,
-            member_user_id,
-          })),
-        );
+      const rows = memberIds.map((member_user_id) => ({
+        user_id: ownerId,
+        property_id: propertyId,
+        member_user_id,
+      }));
+      return insertRecord(getClient(), "pd_property_holders", rows);
     }
 
     return { clearPropertyHolders, addPropertyHolders };
