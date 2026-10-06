@@ -7,9 +7,14 @@ const vm = require("node:vm");
 test("account details workflow composes detail, history, and deposit actions", () => {
   const created = [];
   const passed = {};
+  const attached = [];
   const methods = {
-    attachAccountDetailActionEvents() {},
-    attachDepositEvents() {},
+    attachAccountDetailActionEvents() {
+      attached.push("account actions");
+    },
+    attachDepositEvents() {
+      attached.push("deposit actions");
+    },
     depositSectionHTML() {},
     openAccountDetails() {},
     renderAccountHistory() {},
@@ -108,11 +113,8 @@ test("account details workflow composes detail, history, and deposit actions", (
     passed.accountContent.depositSectionHTML,
     methods.depositSectionHTML,
   );
-  assert.equal(
-    workflow.attachAccountDetailActionEvents,
-    methods.attachAccountDetailActionEvents,
-  );
-  assert.equal(workflow.attachDepositEvents, methods.attachDepositEvents);
+  workflow.attachEvents();
+  assert.deepEqual(attached, ["account actions", "deposit actions"]);
   assert.equal(workflow.depositSectionHTML, undefined);
   assert.equal(workflow.openAccountDetails, methods.openAccountDetails);
 });

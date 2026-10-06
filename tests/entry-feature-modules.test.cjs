@@ -33,7 +33,7 @@ test("app root delegates entry forms and create actions to one workflow", () => 
   assert.match(app, /openAccountForProperty,/);
   assert.match(app, /updateAllocationPreview,/);
   assert.doesNotMatch(app, /entryWorkflow\./);
-  assert.match(app, /attachDepositEvents,/);
+  assert.match(app, /attachEvents: attachAccountDetailsEvents/);
   assert.match(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),

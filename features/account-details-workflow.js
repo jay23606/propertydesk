@@ -83,9 +83,13 @@
         propertyAddress,
       });
 
+    function attachEvents() {
+      attachAccountDetailActionEvents();
+      attachDepositEvents();
+    }
+
     return {
-      attachAccountDetailActionEvents,
-      attachDepositEvents,
+      attachEvents,
       openAccountDetails,
     };
   }
