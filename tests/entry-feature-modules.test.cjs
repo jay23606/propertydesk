@@ -68,12 +68,9 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:AccountDetails|AccountHistoryDetails|AccountDetailEvents|DepositDetails|DepositDetailEvents)\.create/,
   );
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:Overview|PropertyPortfolio)Workflow\.create/,
-  );
   assert.doesNotMatch(
     app,
     /attachPropertyViewEvents|attachPropertyActionEvents/,
@@ -120,24 +117,21 @@ test("app coordinator passes the amortization helper into account details", () =
 
 test("app coordinator creates cross-linked property views after their actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  const propertyWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
-    "utf8",
+  const detailPosition = app.indexOf(
+    "PropertyDeskPropertyDetailsWorkflow.create(",
   );
-  const workspaceOrder = [
-    "PropertyDeskOverviewWorkflow.create(",
+  const overviewPosition = app.indexOf("PropertyDeskOverviewWorkflow.create(");
+  const portfolioPosition = app.indexOf(
     "PropertyDeskPropertyPortfolioWorkflow.create(",
-  ].map((marker) => propertyWorkflow.indexOf(marker));
+  );
 
-  assert.ok(workspaceOrder.every((position) => position >= 0));
-  assert.deepEqual(
-    workspaceOrder,
-    [...workspaceOrder].sort((left, right) => left - right),
-  );
-  assert.doesNotMatch(
-    propertyWorkflow,
-    /PropertyDeskPropertyDetailsWorkflow\.create\(/,
-  );
+  assert.ok(detailPosition >= 0);
+  assert.ok(detailPosition < overviewPosition);
+  assert.ok(overviewPosition < portfolioPosition);
+  const overviewWiring = app.slice(overviewPosition, portfolioPosition);
+  const portfolioWiring = app.slice(portfolioPosition);
+  assert.match(overviewWiring, /openPropertyDetails,/);
+  assert.match(portfolioWiring, /openPropertyDetails,/);
   assert.doesNotMatch(
     app,
     /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/,
@@ -148,7 +142,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
   assert.ok(
     app.indexOf("PropertyDeskPropertyDetailsWorkflow.create(") <
-      app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
+      app.indexOf("PropertyDeskOverviewWorkflow.create("),
   );
 });
 

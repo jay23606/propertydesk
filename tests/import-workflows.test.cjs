@@ -79,10 +79,6 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
-    html.indexOf("features/property-workspace-workflow.js") <
-      html.indexOf("app.js"),
-  );
-  assert.ok(
     html.indexOf("features/transaction-workflow.js") <
       html.indexOf("features/ledger-workflow.js"),
   );
@@ -265,10 +261,6 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-workspace-workflow.js") <
-      html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/transaction-corrections.js") <
