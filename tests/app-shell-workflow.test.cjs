@@ -107,7 +107,7 @@ test("app shell receives reminder callbacks and is precached", () => {
   assert.doesNotMatch(html, /workspace-settings-workflow\.js/);
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(worker, /'\.\/features\/app-shell-workflow\.js'/);
-  assert.match(app, /PropertyDeskAppChromeWorkflow\.create/);
+  assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.match(app, /PropertyDeskRecordEntrySupportWorkflow\.create/);
   assert.match(app, /renderReminderActivity,/);
   assert.doesNotMatch(
@@ -134,15 +134,9 @@ test("app shell receives reminder callbacks and is precached", () => {
     /PropertyDesk(?:ReminderActivityView|ReminderPreview)\.create/,
   );
   assert.doesNotMatch(app, /PropertyDeskNavigation\.create/);
-  assert.match(app, /PropertyDeskAppChromeWorkflow\.create/);
+  assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.match(app, /attachThemeEvents,/);
-  assert.match(
-    fs.readFileSync(
-      path.join(root, "features", "app-chrome-workflow.js"),
-      "utf8",
-    ),
-    /PropertyDeskTheme\.create/,
-  );
+  assert.match(app, /PropertyDeskTheme\.create\(\)/);
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(root, "features", "app-shell-workflow.js"),
