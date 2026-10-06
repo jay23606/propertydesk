@@ -124,41 +124,34 @@ async function main() {
           accountLoanScheduleHTML,
         },
       ).renderAccountDetails;
+      const { buildAccountDetailData } =
+        window.PropertyDeskAccountDetailsModel.create({
+          state,
+          sumPosted: (rows) =>
+            rows
+              .filter(
+                (payment) => !payment.status || payment.status === "posted",
+              )
+              .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
+          accountBalance: () => 10000,
+          amortizationSchedule: utilities.amortizationSchedule,
+          amountDueSince: () => 0,
+          unpaidDueAccrualStart: () => "2026-01-01",
+          todayIso: () => "2026-01-01",
+          propertyAddress: (property) => property.name,
+        });
       const feature = details.create({
         $: (id) => document.getElementById(id),
         state,
-        sumPosted: (rows) =>
-          rows
-            .filter((payment) => !payment.status || payment.status === "posted")
-            .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
-        sumIncome: () => 0,
-        sumOperatingExpenses: () => 0,
-        money,
+        buildAccountDetailData,
         fmtDate: (value, options) =>
           value
             ? new Date(`${value}T12:00:00`).toLocaleDateString("en-US", options)
             : "—",
-        esc: (value) => String(value ?? ""),
-        prettyType: (type) => type,
-        paymentFrequencyLabel: () => "Monthly",
-        accountBalance: () => 10000,
-        amortizationSchedule: utilities.amortizationSchedule,
-        amountDueSince: () => 0,
-        unpaidDueAccrualStart: () => "2026-01-01",
-        todayIso: () => "2026-01-01",
-        depositLedger: () => ({ entries: [], active: [], totals: {} }),
         depositSectionHTML: () => "",
         renderAccountHistory: async () => "",
         renderAccountDetails,
         openModal() {},
-        closeModal() {},
-        editAccount() {},
-        openPayment() {},
-        openExpense() {},
-        resetAccountForm() {},
-        populateFormOptions() {},
-        closeAccount() {},
-        propertyAddress: (property) => property.name,
       });
 
       await feature.openAccountDetails(account.id);

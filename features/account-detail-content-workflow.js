@@ -33,25 +33,26 @@
         paymentFrequencyLabel,
         accountLoanScheduleHTML,
       });
+    const { buildAccountDetailData } =
+      window.PropertyDeskAccountDetailsModel.create({
+        state,
+        sumPosted,
+        accountBalance,
+        amortizationSchedule,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+        propertyAddress,
+      });
     const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
       $,
       state,
-      sumPosted,
-      money,
+      buildAccountDetailData,
       fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
       depositSectionHTML,
       renderAccountHistory,
       renderAccountDetails,
       openModal,
-      propertyAddress,
     });
 
     return { openAccountDetails };

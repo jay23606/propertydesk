@@ -277,6 +277,12 @@ test("account detail content workflow composes schedule and selected account", (
           return { renderAccountDetails };
         },
       },
+      PropertyDeskAccountDetailsModel: {
+        create: (options) => {
+          passed.model = options;
+          return { buildAccountDetailData: () => ({}) };
+        },
+      },
       PropertyDeskAccountDetails: {
         create: (options) => {
           passed.details = options;
@@ -322,7 +328,10 @@ test("account detail content workflow composes schedule and selected account", (
     );
 
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
+  assert.equal(passed.model.state, dependencies.state);
+  assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(passed.details.renderAccountDetails, renderAccountDetails);
+  assert.equal(typeof passed.details.buildAccountDetailData, "function");
   assert.equal(
     passed.details.renderAccountHistory,
     dependencies.renderAccountHistory,
