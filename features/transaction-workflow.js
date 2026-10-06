@@ -54,10 +54,14 @@
         documentRef,
       });
 
+    function attachEvents() {
+      attachTransactionEvents();
+      attachTransactionActionEvents();
+    }
+
     return {
       renderPayments,
-      attachTransactionEvents,
-      attachTransactionActionEvents,
+      attachEvents,
     };
   }
 

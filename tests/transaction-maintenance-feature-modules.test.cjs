@@ -103,9 +103,14 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
 test("transaction workflow connects history and maintenance interfaces", () => {
   const created = [];
   const passed = {};
+  const attached = [];
   const methods = {
-    attachEvents() {},
-    attachTransactionActionEvents() {},
+    attachEvents() {
+      attached.push("history");
+    },
+    attachTransactionActionEvents() {
+      attached.push("maintenance");
+    },
     renderPayments() {},
   };
   const context = vm.createContext({
@@ -186,17 +191,10 @@ test("transaction workflow connects history and maintenance interfaces", () => {
     passed.maintenance.updateAllocationPreview,
     dependencies.updateAllocationPreview,
   );
-  assert.deepEqual(Object.keys(workflow), [
-    "renderPayments",
-    "attachTransactionEvents",
-    "attachTransactionActionEvents",
-  ]);
+  assert.deepEqual(Object.keys(workflow), ["renderPayments", "attachEvents"]);
   assert.equal(workflow.renderPayments, methods.renderPayments);
-  assert.equal(workflow.attachTransactionEvents, methods.attachEvents);
-  assert.equal(
-    workflow.attachTransactionActionEvents,
-    methods.attachTransactionActionEvents,
-  );
+  workflow.attachEvents();
+  assert.deepEqual(attached, ["history", "maintenance"]);
 });
 
 test("transaction maintenance workflow composes correction and void actions", () => {
