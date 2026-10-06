@@ -8,6 +8,7 @@ import {
   TRACKING_START,
 } from "../_shared/reminder-schedule.mjs";
 import { reminderMessage } from "../_shared/reminder-message.mjs";
+import { createReminderLogStore } from "../_shared/reminder-log.mjs";
 
 const FROM_EMAIL =
   Deno.env.get("MAILERSEND_FROM_EMAIL") ??
@@ -28,52 +29,6 @@ type Account = {
   payment_frequency: string;
   status: string;
 };
-
-async function claimLog(
-  db: ReturnType<typeof createClient>,
-  row: Record<string, unknown>,
-) {
-  const key = {
-    account_id: row.account_id,
-    reminder_month: row.reminder_month,
-    recipient_index: row.recipient_index,
-  };
-  const { data: retry } = await db
-    .from("pd_reminder_logs")
-    .update({
-      status: "sending",
-      reason: null,
-      unpaid_due: row.unpaid_due,
-      provider_message_id: null,
-      attempted_at: new Date().toISOString(),
-      completed_at: null,
-    })
-    .match(key)
-    .eq("status", "failed")
-    .select("id")
-    .maybeSingle();
-  if (retry?.id) return retry.id as string;
-  const { data, error } = await db
-    .from("pd_reminder_logs")
-    .insert({ ...row, status: "sending" })
-    .select("id")
-    .single();
-  if (error?.code === "23505") return null;
-  if (error) throw error;
-  return data.id as string;
-}
-
-async function saveResult(
-  db: ReturnType<typeof createClient>,
-  id: string,
-  values: Record<string, unknown>,
-) {
-  const { error } = await db
-    .from("pd_reminder_logs")
-    .update({ ...values, completed_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) throw error;
-}
 
 Deno.serve(async (request) => {
   // This job is invoked by pg_cron, not by browser code. Do not expose a
@@ -106,6 +61,7 @@ Deno.serve(async (request) => {
   const db = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  const reminderLog = createReminderLogStore(db);
   const { data: accounts, error: accountsError } = await db
     .from("pd_accounts")
     .select(
@@ -192,15 +148,15 @@ Deno.serve(async (request) => {
         attempted_at: new Date().toISOString(),
       };
       if (reason) {
-        const { error } = await db.from("pd_reminder_logs").upsert(logRow, {
-          onConflict: "account_id,reminder_month,recipient_index",
-          ignoreDuplicates: true,
-        });
-        if (error) failed++;
-        else skipped++;
+        try {
+          await reminderLog.recordSkipped(logRow);
+          skipped++;
+        } catch {
+          failed++;
+        }
         continue;
       }
-      const logId = await claimLog(db, logRow);
+      const logId = await reminderLog.claim(logRow);
       if (!logId) continue;
       try {
         const message = reminderMessage(
@@ -226,21 +182,21 @@ Deno.serve(async (request) => {
           }),
         });
         if (response.status === 202) {
-          await saveResult(db, logId, {
+          await reminderLog.saveResult(logId, {
             status: "accepted",
             reason: null,
             provider_message_id: response.headers.get("x-message-id"),
           });
           accepted++;
         } else {
-          await saveResult(db, logId, {
+          await reminderLog.saveResult(logId, {
             status: "failed",
             reason: `mailersend_http_${response.status}`,
           });
           failed++;
         }
       } catch {
-        await saveResult(db, logId, {
+        await reminderLog.saveResult(logId, {
           status: "failed",
           reason: "mailersend_request_failed",
         });
