@@ -36,8 +36,39 @@
     };
   }
 
+  function buildPaymentCorrection(payload) {
+    return {
+      account_id: payload.account_id,
+      amount: payload.amount,
+      received_date: payload.received_date,
+      payment_method: payload.payment_method,
+      income_category: payload.income_category,
+      principal_amount: payload.principal_amount,
+      interest_amount: payload.interest_amount,
+      fee_amount: payload.fee_amount,
+      escrow_amount: payload.escrow_amount,
+      unapplied_amount: payload.unapplied_amount,
+      memo: payload.memo,
+    };
+  }
+
+  function buildExpenseCorrection(payload) {
+    return {
+      property_id: payload.property_id,
+      account_id: payload.account_id,
+      amount: payload.amount,
+      expense_date: payload.expense_date,
+      category: payload.category,
+      payee: payload.payee,
+      payment_method: payload.payment_method,
+      memo: payload.memo,
+    };
+  }
+
   window.PropertyDeskTransactionPayloads = Object.freeze({
     buildPayment: buildPaymentPayload,
     buildExpense: buildExpensePayload,
+    buildPaymentCorrection,
+    buildExpenseCorrection,
   });
 })();

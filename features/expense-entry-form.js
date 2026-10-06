@@ -12,6 +12,7 @@
       saveCorrection,
       insertTransaction,
       buildExpensePayload,
+      buildExpenseCorrection,
       moneyInput,
       todayIso,
       fillSelect,
@@ -61,16 +62,7 @@
         memo,
       });
       if (state.pendingCorrection?.kind === "expense") {
-        await saveCorrection("expense", {
-          property_id: payload.property_id,
-          account_id: payload.account_id,
-          amount: payload.amount,
-          expense_date: payload.expense_date,
-          category: payload.category,
-          payee: payload.payee,
-          payment_method: payload.payment_method,
-          memo: payload.memo,
-        });
+        await saveCorrection("expense", buildExpenseCorrection(payload));
         return;
       }
 

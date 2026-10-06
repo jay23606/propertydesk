@@ -16,6 +16,18 @@ function loadBuilder() {
   return context.window.PropertyDeskTransactionPayloads.buildPayment;
 }
 
+function loadCorrectionBuilder() {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-payloads.js"),
+      "utf8",
+    ),
+    context,
+  );
+  return context.window.PropertyDeskTransactionPayloads.buildPaymentCorrection;
+}
+
 test("manual loan receipts stay unapplied with no estimated allocation", () => {
   const payload = loadBuilder()({
     ownerId: "workspace-1",
@@ -61,4 +73,36 @@ test("manual rent receipts retain their selected category and rent allocation", 
   assert.equal(payload.escrow_amount, 0);
   assert.equal(payload.unapplied_amount, 0);
   assert.equal(payload.memo, null);
+});
+
+test("payment corrections use only the editable receipt fields", () => {
+  const payload = loadCorrectionBuilder()({
+    user_id: "workspace-1",
+    account_id: "note-1",
+    amount: 750,
+    received_date: "2026-10-04",
+    payment_method: "check",
+    income_category: "installment",
+    principal_amount: 0,
+    interest_amount: 0,
+    fee_amount: 0,
+    escrow_amount: 0,
+    unapplied_amount: 750,
+    memo: "Correction",
+    source_type: "manual",
+  });
+
+  assert.deepEqual(JSON.parse(JSON.stringify(payload)), {
+    account_id: "note-1",
+    amount: 750,
+    received_date: "2026-10-04",
+    payment_method: "check",
+    income_category: "installment",
+    principal_amount: 0,
+    interest_amount: 0,
+    fee_amount: 0,
+    escrow_amount: 0,
+    unapplied_amount: 750,
+    memo: "Correction",
+  });
 });

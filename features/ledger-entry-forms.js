@@ -4,6 +4,12 @@
 
   function createLedgerEntryForms(context) {
     const {
+      buildPayment,
+      buildExpense,
+      buildPaymentCorrection,
+      buildExpenseCorrection,
+    } = window.PropertyDeskTransactionPayloads;
+    const {
       $,
       state,
       moneyInput,
@@ -35,7 +41,8 @@
       openModal,
       saveCorrection,
       insertTransaction,
-      buildPaymentPayload: window.PropertyDeskTransactionPayloads.buildPayment,
+      buildPaymentPayload: buildPayment,
+      buildPaymentCorrection,
     });
     const expenses = window.PropertyDeskExpenseEntryForm.create({
       $,
@@ -51,7 +58,8 @@
       openModal,
       saveCorrection,
       insertTransaction,
-      buildExpensePayload: window.PropertyDeskTransactionPayloads.buildExpense,
+      buildExpensePayload: buildExpense,
+      buildExpenseCorrection,
     });
 
     function attachEvents() {

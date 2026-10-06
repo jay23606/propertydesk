@@ -16,6 +16,18 @@ function loadBuilder() {
   return context.window.PropertyDeskTransactionPayloads.buildExpense;
 }
 
+function loadCorrectionBuilder() {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-payloads.js"),
+      "utf8",
+    ),
+    context,
+  );
+  return context.window.PropertyDeskTransactionPayloads.buildExpenseCorrection;
+}
+
 test("expense payload normalizes property-only records and optional fields", () => {
   const payload = loadBuilder()({
     ownerId: "workspace-1",
@@ -57,4 +69,30 @@ test("expense payload preserves linked rental deposit-refund records", () => {
   assert.equal(payload.account_id, "rental-1");
   assert.equal(payload.category, "deposit_refund");
   assert.equal(payload.memo, null);
+});
+
+test("expense corrections use only editable property-expense fields", () => {
+  const payload = loadCorrectionBuilder()({
+    user_id: "workspace-1",
+    property_id: "property-1",
+    account_id: null,
+    amount: 425.5,
+    expense_date: "2026-10-04",
+    category: "contractor_labor",
+    payee: "Roofing Co",
+    payment_method: "check",
+    memo: "Roof repair",
+    source_type: "manual",
+  });
+
+  assert.deepEqual(JSON.parse(JSON.stringify(payload)), {
+    property_id: "property-1",
+    account_id: null,
+    amount: 425.5,
+    expense_date: "2026-10-04",
+    category: "contractor_labor",
+    payee: "Roofing Co",
+    payment_method: "check",
+    memo: "Roof repair",
+  });
 });
