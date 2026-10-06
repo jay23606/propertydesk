@@ -2,8 +2,10 @@
 (() => {
   "use strict";
 
+  const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
+
   function insert(client, payload) {
-    return client.from("pd_deposit_entries").insert(payload);
+    return insertRecord(client, "pd_deposit_entries", payload);
   }
 
   window.PropertyDeskDepositRepository = Object.freeze({ insert });

@@ -10,7 +10,7 @@ The source code is licensed under the [MIT License](LICENSE).
 
 ## Browser architecture
 
-`workspace-data.js` declares the records needed by the app and resolves the active workspace; `workspace-query.js` builds owner-scoped reads and paginates full record exports. `workspace-refresh.js` coordinates that load, hydrates state, and then renders the views.
+`workspace-data.js` declares the records needed by the app and resolves the active workspace; `workspace-query.js` builds owner-scoped reads and paginates full record exports. `features/repository-query-utils.js` shares common insert and update query construction while table-specific repositories retain their table names and specialized operations. `workspace-refresh.js` coordinates that load, hydrates state, and then renders the views.
 
 The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js` is the composition root: it builds feature dependencies before the workflows that consume them, passes callbacks directly, and hands rendering, event binding, and startup to `features/app-lifecycle.js`.
 

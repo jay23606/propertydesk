@@ -2,6 +2,10 @@
 (() => {
   "use strict";
 
+  function insert(client, table, payload) {
+    return client.from(table).insert(payload);
+  }
+
   function updateById(client, table, recordId, payload) {
     return client.from(table).update(payload).eq("id", recordId);
   }
@@ -17,6 +21,7 @@
   }
 
   window.PropertyDeskRepositoryQueryUtils = Object.freeze({
+    insert,
     saveById,
     updateById,
     updateOwnedById,

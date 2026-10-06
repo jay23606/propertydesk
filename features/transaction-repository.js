@@ -2,8 +2,10 @@
 (() => {
   "use strict";
 
+  const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
+
   function insert(client, table, payload) {
-    return client.from(table).insert(payload);
+    return insertRecord(client, table, payload);
   }
 
   function correct(client, { kind, transactionId, correction, reason }) {
