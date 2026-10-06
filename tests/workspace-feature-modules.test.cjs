@@ -184,20 +184,24 @@ test("adding a workspace member clears the address only after successful refresh
   };
   const calls = [];
   const messages = [];
-  const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    $: element,
-    state: {
-      client: {
-        async rpc(name, args) {
-          calls.push([name, args]);
-          return { error: null };
-        },
+  const state = {
+    client: {
+      async rpc(name, args) {
+        calls.push([name, args]);
+        return { error: null };
       },
-      workspaceMembers: [],
-      user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
-      workspaceOwnerId: "owner-1",
     },
-    esc: String,
+    workspaceMembers: [],
+    user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+    workspaceOwnerId: "owner-1",
+  };
+  const feature = context.window.PropertyDeskWorkspaceMembers.create({
+    state,
+    view: context.window.PropertyDeskWorkspaceMembersView.create({
+      $: element,
+      state,
+      esc: String,
+    }),
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
     refreshWorkspaceSettings: () => calls.push(["render-reminders"]),
@@ -265,9 +269,12 @@ test("workspace setting writes report rejected requests and retain entered value
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
   };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    $,
     state,
-    esc: String,
+    view: context.window.PropertyDeskWorkspaceMembersView.create({
+      $,
+      state,
+      esc: String,
+    }),
     fmtDate: () => "",
     money: () => "",
     toast: (message) => messages.push(message),

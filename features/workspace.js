@@ -31,9 +31,7 @@
     }
 
     const members = window.PropertyDeskWorkspaceMembers.create({
-      $,
       state,
-      esc,
       toast,
       fetchAll,
       view: memberView,

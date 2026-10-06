@@ -3,19 +3,13 @@
   "use strict";
 
   function create({
-    $,
     state,
-    esc,
     toast,
     fetchAll,
-    view: suppliedView,
+    view,
     refreshWorkspaceSettings,
     confirmAction = (message) => window.confirm(message),
   }) {
-    const view =
-      suppliedView ||
-      window.PropertyDeskWorkspaceMembersView.create({ $, state, esc });
-
     async function addWorkspaceMember(event) {
       event.preventDefault();
       const email = view.memberEmail();
