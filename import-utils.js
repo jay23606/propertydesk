@@ -8,19 +8,28 @@
   if (!moneyInput)
     throw new Error("The PropertyDesk money input helper is not loaded.");
 
-  function csvMoney(value, label, { optional = false, minimum = 0 } = {}) {
-    const raw = String(value ?? "").trim();
+  function hasValidCsvMoneyFormat(raw) {
     const number = "(?:\\d+|\\d{1,3}(?:,\\d{3})+)(?:\\.\\d{1,2})?";
-    const wrapped = new RegExp(`^\\(\\s*\\$?\\s*${number}\\s*\\)$`).test(raw);
-    const plain = new RegExp(`^\\$?\\s*${number}$`).test(raw);
-    if (!raw && optional) return 0;
-    if (!wrapped && !plain)
-      throw new Error(`Invalid amount “${raw}” for ${label}.`);
-    const amount = moneyInput(raw);
+    return (
+      new RegExp(`^\\(\\s*\\$?\\s*${number}\\s*\\)$`).test(raw) ||
+      new RegExp(`^\\$?\\s*${number}$`).test(raw)
+    );
+  }
+
+  function validateMinimumAmount(amount, label, minimum) {
     if (amount < minimum)
       throw new Error(
         `Amount for ${label} must be ${minimum === 0 ? "zero or greater" : "greater than zero"}.`,
       );
+  }
+
+  function csvMoney(value, label, { optional = false, minimum = 0 } = {}) {
+    const raw = String(value ?? "").trim();
+    if (!raw && optional) return 0;
+    if (!hasValidCsvMoneyFormat(raw))
+      throw new Error(`Invalid amount “${raw}” for ${label}.`);
+    const amount = moneyInput(raw);
+    validateMinimumAmount(amount, label, minimum);
     return amount;
   }
 
