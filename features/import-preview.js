@@ -15,9 +15,7 @@
         renderImportCorrections,
       });
 
-    function stageImport(title, rows, commit, note = "", report = {}) {
-      const total = Number(report.total ?? rows.length);
-      const errors = report.errors || [];
+    function validateImportStage(rows, total, errors) {
       if (total > 500) {
         throw new Error(
           "Imports are limited to 500 rows at a time. Split the CSV and review each batch.",
@@ -26,7 +24,13 @@
       if (!rows.length && !errors.length) {
         throw new Error("The CSV file has no importable rows.");
       }
-      state.pendingImport = {
+    }
+
+    function pendingImportFor(title, rows, commit, note, report) {
+      const total = Number(report.total ?? rows.length);
+      const errors = report.errors || [];
+      validateImportStage(rows, total, errors);
+      return {
         title,
         rows,
         commit,
@@ -37,6 +41,10 @@
         correctionKeys: report.correctionKeys || [],
         revalidate: report.revalidate || null,
       };
+    }
+
+    function stageImport(title, rows, commit, note = "", report = {}) {
+      state.pendingImport = pendingImportFor(title, rows, commit, note, report);
       $("import-include-duplicates").checked = false;
       renderImportPreview();
       openModal("import-preview-modal");

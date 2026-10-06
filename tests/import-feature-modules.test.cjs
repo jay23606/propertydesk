@@ -93,6 +93,35 @@ test("CSV preview renderer receives only rendering dependencies", () => {
   assert.equal(typeof preview.stageImport, "function");
 });
 
+test("import preview enforces batch size and rejects empty CSV data", () => {
+  const context = vm.createContext({
+    window: {
+      PropertyDeskImportCorrectionView: {
+        create: () => ({ renderImportCorrections() {} }),
+      },
+      PropertyDeskImportPreviewRendering: {
+        create: () => ({
+          renderImportPreview() {},
+          updateImportCommitButton() {},
+        }),
+      },
+    },
+  });
+  loadImportPreview(context);
+  const preview = context.window.PropertyDeskImportPreview.create({
+    state: { pendingImport: null },
+  });
+
+  assert.throws(
+    () => preview.stageImport("Review", Array(501).fill({}), async () => {}),
+    /limited to 500 rows/,
+  );
+  assert.throws(
+    () => preview.stageImport("Review", [], async () => {}),
+    /no importable rows/,
+  );
+});
+
 test("CSV correction view escapes raw values and validation messages", () => {
   const context = vm.createContext({ window: {} });
   loadImportPreview(context);
