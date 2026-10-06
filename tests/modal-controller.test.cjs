@@ -188,6 +188,10 @@ test("modal controller is loaded before app startup and precached", () => {
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const supportWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "record-entry-support-workflow.js"),
+    "utf8",
+  );
 
   assert.ok(
     html.indexOf("features/modal-controller.js") < html.indexOf("app.js"),
@@ -195,6 +199,7 @@ test("modal controller is loaded before app startup and precached", () => {
   assert.ok(html.indexOf("features/form-options.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/modal-controller\.js'/);
   assert.match(worker, /'\.\/features\/form-options\.js'/);
-  assert.match(app, /PropertyDeskModalController\.create/);
-  assert.match(app, /PropertyDeskFormOptions\.create/);
+  assert.match(app, /PropertyDeskRecordEntrySupportWorkflow\.create/);
+  assert.match(supportWorkflow, /PropertyDeskModalController\.create/);
+  assert.match(supportWorkflow, /PropertyDeskFormOptions\.create/);
 });

@@ -70,40 +70,31 @@
       prettyType,
     });
   const {
-    attachEvents: attachModalEvents,
+    attachModalEvents,
     openModal,
     closeModal,
-  } = window.PropertyDeskModalController.create({
+    fillSelect,
+    populateFormOptions,
+    renderReminderActivity,
+    previewReminderEmail,
+  } = window.PropertyDeskRecordEntrySupportWorkflow.create({
     $,
     state,
+    esc,
+    propertyAddress,
+    prettyType,
     documentRef: document,
+    fmtDate,
+    money,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+    monthEnd,
+    moneyInput,
+    toast,
+    dateOnly,
+    monthStart,
   });
-  const { fillSelect, populateFormOptions } =
-    window.PropertyDeskFormOptions.create({
-      $,
-      state,
-      esc,
-      propertyAddress,
-      prettyType,
-    });
-  const { renderReminderActivity, previewReminderEmail } =
-    window.PropertyDeskReminderWorkflow.create({
-      $,
-      state,
-      esc,
-      fmtDate,
-      money,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-      monthEnd,
-      moneyInput,
-      toast,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      openModal,
-    });
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const {
     updateGreeting,

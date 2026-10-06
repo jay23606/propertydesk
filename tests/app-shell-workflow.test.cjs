@@ -108,7 +108,8 @@ test("app shell receives reminder callbacks and is precached", () => {
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(worker, /'\.\/features\/app-shell-workflow\.js'/);
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
-  assert.match(app, /PropertyDeskReminderWorkflow\.create/);
+  assert.match(app, /PropertyDeskRecordEntrySupportWorkflow\.create/);
+  assert.match(app, /renderReminderActivity,/);
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(root, "features", "app-shell-workflow.js"),
