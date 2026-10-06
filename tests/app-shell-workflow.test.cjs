@@ -30,15 +30,6 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskReminderWorkflow: {
-        create(options) {
-          calls.push(["reminders", options]);
-          return {
-            renderReminderActivity: handlers.renderReminderActivity,
-            previewReminderEmail: handlers.previewReminderEmail,
-          };
-        },
-      },
       PropertyDeskWorkspace: {
         create(options) {
           calls.push(["settings", options]);
@@ -78,19 +69,10 @@ test("app shell workflow owns settings and groups shell event binding", () => {
     $: () => {},
     state: { view: "properties" },
     esc() {},
-    fmtDate() {},
-    money() {},
     toast() {},
     fetchAll() {},
-    amountDueSince() {},
-    unpaidDueAccrualStart() {},
-    todayIso() {},
-    monthEnd() {},
-    moneyInput() {},
-    dateOnly() {},
-    monthStart() {},
-    propertyAddress() {},
-    openModal() {},
+    renderReminderActivity: handlers.renderReminderActivity,
+    previewReminderEmail: handlers.previewReminderEmail,
     unrelatedDependency() {},
   };
   const shell = context.window.PropertyDeskAppShellWorkflow.create(options);
@@ -101,23 +83,21 @@ test("app shell workflow owns settings and groups shell event binding", () => {
     "previewReminderEmail",
     "updateGreeting",
   ]);
-  assert.equal(calls[0][0], "reminders");
-  assert.equal(calls[0][1].openModal, options.openModal);
-  assert.equal(calls[1][0], "settings");
-  assert.notEqual(calls[1][1], options);
+  assert.equal(calls[0][0], "settings");
+  assert.notEqual(calls[0][1], options);
   assert.deepEqual(
-    Object.keys(calls[1][1]).sort(),
+    Object.keys(calls[0][1]).sort(),
     ["$", "esc", "fetchAll", "state", "toast"].sort(),
   );
-  assert.equal(calls[1][1].state, options.state);
-  assert.equal(typeof calls[2][1].renderWorkspaceSettings, "function");
+  assert.equal(calls[0][1].state, options.state);
+  assert.equal(typeof calls[1][1].renderWorkspaceSettings, "function");
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["reminders", "settings", "navigation", "theme"],
+    ["settings", "navigation", "theme"],
   );
   assert.equal(shell.updateGreeting, handlers.updateGreeting);
   assert.equal(shell.previewReminderEmail, handlers.previewReminderEmail);
-  calls[2][1].renderWorkspaceSettings();
+  calls[1][1].renderWorkspaceSettings();
   assert.deepEqual(calls.slice(-2), [
     "workspace settings rendered",
     "reminder activity rendered",
@@ -130,7 +110,7 @@ test("app shell workflow owns settings and groups shell event binding", () => {
   ]);
 });
 
-test("app shell workflow composes reminders before the coordinator and is precached", () => {
+test("app shell receives reminder callbacks and is precached", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
@@ -142,7 +122,14 @@ test("app shell workflow composes reminders before the coordinator and is precac
   assert.doesNotMatch(worker, /workspace-settings-workflow\.js/);
   assert.match(worker, /'\.\/features\/app-shell-workflow\.js'/);
   assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
-  assert.doesNotMatch(app, /PropertyDeskReminderWorkflow\.create/);
+  assert.match(app, /PropertyDeskReminderWorkflow\.create/);
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(root, "features", "app-shell-workflow.js"),
+      "utf8",
+    ),
+    /PropertyDeskReminderWorkflow\.create/,
+  );
   assert.doesNotMatch(app, /PropertyDeskProfileDisplay\.create/);
   assert.match(app, /attachAccountFormEvents,/);
   assert.match(html, /features\/reminder-workflow\.js/);

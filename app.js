@@ -84,28 +84,36 @@
       propertyAddress,
       prettyType,
     });
+  const { renderReminderActivity, previewReminderEmail } =
+    window.PropertyDeskReminderWorkflow.create({
+      $,
+      state,
+      esc,
+      fmtDate,
+      money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+      monthEnd,
+      moneyInput,
+      toast,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      openModal,
+    });
   const {
     updateGreeting,
     navigate,
-    previewReminderEmail,
     attachEvents: attachAppShellEvents,
   } = window.PropertyDeskAppShellWorkflow.create({
     $,
     state,
     esc,
-    fmtDate,
-    money,
     toast,
     fetchAll,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
-    monthEnd,
-    moneyInput,
-    dateOnly,
-    monthStart,
-    propertyAddress,
-    openModal,
+    renderReminderActivity,
+    previewReminderEmail,
   });
   const { entries: recordEntryWorkflow, transactions } =
     window.PropertyDeskLedgerWorkflow.create({
