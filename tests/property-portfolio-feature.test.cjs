@@ -273,6 +273,7 @@ test("property portfolio workflow connects its filter model and read view", () =
     unpaidDueAccrualStart: action,
     todayIso: action,
     propertyAddress: action,
+    streetAddress: action,
     monthStart: action,
     dateOnly: action,
     monthEnd: action,
@@ -285,6 +286,7 @@ test("property portfolio workflow connects its filter model and read view", () =
   assert.equal(passed.accountRowOptions.state, state);
   assert.equal(passed.accountRowOptions.amountDueSince, action);
   assert.equal(passed.viewOptions.portfolioModel, "model");
+  assert.equal(passed.modelOptions.streetAddress, action);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "renderProperties",
