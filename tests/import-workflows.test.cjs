@@ -656,6 +656,11 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/backup-records.js") <
       html.indexOf("features/backup-export.js"),
   );
+  assert.ok(
+    html.indexOf("workspace-query.js") <
+      html.indexOf("features/backup-records.js"),
+  );
+  assert.match(worker, /'\.\/workspace-query\.js'/);
   assert.match(worker, /'\.\/features\/backup-records\.js'/);
   assert.match(worker, /'\.\/features\/document-repository\.js'/);
   assert.ok(

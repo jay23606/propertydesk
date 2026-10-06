@@ -62,16 +62,9 @@
     },
   ];
 
-  function runWorkspaceRead(client, workspaceId, read) {
-    if (read.rpc) return client.rpc(read.rpc);
-    let query = client.from(read.table).select("*").eq("user_id", workspaceId);
-    for (const [column, ascending] of read.order || [])
-      query = query.order(column, { ascending });
-    if (read.limit) query = query.limit(read.limit);
-    return query;
-  }
-
   function create() {
+    const { runWorkspaceRead } = window.PropertyDeskWorkspaceQuery;
+
     function loadWorkspaceId(client) {
       return client.rpc("pd_workspace_id");
     }

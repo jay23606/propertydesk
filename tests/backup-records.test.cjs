@@ -8,6 +8,10 @@ test("backup record loader paginates each workspace table into named records", a
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
   vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "backup-records.js"),
       "utf8",
@@ -64,6 +68,10 @@ test("backup record loader paginates each workspace table into named records", a
 test("backup record loader stops when a table query fails", async () => {
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskBackupUtils = require("../backup-utils.js");
+  vm.runInContext(
+    fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "backup-records.js"),
