@@ -24,13 +24,18 @@
       openPropertyDetails,
       openPropertyPayment,
     } = context;
+    const propertySummaryModel =
+      window.PropertyDeskOverviewPropertySummaryModel.create({
+        state,
+        monthlyScheduledEstimate,
+        accountBalance,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        todayIso,
+      });
     const overviewModel = window.PropertyDeskOverviewModel.create({
       state,
-      monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
+      propertySummaryModel,
       collectedSince,
       scheduledMonthlyRunRate,
       monthStart,

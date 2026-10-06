@@ -6,13 +6,18 @@ const vm = require("node:vm");
 
 test("overview model aggregates current counts, upcoming accounts, activity, and property cards", () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "overview-model.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const moduleName of [
+    "overview-property-summary-model.js",
+    "overview-model.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", moduleName),
+        "utf8",
+      ),
+      context,
+    );
+  }
   const properties = [
     { id: "property-1", name: "One Oak" },
     { id: "property-2", name: "Two Pine", archived_at: "2026-01-01" },
@@ -83,14 +88,20 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
       status: "voided",
     },
   ];
+  const state = { properties, accounts, payments };
+  const propertySummaryModel =
+    context.window.PropertyDeskOverviewPropertySummaryModel.create({
+      state,
+      monthlyScheduledEstimate: (rows) =>
+        rows.reduce((sum, account) => sum + account.payment_amount, 0),
+      accountBalance: (account) => (account.id === "note-1" ? 42000 : 0),
+      amountDueSince: (rows) => (rows[0].id === "closed-1" ? 0 : 100),
+      unpaidDueAccrualStart: () => "2026-10-01",
+      todayIso: () => "2026-10-05",
+    });
   const model = context.window.PropertyDeskOverviewModel.create({
-    state: { properties, accounts, payments },
-    monthlyScheduledEstimate: (rows) =>
-      rows.reduce((sum, account) => sum + account.payment_amount, 0),
-    accountBalance: (account) => (account.id === "note-1" ? 42000 : 0),
-    amountDueSince: (rows) => (rows[0].id === "closed-1" ? 0 : 100),
-    unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-05",
+    state,
+    propertySummaryModel,
     collectedSince: (start) => (start === "2026-10-01" ? 800 : 0),
     scheduledMonthlyRunRate: () => 1300,
     monthStart: () => "2026-10-01",

@@ -4,58 +4,12 @@
 
   function createOverviewModel({
     state,
-    monthlyScheduledEstimate,
-    accountBalance,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
+    propertySummaryModel,
     collectedSince,
     scheduledMonthlyRunRate,
     monthStart,
     isPosted,
   }) {
-    function propertySummary(property) {
-      const related = state.accounts.filter(
-        (account) => account.property_id === property.id,
-      );
-      const active = related.filter(
-        (account) => (account.status || "active") === "active",
-      );
-      const loanAccounts = active.filter(
-        (account) => account.account_type !== "rental",
-      );
-      const amountDue = active.reduce(
-        (sum, account) =>
-          sum +
-          amountDueSince(
-            [account],
-            state.payments,
-            unpaidDueAccrualStart(),
-            todayIso(),
-          ),
-        0,
-      );
-
-      return {
-        property,
-        scheduledMonthly: monthlyScheduledEstimate(active),
-        hasNonMonthly: active.some(
-          (account) => account.payment_frequency !== "monthly",
-        ),
-        loanBalance: loanAccounts.reduce(
-          (sum, account) => sum + accountBalance(account),
-          0,
-        ),
-        hasLoanAccount: loanAccounts.length > 0,
-        amountDue,
-        parties: [
-          ...new Set(
-            active.map((account) => account.party_name).filter(Boolean),
-          ),
-        ].join(", "),
-      };
-    }
-
     function buildOverview() {
       const currentMonthStart = monthStart();
       const activeProperties = state.properties.filter(
@@ -108,7 +62,9 @@
         recordedPaymentCount: postedThisMonth.length,
         upcoming,
         recent,
-        propertyCards: activeProperties.slice(0, 3).map(propertySummary),
+        propertyCards: activeProperties
+          .slice(0, 3)
+          .map(propertySummaryModel.summarizeProperty),
       };
     }
 

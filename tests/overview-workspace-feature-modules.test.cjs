@@ -136,8 +136,15 @@ test("overview workflow composes dashboard rendering with property actions", () 
   const overviewModel = { buildOverview: () => ({}) };
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
+  const propertySummaryModel = { summarizeProperty: () => ({}) };
   const context = vm.createContext({
     window: {
+      PropertyDeskOverviewPropertySummaryModel: {
+        create: (options) => {
+          received.propertySummary = options;
+          return propertySummaryModel;
+        },
+      },
       PropertyDeskOverviewModel: {
         create: (options) => {
           received.model = options;
@@ -179,13 +186,41 @@ test("overview workflow composes dashboard rendering with property actions", () 
   for (const [key, value] of Object.entries(viewContext)) {
     assert.equal(received.view[key], value);
   }
+  const propertySummaryKeys = [
+    "state",
+    "monthlyScheduledEstimate",
+    "accountBalance",
+    "amountDueSince",
+    "unpaidDueAccrualStart",
+    "todayIso",
+  ];
+  assert.deepEqual(
+    Object.keys(received.propertySummary).sort(),
+    [...propertySummaryKeys].sort(),
+  );
+  for (const key of propertySummaryKeys) {
+    assert.equal(received.propertySummary[key], modelContext[key]);
+  }
   assert.deepEqual(
     Object.keys(received.model).sort(),
-    Object.keys(modelContext).sort(),
+    [
+      "state",
+      "propertySummaryModel",
+      "collectedSince",
+      "scheduledMonthlyRunRate",
+      "monthStart",
+      "isPosted",
+    ].sort(),
   );
-  for (const [key, value] of Object.entries(modelContext)) {
-    assert.equal(received.model[key], value);
-  }
+  assert.equal(received.model.propertySummaryModel, propertySummaryModel);
+  for (const key of [
+    "state",
+    "collectedSince",
+    "scheduledMonthlyRunRate",
+    "monthStart",
+    "isPosted",
+  ])
+    assert.equal(received.model[key], modelContext[key]);
   assert.equal(received.view.overviewModel, overviewModel);
   assert.equal(received.events.openPropertyDetails, openPropertyDetails);
   assert.equal(received.events.openPropertyPayment, openPropertyPayment);
