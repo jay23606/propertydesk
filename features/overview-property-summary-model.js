@@ -18,11 +18,8 @@
         todayIso,
       });
 
-    function summarizeProperty(property) {
-      const related = state.accounts.filter(
-        (account) => account.property_id === property.id,
-      );
-      const active = related.filter(
+    function summarizeProperty(property, relatedAccounts) {
+      const active = relatedAccounts.filter(
         (account) => (account.status || "active") === "active",
       );
       const financials = active.map((account) =>

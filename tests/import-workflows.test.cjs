@@ -326,6 +326,14 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.doesNotMatch(app, /PropertyDesk(?:ImportUtils|ImportWorkflows)\./);
   assert.ok(
+    html.indexOf("features/property-account-index.js") <
+      html.indexOf("features/overview-model.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-account-index.js") <
+      html.indexOf("features/property-portfolio-model.js"),
+  );
+  assert.ok(
     html.indexOf("features/account-financial-summary.js") <
       html.indexOf("features/overview-property-summary-model.js"),
   );
@@ -706,6 +714,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/property-archive\.js'/);
   assert.match(worker, /'\.\/features\/overview\.js'/);
   assert.match(worker, /'\.\/features\/account-financial-summary\.js'/);
+  assert.match(worker, /'\.\/features\/property-account-index\.js'/);
   assert.match(worker, /'\.\/features\/overview-property-summary-model\.js'/);
   assert.match(worker, /'\.\/features\/overview-model\.js'/);
   assert.match(worker, /'\.\/features\/app-state\.js'/);

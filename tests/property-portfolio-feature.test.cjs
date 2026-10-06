@@ -238,6 +238,13 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-account-index.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "property-portfolio-model.js"),
       "utf8",
     ),
@@ -389,6 +396,13 @@ test("property portfolio indexes accounts and holders once per grid build", () =
     ]),
   };
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-account-index.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-portfolio-model.js"),

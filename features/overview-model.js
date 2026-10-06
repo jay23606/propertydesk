@@ -19,6 +19,8 @@
       const propertyById = new Map(
         state.properties.map((property) => [property.id, property]),
       );
+      const accountsByProperty =
+        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
       const accountById = new Map(
         state.accounts.map((account) => [account.id, account]),
       );
@@ -65,7 +67,12 @@
         recent,
         propertyCards: activeProperties
           .slice(0, 3)
-          .map(propertySummaryModel.summarizeProperty),
+          .map((property) =>
+            propertySummaryModel.summarizeProperty(
+              property,
+              accountsByProperty.get(property.id) || [],
+            ),
+          ),
       };
     }
 

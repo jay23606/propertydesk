@@ -14,6 +14,7 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
     context,
   );
   for (const moduleName of [
+    "property-account-index.js",
     "overview-property-summary-model.js",
     "overview-model.js",
   ]) {

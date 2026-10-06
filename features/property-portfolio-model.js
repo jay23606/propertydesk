@@ -10,12 +10,8 @@
   }) {
     function buildRows({ query, type, holderId, showArchived }) {
       const rows = [];
-      const accountsByProperty = new Map();
-      for (const account of state.accounts) {
-        const related = accountsByProperty.get(account.property_id) || [];
-        related.push(account);
-        accountsByProperty.set(account.property_id, related);
-      }
+      const accountsByProperty =
+        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
       const holdersByProperty = new Map();
       for (const row of state.propertyHolders) {
         const holders = holdersByProperty.get(row.property_id) || new Set();
