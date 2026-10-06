@@ -484,15 +484,16 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/property-portfolio-workflow.js") <
-      html.indexOf("features/property-portfolio-screen-workflow.js"),
+      html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/property-portfolio-actions-workflow.js") <
-      html.indexOf("features/property-portfolio-screen-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/property-portfolio-screen-workflow.js") <
       html.indexOf("app.js"),
+  );
+  assert.doesNotMatch(html, /features\/property-portfolio-screen-workflow\.js/);
+  assert.doesNotMatch(
+    worker,
+    /features\/property-portfolio-screen-workflow\.js/,
   );
   assert.ok(
     html.indexOf("features/property-details.js") < html.indexOf("app.js"),
@@ -834,7 +835,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/property-portfolio-workflow\.js'/);
   assert.match(
     worker,
-    /'\.\/features\/property-portfolio-screen-workflow\.js'/,
+    /'\.\/features\/property-portfolio-actions-workflow\.js'/,
   );
   assert.match(
     worker,

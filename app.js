@@ -287,8 +287,8 @@
       openPropertyDetails,
       openPropertyPayment,
     });
-  const { renderProperties, attachEvents: attachPropertyPortfolioEvents } =
-    window.PropertyDeskPropertyPortfolioScreenWorkflow.create({
+  const { renderProperties, attachEvents: attachPropertyGridEvents } =
+    window.PropertyDeskPropertyPortfolioWorkflow.create({
       $,
       state,
       esc,
@@ -306,12 +306,22 @@
       monthEnd,
       lateReminderMailto,
       paymentStatusInMonth,
+    });
+  const { attachEvents: attachPropertyActionEvents } =
+    window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
+      $,
+      state,
       toast,
       fetchAll,
+      streetAddress,
       openPayment,
       openPropertyDetails,
       openAccountForProperty,
     });
+  function attachPropertyPortfolioEvents() {
+    attachPropertyGridEvents();
+    attachPropertyActionEvents();
+  }
   const { attachEvents: attachCsvImportEvents } =
     window.PropertyDeskCsvImportWorkflow.create({
       $,

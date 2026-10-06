@@ -3,108 +3,18 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-test("Properties screen workflow connects the grid and quick-action binders", () => {
-  const created = [];
-  const passed = {};
-  const attached = [];
-  const renderProperties = () => "properties";
-  const attachPortfolioEvents = () => attached.push("grid events");
-  const attachPortfolioActionEvents = () => attached.push("action events");
-  const context = vm.createContext({
-    window: {
-      PropertyDeskPropertyPortfolioWorkflow: {
-        create: (options) => {
-          created.push("grid");
-          passed.grid = options;
-          return { renderProperties, attachEvents: attachPortfolioEvents };
-        },
-      },
-      PropertyDeskPropertyPortfolioActionsWorkflow: {
-        create: (options) => {
-          created.push("actions");
-          passed.actions = options;
-          return { attachEvents: attachPortfolioActionEvents };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "property-portfolio-screen-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
+test("app composes the Properties grid and action workflows explicitly", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
+  assert.match(
+    app,
+    /function attachPropertyPortfolioEvents\(\) \{\s*attachPropertyGridEvents\(\);\s*attachPropertyActionEvents\(\);/,
   );
-  const dependencies = {
-    $() {},
-    state: {},
-    esc() {},
-    money() {},
-    paymentFrequencyLabel() {},
-    monthlyScheduledEstimate() {},
-    accountBalance() {},
-    amountDueSince() {},
-    unpaidDueAccrualStart() {},
-    todayIso() {},
-    propertyAddress() {},
-    streetAddress() {},
-    monthStart() {},
-    dateOnly() {},
-    monthEnd() {},
-    lateReminderMailto() {},
-    paymentStatusInMonth() {},
-    toast() {},
-    fetchAll() {},
-    openPayment() {},
-    openPropertyDetails() {},
-    openAccountForProperty() {},
-  };
-  const workflow =
-    context.window.PropertyDeskPropertyPortfolioScreenWorkflow.create(
-      dependencies,
-    );
-
-  assert.deepEqual(created, ["grid", "actions"]);
-  assert.notEqual(passed.grid, dependencies);
-  assert.notEqual(passed.actions, dependencies);
-  assert.deepEqual(Object.keys(passed.grid), [
-    "$",
-    "state",
-    "esc",
-    "money",
-    "paymentFrequencyLabel",
-    "monthlyScheduledEstimate",
-    "accountBalance",
-    "amountDueSince",
-    "unpaidDueAccrualStart",
-    "todayIso",
-    "propertyAddress",
-    "streetAddress",
-    "monthStart",
-    "dateOnly",
-    "monthEnd",
-    "lateReminderMailto",
-    "paymentStatusInMonth",
-  ]);
-  assert.deepEqual(Object.keys(passed.actions), [
-    "$",
-    "state",
-    "toast",
-    "fetchAll",
-    "streetAddress",
-    "openPayment",
-    "openPropertyDetails",
-    "openAccountForProperty",
-  ]);
-  assert.deepEqual(Object.keys(workflow), ["renderProperties", "attachEvents"]);
-  assert.equal(workflow.renderProperties, renderProperties);
-  workflow.attachEvents();
-  assert.deepEqual(attached, ["grid events", "action events"]);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskPropertyPortfolioScreenWorkflow\.create\(/,
+  );
 });
 
 test("Properties account-row model derives balances and reminder details", () => {
