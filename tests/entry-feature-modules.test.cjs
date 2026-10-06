@@ -93,7 +93,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
   assert.match(
     app,
-    /attachPropertyDetailEvents,\s*attachPropertyDocumentEvents,/,
+    /attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents,/,
   );
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(

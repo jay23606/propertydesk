@@ -38,7 +38,7 @@
         openPropertyDetails,
       },
     );
-    const { attachEvents: attachPropertyDetailContentEvents } =
+    const { attachEvents: attachPropertyDetailEvents } =
       window.PropertyDeskPropertyDetailEvents.create({
         $,
         state,
@@ -46,7 +46,7 @@
         editAccount,
         openAccountDetails,
       });
-    const { attachEvents: attachPropertyQuickActions } =
+    const { attachEvents: attachPropertyQuickActionEvents } =
       window.PropertyDeskPropertyDetailQuickActions.create({
         $,
         state,
@@ -57,13 +57,11 @@
         toggleArchiveProperty,
       });
 
-    function attachPropertyDetailEvents() {
-      attachPropertyDetailContentEvents();
-      attachPropertyHolderEvents();
-      attachPropertyQuickActions();
-    }
-
-    return { attachPropertyDetailEvents };
+    return {
+      attachPropertyDetailEvents,
+      attachPropertyHolderEvents,
+      attachPropertyQuickActionEvents,
+    };
   }
 
   window.PropertyDeskPropertyDetailActionsWorkflow = Object.freeze({ create });

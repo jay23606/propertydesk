@@ -770,9 +770,12 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /attachPropertyDetailEvents,\s*attachPropertyDocumentEvents,/,
+    /attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents,/,
   );
-  assert.match(app, /eventBinders:[\s\S]*?attachPropertyDetailEvents/);
+  assert.match(
+    app,
+    /eventBinders:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,
+  );
   assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
 });
 
@@ -842,6 +845,8 @@ test("property detail actions workflow composes administration and modal actions
   assert.equal(passed.quickActions.toggleArchiveProperty, action);
   assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
   workflow.attachPropertyDetailEvents();
+  workflow.attachPropertyHolderEvents();
+  workflow.attachPropertyQuickActionEvents();
   assert.deepEqual(attachCalls, ["content", "holders", action]);
 });
 
