@@ -717,6 +717,36 @@ test("account close maintenance reports rejected requests without closing detail
   ]);
 });
 
+test("account close maintenance reports database errors before closing details", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-close-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const calls = [];
+  const messages = [];
+  const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    state: { client: {} },
+    repository: {
+      close: async (client, id) => {
+        calls.push(["close", client, id]);
+        return { error: { message: "Permission denied" } };
+      },
+    },
+    closeAccountDetails: () => calls.push("close-details"),
+    fetchAll: async () => calls.push("refresh"),
+    toast: (message) => messages.push(message),
+  });
+
+  await feature.saveCloseAccount({ id: "account-1", name: "Rental" });
+
+  assert.deepEqual(calls, [["close", {}, "account-1"]]);
+  assert.deepEqual(messages, ["Permission denied"]);
+});
+
 test("account close entry confirms before delegating to persistence", async () => {
   const calls = [];
   const context = vm.createContext({ window: {} });
