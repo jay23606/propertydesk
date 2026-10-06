@@ -3,6 +3,49 @@ const assert = require("node:assert/strict");
 
 const utilsPromise =
   import("../supabase/functions/_shared/reminder-schedule.mjs");
+const messagePromise =
+  import("../supabase/functions/_shared/reminder-message.mjs");
+
+test("reminder messages keep plain text readable and escape HTML fields", async () => {
+  const { reminderMessage } = await messagePromise;
+  const message = reminderMessage(
+    { party_name: "Ana & <Sam>" },
+    {
+      address: "12 <Main> & 2nd",
+      city: "Town",
+      state: "PA",
+      postal_code: "17000",
+    },
+    "2026-10-01",
+    "2026-10-31",
+    550,
+  );
+
+  assert.equal(
+    message.subject,
+    "Payment reminder for 12 <Main> & 2nd · October 2026",
+  );
+  assert.match(message.text, /Hello Ana & <Sam>,/);
+  assert.match(message.text, /Unpaid due as of 2026-10-31: \$550\.00/);
+  assert.match(message.text, /Property: 12 <Main> & 2nd, Town, PA, 17000/);
+  assert.match(message.html, /Hello Ana &amp; &lt;Sam&gt;/);
+  assert.match(message.html, /12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000/);
+  assert.match(message.html, /October 2026/);
+});
+
+test("reminder message greets the recipient generically when no name is set", async () => {
+  const { reminderMessage } = await messagePromise;
+  const message = reminderMessage(
+    { party_name: "  " },
+    { address: "10 Main St" },
+    "2026-10-01",
+    "2026-10-31",
+    100,
+  );
+
+  assert.match(message.text, /^Hello there,/);
+  assert.match(message.html, /<p>Hello there,<\/p>/);
+});
 
 test("month-end detection uses New York calendar time, including daylight-saving boundaries", async () => {
   const utils = await utilsPromise;
