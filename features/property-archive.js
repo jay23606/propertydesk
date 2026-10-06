@@ -3,29 +3,17 @@
   "use strict";
 
   function create({ state, toast, fetchAll, todayIso, openPropertyDetails }) {
+    const { savePropertyArchive } =
+      window.PropertyDeskPropertyMaintenance.create({ state, toast });
+
     async function toggleArchiveProperty() {
       const id = state.selectedPropertyId;
       const property = state.properties.find((item) => item.id === id);
       if (!property) return;
 
       const archived_at = property.archived_at ? null : todayIso();
-      let error;
-      try {
-        ({ error } = await state.client
-          .from("pd_properties")
-          .update({ archived_at })
-          .eq("id", id)
-          .eq("user_id", state.workspaceOwnerId));
-      } catch {
-        toast(
-          "Property status couldn't be updated right now. Check your connection and try again.",
-        );
+      if (!(await savePropertyArchive(id, state.workspaceOwnerId, archived_at)))
         return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
       try {
         await fetchAll();
       } catch {

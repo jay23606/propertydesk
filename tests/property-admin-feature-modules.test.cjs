@@ -6,13 +6,12 @@ const path = require("node:path");
 const vm = require("node:vm");
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-quick-note.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const source of ["property-maintenance.js", "property-quick-note.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
   const updates = [];
   const messages = [];
   let refreshed = false;
@@ -67,13 +66,12 @@ test("property quick notes normalize whitespace and scope updates to the workspa
 
 test("property quick notes enforce the character limit before writing", async () => {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-quick-note.js"),
-      "utf8",
-    ),
-    context,
-  );
+  for (const source of ["property-maintenance.js", "property-quick-note.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
   const messages = [];
   const state = {
     properties: [{ id: "property-1", address: "10 Main St" }],
@@ -99,6 +97,7 @@ test("property holder and archive workflows report rejected writes without runni
   for (const source of [
     "property-holder-repository.js",
     "property-holder-management.js",
+    "property-maintenance.js",
     "property-archive.js",
   ]) {
     vm.runInContext(
@@ -159,6 +158,77 @@ test("property holder and archive workflows report rejected writes without runni
     "Account-holder labels couldn't be saved right now. Check your connection and try again.",
     "Property status couldn't be updated right now. Check your connection and try again.",
   ]);
+});
+
+test("archive and restore writes share property maintenance and reopen updated details", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const source of ["property-maintenance.js", "property-archive.js"]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
+  const calls = [];
+  const messages = [];
+  const property = {
+    id: "property-1",
+    archived_at: null,
+  };
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    selectedPropertyId: property.id,
+    properties: [property],
+    client: {
+      from(table) {
+        assert.equal(table, "pd_properties");
+        return {
+          update(values) {
+            calls.push(["update", values]);
+            return {
+              eq(column, id) {
+                calls.push(["filter", column, id]);
+                return {
+                  eq: async (ownerColumn, ownerId) => {
+                    calls.push(["filter", ownerColumn, ownerId]);
+                    return { error: null };
+                  },
+                };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const archive = context.window.PropertyDeskPropertyArchive.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => {
+      calls.push(["refresh"]);
+      property.archived_at = calls.findLast(
+        ([operation]) => operation === "update",
+      )[1].archived_at;
+    },
+    todayIso: () => "2026-10-06",
+    openPropertyDetails: (id) => calls.push(["open", id]),
+  });
+
+  await archive.toggleArchiveProperty();
+  await archive.toggleArchiveProperty();
+
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ["update", { archived_at: "2026-10-06" }],
+    ["filter", "id", "property-1"],
+    ["filter", "user_id", "workspace-1"],
+    ["refresh"],
+    ["open", "property-1"],
+    ["update", { archived_at: null }],
+    ["filter", "id", "property-1"],
+    ["filter", "user_id", "workspace-1"],
+    ["refresh"],
+    ["open", "property-1"],
+  ]);
+  assert.deepEqual(messages, ["Property archived", "Property restored"]);
 });
 
 test("property holder save persists the member IDs supplied by the event layer", async () => {

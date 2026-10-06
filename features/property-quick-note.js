@@ -10,6 +10,9 @@
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
   }) {
+    const { savePropertyQuickNote } =
+      window.PropertyDeskPropertyMaintenance.create({ state, toast });
+
     async function editPropertyQuickNote(id) {
       const property = state.properties.find((item) => item.id === id);
       if (!property) return;
@@ -23,23 +26,8 @@
         toast("Quick notes are limited to 140 characters.");
         return;
       }
-      let error;
-      try {
-        ({ error } = await state.client
-          .from("pd_properties")
-          .update({ notes: note || null })
-          .eq("id", id)
-          .eq("user_id", state.workspaceOwnerId));
-      } catch {
-        toast(
-          "Property note couldn't be saved right now. Check your connection and try again.",
-        );
+      if (!(await savePropertyQuickNote(id, state.workspaceOwnerId, note)))
         return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
       try {
         await fetchAll();
       } catch {
