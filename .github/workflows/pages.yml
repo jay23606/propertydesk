@@ -14,12 +14,12 @@ jobs:
     outputs:
       configured: ${{ steps.config.outputs.configured }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -70,8 +70,8 @@ jobs:
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Generate untracked browser config
@@ -80,23 +80,23 @@ jobs:
           PROPERTYDESK_SUPABASE_ANON_KEY: ${{ secrets.PROPERTYDESK_SUPABASE_ANON_KEY }}
         run: |
           node -e 'const fs=require("fs"); const config={supabaseUrl:process.env.PROPERTYDESK_SUPABASE_URL,supabaseAnonKey:process.env.PROPERTYDESK_SUPABASE_ANON_KEY}; fs.writeFileSync("config.js", `window.PROPERTYDESK_CONFIG = ${JSON.stringify(config)};\n`);'
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   runtime-smoke:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
