@@ -197,7 +197,7 @@
       openPayment,
     });
   const { openAccountDetails } =
-    window.PropertyDeskAccountDetailsWorkflow.create({
+    window.PropertyDeskAccountDetailContentWorkflow.create({
       $,
       state,
       money,

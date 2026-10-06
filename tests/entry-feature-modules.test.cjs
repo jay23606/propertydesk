@@ -60,7 +60,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailsWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
   );
   assert.doesNotMatch(
     app,
@@ -89,7 +89,10 @@ test("app coordinator passes the amortization helper into account details", () =
     /window\.PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
-  assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);
+  assert.match(
+    app,
+    /window\.PropertyDeskAccountDetailContentWorkflow\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(
@@ -134,60 +137,13 @@ test("app coordinator creates cross-linked property views after their actions", 
     /\.\.\.args\) => open(?:PropertyDetails|PropertyPayment|Payment|Expense)\(/,
   );
   assert.ok(
-    app.indexOf("PropertyDeskAccountDetailsWorkflow.create(") <
+    app.indexOf("PropertyDeskAccountDetailContentWorkflow.create(") <
       app.indexOf("PropertyDeskPropertyDetailsWorkflow.create("),
   );
   assert.ok(
     app.indexOf("PropertyDeskPropertyDetailsWorkflow.create(") <
       app.indexOf("PropertyDeskOverviewWorkflow.create("),
   );
-});
-
-test("account detail content consumes the separate deposit renderer", () => {
-  const created = [];
-  const passed = {};
-  const depositSectionHTML = () => "deposit html";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountDetailContentWorkflow: {
-        create: (options) => {
-          created.push("account detail content workflow");
-          passed.accountContent = options;
-          return { openAccountDetails: () => "opened" };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-details-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    money: () => 0,
-    fmtDate: () => "",
-    moneyInput: Number,
-    depositSectionHTML,
-    esc: String,
-    prettyType: String,
-    paymentFrequencyLabel: () => "monthly",
-    todayIso() {},
-  };
-  const workflow =
-    context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
-
-  assert.deepEqual(created, ["account detail content workflow"]);
-  assert.equal(passed.accountContent.money, dependencies.money);
-  assert.equal(
-    passed.accountContent.depositSectionHTML,
-    dependencies.depositSectionHTML,
-  );
-  assert.deepEqual(Object.keys(workflow).sort(), ["openAccountDetails"]);
-  assert.equal(workflow.openAccountDetails(), "opened");
 });
 
 test("reminder workflow composes the activity view and email preview", () => {

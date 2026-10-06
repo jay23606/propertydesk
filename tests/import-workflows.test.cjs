@@ -60,20 +60,12 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("features/deposit-details-workflow.js"),
   );
   assert.ok(
-    html.indexOf("features/deposit-details-workflow.js") <
-      html.indexOf("features/account-details-workflow.js"),
-  );
-  assert.ok(
     html.indexOf("features/account-maintenance.js") <
       html.indexOf("features/account-detail-actions-workflow.js"),
   );
   assert.ok(
     html.indexOf("features/account-detail-actions-workflow.js") <
-      html.indexOf("features/account-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/account-detail-content-workflow.js") <
-      html.indexOf("features/account-details-workflow.js"),
+      html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
@@ -483,26 +475,14 @@ test("the browser loads tested import and backup workflows before the app and pr
       html.indexOf("app.js"),
   );
   assert.ok(
-    html.indexOf("features/account-details.js") <
-      html.indexOf("features/account-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/account-history-details.js") <
-      html.indexOf("features/account-details-workflow.js"),
+    html.indexOf("features/account-detail-content-workflow.js") <
+      html.indexOf("app.js"),
   );
   assert.ok(
     html.indexOf("features/account-loan-schedule-view.js") <
       html.indexOf("features/account-details-view.js"),
   );
   assert.match(worker, /'\.\/features\/account-loan-schedule-view\.js'/);
-  assert.ok(
-    html.indexOf("features/account-detail-events.js") <
-      html.indexOf("features/account-details-workflow.js"),
-  );
-  assert.ok(
-    html.indexOf("features/account-details-workflow.js") <
-      html.indexOf("app.js"),
-  );
   assert.ok(html.indexOf("features/documents.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/backup-agreement-files.js") <
@@ -672,14 +652,13 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/account-history-view\.js'/);
   assert.match(worker, /'\.\/features\/deposit-details-model\.js'/);
   assert.match(worker, /'\.\/features\/deposit-details-view\.js'/);
-  assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/account-detail-actions-workflow\.js'/);
   assert.match(worker, /'\.\/features\/account-detail-content-workflow\.js'/);
   assert.match(worker, /'\.\/features\/deposit-details-workflow\.js'/);
   assert.match(worker, /'\.\/features\/transaction-list-model\.js'/);
   assert.match(worker, /'\.\/features\/transaction-summary-model\.js'/);
   assert.match(worker, /'\.\/features\/transaction-row-view\.js'/);
-  assert.match(worker, /'\.\/features\/account-details-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/account-detail-content-workflow\.js'/);
   assert.match(worker, /'\.\/features\/account-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/transaction-maintenance-workflow\.js'/);
   assert.match(worker, /'\.\/features\/document-upload-policy\.js'/);
