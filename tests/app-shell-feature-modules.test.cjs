@@ -166,16 +166,10 @@ test("theme controller loads before app startup and is precached", () => {
     /PropertyDeskTheme\.create\(\)/,
   );
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  const appShell = fs.readFileSync(
-    path.join(__dirname, "..", "features", "app-shell-workflow.js"),
-    "utf8",
-  );
-  assert.match(app, /PropertyDeskAppShellWorkflow\.create/);
+  assert.match(app, /PropertyDeskWorkspace\.create/);
+  assert.match(app, /PropertyDeskNavigation\.create/);
+  assert.doesNotMatch(app, /PropertyDeskAppShellWorkflow\.create/);
   assert.match(app, /attachThemeEvents,/);
-  assert.doesNotMatch(
-    appShell,
-    /PropertyDeskTheme\.create|previewReminderEmail/,
-  );
 });
 
 test("local browser scripts exist and are precached except runtime config", () => {

@@ -820,24 +820,18 @@ test("the browser loads tested import and backup workflows before the app and pr
     html.indexOf("features/reminder-preview.js") < html.indexOf("app.js"),
   );
   assert.ok(
-    html.indexOf("features/reminder-workflow.js") <
-      html.indexOf("features/app-shell-workflow.js"),
+    html.indexOf("features/reminder-workflow.js") < html.indexOf("app.js"),
   );
-  assert.ok(
-    html.indexOf("features/workspace.js") <
-      html.indexOf("features/app-shell-workflow.js"),
-  );
+  assert.ok(html.indexOf("features/workspace.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/reminder-activity-model.js") <
       html.indexOf("features/reminder-activity-view.js"),
   );
   assert.ok(
-    html.indexOf("features/reminder-activity-view.js") <
-      html.indexOf("features/app-shell-workflow.js"),
+    html.indexOf("features/reminder-activity-view.js") < html.indexOf("app.js"),
   );
-  assert.ok(
-    html.indexOf("features/app-shell-workflow.js") < html.indexOf("app.js"),
-  );
+  assert.doesNotMatch(html, /features\/app-shell-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/app-shell-workflow\.js/);
   assert.match(worker, /'\.\/import-workflows\.js'/);
   assert.match(worker, /'\.\/zip-utils\.js'/);
   assert.match(worker, /'\.\/features\/import-preview\.js'/);
