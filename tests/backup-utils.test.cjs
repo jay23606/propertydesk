@@ -1,36 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
 require("../workspace-table-catalog.js");
+require("../features/date-utils.js");
+require("../ledger-schedule-utils.js");
+require("../loan-amortization-utils.js");
 const { createBackup } = require("../backup-utils.js");
-const dateUtils = require("../features/date-utils.js");
-const scheduleFactory = require("../ledger-schedule-utils.js");
-const loanAmortizationFactory = require("../loan-amortization-utils.js");
 const ledgerUtils = require("../ledger-utils.js");
-const scheduleUtils = scheduleFactory.create({
-  isPosted: ledgerUtils.isPosted,
-});
-const loanUtils = loanAmortizationFactory.create({
-  sumPosted: ledgerUtils.sumPosted,
-});
-const {
-  amountDueSince,
-  amortizationSchedule,
-  hasPostedPaymentInMonth,
-  isPosted,
-  monthlyScheduledEstimate,
-  paymentStatusInMonth,
-  postedOnOrAfter,
-  postedPaymentTotalInMonth,
-  principalBalance,
-  scheduledLoanBalance,
-  securityDepositBalance,
-  sumIncome,
-  sumOperatingExpenses,
-  sumPosted,
-  unpaidDueAccrualStart,
-} = ledgerUtils;
 
 test("backup manifest generation stays separate from ledger calculations", () => {
   assert.equal(typeof createBackup, "function");

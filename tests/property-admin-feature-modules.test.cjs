@@ -1,6 +1,5 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadWorkspaceFeatures } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");

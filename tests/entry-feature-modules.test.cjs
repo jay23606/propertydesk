@@ -2,7 +2,6 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
-const vm = require("node:vm");
 
 test("app root wires record entry forms and create actions directly", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");

@@ -15,11 +15,11 @@ module.exports = [
     },
   },
   {
-    files: ["eslint.config.js"],
+    files: ["eslint.config.js", "*.cjs", "**/*.cjs"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "commonjs",
-      globals: globals.node,
+      globals: { ...globals.node, ...globals.browser },
     },
     rules: {
       "no-undef": "error",

@@ -3,26 +3,10 @@ const test = require("node:test");
 const {
   loadLedgerEntryForms,
   loadPropertyAndAccountForms,
-  formElements,
 } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function captureFormSubmissions(getElement, formIds) {
-  const handlers = new Map();
-  const $ = (id) => {
-    const element = getElement(id);
-    if (typeof element.addEventListener !== "function")
-      element.addEventListener = () => {};
-    if (formIds.includes(id))
-      element.addEventListener = (event, handler) => {
-        if (event === "submit") handlers.set(`${id}:${event}`, handler);
-      };
-    return element;
-  };
-  return { $, handlers };
-}
 
 test("record-entry feature owns form event bindings and category hints", () => {
   const context = vm.createContext({ window: {} });

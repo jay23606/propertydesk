@@ -1,8 +1,6 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 const { loadAuthFeatures } = require("./feature-test-helpers.cjs");
-const fs = require("node:fs");
-const path = require("node:path");
 const vm = require("node:vm");
 
 test("password recovery saves the new password before resuming workspace access", async () => {

@@ -250,7 +250,7 @@ test("transaction import workflow shares file staging and batch commit wiring", 
     stage: (options) => staged.push(options),
   };
   const commitTransactions = (options) => commitCalls.push(options);
-  const workflow = context.window.PropertyDeskTransactionImportWorkflow.create({
+  context.window.PropertyDeskTransactionImportWorkflow.create({
     $: (id) => id,
     parseCSV: () => [],
     importReview,
