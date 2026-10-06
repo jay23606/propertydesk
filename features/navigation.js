@@ -41,5 +41,5 @@
     return { navigate, attachEvents };
   }
 
-  window.PropertyDeskNavigation = { create };
+  window.PropertyDeskNavigation = Object.freeze({ create });
 })();

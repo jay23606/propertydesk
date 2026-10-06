@@ -134,5 +134,5 @@
     return { attachEvents };
   }
 
-  window.PropertyDeskBackupExport = { create };
+  window.PropertyDeskBackupExport = Object.freeze({ create });
 })();

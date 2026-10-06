@@ -72,5 +72,5 @@
     };
   }
 
-  window.PropertyDeskAuth = { create };
+  window.PropertyDeskAuth = Object.freeze({ create });
 })();

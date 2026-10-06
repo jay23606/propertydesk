@@ -199,5 +199,5 @@
     };
   }
 
-  window.PropertyDeskDocuments = { create };
+  window.PropertyDeskDocuments = Object.freeze({ create });
 })();

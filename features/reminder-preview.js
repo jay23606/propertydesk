@@ -82,5 +82,5 @@
     return { previewReminderEmail };
   }
 
-  window.PropertyDeskReminderPreview = { create };
+  window.PropertyDeskReminderPreview = Object.freeze({ create });
 })();

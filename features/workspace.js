@@ -45,5 +45,5 @@
     };
   }
 
-  window.PropertyDeskWorkspace = { create };
+  window.PropertyDeskWorkspace = Object.freeze({ create });
 })();

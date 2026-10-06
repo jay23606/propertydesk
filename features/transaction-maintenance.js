@@ -62,5 +62,5 @@
     return { voidTransaction };
   }
 
-  window.PropertyDeskTransactionMaintenance = { create };
+  window.PropertyDeskTransactionMaintenance = Object.freeze({ create });
 })();

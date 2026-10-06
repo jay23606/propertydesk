@@ -43,5 +43,5 @@
     return { closeAccount };
   }
 
-  window.PropertyDeskAccountMaintenance = { create };
+  window.PropertyDeskAccountMaintenance = Object.freeze({ create });
 })();

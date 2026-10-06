@@ -65,5 +65,5 @@
     return { recordDepositAdjustment };
   }
 
-  window.PropertyDeskDepositMaintenance = { create };
+  window.PropertyDeskDepositMaintenance = Object.freeze({ create });
 })();
