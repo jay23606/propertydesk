@@ -4,6 +4,8 @@
 
   function createPropertyForm({ $, state, toast, closeModal, fetchAll }) {
     const formView = window.PropertyDeskPropertyFormView.create({ $ });
+    const { saveProperty: persistProperty } =
+      window.PropertyDeskPropertyMaintenance.create({ state, toast });
 
     async function saveProperty(event) {
       event.preventDefault();
@@ -12,22 +14,7 @@
         user_id: state.workspaceOwnerId,
         ...values,
       };
-      const query = id
-        ? state.client.from("pd_properties").update(payload).eq("id", id)
-        : state.client.from("pd_properties").insert(payload);
-      let error;
-      try {
-        ({ error } = await query);
-      } catch {
-        toast(
-          "Property couldn't be saved right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      if (!(await persistProperty(payload, id))) return;
       closeModal($("property-modal"));
       formView.resetPropertyForm();
       try {

@@ -1,8 +1,28 @@
-/* PropertyDesk account closure and history-preservation workflow. */
+/* Persist account changes and preserve closed accounts for history. */
 (() => {
   "use strict";
 
   function create({ state, toast, fetchAll, closeAccountDetails }) {
+    async function saveAccount(payload, accountId) {
+      let error;
+      try {
+        const query = accountId
+          ? state.client.from("pd_accounts").update(payload).eq("id", accountId)
+          : state.client.from("pd_accounts").insert(payload);
+        ({ error } = await query);
+      } catch {
+        toast(
+          "Account couldn't be saved right now. Check your connection and try again.",
+        );
+        return false;
+      }
+      if (error) {
+        toast(error.message);
+        return false;
+      }
+      return true;
+    }
+
     async function saveCloseAccount(account) {
       let error;
       try {
@@ -27,7 +47,7 @@
       toast("Account closed");
     }
 
-    return { saveCloseAccount };
+    return { saveAccount, saveCloseAccount };
   }
 
   window.PropertyDeskAccountMaintenance = Object.freeze({ create });

@@ -23,6 +23,8 @@
       populateFormOptions,
       openModal,
     });
+    const { saveAccount: persistAccount } =
+      window.PropertyDeskAccountMaintenance.create({ state, toast });
     const { resetAccountForm, readValues, editAccount } = formView;
 
     async function saveAccount(event) {
@@ -65,22 +67,7 @@
         },
         moneyInput,
       );
-      const query = form.id
-        ? state.client.from("pd_accounts").update(payload).eq("id", form.id)
-        : state.client.from("pd_accounts").insert(payload);
-      let error;
-      try {
-        ({ error } = await query);
-      } catch {
-        toast(
-          "Account couldn't be saved right now. Check your connection and try again.",
-        );
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      if (!(await persistAccount(payload, form.id))) return;
       closeModal($("account-modal"));
       resetAccountForm();
       try {

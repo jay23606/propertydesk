@@ -56,6 +56,97 @@ test("property and account form modules expose separate APIs", () => {
   ]);
 });
 
+test("property and account maintenance save inserts and updates to their own tables", async () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
+  const writes = [];
+  const state = {
+    client: {
+      from(table) {
+        return {
+          insert(payload) {
+            writes.push({ operation: "insert", table, payload });
+            return Promise.resolve({ error: null });
+          },
+          update(payload) {
+            return {
+              async eq(column, value) {
+                writes.push({
+                  operation: "update",
+                  table,
+                  payload,
+                  column,
+                  value,
+                });
+                return { error: null };
+              },
+            };
+          },
+        };
+      },
+    },
+  };
+  const messages = [];
+  const property = context.window.PropertyDeskPropertyMaintenance.create({
+    state,
+    toast: (message) => messages.push(message),
+  });
+  const account = context.window.PropertyDeskAccountMaintenance.create({
+    state,
+    toast: (message) => messages.push(message),
+  });
+
+  assert.equal(
+    await property.saveProperty({ user_id: "workspace-1", name: "Home" }),
+    true,
+  );
+  assert.equal(
+    await property.saveProperty(
+      { user_id: "workspace-1", name: "Updated" },
+      "property-1",
+    ),
+    true,
+  );
+  assert.equal(
+    await account.saveAccount({ user_id: "workspace-1", name: "Note" }),
+    true,
+  );
+  assert.equal(
+    await account.saveAccount(
+      { user_id: "workspace-1", name: "Updated note" },
+      "account-1",
+    ),
+    true,
+  );
+  assert.deepEqual(JSON.parse(JSON.stringify(writes)), [
+    {
+      operation: "insert",
+      table: "pd_properties",
+      payload: { user_id: "workspace-1", name: "Home" },
+    },
+    {
+      operation: "update",
+      table: "pd_properties",
+      payload: { user_id: "workspace-1", name: "Updated" },
+      column: "id",
+      value: "property-1",
+    },
+    {
+      operation: "insert",
+      table: "pd_accounts",
+      payload: { user_id: "workspace-1", name: "Note" },
+    },
+    {
+      operation: "update",
+      table: "pd_accounts",
+      payload: { user_id: "workspace-1", name: "Updated note" },
+      column: "id",
+      value: "account-1",
+    },
+  ]);
+  assert.deepEqual(messages, []);
+});
+
 test("property form view reads normalized values, resets the form, and binds submit", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);

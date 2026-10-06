@@ -98,7 +98,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/account-close-entry.js") <
-      html.indexOf("features/account-maintenance.js"),
+      html.indexOf("features/account-detail-actions-workflow.js"),
   );
   assert.ok(
     html.indexOf("features/account-maintenance.js") <
@@ -292,6 +292,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/property-form-view.js") <
+      html.indexOf("features/property-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/property-maintenance.js") <
       html.indexOf("features/property-form.js"),
   );
   assert.ok(html.indexOf("features/property-form.js") < html.indexOf("app.js"));
@@ -301,6 +305,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/account-form-view.js") <
+      html.indexOf("features/account-form.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-maintenance.js") <
       html.indexOf("features/account-form.js"),
   );
   assert.ok(html.indexOf("features/account-form.js") < html.indexOf("app.js"));
@@ -761,6 +769,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/app-services\.js'/);
   assert.match(worker, /'\.\/features\/property-form\.js'/);
   assert.match(worker, /'\.\/features\/property-form-view\.js'/);
+  assert.match(worker, /'\.\/features\/property-maintenance\.js'/);
   assert.match(worker, /'\.\/features\/account-form\.js'/);
   assert.match(worker, /'\.\/features\/account-form-view\.js'/);
   assert.match(worker, /'\.\/features\/payment-entry-form\.js'/);
