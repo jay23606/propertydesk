@@ -3,24 +3,14 @@
   "use strict";
 
   function createPropertyForm({ $, state, toast, closeModal, fetchAll }) {
-    function resetPropertyForm() {
-      $("property-form").reset();
-      $("property-id").value = "";
-      $("property-modal-title").textContent = "Add property";
-    }
+    const formView = window.PropertyDeskPropertyFormView.create({ $ });
 
     async function saveProperty(event) {
       event.preventDefault();
-      const id = $("property-id").value;
+      const { id, ...values } = formView.readValues();
       const payload = {
         user_id: state.workspaceOwnerId,
-        name: $("property-name").value.trim(),
-        address: $("property-address").value.trim(),
-        city: $("property-city").value.trim() || null,
-        state: $("property-state").value.trim().toUpperCase() || null,
-        postal_code: $("property-zip").value.trim() || null,
-        property_kind: $("property-kind").value,
-        notes: $("property-notes").value.trim() || null,
+        ...values,
       };
       const query = id
         ? state.client.from("pd_properties").update(payload).eq("id", id)
@@ -39,7 +29,7 @@
         return;
       }
       closeModal($("property-modal"));
-      resetPropertyForm();
+      formView.resetPropertyForm();
       try {
         await fetchAll();
       } catch {
@@ -48,11 +38,10 @@
       toast(id ? "Property updated" : "Property added");
     }
 
-    function attachEvents() {
-      $("property-form").addEventListener("submit", saveProperty);
-    }
-
-    return { resetPropertyForm, attachEvents };
+    return {
+      resetPropertyForm: formView.resetPropertyForm,
+      attachEvents: () => formView.attachEvents(saveProperty),
+    };
   }
 
   window.PropertyDeskPropertyForm = Object.freeze({

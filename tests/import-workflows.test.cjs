@@ -149,6 +149,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(
     html.indexOf("features/ledger-context.js") < html.indexOf("app.js"),
   );
+  assert.ok(
+    html.indexOf("features/property-form-view.js") <
+      html.indexOf("features/property-form.js"),
+  );
   assert.ok(html.indexOf("features/property-form.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/account-payload.js") <
@@ -528,6 +532,7 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.match(worker, /'\.\/features\/ledger-context\.js'/);
   assert.match(worker, /'\.\/features\/app-services\.js'/);
   assert.match(worker, /'\.\/features\/property-form\.js'/);
+  assert.match(worker, /'\.\/features\/property-form-view\.js'/);
   assert.match(worker, /'\.\/features\/account-form\.js'/);
   assert.match(worker, /'\.\/features\/account-form-view\.js'/);
   assert.match(worker, /'\.\/features\/payment-entry-form\.js'/);

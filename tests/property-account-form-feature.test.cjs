@@ -37,6 +37,45 @@ test("property and account form modules expose separate APIs", () => {
   ]);
 });
 
+test("property form view reads normalized values, resets the form, and binds submit", () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
+  const elements = formElements({
+    "property-id": "property-1",
+    "property-name": "  House  ",
+    "property-address": "  10 Main St  ",
+    "property-city": "  Altoona  ",
+    "property-state": " pa ",
+    "property-zip": " 16601 ",
+    "property-kind": "residential",
+    "property-notes": "  Notes  ",
+  });
+  const handlers = new Map();
+  elements("property-form").addEventListener = (event, handler) =>
+    handlers.set(event, handler);
+  const view = context.window.PropertyDeskPropertyFormView.create({
+    $: elements,
+  });
+
+  assert.deepEqual(JSON.parse(JSON.stringify(view.readValues())), {
+    id: "property-1",
+    name: "House",
+    address: "10 Main St",
+    city: "Altoona",
+    state: "PA",
+    postal_code: "16601",
+    property_kind: "residential",
+    notes: "Notes",
+  });
+  const save = () => {};
+  view.attachEvents(save);
+  assert.equal(handlers.get("submit"), save);
+
+  view.resetPropertyForm();
+  assert.equal(elements("property-id").value, "");
+  assert.equal(elements("property-modal-title").textContent, "Add property");
+});
+
 test("account form view resets and populates fields without owning persistence", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
