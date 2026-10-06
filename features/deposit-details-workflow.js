@@ -15,7 +15,7 @@
       toast,
       fetchAll,
     } = context;
-    const { depositSectionHTML } = window.PropertyDeskDepositWorkflow.create({
+    const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
       state,
       depositLedger,
       money,

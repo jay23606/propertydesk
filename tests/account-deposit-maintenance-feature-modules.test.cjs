@@ -4,42 +4,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("deposit workflow composes only its read-only ledger view", () => {
-  const passed = {};
-  const depositSectionHTML = () => "deposit HTML";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDepositDetails: {
-        create: (dependencies) => {
-          passed.view = dependencies;
-          return { depositSectionHTML };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "deposit-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    state: {},
-    depositLedger: () => [],
-    money: () => "$0.00",
-    fmtDate: () => "Oct 1",
-    esc: String,
-  };
-
-  const workflow =
-    context.window.PropertyDeskDepositWorkflow.create(dependencies);
-
-  assert.equal(passed.view.depositLedger, dependencies.depositLedger);
-  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
-  assert.deepEqual(Object.keys(workflow), ["depositSectionHTML"]);
-});
-
 test("deposit details workflow composes the view, maintenance, and action router", () => {
   const passed = {};
   const depositSectionHTML = () => "deposit HTML";
@@ -47,7 +11,7 @@ test("deposit details workflow composes the view, maintenance, and action router
   let attached = 0;
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositWorkflow: {
+      PropertyDeskDepositDetails: {
         create: (options) => {
           passed.view = options;
           return { depositSectionHTML };
