@@ -27,22 +27,23 @@
         closeModal,
         toast,
       });
-    const importFeature = window.PropertyDeskImportFeature.create({
-      $,
-      state,
-      stageImport: preview.stageImport,
-      parseCSV,
-      validateAccountRows,
-      validatePaymentRows,
-      validateExpenseRows,
-      todayIso,
-      fetchAll,
-      toast,
-    });
+    const { attachEvents: attachImportEvents } =
+      window.PropertyDeskImportFeature.create({
+        $,
+        state,
+        stageImport: preview.stageImport,
+        parseCSV,
+        validateAccountRows,
+        validatePaymentRows,
+        validateExpenseRows,
+        todayIso,
+        fetchAll,
+        toast,
+      });
 
     function attachEvents() {
       attachPreviewEvents();
-      importFeature.attachEvents();
+      attachImportEvents();
     }
 
     return { attachEvents };

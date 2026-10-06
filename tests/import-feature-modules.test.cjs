@@ -418,6 +418,12 @@ test("CSV import workflow stages preview before attaching review and file handle
     passed.previewEvents.renderImportPreview instanceof Function,
     true,
   );
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "csv-import-workflow.js"),
+    "utf8",
+  );
+  assert.match(source, /attachEvents: attachImportEvents/);
+  assert.doesNotMatch(source, /importFeature\./);
 });
 
 test("payment and expense CSV importers save their own validated transaction payloads", async () => {
