@@ -5,7 +5,26 @@ const path = require("node:path");
 const vm = require("node:vm");
 test("app composes the Properties grid and action workflows explicitly", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  const order = [
+    "PropertyDeskPropertyPortfolioTable.create(",
+    "PropertyDeskPropertyPortfolioAccountRowModel.create(",
+    "PropertyDeskPropertyPortfolioModel.create(",
+    "PropertyDeskPropertyViews.create(",
+    "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
+  ].map((marker) => app.indexOf(marker));
+  assert.ok(order.every((position) => position >= 0));
+  assert.deepEqual(
+    order,
+    [...order].sort((left, right) => left - right),
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyPortfolioModel.create\(\{\s*state,\s*accountRowModel: portfolioAccountRowModel,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyViews.create\(\{\s*\$,\s*state,\s*esc,\s*portfolioTable,\s*portfolioModel,/,
+  );
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
   assert.match(
     app,
@@ -353,83 +372,6 @@ test("property portfolio indexes accounts and holders once per grid build", () =
     ["account-1"],
   );
   assert.deepEqual(iterations, { properties: 2, accounts: 2, holders: 2 });
-});
-
-test("property portfolio workflow connects its filter model and read view", () => {
-  const passed = {};
-  const action = () => {};
-  let attached = 0;
-  const state = {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskPropertyPortfolioTable: {
-        create: (options) => {
-          passed.tableOptions = options;
-          return "table";
-        },
-      },
-      PropertyDeskPropertyPortfolioAccountRowModel: {
-        create: (options) => {
-          passed.accountRowOptions = options;
-          return "account rows";
-        },
-      },
-      PropertyDeskPropertyPortfolioModel: {
-        create: (options) => {
-          passed.modelOptions = options;
-          return "model";
-        },
-      },
-      PropertyDeskPropertyViews: {
-        create: (options) => {
-          passed.viewOptions = options;
-          return {
-            renderProperties: () => "properties",
-            attachEvents: () => attached++,
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-portfolio-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
-    state,
-    esc: action,
-    money: action,
-    paymentFrequencyLabel: action,
-    monthlyScheduledEstimate: action,
-    accountBalance: action,
-    amountDueSince: action,
-    unpaidDueAccrualStart: action,
-    todayIso: action,
-    propertyAddress: action,
-    streetAddress: action,
-    monthStart: action,
-    dateOnly: action,
-    monthEnd: action,
-    lateReminderMailto: action,
-    paymentStatusInMonth: action,
-  });
-
-  assert.equal(passed.viewOptions.portfolioTable, "table");
-  assert.equal(passed.modelOptions.accountRowModel, "account rows");
-  assert.equal(passed.accountRowOptions.state, state);
-  assert.equal(passed.accountRowOptions.amountDueSince, action);
-  assert.equal(passed.viewOptions.portfolioModel, "model");
-  assert.equal(passed.modelOptions.streetAddress, action);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
-    "renderProperties",
-  ]);
-  assert.equal(workflow.renderProperties(), "properties");
-  workflow.attachEvents();
-  assert.equal(attached, 1);
 });
 
 test("property portfolio actions workflow owns quick-note and grid action routing", () => {

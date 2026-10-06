@@ -316,25 +316,40 @@
       openPropertyDetails,
       openPropertyPayment,
     });
-  const { renderProperties, attachEvents: attachPropertyGridEvents } =
-    window.PropertyDeskPropertyPortfolioWorkflow.create({
-      $,
+  const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
+    esc,
+    money,
+    paymentFrequencyLabel,
+  });
+  const portfolioAccountRowModel =
+    window.PropertyDeskPropertyPortfolioAccountRowModel.create({
       state,
-      esc,
-      money,
-      paymentFrequencyLabel,
       monthlyScheduledEstimate,
       accountBalance,
       amountDueSince,
       unpaidDueAccrualStart,
       todayIso,
       propertyAddress,
-      streetAddress,
       monthStart,
       dateOnly,
       monthEnd,
       lateReminderMailto,
       paymentStatusInMonth,
+      money,
+    });
+  const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
+    state,
+    accountRowModel: portfolioAccountRowModel,
+    propertyAddress,
+    streetAddress,
+  });
+  const { renderProperties, attachEvents: attachPropertyGridEvents } =
+    window.PropertyDeskPropertyViews.create({
+      $,
+      state,
+      esc,
+      portfolioTable,
+      portfolioModel,
     });
   const { attachEvents: attachPropertyActionEvents } =
     window.PropertyDeskPropertyPortfolioActionsWorkflow.create({

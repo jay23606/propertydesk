@@ -85,7 +85,10 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskOverviewModel\.create\(/);
   assert.match(app, /PropertyDeskOverview\.create\(/);
   assert.match(app, /PropertyDeskOverviewEvents\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioTable\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioAccountRowModel\.create\(/);
+  assert.match(app, /PropertyDeskPropertyPortfolioModel\.create\(/);
+  assert.match(app, /PropertyDeskPropertyViews\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioActionsWorkflow\.create\(/);
   assert.match(app, /function attachPropertyPortfolioEvents\(\)/);
   assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
@@ -147,7 +150,10 @@ test("app root composes independent property screens and shares detail actions",
     "PropertyDeskOverviewModel.create(",
     "PropertyDeskOverview.create(",
     "PropertyDeskOverviewEvents.create(",
-    "PropertyDeskPropertyPortfolioWorkflow.create(",
+    "PropertyDeskPropertyPortfolioTable.create(",
+    "PropertyDeskPropertyPortfolioAccountRowModel.create(",
+    "PropertyDeskPropertyPortfolioModel.create(",
+    "PropertyDeskPropertyViews.create(",
     "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
 
@@ -167,7 +173,10 @@ test("app root composes independent property screens and shares detail actions",
     "features/overview-model.js",
     "features/overview.js",
     "features/overview-events.js",
-    "features/property-portfolio-workflow.js",
+    "features/property-portfolio-table.js",
+    "features/property-portfolio-account-row-model.js",
+    "features/property-portfolio-model.js",
+    "features/property-views.js",
     "features/property-portfolio-actions-workflow.js",
   ]) {
     assert.ok(
