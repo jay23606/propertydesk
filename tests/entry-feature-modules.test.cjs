@@ -85,6 +85,7 @@ test("app coordinator passes the amortization helper into account details", () =
     /window\.PropertyDeskTransaction(?:Views|MaintenanceWorkflow)\.create\(/,
   );
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
+  assert.doesNotMatch(app, /window\.PropertyDeskDepositWorkflow\.create\(/);
   assert.match(app, /window\.PropertyDeskAccountDetailsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
@@ -135,7 +136,7 @@ test("app coordinator creates cross-linked property views after their actions", 
   );
 });
 
-test("account details workflow composes account details, history, and account maintenance", () => {
+test("account details workflow composes its deposit, history, and maintenance features", () => {
   const created = [];
   const passed = {};
   const closeAccount = () => "closed";
@@ -143,6 +144,16 @@ test("account details workflow composes account details, history, and account ma
   let depositAttached = 0;
   const context = vm.createContext({
     window: {
+      PropertyDeskDepositWorkflow: {
+        create: (options) => {
+          created.push("deposit workflow");
+          passed.deposit = options;
+          return {
+            depositSectionHTML,
+            attachEvents: () => depositAttached++,
+          };
+        },
+      },
       PropertyDeskAccountMaintenance: {
         create: (options) => {
           created.push("account maintenance");
@@ -200,11 +211,11 @@ test("account details workflow composes account details, history, and account ma
     state: {},
     money: () => 0,
     fmtDate: () => "",
+    moneyInput: Number,
+    depositLedger: () => [],
     esc: String,
     toast() {},
     fetchAll() {},
-    depositSectionHTML,
-    attachDepositEvents: () => depositAttached++,
     prettyType: String,
     paymentFrequencyLabel: () => "monthly",
     closeModal() {},
@@ -214,6 +225,7 @@ test("account details workflow composes account details, history, and account ma
     context.window.PropertyDeskAccountDetailsWorkflow.create(dependencies);
 
   assert.deepEqual(created, [
+    "deposit workflow",
     "account maintenance",
     "schedule view",
     "account view",
@@ -228,6 +240,8 @@ test("account details workflow composes account details, history, and account ma
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.closeModal, dependencies.closeModal);
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
+  assert.equal(passed.deposit.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.deposit.moneyInput, dependencies.moneyInput);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachEvents",
     "openAccountDetails",

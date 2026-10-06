@@ -46,6 +46,10 @@ test("the browser loads tested import and backup workflows before the app and pr
   assert.ok(html.indexOf("features/app-state.js") < html.indexOf("app.js"));
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf("app.js"));
   assert.ok(
+    html.indexOf("features/deposit-workflow.js") <
+      html.indexOf("features/account-details-workflow.js"),
+  );
+  assert.ok(
     html.indexOf("features/record-entry-workflow.js") < html.indexOf("app.js"),
   );
   assert.ok(
