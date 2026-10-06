@@ -99,7 +99,7 @@ test("deposit details workflow composes the view, maintenance, and action router
   assert.equal(attached, 1);
 });
 
-test("account maintenance workflow composes account closure with detail actions", () => {
+test("account detail actions workflow composes account closure with edit and payment routing", () => {
   const passed = {};
   const closeAccount = () => "closed";
   let attached = 0;
@@ -121,7 +121,12 @@ test("account maintenance workflow composes account closure with detail actions"
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-maintenance-workflow.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "account-detail-actions-workflow.js",
+      ),
       "utf8",
     ),
     context,
@@ -136,7 +141,9 @@ test("account maintenance workflow composes account closure with detail actions"
     openPayment() {},
   };
   const workflow =
-    context.window.PropertyDeskAccountMaintenanceWorkflow.create(dependencies);
+    context.window.PropertyDeskAccountDetailActionsWorkflow.create(
+      dependencies,
+    );
 
   assert.equal(passed.maintenance.state, dependencies.state);
   assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);

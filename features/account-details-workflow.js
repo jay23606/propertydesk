@@ -40,7 +40,7 @@
       fetchAll,
     });
     const accountMaintenance =
-      window.PropertyDeskAccountMaintenanceWorkflow.create({
+      window.PropertyDeskAccountDetailActionsWorkflow.create({
         $,
         state,
         toast,

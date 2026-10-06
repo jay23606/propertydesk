@@ -168,7 +168,7 @@ test("account details delegates account and deposit actions to separate workflow
           };
         },
       },
-      PropertyDeskAccountMaintenanceWorkflow: {
+      PropertyDeskAccountDetailActionsWorkflow: {
         create: (options) => {
           created.push("account maintenance workflow");
           passed.accountMaintenance = options;
