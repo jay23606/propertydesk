@@ -95,6 +95,7 @@ test("property and account maintenance save inserts and updates to their own tab
     state,
     toast: (message) => messages.push(message),
   });
+  assert.deepEqual(Object.keys(account), ["saveAccount"]);
 
   assert.equal(
     await property.saveProperty({ user_id: "workspace-1", name: "Home" }),

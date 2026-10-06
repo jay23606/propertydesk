@@ -84,7 +84,7 @@ test("account detail actions workflow composes account closure with edit and pay
   const modalCloses = [];
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountMaintenance: {
+      PropertyDeskAccountCloseMaintenance: {
         create: (options) => {
           passed.maintenance = options;
           return { saveCloseAccount };
@@ -607,7 +607,7 @@ test("deposit adjustment entry validates the amount before asking for an audit r
   ]);
 });
 
-test("account maintenance closes an account while preserving its history", async () => {
+test("account close maintenance preserves the account history", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -625,7 +625,7 @@ test("account maintenance closes an account while preserving its history", async
   );
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-maintenance.js"),
+      path.join(__dirname, "..", "features", "account-close-maintenance.js"),
       "utf8",
     ),
     context,
@@ -650,7 +650,7 @@ test("account maintenance closes an account while preserving its history", async
       },
     },
   };
-  const feature = context.window.PropertyDeskAccountMaintenance.create({
+  const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
     closeAccountDetails: () => calls.push(["close-details"]),
     fetchAll: async () => calls.push("refresh"),
@@ -666,7 +666,7 @@ test("account maintenance closes an account while preserving its history", async
   assert.equal(messages.at(-1), "Account closed");
 });
 
-test("account maintenance reports rejected requests and skips success actions", async () => {
+test("account close maintenance reports rejected requests without closing details", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -684,14 +684,14 @@ test("account maintenance reports rejected requests and skips success actions", 
   );
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-maintenance.js"),
+      path.join(__dirname, "..", "features", "account-close-maintenance.js"),
       "utf8",
     ),
     context,
   );
   const calls = [];
   const messages = [];
-  const feature = context.window.PropertyDeskAccountMaintenance.create({
+  const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state: {
       client: {
         from: () => ({

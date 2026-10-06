@@ -1,12 +1,10 @@
-/* Persist account changes and preserve closed accounts for history. */
+/* Persist account form changes without owning detail-page actions. */
 (() => {
   "use strict";
 
   function create({
     state,
     toast,
-    fetchAll,
-    closeAccountDetails,
     repository = window.PropertyDeskAccountRepository,
   }) {
     async function saveAccount(payload, accountId) {
@@ -26,28 +24,7 @@
       return true;
     }
 
-    async function saveCloseAccount(account) {
-      let error;
-      try {
-        ({ error } = await repository.close(state.client, account.id));
-      } catch {
-        toast("Account couldn't be closed right now. Please try again.");
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
-      closeAccountDetails();
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast("Account closed");
-    }
-
-    return { saveAccount, saveCloseAccount };
+    return { saveAccount };
   }
 
   window.PropertyDeskAccountMaintenance = Object.freeze({ create });

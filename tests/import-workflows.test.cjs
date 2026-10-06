@@ -172,12 +172,17 @@ test("the browser loads tested import and backup workflows before the app and pr
   );
   assert.ok(
     html.indexOf("features/account-close-entry.js") <
-      html.indexOf("features/account-detail-actions-workflow.js"),
+      html.indexOf("features/account-close-maintenance.js"),
   );
   assert.ok(
-    html.indexOf("features/account-maintenance.js") <
+    html.indexOf("features/account-repository.js") <
+      html.indexOf("features/account-close-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/account-close-maintenance.js") <
       html.indexOf("features/account-detail-actions-workflow.js"),
   );
+  assert.match(worker, /'\.\/features\/account-close-maintenance\.js'/);
   assert.ok(
     html.indexOf("features/account-detail-actions-workflow.js") <
       html.indexOf("app.js"),
