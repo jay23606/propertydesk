@@ -76,7 +76,6 @@
     },
     amountDueSince,
     unpaidDueAccrualStart,
-    todayIso,
   });
   const {
     accountBalance,

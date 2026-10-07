@@ -7,7 +7,8 @@ const vm = require("node:vm");
 test("workspace financial context shares state with ledger and deposit models", () => {
   const calls = [];
   const state = { accounts: [] };
-  const ledgerOptions = { todayIso() {}, scheduledLoanBalance() {} };
+  const todayIso = () => "2026-10-07";
+  const ledgerOptions = { todayIso, scheduledLoanBalance() {} };
   const depositOptions = { securityDepositBalance() {} };
   const accountBalance = () => 42;
   const depositLedger = () => ({ active: [] });
@@ -15,7 +16,6 @@ test("workspace financial context shares state with ledger and deposit models", 
   const accountSummaryOptions = {
     amountDueSince() {},
     unpaidDueAccrualStart() {},
-    todayIso() {},
   };
   let capturedAccountSummaryOptions;
   const context = vm.createContext({
@@ -79,10 +79,7 @@ test("workspace financial context shares state with ledger and deposit models", 
     capturedAccountSummaryOptions.unpaidDueAccrualStart,
     accountSummaryOptions.unpaidDueAccrualStart,
   );
-  assert.equal(
-    capturedAccountSummaryOptions.todayIso,
-    accountSummaryOptions.todayIso,
-  );
+  assert.equal(capturedAccountSummaryOptions.todayIso, todayIso);
   assert.equal(workflow.summarizeAccount, summarizeAccount);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "accountBalance",

@@ -8,7 +8,6 @@
     deposit,
     amountDueSince,
     unpaidDueAccrualStart,
-    todayIso,
   }) {
     const ledgerContext = window.PropertyDeskLedgerContext.create({
       state,
@@ -23,7 +22,7 @@
       accountBalance: ledgerContext.accountBalance,
       amountDueSince,
       unpaidDueAccrualStart,
-      todayIso,
+      todayIso: ledger.todayIso,
     });
 
     return {
