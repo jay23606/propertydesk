@@ -35,18 +35,17 @@ test("transaction history workflow exposes view rendering and filters", () => {
   assert.equal(workflow.attachTransactionViewEvents, attachEvents);
 });
 
-test("ledger entry workflow no longer owns transaction history", () => {
+test("app composes transaction history separately from record entry", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const ledgerWorkflow = fs.readFileSync(
-    path.join(root, "features", "ledger-workflow.js"),
-    "utf8",
-  );
 
   assert.match(app, /PropertyDeskTransactionHistoryWorkflow\.create\(/);
-  assert.doesNotMatch(ledgerWorkflow, /PropertyDeskTransactionViews/);
+  assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
+  assert.doesNotMatch(html, /features\/ledger-workflow\.js/);
+  assert.doesNotMatch(worker, /features\/ledger-workflow\.js/);
   assert.ok(
     html.indexOf("features/transaction-views.js") <
       html.indexOf("features/transaction-history-workflow.js") &&

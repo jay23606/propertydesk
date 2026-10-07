@@ -126,7 +126,14 @@
     attachProfileEvents,
     attachWorkspaceMemberEvents,
   } = appShell;
-  const recordEntry = window.PropertyDeskLedgerWorkflow.create({
+  const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
+    $,
+    state,
+    toast,
+    fetchAll,
+    closeModal,
+  });
+  const recordEntry = window.PropertyDeskRecordEntryWorkflow.create({
     $,
     state,
     moneyInput,
@@ -139,15 +146,7 @@
     prettyType,
     openModal,
     previewReminderEmail,
-    dateOnly,
-    fmtDate,
-    esc,
-    expenseCategoryLabel,
-    money,
-    postedOnOrAfter,
-    monthStart,
-    sumIncome,
-    sumOperatingExpenses,
+    saveCorrection,
   });
   const {
     editAccount,

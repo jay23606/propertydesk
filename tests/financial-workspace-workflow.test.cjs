@@ -19,7 +19,8 @@ test("app root composes financial screens and maintenance boundaries directly", 
     "features/account-detail-content-workflow.js",
   ];
   const creationOrder = [
-    "PropertyDeskLedgerWorkflow.create(",
+    "PropertyDeskTransactionCorrections.create(",
+    "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskTransactionHistoryWorkflow.create(",
     "PropertyDeskCreateActions.create(",
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
