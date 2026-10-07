@@ -114,18 +114,71 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   assert.equal(actions.attachEvents, attachEvents);
 });
 
-test("account and deposit coordinator wires entry actions to workspace details", () => {
+test("deposit adjustment workflow wires only deposit concerns", () => {
   const passed = {};
-  const repository = { close() {} };
-  const depositRepository = { insert() {} };
+  const repository = { insert() {} };
   const prepareAdjustment = () => ({ status: "ready", payload: {} });
   const validateAdjustment = () => ({ status: "ready" });
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
   const attachDepositEvents = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositMaintenance: {
+        create: (options) => {
+          passed.maintenance = options;
+          return { saveDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositAdjustmentEntry: {
+        create: (options) => {
+          passed.entry = options;
+          return { recordDepositAdjustment };
+        },
+      },
+      PropertyDeskDepositDetailEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: attachDepositEvents };
+        },
+      },
+    },
+  });
+  loadWorkflow(context, "deposit-adjustment-workflow.js");
+  const dependencies = {
+    $() {},
+    state: {},
+    todayIso() {},
+    toast() {},
+    fetchAll() {},
+    depositSectionHTML() {},
+    moneyInput() {},
+    repository,
+    prepareAdjustment,
+    validateAdjustment,
+  };
+  const workflow =
+    context.window.PropertyDeskDepositAdjustmentWorkflow.create(dependencies);
+
+  assert.equal(passed.maintenance.repository, repository);
+  assert.equal(passed.maintenance.prepareAdjustment, prepareAdjustment);
+  assert.equal(passed.entry.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.entry.validateAdjustment, validateAdjustment);
+  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
+  assert.equal(
+    passed.events.depositSectionHTML,
+    dependencies.depositSectionHTML,
+  );
+  assert.equal(workflow.attachDepositEvents, attachDepositEvents);
+  assert.deepEqual(Object.keys(workflow), ["attachDepositEvents"]);
+});
+
+test("account detail action workflow wires only account close concerns", () => {
+  const passed = {};
+  const repository = { close() {} };
   const saveCloseAccount = () => {};
   const closeAccount = () => {};
-  const attachAccountDetailActionEvents = () => {};
+  const attachEvents = () => {};
   const elements = new Map();
   const $ = (id) => {
     elements.set(id, { id });
@@ -134,95 +187,47 @@ test("account and deposit coordinator wires entry actions to workspace details",
   const closeModal = (element) => (passed.closedModal = element);
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositMaintenance: {
-        create: (options) => {
-          passed.depositMaintenance = options;
-          return { saveDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositAdjustmentEntry: {
-        create: (options) => {
-          passed.depositEntry = options;
-          return { recordDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          passed.depositEvents = options;
-          return { attachEvents: attachDepositEvents };
-        },
-      },
       PropertyDeskAccountCloseMaintenance: {
         create: (options) => {
-          passed.closeMaintenance = options;
+          passed.maintenance = options;
           return { saveCloseAccount };
         },
       },
       PropertyDeskAccountCloseEntry: {
         create: (options) => {
-          passed.closeEntry = options;
+          passed.entry = options;
           return { closeAccount };
         },
       },
       PropertyDeskAccountDetailEvents: {
         create: (options) => {
-          passed.accountEvents = options;
-          return { attachEvents: attachAccountDetailActionEvents };
+          passed.events = options;
+          return { attachEvents };
         },
       },
     },
   });
-  loadWorkflow(context, "account-deposit-maintenance-workflow.js");
-
+  loadWorkflow(context, "account-detail-action-workflow.js");
   const dependencies = {
     $,
     state: {},
-    todayIso() {},
     toast() {},
     fetchAll() {},
     closeModal,
     editAccount() {},
     openPayment() {},
-    depositSectionHTML() {},
-    moneyInput() {},
-    accountRepository: repository,
-    depositRepository,
-    prepareAdjustment,
-    validateAdjustment,
+    repository,
   };
   const workflow =
-    context.window.PropertyDeskAccountDepositMaintenanceWorkflow.create(
-      dependencies,
-    );
+    context.window.PropertyDeskAccountDetailActionWorkflow.create(dependencies);
 
-  assert.equal(passed.depositMaintenance.state, dependencies.state);
-  assert.equal(passed.depositMaintenance.repository, depositRepository);
-  assert.equal(passed.depositMaintenance.prepareAdjustment, prepareAdjustment);
-  assert.equal(
-    passed.depositEntry.saveDepositAdjustment,
-    saveDepositAdjustment,
-  );
-  assert.equal(passed.depositEntry.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.depositEntry.validateAdjustment, validateAdjustment);
-  assert.equal(
-    passed.depositEvents.recordDepositAdjustment,
-    recordDepositAdjustment,
-  );
-  assert.equal(passed.closeMaintenance.state, dependencies.state);
-  assert.equal(passed.closeMaintenance.repository, repository);
-  assert.equal(passed.closeEntry.saveCloseAccount, saveCloseAccount);
-  assert.equal(passed.accountEvents.closeAccount, closeAccount);
-  assert.equal(passed.accountEvents.editAccount, dependencies.editAccount);
-  assert.equal(workflow.attachDepositEvents, attachDepositEvents);
-  assert.equal(
-    workflow.attachAccountDetailActionEvents,
-    attachAccountDetailActionEvents,
-  );
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachAccountDetailActionEvents",
-    "attachDepositEvents",
-  ]);
-
-  passed.closeMaintenance.closeAccountDetails();
+  assert.equal(passed.maintenance.repository, repository);
+  assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
+  assert.equal(passed.entry.saveCloseAccount, saveCloseAccount);
+  assert.equal(passed.events.closeAccount, closeAccount);
+  assert.equal(passed.events.editAccount, dependencies.editAccount);
+  assert.equal(workflow.attachAccountDetailActionEvents, attachEvents);
+  assert.deepEqual(Object.keys(workflow), ["attachAccountDetailActionEvents"]);
+  passed.maintenance.closeAccountDetails();
   assert.equal(passed.closedModal, elements.get("detail-modal"));
 });

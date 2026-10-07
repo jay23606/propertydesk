@@ -116,7 +116,11 @@ test("browser feature scripts load after their dependencies", () => {
       "features/account-screen-workflow.js",
     ],
     [
-      "features/account-deposit-maintenance-workflow.js",
+      "features/account-detail-action-workflow.js",
+      "features/account-screen-workflow.js",
+    ],
+    [
+      "features/deposit-adjustment-workflow.js",
       "features/account-screen-workflow.js",
     ],
     ["features/report-model.js", "features/report-workflow.js"],
@@ -194,27 +198,27 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview-events.js", "features/imports.js"],
     [
       "features/account-detail-events.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/account-detail-action-workflow.js",
     ],
     [
       "features/account-close-entry.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/account-detail-action-workflow.js",
     ],
     [
       "features/account-close-maintenance.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/account-detail-action-workflow.js",
     ],
     [
       "features/deposit-adjustment-entry.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/deposit-adjustment-workflow.js",
     ],
     [
       "features/deposit-detail-events.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/deposit-adjustment-workflow.js",
     ],
     [
       "features/deposit-maintenance.js",
-      "features/account-deposit-maintenance-workflow.js",
+      "features/deposit-adjustment-workflow.js",
     ],
     [
       "features/transaction-corrections.js",
