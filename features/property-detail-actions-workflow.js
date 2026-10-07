@@ -1,4 +1,4 @@
-/* Compose property-detail administration and modal actions. */
+/* Compose property archive and modal actions. */
 (() => {
   "use strict";
 
@@ -17,18 +17,6 @@
       openAccountForProperty,
       openAccountDetails,
     } = context;
-    const { savePropertyHolders } =
-      window.PropertyDeskPropertyHolderManagement.create({
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-      });
-    const { attachEvents: attachPropertyHolderEvents } =
-      window.PropertyDeskPropertyHolderEvents.create({
-        $,
-        savePropertyHolders,
-      });
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
         state,
@@ -59,7 +47,6 @@
 
     return {
       attachPropertyDetailEvents,
-      attachPropertyHolderEvents,
       attachPropertyQuickActionEvents,
     };
   }

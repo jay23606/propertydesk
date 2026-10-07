@@ -85,11 +85,13 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyHolderWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
   assert.match(
     app,
-    /attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents,/,
+    /attachPropertyDetailEvents,\s*attachPropertyQuickActionEvents\s*\}/,
   );
+  assert.match(app, /PropertyDeskPropertyHolderWorkflow\.create\(/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
@@ -141,6 +143,7 @@ test("app root composes independent property screens and shares detail actions",
   const creationOrder = [
     "PropertyDeskPropertyDetailContentWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
+    "PropertyDeskPropertyHolderWorkflow.create(",
     "PropertyDeskPropertyDocumentWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
@@ -157,6 +160,7 @@ test("app root composes independent property screens and shares detail actions",
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-actions-workflow.js",
+    "features/property-holder-workflow.js",
     "features/property-document-workflow.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",

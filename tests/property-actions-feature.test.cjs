@@ -213,6 +213,7 @@ test("app composes property detail content, actions, and document routes", () =>
   const order = [
     "PropertyDeskPropertyDetailContentWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
+    "PropertyDeskPropertyHolderWorkflow.create(",
     "PropertyDeskPropertyDocumentWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
@@ -226,7 +227,11 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents,/,
+    /attachPropertyDetailEvents,\s*attachPropertyQuickActionEvents\s*\}/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyHolderWorkflow\.create\([\s\S]*?attachPropertyHolderEvents/,
   );
   assert.match(
     app,
@@ -235,21 +240,12 @@ test("app composes property detail content, actions, and document routes", () =>
   assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
 });
 
-test("property detail actions workflow composes administration and modal actions", () => {
+test("property detail actions workflow composes archive and modal actions", () => {
   const passed = {};
   const action = () => {};
   const attachCalls = [];
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyHolderManagement: {
-        create: () => ({ savePropertyHolders: action }),
-      },
-      PropertyDeskPropertyHolderEvents: {
-        create: (options) => {
-          passed.holderEvents = options;
-          return { attachEvents: () => attachCalls.push("holders") };
-        },
-      },
       PropertyDeskPropertyArchive: {
         create: () => ({ toggleArchiveProperty: action }),
       },
@@ -294,14 +290,62 @@ test("property detail actions workflow composes administration and modal actions
       quickActionDependencies,
     );
 
-  assert.equal(passed.holderEvents.savePropertyHolders, action);
   assert.equal(passed.quickActions.openPayment, action);
   assert.equal(passed.quickActions.openExpense, action);
   assert.equal(passed.quickActions.openAccountForProperty, action);
   assert.equal(passed.quickActions.toggleArchiveProperty, action);
   assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
   workflow.attachPropertyDetailEvents();
-  workflow.attachPropertyHolderEvents();
   workflow.attachPropertyQuickActionEvents();
-  assert.deepEqual(attachCalls, ["content", "holders", action]);
+  assert.deepEqual(attachCalls, ["content", action]);
+});
+
+test("property holder workflow composes label saving with holder events", () => {
+  const passed = {};
+  const savePropertyHolders = () => "saved";
+  let attached = 0;
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyHolderManagement: {
+        create: (options) => {
+          passed.management = options;
+          return { savePropertyHolders };
+        },
+      },
+      PropertyDeskPropertyHolderEvents: {
+        create: (options) => {
+          passed.events = options;
+          return { attachEvents: () => attached++ };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-holder-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    openPropertyDetails() {},
+  };
+  const workflow =
+    context.window.PropertyDeskPropertyHolderWorkflow.create(dependencies);
+
+  assert.equal(passed.management.state, dependencies.state);
+  assert.equal(passed.management.toast, dependencies.toast);
+  assert.equal(passed.management.fetchAll, dependencies.fetchAll);
+  assert.equal(
+    passed.management.openPropertyDetails,
+    dependencies.openPropertyDetails,
+  );
+  assert.equal(passed.events.savePropertyHolders, savePropertyHolders);
+  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
+  workflow.attachEvents();
+  assert.equal(attached, 1);
 });

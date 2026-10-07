@@ -258,24 +258,29 @@
       openModal,
       propertyAddress,
     });
-  const {
-    attachPropertyDetailEvents,
-    attachPropertyHolderEvents,
-    attachPropertyQuickActionEvents,
-  } = window.PropertyDeskPropertyDetailActionsWorkflow.create({
-    $,
-    state,
-    toast,
-    fetchAll,
-    todayIso,
-    openPropertyDetails,
-    closeModal,
-    editAccount,
-    openPayment,
-    openExpense,
-    openAccountForProperty,
-    openAccountDetails,
-  });
+  const { attachPropertyDetailEvents, attachPropertyQuickActionEvents } =
+    window.PropertyDeskPropertyDetailActionsWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      todayIso,
+      openPropertyDetails,
+      closeModal,
+      editAccount,
+      openPayment,
+      openExpense,
+      openAccountForProperty,
+      openAccountDetails,
+    });
+  const { attachEvents: attachPropertyHolderEvents } =
+    window.PropertyDeskPropertyHolderWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+    });
   const { attachPropertyDocumentEvents } =
     window.PropertyDeskPropertyDocumentWorkflow.create({
       $,
