@@ -64,20 +64,21 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   );
 
   const state = { user: { user_metadata: { display_name: "Owner" } } };
+  const memberRepository = { addMember() {}, removeMember() {} };
   const workflow = context.window.PropertyDeskWorkspace.create({
     $: () => ({ value: "" }),
     state,
     esc() {},
     toast() {},
     fetchAll() {},
+    memberRepository,
     renderReminderActivity: () => reminderActivityRenders++,
   });
 
   assert.equal(passed.profileDisplay.state, state);
   assert.equal(passed.profileSettings.updateGreeting, updateGreeting);
   assert.equal(passed.profileSettings.state, state);
-  assert.equal(passed.members.repository.kind, "member-repository");
-  assert.equal(passed.memberRepository.getClient(), state.client);
+  assert.equal(passed.members.repository, memberRepository);
   assert.equal(typeof passed.profileSettingsView.$, "function");
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();

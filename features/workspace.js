@@ -9,6 +9,7 @@
     toast,
     fetchAll,
     renderReminderActivity = () => {},
+    memberRepository,
     confirmAction = (message) => window.confirm(message),
   }) {
     const profileDisplay = window.PropertyDeskProfileDisplay.create({
@@ -44,9 +45,7 @@
       fetchAll,
       view: memberView,
       refreshWorkspaceSettings: renderWorkspaceSettings,
-      repository: window.PropertyDeskWorkspaceMemberRepository.create({
-        getClient: () => state.client,
-      }),
+      repository: memberRepository,
       confirmAction,
     });
 

@@ -10,6 +10,7 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   const previewReminderEmail = () => "preview";
   const reminder = { state: {} };
   const navigation = {
+    memberRepository: {},
     documentRef: {},
     windowRef: {},
     unusedDependency: true,
@@ -54,6 +55,7 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   assert.equal(calls[1][0], "navigation");
   assert.equal(calls[1][1].documentRef, navigation.documentRef);
   assert.equal(calls[1][1].windowRef, navigation.windowRef);
+  assert.equal(calls[1][1].memberRepository, navigation.memberRepository);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].renderReminderActivity, renderReminderActivity);
   assert.equal(workflow.previewReminderEmail, previewReminderEmail);

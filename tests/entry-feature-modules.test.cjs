@@ -208,6 +208,10 @@ test("app wires reminder activity and preview through the workspace workflow", (
   );
   assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
+  assert.match(
+    app,
+    /memberRepository: window\.PropertyDeskWorkspaceMemberRepository\.create\(/,
+  );
 });
 
 test("app root composes shared state and workspace services directly", () => {

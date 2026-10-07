@@ -10,6 +10,7 @@
       toast,
       fetchAll,
       renderReminderActivity,
+      memberRepository,
       documentRef,
       windowRef,
       confirmAction,
@@ -21,6 +22,7 @@
       toast,
       fetchAll,
       renderReminderActivity,
+      memberRepository,
       confirmAction,
     });
     const navigation = window.PropertyDeskNavigation.create({

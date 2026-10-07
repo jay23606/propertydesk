@@ -14,6 +14,7 @@
       renderReminderActivity: reminders.renderReminderActivity,
       documentRef: navigation.documentRef,
       windowRef: navigation.windowRef,
+      memberRepository: navigation.memberRepository,
       confirmAction: navigation.confirmAction,
     });
 

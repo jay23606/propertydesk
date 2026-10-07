@@ -135,6 +135,9 @@
       esc,
       toast,
       fetchAll,
+      memberRepository: window.PropertyDeskWorkspaceMemberRepository.create({
+        getClient: () => state.client,
+      }),
       documentRef: document,
       windowRef: window,
     },

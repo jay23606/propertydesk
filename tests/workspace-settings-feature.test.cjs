@@ -10,6 +10,7 @@ test("workspace feature owns profile and member form bindings", () => {
   loadWorkspaceFeatures(context);
   const handlers = new Map();
   const feature = context.window.PropertyDeskWorkspace.create({
+    memberRepository: { addMember() {}, removeMember() {} },
     $: (id) => ({
       addEventListener(event, handler) {
         handlers.set(`${id}:${event}`, handler);
@@ -191,6 +192,10 @@ test("workspace setting writes report rejected requests and retain entered value
     esc: String,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    memberRepository:
+      context.window.PropertyDeskWorkspaceMemberRepository.create({
+        getClient: () => state.client,
+      }),
     confirmAction: () => true,
   });
 

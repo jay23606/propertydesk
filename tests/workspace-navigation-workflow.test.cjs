@@ -57,6 +57,7 @@ test("workspace navigation coordinator connects settings render and route events
     toast() {},
     fetchAll() {},
     renderReminderActivity() {},
+    memberRepository: {},
     documentRef: {},
     windowRef: {},
   };
@@ -66,6 +67,10 @@ test("workspace navigation coordinator connects settings render and route events
   assert.equal(
     passed.workspace.renderReminderActivity,
     dependencies.renderReminderActivity,
+  );
+  assert.equal(
+    passed.workspace.memberRepository,
+    dependencies.memberRepository,
   );
   assert.equal(typeof passed.navigation.renderWorkspaceSettings, "function");
   assert.equal(passed.navigation.documentRef, dependencies.documentRef);
