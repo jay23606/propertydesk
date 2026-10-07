@@ -56,8 +56,16 @@
       transactionPayloads,
     });
     return {
-      ...propertyAccountEntry,
-      ...ledgerEntry,
+      editAccount: propertyAccountEntry.editAccount,
+      openAccountForProperty: propertyAccountEntry.openAccountForProperty,
+      resetPropertyForm: propertyAccountEntry.resetPropertyForm,
+      attachPropertyFormEvents: propertyAccountEntry.attachPropertyFormEvents,
+      attachAccountFormEvents: propertyAccountEntry.attachAccountFormEvents,
+      updatePaymentGuidance: ledgerEntry.updatePaymentGuidance,
+      openPayment: ledgerEntry.openPayment,
+      openPropertyPayment: ledgerEntry.openPropertyPayment,
+      openExpense: ledgerEntry.openExpense,
+      attachLedgerEntryFormEvents: ledgerEntry.attachLedgerEntryFormEvents,
     };
   }
 

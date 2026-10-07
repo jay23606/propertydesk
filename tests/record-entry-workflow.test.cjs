@@ -102,6 +102,18 @@ test("record entry workflow composes forms and exposes their actions and binders
   );
   assert.equal(passed.propertyAccount.previewReminderEmail, preview);
   assert.equal(workflow.resetPropertyForm, propertyReset);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachAccountFormEvents",
+    "attachLedgerEntryFormEvents",
+    "attachPropertyFormEvents",
+    "editAccount",
+    "openAccountForProperty",
+    "openExpense",
+    "openPayment",
+    "openPropertyPayment",
+    "resetPropertyForm",
+    "updatePaymentGuidance",
+  ]);
   for (const [name, expected] of Object.entries({
     editAccount,
     openAccountForProperty,
