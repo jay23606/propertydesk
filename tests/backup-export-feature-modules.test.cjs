@@ -51,7 +51,7 @@ test("backup export requires an initialized runtime client", async () => {
     documentRepository: {},
   });
 
-  feature.attachEvents();
+  feature.attachBackupExportEvents();
   await exportHandler();
 
   assert.equal(button.disabled, false);
@@ -84,7 +84,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
       PropertyDeskBackupExport: {
         create(options) {
           calls.exporter = options;
-          return { attachEvents };
+          return { attachBackupExportEvents: attachEvents };
         },
       },
     },
@@ -130,8 +130,8 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     calls.exporter.documentRepository,
     dependencies.documentRepository,
   );
-  assert.equal(workflow.attachBackupEvents, attachEvents);
-  assert.deepEqual(Object.keys(workflow), ["attachBackupEvents"]);
+  assert.equal(workflow.attachBackupExportEvents, attachEvents);
+  assert.deepEqual(Object.keys(workflow), ["attachBackupExportEvents"]);
 });
 
 test("backup agreement collector downloads only workspace-scoped files into the archive manifest", async () => {
@@ -303,8 +303,8 @@ test("backup export aborts before download when a private document path escapes 
     },
   });
 
-  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
-  feature.attachEvents();
+  assert.deepEqual(Object.keys(feature), ["attachBackupExportEvents"]);
+  feature.attachBackupExportEvents();
   await exportHandler();
 
   assert.equal(downloads.length, 0);
@@ -441,7 +441,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     },
   });
 
-  feature.attachEvents();
+  feature.attachBackupExportEvents();
   await button.handler();
 
   assert.equal(backupContents.records.pd_documents[0].id, "doc-1");

@@ -53,11 +53,11 @@
       }
     }
 
-    function attachEvents() {
+    function attachBackupExportEvents() {
       $("export-all").addEventListener("click", exportAll);
     }
 
-    return { attachEvents };
+    return { attachBackupExportEvents };
   }
 
   window.PropertyDeskBackupExport = Object.freeze({ create });

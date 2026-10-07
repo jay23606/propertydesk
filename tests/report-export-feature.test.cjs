@@ -56,7 +56,9 @@ test("backup and report exports own separate button bindings", () => {
       }),
     });
 
-    feature.attachEvents();
+    (file === "backup-export.js"
+      ? feature.attachBackupExportEvents
+      : feature.attachEvents)();
 
     assert.deepEqual([...bindings.keys()], expected);
     assert.ok(
