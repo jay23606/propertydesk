@@ -268,6 +268,7 @@ test("transaction import feature shares setup without mixing payment and expense
     createImportLookup() {},
     createFileWorkflow() {},
     createTransactionImportWorkflow() {},
+    unusedSharedValue: true,
   };
   const payment = {
     state: {},
@@ -275,6 +276,7 @@ test("transaction import feature shares setup without mixing payment and expense
     validatePaymentRows() {},
     commitTransactions() {},
     importReview: {},
+    unusedPaymentValue: true,
   };
   const expense = {
     state: {},
@@ -282,6 +284,7 @@ test("transaction import feature shares setup without mixing payment and expense
     validateExpenseRows() {},
     commitTransactions() {},
     importReview: {},
+    unusedExpenseValue: true,
   };
   const feature = context.window.PropertyDeskTransactionImportFeature.create({
     shared,
@@ -295,8 +298,20 @@ test("transaction import feature shares setup without mixing payment and expense
   assert.equal(passed.expense.state, expense.state);
   assert.equal(passed.payment.validatePaymentRows, payment.validatePaymentRows);
   assert.equal(passed.expense.validateExpenseRows, expense.validateExpenseRows);
+  assert.equal(
+    passed.payment.createTransactionImportWorkflow,
+    shared.createTransactionImportWorkflow,
+  );
+  assert.equal(
+    passed.expense.createTransactionImportWorkflow,
+    shared.createTransactionImportWorkflow,
+  );
   assert.equal("validateExpenseRows" in passed.payment, false);
   assert.equal("validatePaymentRows" in passed.expense, false);
+  assert.equal("unusedSharedValue" in passed.payment, false);
+  assert.equal("unusedSharedValue" in passed.expense, false);
+  assert.equal("unusedPaymentValue" in passed.payment, false);
+  assert.equal("unusedExpenseValue" in passed.expense, false);
   assert.equal(feature.attachPaymentEvents, paymentEvents);
   assert.equal(feature.attachExpenseEvents, expenseEvents);
 });
