@@ -2,9 +2,11 @@
 (() => {
   "use strict";
 
-  function createTransactionMaintenanceWorkflow(context) {
-    const correctionContext = context.correction;
-    const voidingContext = context.voiding;
+  function createTransactionMaintenanceWorkflow({
+    correction: correctionContext,
+    voiding: voidingContext,
+    events: eventsContext,
+  }) {
     const correction = window.PropertyDeskTransactionCorrectionWorkflow.create({
       $: correctionContext.$,
       state: correctionContext.state,
@@ -44,7 +46,7 @@
       });
       const { attachTransactionActionEvents } =
         window.PropertyDeskTransactionViewEvents.create({
-          documentRef: context.events.documentRef,
+          documentRef: eventsContext.documentRef,
           correctTransaction,
           voidTransaction,
         });
