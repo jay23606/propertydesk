@@ -25,7 +25,10 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
     app,
     /WorkspaceShellWorkflow\.create\(\{[\s\S]*?navigation: \{[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
   );
-  assert.match(shell, /WorkspaceReminderWorkflow\.create\(\s*reminder\s*\)/);
+  assert.match(
+    shell,
+    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?state: reminder\.state,[\s\S]*?openModal: reminder\.openModal/,
+  );
   assert.match(
     shell,
     /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,

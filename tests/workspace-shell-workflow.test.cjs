@@ -8,7 +8,24 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   const calls = [];
   const renderReminderActivity = () => "activity";
   const previewReminderEmail = () => "preview";
-  const reminder = { state: {} };
+  const reminder = {
+    $() {},
+    state: {},
+    esc() {},
+    fmtDate() {},
+    money() {},
+    amountDueSince() {},
+    unpaidDueAccrualStart() {},
+    monthEnd() {},
+    dateOnly() {},
+    monthStart() {},
+    propertyAddress() {},
+    todayIso() {},
+    moneyInput() {},
+    toast() {},
+    openModal() {},
+    unusedReminderValue: true,
+  };
   const navigation = {
     memberRepository: {},
     documentRef: {},
@@ -51,7 +68,27 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   });
 
   assert.equal(calls[0][0], "reminder");
-  assert.equal(calls[0][1], reminder);
+  assert.equal(calls[0][1].state, reminder.state);
+  assert.equal(calls[0][1].amountDueSince, reminder.amountDueSince);
+  assert.equal(calls[0][1].propertyAddress, reminder.propertyAddress);
+  assert.equal("unusedReminderValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "$",
+    "amountDueSince",
+    "dateOnly",
+    "esc",
+    "fmtDate",
+    "money",
+    "moneyInput",
+    "monthEnd",
+    "monthStart",
+    "openModal",
+    "propertyAddress",
+    "state",
+    "toast",
+    "todayIso",
+    "unpaidDueAccrualStart",
+  ]);
   assert.equal(calls[1][0], "navigation");
   assert.equal(calls[1][1].documentRef, navigation.documentRef);
   assert.equal(calls[1][1].windowRef, navigation.windowRef);

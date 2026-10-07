@@ -24,7 +24,7 @@ test("reminder activity flows through reminder and workspace navigation workflow
   assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(
     shellWorkflow,
-    /WorkspaceReminderWorkflow\.create\(\s*reminder\s*\)[\s\S]*?WorkspaceNavigationWorkflow\.create\([\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
+    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?state: reminder\.state,[\s\S]*?openModal: reminder\.openModal,\s*\}\);[\s\S]*?WorkspaceNavigationWorkflow\.create\([\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
   );
   assert.match(
     reminderWorkflow,
