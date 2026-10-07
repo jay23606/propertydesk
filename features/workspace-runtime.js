@@ -42,7 +42,7 @@
     });
 
     return {
-      backend,
+      backendConfigured: backend.configured,
       state,
       fetchAll,
       workspaceQuery,

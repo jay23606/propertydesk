@@ -33,9 +33,7 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
         calls.push("subscribe-auth");
       },
     },
-    backend: {
-      configured: true,
-    },
+    backendConfigured: true,
     initializeClient() {
       calls.push("create-client");
       return { auth: {} };
@@ -79,9 +77,7 @@ test("app lifecycle shows the configuration error before creating a client", asy
   const lifecycle = context.window.PropertyDeskAppLifecycle.create({
     $: () => ({ value: "" }),
     authClient: { onAuthStateChange() {} },
-    backend: {
-      configured: false,
-    },
+    backendConfigured: false,
     initializeClient() {
       calls.push("create-client");
     },

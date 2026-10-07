@@ -4,7 +4,7 @@
 
   function create({
     $,
-    backend,
+    backendConfigured,
     initializeClient,
     authClient,
     todayIso,
@@ -28,7 +28,7 @@
       auth.setAuthMode(false);
       registerShell();
 
-      if (!backend.configured) {
+      if (!backendConfigured) {
         auth.showConfigError();
         return;
       }

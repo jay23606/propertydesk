@@ -37,7 +37,7 @@
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
   const {
-    backend,
+    backendConfigured,
     state,
     fetchAll,
     workspaceQuery,
@@ -400,7 +400,7 @@
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,
-    backend,
+    backendConfigured,
     initializeClient,
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
