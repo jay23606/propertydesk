@@ -83,6 +83,13 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/auth-client.js", "features/auth-session.js"],
     ["features/auth-client.js", "features/app-lifecycle.js"],
     ["features/domain-options.js", "features/account-import-validation.js"],
+    [
+      "features/email-address-utils.js",
+      "features/account-import-validation.js",
+    ],
+    ["features/email-address-utils.js", "features/account-form-model.js"],
+    ["features/email-address-utils.js", "features/email-utils.js"],
+    ["features/email-address-utils.js", "features/reminder-preview.js"],
     ["workspace-table-catalog.js", "features/backup-utils.js"],
     [
       "features/transaction-options.js",

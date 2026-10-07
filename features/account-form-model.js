@@ -2,12 +2,12 @@
 (() => {
   "use strict";
 
+  const { splitEmailAddresses, isValidEmailAddress } =
+    window.PropertyDeskEmailAddressUtils;
+
   function partyEmails(value, reminderEnabled) {
-    const emails = String(value || "")
-      .split(/[;,]/)
-      .map((email) => email.trim())
-      .filter(Boolean);
-    if (emails.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+    const emails = splitEmailAddresses(value);
+    if (emails.some((email) => !isValidEmailAddress(email))) {
       return { emails, error: "Check each tenant/buyer email address." };
     }
     if (reminderEnabled && !emails.length) {

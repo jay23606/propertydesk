@@ -1,5 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+require("../features/email-address-utils.js");
 const { lateReminderMailto } = require("../features/email-utils.js");
 
 function parts(href) {

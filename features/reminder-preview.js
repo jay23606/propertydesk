@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { splitEmailAddresses } = window.PropertyDeskEmailAddressUtils;
+
   function create({
     $,
     state,
@@ -32,10 +34,7 @@
         payment_frequency: $("account-frequency").value,
         status: "active",
       };
-      const recipients = $("account-party-email")
-        .value.split(/[;,]/)
-        .map((email) => email.trim())
-        .filter(Boolean);
+      const recipients = splitEmailAddresses($("account-party-email").value);
       const preview = previewModel.build({
         property,
         account,

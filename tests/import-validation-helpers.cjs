@@ -3,6 +3,7 @@ const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
 require("../features/money-input-utils.js");
 require("../features/csv-value-utils.js");
+require("../features/email-address-utils.js");
 require("../features/import-row-utils.js");
 require("../features/account-import-identity.js");
 require("../features/payment-import-allocation.js");

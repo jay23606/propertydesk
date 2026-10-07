@@ -9,6 +9,8 @@
     globalThis.PropertyDeskAccountImportIdentity;
   const { accountTypes, paymentFrequencies, propertyKinds, defaults } =
     globalThis.PropertyDeskDomainOptions;
+  const { splitEmailAddresses, isValidEmailAddress } =
+    globalThis.PropertyDeskEmailAddressUtils;
   const paymentFrequencyValues = new Set(
     paymentFrequencies.map(({ value }) => value),
   );
@@ -111,11 +113,8 @@
   }
 
   function accountContactFields(row) {
-    const partyEmail = (row.party_email || "")
-      .split(/[;,]/)
-      .map((email) => email.trim())
-      .filter(Boolean);
-    if (partyEmail.some((email) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
+    const partyEmail = splitEmailAddresses(row.party_email);
+    if (partyEmail.some((email) => !isValidEmailAddress(email)))
       throw new Error(`Invalid tenant/buyer email for ${row.account_name}.`);
     return {
       partyEmail: partyEmail.join(", "),

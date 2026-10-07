@@ -2,6 +2,9 @@
 (() => {
   "use strict";
 
+  const { splitEmailAddresses, isValidEmailAddress } =
+    globalThis.PropertyDeskEmailAddressUtils;
+
   function lateReminderMailto({
     email,
     address,
@@ -11,10 +14,8 @@
     month,
     asOf,
   }) {
-    const recipients = String(email || "")
-      .split(/[;,]/)
-      .map((value) => value.trim())
-      .filter((value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+    const recipients = splitEmailAddresses(email)
+      .filter(isValidEmailAddress)
       .map((value) => encodeURIComponent(value).replace(/%40/gi, "@"))
       .join(",");
     const period =

@@ -7,6 +7,13 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "email-address-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "reminder-preview-model.js"),
       "utf8",
     ),
