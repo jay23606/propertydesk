@@ -37,9 +37,13 @@
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const { backend, state, fetchAll } = window.PropertyDeskAppServices.create({
-    render,
+  const backend = window.PropertyDeskBackendClient.create();
+  const state = window.PropertyDeskAppState.create();
+  const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
+    state,
+    workspaceData: window.PropertyDeskWorkspaceData.create(),
     toast,
+    render,
   });
   const { accountBalance, scheduledMonthlyRunRate, collectedSince } =
     window.PropertyDeskLedgerContext.create({

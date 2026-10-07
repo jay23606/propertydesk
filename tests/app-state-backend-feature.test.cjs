@@ -70,65 +70,6 @@ test("backend client only initializes with complete public Supabase config", () 
   });
 });
 
-test("app services compose shared state and workspace refresh", () => {
-  const received = {};
-  const state = {};
-  const toast = () => {};
-  const fetchAll = () => {};
-  const config = {
-    supabaseUrl: "https://example.test",
-    supabaseAnonKey: "public-key",
-  };
-  const supabase = { createClient() {} };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskWorkspaceData: {
-        create: () => ({ loadWorkspaceRecords() {} }),
-      },
-      PropertyDeskBackendClient: {
-        create: (options) => {
-          received.backend = options;
-          return { configured: true };
-        },
-      },
-      PropertyDeskAppState: { create: () => state },
-      PropertyDeskWorkspaceRefresh: {
-        create: (options) => {
-          received.refresh = options;
-          return { fetchAll };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "app-services.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    render() {},
-    toast,
-    config,
-    supabase,
-  };
-  const services = context.window.PropertyDeskAppServices.create(dependencies);
-
-  assert.equal(received.backend.config, config);
-  assert.equal(received.backend.supabase, supabase);
-  assert.equal(received.refresh.state, state);
-  assert.equal(received.refresh.toast, toast);
-  assert.equal(received.refresh.render, dependencies.render);
-  assert.equal(services.backend.configured, true);
-  assert.equal(services.state, state);
-  assert.equal(services.fetchAll, fetchAll);
-  assert.deepEqual(
-    Object.keys(services).sort(),
-    ["backend", "fetchAll", "state"].sort(),
-  );
-});
-
 test("notification feature replaces its timer and hides transient feedback", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
