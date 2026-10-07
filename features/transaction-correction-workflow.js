@@ -19,7 +19,7 @@
       { $, state, toast, fetchAll, closeModal, repository },
     );
 
-    function createActionHandlers({
+    function createCorrectionActionHandlers({
       openPayment,
       openExpense,
       updatePaymentGuidance,
@@ -38,7 +38,7 @@
       });
     }
 
-    return { saveCorrection, createActionHandlers };
+    return { saveCorrection, createCorrectionActionHandlers };
   }
 
   window.PropertyDeskTransactionCorrectionWorkflow = Object.freeze({

@@ -9,12 +9,12 @@
     const { voidTransaction } =
       window.PropertyDeskTransactionVoidWorkflow.create(context.voiding);
 
-    function createActionHandlers({
+    function createTransactionActionHandlers({
       openPayment,
       openExpense,
       updatePaymentGuidance,
     }) {
-      const { correctTransaction } = correction.createActionHandlers({
+      const { correctTransaction } = correction.createCorrectionActionHandlers({
         openPayment,
         openExpense,
         updatePaymentGuidance,
@@ -28,7 +28,10 @@
       return { attachTransactionActionEvents };
     }
 
-    return { saveCorrection: correction.saveCorrection, createActionHandlers };
+    return {
+      saveCorrection: correction.saveCorrection,
+      createTransactionActionHandlers,
+    };
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({

@@ -25,7 +25,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
           passed.correctionWorkflow = options;
           return {
             saveCorrection,
-            createActionHandlers: (actionOptions) => {
+            createCorrectionActionHandlers: (actionOptions) => {
               passed.correctionActions = actionOptions;
               return { correctTransaction };
             },
@@ -81,7 +81,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     openExpense() {},
     updatePaymentGuidance() {},
   };
-  const handlers = workflow.createActionHandlers(actions);
+  const handlers = workflow.createTransactionActionHandlers(actions);
 
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.correctionWorkflow, correctionContext);
@@ -143,7 +143,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     openExpense() {},
     updatePaymentGuidance() {},
   };
-  const handlers = workflow.createActionHandlers(actions);
+  const handlers = workflow.createCorrectionActionHandlers(actions);
 
   assert.equal(passed.corrections.state, correctionContext.state);
   assert.equal(passed.corrections.repository, correctionContext.repository);

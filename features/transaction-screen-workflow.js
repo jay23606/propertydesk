@@ -34,7 +34,7 @@
       sumOperatingExpenses,
     });
     const { attachTransactionActionEvents } =
-      transactionMaintenance.createActionHandlers({
+      transactionMaintenance.createTransactionActionHandlers({
         openPayment,
         openExpense,
         updatePaymentGuidance,

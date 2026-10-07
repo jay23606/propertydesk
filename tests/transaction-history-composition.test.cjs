@@ -18,11 +18,14 @@ test("transaction screen workflow composes history views with maintenance action
   );
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(workflow, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(workflow, /transactionMaintenance\.createActionHandlers\(/);
+  assert.match(
+    workflow,
+    /transactionMaintenance\.createTransactionActionHandlers\(/,
+  );
   assert.match(workflow, /attachTransactionViewEvents: views\.attachEvents/);
   assert.match(
     workflow,
-    /const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createActionHandlers\(/,
+    /const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\(/,
   );
   assert.match(workspaceWorkflow, /TransactionMaintenanceWorkflow\.create\(/);
   assert.ok(

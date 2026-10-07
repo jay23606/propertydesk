@@ -27,7 +27,7 @@ test("transaction screen workflow joins view rendering and maintenance actions",
     context,
   );
   const transactionMaintenance = {
-    createActionHandlers(dependencies) {
+    createTransactionActionHandlers(dependencies) {
       passed.actions = dependencies;
       return { attachTransactionActionEvents: attachActionEvents };
     },
