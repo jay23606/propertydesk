@@ -21,6 +21,17 @@ function loadDocumentModules(context) {
   }
 }
 
+function createDocuments(context, options) {
+  return context.window.PropertyDeskDocuments.create({
+    ...options,
+    repository:
+      options.repository ||
+      context.window.PropertyDeskDocumentRepository.create(
+        () => options.state.client,
+      ),
+  });
+}
+
 test("agreement upload policy accepts supported files and rejects unsupported or oversized files", () => {
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);
@@ -55,7 +66,7 @@ test("private document module exposes upload, delete, and open workflows", () =>
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);
 
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state: { client: {} },
   });
   for (const action of [
@@ -159,7 +170,7 @@ test("document upload stores objects privately and removes an orphan after metad
     files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
     value: "selected",
   };
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed metadata must not refresh"),
@@ -203,7 +214,7 @@ test("document upload saves metadata before refreshing and reopening the propert
     },
   };
   const calls = [];
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state,
     toast: (message) => calls.push(["toast", message]),
     fetchAll: async () => calls.push(["refresh"]),
@@ -253,7 +264,7 @@ test("agreement deletion removes only the selected workspace file before refresh
     ],
   };
   const calls = [];
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state,
     toast: (message) => calls.push(["toast", message]),
     fetchAll: async () => calls.push(["refresh"]),
@@ -336,7 +347,7 @@ test("private document workflows handle rejected storage requests without leakin
     },
     opener: "parent",
   };
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("a rejected request must not refresh"),
@@ -388,7 +399,7 @@ test("uncertain document metadata writes keep the private file for reconciliatio
     },
   };
   const messages = [];
-  const feature = context.window.PropertyDeskDocuments.create({
+  const feature = createDocuments(context, {
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () =>
