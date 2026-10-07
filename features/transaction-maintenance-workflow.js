@@ -6,8 +6,13 @@
     const correction = window.PropertyDeskTransactionCorrectionWorkflow.create(
       context.correction,
     );
-    const { voidTransaction } =
-      window.PropertyDeskTransactionVoidWorkflow.create(context.voiding);
+    const { saveVoidTransaction } =
+      window.PropertyDeskTransactionMaintenance.create(context.voiding);
+    const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
+      toast: context.voiding.toast,
+      saveVoidTransaction,
+      resolveVoidTarget: context.voiding.resolveVoidTarget,
+    });
 
     function createTransactionActionHandlers({
       openPayment,

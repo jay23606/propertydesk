@@ -32,9 +32,16 @@ test("transaction maintenance coordinator joins isolated correction and void act
           };
         },
       },
-      PropertyDeskTransactionVoidWorkflow: {
+      PropertyDeskTransactionMaintenance: {
         create: (options) => {
-          passed.voidWorkflow = options;
+          passed.voidMaintenance = options;
+          passed.saveVoidTransaction = () => {};
+          return { saveVoidTransaction: passed.saveVoidTransaction };
+        },
+      },
+      PropertyDeskTransactionVoidEntry: {
+        create: (options) => {
+          passed.voidEntry = options;
           return { voidTransaction };
         },
       },
@@ -85,9 +92,17 @@ test("transaction maintenance coordinator joins isolated correction and void act
 
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.correctionWorkflow, correctionContext);
-  assert.equal(passed.voidWorkflow, voidingContext);
+  assert.equal(passed.voidMaintenance, voidingContext);
+  assert.equal(passed.voidEntry.toast, voidingContext.toast);
+  assert.equal(
+    passed.voidEntry.saveVoidTransaction,
+    passed.saveVoidTransaction,
+  );
+  assert.equal(
+    passed.voidEntry.resolveVoidTarget,
+    voidingContext.resolveVoidTarget,
+  );
   assert.equal("resolveVoidTarget" in passed.correctionWorkflow, false);
-  assert.equal("closeModal" in passed.voidWorkflow, false);
   assert.equal(passed.events.documentRef, eventsContext.documentRef);
   assert.equal(passed.correctionActions.openPayment, actions.openPayment);
   assert.equal(passed.correctionActions.openExpense, actions.openExpense);
@@ -155,48 +170,6 @@ test("transaction correction workflow owns correction persistence and forms", ()
   assert.equal(passed.form.openExpense, actions.openExpense);
   assert.equal(handlers.correctTransaction, correctTransaction);
   assert.equal(workflow.saveCorrection, saveCorrection);
-});
-
-test("transaction void workflow owns void persistence and confirmation", () => {
-  const passed = {};
-  const saveVoidTransaction = () => {};
-  const voidTransaction = () => {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskTransactionMaintenance: {
-        create: (options) => {
-          passed.maintenance = options;
-          return { saveVoidTransaction };
-        },
-      },
-      PropertyDeskTransactionVoidEntry: {
-        create: (options) => {
-          passed.entry = options;
-          return { voidTransaction };
-        },
-      },
-    },
-  });
-  loadWorkflow(context, "transaction-void-workflow.js");
-  const dependencies = {
-    state: {},
-    toast() {},
-    fetchAll() {},
-    repository: {},
-    resolveVoidTarget() {},
-    buildVoidPayload() {},
-  };
-  const workflow =
-    context.window.PropertyDeskTransactionVoidWorkflow.create(dependencies);
-
-  assert.equal(passed.maintenance.repository, dependencies.repository);
-  assert.equal(
-    passed.maintenance.resolveVoidTarget,
-    dependencies.resolveVoidTarget,
-  );
-  assert.equal(passed.entry.saveVoidTransaction, saveVoidTransaction);
-  assert.equal(passed.entry.resolveVoidTarget, dependencies.resolveVoidTarget);
-  assert.equal(workflow.voidTransaction, voidTransaction);
 });
 
 test("deposit adjustment workflow wires only deposit concerns", () => {
