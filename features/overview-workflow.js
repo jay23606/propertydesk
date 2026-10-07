@@ -42,13 +42,16 @@
     });
     const overview = window.PropertyDeskOverview.create({
       $,
-      esc,
-      prettyKind,
       money,
-      propertyAddress,
-      prettyType,
-      fmtDate,
       overviewModel,
+      overviewView: window.PropertyDeskOverviewView.create({
+        esc,
+        prettyKind,
+        money,
+        propertyAddress,
+        prettyType,
+        fmtDate,
+      }),
     });
     const overviewEvents = window.PropertyDeskOverviewEvents.create({
       $,

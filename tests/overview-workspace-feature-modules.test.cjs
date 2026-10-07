@@ -51,6 +51,13 @@ test("overview renderer displays its summary model and quick-payment card", () =
     ),
     context,
   );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "overview-view.js"),
+      "utf8",
+    ),
+    context,
+  );
   const elements = new Map();
   const $ = (id) => {
     if (!elements.has(id)) elements.set(id, { textContent: "", innerHTML: "" });
@@ -82,14 +89,19 @@ test("overview renderer displays its summary model and quick-payment card", () =
       },
     ],
   };
-  const feature = context.window.PropertyDeskOverview.create({
-    $,
+  const money = (amount) => `$${Number(amount).toFixed(2)}`;
+  const overviewView = context.window.PropertyDeskOverviewView.create({
     esc: String,
     prettyKind: String,
-    money: (amount) => `$${Number(amount).toFixed(2)}`,
+    money,
     propertyAddress: (record) => record.address,
     prettyType: String,
     fmtDate: String,
+  });
+  const feature = context.window.PropertyDeskOverview.create({
+    $,
+    money,
+    overviewView,
     overviewModel: {
       buildOverview: () => summary,
     },
@@ -155,6 +167,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
     "PropertyDeskOverviewModel.create(",
     "PropertyDeskOverviewActivityModel.create(",
     "PropertyDeskOverview.create(",
+    "PropertyDeskOverviewView.create(",
     "PropertyDeskOverviewEvents.create(",
   ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
@@ -208,6 +221,13 @@ test("overview workflow exposes its renderer and event binder directly", () => {
           return {};
         },
       },
+      PropertyDeskOverviewView: {
+        create: (options) => {
+          calls.push("markup");
+          passed.markup = options;
+          return {};
+        },
+      },
       PropertyDeskOverview: {
         create: (options) => {
           calls.push("view");
@@ -247,6 +267,7 @@ test("overview workflow exposes its renderer and event binder directly", () => {
     "property summary",
     "activity model",
     "summary",
+    "markup",
     "view",
     "events",
   ]);
@@ -331,6 +352,7 @@ test("profile display loads before overview and is precached", () => {
   assert.match(worker, /'\.\/features\/overview-model\.js'/);
   assert.match(worker, /'\.\/features\/overview-events\.js'/);
   assert.match(worker, /'\.\/features\/overview-property-summary-model\.js'/);
+  assert.match(worker, /'\.\/features\/overview-view\.js'/);
   assert.match(worker, /'\.\/features\/overview-workflow\.js'/);
 });
 

@@ -377,6 +377,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/overview-events.js", "features/overview-workflow.js"],
     ["features/overview-model.js", "features/overview.js"],
+    ["features/overview-view.js", "features/overview.js"],
     ["features/transaction-inserts.js", "features/payment-entry-form.js"],
     ["features/import-review.js", "features/payment-import.js"],
     ["features/transaction-import-workflow.js", "features/payment-import.js"],
