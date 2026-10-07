@@ -167,22 +167,30 @@
     attachLedgerEntryFormEvents,
   } = window.PropertyDeskTransactionWorkspaceWorkflow.create({
     maintenance: {
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      prettyType,
-      EventClass: Event,
-      OptionClass: Option,
-      documentRef: document,
-      repository: repositories.transactions,
-      resolveVoidTarget:
-        window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-      buildVoidPayload:
-        window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-      findCorrectionTarget:
-        window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+      correction: {
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        prettyType,
+        EventClass: Event,
+        OptionClass: Option,
+        repository: repositories.transactions,
+        findCorrectionTarget:
+          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+      },
+      voiding: {
+        state,
+        toast,
+        fetchAll,
+        repository: repositories.transactions,
+        resolveVoidTarget:
+          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+        buildVoidPayload:
+          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+      },
+      events: { documentRef: document },
     },
     entry: {
       $,

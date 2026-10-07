@@ -11,44 +11,31 @@ function loadWorkflow(context, filename) {
   );
 }
 
-test("transaction maintenance coordinator joins correction and void actions", () => {
+test("transaction maintenance coordinator joins isolated correction and void actions", () => {
   const passed = {};
-  const transactionRepository = { voidPosted() {}, correct() {} };
-  const resolveVoidTarget = () => ({ table: "pd_payments" });
-  const buildVoidPayload = () => ({ status: "voided" });
-  const findCorrectionTarget = () => null;
   const saveCorrection = () => {};
-  const saveVoidTransaction = () => {};
   const voidTransaction = () => {};
   const correctTransaction = () => {};
   const attachEvents = () => {};
   const context = vm.createContext({
-    Event: class MockEvent {},
-    Option: class MockOption {},
     document: {},
     window: {
-      PropertyDeskTransactionCorrections: {
+      PropertyDeskTransactionCorrectionWorkflow: {
         create: (options) => {
-          passed.corrections = options;
-          return { saveCorrection };
+          passed.correctionWorkflow = options;
+          return {
+            saveCorrection,
+            createActionHandlers: (actionOptions) => {
+              passed.correctionActions = actionOptions;
+              return { correctTransaction };
+            },
+          };
         },
       },
-      PropertyDeskTransactionMaintenance: {
+      PropertyDeskTransactionVoidWorkflow: {
         create: (options) => {
-          passed.maintenance = options;
-          return { saveVoidTransaction };
-        },
-      },
-      PropertyDeskTransactionVoidEntry: {
-        create: (options) => {
-          passed.voidEntry = options;
+          passed.voidWorkflow = options;
           return { voidTransaction };
-        },
-      },
-      PropertyDeskTransactionCorrectionForm: {
-        create: (options) => {
-          passed.correctionForm = options;
-          return { correctTransaction };
         },
       },
       PropertyDeskTransactionViewEvents: {
@@ -61,57 +48,154 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   });
   loadWorkflow(context, "transaction-maintenance-workflow.js");
 
-  const dependencies = {
+  const correctionContext = {
     $: () => {},
     state: {},
     toast() {},
     fetchAll() {},
     closeModal() {},
     prettyType() {},
-    EventClass: class TestEvent {},
-    OptionClass: class TestOption {},
-    documentRef: { name: "document" },
-    repository: transactionRepository,
-    resolveVoidTarget,
-    buildVoidPayload,
-    findCorrectionTarget,
+    repository: {},
+    findCorrectionTarget() {},
+  };
+  const voidingContext = {
+    state: correctionContext.state,
+    toast: correctionContext.toast,
+    fetchAll: correctionContext.fetchAll,
+    repository: correctionContext.repository,
+    resolveVoidTarget() {},
+    buildVoidPayload() {},
+  };
+  const eventsContext = { documentRef: { name: "document" } };
+  const dependencies = {
+    correction: correctionContext,
+    voiding: voidingContext,
+    events: eventsContext,
   };
   const workflow =
     context.window.PropertyDeskTransactionMaintenanceWorkflow.create(
       dependencies,
     );
-  const openPayment = () => {};
-  const openExpense = () => {};
-  const updatePaymentGuidance = () => {};
-  const actions = workflow.createActionHandlers({
-    openPayment,
-    openExpense,
-    updatePaymentGuidance,
-  });
+  const actions = {
+    openPayment() {},
+    openExpense() {},
+    updatePaymentGuidance() {},
+  };
+  const handlers = workflow.createActionHandlers(actions);
 
   assert.equal(workflow.saveCorrection, saveCorrection);
-  assert.equal(passed.corrections.state, dependencies.state);
-  assert.equal(passed.corrections.repository, transactionRepository);
-  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.maintenance.repository, transactionRepository);
-  assert.equal(passed.maintenance.resolveVoidTarget, resolveVoidTarget);
-  assert.equal(passed.maintenance.buildVoidPayload, buildVoidPayload);
-  assert.equal(passed.voidEntry.resolveVoidTarget, resolveVoidTarget);
-  assert.equal(passed.voidEntry.saveVoidTransaction, saveVoidTransaction);
-  assert.equal(passed.correctionForm.openPayment, openPayment);
-  assert.equal(passed.correctionForm.openExpense, openExpense);
+  assert.equal(passed.correctionWorkflow, correctionContext);
+  assert.equal(passed.voidWorkflow, voidingContext);
+  assert.equal("resolveVoidTarget" in passed.correctionWorkflow, false);
+  assert.equal("closeModal" in passed.voidWorkflow, false);
+  assert.equal(passed.events.documentRef, eventsContext.documentRef);
+  assert.equal(passed.correctionActions.openPayment, actions.openPayment);
+  assert.equal(passed.correctionActions.openExpense, actions.openExpense);
   assert.equal(
-    passed.correctionForm.updatePaymentGuidance,
-    updatePaymentGuidance,
-  );
-  assert.equal(
-    passed.correctionForm.findCorrectionTarget,
-    findCorrectionTarget,
+    passed.correctionActions.updatePaymentGuidance,
+    actions.updatePaymentGuidance,
   );
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
-  assert.deepEqual(Object.keys(actions), ["attachEvents"]);
-  assert.equal(actions.attachEvents, attachEvents);
+  assert.equal(handlers.attachEvents, attachEvents);
+});
+
+test("transaction correction workflow owns correction persistence and forms", () => {
+  const passed = {};
+  const saveCorrection = () => {};
+  const correctTransaction = () => {};
+  const context = vm.createContext({
+    Event: class MockEvent {},
+    Option: class MockOption {},
+    window: {
+      PropertyDeskTransactionCorrections: {
+        create: (options) => {
+          passed.corrections = options;
+          return { saveCorrection };
+        },
+      },
+      PropertyDeskTransactionCorrectionForm: {
+        create: (options) => {
+          passed.form = options;
+          return { correctTransaction };
+        },
+      },
+    },
+  });
+  loadWorkflow(context, "transaction-correction-workflow.js");
+  const correctionContext = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    closeModal() {},
+    prettyType() {},
+    repository: {},
+    findCorrectionTarget() {},
+  };
+  const workflow =
+    context.window.PropertyDeskTransactionCorrectionWorkflow.create(
+      correctionContext,
+    );
+  const actions = {
+    openPayment() {},
+    openExpense() {},
+    updatePaymentGuidance() {},
+  };
+  const handlers = workflow.createActionHandlers(actions);
+
+  assert.equal(passed.corrections.state, correctionContext.state);
+  assert.equal(passed.corrections.repository, correctionContext.repository);
+  assert.equal(
+    passed.form.findCorrectionTarget,
+    correctionContext.findCorrectionTarget,
+  );
+  assert.equal(passed.form.openPayment, actions.openPayment);
+  assert.equal(passed.form.openExpense, actions.openExpense);
+  assert.equal(handlers.correctTransaction, correctTransaction);
+  assert.equal(workflow.saveCorrection, saveCorrection);
+});
+
+test("transaction void workflow owns void persistence and confirmation", () => {
+  const passed = {};
+  const saveVoidTransaction = () => {};
+  const voidTransaction = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskTransactionMaintenance: {
+        create: (options) => {
+          passed.maintenance = options;
+          return { saveVoidTransaction };
+        },
+      },
+      PropertyDeskTransactionVoidEntry: {
+        create: (options) => {
+          passed.entry = options;
+          return { voidTransaction };
+        },
+      },
+    },
+  });
+  loadWorkflow(context, "transaction-void-workflow.js");
+  const dependencies = {
+    state: {},
+    toast() {},
+    fetchAll() {},
+    repository: {},
+    resolveVoidTarget() {},
+    buildVoidPayload() {},
+  };
+  const workflow =
+    context.window.PropertyDeskTransactionVoidWorkflow.create(dependencies);
+
+  assert.equal(passed.maintenance.repository, dependencies.repository);
+  assert.equal(
+    passed.maintenance.resolveVoidTarget,
+    dependencies.resolveVoidTarget,
+  );
+  assert.equal(passed.entry.saveVoidTransaction, saveVoidTransaction);
+  assert.equal(passed.entry.resolveVoidTarget, dependencies.resolveVoidTarget);
+  assert.equal(workflow.voidTransaction, voidTransaction);
 });
 
 test("deposit adjustment workflow wires only deposit concerns", () => {

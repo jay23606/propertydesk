@@ -3,73 +3,31 @@
   "use strict";
 
   function createTransactionMaintenanceWorkflow(context) {
-    const {
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      prettyType,
-      EventClass = Event,
-      OptionClass = Option,
-      documentRef = document,
-      repository,
-      resolveVoidTarget,
-      buildVoidPayload,
-      findCorrectionTarget,
-    } = context;
-    const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
-      {
-        $,
-        state,
-        toast,
-        fetchAll,
-        closeModal,
-        repository,
-      },
+    const correction = window.PropertyDeskTransactionCorrectionWorkflow.create(
+      context.correction,
     );
-    const { saveVoidTransaction } =
-      window.PropertyDeskTransactionMaintenance.create({
-        state,
-        toast,
-        fetchAll,
-        repository,
-        resolveVoidTarget,
-        buildVoidPayload,
-      });
-    const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
-      toast,
-      saveVoidTransaction,
-      resolveVoidTarget,
-    });
+    const { voidTransaction } =
+      window.PropertyDeskTransactionVoidWorkflow.create(context.voiding);
 
     function createActionHandlers({
       openPayment,
       openExpense,
       updatePaymentGuidance,
     }) {
-      const { correctTransaction } =
-        window.PropertyDeskTransactionCorrectionForm.create({
-          $,
-          state,
-          toast,
-          prettyType,
-          openPayment,
-          openExpense,
-          updatePaymentGuidance,
-          findCorrectionTarget,
-          EventClass,
-          OptionClass,
-        });
+      const { correctTransaction } = correction.createActionHandlers({
+        openPayment,
+        openExpense,
+        updatePaymentGuidance,
+      });
       const { attachEvents } = window.PropertyDeskTransactionViewEvents.create({
-        documentRef,
+        documentRef: context.events.documentRef,
         correctTransaction,
         voidTransaction,
       });
       return { attachEvents };
     }
 
-    return { saveCorrection, createActionHandlers };
+    return { saveCorrection: correction.saveCorrection, createActionHandlers };
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({

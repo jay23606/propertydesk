@@ -222,18 +222,26 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/transaction-corrections.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
-    [
-      "features/transaction-maintenance.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
-    [
-      "features/transaction-void-entry.js",
-      "features/transaction-maintenance-workflow.js",
+      "features/transaction-correction-workflow.js",
     ],
     [
       "features/transaction-correction-form.js",
+      "features/transaction-correction-workflow.js",
+    ],
+    [
+      "features/transaction-maintenance.js",
+      "features/transaction-void-workflow.js",
+    ],
+    [
+      "features/transaction-void-entry.js",
+      "features/transaction-void-workflow.js",
+    ],
+    [
+      "features/transaction-correction-workflow.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-void-workflow.js",
       "features/transaction-maintenance-workflow.js",
     ],
     [
