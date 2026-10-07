@@ -44,18 +44,23 @@
       toast,
       render,
     });
-  const { accountBalance, scheduledMonthlyRunRate, collectedSince } =
-    window.PropertyDeskLedgerContext.create({
-      state,
+  const {
+    accountBalance,
+    scheduledMonthlyRunRate,
+    collectedSince,
+    depositLedger,
+  } = window.PropertyDeskWorkspaceFinancialContext.create({
+    state,
+    ledger: {
       todayIso,
       scheduledLoanBalance,
       monthlyScheduledEstimate,
       postedOnOrAfter,
       sumPosted,
-    });
-  const { depositLedger } = window.PropertyDeskDepositContext.create({
-    state,
-    securityDepositBalance,
+    },
+    deposit: {
+      securityDepositBalance,
+    },
   });
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =

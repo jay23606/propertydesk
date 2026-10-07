@@ -184,8 +184,8 @@ test("app root composes shared state and workspace services directly", () => {
     /PropertyDesk(?:BackendClient|AppState|WorkspaceData|WorkspaceRefresh)\.create\(/,
   );
   assert.doesNotMatch(app, /PropertyDeskAppServices/);
-  assert.match(app, /PropertyDeskLedgerContext\.create\(/);
-  assert.match(app, /PropertyDeskDepositContext\.create\(/);
+  assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
+  assert.doesNotMatch(app, /PropertyDesk(?:Ledger|Deposit)Context\.create\(/);
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.doesNotMatch(
