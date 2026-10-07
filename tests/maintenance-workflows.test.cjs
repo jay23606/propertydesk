@@ -66,7 +66,6 @@ test("transaction maintenance coordinator joins isolated correction and void act
     findCorrectionTarget() {},
   };
   const voidingContext = {
-    state: correctionContext.state,
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
     repository: correctionContext.repository,
