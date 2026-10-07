@@ -94,14 +94,6 @@ test("record entry forms and global create actions use separate workflows", () =
   );
   assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachCreateActionEvents/);
-  const createActionWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "create-actions-workflow.js"),
-    "utf8",
-  );
-  assert.match(
-    createActionWorkflow,
-    /PropertyDeskCreateActions\.create\(context\)/,
-  );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
@@ -116,7 +108,7 @@ test("record entry forms and global create actions use separate workflows", () =
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskCreateActionsWorkflow\.create\([\s\S]*?resetPropertyForm: entry\.resetPropertyForm/,
+    /PropertyDeskCreateActions\.create\(\{[\s\S]*?resetPropertyForm: entry\.resetPropertyForm,[\s\S]*?navigate: entryContext\.navigate/,
   );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });

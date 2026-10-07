@@ -45,7 +45,7 @@ test("transaction workspace shares corrections and entry actions across its flow
           };
         },
       },
-      PropertyDeskCreateActionsWorkflow: {
+      PropertyDeskCreateActions: {
         create(options) {
           calls.push(["create-actions", options]);
           return { attachCreateActionEvents };

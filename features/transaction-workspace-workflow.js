@@ -32,7 +32,7 @@
       transactionPayloads: entryContext.transactionPayloads,
       saveCorrection: maintenance.saveCorrection,
     });
-    const createActions = window.PropertyDeskCreateActionsWorkflow.create({
+    const createActions = window.PropertyDeskCreateActions.create({
       $: entryContext.$,
       state: entryContext.state,
       toast: entryContext.toast,
