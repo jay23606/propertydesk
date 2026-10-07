@@ -5,7 +5,7 @@ require("../features/money-input-utils.js");
 require("../features/domain-options.js");
 require("../features/transaction-options.js");
 require("../features/expense-account-policy.js");
-const { selectImportRows } = require("../import-utils.js");
+const { selectImportRows } = require("../features/import-utils.js");
 require("../features/account-import-validation.js");
 require("../features/expense-import-validation.js");
 require("../features/payment-import-validation.js");

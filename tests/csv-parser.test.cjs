@@ -39,5 +39,5 @@ test("CSV parser rejects malformed headings and quoting and marks long rows", ()
 });
 
 test("import helpers preserve the established parser function reference", () => {
-  assert.equal(require("../import-utils.js").parseCSV, parseCSV);
+  assert.equal(require("../features/import-utils.js").parseCSV, parseCSV);
 });

@@ -10,7 +10,7 @@ const {
   selectImportRows,
   validIsoDate,
   validateImportRows,
-} = require("../import-utils.js");
+} = require("../features/import-utils.js");
 
 test("row validation keeps valid rows and reports every bad source row", () => {
   const rows = parseCSV(
