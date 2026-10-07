@@ -170,6 +170,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "validateAccountRows",
     ].sort(),
   );
+  assert.equal(
+    passed.account.buildPayloads,
+    context.window.PropertyDeskAccountImportPayload.build,
+  );
   assert.deepEqual(
     Object.keys(passed.payment).sort(),
     [

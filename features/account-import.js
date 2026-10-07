@@ -9,7 +9,7 @@
       parseCSV,
       validateAccountRows,
       todayIso,
-      buildPayloads = window.PropertyDeskAccountImportPayload.build,
+      buildPayloads,
       commitAccounts,
       importReview,
       createFileWorkflow,
