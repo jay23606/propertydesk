@@ -151,18 +151,30 @@
   });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
+  const propertyAccountEntry =
+    window.PropertyDeskPropertyAccountEntryWorkflow.create({
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      populateFormOptions,
+      openModal,
+      previewReminderEmail,
+      propertyRepository: repositories.properties,
+      accountRepository: repositories.accounts,
+      accountPayload: window.PropertyDeskAccountPayload.build,
+      accountFormModel: window.PropertyDeskAccountFormModel,
+    });
   const {
     renderPayments,
     attachTransactionFilterEvents,
     attachTransactionActionEvents,
-    editAccount,
-    openAccountForProperty,
     openPayment,
     openPropertyPayment,
     openExpense,
-    attachCreateActionEvents,
-    attachPropertyFormEvents,
-    attachAccountFormEvents,
     attachLedgerEntryFormEvents,
   } = window.PropertyDeskTransactionWorkspaceWorkflow.create({
     maintenance: {
@@ -202,13 +214,6 @@
       fillSelect,
       prettyType,
       openModal,
-      previewReminderEmail,
-      navigate,
-      documentRef: document,
-      propertyRepository: repositories.properties,
-      accountRepository: repositories.accounts,
-      accountPayload: window.PropertyDeskAccountPayload.build,
-      accountFormModel: window.PropertyDeskAccountFormModel,
       transactionRepository: repositories.transactions,
       transactionPayloads: window.PropertyDeskTransactionPayloads,
     },
@@ -225,6 +230,18 @@
       sumIncome,
       sumOperatingExpenses,
     },
+  });
+  const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
+    $,
+    state,
+    toast,
+    resetPropertyForm: propertyAccountEntry.resetPropertyForm,
+    openModal,
+    openAccountForProperty: propertyAccountEntry.openAccountForProperty,
+    openPayment,
+    openExpense,
+    navigate,
+    documentRef: document,
   });
   const {
     openAccountDetails,
@@ -259,7 +276,7 @@
       toast,
       fetchAll,
       closeModal,
-      editAccount,
+      editAccount: propertyAccountEntry.editAccount,
       openPayment,
       repository: repositories.accounts,
     },
@@ -310,11 +327,11 @@
         todayIso,
         propertyRepository: repositories.properties,
         closeModal,
-        editAccount,
+        editAccount: propertyAccountEntry.editAccount,
         openAccountDetails,
         openPayment,
         openExpense,
-        openAccountForProperty,
+        openAccountForProperty: propertyAccountEntry.openAccountForProperty,
       },
       holders: {
         $,
@@ -369,7 +386,7 @@
       fetchAll,
       openPayment,
       propertyRepository: repositories.properties,
-      openAccountForProperty,
+      openAccountForProperty: propertyAccountEntry.openAccountForProperty,
     },
   });
   const {
@@ -432,8 +449,8 @@
       attachAccountDetailActionEvents,
       attachDepositAdjustmentEvents,
       attachCreateActionEvents,
-      attachPropertyFormEvents,
-      attachAccountFormEvents,
+      propertyAccountEntry.attachPropertyFormEvents,
+      propertyAccountEntry.attachAccountFormEvents,
       attachLedgerEntryFormEvents,
       attachPropertyDetailEvents,
       attachPropertyHolderEvents,

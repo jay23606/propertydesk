@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("record entry forms and global create actions use separate workflows", () => {
+test("account records and ledger entries use separate workspace workflows", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.ok(
@@ -33,11 +33,11 @@ test("record entry forms and global create actions use separate workflows", () =
   );
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
+  assert.match(app, /attachCreateActionEvents/);
   assert.match(
     app,
-    /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
+    /openAccountForProperty: propertyAccountEntry\.openAccountForProperty/,
   );
-  assert.match(app, /openAccountForProperty,/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /entryWorkflow\./);
   assert.match(
@@ -45,10 +45,6 @@ test("record entry forms and global create actions use separate workflows", () =
     /attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
-  const workflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "record-entry-workflow.js"),
-    "utf8",
-  );
   const propertyAccountEntry = fs.readFileSync(
     path.join(
       __dirname,
@@ -64,13 +60,7 @@ test("record entry forms and global create actions use separate workflows", () =
   );
   assert.match(propertyAccountEntry, /PropertyDeskPropertyForm\.create\(/);
   assert.match(propertyAccountEntry, /PropertyDeskAccountForm\.create\(/);
-  assert.match(workflow, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
-  assert.match(
-    workflow,
-    /PropertyDeskPropertyAccountEntryWorkflow\.create\([\s\S]*?PropertyDeskLedgerEntryForms\.create\(/,
-  );
-  assert.doesNotMatch(workflow, /PropertyDeskCreateActions\.create\(/);
   assert.match(propertyAccountEntry, /repository: context\.accountRepository/);
   assert.match(propertyAccountEntry, /repository: context\.propertyRepository/);
   assert.match(
@@ -78,38 +68,34 @@ test("record entry forms and global create actions use separate workflows", () =
     /buildAccountPayload: context\.accountPayload/,
   );
   assert.match(propertyAccountEntry, /formModel: context\.accountFormModel/);
-  assert.match(workflow, /transactionRepository,/);
-  assert.match(workflow, /transactionPayloads,/);
+  assert.match(app, /transactionRepository: repositories\.transactions/);
+  assert.match(
+    app,
+    /transactionPayloads: window\.PropertyDeskTransactionPayloads/,
+  );
   assert.match(
     app,
     /propertyRepository: repositories\.properties,[\s\S]*?accountRepository: repositories\.accounts,/,
   );
-  assert.match(
-    app,
-    /accountRepository: repositories\.accounts,[\s\S]*?transactionRepository: repositories\.transactions,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,/,
-  );
+  assert.match(app, /accountRepository: repositories\.accounts/);
   assert.match(
     app,
     /accountPayload: window\.PropertyDeskAccountPayload\.build,[\s\S]*?accountFormModel: window\.PropertyDeskAccountFormModel,/,
   );
-  assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
-  assert.match(app, /attachCreateActionEvents/);
+  assert.match(app, /PropertyDeskCreateActions\.create\(/);
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
   assert.match(
     transactionWorkflow,
-    /TransactionMaintenanceWorkflow\.create\([\s\S]*?RecordEntryWorkflow\.create\(\{[\s\S]*?accountRepository: entryContext\.accountRepository,[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
+    /TransactionMaintenanceWorkflow\.create\([\s\S]*?LedgerEntryForms\.create\(\{[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
   );
   assert.match(
     transactionWorkflow,
     /TransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance: maintenance,[\s\S]*?openPayment: entry\.openPayment/,
   );
-  assert.match(
-    transactionWorkflow,
-    /PropertyDeskCreateActions\.create\(\{[\s\S]*?resetPropertyForm: entry\.resetPropertyForm,[\s\S]*?navigate: entryContext\.navigate/,
-  );
+  assert.doesNotMatch(transactionWorkflow, /PropertyDeskCreateActions\.create/);
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 

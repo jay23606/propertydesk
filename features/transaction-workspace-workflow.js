@@ -13,7 +13,7 @@
         voiding: maintenanceContext.voiding,
         events: maintenanceContext.events,
       });
-    const entry = window.PropertyDeskRecordEntryWorkflow.create({
+    const entry = window.PropertyDeskLedgerEntryForms.create({
       $: entryContext.$,
       state: entryContext.state,
       moneyInput: entryContext.moneyInput,
@@ -25,26 +25,9 @@
       populateFormOptions: entryContext.populateFormOptions,
       prettyType: entryContext.prettyType,
       openModal: entryContext.openModal,
-      previewReminderEmail: entryContext.previewReminderEmail,
-      propertyRepository: entryContext.propertyRepository,
-      accountRepository: entryContext.accountRepository,
-      accountPayload: entryContext.accountPayload,
-      accountFormModel: entryContext.accountFormModel,
       transactionRepository: entryContext.transactionRepository,
       transactionPayloads: entryContext.transactionPayloads,
       saveCorrection: maintenance.saveCorrection,
-    });
-    const createActions = window.PropertyDeskCreateActions.create({
-      $: entryContext.$,
-      state: entryContext.state,
-      toast: entryContext.toast,
-      resetPropertyForm: entry.resetPropertyForm,
-      openModal: entryContext.openModal,
-      openAccountForProperty: entry.openAccountForProperty,
-      openPayment: entry.openPayment,
-      openExpense: entry.openExpense,
-      navigate: entryContext.navigate,
-      documentRef: entryContext.documentRef,
     });
     const screen = window.PropertyDeskTransactionScreenWorkflow.create({
       $: screenContext.$,
@@ -65,15 +48,10 @@
     });
 
     return {
-      editAccount: entry.editAccount,
-      openAccountForProperty: entry.openAccountForProperty,
       openPayment: entry.openPayment,
       openPropertyPayment: entry.openPropertyPayment,
       openExpense: entry.openExpense,
-      attachPropertyFormEvents: entry.attachPropertyFormEvents,
-      attachAccountFormEvents: entry.attachAccountFormEvents,
       attachLedgerEntryFormEvents: entry.attachLedgerEntryFormEvents,
-      attachCreateActionEvents: createActions.attachCreateActionEvents,
       renderPayments: screen.renderPayments,
       attachTransactionFilterEvents: screen.attachTransactionFilterEvents,
       attachTransactionActionEvents: screen.attachTransactionActionEvents,

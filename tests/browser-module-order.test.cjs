@@ -366,7 +366,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-workspace-workflow.js",
     ],
     [
-      "features/record-entry-workflow.js",
+      "features/ledger-entry-forms.js",
       "features/transaction-workspace-workflow.js",
     ],
     [
@@ -407,18 +407,14 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-account-entry-workflow.js",
     ],
     ["features/account-form.js", "features/property-account-entry-workflow.js"],
+    ["features/property-account-entry-workflow.js", "app.js"],
     [
-      "features/property-account-entry-workflow.js",
-      "features/record-entry-workflow.js",
-    ],
-    ["features/ledger-entry-forms.js", "features/record-entry-workflow.js"],
-    [
-      "features/create-actions.js",
+      "features/ledger-entry-forms.js",
       "features/transaction-workspace-workflow.js",
     ],
+    ["features/create-actions.js", "app.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/transaction-corrections.js", "app.js"],
-    ["features/record-entry-workflow.js", "app.js"],
     ["features/transaction-views.js", "app.js"],
     [
       "features/transaction-views.js",
@@ -426,10 +422,6 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/transaction-maintenance-workflow.js",
-      "features/transaction-screen-workflow.js",
-    ],
-    [
-      "features/record-entry-workflow.js",
       "features/transaction-screen-workflow.js",
     ],
     [

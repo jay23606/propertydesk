@@ -4,30 +4,31 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("transaction workspace shares corrections and entry actions across its flows", () => {
+test("transaction workspace owns only ledger entry and transaction workflows", () => {
   const calls = [];
   const saveCorrection = () => "corrected";
   const openPayment = () => "payment";
   const openExpense = () => "expense";
   const updatePaymentGuidance = () => "guidance";
-  const openAccountForProperty = () => "new account";
-  const resetPropertyForm = () => {};
-  const attachCreateActionEvents = () => {};
   const maintenance = {
     correction: { name: "correction" },
     voiding: { name: "voiding" },
     events: { name: "events" },
-    unusedMaintenanceValue: true,
   };
   const entry = {
+    $() {},
+    state: {},
+    moneyInput() {},
+    todayIso() {},
     toast() {},
-    previewReminderEmail() {},
-    propertyRepository: {},
-    accountPayload: () => {},
-    accountFormModel: {},
-    navigate() {},
-    documentRef: {},
-    unusedDependency: true,
+    closeModal() {},
+    fetchAll() {},
+    fillSelect() {},
+    populateFormOptions() {},
+    prettyType() {},
+    openModal() {},
+    transactionRepository: {},
+    transactionPayloads: {},
   };
   const screen = { state: {} };
   const context = vm.createContext({
@@ -38,22 +39,16 @@ test("transaction workspace shares corrections and entry actions across its flow
           return { saveCorrection };
         },
       },
-      PropertyDeskRecordEntryWorkflow: {
+      PropertyDeskLedgerEntryForms: {
         create(options) {
           calls.push(["entry", options]);
           return {
             openPayment,
+            openPropertyPayment() {},
             openExpense,
             updatePaymentGuidance,
-            openAccountForProperty,
-            resetPropertyForm,
+            attachLedgerEntryFormEvents() {},
           };
-        },
-      },
-      PropertyDeskCreateActions: {
-        create(options) {
-          calls.push(["create-actions", options]);
-          return { attachCreateActionEvents };
         },
       },
       PropertyDeskTransactionScreenWorkflow: {
@@ -89,52 +84,34 @@ test("transaction workspace shares corrections and entry actions across its flow
     });
 
   assert.equal(calls[0][0], "maintenance");
-  assert.equal(calls[0][1].correction, maintenance.correction);
-  assert.equal(calls[0][1].voiding, maintenance.voiding);
-  assert.equal(calls[0][1].events, maintenance.events);
-  assert.equal("unusedMaintenanceValue" in calls[0][1], false);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "correction",
     "events",
     "voiding",
   ]);
   assert.equal(calls[1][0], "entry");
-  assert.equal(calls[1][1].toast, entry.toast);
-  assert.equal(calls[1][1].previewReminderEmail, entry.previewReminderEmail);
-  assert.equal(calls[1][1].propertyRepository, entry.propertyRepository);
-  assert.equal(calls[1][1].accountPayload, entry.accountPayload);
-  assert.equal(calls[1][1].accountFormModel, entry.accountFormModel);
-  assert.equal("navigate" in calls[1][1], false);
-  assert.equal("documentRef" in calls[1][1], false);
-  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.equal(calls[1][1].transactionRepository, entry.transactionRepository);
+  assert.equal(calls[1][1].transactionPayloads, entry.transactionPayloads);
   assert.equal(calls[1][1].saveCorrection, saveCorrection);
-  assert.equal(calls[2][0], "create-actions");
-  assert.equal(calls[2][1].openPayment, openPayment);
-  assert.equal(calls[2][1].openExpense, openExpense);
-  assert.equal(calls[2][1].openAccountForProperty, openAccountForProperty);
-  assert.equal(calls[2][1].resetPropertyForm, resetPropertyForm);
-  assert.equal(calls[2][1].navigate, entry.navigate);
-  assert.equal(calls[2][1].documentRef, entry.documentRef);
-  assert.equal(calls[3][0], "screen");
-  assert.equal(calls[3][1].state, screen.state);
+  assert.equal("propertyRepository" in calls[1][1], false);
+  assert.equal("accountRepository" in calls[1][1], false);
+  assert.equal("accountPayload" in calls[1][1], false);
+  assert.equal("accountFormModel" in calls[1][1], false);
+  assert.equal("previewReminderEmail" in calls[1][1], false);
+  assert.equal(calls[2][0], "screen");
+  assert.equal(calls[2][1].state, screen.state);
   assert.equal(
-    calls[3][1].transactionMaintenance.saveCorrection,
+    calls[2][1].transactionMaintenance.saveCorrection,
     saveCorrection,
   );
-  assert.equal(calls[3][1].openPayment, openPayment);
-  assert.equal(calls[3][1].openExpense, openExpense);
-  assert.equal(calls[3][1].updatePaymentGuidance, updatePaymentGuidance);
+  assert.equal(calls[2][1].openPayment, openPayment);
+  assert.equal(calls[2][1].openExpense, openExpense);
+  assert.equal(calls[2][1].updatePaymentGuidance, updatePaymentGuidance);
   assert.equal(workflow.openPayment, openPayment);
-  assert.equal(workflow.renderPayments instanceof Function, true);
   assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachAccountFormEvents",
-    "attachCreateActionEvents",
     "attachLedgerEntryFormEvents",
-    "attachPropertyFormEvents",
     "attachTransactionActionEvents",
     "attachTransactionFilterEvents",
-    "editAccount",
-    "openAccountForProperty",
     "openExpense",
     "openPayment",
     "openPropertyPayment",
