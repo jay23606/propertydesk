@@ -5,47 +5,14 @@
   const { csvMoney, csvRate, validIsoDate } =
     globalThis.PropertyDeskCsvValueUtils;
   const { validateImportRows } = globalThis.PropertyDeskImportRows;
+  const { createContext: createIdentityContext, validate: validateIdentity } =
+    globalThis.PropertyDeskAccountImportIdentity;
   const { accountTypes, paymentFrequencies, propertyKinds, defaults } =
     globalThis.PropertyDeskDomainOptions;
-  const accountTypeValues = new Set(accountTypes.map(({ value }) => value));
   const paymentFrequencyValues = new Set(
     paymentFrequencies.map(({ value }) => value),
   );
   const propertyKindValues = new Set(propertyKinds.map(({ value }) => value));
-
-  function accountKey(name, propertyName, propertyAddress) {
-    return JSON.stringify([
-      name.toLowerCase(),
-      propertyName.toLowerCase(),
-      propertyAddress.toLowerCase(),
-    ]);
-  }
-
-  function accountIdentity(row, existingAccounts, seenAccounts) {
-    const required = [
-      "property_name",
-      "property_address",
-      "account_type",
-      "account_name",
-    ];
-    for (const key of required)
-      if (!row[key]) throw new Error(`Missing required value “${key}”.`);
-    const type = row.account_type.toLowerCase();
-    if (!accountTypeValues.has(type))
-      throw new Error(
-        `Invalid account_type “${row.account_type}”. Use ${[...accountTypeValues].join(", ")}.`,
-      );
-    const key = accountKey(
-      row.account_name,
-      row.property_name,
-      row.property_address,
-    );
-    if (existingAccounts.has(key) || seenAccounts.has(key))
-      throw new Error(
-        `Possible duplicate account: ${row.account_name} at ${row.property_address}.`,
-      );
-    return { type, key };
-  }
 
   function accountFinancialFields(row, type) {
     const amount = csvMoney(
@@ -157,18 +124,14 @@
   }
 
   function normalizeAccountRow(row, context) {
-    const { type, key } = accountIdentity(
-      row,
-      context.existingAccounts,
-      context.seenAccounts,
-    );
+    const { type, key } = validateIdentity(row, context.identity);
     const financial = accountFinancialFields(row, type);
     const schedule = accountScheduleFields(row, context.today);
     const lateFee = csvMoney(row.late_fee, `${row.account_name} late fee`, {
       optional: true,
     });
     const contact = accountContactFields(row);
-    context.seenAccounts.add(key);
+    context.identity.seenAccounts.add(key);
     return {
       property_name: row.property_name,
       property_address: row.property_address,
@@ -200,20 +163,13 @@
   }
 
   function validateAccountRows(rows, properties, accounts, today) {
-    const seenAccounts = new Set();
-    const propertyById = new Map(
-      properties.map((property) => [property.id, property]),
-    );
-    const existingAccounts = new Set(
-      accounts.flatMap((account) => {
-        const property = propertyById.get(account.property_id);
-        return property
-          ? [accountKey(account.name, property.name, property.address)]
-          : [];
-      }),
+    const identity = createIdentityContext(
+      properties,
+      accounts,
+      new Set(accountTypes.map(({ value }) => value)),
     );
     return validateImportRows(rows, (row) =>
-      normalizeAccountRow(row, { existingAccounts, seenAccounts, today }),
+      normalizeAccountRow(row, { identity, today }),
     );
   }
 
