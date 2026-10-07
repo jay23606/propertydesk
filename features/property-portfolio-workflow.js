@@ -73,14 +73,18 @@
       portfolioTable,
       portfolioModel,
     });
-    const propertyActions =
-      window.PropertyDeskPropertyPortfolioActionsWorkflow.create({
-        $,
+    const { editPropertyQuickNote } =
+      window.PropertyDeskPropertyQuickNote.create({
         state,
         toast,
         fetchAll,
         streetAddress,
+      });
+    const { attachEvents: attachPropertyActionEvents } =
+      window.PropertyDeskPropertyViewEvents.create({
+        $,
         openPayment,
+        editPropertyQuickNote,
         openPropertyDetails,
         openAccountForProperty,
       });
@@ -88,7 +92,7 @@
     return {
       renderProperties: propertyViews.renderProperties,
       attachPropertyGridEvents: propertyViews.attachEvents,
-      attachPropertyActionEvents: propertyActions.attachEvents,
+      attachPropertyActionEvents,
     };
   }
 

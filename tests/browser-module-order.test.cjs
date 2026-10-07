@@ -283,7 +283,11 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-portfolio-model.js",
     ],
     [
-      "features/property-portfolio-actions-workflow.js",
+      "features/property-quick-note.js",
+      "features/property-portfolio-workflow.js",
+    ],
+    [
+      "features/property-view-events.js",
       "features/property-portfolio-workflow.js",
     ],
     ["features/repository-query-utils.js", "features/property-repository.js"],

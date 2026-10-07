@@ -170,7 +170,8 @@ test("app root composes independent property screens and shares detail actions",
     "features/property-portfolio-account-row-model.js",
     "features/property-portfolio-model.js",
     "features/property-views.js",
-    "features/property-portfolio-actions-workflow.js",
+    "features/property-view-events.js",
+    "features/property-quick-note.js",
     "features/property-portfolio-workflow.js",
   ]) {
     assert.ok(

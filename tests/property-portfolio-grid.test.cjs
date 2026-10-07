@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("app composes the Properties grid and action workflows explicitly", () => {
+test("app composes the Properties grid and action operations explicitly", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const workflow = fs.readFileSync(
@@ -21,7 +21,8 @@ test("app composes the Properties grid and action workflows explicitly", () => {
     "PropertyDeskPropertyPortfolioFilterModel.create(",
     "PropertyDeskPropertyPortfolioModel.create(",
     "PropertyDeskPropertyViews.create(",
-    "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
+    "PropertyDeskPropertyQuickNote.create(",
+    "PropertyDeskPropertyViewEvents.create(",
   ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -31,7 +32,7 @@ test("app composes the Properties grid and action workflows explicitly", () => {
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDeskPropertyPortfolio(?:Table|Model|ActionsWorkflow)\.create\(/,
+    /(?:PropertyDeskPropertyPortfolio(?:Table|Model)|PropertyDeskProperty(?:QuickNote|ViewEvents))\.create\(/,
   );
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   const script = "features/property-portfolio-workflow.js";
@@ -47,6 +48,10 @@ test("app composes the Properties grid and action workflows explicitly", () => {
 
 test("Properties workflow returns explicit view and action operations", () => {
   const calls = [];
+  const action = () => {};
+  const editPropertyQuickNote = () => {};
+  const state = {};
+  const passed = {};
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyPortfolioTable: {
@@ -85,9 +90,17 @@ test("Properties workflow returns explicit view and action operations", () => {
           return { renderProperties() {}, attachEvents() {} };
         },
       },
-      PropertyDeskPropertyPortfolioActionsWorkflow: {
-        create: () => {
+      PropertyDeskPropertyQuickNote: {
+        create: (options) => {
+          calls.push("quick note");
+          passed.quickNote = options;
+          return { editPropertyQuickNote };
+        },
+      },
+      PropertyDeskPropertyViewEvents: {
+        create: (options) => {
           calls.push("portfolio actions");
+          passed.actions = options;
           return { attachEvents() {} };
         },
       },
@@ -101,9 +114,16 @@ test("Properties workflow returns explicit view and action operations", () => {
     context,
   );
 
-  const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create(
-    {},
-  );
+  const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
+    $: action,
+    state,
+    toast: action,
+    fetchAll: action,
+    streetAddress: action,
+    openPayment: action,
+    openPropertyDetails: action,
+    openAccountForProperty: action,
+  });
 
   assert.deepEqual(calls, [
     "table",
@@ -112,6 +132,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     "filter model",
     "portfolio model",
     "property views",
+    "quick note",
     "portfolio actions",
   ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
@@ -119,6 +140,15 @@ test("Properties workflow returns explicit view and action operations", () => {
     "attachPropertyGridEvents",
     "renderProperties",
   ]);
+  assert.equal(passed.quickNote.state, state);
+  assert.equal(passed.quickNote.toast, action);
+  assert.equal(passed.quickNote.fetchAll, action);
+  assert.equal(passed.quickNote.streetAddress, action);
+  assert.equal(passed.actions.$, action);
+  assert.equal(passed.actions.openPayment, action);
+  assert.equal(passed.actions.editPropertyQuickNote, editPropertyQuickNote);
+  assert.equal(passed.actions.openPropertyDetails, action);
+  assert.equal(passed.actions.openAccountForProperty, action);
 });
 
 test("Properties account-row model derives balances and reminder details", () => {

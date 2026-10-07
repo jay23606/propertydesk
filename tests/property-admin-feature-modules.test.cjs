@@ -326,7 +326,7 @@ test("property holder save persists the member IDs supplied by the event layer",
   assert.deepEqual(messages, ["Account-holder labels saved"]);
 });
 
-test("quick note feature loads before portfolio actions and is precached", () => {
+test("quick note and grid actions load before the Properties workflow", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -334,16 +334,17 @@ test("quick note feature loads before portfolio actions and is precached", () =>
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
     html.indexOf("features/property-quick-note.js") <
-      html.indexOf("features/property-portfolio-actions-workflow.js"),
-    "property quick note should load before the portfolio action coordinator",
+      html.indexOf("features/property-portfolio-workflow.js"),
+    "property quick note should load before the Properties workflow",
   );
   assert.ok(
     html.indexOf("features/property-view-events.js") <
-      html.indexOf("features/property-portfolio-actions-workflow.js"),
+      html.indexOf("features/property-portfolio-workflow.js"),
   );
   for (const source of [
     "property-quick-note.js",
-    "property-portfolio-actions-workflow.js",
+    "property-view-events.js",
+    "property-portfolio-workflow.js",
   ]) {
     assert.ok(worker.includes(`'./features/${source}'`));
   }
