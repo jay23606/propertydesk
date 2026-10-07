@@ -225,13 +225,18 @@
       correctTransaction,
       voidTransaction,
     });
-  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
-    state,
-    depositLedger,
-    money,
-    fmtDate,
-    esc,
-  });
+  const { buildDepositDetails } = window.PropertyDeskDepositDetailsModel.create(
+    { state, depositLedger },
+  );
+  const { depositSectionHTML: renderDepositSection } =
+    window.PropertyDeskDepositDetailsView.create({
+      money,
+      fmtDate,
+      esc,
+    });
+  function depositSectionHTML(account) {
+    return renderDepositSection(buildDepositDetails(account));
+  }
   const { openAccountDetails } =
     window.PropertyDeskAccountDetailContentWorkflow.create({
       $,

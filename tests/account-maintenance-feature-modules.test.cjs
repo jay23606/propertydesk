@@ -8,7 +8,9 @@ const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 test("app connects account and deposit actions without workflow wrappers", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositDetails\.create\(/);
+  assert.match(app, /PropertyDeskDepositDetailsModel\.create\(/);
+  assert.match(app, /PropertyDeskDepositDetailsView\.create\(/);
+  assert.match(app, /renderDepositSection\(buildDepositDetails\(account\)\)/);
   const accountMaintenance = app.indexOf(
     "PropertyDeskAccountCloseMaintenance.create(",
   );

@@ -9,7 +9,6 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   for (const filename of [
     "deposit-details-model.js",
     "deposit-details-view.js",
-    "deposit-details.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -17,51 +16,55 @@ test("deposit details render rental-only ledger rows and preserve voided markers
     );
   }
   let ledgerReads = 0;
-  const details = context.window.PropertyDeskDepositDetails.create({
-    state: {
-      payments: [{ id: "payment-1", memo: "Move-in" }],
-      expenses: [],
-    },
-    depositLedger: () => {
-      ledgerReads += 1;
-      return {
-        entries: [
-          {
-            id: "entry-1",
-            entry_type: "received",
-            movement_date: "2026-10-01",
-            amount: 500,
-            source_payment_id: "payment-1",
+  const state = {
+    payments: [{ id: "payment-1", memo: "Move-in" }],
+    expenses: [],
+  };
+  const { buildDepositDetails } =
+    context.window.PropertyDeskDepositDetailsModel.create({
+      state,
+      depositLedger: () => {
+        ledgerReads += 1;
+        return {
+          entries: [
+            {
+              id: "entry-1",
+              entry_type: "received",
+              movement_date: "2026-10-01",
+              amount: 500,
+              source_payment_id: "payment-1",
+            },
+            {
+              id: "entry-2",
+              entry_type: "retained",
+              movement_date: "2026-10-02",
+              amount: 100,
+              reason: "Repair",
+            },
+          ],
+          active: [{ id: "entry-1" }],
+          totals: {
+            held: 400,
+            received: 500,
+            refunded: 0,
+            retained: 100,
+            restored: 0,
           },
-          {
-            id: "entry-2",
-            entry_type: "retained",
-            movement_date: "2026-10-02",
-            amount: 100,
-            reason: "Repair",
-          },
-        ],
-        active: [{ id: "entry-1" }],
-        totals: {
-          held: 400,
-          received: 500,
-          refunded: 0,
-          retained: 100,
-          restored: 0,
-        },
-      };
-    },
-    money: (value) => `$${value.toFixed(2)}`,
-    fmtDate: (value) => value,
-    esc: (value) => String(value).replaceAll("<", "&lt;"),
-  });
+        };
+      },
+    });
+  const { depositSectionHTML: renderDepositSection } =
+    context.window.PropertyDeskDepositDetailsView.create({
+      money: (value) => `$${value.toFixed(2)}`,
+      fmtDate: (value) => value,
+      esc: (value) => String(value).replaceAll("<", "&lt;"),
+    });
+  const depositSectionHTML = (account) =>
+    renderDepositSection(buildDepositDetails(account));
 
-  assert.equal(
-    details.depositSectionHTML({ id: "note-1", account_type: "note" }),
-    "",
-  );
+  assert.equal(depositSectionHTML({ id: "note-1", account_type: "note" }), "");
   assert.equal(ledgerReads, 0);
-  const html = details.depositSectionHTML({
+  const html = depositSectionHTML({
     id: "rental-1",
     account_type: "rental",
   });
