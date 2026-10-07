@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { lateReminderMailto } = require("../email-utils.js");
+const { lateReminderMailto } = require("../features/email-utils.js");
 
 function parts(href) {
   const url = new URL(href);
@@ -79,10 +79,10 @@ test("the app renders the account holder as a mailto link instead of an account-
     views,
     /class="table-action" data-detail="\$\{esc\(account\.id\)\}">${esc\(account\.party_name/,
   );
-  assert.ok(html.indexOf("email-utils.js") < html.indexOf("app.js"));
+  assert.ok(html.indexOf("features/email-utils.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/property-views.js") < html.indexOf("app.js"),
   );
-  assert.match(worker, /'\.\/email-utils\.js'/);
+  assert.match(worker, /'\.\/features\/email-utils\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
 });
