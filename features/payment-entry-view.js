@@ -8,7 +8,6 @@
       state,
       moneyInput,
       todayIso,
-      toast,
       fillSelect,
       populateFormOptions,
       prettyType,
@@ -103,18 +102,6 @@
       openModal("payment-modal");
     }
 
-    function openPropertyPayment(propertyId) {
-      const accounts = state.accounts.filter(
-        (account) =>
-          account.property_id === propertyId && account.status === "active",
-      );
-      if (!accounts.length) {
-        toast("Add an active account before recording a payment");
-        return;
-      }
-      openPayment(accounts.length === 1 ? accounts[0].id : null, propertyId);
-    }
-
     function attachEvents() {
       $("payment-account").addEventListener("change", () => {
         prefillPaymentAmount();
@@ -130,7 +117,6 @@
       resetAfterSave,
       prepareNextPayment,
       openPayment,
-      openPropertyPayment,
       attachEvents,
     };
   }

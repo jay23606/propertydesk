@@ -58,6 +58,7 @@ function loadLedgerEntryForms(context) {
     "transaction-repository.js",
     "transaction-inserts.js",
     "payment-entry-view.js",
+    "property-payment-action.js",
     "payment-entry-form.js",
     "expense-entry-view.js",
     "expense-entry-form.js",

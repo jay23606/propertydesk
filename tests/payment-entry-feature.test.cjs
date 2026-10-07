@@ -56,7 +56,6 @@ test("opening a payment for an account prefills its scheduled installment withou
     fillSelect() {},
     prettyType: (value) => value,
     openModal() {},
-    toast() {},
   });
 
   feature.attachEvents();
@@ -65,6 +64,45 @@ test("opening a payment for an account prefills its scheduled installment withou
   elements.get("payment-amount").value = "300";
   handlers.get("payment-account:change")();
   assert.equal(elements.get("payment-amount").value, "300");
+});
+
+test("property payment action targets the active account or asks for a choice", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-payment-action.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const calls = [];
+  const messages = [];
+  const state = {
+    accounts: [
+      { id: "current", property_id: "one", status: "active" },
+      { id: "closed", property_id: "one", status: "closed" },
+      { id: "other", property_id: "two", status: "active" },
+      { id: "second", property_id: "three", status: "active" },
+      { id: "third", property_id: "three", status: "active" },
+    ],
+  };
+  const feature = context.window.PropertyDeskPropertyPaymentAction.create({
+    state,
+    toast: (message) => messages.push(message),
+    openPayment: (...args) => calls.push(args),
+  });
+
+  feature.openPropertyPayment("one");
+  feature.openPropertyPayment("three");
+  feature.openPropertyPayment("missing");
+
+  assert.deepEqual(calls, [
+    ["current", "one"],
+    [null, "three"],
+  ]);
+  assert.deepEqual(messages, [
+    "Add an active account before recording a payment",
+  ]);
 });
 
 test("recording a loan payment does not invent principal or interest splits", async () => {

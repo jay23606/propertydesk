@@ -171,6 +171,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/ledger-entry-forms.js",
     ],
     ["features/payment-entry-form.js", "features/ledger-entry-forms.js"],
+    ["features/property-payment-action.js", "features/payment-entry-form.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/record-entry-workflow.js", "features/ledger-workflow.js"],
     [

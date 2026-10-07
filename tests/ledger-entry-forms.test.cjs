@@ -374,7 +374,6 @@ test("payment and expense form workflows publish explicit view operations", () =
     "populateFormOptions",
     "prettyType",
     "state",
-    "toast",
     "todayIso",
   ]);
   assert.deepEqual(Object.keys(viewDependencies.expense).sort(), [

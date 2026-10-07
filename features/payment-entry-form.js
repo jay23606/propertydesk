@@ -24,12 +24,17 @@
       state,
       moneyInput,
       todayIso,
-      toast,
       fillSelect,
       populateFormOptions,
       prettyType,
       openModal,
     });
+    const { openPropertyPayment } =
+      window.PropertyDeskPropertyPaymentAction.create({
+        state,
+        toast,
+        openPayment: paymentView.openPayment,
+      });
 
     async function savePayment(event) {
       event.preventDefault();
@@ -88,7 +93,7 @@
       resetAfterSave: paymentView.resetAfterSave,
       prepareNextPayment: paymentView.prepareNextPayment,
       openPayment: paymentView.openPayment,
-      openPropertyPayment: paymentView.openPropertyPayment,
+      openPropertyPayment,
       attachEvents,
     };
   }
