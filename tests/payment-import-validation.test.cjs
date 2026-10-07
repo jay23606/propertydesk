@@ -26,6 +26,7 @@ test("payment import enforces loan allocation totals and excludes duplicate rece
   );
   assert.equal(result.valid[0].principal_amount, 150);
   assert.equal(result.valid[0].interest_amount, 50);
+  assert.match(result.errors[0].message, /must add up to \$100\.00/);
 });
 
 test("simple loan payment imports do not need principal and interest columns", () => {

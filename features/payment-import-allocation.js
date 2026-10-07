@@ -3,6 +3,8 @@
   "use strict";
 
   const { csvMoney } = globalThis.PropertyDeskCsvValueUtils;
+  const money = globalThis.PropertyDeskDisplayUtils?.money;
+  if (!money) throw new Error("The PropertyDesk display helper is not loaded.");
   const allocationColumns = [
     "principal_amount",
     "interest_amount",
@@ -59,7 +61,7 @@
     );
     if (Math.round(allocated * 100) !== Math.round(amount * 100))
       throw new Error(
-        `Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(amount)}.`,
+        `Payment allocations for ${account.name} on ${paymentDate} must add up to ${money(amount)}.`,
       );
     return allocation;
   }

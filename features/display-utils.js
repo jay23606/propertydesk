@@ -2,9 +2,10 @@
 (() => {
   "use strict";
 
+  const target = typeof window === "undefined" ? globalThis : window;
   const { accountTypes, paymentFrequencies, propertyKinds } =
-    window.PropertyDeskDomainOptions;
-  const { expenseCategories } = window.PropertyDeskTransactionOptions;
+    target.PropertyDeskDomainOptions;
+  const { expenseCategories } = target.PropertyDeskTransactionOptions;
   const optionLabel = (options, value, fallback) => {
     const option = options.find((item) => item.value === value);
     return option?.displayLabel || option?.label || fallback;
@@ -41,7 +42,7 @@
     optionLabel(expenseCategories, category, null) ||
     String(category || "other").replaceAll("_", " ");
 
-  window.PropertyDeskDisplayUtils = Object.freeze({
+  const helpers = Object.freeze({
     money,
     esc,
     prettyType,
@@ -49,4 +50,6 @@
     paymentFrequencyLabel,
     expenseCategoryLabel,
   });
+  target.PropertyDeskDisplayUtils = helpers;
+  if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();
