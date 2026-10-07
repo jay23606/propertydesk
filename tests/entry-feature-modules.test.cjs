@@ -54,10 +54,15 @@ test("record entry workflow owns forms and their global create actions", () => {
   }
   assert.match(workflow, /PropertyDeskCreateActions\.create\(/);
   assert.match(workflow, /repository: accountRepository/);
+  assert.match(workflow, /repository: propertyRepository/);
   assert.match(workflow, /buildAccountPayload: accountPayload/);
   assert.match(workflow, /formModel: accountFormModel/);
   assert.match(workflow, /transactionRepository,/);
   assert.match(workflow, /transactionPayloads,/);
+  assert.match(
+    app,
+    /propertyRepository: window\.PropertyDeskPropertyRepository,[\s\S]*?accountRepository: window\.PropertyDeskAccountRepository,/,
+  );
   assert.match(
     app,
     /accountRepository: window\.PropertyDeskAccountRepository,[\s\S]*?transactionRepository: window\.PropertyDeskTransactionRepository,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,/,

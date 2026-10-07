@@ -3,6 +3,7 @@ const test = require("node:test");
 const {
   loadPropertyAndAccountForms,
   accountFormDependencies,
+  propertyFormDependencies,
   formElements,
 } = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
@@ -20,7 +21,10 @@ test("property and account form modules expose separate APIs", () => {
     populateFormOptions() {},
     openModal() {},
   };
-  const property = context.window.PropertyDeskPropertyForm.create(dependencies);
+  const property = context.window.PropertyDeskPropertyForm.create({
+    ...dependencies,
+    ...propertyFormDependencies(context),
+  });
   let accountViewDependencies;
   context.window.PropertyDeskAccountFormView = {
     create: (viewDependencies) => {
@@ -311,7 +315,10 @@ test("property and account forms report rejected saves without running success a
     closeModal: () => assert.fail("rejected save must keep its form open"),
     fetchAll: async () => assert.fail("rejected save must not refresh"),
   };
-  const property = context.window.PropertyDeskPropertyForm.create(dependencies);
+  const property = context.window.PropertyDeskPropertyForm.create({
+    ...dependencies,
+    ...propertyFormDependencies(context),
+  });
   const account = context.window.PropertyDeskAccountForm.create({
     ...dependencies,
     moneyInput: Number,

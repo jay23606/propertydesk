@@ -26,6 +26,7 @@
       previewReminderEmail: entryContext.previewReminderEmail,
       navigate: entryContext.navigate,
       documentRef: entryContext.documentRef,
+      propertyRepository: entryContext.propertyRepository,
       accountRepository: entryContext.accountRepository,
       accountPayload: entryContext.accountPayload,
       accountFormModel: entryContext.accountFormModel,

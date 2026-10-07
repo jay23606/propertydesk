@@ -14,6 +14,7 @@ test("transaction workspace shares corrections and entry actions across its flow
   const entry = {
     toast() {},
     previewReminderEmail() {},
+    propertyRepository: {},
     accountPayload: () => {},
     accountFormModel: {},
     unusedDependency: true,
@@ -70,6 +71,7 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[1][0], "entry");
   assert.equal(calls[1][1].toast, entry.toast);
   assert.equal(calls[1][1].previewReminderEmail, entry.previewReminderEmail);
+  assert.equal(calls[1][1].propertyRepository, entry.propertyRepository);
   assert.equal(calls[1][1].accountPayload, entry.accountPayload);
   assert.equal(calls[1][1].accountFormModel, entry.accountFormModel);
   assert.equal("unusedDependency" in calls[1][1], false);

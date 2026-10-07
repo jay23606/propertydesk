@@ -4,6 +4,7 @@ const {
   loadLedgerEntryForms,
   ledgerEntryDependencies,
   accountFormDependencies,
+  propertyFormDependencies,
   loadPropertyAndAccountForms,
   formElements,
 } = require("./feature-test-helpers.cjs");
@@ -291,7 +292,10 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     populateFormOptions() {},
     openModal() {},
   };
-  const property = context.window.PropertyDeskPropertyForm.create(formContext);
+  const property = context.window.PropertyDeskPropertyForm.create({
+    ...formContext,
+    ...propertyFormDependencies(context),
+  });
   const account = context.window.PropertyDeskAccountForm.create({
     ...formContext,
     previewReminderEmail: () => {},

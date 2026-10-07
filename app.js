@@ -188,6 +188,7 @@
       previewReminderEmail,
       navigate,
       documentRef: document,
+      propertyRepository: window.PropertyDeskPropertyRepository,
       accountRepository: window.PropertyDeskAccountRepository,
       accountPayload: window.PropertyDeskAccountPayload.build,
       accountFormModel: window.PropertyDeskAccountFormModel,

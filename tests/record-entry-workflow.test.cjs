@@ -85,6 +85,7 @@ test("record entry workflow composes forms and exposes their actions and binders
     prettyType: () => {},
     openModal: () => {},
     previewReminderEmail: preview,
+    propertyRepository: {},
     accountPayload: context.window.PropertyDeskAccountPayload.build,
     accountFormModel: context.window.PropertyDeskAccountFormModel,
     saveCorrection: () => {},

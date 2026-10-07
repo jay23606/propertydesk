@@ -19,6 +19,7 @@
       saveCorrection,
       navigate,
       documentRef,
+      propertyRepository,
       accountRepository,
       accountPayload,
       accountFormModel,
@@ -31,6 +32,7 @@
       toast,
       closeModal,
       fetchAll,
+      repository: propertyRepository,
     });
     const accountForm = window.PropertyDeskAccountForm.create({
       $,

@@ -2,13 +2,20 @@
 (() => {
   "use strict";
 
-  function createPropertyForm({ $, state, toast, closeModal, fetchAll }) {
+  function createPropertyForm({
+    $,
+    state,
+    toast,
+    closeModal,
+    fetchAll,
+    repository,
+  }) {
     const formView = window.PropertyDeskPropertyFormView.create({ $ });
     const { saveProperty: persistProperty } =
       window.PropertyDeskPropertyMaintenance.create({
         state,
         toast,
-        repository: window.PropertyDeskPropertyRepository,
+        repository,
       });
 
     async function saveProperty(event) {
