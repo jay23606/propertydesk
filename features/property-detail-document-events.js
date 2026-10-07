@@ -8,7 +8,7 @@
     deletePropertyDocument,
     uploadPropertyDocument,
   }) {
-    function attachEvents() {
+    function attachPropertyDocumentEvents() {
       const detailContent = $("property-detail-content");
       detailContent.addEventListener("click", (event) => {
         const openDocument = event.target.closest("[data-open-document]");
@@ -30,7 +30,7 @@
       });
     }
 
-    return { attachEvents };
+    return { attachPropertyDocumentEvents };
   }
 
   window.PropertyDeskPropertyDetailDocumentEvents = Object.freeze({

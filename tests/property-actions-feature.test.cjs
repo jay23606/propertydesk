@@ -151,7 +151,7 @@ test("property detail events own editing and quick-action bindings", () => {
     });
 
   feature.attachEvents();
-  holderEvents.attachEvents();
+  holderEvents.attachPropertyHolderEvents();
   quickActions.attachEvents();
   const dispatch = (key, event) => {
     for (const handler of handlers.get(key) || []) handler(event);

@@ -19,7 +19,7 @@ test("property holder workflow connects saves to its delegated event binder", ()
       PropertyDeskPropertyHolderEvents: {
         create(options) {
           passed.events = options;
-          return { attachEvents };
+          return { attachPropertyHolderEvents: attachEvents };
         },
       },
     },

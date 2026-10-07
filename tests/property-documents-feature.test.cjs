@@ -31,7 +31,7 @@ test("property detail document events route private document actions to document
       deletePropertyDocument: (id) => calls.push(["delete", id]),
       uploadPropertyDocument: (input) => calls.push(["upload", input.id]),
     });
-  feature.attachEvents();
+  feature.attachPropertyDocumentEvents();
 
   let prevented = false;
   let propagationStopped = false;

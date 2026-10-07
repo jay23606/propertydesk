@@ -3,7 +3,7 @@
   "use strict";
 
   function create({ $, savePropertyHolders }) {
-    function attachEvents() {
+    function attachPropertyHolderEvents() {
       $("property-detail-content").addEventListener("click", (event) => {
         if (event.target.closest("[data-save-holders]")) {
           const selectedMemberIds = [
@@ -16,7 +16,7 @@
       });
     }
 
-    return { attachEvents };
+    return { attachPropertyHolderEvents };
   }
 
   window.PropertyDeskPropertyHolderEvents = Object.freeze({ create });

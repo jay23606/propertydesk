@@ -4,7 +4,7 @@
 
   function createPropertyDocumentManagementWorkflow(context) {
     const propertyDocuments = window.PropertyDeskDocuments.create(context);
-    const { attachEvents: attachPropertyDocumentEvents } =
+    const { attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDetailDocumentEvents.create({
         $: context.$,
         uploadPropertyDocument: propertyDocuments.uploadPropertyDocument,

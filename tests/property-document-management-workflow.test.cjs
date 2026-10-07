@@ -22,7 +22,7 @@ test("property document workflow connects private file actions to detail events"
       PropertyDeskPropertyDetailDocumentEvents: {
         create(options) {
           passed.events = options;
-          return { attachEvents };
+          return { attachPropertyDocumentEvents: attachEvents };
         },
       },
     },
