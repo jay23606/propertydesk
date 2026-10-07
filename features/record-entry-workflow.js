@@ -1,4 +1,4 @@
-/* Compose property, account, payment, and expense form workflows. */
+/* Compose property/account record forms with payment/expense forms. */
 (() => {
   "use strict";
 
@@ -11,9 +11,7 @@
       toast,
       closeModal,
       fetchAll,
-      fillSelect,
       populateFormOptions,
-      prettyType,
       openModal,
       previewReminderEmail,
       saveCorrection,
@@ -24,30 +22,24 @@
       transactionRepository,
       transactionPayloads,
     } = context;
-    const propertyForm = window.PropertyDeskPropertyForm.create({
-      $,
-      state,
-      toast,
-      closeModal,
-      fetchAll,
-      repository: propertyRepository,
-    });
-    const accountForm = window.PropertyDeskAccountForm.create({
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      closeModal,
-      fetchAll,
-      populateFormOptions,
-      openModal,
-      previewReminderEmail,
-      buildAccountPayload: accountPayload,
-      formModel: accountFormModel,
-      repository: accountRepository,
-    });
-    const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
+    const propertyAccountEntry =
+      window.PropertyDeskPropertyAccountEntryWorkflow.create({
+        $,
+        state,
+        moneyInput,
+        todayIso,
+        toast,
+        closeModal,
+        fetchAll,
+        populateFormOptions,
+        openModal,
+        previewReminderEmail,
+        propertyRepository,
+        accountRepository,
+        accountPayload,
+        accountFormModel,
+      });
+    const ledgerEntry = window.PropertyDeskLedgerEntryWorkflow.create({
       $,
       state,
       moneyInput,
@@ -55,25 +47,17 @@
       toast,
       closeModal,
       fetchAll,
-      fillSelect,
+      fillSelect: context.fillSelect,
       populateFormOptions,
-      prettyType,
+      prettyType: context.prettyType,
       openModal,
       saveCorrection,
       transactionRepository,
       transactionPayloads,
     });
     return {
-      editAccount: accountForm.editAccount,
-      openAccountForProperty: accountForm.openAccountForProperty,
-      resetPropertyForm: propertyForm.resetPropertyForm,
-      updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
-      openPayment: ledgerEntryForms.openPayment,
-      openPropertyPayment: ledgerEntryForms.openPropertyPayment,
-      openExpense: ledgerEntryForms.openExpense,
-      attachPropertyFormEvents: propertyForm.attachEvents,
-      attachAccountFormEvents: accountForm.attachEvents,
-      attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
+      ...propertyAccountEntry,
+      ...ledgerEntry,
     };
   }
 

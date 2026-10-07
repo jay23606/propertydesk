@@ -46,14 +46,34 @@ test("record entry forms and global create actions use separate workflows", () =
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),
     "utf8",
   );
-  for (const feature of ["PropertyForm", "AccountForm", "LedgerEntryForms"]) {
-    assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
-  }
+  const propertyAccountEntry = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-account-entry-workflow.js",
+    ),
+    "utf8",
+  );
+  const ledgerEntryWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "ledger-entry-workflow.js"),
+    "utf8",
+  );
+  assert.match(propertyAccountEntry, /PropertyDeskPropertyForm\.create\(/);
+  assert.match(propertyAccountEntry, /PropertyDeskAccountForm\.create\(/);
+  assert.match(ledgerEntryWorkflow, /PropertyDeskLedgerEntryForms\.create\(/);
+  assert.match(
+    workflow,
+    /PropertyDeskPropertyAccountEntryWorkflow\.create\([\s\S]*?PropertyDeskLedgerEntryWorkflow\.create\(/,
+  );
   assert.doesNotMatch(workflow, /PropertyDeskCreateActions\.create\(/);
-  assert.match(workflow, /repository: accountRepository/);
-  assert.match(workflow, /repository: propertyRepository/);
-  assert.match(workflow, /buildAccountPayload: accountPayload/);
-  assert.match(workflow, /formModel: accountFormModel/);
+  assert.match(propertyAccountEntry, /repository: context\.accountRepository/);
+  assert.match(propertyAccountEntry, /repository: context\.propertyRepository/);
+  assert.match(
+    propertyAccountEntry,
+    /buildAccountPayload: context\.accountPayload/,
+  );
+  assert.match(propertyAccountEntry, /formModel: context\.accountFormModel/);
   assert.match(workflow, /transactionRepository,/);
   assert.match(workflow, /transactionPayloads,/);
   assert.match(

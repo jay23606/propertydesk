@@ -20,27 +20,20 @@ test("record entry workflow composes forms and exposes their actions and binders
   const preview = () => {};
   const context = vm.createContext({
     window: {
-      PropertyDeskPropertyForm: {
+      PropertyDeskPropertyAccountEntryWorkflow: {
         create(dependencies) {
-          passed.property = dependencies;
+          passed.propertyAccount = dependencies;
           return {
             resetPropertyForm: propertyReset,
-            attachEvents: propertyAttach,
-          };
-        },
-      },
-      PropertyDeskAccountForm: {
-        create(dependencies) {
-          passed.account = dependencies;
-          return {
-            openAccountForProperty,
             editAccount,
-            attachEvents: () =>
+            openAccountForProperty,
+            attachPropertyFormEvents: propertyAttach,
+            attachAccountFormEvents: () =>
               accountAttach(dependencies.previewReminderEmail),
           };
         },
       },
-      PropertyDeskLedgerEntryForms: {
+      PropertyDeskLedgerEntryWorkflow: {
         create(dependencies) {
           passed.ledger = dependencies;
           return {
@@ -48,7 +41,7 @@ test("record entry workflow composes forms and exposes their actions and binders
             openPayment,
             openPropertyPayment,
             openExpense,
-            attachEvents: ledgerAttach,
+            attachLedgerEntryFormEvents: ledgerAttach,
           };
         },
       },
@@ -78,24 +71,36 @@ test("record entry workflow composes forms and exposes their actions and binders
     openModal: () => {},
     previewReminderEmail: preview,
     propertyRepository: {},
+    accountRepository: {},
     accountPayload: context.window.PropertyDeskAccountPayload.build,
     accountFormModel: context.window.PropertyDeskAccountFormModel,
     saveCorrection: () => {},
+    transactionRepository: {},
+    transactionPayloads: {},
   };
   const workflow =
     context.window.PropertyDeskRecordEntryWorkflow.create(dependencies);
 
-  assert.equal(passed.property.state, dependencies.state);
+  assert.equal(passed.propertyAccount.state, dependencies.state);
   assert.equal(
-    passed.account.buildAccountPayload,
+    passed.propertyAccount.propertyRepository,
+    dependencies.propertyRepository,
+  );
+  assert.equal(
+    passed.propertyAccount.accountPayload,
     context.window.PropertyDeskAccountPayload.build,
   );
   assert.equal(
-    passed.account.formModel,
+    passed.propertyAccount.accountFormModel,
     context.window.PropertyDeskAccountFormModel,
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
-  assert.equal(passed.account.previewReminderEmail, preview);
+  assert.equal(passed.ledger.fillSelect, dependencies.fillSelect);
+  assert.equal(
+    passed.ledger.transactionRepository,
+    dependencies.transactionRepository,
+  );
+  assert.equal(passed.propertyAccount.previewReminderEmail, preview);
   assert.equal(workflow.resetPropertyForm, propertyReset);
   for (const [name, expected] of Object.entries({
     editAccount,
