@@ -347,6 +347,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-workspace-workflow.js",
     ],
     [
+      "features/create-actions-workflow.js",
+      "features/transaction-workspace-workflow.js",
+    ],
+    [
       "features/transaction-screen-workflow.js",
       "features/transaction-workspace-workflow.js",
     ],
@@ -379,7 +383,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-account-action.js",
       "features/record-entry-workflow.js",
     ],
-    ["features/create-actions.js", "features/record-entry-workflow.js"],
+    ["features/create-actions.js", "features/create-actions-workflow.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/transaction-corrections.js", "app.js"],
     ["features/record-entry-workflow.js", "app.js"],

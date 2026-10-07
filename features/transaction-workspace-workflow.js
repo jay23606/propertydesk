@@ -34,6 +34,18 @@
       transactionPayloads: entryContext.transactionPayloads,
       saveCorrection: maintenance.saveCorrection,
     });
+    const createActions = window.PropertyDeskCreateActionsWorkflow.create({
+      $: entryContext.$,
+      state: entryContext.state,
+      toast: entryContext.toast,
+      resetPropertyForm: entry.resetPropertyForm,
+      openModal: entryContext.openModal,
+      openAccountForProperty: entry.openAccountForProperty,
+      openPayment: entry.openPayment,
+      openExpense: entry.openExpense,
+      navigate: entryContext.navigate,
+      documentRef: entryContext.documentRef,
+    });
     const screen = window.PropertyDeskTransactionScreenWorkflow.create({
       $: screenContext.$,
       state: screenContext.state,
@@ -61,7 +73,7 @@
       attachPropertyFormEvents: entry.attachPropertyFormEvents,
       attachAccountFormEvents: entry.attachAccountFormEvents,
       attachLedgerEntryFormEvents: entry.attachLedgerEntryFormEvents,
-      attachCreateActionEvents: entry.attachCreateActionEvents,
+      attachCreateActionEvents: createActions.attachCreateActionEvents,
       renderPayments: screen.renderPayments,
       attachTransactionViewEvents: screen.attachTransactionViewEvents,
       attachTransactionActionEvents: screen.attachTransactionActionEvents,

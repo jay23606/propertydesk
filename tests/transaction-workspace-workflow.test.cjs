@@ -10,6 +10,9 @@ test("transaction workspace shares corrections and entry actions across its flow
   const openPayment = () => "payment";
   const openExpense = () => "expense";
   const updatePaymentGuidance = () => "guidance";
+  const openAccountForProperty = () => "new account";
+  const resetPropertyForm = () => {};
+  const attachCreateActionEvents = () => {};
   const maintenance = { closeModal() {} };
   const entry = {
     toast() {},
@@ -31,7 +34,19 @@ test("transaction workspace shares corrections and entry actions across its flow
       PropertyDeskRecordEntryWorkflow: {
         create(options) {
           calls.push(["entry", options]);
-          return { openPayment, openExpense, updatePaymentGuidance };
+          return {
+            openPayment,
+            openExpense,
+            updatePaymentGuidance,
+            openAccountForProperty,
+            resetPropertyForm,
+          };
+        },
+      },
+      PropertyDeskCreateActionsWorkflow: {
+        create(options) {
+          calls.push(["create-actions", options]);
+          return { attachCreateActionEvents };
         },
       },
       PropertyDeskTransactionScreenWorkflow: {
@@ -76,15 +91,20 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[1][1].accountFormModel, entry.accountFormModel);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].saveCorrection, saveCorrection);
-  assert.equal(calls[2][0], "screen");
-  assert.equal(calls[2][1].state, screen.state);
-  assert.equal(
-    calls[2][1].transactionMaintenance.saveCorrection,
-    saveCorrection,
-  );
+  assert.equal(calls[2][0], "create-actions");
   assert.equal(calls[2][1].openPayment, openPayment);
   assert.equal(calls[2][1].openExpense, openExpense);
-  assert.equal(calls[2][1].updatePaymentGuidance, updatePaymentGuidance);
+  assert.equal(calls[2][1].openAccountForProperty, openAccountForProperty);
+  assert.equal(calls[2][1].resetPropertyForm, resetPropertyForm);
+  assert.equal(calls[3][0], "screen");
+  assert.equal(calls[3][1].state, screen.state);
+  assert.equal(
+    calls[3][1].transactionMaintenance.saveCorrection,
+    saveCorrection,
+  );
+  assert.equal(calls[3][1].openPayment, openPayment);
+  assert.equal(calls[3][1].openExpense, openExpense);
+  assert.equal(calls[3][1].updatePaymentGuidance, updatePaymentGuidance);
   assert.equal(workflow.openPayment, openPayment);
   assert.equal(workflow.renderPayments instanceof Function, true);
   assert.deepEqual(Object.keys(workflow).sort(), [

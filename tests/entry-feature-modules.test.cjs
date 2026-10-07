@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("record entry workflow owns forms and their global create actions", () => {
+test("record entry forms and global create actions use separate workflows", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.ok(
@@ -49,7 +49,7 @@ test("record entry workflow owns forms and their global create actions", () => {
   for (const feature of ["PropertyForm", "AccountForm", "LedgerEntryForms"]) {
     assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
   }
-  assert.match(workflow, /PropertyDeskCreateActions\.create\(/);
+  assert.doesNotMatch(workflow, /PropertyDeskCreateActions\.create\(/);
   assert.match(workflow, /repository: accountRepository/);
   assert.match(workflow, /repository: propertyRepository/);
   assert.match(workflow, /buildAccountPayload: accountPayload/);
@@ -70,6 +70,14 @@ test("record entry workflow owns forms and their global create actions", () => {
   );
   assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachCreateActionEvents/);
+  const createActionWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "create-actions-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    createActionWorkflow,
+    /PropertyDeskCreateActions\.create\(context\)/,
+  );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
@@ -81,6 +89,10 @@ test("record entry workflow owns forms and their global create actions", () => {
   assert.match(
     transactionWorkflow,
     /TransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance: maintenance,[\s\S]*?openPayment: entry\.openPayment/,
+  );
+  assert.match(
+    transactionWorkflow,
+    /PropertyDeskCreateActionsWorkflow\.create\([\s\S]*?resetPropertyForm: entry\.resetPropertyForm/,
   );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });

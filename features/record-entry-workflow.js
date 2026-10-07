@@ -17,8 +17,6 @@
       openModal,
       previewReminderEmail,
       saveCorrection,
-      navigate,
-      documentRef,
       propertyRepository,
       accountRepository,
       accountPayload,
@@ -65,21 +63,10 @@
       transactionRepository,
       transactionPayloads,
     });
-    const createActions = window.PropertyDeskCreateActions.create({
-      $,
-      state,
-      toast,
-      resetPropertyForm: propertyForm.resetPropertyForm,
-      openModal,
-      openAccountForProperty: accountForm.openAccountForProperty,
-      openPayment: ledgerEntryForms.openPayment,
-      openExpense: ledgerEntryForms.openExpense,
-      navigate,
-      documentRef,
-    });
     return {
       editAccount: accountForm.editAccount,
       openAccountForProperty: accountForm.openAccountForProperty,
+      resetPropertyForm: propertyForm.resetPropertyForm,
       updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,
@@ -87,7 +74,6 @@
       attachPropertyFormEvents: propertyForm.attachEvents,
       attachAccountFormEvents: accountForm.attachEvents,
       attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
-      attachCreateActionEvents: createActions.attachEvents,
     };
   }
 
