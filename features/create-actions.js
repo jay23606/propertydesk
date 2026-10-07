@@ -8,21 +8,13 @@
       state,
       toast,
       resetPropertyForm,
-      resetAccountForm,
-      populateFormOptions,
       openModal,
+      openAccountForProperty,
       openPayment,
       openExpense,
       navigate,
       documentRef,
     } = context;
-
-    function openAccountForProperty(propertyId) {
-      resetAccountForm();
-      populateFormOptions();
-      if (propertyId) $("account-property").value = propertyId;
-      openModal("account-modal");
-    }
 
     function attachCreateActions() {
       const browserDocument = documentRef || document;
@@ -75,7 +67,7 @@
         });
     }
 
-    return { attachEvents: attachCreateActions, openAccountForProperty };
+    return { attachEvents: attachCreateActions };
   }
 
   window.PropertyDeskCreateActions = Object.freeze({ create: createActions });

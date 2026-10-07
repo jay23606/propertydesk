@@ -151,6 +151,7 @@
   });
   const {
     editAccount,
+    openAccountForProperty,
     updatePaymentGuidance,
     openPayment,
     openPropertyPayment,
@@ -159,7 +160,6 @@
     attachAccountFormEvents,
     attachLedgerEntryFormEvents,
     resetPropertyForm,
-    resetAccountForm,
   } = recordEntry;
   const { renderPayments, attachTransactionViewEvents } =
     window.PropertyDeskTransactionHistoryWorkflow.create({
@@ -175,15 +175,14 @@
       sumIncome,
       sumOperatingExpenses,
     });
-  const { attachEvents: attachCreateActionEvents, openAccountForProperty } =
+  const { attachEvents: attachCreateActionEvents } =
     window.PropertyDeskCreateActions.create({
       $,
       state,
       toast,
       resetPropertyForm,
-      resetAccountForm,
-      populateFormOptions,
       openModal,
+      openAccountForProperty,
       openPayment,
       openExpense,
       navigate,

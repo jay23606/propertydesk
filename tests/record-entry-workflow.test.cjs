@@ -17,6 +17,7 @@ test("record entry workflow composes forms and exposes their actions and binders
   const propertyAttach = () => calls.push("property events");
   const accountAttach = (preview) => calls.push(["account events", preview]);
   const ledgerAttach = () => calls.push("ledger events");
+  const openAccountForProperty = () => calls.push("open account for property");
   const preview = () => {};
   const context = vm.createContext({
     window: {
@@ -50,6 +51,12 @@ test("record entry workflow composes forms and exposes their actions and binders
             openExpense,
             attachEvents: ledgerAttach,
           };
+        },
+      },
+      PropertyDeskPropertyAccountAction: {
+        create(dependencies) {
+          passed.propertyAccountAction = dependencies;
+          return { openAccountForProperty };
         },
       },
       PropertyDeskAccountPayload: { build: () => "account payload" },
@@ -93,10 +100,17 @@ test("record entry workflow composes forms and exposes their actions and binders
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.account.previewReminderEmail, preview);
+  assert.equal(passed.propertyAccountAction.resetAccountForm, accountReset);
+  assert.equal(
+    passed.propertyAccountAction.populateFormOptions,
+    dependencies.populateFormOptions,
+  );
+  assert.equal(passed.propertyAccountAction.openModal, dependencies.openModal);
   for (const [name, expected] of Object.entries({
     resetPropertyForm: propertyReset,
     resetAccountForm: accountReset,
     editAccount,
+    openAccountForProperty,
     updatePaymentGuidance,
     openPayment,
     openPropertyPayment,

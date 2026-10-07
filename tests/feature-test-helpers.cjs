@@ -87,6 +87,7 @@ function loadPropertyAndAccountForms(context) {
     "account-payload.js",
     "account-form-view.js",
     "account-form.js",
+    "property-account-action.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),

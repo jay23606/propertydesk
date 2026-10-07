@@ -113,7 +113,8 @@ test("record-entry feature owns create actions and handles empty workspace state
     $: getElement,
     state,
     resetPropertyForm: () => getElement("property-form").reset(),
-    resetAccountForm: () => getElement("account-form").reset(),
+    openAccountForProperty: (propertyId) =>
+      calls.push(`open-account:${propertyId || "any"}`),
     documentRef: { querySelectorAll: (selector) => selectors[selector] || [] },
     todayIso: () => "2026-10-04",
     toast: (message) => calls.push(`toast:${message}`),
@@ -144,18 +145,10 @@ test("record-entry feature owns create actions and handles empty workspace state
   assert.deepEqual(calls, [
     "reset:property-form",
     "open:property-modal",
-    "reset:account-form",
-    "populate-options",
-    "open:account-modal",
+    "open-account:any",
     "open-expense",
   ]);
 
   calls.length = 0;
-  feature.openAccountForProperty("property-1");
-  assert.equal(getElement("account-property").value, "property-1");
-  assert.deepEqual(calls, [
-    "reset:account-form",
-    "populate-options",
-    "open:account-modal",
-  ]);
+  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
 });
