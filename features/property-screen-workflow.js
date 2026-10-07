@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  function createPropertyScreenWorkflow({ content, management, documents }) {
+  function createPropertyScreenWorkflow({
+    content,
+    management,
+    holders,
+    documents,
+  }) {
     const details =
       window.PropertyDeskPropertyDetailContentWorkflow.create(content);
     const actions = window.PropertyDeskPropertyDetailManagementWorkflow.create({
@@ -19,7 +24,10 @@
       openExpense: management.openExpense,
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
-      propertyHolderRepository: management.propertyHolderRepository,
+    });
+    const propertyHolders = window.PropertyDeskPropertyHolderWorkflow.create({
+      ...holders,
+      openPropertyDetails: details.openPropertyDetails,
     });
     const propertyDocuments =
       window.PropertyDeskPropertyDocumentManagementWorkflow.create({
@@ -31,7 +39,7 @@
       openPropertyDetails: details.openPropertyDetails,
       attachPropertyDetailEvents: actions.attachPropertyDetailEvents,
       attachPropertyQuickActionEvents: actions.attachPropertyQuickActionEvents,
-      attachPropertyHolderEvents: actions.attachPropertyHolderEvents,
+      attachPropertyHolderEvents: propertyHolders.attachPropertyHolderEvents,
       attachPropertyDocumentEvents:
         propertyDocuments.attachPropertyDocumentEvents,
     };

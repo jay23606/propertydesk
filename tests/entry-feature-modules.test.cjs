@@ -161,6 +161,7 @@ test("property workspace composes screens and shares detail actions", () => {
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",
+    "features/property-holder-workflow.js",
     "features/property-document-management-workflow.js",
     "features/property-screen-workflow.js",
     "features/property-workspace-workflow.js",

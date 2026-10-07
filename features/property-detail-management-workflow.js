@@ -1,4 +1,4 @@
-/* Compose archive, holder, and action workflows for property details. */
+/* Compose archive and action workflows for property details. */
 (() => {
   "use strict";
 
@@ -17,7 +17,6 @@
       openExpense,
       openAccountForProperty,
       propertyRepository,
-      propertyHolderRepository,
     } = context;
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
@@ -47,23 +46,9 @@
         openAccountForProperty,
         toggleArchiveProperty,
       });
-    const { savePropertyHolders } =
-      window.PropertyDeskPropertyHolderManagement.create({
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-        repository: propertyHolderRepository,
-      });
-    const { attachEvents: attachPropertyHolderEvents } =
-      window.PropertyDeskPropertyHolderEvents.create({
-        $,
-        savePropertyHolders,
-      });
     return {
       attachPropertyDetailEvents,
       attachPropertyQuickActionEvents,
-      attachPropertyHolderEvents,
     };
   }
 

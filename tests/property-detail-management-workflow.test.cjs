@@ -4,12 +4,11 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("property detail coordinator connects archive, holder, and quick actions", () => {
+test("property detail coordinator connects archive and quick actions", () => {
   const passed = {};
   const binders = {
     detail: () => {},
     quick: () => {},
-    holders: () => {},
   };
   const context = vm.createContext({
     window: {
@@ -29,24 +28,6 @@ test("property detail coordinator connects archive, holder, and quick actions", 
         create: (options) => {
           passed.quick = options;
           return { attachEvents: binders.quick };
-        },
-      },
-      PropertyDeskPropertyHolderManagement: {
-        create: (options) => {
-          passed.holderManagement = options;
-          return { savePropertyHolders() {} };
-        },
-      },
-      PropertyDeskPropertyHolderRepository: {
-        create: ({ getClient }) => {
-          passed.holderRepository = getClient;
-          return { kind: "holder-repository" };
-        },
-      },
-      PropertyDeskPropertyHolderEvents: {
-        create: (options) => {
-          passed.holderEvents = options;
-          return { attachEvents: binders.holders };
         },
       },
     },
@@ -70,7 +51,6 @@ test("property detail coordinator connects archive, holder, and quick actions", 
   const openExpense = () => {};
   const openAccountForProperty = () => {};
   const propertyRepository = { updateOwned() {} };
-  const propertyHolderRepository = { kind: "holder-repository" };
   const dependencies = {
     $() {},
     state,
@@ -85,7 +65,6 @@ test("property detail coordinator connects archive, holder, and quick actions", 
     openExpense,
     openAccountForProperty,
     propertyRepository,
-    propertyHolderRepository,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailManagementWorkflow.create(
@@ -97,18 +76,10 @@ test("property detail coordinator connects archive, holder, and quick actions", 
   assert.equal(passed.quick.openPayment, openPayment);
   assert.equal(passed.quick.openExpense, openExpense);
   assert.equal(passed.quick.openAccountForProperty, openAccountForProperty);
-  assert.equal(
-    passed.holderManagement.openPropertyDetails,
-    openPropertyDetails,
-  );
-  assert.equal(passed.holderManagement.repository, propertyHolderRepository);
-  assert.equal(passed.holderRepository, undefined);
   assert.deepEqual(Object.keys(workflow), [
     "attachPropertyDetailEvents",
     "attachPropertyQuickActionEvents",
-    "attachPropertyHolderEvents",
   ]);
   assert.equal(workflow.attachPropertyDetailEvents, binders.detail);
   assert.equal(workflow.attachPropertyQuickActionEvents, binders.quick);
-  assert.equal(workflow.attachPropertyHolderEvents, binders.holders);
 });

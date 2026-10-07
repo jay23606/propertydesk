@@ -11,8 +11,14 @@ test("property screen workflow passes detail actions to management and returns b
   const management = {
     closeModal() {},
     toast() {},
-    propertyHolderRepository: { kind: "holder-repository" },
     unusedDependency: true,
+  };
+  const holders = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    repository: { kind: "holder-repository" },
   };
   const documents = {
     $() {},
@@ -22,6 +28,7 @@ test("property screen workflow passes detail actions to management and returns b
     documentRepository: { kind: "document-repository" },
   };
   const attachPropertyDocumentEvents = () => {};
+  const attachPropertyHolderEvents = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDetailContentWorkflow: {
@@ -36,7 +43,6 @@ test("property screen workflow passes detail actions to management and returns b
           return {
             attachPropertyDetailEvents() {},
             attachPropertyQuickActionEvents() {},
-            attachPropertyHolderEvents() {},
           };
         },
       },
@@ -44,6 +50,12 @@ test("property screen workflow passes detail actions to management and returns b
         create(options) {
           calls.push(["documents", options]);
           return { attachPropertyDocumentEvents };
+        },
+      },
+      PropertyDeskPropertyHolderWorkflow: {
+        create(options) {
+          calls.push(["holders", options]);
+          return { attachPropertyHolderEvents };
         },
       },
     },
@@ -59,6 +71,7 @@ test("property screen workflow passes detail actions to management and returns b
   const workflow = context.window.PropertyDeskPropertyScreenWorkflow.create({
     content,
     management,
+    holders,
     documents,
   });
 
@@ -69,15 +82,15 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[1][1].toast, management.toast);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
-  assert.equal(
-    calls[1][1].propertyHolderRepository,
-    management.propertyHolderRepository,
-  );
+  assert.equal("propertyHolderRepository" in calls[1][1], false);
   assert.equal("documentRepository" in calls[1][1], false);
-  assert.equal(calls[2][0], "documents");
-  assert.equal(calls[2][1].$, documents.$);
-  assert.equal(calls[2][1].documentRepository, documents.documentRepository);
+  assert.equal(calls[2][0], "holders");
+  assert.equal(calls[2][1].$, holders.$);
+  assert.equal(calls[2][1].repository, holders.repository);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
+  assert.equal(calls[3][0], "documents");
+  assert.equal(calls[3][1].documentRepository, documents.documentRepository);
+  assert.equal(calls[3][1].openPropertyDetails, openPropertyDetails);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",
@@ -90,4 +103,5 @@ test("property screen workflow passes detail actions to management and returns b
     workflow.attachPropertyDocumentEvents,
     attachPropertyDocumentEvents,
   );
+  assert.equal(workflow.attachPropertyHolderEvents, attachPropertyHolderEvents);
 });
