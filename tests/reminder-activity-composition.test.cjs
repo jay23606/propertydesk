@@ -10,18 +10,18 @@ test("app composes the reminder activity model into its display view", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const model = app.indexOf("PropertyDeskReminderActivityModel.create(");
   const view = app.indexOf("PropertyDeskReminderActivityView.create(");
-  const shell = app.indexOf("PropertyDeskAppShellWorkflow.create(");
+  const workspace = app.indexOf("PropertyDeskWorkspace.create(");
 
   assert.ok(model >= 0);
   assert.ok(view > model);
-  assert.ok(shell > view);
+  assert.ok(workspace > view);
   assert.match(
     app,
     /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: reminderActivityModel,/,
   );
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
+    /function renderWorkspaceSettings\(\)\s*\{\s*workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
   );
   assert.doesNotMatch(app, /PropertyDeskReminderActivityWorkflow/);
   assert.doesNotMatch(html, /features\/reminder-activity-workflow\.js/);

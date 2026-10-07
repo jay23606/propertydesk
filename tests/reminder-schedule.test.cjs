@@ -239,7 +239,7 @@ test("reminder controls remain off by default and the preview stylesheet is in t
   assert.match(html, /EMAIL PREVIEW · NOTHING SENT/);
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
+    /function renderWorkspaceSettings\(\)\s*\{\s*workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
   );
   assert.match(
     preview,

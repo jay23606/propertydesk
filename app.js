@@ -123,20 +123,25 @@
   });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
-  const {
-    updateGreeting,
-    navigate,
-    attachNavigationEvents,
-    attachProfileEvents,
-    attachWorkspaceMemberEvents,
-  } = window.PropertyDeskAppShellWorkflow.create({
+  const workspace = window.PropertyDeskWorkspace.create({
     $,
     state,
     esc,
     toast,
     fetchAll,
-    renderReminderActivity,
   });
+  function renderWorkspaceSettings() {
+    workspace.renderWorkspaceSettings();
+    renderReminderActivity();
+  }
+  const navigation = window.PropertyDeskNavigation.create({
+    $,
+    state,
+    renderWorkspaceSettings,
+  });
+  const { updateGreeting, attachProfileEvents, attachWorkspaceMemberEvents } =
+    workspace;
+  const { navigate, attachEvents: attachNavigationEvents } = navigation;
   const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
     $,
     state,

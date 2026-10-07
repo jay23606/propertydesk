@@ -206,9 +206,10 @@ test("app wires reminder activity and email preview separately", () => {
     app,
     /PropertyDeskReminderPreview.create\(\{[\s\S]*?model: reminderPreviewModel,[\s\S]*?openModal: modal\.openModal/,
   );
+  assert.match(app, /function renderWorkspaceSettings\(\)/);
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
+    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspaceSettings,/,
   );
   assert.match(app, /previewReminderEmail,/);
   assert.doesNotMatch(app, /PropertyDeskReminderWorkflow/);
