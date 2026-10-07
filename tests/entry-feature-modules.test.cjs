@@ -25,10 +25,7 @@ test("record entry workflow owns forms and their global create actions", () => {
     /PropertyDesk(?:TransactionMaintenance|RecordEntry|TransactionScreen)Workflow\.create\(/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
-  assert.match(
-    app,
-    /accountHistoryRepository: window\.PropertyDeskAccountHistoryRepository/,
-  );
+  assert.match(app, /accountHistoryRepository: repositories\.accountHistory/);
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
@@ -61,11 +58,11 @@ test("record entry workflow owns forms and their global create actions", () => {
   assert.match(workflow, /transactionPayloads,/);
   assert.match(
     app,
-    /propertyRepository: window\.PropertyDeskPropertyRepository,[\s\S]*?accountRepository: window\.PropertyDeskAccountRepository,/,
+    /propertyRepository: repositories\.properties,[\s\S]*?accountRepository: repositories\.accounts,/,
   );
   assert.match(
     app,
-    /accountRepository: window\.PropertyDeskAccountRepository,[\s\S]*?transactionRepository: window\.PropertyDeskTransactionRepository,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,/,
+    /accountRepository: repositories\.accounts,[\s\S]*?transactionRepository: repositories\.transactions,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,/,
   );
   assert.match(
     app,
@@ -208,10 +205,7 @@ test("app wires reminder activity and preview through the workspace workflow", (
   );
   assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
-  assert.match(
-    app,
-    /memberRepository: window\.PropertyDeskWorkspaceMemberRepository\.create\(/,
-  );
+  assert.match(app, /memberRepository: repositories\.workspaceMembers/);
 });
 
 test("app root composes shared state and workspace services directly", () => {

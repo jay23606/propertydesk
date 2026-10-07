@@ -11,7 +11,7 @@ test("app wires CSV import and private backup export independently", () => {
 
   assert.match(
     app,
-    /PropertyDeskImportFeature\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?PropertyDeskImportRepository\.create/,
+    /PropertyDeskImportFeature\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports/,
   );
   const imports = fs.readFileSync(
     path.join(root, "features", "imports.js"),

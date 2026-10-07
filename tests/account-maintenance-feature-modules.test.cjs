@@ -52,7 +52,7 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
   );
   assert.match(workflow, /repository: depositRepository/);
   assert.match(workflow, /repository: accountRepository/);
-  assert.match(app, /repository: window\.PropertyDeskTransactionRepository/);
+  assert.match(app, /repository: repositories\.transactions/);
   assert.match(
     app,
     /resolveVoidTarget:\s*window\.PropertyDeskTransactionVoidModel\.resolveVoidTarget/,
@@ -65,8 +65,8 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
     app,
     /findCorrectionTarget:\s*window\.PropertyDeskTransactionCorrectionModel\.findCorrectionTarget/,
   );
-  assert.match(app, /accountRepository: window\.PropertyDeskAccountRepository/);
-  assert.match(app, /depositRepository: window\.PropertyDeskDepositRepository/);
+  assert.match(app, /accountRepository: repositories\.accounts/);
+  assert.match(app, /depositRepository: repositories\.deposits/);
   assert.match(
     app,
     /prepareAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.prepare/,

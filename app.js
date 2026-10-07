@@ -51,13 +51,23 @@
       toast,
       render,
     });
-  const propertyHolderRepository =
-    window.PropertyDeskPropertyHolderRepository.create({
+  const repositories = Object.freeze({
+    accounts: window.PropertyDeskAccountRepository,
+    accountHistory: window.PropertyDeskAccountHistoryRepository,
+    deposits: window.PropertyDeskDepositRepository,
+    documents: window.PropertyDeskDocumentRepository.create(() => state.client),
+    imports: window.PropertyDeskImportRepository.create({
       getClient: () => state.client,
-    });
-  const documentRepository = window.PropertyDeskDocumentRepository.create(
-    () => state.client,
-  );
+    }),
+    properties: window.PropertyDeskPropertyRepository,
+    propertyHolders: window.PropertyDeskPropertyHolderRepository.create({
+      getClient: () => state.client,
+    }),
+    transactions: window.PropertyDeskTransactionRepository,
+    workspaceMembers: window.PropertyDeskWorkspaceMemberRepository.create({
+      getClient: () => state.client,
+    }),
+  });
   const {
     accountBalance,
     scheduledMonthlyRunRate,
@@ -142,9 +152,7 @@
       esc,
       toast,
       fetchAll,
-      memberRepository: window.PropertyDeskWorkspaceMemberRepository.create({
-        getClient: () => state.client,
-      }),
+      memberRepository: repositories.workspaceMembers,
       documentRef: document,
       windowRef: window,
     },
@@ -175,7 +183,7 @@
       EventClass: Event,
       OptionClass: Option,
       documentRef: document,
-      repository: window.PropertyDeskTransactionRepository,
+      repository: repositories.transactions,
       resolveVoidTarget:
         window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
       buildVoidPayload:
@@ -198,11 +206,11 @@
       previewReminderEmail,
       navigate,
       documentRef: document,
-      propertyRepository: window.PropertyDeskPropertyRepository,
-      accountRepository: window.PropertyDeskAccountRepository,
+      propertyRepository: repositories.properties,
+      accountRepository: repositories.accounts,
       accountPayload: window.PropertyDeskAccountPayload.build,
       accountFormModel: window.PropertyDeskAccountFormModel,
-      transactionRepository: window.PropertyDeskTransactionRepository,
+      transactionRepository: repositories.transactions,
       transactionPayloads: window.PropertyDeskTransactionPayloads,
     },
     screen: {
@@ -238,7 +246,7 @@
       openModal,
       propertyAddress,
       depositLedger,
-      accountHistoryRepository: window.PropertyDeskAccountHistoryRepository,
+      accountHistoryRepository: repositories.accountHistory,
     },
     maintenance: {
       $,
@@ -250,8 +258,8 @@
       editAccount,
       openPayment,
       moneyInput,
-      accountRepository: window.PropertyDeskAccountRepository,
-      depositRepository: window.PropertyDeskDepositRepository,
+      accountRepository: repositories.accounts,
+      depositRepository: repositories.deposits,
       prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
       validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
     },
@@ -289,9 +297,9 @@
         toast,
         fetchAll,
         todayIso,
-        propertyRepository: window.PropertyDeskPropertyRepository,
-        propertyHolderRepository,
-        documentRepository,
+        propertyRepository: repositories.properties,
+        propertyHolderRepository: repositories.propertyHolders,
+        documentRepository: repositories.documents,
         closeModal,
         editAccount,
         openAccountDetails,
@@ -337,7 +345,7 @@
       toast,
       fetchAll,
       openPayment,
-      propertyRepository: window.PropertyDeskPropertyRepository,
+      propertyRepository: repositories.properties,
       openAccountForProperty,
     },
   });
@@ -355,9 +363,7 @@
     todayIso,
     fetchAll,
     toast,
-    repository: window.PropertyDeskImportRepository.create({
-      getClient: () => state.client,
-    }),
+    repository: repositories.imports,
   });
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskBackupExport.create({
@@ -371,7 +377,7 @@
       loadBackupRecords: backupRecords.load,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
-      documentRepository,
+      documentRepository: repositories.documents,
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,

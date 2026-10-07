@@ -32,7 +32,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /propertyRepository: window\.PropertyDeskPropertyRepository,[\s\S]*?openAccountForProperty,/,
+    /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
   );
   assert.doesNotMatch(
     app,
