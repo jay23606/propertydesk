@@ -5,7 +5,7 @@
   function create({ state, workspaceData, toast, render }) {
     async function resolveWorkspaceId() {
       const { data: workspaceId, error: workspaceError } =
-        await workspaceData.loadWorkspaceId(state.client);
+        await workspaceData.loadWorkspaceId();
       if (workspaceError || !workspaceId) {
         const error = workspaceError || new Error("Missing workspace");
         toast(workspaceError?.message || "Could not load this workspace");
@@ -19,7 +19,7 @@
       try {
         Object.assign(
           state,
-          await workspaceData.loadWorkspaceRecords(state.client, workspaceId),
+          await workspaceData.loadWorkspaceRecords(workspaceId),
         );
       } catch (error) {
         toast(error?.message || "Could not load this workspace");

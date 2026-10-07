@@ -36,7 +36,7 @@
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const { backend, state, fetchAll } =
+  const { backend, state, fetchAll, workspaceQuery } =
     window.PropertyDeskWorkspaceRuntime.create({
       config: window.PROPERTYDESK_CONFIG || {},
       supabase: window.supabase,
@@ -361,7 +361,7 @@
       downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       zipUtils: window.PropertyDeskZipUtils,
       workspaceTables: window.PropertyDeskWorkspaceTables,
-      loadAllPages: window.PropertyDeskWorkspaceQuery.loadAllPages,
+      loadAllPages: workspaceQuery.loadAllPages,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: repositories.documents,

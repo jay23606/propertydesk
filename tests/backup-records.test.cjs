@@ -27,12 +27,6 @@ test("backup record loader paginates each workspace table into named records", a
     ),
     context,
   );
-  const backupRecords = context.window.PropertyDeskBackupRecords.create({
-    tables: context.window.PropertyDeskBackupUtils.tables,
-    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
-  });
-
-  const calls = [];
   const client = {
     from(table) {
       return {
@@ -55,8 +49,16 @@ test("backup record loader paginates each workspace table into named records", a
       };
     },
   };
+  const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
+    getClient: () => client,
+  });
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: workspaceQuery.loadAllPages,
+  });
 
-  const records = await backupRecords.load(client);
+  const calls = [];
+  const records = await backupRecords.load();
 
   assert.equal(calls.length, backupRecords.tables.length + 1);
   assert.deepEqual(Array.from(records.pd_payments.slice(0, 2)), [0, 1]);
@@ -90,19 +92,20 @@ test("backup record loader stops when a table query fails", async () => {
     ),
     context,
   );
-  const backupRecords = context.window.PropertyDeskBackupRecords.create({
-    tables: context.window.PropertyDeskBackupUtils.tables,
-    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
-  });
-
-  await assert.rejects(
-    backupRecords.load({
-      from: () => ({
-        select: () => ({
-          range: async () => ({ data: null, error: new Error("offline") }),
-        }),
+  const client = {
+    from: () => ({
+      select: () => ({
+        range: async () => ({ data: null, error: new Error("offline") }),
       }),
     }),
-    /offline/,
-  );
+  };
+  const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
+    getClient: () => client,
+  });
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: workspaceQuery.loadAllPages,
+  });
+
+  await assert.rejects(backupRecords.load(), /offline/);
 });

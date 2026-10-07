@@ -3,16 +3,16 @@
   "use strict";
 
   function create({ tables, loadAllPages }) {
-    async function load(client) {
+    async function load() {
       const values = await Promise.all(
-        tables.map((table) => loadAllPages(client, table)),
+        tables.map((table) => loadAllPages(table)),
       );
       return Object.fromEntries(
         tables.map((table, index) => [table, values[index]]),
       );
     }
 
-    return { tables, load };
+    return Object.freeze({ tables, load });
   }
 
   window.PropertyDeskBackupRecords = Object.freeze({ create });

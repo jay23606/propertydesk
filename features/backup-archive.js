@@ -10,8 +10,8 @@
     documentRepository,
     now = () => new Date(),
   }) {
-    async function prepare({ client, workspaceOwnerId }) {
-      const records = await loadBackupRecords(client);
+    async function prepare({ workspaceOwnerId }) {
+      const records = await loadBackupRecords();
       const { entries, includedFiles } = await collectBackupAgreementFiles({
         documents: records.pd_documents,
         repository: documentRepository,

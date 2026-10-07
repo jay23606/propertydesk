@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ tables, runWorkspaceRead }) {
+  function create({ tables, workspaceQuery }) {
     const workspaceReads = [
       {
         key: "properties",
@@ -63,14 +63,14 @@
       },
     ];
 
-    function loadWorkspaceId(client) {
-      return client.rpc("pd_workspace_id");
+    function loadWorkspaceId() {
+      return workspaceQuery.loadWorkspaceId();
     }
 
-    async function loadWorkspaceRecords(client, workspaceId) {
+    async function loadWorkspaceRecords(workspaceId) {
       const requests = workspaceReads.map((read) => [
         read.key,
-        () => runWorkspaceRead(client, workspaceId, read),
+        () => workspaceQuery.runWorkspaceRead(workspaceId, read),
       ]);
 
       const results = await Promise.all(requests.map(([, run]) => run()));
@@ -84,7 +84,7 @@
       );
     }
 
-    return { loadWorkspaceId, loadWorkspaceRecords };
+    return Object.freeze({ loadWorkspaceId, loadWorkspaceRecords });
   }
 
   window.PropertyDeskWorkspaceData = Object.freeze({ create });

@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-function loadModule() {
+function loadModule(getClient = () => null) {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -21,10 +21,12 @@ function loadModule() {
     fs.readFileSync(path.join(__dirname, "..", "workspace-data.js"), "utf8"),
     context,
   );
+  const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
+    getClient,
+  });
   return context.window.PropertyDeskWorkspaceData.create({
     tables: context.window.PropertyDeskWorkspaceTables,
-    runWorkspaceRead:
-      context.window.PropertyDeskWorkspaceQuery.runWorkspaceRead,
+    workspaceQuery,
   });
 }
 
@@ -37,13 +39,29 @@ test("workspace data delegates active workspace lookup to its data adapter", asy
     },
   };
 
-  const result = await loadModule().loadWorkspaceId(client);
+  const result = await loadModule(() => client).loadWorkspaceId();
 
   assert.deepEqual(JSON.parse(JSON.stringify(result)), {
     data: "workspace-1",
     error: null,
   });
   assert.deepEqual(calls, ["pd_workspace_id"]);
+});
+
+test("workspace query resolves the active client when each read starts", async () => {
+  const client = {
+    rpc: async (name) => ({ data: name, error: null }),
+  };
+  let activeClient = null;
+  const workspaceData = loadModule(() => activeClient);
+
+  activeClient = client;
+  const result = await workspaceData.loadWorkspaceId();
+
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), {
+    data: "pd_workspace_id",
+    error: null,
+  });
 });
 
 test("workspace data reads every owner table in parallel and maps named results", async () => {
@@ -85,8 +103,7 @@ test("workspace data reads every owner table in parallel and maps named results"
     },
   };
 
-  const records = await loadModule().loadWorkspaceRecords(
-    client,
+  const records = await loadModule(() => client).loadWorkspaceRecords(
     "workspace-1",
   );
 
@@ -166,7 +183,7 @@ test("workspace data loading rejects the first database error", async () => {
   };
 
   await assert.rejects(
-    () => loadModule().loadWorkspaceRecords(client, "workspace-1"),
+    () => loadModule(() => client).loadWorkspaceRecords("workspace-1"),
     (error) => error === failure,
   );
 });
@@ -210,10 +227,11 @@ test("workspace data modules load before app root and are precached", () => {
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
   assert.match(worker, /'\.\/features\/workspace-runtime\.js'/);
   assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
+  assert.match(runtime, /PropertyDeskWorkspaceQuery\.create\(\{/);
   assert.match(runtime, /PropertyDeskWorkspaceData\.create\(\{/);
   assert.match(runtime, /PropertyDeskWorkspaceRefresh\.create\(/);
   assert.match(
     runtime,
-    /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData: window\.PropertyDeskWorkspaceData\.create\(\{\s*tables: window\.PropertyDeskWorkspaceTables,\s*runWorkspaceRead: window\.PropertyDeskWorkspaceQuery\.runWorkspaceRead,/,
+    /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData,/,
   );
 });

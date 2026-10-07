@@ -8,17 +8,21 @@
       supabase,
     });
     const state = window.PropertyDeskAppState.create();
+    const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
+      getClient: () => state.client,
+    });
+    const workspaceData = window.PropertyDeskWorkspaceData.create({
+      tables: window.PropertyDeskWorkspaceTables,
+      workspaceQuery,
+    });
     const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
       state,
-      workspaceData: window.PropertyDeskWorkspaceData.create({
-        tables: window.PropertyDeskWorkspaceTables,
-        runWorkspaceRead: window.PropertyDeskWorkspaceQuery.runWorkspaceRead,
-      }),
+      workspaceData,
       toast,
       render,
     });
 
-    return { backend, state, fetchAll };
+    return { backend, state, fetchAll, workspaceQuery };
   }
 
   window.PropertyDeskWorkspaceRuntime = Object.freeze({

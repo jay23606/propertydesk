@@ -22,23 +22,17 @@ function createRefresh({ state, workspaceData, toast, render }) {
 }
 
 test("workspace refresh resolves workspace, hydrates state, and rerenders", async () => {
-  const client = {
-    rpc: async (name) => ({
-      data: name === "pd_workspace_id" ? "workspace-1" : null,
-      error: null,
-    }),
-  };
-  const state = { client, properties: [] };
+  const state = { properties: [] };
   const calls = [];
   const refresh = createRefresh({
     state,
     workspaceData: {
-      loadWorkspaceId: async (receivedClient) => {
-        assert.equal(receivedClient, client);
+      loadWorkspaceId: async (...args) => {
+        assert.deepEqual(args, []);
         return { data: "workspace-1", error: null };
       },
-      loadWorkspaceRecords: async (receivedClient, workspaceId) => {
-        calls.push(["load", receivedClient, workspaceId]);
+      loadWorkspaceRecords: async (...args) => {
+        calls.push(["load", ...args]);
         return { properties: [{ id: "property-1" }], payments: [] };
       },
     },
@@ -50,7 +44,7 @@ test("workspace refresh resolves workspace, hydrates state, and rerenders", asyn
 
   assert.equal(state.workspaceOwnerId, "workspace-1");
   assert.equal(state.properties[0].id, "property-1");
-  assert.deepEqual(calls, [["load", client, "workspace-1"], ["render"]]);
+  assert.deepEqual(calls, [["load", "workspace-1"], ["render"]]);
 });
 
 test("workspace lookup failures show feedback and stop before loading records", async () => {

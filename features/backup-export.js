@@ -36,7 +36,6 @@
 
       try {
         const { blob, recordCount, agreementCount } = await archive.prepare({
-          client: state.client,
           workspaceOwnerId: state.workspaceOwnerId,
         });
         downloadBlob(blob, `propertydesk-backup-${todayIso()}.zip`);

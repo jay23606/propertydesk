@@ -8,7 +8,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: window\.PropertyDeskWorkspaceQuery\.loadAllPages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: workspaceQuery\.loadAllPages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
   );
   assert.match(
     app,
@@ -179,9 +179,13 @@ test("backup export aborts before download when a private document path escapes 
       context,
     );
   }
+  let state;
+  const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
+    getClient: () => state.client,
+  });
   const backupRecords = context.window.PropertyDeskBackupRecords.create({
     tables: context.window.PropertyDeskBackupUtils.tables,
-    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+    loadAllPages: workspaceQuery.loadAllPages,
   });
   const tables = backupRecords.tables;
   let exportHandler;
@@ -193,7 +197,7 @@ test("backup export aborts before download when a private document path escapes 
       exportHandler = handler;
     },
   };
-  const state = {
+  state = {
     user: { id: "workspace-1" },
     workspaceOwnerId: "workspace-1",
     accounts: [],
@@ -287,9 +291,13 @@ test("backup export adds the validated private agreement to the ZIP and manifest
       context,
     );
   }
+  let state;
+  const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
+    getClient: () => state.client,
+  });
   const backupRecords = context.window.PropertyDeskBackupRecords.create({
     tables: context.window.PropertyDeskBackupUtils.tables,
-    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+    loadAllPages: workspaceQuery.loadAllPages,
   });
   const tables = backupRecords.tables;
   const agreement = {
@@ -302,7 +310,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     content_type: "application/pdf",
   };
   const fileBytes = new Uint8Array([4, 5, 6]);
-  const state = {
+  state = {
     user: { id: "workspace-1" },
     workspaceOwnerId: "workspace-1",
     client: {

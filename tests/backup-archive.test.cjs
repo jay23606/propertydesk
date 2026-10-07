@@ -33,8 +33,8 @@ test("backup archive assembles records and agreement files before ZIP encoding",
   );
   const archive = context.window.PropertyDeskBackupArchive.create({
     documentRepository: { kind: "document repository" },
-    loadBackupRecords: async (client) => {
-      calls.push(["load", client]);
+    loadBackupRecords: async () => {
+      calls.push(["load"]);
       return records;
     },
     collectBackupAgreementFiles: async (input) => {
@@ -53,10 +53,7 @@ test("backup archive assembles records and agreement files before ZIP encoding",
     },
     now: () => new Date("2026-10-06T13:00:00.000Z"),
   });
-  const client = { id: "client" };
-
   const result = await archive.prepare({
-    client,
     workspaceOwnerId: "owner-1",
   });
 
@@ -64,7 +61,6 @@ test("backup archive assembles records and agreement files before ZIP encoding",
     calls.map(([stage]) => stage),
     ["load", "agreements", "manifest", "zip"],
   );
-  assert.equal(calls[0][1], client);
   assert.equal(calls[1][1].documents, records.pd_documents);
   assert.equal(calls[1][1].repository.kind, "document repository");
   assert.equal(calls[1][1].workspaceOwnerId, "owner-1");
