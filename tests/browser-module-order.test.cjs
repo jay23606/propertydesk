@@ -233,7 +233,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-maintenance-workflow.js",
     ],
     [
-      "features/transaction-maintenance.js",
+      "features/transaction-void-maintenance.js",
       "features/transaction-maintenance-workflow.js",
     ],
     [
@@ -534,16 +534,16 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/transaction-repository.js", "features/transaction-inserts.js"],
     ["features/transaction-correction-form.js", "app.js"],
-    ["features/transaction-maintenance.js", "app.js"],
+    ["features/transaction-void-maintenance.js", "app.js"],
     ["features/transaction-view-events.js", "app.js"],
     ["features/transaction-void-entry.js", "app.js"],
     [
       "features/repository-write-feedback.js",
-      "features/transaction-maintenance.js",
+      "features/transaction-void-maintenance.js",
     ],
     [
       "features/transaction-repository.js",
-      "features/transaction-maintenance.js",
+      "features/transaction-void-maintenance.js",
     ],
     [
       "features/repository-query-utils.js",

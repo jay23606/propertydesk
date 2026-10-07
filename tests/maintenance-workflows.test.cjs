@@ -32,7 +32,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
           };
         },
       },
-      PropertyDeskTransactionMaintenance: {
+      PropertyDeskTransactionVoidMaintenance: {
         create: (options) => {
           passed.voidMaintenance = options;
           passed.saveVoidTransaction = () => {};

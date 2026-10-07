@@ -179,7 +179,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
+      path.join(__dirname, "..", "features", "transaction-void-maintenance.js"),
       "utf8",
     ),
     context,
@@ -217,7 +217,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
       },
     },
   };
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state,
     repository: context.window.PropertyDeskTransactionRepository.create({
       getClient: () => state.client,
@@ -247,7 +247,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
     "repository-query-utils.js",
     "repository-write-feedback.js",
     "transaction-repository.js",
-    "transaction-maintenance.js",
+    "transaction-void-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -255,7 +255,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
     );
   }
   const messages = [];
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state: {
       client: {
         from: () => assert.fail("unsupported kind must not write"),
@@ -291,13 +291,13 @@ test("transaction maintenance reports rejected void requests without refreshing"
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-maintenance.js"),
+      path.join(__dirname, "..", "features", "transaction-void-maintenance.js"),
       "utf8",
     ),
     context,
   );
   const messages = [];
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state: {
       client: {
         from: () => ({
@@ -350,7 +350,7 @@ test("transaction maintenance reports returned database errors without refreshin
   for (const filename of [
     "transaction-void-model.js",
     "repository-write-feedback.js",
-    "transaction-maintenance.js",
+    "transaction-void-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -358,7 +358,7 @@ test("transaction maintenance reports returned database errors without refreshin
     );
   }
   const messages = [];
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state: { client: {} },
     repository: {
       voidPosted: async () => ({
@@ -381,7 +381,7 @@ test("transaction maintenance reports an already-changed row without refreshing"
   for (const filename of [
     "transaction-void-model.js",
     "repository-write-feedback.js",
-    "transaction-maintenance.js",
+    "transaction-void-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -389,7 +389,7 @@ test("transaction maintenance reports an already-changed row without refreshing"
     );
   }
   const messages = [];
-  const feature = context.window.PropertyDeskTransactionMaintenance.create({
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state: { client: {} },
     repository: {
       voidPosted: async () => ({ data: null, error: null }),

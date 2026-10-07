@@ -7,7 +7,7 @@
       context.correction,
     );
     const { saveVoidTransaction } =
-      window.PropertyDeskTransactionMaintenance.create(context.voiding);
+      window.PropertyDeskTransactionVoidMaintenance.create(context.voiding);
     const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
       toast: context.voiding.toast,
       saveVoidTransaction,

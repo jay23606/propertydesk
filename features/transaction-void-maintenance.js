@@ -44,5 +44,5 @@
     return { saveVoidTransaction };
   }
 
-  window.PropertyDeskTransactionMaintenance = Object.freeze({ create });
+  window.PropertyDeskTransactionVoidMaintenance = Object.freeze({ create });
 })();
