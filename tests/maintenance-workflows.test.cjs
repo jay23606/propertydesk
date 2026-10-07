@@ -93,8 +93,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   );
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
-  assert.equal(actions.correctTransaction, correctTransaction);
-  assert.equal(actions.voidTransaction, voidTransaction);
+  assert.deepEqual(Object.keys(actions), ["attachEvents"]);
   assert.equal(actions.attachEvents, attachEvents);
 });
 

@@ -56,7 +56,7 @@
         correctTransaction,
         voidTransaction,
       });
-      return { correctTransaction, voidTransaction, attachEvents };
+      return { attachEvents };
     }
 
     return { saveCorrection, createActionHandlers };
