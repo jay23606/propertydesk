@@ -165,26 +165,27 @@
     navigate,
     documentRef: document,
   });
-  const { renderPayments, attachEvents: attachTransactionViewEvents } =
-    window.PropertyDeskTransactionViews.create({
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      postedOnOrAfter,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    });
-  const { attachEvents: attachTransactionActionEvents } =
-    transactionMaintenance.createActionHandlers({
-      openPayment,
-      openExpense,
-      updatePaymentGuidance,
-    });
+  const {
+    renderPayments,
+    attachTransactionViewEvents,
+    attachTransactionActionEvents,
+  } = window.PropertyDeskTransactionScreenWorkflow.create({
+    $,
+    state,
+    dateOnly,
+    fmtDate,
+    esc,
+    expenseCategoryLabel,
+    money,
+    postedOnOrAfter,
+    monthStart,
+    sumIncome,
+    sumOperatingExpenses,
+    transactionMaintenance,
+    openPayment,
+    openExpense,
+    updatePaymentGuidance,
+  });
   const { openAccountDetails, depositSectionHTML } =
     window.PropertyDeskAccountDetailContentWorkflow.create({
       $,

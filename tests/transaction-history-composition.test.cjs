@@ -3,31 +3,29 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("app composes transaction history views and aliases their event binder", () => {
+test("transaction screen workflow composes history views with maintenance actions", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const source = app.indexOf("PropertyDeskTransactionViews.create(");
-  const maintenance = app.indexOf(
-    "transactionMaintenance.createActionHandlers(",
+  const workflow = fs.readFileSync(
+    path.join(root, "features", "transaction-screen-workflow.js"),
+    "utf8",
   );
-
-  assert.ok(source >= 0);
-  assert.ok(maintenance > source);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(workflow, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(workflow, /transactionMaintenance\.createActionHandlers\(/);
+  assert.match(workflow, /attachTransactionViewEvents: views\.attachEvents/);
   assert.match(
-    app,
-    /attachEvents: attachTransactionViewEvents\s*\}\s*=\s*window\.PropertyDeskTransactionViews\.create\(/,
+    workflow,
+    /attachTransactionActionEvents: actions\.attachEvents/,
   );
-  assert.match(app, /attachEvents: attachTransactionActionEvents/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskTransactionHistoryWorkflow/);
-  assert.doesNotMatch(html, /features\/transaction-history-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/transaction-history-workflow\.js/);
-  assert.equal(
-    fs.existsSync(
-      path.join(root, "features", "transaction-history-workflow.js"),
-    ),
-    false,
+  assert.ok(
+    html.indexOf("features/transaction-screen-workflow.js") <
+      html.indexOf("app.js"),
   );
+  assert.ok(worker.includes("'./features/transaction-screen-workflow.js'"));
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
 });

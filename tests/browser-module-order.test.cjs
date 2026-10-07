@@ -288,6 +288,18 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/record-entry-workflow.js", "app.js"],
     ["features/transaction-views.js", "app.js"],
     [
+      "features/transaction-views.js",
+      "features/transaction-screen-workflow.js",
+    ],
+    [
+      "features/transaction-maintenance-workflow.js",
+      "features/transaction-screen-workflow.js",
+    ],
+    [
+      "features/record-entry-workflow.js",
+      "features/transaction-screen-workflow.js",
+    ],
+    [
       "features/overview-property-summary-model.js",
       "features/overview-model.js",
     ],

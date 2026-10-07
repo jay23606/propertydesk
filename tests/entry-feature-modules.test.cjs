@@ -19,7 +19,7 @@ test("record entry workflow owns forms and their global create actions", () => {
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
@@ -34,10 +34,7 @@ test("record entry workflow owns forms and their global create actions", () => {
     /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
   );
   assert.match(app, /openAccountForProperty,/);
-  assert.match(
-    app,
-    /transactionMaintenance\.createActionHandlers\(\{[\s\S]*?updatePaymentGuidance,/,
-  );
+  assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /entryWorkflow\./);
   assert.match(app, /attachAccountDetailActionEvents,\s*attachDepositEvents,/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
@@ -66,7 +63,7 @@ test("record entry workflow owns forms and their global create actions", () => {
   );
   assert.match(
     app,
-    /attachEvents: attachTransactionViewEvents[\s\S]*?PropertyDeskTransactionViews\.create\(/,
+    /attachTransactionViewEvents,[\s\S]*?attachTransactionActionEvents,[\s\S]*?PropertyDeskTransactionScreenWorkflow\.create\(/,
   );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
@@ -97,9 +94,10 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(app, /transactionMaintenance\.createActionHandlers\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
   assert.match(
     app,
@@ -113,7 +111,7 @@ test("app coordinator passes the amortization helper into account details", () =
     );
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.match(app, /transactionMaintenance\.createActionHandlers/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create/);
   assert.match(app, /PropertyDeskAccountDepositMaintenanceWorkflow\.create/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create/);
@@ -199,7 +197,7 @@ test("app root composes shared state and workspace services directly", () => {
   assert.doesNotMatch(app, /PropertyDeskAppServices/);
   assert.match(app, /PropertyDeskLedgerContext\.create\(/);
   assert.match(app, /PropertyDeskDepositContext\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);

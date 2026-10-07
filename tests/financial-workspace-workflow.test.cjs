@@ -10,10 +10,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(
-    app,
-    /transactionMaintenance\.createActionHandlers\(\{[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,/,
-  );
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositMaintenanceWorkflow\.create\(/);
   assert.match(
     app,
@@ -27,6 +24,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   for (const feature of [
     "account-deposit-maintenance-workflow",
     "transaction-maintenance-workflow",
+    "transaction-screen-workflow",
   ]) {
     const script = `features/${feature}.js`;
     assert.ok(
