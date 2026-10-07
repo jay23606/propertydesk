@@ -5,7 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
-test("app connects account and deposit actions without workflow wrappers", () => {
+test("app delegates account closure and deposit adjustments to one workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(
@@ -13,39 +13,31 @@ test("app connects account and deposit actions without workflow wrappers", () =>
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositLedger,/,
   );
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
-  const accountMaintenance = app.indexOf(
-    "PropertyDeskAccountCloseMaintenance.create(",
-  );
-  const accountEntry = app.indexOf("PropertyDeskAccountCloseEntry.create(");
-  const accountEvents = app.indexOf("PropertyDeskAccountDetailEvents.create(");
-  const depositMaintenance = app.indexOf(
-    "PropertyDeskDepositMaintenance.create(",
-  );
-  const depositEntry = app.indexOf(
-    "PropertyDeskDepositAdjustmentEntry.create(",
-  );
-  const depositEvents = app.indexOf("PropertyDeskDepositDetailEvents.create(");
-  assert.ok(accountMaintenance < accountEntry && accountEntry < accountEvents);
-  assert.ok(depositMaintenance < depositEntry && depositEntry < depositEvents);
   assert.match(
     app,
+    /PropertyDeskAccountDepositMaintenanceWorkflow\.create\(\{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?depositSectionHTML,[\s\S]*?moneyInput,/,
+  );
+  const workflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-deposit-maintenance-workflow.js",
+    ),
+    "utf8",
+  );
+  for (const feature of [
+    "PropertyDeskAccountCloseMaintenance",
+    "PropertyDeskAccountCloseEntry",
+    "PropertyDeskAccountDetailEvents",
+    "PropertyDeskDepositMaintenance",
+    "PropertyDeskDepositAdjustmentEntry",
+    "PropertyDeskDepositDetailEvents",
+  ])
+    assert.match(workflow, new RegExp(`${feature}\\.create\\(`));
+  assert.match(
+    workflow,
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskAccountCloseEntry\.create\(\{\s*saveCloseAccount,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskAccountDetailEvents\.create\(\{[\s\S]*?closeAccount,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskDepositAdjustmentEntry\.create\(\{[\s\S]*?saveDepositAdjustment,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskDepositDetailEvents\.create\(\{[\s\S]*?recordDepositAdjustment,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(

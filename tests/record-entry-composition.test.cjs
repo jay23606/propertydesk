@@ -8,14 +8,16 @@ test("app injects audited correction persistence into record entry directly", ()
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const corrections = app.indexOf("PropertyDeskTransactionCorrections.create(");
+  const corrections = app.indexOf(
+    "PropertyDeskTransactionMaintenanceWorkflow.create(",
+  );
   const recordEntry = app.indexOf("PropertyDeskRecordEntryWorkflow.create(");
 
   assert.ok(corrections >= 0);
   assert.ok(recordEntry > corrections);
   assert.match(
     app,
-    /PropertyDeskTransactionCorrections\.create\(\{\s*\$,\s*state,\s*toast,\s*fetchAll,\s*closeModal,/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{[\s\S]*?closeModal,[\s\S]*?prettyType,[\s\S]*?EventClass: Event,[\s\S]*?OptionClass: Option,/,
   );
   assert.match(
     app,

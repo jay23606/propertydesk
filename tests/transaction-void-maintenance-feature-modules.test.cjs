@@ -124,18 +124,15 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
   assert.deepEqual(calls, [["toast", "This transaction type can't be voided"]]);
 });
 
-test("app composes transaction history and maintenance without a broad wrapper", () => {
+test("app composes transaction history through its maintenance coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionHistoryWorkflow/);
   assert.match(app, /renderPayments,/);
-  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
-  assert.match(app, /PropertyDeskTransactionVoidEntry\.create\(/);
-  assert.match(app, /PropertyDeskTransactionCorrectionForm\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViewEvents\.create\(/);
+  assert.match(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.match(
     app,
     /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,

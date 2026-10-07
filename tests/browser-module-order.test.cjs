@@ -166,6 +166,50 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview.js", "features/imports.js"],
     ["features/import-preview-events.js", "features/imports.js"],
     [
+      "features/account-detail-events.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/account-close-entry.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/account-close-maintenance.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/deposit-adjustment-entry.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/deposit-detail-events.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/deposit-maintenance.js",
+      "features/account-deposit-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-corrections.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-maintenance.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-void-entry.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-correction-form.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
+      "features/transaction-view-events.js",
+      "features/transaction-maintenance-workflow.js",
+    ],
+    [
       "features/import-correction-view.js",
       "features/import-preview-rendering.js",
     ],
