@@ -19,6 +19,8 @@
       openExpense: management.openExpense,
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
+      propertyHolderRepository: management.propertyHolderRepository,
+      documentRepository: management.documentRepository,
       makeId: management.makeId,
       confirm: management.confirm,
       openWindow: management.openWindow,

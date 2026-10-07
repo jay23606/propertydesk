@@ -20,6 +20,8 @@
       confirm,
       openWindow,
       propertyRepository,
+      propertyHolderRepository,
+      documentRepository,
     } = context;
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
@@ -55,9 +57,7 @@
         toast,
         fetchAll,
         openPropertyDetails,
-        repository: window.PropertyDeskPropertyHolderRepository.create({
-          getClient: () => state.client,
-        }),
+        repository: propertyHolderRepository,
       });
     const { attachEvents: attachPropertyHolderEvents } =
       window.PropertyDeskPropertyHolderEvents.create({
@@ -72,9 +72,7 @@
       makeId,
       confirm,
       openWindow,
-      repository: window.PropertyDeskDocumentRepository.create(
-        () => state.client,
-      ),
+      repository: documentRepository,
     });
     const { attachEvents: attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDetailDocumentEvents.create({

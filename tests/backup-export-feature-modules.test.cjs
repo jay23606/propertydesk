@@ -17,7 +17,7 @@ test("app supplies all backup archive and download dependencies", () => {
   assert.match(app, /loadBackupRecords: backupRecords\.load/);
   assert.match(
     app,
-    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: window\.PropertyDeskDocumentRepository\.create\(/,
+    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository,/,
   );
 });
 

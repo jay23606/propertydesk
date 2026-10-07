@@ -11,6 +11,8 @@ test("property screen workflow passes detail actions to management and returns b
   const management = {
     closeModal() {},
     toast() {},
+    propertyHolderRepository: { kind: "holder-repository" },
+    documentRepository: { kind: "document-repository" },
     unusedDependency: true,
   };
   const context = vm.createContext({
@@ -54,6 +56,11 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[1][1].toast, management.toast);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
+  assert.equal(
+    calls[1][1].propertyHolderRepository,
+    management.propertyHolderRepository,
+  );
+  assert.equal(calls[1][1].documentRepository, management.documentRepository);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",

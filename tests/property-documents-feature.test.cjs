@@ -97,8 +97,13 @@ test("app connects private document actions to their detail event router", () =>
   );
   assert.match(
     workflow,
-    /PropertyDeskDocuments\.create\([\s\S]*?repository: window\.PropertyDeskDocumentRepository\.create\(/,
+    /PropertyDeskDocuments\.create\([\s\S]*?repository: documentRepository,/,
   );
+  assert.match(
+    app,
+    /const documentRepository = window\.PropertyDeskDocumentRepository\.create\(/,
+  );
+  assert.match(app, /management:[\s\S]*?documentRepository,/);
   assert.match(
     workflow,
     /PropertyDeskPropertyDetailDocumentEvents\.create\([\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,

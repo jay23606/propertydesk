@@ -51,6 +51,13 @@
       toast,
       render,
     });
+  const propertyHolderRepository =
+    window.PropertyDeskPropertyHolderRepository.create({
+      getClient: () => state.client,
+    });
+  const documentRepository = window.PropertyDeskDocumentRepository.create(
+    () => state.client,
+  );
   const {
     accountBalance,
     scheduledMonthlyRunRate,
@@ -283,6 +290,8 @@
         fetchAll,
         todayIso,
         propertyRepository: window.PropertyDeskPropertyRepository,
+        propertyHolderRepository,
+        documentRepository,
         closeModal,
         editAccount,
         openAccountDetails,
@@ -362,9 +371,7 @@
       loadBackupRecords: backupRecords.load,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
-      documentRepository: window.PropertyDeskDocumentRepository.create(
-        () => state.client,
-      ),
+      documentRepository,
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,

@@ -93,6 +93,8 @@ test("property detail coordinator connects archive, holder, and document actions
   const openExpense = () => {};
   const openAccountForProperty = () => {};
   const propertyRepository = { updateOwned() {} };
+  const propertyHolderRepository = { kind: "holder-repository" };
+  const documentRepository = { kind: "document-repository" };
   const dependencies = {
     $() {},
     state,
@@ -107,6 +109,8 @@ test("property detail coordinator connects archive, holder, and document actions
     openExpense,
     openAccountForProperty,
     propertyRepository,
+    propertyHolderRepository,
+    documentRepository,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailManagementWorkflow.create(
@@ -122,11 +126,11 @@ test("property detail coordinator connects archive, holder, and document actions
     passed.holderManagement.openPropertyDetails,
     openPropertyDetails,
   );
-  assert.equal(passed.holderManagement.repository.kind, "holder-repository");
-  assert.equal(passed.holderRepository(), state.client);
+  assert.equal(passed.holderManagement.repository, propertyHolderRepository);
+  assert.equal(passed.holderRepository, undefined);
   assert.equal(passed.documents.openPropertyDetails, openPropertyDetails);
-  assert.equal(passed.documents.repository.kind, "repository");
-  assert.equal(passed.getClient(), state.client);
+  assert.equal(passed.documents.repository, documentRepository);
+  assert.equal(passed.getClient, undefined);
   assert.equal(typeof passed.documentEvents.uploadPropertyDocument, "function");
   assert.equal(typeof passed.documentEvents.deletePropertyDocument, "function");
   assert.equal(typeof passed.documentEvents.openPropertyDocument, "function");
