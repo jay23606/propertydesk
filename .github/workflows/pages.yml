@@ -27,7 +27,7 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm test
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Create empty browser config for candidate smoke check
         run: printf '%s\n' 'window.PROPERTYDESK_CONFIG = {};' > config.js
       - name: Serve candidate files for browser smoke check
