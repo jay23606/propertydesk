@@ -92,6 +92,7 @@ test("property detail coordinator connects archive, holder, and document actions
   const openPayment = () => {};
   const openExpense = () => {};
   const openAccountForProperty = () => {};
+  const propertyRepository = { updateOwned() {} };
   const dependencies = {
     $() {},
     state,
@@ -105,6 +106,7 @@ test("property detail coordinator connects archive, holder, and document actions
     openPayment,
     openExpense,
     openAccountForProperty,
+    propertyRepository,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailManagementWorkflow.create(
@@ -112,6 +114,7 @@ test("property detail coordinator connects archive, holder, and document actions
     );
 
   assert.equal(passed.archive.openPropertyDetails, openPropertyDetails);
+  assert.equal(passed.archive.repository, propertyRepository);
   assert.equal(passed.quick.openPayment, openPayment);
   assert.equal(passed.quick.openExpense, openExpense);
   assert.equal(passed.quick.openAccountForProperty, openAccountForProperty);

@@ -282,6 +282,7 @@
         toast,
         fetchAll,
         todayIso,
+        propertyRepository: window.PropertyDeskPropertyRepository,
         closeModal,
         editAccount,
         openAccountDetails,
@@ -327,6 +328,7 @@
       toast,
       fetchAll,
       openPayment,
+      propertyRepository: window.PropertyDeskPropertyRepository,
       openAccountForProperty,
     },
   });

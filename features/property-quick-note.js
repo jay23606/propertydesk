@@ -7,6 +7,7 @@
     toast,
     fetchAll,
     streetAddress,
+    repository,
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
   }) {
@@ -14,7 +15,7 @@
       window.PropertyDeskPropertyMaintenance.create({
         state,
         toast,
-        repository: window.PropertyDeskPropertyRepository,
+        repository,
       });
 
     async function editPropertyQuickNote(id) {

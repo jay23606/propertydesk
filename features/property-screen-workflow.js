@@ -18,6 +18,7 @@
       openPayment: management.openPayment,
       openExpense: management.openExpense,
       openAccountForProperty: management.openAccountForProperty,
+      propertyRepository: management.propertyRepository,
       makeId: management.makeId,
       confirm: management.confirm,
       openWindow: management.openWindow,

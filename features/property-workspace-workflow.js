@@ -45,6 +45,7 @@
       openPayment: portfolio.openPayment,
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
+      propertyRepository: portfolio.propertyRepository,
     });
 
     return {

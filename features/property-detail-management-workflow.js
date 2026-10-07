@@ -19,6 +19,7 @@
       makeId,
       confirm,
       openWindow,
+      propertyRepository,
     } = context;
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
@@ -27,6 +28,7 @@
         fetchAll,
         todayIso,
         openPropertyDetails,
+        repository: propertyRepository,
       },
     );
     const { attachEvents: attachPropertyDetailEvents } =

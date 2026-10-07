@@ -30,6 +30,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
     [...order].sort((left, right) => left - right),
   );
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /propertyRepository: window\.PropertyDeskPropertyRepository,[\s\S]*?openAccountForProperty,/,
+  );
   assert.doesNotMatch(
     app,
     /(?:PropertyDeskPropertyPortfolio(?:Table|Model)|PropertyDeskProperty(?:QuickNote|ViewEvents))\.create\(/,
@@ -50,6 +54,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   const calls = [];
   const action = () => {};
   const editPropertyQuickNote = () => {};
+  const propertyRepository = {};
   const state = {};
   const passed = {};
   const context = vm.createContext({
@@ -121,6 +126,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     fetchAll: action,
     streetAddress: action,
     openPayment: action,
+    propertyRepository,
     openPropertyDetails: action,
     openAccountForProperty: action,
   });
@@ -144,6 +150,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal(passed.quickNote.toast, action);
   assert.equal(passed.quickNote.fetchAll, action);
   assert.equal(passed.quickNote.streetAddress, action);
+  assert.equal(passed.quickNote.repository, propertyRepository);
   assert.equal(passed.actions.$, action);
   assert.equal(passed.actions.openPayment, action);
   assert.equal(passed.actions.editPropertyQuickNote, editPropertyQuickNote);

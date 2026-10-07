@@ -24,6 +24,7 @@
       openPayment,
       openPropertyDetails,
       openAccountForProperty,
+      propertyRepository,
     } = context;
 
     const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
@@ -75,6 +76,7 @@
         toast,
         fetchAll,
         streetAddress,
+        repository: propertyRepository,
       });
     const { attachEvents: attachPropertyActionEvents } =
       window.PropertyDeskPropertyViewEvents.create({

@@ -2,12 +2,19 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, todayIso, openPropertyDetails }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    todayIso,
+    openPropertyDetails,
+    repository,
+  }) {
     const { savePropertyArchive } =
       window.PropertyDeskPropertyMaintenance.create({
         state,
         toast,
-        repository: window.PropertyDeskPropertyRepository,
+        repository,
       });
 
     async function toggleArchiveProperty() {
