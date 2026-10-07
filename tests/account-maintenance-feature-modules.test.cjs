@@ -19,11 +19,11 @@ test("app delegates account actions and deposit adjustments to separate workflow
   );
   assert.match(
     accountScreenWorkflow,
-    /AccountDetailContentWorkflow\.create\(\s*content,?\s*\)/,
+    /AccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository/,
   );
   assert.match(
     accountScreenWorkflow,
-    /AccountDetailActionWorkflow\.create\(accountActions\)/,
+    /AccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: accountActions\.repository/,
   );
   assert.match(
     accountScreenWorkflow,
@@ -118,8 +118,28 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     ),
     context,
   );
-  const content = { state: {} };
+  const content = {
+    $() {},
+    state: {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    sumPosted() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    summarizeAccount() {},
+    amortizationSchedule() {},
+    openModal() {},
+    propertyAddress() {},
+    depositLedger() {},
+    accountHistoryRepository: {},
+    unusedContentValue: true,
+  };
   const accountActions = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
     closeModal() {},
     editAccount() {},
     openPayment() {},
@@ -145,9 +165,42 @@ test("account screen workflow composes isolated detail actions and deposits", ()
   });
 
   assert.equal(calls[0][0], "content");
-  assert.equal(calls[0][1], content);
+  assert.equal(calls[0][1].state, content.state);
+  assert.equal(calls[0][1].depositLedger, content.depositLedger);
+  assert.equal(
+    calls[0][1].accountHistoryRepository,
+    content.accountHistoryRepository,
+  );
+  assert.equal("unusedContentValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "$",
+    "accountHistoryRepository",
+    "amortizationSchedule",
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "state",
+    "sumPosted",
+    "summarizeAccount",
+  ]);
   assert.equal(calls[1][0], "accountActions");
-  assert.equal(calls[1][1], accountActions);
+  assert.equal(calls[1][1].repository, accountActions.repository);
+  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+    "$",
+    "closeModal",
+    "editAccount",
+    "fetchAll",
+    "openPayment",
+    "repository",
+    "state",
+    "toast",
+  ]);
   assert.equal(calls[2][0], "deposit");
   assert.equal(calls[2][1].repository, deposit.repository);
   assert.equal(calls[2][1].prepareAdjustment, deposit.prepareAdjustment);
