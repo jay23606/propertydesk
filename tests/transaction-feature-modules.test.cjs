@@ -7,6 +7,7 @@ const vm = require("node:vm");
 function loadTransactionModules() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "transaction-list-filter-model.js",
     "transaction-list-model.js",
     "transaction-summary-model.js",
     "transaction-row-view.js",
@@ -111,8 +112,10 @@ test("transaction list model filters rows and resolves their display association
   };
   const model = context.window.PropertyDeskTransactionListModel.create({
     state,
-    dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
     expenseCategoryLabel: (value) => value,
+    filterModel: context.window.PropertyDeskTransactionListFilterModel.create({
+      dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
+    }),
   });
   const summary = context.window.PropertyDeskTransactionSummaryModel.create({
     state,

@@ -4,8 +4,8 @@
 
   function createTransactionListModel({
     state,
-    dateOnly,
     expenseCategoryLabel,
+    filterModel,
   }) {
     function associateTransaction(row) {
       const account = state.accounts.find(
@@ -65,28 +65,8 @@
       };
     }
 
-    function matchesDatePeriod(date, period, now) {
-      if (period === "all") return true;
-      if (period === "month") {
-        return (
-          date?.getMonth() === now.getMonth() &&
-          date?.getFullYear() === now.getFullYear()
-        );
-      }
-      return period === "year" && date?.getFullYear() === now.getFullYear();
-    }
-
-    function matchesPeriodAndType(row, period, type, now) {
-      const date = dateOnly(row.date);
-      return (
-        (type === "all" || type === row.kind) &&
-        matchesDatePeriod(date, period, now)
-      );
-    }
-
-    function buildTransactionList({ period, query, type, now = new Date() }) {
-      const normalizedQuery = query.trim().toLowerCase();
-      return [
+    function buildTransactionList(filters) {
+      const rows = [
         ...state.payments.map((item) => ({
           kind: "income",
           date: item.received_date,
@@ -99,16 +79,8 @@
           amount: Number(item.amount),
           item,
         })),
-      ]
-        .filter((row) => matchesPeriodAndType(row, period, type, now))
-        .map(associateTransaction)
-        .filter(
-          (row) => !normalizedQuery || row.searchText.includes(normalizedQuery),
-        )
-        .sort((left, right) =>
-          String(right.date).localeCompare(String(left.date)),
-        )
-        .map(toDisplayRow);
+      ].map(associateTransaction);
+      return filterModel.filterRows(rows, filters).map(toDisplayRow);
     }
 
     return { buildTransactionList };

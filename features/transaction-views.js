@@ -16,11 +16,14 @@
       sumIncome,
       sumOperatingExpenses,
     } = context;
+    const filterModel = window.PropertyDeskTransactionListFilterModel.create({
+      dateOnly,
+    });
     const { buildTransactionList } =
       window.PropertyDeskTransactionListModel.create({
         state,
-        dateOnly,
         expenseCategoryLabel,
+        filterModel,
       });
     const { currentMonthTotals } =
       window.PropertyDeskTransactionSummaryModel.create({

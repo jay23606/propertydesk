@@ -341,6 +341,14 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-repository.js",
     ],
     ["features/transaction-list-model.js", "features/transaction-views.js"],
+    [
+      "features/transaction-list-filter-model.js",
+      "features/transaction-list-model.js",
+    ],
+    [
+      "features/transaction-list-filter-model.js",
+      "features/transaction-views.js",
+    ],
     ["features/transaction-row-view.js", "features/transaction-views.js"],
     ["features/transaction-summary-model.js", "features/transaction-views.js"],
     [
