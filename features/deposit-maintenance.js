@@ -32,7 +32,7 @@
       });
       if (!adjustmentIsReady(prepared, toast)) return false;
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () => repository.insert(state.client, prepared.payload),
+        operation: () => repository.insert(prepared.payload),
         toast,
         failureMessage:
           "Deposit adjustment failed. Check your connection and try again.",

@@ -11,7 +11,7 @@
       }
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () =>
-          repository.correct(state.client, {
+          repository.correct({
             kind,
             transactionId: pending.id,
             correction,

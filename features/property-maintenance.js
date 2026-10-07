@@ -2,11 +2,10 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, repository }) {
+  function create({ toast, repository }) {
     function updateProperty(propertyId, ownerId, values, failureMessage) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () =>
-          repository.updateOwned(state.client, propertyId, ownerId, values),
+        operation: () => repository.updateOwned(propertyId, ownerId, values),
         toast,
         failureMessage,
       });
@@ -14,7 +13,7 @@
 
     function saveProperty(payload, propertyId) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () => repository.save(state.client, payload, propertyId),
+        operation: () => repository.save(payload, propertyId),
         toast,
         failureMessage:
           "Property couldn't be saved right now. Check your connection and try again.",

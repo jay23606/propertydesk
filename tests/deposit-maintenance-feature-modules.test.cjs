@@ -122,7 +122,9 @@ test("deposit maintenance retains adjustment audit details", async () => {
     fetchAll: async () => {
       refreshes += 1;
     },
-    repository: context.window.PropertyDeskDepositRepository,
+    repository: context.window.PropertyDeskDepositRepository.create({
+      getClient: () => state.client,
+    }),
     prepareAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.prepare,
   });
@@ -275,7 +277,13 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
-    repository: context.window.PropertyDeskDepositRepository,
+    repository: context.window.PropertyDeskDepositRepository.create({
+      getClient: () => ({
+        from: () => ({
+          insert: async () => ({ error: { message: "Denied" } }),
+        }),
+      }),
+    }),
     prepareAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.prepare,
   });
@@ -293,9 +301,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     await entry.recordDepositAdjustment("rental-1", "retained"),
     false,
   );
-  assert.deepEqual(messages, [
-    "Deposit adjustment failed. Check your connection and try again.",
-  ]);
+  assert.deepEqual(messages, ["Deposit adjustment failed: Denied"]);
 });
 
 test("deposit adjustment entry validates the amount before asking for an audit reason", async () => {

@@ -3,7 +3,6 @@
   "use strict";
 
   function create({
-    state,
     toast,
     fetchAll,
     timestamp = () => new Date().toISOString(),
@@ -19,7 +18,7 @@
       }
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () =>
-          repository.voidPosted(state.client, {
+          repository.voidPosted({
             target,
             id,
             payload: buildVoidPayload(reason, timestamp()),

@@ -5,10 +5,9 @@
   const BUCKET = "pd-private-agreements";
   const TABLE = "pd_documents";
 
-  function create(clientSource) {
+  function create({ getClient }) {
     function client() {
-      const resolved =
-        typeof clientSource === "function" ? clientSource() : clientSource;
+      const resolved = getClient();
       if (!resolved)
         throw new Error("Document storage is unavailable until sign-in.");
       return resolved;

@@ -4,15 +4,19 @@
 
   const { saveById, updateById } = window.PropertyDeskRepositoryQueryUtils;
 
-  function save(client, payload, accountId) {
-    return saveById(client, "pd_accounts", payload, accountId);
+  function create({ getClient }) {
+    function save(payload, accountId) {
+      return saveById(getClient(), "pd_accounts", payload, accountId);
+    }
+
+    function close(accountId) {
+      return updateById(getClient(), "pd_accounts", accountId, {
+        status: "closed",
+      });
+    }
+
+    return Object.freeze({ save, close });
   }
 
-  function close(client, accountId) {
-    return updateById(client, "pd_accounts", accountId, {
-      status: "closed",
-    });
-  }
-
-  window.PropertyDeskAccountRepository = Object.freeze({ save, close });
+  window.PropertyDeskAccountRepository = Object.freeze({ create });
 })();

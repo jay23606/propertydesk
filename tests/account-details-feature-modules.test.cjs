@@ -391,7 +391,9 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   const { loadAccountHistory } =
     context.window.PropertyDeskAccountHistoryModel.create({
       state,
-      repository: context.window.PropertyDeskAccountHistoryRepository,
+      repository: context.window.PropertyDeskAccountHistoryRepository.create({
+        getClient: () => state.client,
+      }),
     });
   const { accountHistoryHTML } =
     context.window.PropertyDeskAccountHistoryView.create({

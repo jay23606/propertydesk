@@ -43,17 +43,15 @@ test("account repository inserts and updates only account rows", async () => {
       };
     },
   };
-  const repository = loadRepository(
+  const repositoryFactory = loadRepository(
     "account-repository.js",
     "PropertyDeskAccountRepository",
   );
+  const repository = repositoryFactory.create({ getClient: () => client });
 
-  assert.equal(await repository.save(client, { name: "New" }), result);
-  assert.equal(
-    await repository.save(client, { name: "Edited" }, "a-1"),
-    result,
-  );
-  assert.equal(await repository.close(client, "a-1"), result);
+  assert.equal(await repository.save({ name: "New" }), result);
+  assert.equal(await repository.save({ name: "Edited" }, "a-1"), result);
+  assert.equal(await repository.close("a-1"), result);
   assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
     ["from", "pd_accounts"],
     ["insert", { name: "New" }],
@@ -80,10 +78,11 @@ test("deposit repository inserts an audited entry into the deposit ledger", asyn
       };
     },
   };
-  const repository = loadRepository(
+  const repositoryFactory = loadRepository(
     "deposit-repository.js",
     "PropertyDeskDepositRepository",
   );
+  const repository = repositoryFactory.create({ getClient: () => client });
   const payload = {
     account_id: "rental-1",
     entry_type: "retained",
@@ -91,7 +90,7 @@ test("deposit repository inserts an audited entry into the deposit ledger", asyn
     reason: "Inspection retention",
   };
 
-  assert.equal(await repository.insert(client, payload), result);
+  assert.equal(await repository.insert(payload), result);
   assert.deepEqual(calls, [
     ["from", "pd_deposit_entries"],
     ["insert", payload],

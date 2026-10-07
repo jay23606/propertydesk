@@ -37,10 +37,8 @@ test("transaction repository inserts ledger rows through the selected table", as
     },
   };
 
-  assert.equal(
-    await loadRepository().insert(client, "pd_payments", { amount: 250 }),
-    result,
-  );
+  const repository = loadRepository().create({ getClient: () => client });
+  assert.equal(await repository.insert("pd_payments", { amount: 250 }), result);
   assert.deepEqual(calls, [["pd_payments", { amount: 250 }]]);
 });
 
@@ -54,8 +52,9 @@ test("transaction repository forwards audited correction arguments", async () =>
     },
   };
 
+  const repository = loadRepository().create({ getClient: () => client });
   assert.equal(
-    await loadRepository().correct(client, {
+    await repository.correct({
       kind: "payment",
       transactionId: "payment-1",
       correction: { amount: 120 },
@@ -111,8 +110,9 @@ test("transaction repository only voids posted rows and returns the selected row
     },
   };
 
+  const repository = loadRepository().create({ getClient: () => client });
   assert.equal(
-    await loadRepository().voidPosted(client, {
+    await repository.voidPosted({
       target: { table: "pd_expenses" },
       id: "expense-1",
       payload: { status: "voided", void_reason: "Duplicate" },

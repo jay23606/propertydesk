@@ -161,7 +161,7 @@ test("recording a loan payment does not invent principal or interest splits", as
     prettyType: (value) => value,
     paymentFrequencyLabel: (value) => value,
     openModal() {},
-    ...ledgerEntryDependencies(context),
+    ...ledgerEntryDependencies(context, state),
   });
 
   feature.attachEvents();

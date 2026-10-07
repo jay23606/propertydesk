@@ -54,8 +54,9 @@ test("document repository centralizes private storage and workspace-scoped metad
       return query;
     },
   };
-  const repository =
-    context.window.PropertyDeskDocumentRepository.create(client);
+  const repository = context.window.PropertyDeskDocumentRepository.create({
+    getClient: () => client,
+  });
 
   await repository.upload(
     "owner/property/file.pdf",
@@ -109,9 +110,9 @@ test("document repository resolves the client lazily after workspace sign-in", a
     context,
   );
   let client = null;
-  const repository = context.window.PropertyDeskDocumentRepository.create(
-    () => client,
-  );
+  const repository = context.window.PropertyDeskDocumentRepository.create({
+    getClient: () => client,
+  });
 
   assert.throws(
     () => repository.upload("owner/property/file.pdf", {}, "application/pdf"),

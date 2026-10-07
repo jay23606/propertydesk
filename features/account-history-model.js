@@ -13,7 +13,7 @@
         payments.map((payment) => [payment.id, payment]),
       );
       const { events: history, error: auditError } =
-        await loadAccountAuditEvents(state.client, auditIds);
+        await loadAccountAuditEvents(auditIds);
 
       const accountVersions = state.agreementVersions.filter(
         (version) => version.account_id === account.id,

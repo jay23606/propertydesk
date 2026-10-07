@@ -4,9 +4,13 @@
 
   const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
 
-  function insert(client, payload) {
-    return insertRecord(client, "pd_deposit_entries", payload);
+  function create({ getClient }) {
+    function insert(payload) {
+      return insertRecord(getClient(), "pd_deposit_entries", payload);
+    }
+
+    return Object.freeze({ insert });
   }
 
-  window.PropertyDeskDepositRepository = Object.freeze({ insert });
+  window.PropertyDeskDepositRepository = Object.freeze({ create });
 })();

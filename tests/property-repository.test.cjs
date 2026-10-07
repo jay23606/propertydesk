@@ -46,11 +46,11 @@ test("property repository inserts and updates the selected property", async () =
       };
     },
   };
-  const repository = loadRepository();
+  const repository = loadRepository().create({ getClient: () => client });
 
-  assert.equal(await repository.save(client, { name: "Home" }), result);
+  assert.equal(await repository.save({ name: "Home" }), result);
   assert.equal(
-    await repository.save(client, { name: "Updated" }, "property-1"),
+    await repository.save({ name: "Updated" }, "property-1"),
     result,
   );
   assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
@@ -86,10 +86,10 @@ test("property repository scopes notes and archive updates by property and owner
       };
     },
   };
-  const repository = loadRepository();
+  const repository = loadRepository().create({ getClient: () => client });
 
   assert.equal(
-    await repository.updateOwned(client, "property-1", "owner-1", {
+    await repository.updateOwned("property-1", "owner-1", {
       notes: "Check roof",
     }),
     result,

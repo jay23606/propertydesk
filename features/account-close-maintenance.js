@@ -2,10 +2,10 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, closeAccountDetails, repository }) {
+  function create({ toast, fetchAll, closeAccountDetails, repository }) {
     async function saveCloseAccount(account) {
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () => repository.close(state.client, account.id),
+        operation: () => repository.close(account.id),
         toast,
         failureMessage:
           "Account couldn't be closed right now. Please try again.",

@@ -119,24 +119,26 @@ test("backup agreement collector downloads only workspace-scoped files into the 
       ],
       workspaceOwnerId: "workspace-1",
       repository: context.window.PropertyDeskDocumentRepository.create({
-        storage: {
-          from(bucket) {
-            assert.equal(bucket, "pd-private-agreements");
-            return {
-              async download(path) {
-                assert.equal(path, storagePath);
-                return {
-                  data: {
-                    async arrayBuffer() {
-                      return fileBytes.buffer;
+        getClient: () => ({
+          storage: {
+            from(bucket) {
+              assert.equal(bucket, "pd-private-agreements");
+              return {
+                async download(path) {
+                  assert.equal(path, storagePath);
+                  return {
+                    data: {
+                      async arrayBuffer() {
+                        return fileBytes.buffer;
+                      },
                     },
-                  },
-                  error: null,
-                };
-              },
-            };
+                    error: null,
+                  };
+                },
+              };
+            },
           },
-        },
+        }),
       }),
     });
 
@@ -239,9 +241,9 @@ test("backup export aborts before download when a private document path escapes 
     loadBackupRecords: backupRecords.load,
     collectBackupAgreementFiles:
       context.window.PropertyDeskBackupAgreementFiles.collect,
-    documentRepository: context.window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    documentRepository: context.window.PropertyDeskDocumentRepository.create({
+      getClient: () => state.client,
+    }),
     zipUtils: {
       createZip: () =>
         assert.fail("invalid paths must stop before zip creation"),
@@ -366,9 +368,9 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     downloadBlob(blob, filename) {
       download = { blob, filename };
     },
-    documentRepository: context.window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    documentRepository: context.window.PropertyDeskDocumentRepository.create({
+      getClient: () => state.client,
+    }),
     collectBackupAgreementFiles(options) {
       agreementCollectionCalls += 1;
       return collectBackupAgreementFiles(options);

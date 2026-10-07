@@ -73,19 +73,30 @@ function loadLedgerEntryForms(context) {
   }
 }
 
-function ledgerEntryDependencies(context) {
+function ledgerEntryDependencies(context, state = {}) {
+  const repositoryFactory = context.window.PropertyDeskTransactionRepository;
   return {
-    transactionRepository: context.window.PropertyDeskTransactionRepository,
+    transactionRepository: repositoryFactory.create
+      ? repositoryFactory.create({ getClient: () => state.client })
+      : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
   };
 }
 
-function accountFormDependencies(context) {
-  return { repository: context.window.PropertyDeskAccountRepository };
+function accountFormDependencies(context, state = {}) {
+  return {
+    repository: context.window.PropertyDeskAccountRepository.create({
+      getClient: () => state.client,
+    }),
+  };
 }
 
-function propertyFormDependencies(context) {
-  return { repository: context.window.PropertyDeskPropertyRepository };
+function propertyFormDependencies(context, state = {}) {
+  return {
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
+  };
 }
 
 function loadPropertyAndAccountForms(context) {

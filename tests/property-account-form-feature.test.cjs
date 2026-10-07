@@ -23,7 +23,7 @@ test("property and account form modules expose separate APIs", () => {
   };
   const property = context.window.PropertyDeskPropertyForm.create({
     ...dependencies,
-    ...propertyFormDependencies(context),
+    ...propertyFormDependencies(context, dependencies.state),
   });
   let accountViewDependencies;
   context.window.PropertyDeskAccountFormView = {
@@ -41,7 +41,7 @@ test("property and account form modules expose separate APIs", () => {
     ...dependencies,
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
-    ...accountFormDependencies(context),
+    ...accountFormDependencies(context, dependencies.state),
   });
 
   assert.deepEqual(Object.keys(accountViewDependencies).sort(), [
@@ -96,12 +96,16 @@ test("property and account maintenance save inserts and updates to their own tab
   const property = context.window.PropertyDeskPropertyMaintenance.create({
     state,
     toast: (message) => messages.push(message),
-    repository: context.window.PropertyDeskPropertyRepository,
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
   });
   const account = context.window.PropertyDeskAccountMaintenance.create({
     state,
     toast: (message) => messages.push(message),
-    repository: context.window.PropertyDeskAccountRepository,
+    repository: context.window.PropertyDeskAccountRepository.create({
+      getClient: () => state.client,
+    }),
   });
   assert.deepEqual(Object.keys(account), ["saveAccount"]);
 
@@ -317,7 +321,7 @@ test("property and account forms report rejected saves without running success a
   };
   const property = context.window.PropertyDeskPropertyForm.create({
     ...dependencies,
-    ...propertyFormDependencies(context),
+    ...propertyFormDependencies(context, state),
   });
   const account = context.window.PropertyDeskAccountForm.create({
     ...dependencies,
@@ -328,7 +332,7 @@ test("property and account forms report rejected saves without running success a
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
-    ...accountFormDependencies(context),
+    ...accountFormDependencies(context, state),
   });
 
   property.attachEvents();

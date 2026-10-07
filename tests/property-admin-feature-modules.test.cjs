@@ -55,7 +55,9 @@ test("property quick notes normalize whitespace and scope updates to the workspa
       refreshed = true;
     },
     streetAddress: (property) => property.address,
-    repository: context.window.PropertyDeskPropertyRepository,
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
     promptAction: () => "  Follow-up\n needed   soon ",
   });
 
@@ -94,7 +96,9 @@ test("property quick notes enforce the character limit before writing", async ()
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("an overlong note must not refresh"),
     streetAddress: (property) => property.address,
-    repository: context.window.PropertyDeskPropertyRepository,
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
     promptAction: () => "x".repeat(141),
   });
 
@@ -169,7 +173,9 @@ test("property holder and archive workflows report rejected writes without runni
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
-    repository: context.window.PropertyDeskPropertyRepository,
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
   });
 
   await assert.doesNotReject(holderManagement.savePropertyHolders());
@@ -237,7 +243,9 @@ test("archive and restore writes share property maintenance and reopen updated d
     },
     todayIso: () => "2026-10-06",
     openPropertyDetails: (id) => calls.push(["open", id]),
-    repository: context.window.PropertyDeskPropertyRepository,
+    repository: context.window.PropertyDeskPropertyRepository.create({
+      getClient: () => state.client,
+    }),
   });
 
   await archive.toggleArchiveProperty();

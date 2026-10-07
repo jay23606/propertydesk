@@ -7,9 +7,12 @@ const repositoryFactory = /window\.PropertyDesk\w*Repository\.create\s*\(/g;
 const databaseAccess = /\.(?:from|rpc)\s*\(/;
 const dataAccessModules = new Set([
   "account-history-repository.js",
+  "account-repository.js",
+  "deposit-repository.js",
   "document-repository.js",
   "import-repository.js",
   "property-holder-repository.js",
+  "property-repository.js",
   "repository-query-utils.js",
   "transaction-repository.js",
   "workspace-member-repository.js",

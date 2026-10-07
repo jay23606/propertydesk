@@ -76,7 +76,7 @@ test("expense entry saves a property-level contractor expense through the expens
     populateFormOptions() {},
     prettyType: (value) => value,
     openModal() {},
-    ...ledgerEntryDependencies(context),
+    ...ledgerEntryDependencies(context, state),
   });
 
   forms.attachEvents();

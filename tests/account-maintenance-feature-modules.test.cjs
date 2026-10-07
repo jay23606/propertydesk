@@ -325,7 +325,9 @@ test("account close maintenance preserves the account history", async () => {
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
-    repository: context.window.PropertyDeskAccountRepository,
+    repository: context.window.PropertyDeskAccountRepository.create({
+      getClient: () => state.client,
+    }),
     closeAccountDetails: () => calls.push(["close-details"]),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),
@@ -378,7 +380,17 @@ test("account close maintenance reports rejected requests without closing detail
         }),
       },
     },
-    repository: context.window.PropertyDeskAccountRepository,
+    repository: context.window.PropertyDeskAccountRepository.create({
+      getClient: () => ({
+        from: () => ({
+          update: () => ({
+            eq: async () => {
+              throw new Error("offline");
+            },
+          }),
+        }),
+      }),
+    }),
     closeAccountDetails: () => calls.push("close-details"),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),
@@ -408,8 +420,8 @@ test("account close maintenance reports database errors before closing details",
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state: { client: {} },
     repository: {
-      close: async (client, id) => {
-        calls.push(["close", client, id]);
+      close: async (id) => {
+        calls.push(["close", id]);
         return { error: { message: "Permission denied" } };
       },
     },
@@ -420,7 +432,7 @@ test("account close maintenance reports database errors before closing details",
 
   await feature.saveCloseAccount({ id: "account-1", name: "Rental" });
 
-  assert.deepEqual(calls, [["close", {}, "account-1"]]);
+  assert.deepEqual(calls, [["close", "account-1"]]);
   assert.deepEqual(messages, ["Permission denied"]);
 });
 

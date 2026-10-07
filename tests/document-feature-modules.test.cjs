@@ -26,9 +26,9 @@ function createDocuments(context, options) {
     ...options,
     repository:
       options.repository ||
-      context.window.PropertyDeskDocumentRepository.create(
-        () => options.state.client,
-      ),
+      context.window.PropertyDeskDocumentRepository.create({
+        getClient: () => options.state.client,
+      }),
   });
 }
 

@@ -15,36 +15,28 @@ test("registry creates frozen adapters that resolve the active client lazily", (
   let activeClient = null;
   const clientAccessors = [];
   const makeClientRepository = {
-    create(argument) {
-      const getClient =
-        typeof argument === "function" ? argument : argument.getClient;
+    create({ getClient }) {
       clientAccessors.push(getClient);
       return { getClient };
     },
   };
-  const staticRepositories = {
-    accounts: { name: "accounts" },
-    accountHistory: { name: "account history" },
-    deposits: { name: "deposits" },
-    properties: { name: "properties" },
-    transactions: { name: "transactions" },
-  };
   const repositories = context.window.PropertyDeskRepositoryRegistry.create({
     repositories: {
-      ...staticRepositories,
+      accounts: makeClientRepository,
+      accountHistory: makeClientRepository,
+      deposits: makeClientRepository,
       documents: makeClientRepository,
       imports: makeClientRepository,
+      properties: makeClientRepository,
       propertyHolders: makeClientRepository,
+      transactions: makeClientRepository,
       workspaceMembers: makeClientRepository,
     },
     getClient: () => activeClient,
   });
 
   assert.equal(Object.isFrozen(repositories), true);
-  for (const [name, repository] of Object.entries(staticRepositories)) {
-    assert.equal(repositories[name], repository);
-  }
-  assert.equal(clientAccessors.length, 4);
+  assert.equal(clientAccessors.length, 9);
   assert.equal(repositories.documents.getClient(), null);
 
   activeClient = { id: "signed-in-client" };
