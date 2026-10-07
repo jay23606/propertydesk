@@ -134,6 +134,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/auth-session.js", "features/auth.js"],
     ["features/document-repository.js", "features/backup-agreement-files.js"],
     ["features/backup-agreement-files.js", "features/backup-archive.js"],
+    ["features/zip-utils.js", "app.js"],
     ["features/backup-records.js", "features/backup-archive.js"],
     ["features/backup-agreement-files.js", "features/backup-export.js"],
     ["features/backup-archive.js", "features/backup-export.js"],

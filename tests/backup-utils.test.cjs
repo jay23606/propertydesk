@@ -74,7 +74,7 @@ test("backup manifest identifies its version and counts every supported table", 
 });
 
 test("private ZIP helper writes readable stored entries and rejects unsafe paths", async () => {
-  const { createZip, crc32 } = require("../zip-utils.js");
+  const { createZip, crc32 } = require("../features/zip-utils.js");
   assert.equal(crc32(Buffer.from("123456789")), 0xcbf43926);
   const bytes = new Uint8Array(
     await createZip(
