@@ -116,7 +116,13 @@
   });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
-  const appShell = window.PropertyDeskAppShellWorkflow.create({
+  const {
+    updateGreeting,
+    navigate,
+    attachNavigationEvents,
+    attachProfileEvents,
+    attachWorkspaceMemberEvents,
+  } = window.PropertyDeskAppShellWorkflow.create({
     $,
     state,
     esc,
@@ -124,13 +130,6 @@
     fetchAll,
     renderReminderActivity,
   });
-  const {
-    updateGreeting,
-    navigate,
-    attachNavigationEvents,
-    attachProfileEvents,
-    attachWorkspaceMemberEvents,
-  } = appShell;
   const { saveCorrection } = window.PropertyDeskTransactionCorrections.create({
     $,
     state,
@@ -138,7 +137,18 @@
     fetchAll,
     closeModal,
   });
-  const recordEntry = window.PropertyDeskRecordEntryWorkflow.create({
+  const {
+    editAccount,
+    openAccountForProperty,
+    updatePaymentGuidance,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachPropertyFormEvents,
+    attachAccountFormEvents,
+    attachLedgerEntryFormEvents,
+    resetPropertyForm,
+  } = window.PropertyDeskRecordEntryWorkflow.create({
     $,
     state,
     moneyInput,
@@ -153,18 +163,6 @@
     previewReminderEmail,
     saveCorrection,
   });
-  const {
-    editAccount,
-    openAccountForProperty,
-    updatePaymentGuidance,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachPropertyFormEvents,
-    attachAccountFormEvents,
-    attachLedgerEntryFormEvents,
-    resetPropertyForm,
-  } = recordEntry;
   const { renderPayments, attachEvents: attachTransactionViewEvents } =
     window.PropertyDeskTransactionViews.create({
       $,
