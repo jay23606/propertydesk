@@ -13,6 +13,10 @@
     openPayment,
     depositSectionHTML,
     moneyInput,
+    accountRepository,
+    depositRepository,
+    prepareAdjustment,
+    validateAdjustment,
   }) {
     const { saveDepositAdjustment } =
       window.PropertyDeskDepositMaintenance.create({
@@ -20,8 +24,8 @@
         todayIso,
         toast,
         fetchAll,
-        repository: window.PropertyDeskDepositRepository,
-        prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
+        repository: depositRepository,
+        prepareAdjustment,
       });
     const { recordDepositAdjustment } =
       window.PropertyDeskDepositAdjustmentEntry.create({
@@ -29,7 +33,7 @@
         moneyInput,
         toast,
         saveDepositAdjustment,
-        validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
+        validateAdjustment,
       });
     const { attachEvents: attachDepositEvents } =
       window.PropertyDeskDepositDetailEvents.create({
@@ -44,7 +48,7 @@
         toast,
         fetchAll,
         closeAccountDetails: () => closeModal($("detail-modal")),
-        repository: window.PropertyDeskAccountRepository,
+        repository: accountRepository,
       });
     const { closeAccount } = window.PropertyDeskAccountCloseEntry.create({
       saveCloseAccount,

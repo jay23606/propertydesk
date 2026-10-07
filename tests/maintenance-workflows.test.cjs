@@ -27,12 +27,6 @@ test("transaction maintenance coordinator joins correction and void actions", ()
     Option: class MockOption {},
     document: {},
     window: {
-      PropertyDeskTransactionRepository: transactionRepository,
-      PropertyDeskTransactionVoidModel: {
-        resolveVoidTarget,
-        buildVoidPayload,
-      },
-      PropertyDeskTransactionCorrectionModel: { findCorrectionTarget },
       PropertyDeskTransactionCorrections: {
         create: (options) => {
           passed.corrections = options;
@@ -77,6 +71,10 @@ test("transaction maintenance coordinator joins correction and void actions", ()
     EventClass: class TestEvent {},
     OptionClass: class TestOption {},
     documentRef: { name: "document" },
+    repository: transactionRepository,
+    resolveVoidTarget,
+    buildVoidPayload,
+    findCorrectionTarget,
   };
   const workflow =
     context.window.PropertyDeskTransactionMaintenanceWorkflow.create(
@@ -136,12 +134,6 @@ test("account and deposit coordinator wires entry actions to workspace details",
   const closeModal = (element) => (passed.closedModal = element);
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountRepository: repository,
-      PropertyDeskDepositRepository: depositRepository,
-      PropertyDeskDepositAdjustmentModel: {
-        prepare: prepareAdjustment,
-        validate: validateAdjustment,
-      },
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.depositMaintenance = options;
@@ -193,6 +185,10 @@ test("account and deposit coordinator wires entry actions to workspace details",
     openPayment() {},
     depositSectionHTML() {},
     moneyInput() {},
+    accountRepository: repository,
+    depositRepository,
+    prepareAdjustment,
+    validateAdjustment,
   };
   const workflow =
     context.window.PropertyDeskAccountDepositMaintenanceWorkflow.create(

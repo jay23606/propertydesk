@@ -17,6 +17,10 @@
         openPayment: maintenance.openPayment,
         depositSectionHTML: details.depositSectionHTML,
         moneyInput: maintenance.moneyInput,
+        accountRepository: maintenance.accountRepository,
+        depositRepository: maintenance.depositRepository,
+        prepareAdjustment: maintenance.prepareAdjustment,
+        validateAdjustment: maintenance.validateAdjustment,
       },
     );
 

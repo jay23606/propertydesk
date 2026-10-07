@@ -13,6 +13,10 @@
       EventClass = Event,
       OptionClass = Option,
       documentRef = document,
+      repository,
+      resolveVoidTarget,
+      buildVoidPayload,
+      findCorrectionTarget,
     } = context;
     const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
       {
@@ -21,7 +25,7 @@
         toast,
         fetchAll,
         closeModal,
-        repository: window.PropertyDeskTransactionRepository,
+        repository,
       },
     );
     const { saveVoidTransaction } =
@@ -29,17 +33,14 @@
         state,
         toast,
         fetchAll,
-        repository: window.PropertyDeskTransactionRepository,
-        resolveVoidTarget:
-          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-        buildVoidPayload:
-          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+        repository,
+        resolveVoidTarget,
+        buildVoidPayload,
       });
     const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
       toast,
       saveVoidTransaction,
-      resolveVoidTarget:
-        window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+      resolveVoidTarget,
     });
 
     function createActionHandlers({
@@ -56,8 +57,7 @@
           openPayment,
           openExpense,
           updatePaymentGuidance,
-          findCorrectionTarget:
-            window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+          findCorrectionTarget,
           EventClass,
           OptionClass,
         });

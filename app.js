@@ -158,6 +158,13 @@
       EventClass: Event,
       OptionClass: Option,
       documentRef: document,
+      repository: window.PropertyDeskTransactionRepository,
+      resolveVoidTarget:
+        window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+      buildVoidPayload:
+        window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+      findCorrectionTarget:
+        window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
     },
     entry: {
       $,
@@ -222,6 +229,10 @@
       editAccount,
       openPayment,
       moneyInput,
+      accountRepository: window.PropertyDeskAccountRepository,
+      depositRepository: window.PropertyDeskDepositRepository,
+      prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
+      validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
     },
   });
   const {

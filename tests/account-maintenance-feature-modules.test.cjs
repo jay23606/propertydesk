@@ -50,7 +50,31 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
     workflow,
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
   );
-  assert.match(workflow, /repository: window\.PropertyDeskAccountRepository/);
+  assert.match(workflow, /repository: depositRepository/);
+  assert.match(workflow, /repository: accountRepository/);
+  assert.match(app, /repository: window\.PropertyDeskTransactionRepository/);
+  assert.match(
+    app,
+    /resolveVoidTarget:\s*window\.PropertyDeskTransactionVoidModel\.resolveVoidTarget/,
+  );
+  assert.match(
+    app,
+    /buildVoidPayload:\s*window\.PropertyDeskTransactionVoidModel\.buildVoidPayload/,
+  );
+  assert.match(
+    app,
+    /findCorrectionTarget:\s*window\.PropertyDeskTransactionCorrectionModel\.findCorrectionTarget/,
+  );
+  assert.match(app, /accountRepository: window\.PropertyDeskAccountRepository/);
+  assert.match(app, /depositRepository: window\.PropertyDeskDepositRepository/);
+  assert.match(
+    app,
+    /prepareAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.prepare/,
+  );
+  assert.match(
+    app,
+    /validateAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.validate/,
+  );
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
@@ -94,6 +118,10 @@ test("account screen workflow shares its deposit renderer with adjustment events
   const maintenance = {
     closeModal() {},
     moneyInput() {},
+    accountRepository: { close() {} },
+    depositRepository: { insert() {} },
+    prepareAdjustment() {},
+    validateAdjustment() {},
     unusedDependency: true,
   };
   const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
@@ -106,6 +134,10 @@ test("account screen workflow shares its deposit renderer with adjustment events
   assert.equal(calls[1][0], "maintenance");
   assert.equal(calls[1][1].closeModal, maintenance.closeModal);
   assert.equal(calls[1][1].moneyInput, maintenance.moneyInput);
+  assert.equal(calls[1][1].accountRepository, maintenance.accountRepository);
+  assert.equal(calls[1][1].depositRepository, maintenance.depositRepository);
+  assert.equal(calls[1][1].prepareAdjustment, maintenance.prepareAdjustment);
+  assert.equal(calls[1][1].validateAdjustment, maintenance.validateAdjustment);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
   assert.deepEqual(Object.keys(workflow).sort(), [
