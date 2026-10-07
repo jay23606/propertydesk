@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("workspace workflow owns profile display alongside profile settings", () => {
+test("workspace workflow composes profile settings with member settings", () => {
   const root = path.join(__dirname, "..");
   const passed = {};
   const updateGreeting = () => {};
@@ -15,24 +15,13 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   const attachMemberEvents = () => eventCalls.push("members");
   const context = vm.createContext({
     window: {
-      PropertyDeskProfileDisplay: {
+      PropertyDeskWorkspaceProfileWorkflow: {
         create(options) {
-          passed.profileDisplay = options;
-          return { updateGreeting };
-        },
-      },
-      PropertyDeskProfileSettings: {
-        create(options) {
-          passed.profileSettings = options;
-          return { saveProfile: () => {} };
-        },
-      },
-      PropertyDeskProfileSettingsView: {
-        create(options) {
-          passed.profileSettingsView = options;
+          passed.profileWorkflow = options;
           return {
-            setDisplayName: (value) => (passed.displayName = value),
-            attachEvents: () => attachProfileEvents(),
+            updateGreeting,
+            renderProfileSettings: () => (passed.displayName = "Owner"),
+            attachProfileEvents,
           };
         },
       },
@@ -75,11 +64,9 @@ test("workspace workflow owns profile display alongside profile settings", () =>
     renderReminderActivity: () => reminderActivityRenders++,
   });
 
-  assert.equal(passed.profileDisplay.state, state);
-  assert.equal(passed.profileSettings.updateGreeting, updateGreeting);
-  assert.equal(passed.profileSettings.state, state);
+  assert.equal(passed.profileWorkflow.state, state);
+  assert.equal(passed.profileWorkflow.toast instanceof Function, true);
   assert.equal(passed.members.repository, memberRepository);
-  assert.equal(typeof passed.profileSettingsView.$, "function");
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();
   assert.equal(passed.displayName, "Owner");

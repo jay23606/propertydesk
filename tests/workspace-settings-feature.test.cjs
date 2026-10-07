@@ -259,14 +259,20 @@ test("workspace member feature loads before settings and is precached", () => {
   );
   assert.ok(
     html.indexOf("features/profile-settings-view.js") <
-      html.indexOf("features/workspace.js"),
+      html.indexOf("features/workspace-profile-workflow.js"),
     "profile settings view should load before the workspace coordinator",
   );
-  assert.match(worker, /'\.\/features\/profile-settings-view\.js'/);
   assert.ok(
     html.indexOf("features/profile-display.js") <
-      html.indexOf("features/workspace.js"),
-    "profile display should load before the settings coordinator",
+      html.indexOf("features/workspace-profile-workflow.js"),
+    "profile display should load before its workflow",
   );
+  assert.ok(
+    html.indexOf("features/workspace-profile-workflow.js") <
+      html.indexOf("features/workspace.js"),
+    "profile settings should be composed before the workspace screen",
+  );
+  assert.match(worker, /'\.\/features\/profile-settings-view\.js'/);
+  assert.match(worker, /'\.\/features\/workspace-profile-workflow\.js'/);
   assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });

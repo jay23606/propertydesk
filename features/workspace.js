@@ -1,4 +1,4 @@
-/* PropertyDesk profile and Workspace settings composition. */
+/* Compose Workspace member settings and the settings-page renderer. */
 (() => {
   "use strict";
 
@@ -13,17 +13,11 @@
     authClient,
     confirmAction = (message) => window.confirm(message),
   }) {
-    const profileDisplay = window.PropertyDeskProfileDisplay.create({
+    const profileWorkflow = window.PropertyDeskWorkspaceProfileWorkflow.create({
       $,
-      state,
-    });
-    const { updateGreeting } = profileDisplay;
-    const profileView = window.PropertyDeskProfileSettingsView.create({ $ });
-    const profile = window.PropertyDeskProfileSettings.create({
       state,
       authClient,
       toast,
-      updateGreeting,
     });
     const memberView = window.PropertyDeskWorkspaceMembersView.create({
       $,
@@ -32,7 +26,7 @@
     });
 
     function renderWorkspaceSettings() {
-      profileView.setDisplayName(state.user?.user_metadata?.display_name || "");
+      profileWorkflow.renderProfileSettings();
       memberView.renderWorkspaceMembers();
     }
 
@@ -51,18 +45,14 @@
       confirmAction,
     });
 
-    function attachProfileEvents() {
-      profileView.attachEvents(profile.saveProfile);
-    }
-
     function attachWorkspaceMemberEvents() {
       members.attachEvents();
     }
 
     return {
-      updateGreeting,
+      updateGreeting: profileWorkflow.updateGreeting,
       renderWorkspaceSettings: renderWorkspacePage,
-      attachProfileEvents,
+      attachProfileEvents: profileWorkflow.attachProfileEvents,
       attachWorkspaceMemberEvents,
     };
   }

@@ -559,7 +559,8 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-void-model.js",
       "features/transaction-void-entry.js",
     ],
-    ["features/profile-settings.js", "features/workspace.js"],
+    ["features/profile-settings.js", "features/workspace-profile-workflow.js"],
+    ["features/workspace-profile-workflow.js", "features/workspace.js"],
     ["features/workspace-members.js", "features/workspace.js"],
     ["features/csv-value-utils.js", "features/import-validation-api.js"],
     [

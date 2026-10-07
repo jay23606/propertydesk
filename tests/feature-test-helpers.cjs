@@ -44,6 +44,7 @@ function loadWorkspaceFeatures(context) {
     "profile-display.js",
     "profile-settings-view.js",
     "profile-settings.js",
+    "workspace-profile-workflow.js",
     "repository-write-feedback.js",
     "workspace-members-view.js",
     "workspace-member-repository.js",
