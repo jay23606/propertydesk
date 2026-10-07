@@ -210,18 +210,18 @@ test("property detail events own editing and quick-action bindings", () => {
 
 test("app composes property detail content, actions, and document routes", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  const order = [
-    "PropertyDeskPropertyDetailContentWorkflow.create(",
-    "PropertyDeskPropertyDetailManagementWorkflow.create(",
-  ].map((marker) => app.indexOf(marker));
-  assert.ok(order.every((position) => position >= 0));
-  assert.deepEqual(
-    order,
-    [...order].sort((left, right) => left - right),
+  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskPropertyDetail(?:Content|Management)Workflow\.create\(/,
+  );
+  const screenWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-screen-workflow.js"),
+    "utf8",
   );
   assert.match(
-    app,
-    /PropertyDeskPropertyDetailManagementWorkflow\.create\(\{[\s\S]*?openPropertyDetails,[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openAccountDetails,[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?openAccountForProperty,/,
+    screenWorkflow,
+    /PropertyDetailContentWorkflow\.create\([\s\S]*?PropertyDetailManagementWorkflow\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
   );
   const workflow = fs.readFileSync(
     path.join(

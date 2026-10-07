@@ -221,8 +221,14 @@
       moneyInput,
     },
   });
-  const { openPropertyDetails } =
-    window.PropertyDeskPropertyDetailContentWorkflow.create({
+  const {
+    openPropertyDetails,
+    attachPropertyDetailEvents,
+    attachPropertyQuickActionEvents,
+    attachPropertyHolderEvents,
+    attachPropertyDocumentEvents,
+  } = window.PropertyDeskPropertyScreenWorkflow.create({
+    content: {
       $,
       state,
       isPosted,
@@ -236,25 +242,20 @@
       accountBalance,
       openModal,
       propertyAddress,
-    });
-  const {
-    attachPropertyDetailEvents,
-    attachPropertyQuickActionEvents,
-    attachPropertyHolderEvents,
-    attachPropertyDocumentEvents,
-  } = window.PropertyDeskPropertyDetailManagementWorkflow.create({
-    $,
-    state,
-    toast,
-    fetchAll,
-    todayIso,
-    openPropertyDetails,
-    closeModal,
-    editAccount,
-    openAccountDetails,
-    openPayment,
-    openExpense,
-    openAccountForProperty,
+    },
+    management: {
+      $,
+      state,
+      toast,
+      fetchAll,
+      todayIso,
+      closeModal,
+      editAccount,
+      openAccountDetails,
+      openPayment,
+      openExpense,
+      openAccountForProperty,
+    },
   });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({

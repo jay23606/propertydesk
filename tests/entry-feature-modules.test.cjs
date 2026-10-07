@@ -82,12 +82,11 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
-  assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyDetailManagementWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
   assert.match(app, /attachPropertyHolderEvents/);
   assert.match(app, /attachPropertyDetailEvents/);
   assert.match(app, /attachPropertyQuickActionEvents/);
-  assert.match(app, /PropertyDeskPropertyDetailManagementWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
@@ -122,8 +121,7 @@ test("app root composes independent property screens and shares detail actions",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
-    "PropertyDeskPropertyDetailContentWorkflow.create(",
-    "PropertyDeskPropertyDetailManagementWorkflow.create(",
+    "PropertyDeskPropertyScreenWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
@@ -139,6 +137,7 @@ test("app root composes independent property screens and shares detail actions",
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",
+    "features/property-screen-workflow.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview.js",
@@ -164,7 +163,7 @@ test("app root composes independent property screens and shares detail actions",
   assert.doesNotMatch(worker, /property-workspace-workflow\.js/);
   assert.ok(
     app.indexOf("PropertyDeskAccountScreenWorkflow.create(") <
-      app.indexOf("PropertyDeskPropertyDetailContentWorkflow.create("),
+      app.indexOf("PropertyDeskPropertyScreenWorkflow.create("),
   );
 });
 
