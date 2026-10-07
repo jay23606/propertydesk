@@ -11,6 +11,13 @@ test("workspace financial context shares state with ledger and deposit models", 
   const depositOptions = { securityDepositBalance() {} };
   const accountBalance = () => 42;
   const depositLedger = () => ({ active: [] });
+  const summarizeAccount = () => ({ unpaidDue: 5 });
+  const accountSummaryOptions = {
+    amountDueSince() {},
+    unpaidDueAccrualStart() {},
+    todayIso() {},
+  };
+  let capturedAccountSummaryOptions;
   const context = vm.createContext({
     window: {
       PropertyDeskLedgerContext: {
@@ -23,6 +30,12 @@ test("workspace financial context shares state with ledger and deposit models", 
         create(options) {
           calls.push(["deposit", options]);
           return { depositLedger };
+        },
+      },
+      PropertyDeskAccountFinancialSummary: {
+        create(options) {
+          capturedAccountSummaryOptions = options;
+          return { summarizeAccount };
         },
       },
     },
@@ -39,6 +52,7 @@ test("workspace financial context shares state with ledger and deposit models", 
     state,
     ledger: ledgerOptions,
     deposit: depositOptions,
+    ...accountSummaryOptions,
   });
 
   assert.equal(calls[0][0], "ledger");
@@ -56,10 +70,25 @@ test("workspace financial context shares state with ledger and deposit models", 
   );
   assert.equal(workflow.accountBalance, accountBalance);
   assert.equal(workflow.depositLedger, depositLedger);
+  assert.equal(capturedAccountSummaryOptions.accountBalance, accountBalance);
+  assert.equal(
+    capturedAccountSummaryOptions.amountDueSince,
+    accountSummaryOptions.amountDueSince,
+  );
+  assert.equal(
+    capturedAccountSummaryOptions.unpaidDueAccrualStart,
+    accountSummaryOptions.unpaidDueAccrualStart,
+  );
+  assert.equal(
+    capturedAccountSummaryOptions.todayIso,
+    accountSummaryOptions.todayIso,
+  );
+  assert.equal(workflow.summarizeAccount, summarizeAccount);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "accountBalance",
     "collectedSince",
     "depositLedger",
     "scheduledMonthlyRunRate",
+    "summarizeAccount",
   ]);
 });

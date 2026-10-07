@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function createWorkspaceFinancialContext({ state, ledger, deposit }) {
+  function createWorkspaceFinancialContext({
+    state,
+    ledger,
+    deposit,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
+  }) {
     const ledgerContext = window.PropertyDeskLedgerContext.create({
       state,
       ...ledger,
@@ -12,11 +19,19 @@
       ...deposit,
     });
 
+    const accountSummary = window.PropertyDeskAccountFinancialSummary.create({
+      accountBalance: ledgerContext.accountBalance,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+    });
+
     return {
       accountBalance: ledgerContext.accountBalance,
       scheduledMonthlyRunRate: ledgerContext.scheduledMonthlyRunRate,
       collectedSince: ledgerContext.collectedSince,
       depositLedger: depositContext.depositLedger,
+      summarizeAccount: accountSummary.summarizeAccount,
     };
   }
 

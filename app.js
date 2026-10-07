@@ -57,12 +57,7 @@
     },
     getClient: () => state.client,
   });
-  const {
-    accountBalance,
-    scheduledMonthlyRunRate,
-    collectedSince,
-    depositLedger,
-  } = window.PropertyDeskWorkspaceFinancialContext.create({
+  const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
     ledger: {
       todayIso,
@@ -74,14 +69,17 @@
     deposit: {
       securityDepositBalance,
     },
+    amountDueSince,
+    unpaidDueAccrualStart,
+    todayIso,
   });
-  const { summarizeAccount } =
-    window.PropertyDeskAccountFinancialSummary.create({
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
-    });
+  const {
+    accountBalance,
+    scheduledMonthlyRunRate,
+    collectedSince,
+    depositLedger,
+    summarizeAccount,
+  } = financialContext;
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =
     window.PropertyDeskReportWorkflow.create({
