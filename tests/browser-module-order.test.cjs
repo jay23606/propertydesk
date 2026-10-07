@@ -142,6 +142,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/backup-utils.js", "features/backup-workspace-workflow.js"],
     ["features/backup-records.js", "features/backup-workspace-workflow.js"],
     ["features/backup-workspace-workflow.js", "app.js"],
+    ["features/repository-registry.js", "app.js"],
     ["features/backup-utils.js", "features/backup-records.js"],
     ["workspace-query.js", "features/backup-records.js"],
     [

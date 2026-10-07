@@ -43,22 +43,19 @@
       toast,
       render,
     });
-  const repositories = Object.freeze({
-    accounts: window.PropertyDeskAccountRepository,
-    accountHistory: window.PropertyDeskAccountHistoryRepository,
-    deposits: window.PropertyDeskDepositRepository,
-    documents: window.PropertyDeskDocumentRepository.create(() => state.client),
-    imports: window.PropertyDeskImportRepository.create({
-      getClient: () => state.client,
-    }),
-    properties: window.PropertyDeskPropertyRepository,
-    propertyHolders: window.PropertyDeskPropertyHolderRepository.create({
-      getClient: () => state.client,
-    }),
-    transactions: window.PropertyDeskTransactionRepository,
-    workspaceMembers: window.PropertyDeskWorkspaceMemberRepository.create({
-      getClient: () => state.client,
-    }),
+  const repositories = window.PropertyDeskRepositoryRegistry.create({
+    repositories: {
+      accounts: window.PropertyDeskAccountRepository,
+      accountHistory: window.PropertyDeskAccountHistoryRepository,
+      deposits: window.PropertyDeskDepositRepository,
+      documents: window.PropertyDeskDocumentRepository,
+      imports: window.PropertyDeskImportRepository,
+      properties: window.PropertyDeskPropertyRepository,
+      propertyHolders: window.PropertyDeskPropertyHolderRepository,
+      transactions: window.PropertyDeskTransactionRepository,
+      workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
+    },
+    getClient: () => state.client,
   });
   const {
     accountBalance,
