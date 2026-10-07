@@ -61,7 +61,8 @@ test("app root wires record entry forms and create actions directly", () => {
     [...creationOrder].sort((left, right) => left - right),
   );
   assert.match(ledgerWorkflow, /saveCorrection/);
-  assert.match(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionHistoryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 

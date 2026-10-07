@@ -130,8 +130,9 @@ test("app composes transaction history and maintenance without a broad wrapper",
     path.join(__dirname, "..", "features", "ledger-workflow.js"),
     "utf8",
   );
-  assert.match(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(ledgerWorkflow, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionHistoryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /renderPayments,/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);

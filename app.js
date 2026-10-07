@@ -153,11 +153,23 @@
     attachPropertyFormEvents,
     attachAccountFormEvents,
     attachLedgerEntryFormEvents,
-    renderPayments,
-    attachTransactionViewEvents,
     resetPropertyForm,
     resetAccountForm,
   } = recordEntry;
+  const { renderPayments, attachTransactionViewEvents } =
+    window.PropertyDeskTransactionHistoryWorkflow.create({
+      $,
+      state,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    });
   const { attachEvents: attachCreateActionEvents, openAccountForProperty } =
     window.PropertyDeskCreateActions.create({
       $,

@@ -10,6 +10,7 @@ test("app root composes financial screens and maintenance boundaries directly", 
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const workflows = [
     "features/transaction-views.js",
+    "features/transaction-history-workflow.js",
     "features/transaction-maintenance-workflow.js",
     "features/deposit-maintenance-workflow.js",
     "features/account-close-maintenance.js",
@@ -19,6 +20,7 @@ test("app root composes financial screens and maintenance boundaries directly", 
   ];
   const creationOrder = [
     "PropertyDeskLedgerWorkflow.create(",
+    "PropertyDeskTransactionHistoryWorkflow.create(",
     "PropertyDeskCreateActions.create(",
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
     "PropertyDeskAccountDetailContentWorkflow.create(",
