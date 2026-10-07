@@ -17,6 +17,7 @@ function loadAuthFeatures(context) {
     "app-state.js",
     "auth-screens.js",
     "auth-recovery-view.js",
+    "auth-reset-request.js",
     "auth-recovery.js",
     "auth-session.js",
     "auth-form-view.js",

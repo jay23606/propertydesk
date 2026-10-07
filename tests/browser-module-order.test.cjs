@@ -106,6 +106,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/workspace-refresh.js", "features/app-services.js"],
     ["features/auth-form-view.js", "features/auth-form.js"],
     ["features/auth-recovery-view.js", "features/auth-recovery.js"],
+    ["features/auth-reset-request.js", "features/auth-recovery.js"],
     ["features/auth-recovery.js", "features/auth-session.js"],
     ["features/auth-form.js", "features/auth.js"],
     ["features/auth-recovery.js", "features/auth.js"],

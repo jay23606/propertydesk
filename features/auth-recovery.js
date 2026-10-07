@@ -13,34 +13,18 @@
     documentRef = document,
   }) {
     const view = window.PropertyDeskAuthRecoveryView.create({ $, documentRef });
+    const { requestPasswordReset } = window.PropertyDeskAuthResetRequest.create(
+      {
+        state,
+        view,
+        windowRef,
+      },
+    );
 
     function showPasswordReset() {
       state.passwordRecoveryInProgress = true;
       view.showPasswordReset();
       showAuth();
-    }
-
-    async function requestPasswordReset() {
-      const email = view.requestEmail();
-      if (!view.requestEmailIsValid()) return;
-      view.setRequestDisabled(true);
-      try {
-        const redirectTo = `${windowRef.location.origin}${windowRef.location.pathname}`;
-        const { error } = await state.client.auth.resetPasswordForEmail(email, {
-          redirectTo,
-        });
-        view.setMessage(
-          error
-            ? "Unable to request a reset right now. Try again later."
-            : "If that email has a PropertyDesk account, a reset link is on its way.",
-        );
-      } catch {
-        view.setMessage(
-          "Unable to request a reset right now. Try again later.",
-        );
-      } finally {
-        view.setRequestDisabled(false);
-      }
     }
 
     async function submitPasswordReset(event) {
