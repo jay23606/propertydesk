@@ -26,8 +26,16 @@ test("app state starts in Properties with fresh workspace collections", () => {
   assert.equal(second.properties.length, 0);
 });
 
-test("backend client only initializes with complete public Supabase config", () => {
-  const context = vm.createContext({ window: {} });
+test("backend client only initializes with complete explicit Supabase dependencies", () => {
+  const context = vm.createContext({
+    window: {
+      supabase: {
+        createClient() {
+          return { connected: true };
+        },
+      },
+    },
+  });
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "backend-client.js"),
@@ -42,6 +50,15 @@ test("backend client only initializes with complete public Supabase config", () 
       return { connected: true };
     },
   };
+  const implicit = context.window.PropertyDeskBackendClient.create({
+    config: {
+      supabaseUrl: "https://example.test",
+      supabaseAnonKey: "public-anon-key",
+    },
+  });
+  assert.equal(implicit.configured, false);
+  assert.equal(implicit.createClient(), null);
+
   const incomplete = context.window.PropertyDeskBackendClient.create({
     config: { supabaseUrl: "https://example.test" },
     supabase,

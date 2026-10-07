@@ -2,10 +2,7 @@
 (() => {
   "use strict";
 
-  function createBackendClient({
-    config = {},
-    supabase = window.supabase,
-  } = {}) {
+  function createBackendClient({ config, supabase }) {
     const configured = Boolean(
       config.supabaseUrl && config.supabaseAnonKey && supabase,
     );
