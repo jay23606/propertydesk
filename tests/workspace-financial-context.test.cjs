@@ -8,8 +8,18 @@ test("workspace financial context shares state with ledger and deposit models", 
   const calls = [];
   const state = { accounts: [] };
   const todayIso = () => "2026-10-07";
-  const ledgerOptions = { todayIso, scheduledLoanBalance() {} };
-  const depositOptions = { securityDepositBalance() {} };
+  const ledgerOptions = {
+    todayIso,
+    scheduledLoanBalance() {},
+    monthlyScheduledEstimate() {},
+    postedOnOrAfter() {},
+    sumPosted() {},
+    unusedLedgerValue: true,
+  };
+  const depositOptions = {
+    securityDepositBalance() {},
+    unusedDepositValue: true,
+  };
   const accountBalance = () => 42;
   const depositLedger = () => ({ active: [] });
   const summarizeAccount = () => ({ unpaidDue: 5 });
@@ -62,12 +72,32 @@ test("workspace financial context shares state with ledger and deposit models", 
     calls[0][1].scheduledLoanBalance,
     ledgerOptions.scheduledLoanBalance,
   );
+  assert.equal(
+    calls[0][1].monthlyScheduledEstimate,
+    ledgerOptions.monthlyScheduledEstimate,
+  );
+  assert.equal(calls[0][1].postedOnOrAfter, ledgerOptions.postedOnOrAfter);
+  assert.equal(calls[0][1].sumPosted, ledgerOptions.sumPosted);
+  assert.equal("unusedLedgerValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "monthlyScheduledEstimate",
+    "postedOnOrAfter",
+    "scheduledLoanBalance",
+    "state",
+    "sumPosted",
+    "todayIso",
+  ]);
   assert.equal(calls[1][0], "deposit");
   assert.equal(calls[1][1].state, state);
   assert.equal(
     calls[1][1].securityDepositBalance,
     depositOptions.securityDepositBalance,
   );
+  assert.equal("unusedDepositValue" in calls[1][1], false);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+    "securityDepositBalance",
+    "state",
+  ]);
   assert.equal(workflow.accountBalance, accountBalance);
   assert.equal(workflow.depositLedger, depositLedger);
   assert.equal(capturedAccountSummaryOptions.accountBalance, accountBalance);

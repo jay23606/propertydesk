@@ -11,11 +11,15 @@
   }) {
     const ledgerContext = window.PropertyDeskLedgerContext.create({
       state,
-      ...ledger,
+      todayIso: ledger.todayIso,
+      scheduledLoanBalance: ledger.scheduledLoanBalance,
+      monthlyScheduledEstimate: ledger.monthlyScheduledEstimate,
+      postedOnOrAfter: ledger.postedOnOrAfter,
+      sumPosted: ledger.sumPosted,
     });
     const depositContext = window.PropertyDeskDepositContext.create({
       state,
-      ...deposit,
+      securityDepositBalance: deposit.securityDepositBalance,
     });
 
     const accountSummary = window.PropertyDeskAccountFinancialSummary.create({
