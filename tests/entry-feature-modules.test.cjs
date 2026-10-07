@@ -89,6 +89,10 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create/);
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /const \{ summarizeAccount \} =\s*window\.PropertyDeskAccountFinancialSummary\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);

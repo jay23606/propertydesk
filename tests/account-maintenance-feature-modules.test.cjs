@@ -175,12 +175,6 @@ test("account detail content workflow composes schedule, history, and account", 
           return { buildAccountDetailData: () => ({}) };
         },
       },
-      PropertyDeskAccountFinancialSummary: {
-        create: (options) => {
-          passed.financialSummary = options;
-          return { summarizeAccount: () => ({}) };
-        },
-      },
       PropertyDeskAccountDetails: {
         create: (options) => {
           passed.details = options;
@@ -241,11 +235,8 @@ test("account detail content workflow composes schedule, history, and account", 
     sumPosted() {},
     prettyType() {},
     paymentFrequencyLabel() {},
-    accountBalance() {},
+    summarizeAccount() {},
     amortizationSchedule() {},
-    amountDueSince() {},
-    unpaidDueAccrualStart() {},
-    todayIso() {},
     openModal() {},
     propertyAddress() {},
     depositLedger: () => ({ entries: [], active: [], totals: {} }),
@@ -270,11 +261,7 @@ test("account detail content workflow composes schedule, history, and account", 
   assert.equal(passed.depositView.esc, dependencies.esc);
   assert.equal(passed.model.state, dependencies.state);
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
-  assert.equal(
-    passed.financialSummary.accountBalance,
-    dependencies.accountBalance,
-  );
-  assert.equal(typeof passed.model.summarizeAccount, "function");
+  assert.equal(passed.model.summarizeAccount, dependencies.summarizeAccount);
   assert.equal(passed.details.renderAccountDetails, renderAccountDetails);
   assert.equal(typeof passed.details.buildAccountDetailData, "function");
   assert.equal(

@@ -103,10 +103,13 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
       state,
       monthlyScheduledEstimate: (rows) =>
         rows.reduce((sum, account) => sum + account.payment_amount, 0),
-      accountBalance: (account) => (account.id === "note-1" ? 42000 : 0),
-      amountDueSince: (rows) => (rows[0].id === "closed-1" ? 0 : 100),
-      unpaidDueAccrualStart: () => "2026-10-01",
-      todayIso: () => "2026-10-05",
+      summarizeAccount:
+        context.window.PropertyDeskAccountFinancialSummary.create({
+          accountBalance: (account) => (account.id === "note-1" ? 42000 : 0),
+          amountDueSince: (rows) => (rows[0].id === "closed-1" ? 0 : 100),
+          unpaidDueAccrualStart: () => "2026-10-01",
+          todayIso: () => "2026-10-05",
+        }).summarizeAccount,
     });
   const model = context.window.PropertyDeskOverviewModel.create({
     state,

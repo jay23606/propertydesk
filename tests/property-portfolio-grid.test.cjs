@@ -206,10 +206,14 @@ test("Properties account-row model derives balances and reminder details", () =>
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
       state,
       monthlyScheduledEstimate: ([account]) => account.payment_amount,
-      accountBalance: () => 5000,
+      summarizeAccount:
+        context.window.PropertyDeskAccountFinancialSummary.create({
+          accountBalance: () => 5000,
+          amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
+          unpaidDueAccrualStart: () => "2026-10-01",
+          todayIso: () => "2026-10-05",
+        }).summarizeAccount,
       amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
-      unpaidDueAccrualStart: () => "2026-10-01",
-      todayIso: () => "2026-10-05",
       monthStart: () => "2026-10-01",
       monthEnd: () => "2026-10-31",
       paymentStatusInMonth: (_payments, _id, _monthStart, scheduled) =>
@@ -435,6 +439,13 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     paymentStatusInMonth: () => "none",
     money,
   };
+  dependencies.summarizeAccount =
+    context.window.PropertyDeskAccountFinancialSummary.create({
+      accountBalance: dependencies.accountBalance,
+      amountDueSince: dependencies.amountDueSince,
+      unpaidDueAccrualStart: dependencies.unpaidDueAccrualStart,
+      todayIso: dependencies.todayIso,
+    }).summarizeAccount;
   const portfolioTable =
     context.window.PropertyDeskPropertyPortfolioTable.create({
       esc,
@@ -445,10 +456,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
       state,
       monthlyScheduledEstimate: dependencies.monthlyScheduledEstimate,
-      accountBalance: dependencies.accountBalance,
+      summarizeAccount: dependencies.summarizeAccount,
       amountDueSince: dependencies.amountDueSince,
-      unpaidDueAccrualStart: dependencies.unpaidDueAccrualStart,
-      todayIso: dependencies.todayIso,
       monthStart: dependencies.monthStart,
       monthEnd: dependencies.monthEnd,
       paymentStatusInMonth: dependencies.paymentStatusInMonth,

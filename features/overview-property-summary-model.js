@@ -5,19 +5,8 @@
   function createOverviewPropertySummaryModel({
     state,
     monthlyScheduledEstimate,
-    accountBalance,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
+    summarizeAccount,
   }) {
-    const { summarizeAccount } =
-      window.PropertyDeskAccountFinancialSummary.create({
-        accountBalance,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        todayIso,
-      });
-
     function summarizeProperty(property, relatedAccounts) {
       const active = relatedAccounts.filter(
         (account) => (account.status || "active") === "active",

@@ -188,8 +188,9 @@ test("overview workflow exposes its renderer and event binder directly", () => {
   const context = vm.createContext({
     window: {
       PropertyDeskOverviewPropertySummaryModel: {
-        create: () => {
+        create: (options) => {
           calls.push("property summary");
+          passed.propertySummary = options;
           return propertySummaryModel;
         },
       },
@@ -234,10 +235,12 @@ test("overview workflow exposes its renderer and event binder directly", () => {
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
   const isPosted = () => true;
+  const summarizeAccount = () => ({});
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
     openPropertyDetails,
     openPropertyPayment,
     isPosted,
+    summarizeAccount,
   });
 
   assert.deepEqual(calls, [
@@ -248,6 +251,7 @@ test("overview workflow exposes its renderer and event binder directly", () => {
     "events",
   ]);
   assert.equal(passed.activityModelOptions.isPosted, isPosted);
+  assert.equal(passed.propertySummary.summarizeAccount, summarizeAccount);
   assert.equal(passed.model.propertySummaryModel, propertySummaryModel);
   assert.equal(passed.view.overviewModel, overviewModel);
   assert.equal(passed.events.openPropertyDetails, openPropertyDetails);

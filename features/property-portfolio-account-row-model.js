@@ -5,23 +5,13 @@
   function createAccountRowModel({
     state,
     monthlyScheduledEstimate,
-    accountBalance,
+    summarizeAccount,
     amountDueSince,
-    unpaidDueAccrualStart,
-    todayIso,
     monthStart,
     monthEnd,
     paymentStatusInMonth,
     reminderModel,
   }) {
-    const { summarizeAccount } =
-      window.PropertyDeskAccountFinancialSummary.create({
-        accountBalance,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        todayIso,
-      });
-
     function buildAccountRow(property, account, street) {
       const { unpaidDue, loanBalance, hasLoanBalance } = summarizeAccount(
         account,

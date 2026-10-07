@@ -12,11 +12,8 @@
       sumPosted,
       prettyType,
       paymentFrequencyLabel,
-      accountBalance,
+      summarizeAccount,
       amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
       openModal,
       propertyAddress,
       depositLedger,
@@ -59,12 +56,7 @@
       window.PropertyDeskAccountDetailsModel.create({
         state,
         sumPosted,
-        summarizeAccount: window.PropertyDeskAccountFinancialSummary.create({
-          accountBalance,
-          amountDueSince,
-          unpaidDueAccrualStart,
-          todayIso,
-        }).summarizeAccount,
+        summarizeAccount,
         amortizationSchedule,
         propertyAddress,
       });

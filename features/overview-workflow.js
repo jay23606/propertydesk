@@ -7,10 +7,7 @@
       $,
       state,
       monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
+      summarizeAccount,
       collectedSince,
       scheduledMonthlyRunRate,
       monthStart,
@@ -30,10 +27,7 @@
       window.PropertyDeskOverviewPropertySummaryModel.create({
         state,
         monthlyScheduledEstimate,
-        accountBalance,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        todayIso,
+        summarizeAccount,
       });
     const overviewModel = window.PropertyDeskOverviewModel.create({
       state,

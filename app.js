@@ -69,6 +69,13 @@
       securityDepositBalance,
     },
   });
+  const { summarizeAccount } =
+    window.PropertyDeskAccountFinancialSummary.create({
+      accountBalance,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      todayIso,
+    });
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =
     window.PropertyDeskReportWorkflow.create({
@@ -213,11 +220,8 @@
       sumPosted,
       prettyType,
       paymentFrequencyLabel,
-      accountBalance,
+      summarizeAccount,
       amortizationSchedule,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
       openModal,
       propertyAddress,
       depositLedger,
@@ -284,10 +288,7 @@
       $,
       state,
       monthlyScheduledEstimate,
-      accountBalance,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
+      summarizeAccount,
       collectedSince,
       scheduledMonthlyRunRate,
       monthStart,
@@ -308,10 +309,8 @@
       money,
       paymentFrequencyLabel,
       monthlyScheduledEstimate,
-      accountBalance,
+      summarizeAccount,
       amountDueSince,
-      unpaidDueAccrualStart,
-      todayIso,
       propertyAddress,
       streetAddress,
       monthStart,
