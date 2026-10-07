@@ -8,9 +8,7 @@
     fetchAll,
     openPropertyDetails,
     makeId = () => crypto.randomUUID(),
-    repository = window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    repository,
   }) {
     async function uploadFile(path, file, contentType) {
       let error;

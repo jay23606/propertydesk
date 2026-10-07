@@ -8,9 +8,7 @@
     fetchAll,
     openPropertyDetails,
     confirm = (message) => window.confirm(message),
-    repository = window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    repository,
   }) {
     function documentForDeletion(id, propertyId) {
       const doc = state.documents.find((item) => item.id === id);

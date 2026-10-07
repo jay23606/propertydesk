@@ -6,9 +6,7 @@
     state,
     toast,
     openWindow = (...args) => window.open(...args),
-    repository = window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    repository,
   }) {
     async function openPropertyDocument(id) {
       const doc = state.documents.find((item) => item.id === id);

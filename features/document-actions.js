@@ -9,9 +9,7 @@
     openPropertyDetails,
     confirm,
     openWindow,
-    repository = window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
+    repository,
   }) {
     const { deletePropertyDocument } = window.PropertyDeskDocumentDelete.create(
       {
