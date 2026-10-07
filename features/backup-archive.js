@@ -3,14 +3,13 @@
   "use strict";
 
   function create({
-    createBackup = window.PropertyDeskBackupUtils.createBackup,
-    zipUtils = window.PropertyDeskZipUtils,
-    loadBackupRecords = window.PropertyDeskBackupRecords.load,
-    collectBackupAgreementFiles = window.PropertyDeskBackupAgreementFiles
-      .collect,
+    createBackup,
+    zipUtils,
+    loadBackupRecords,
+    collectBackupAgreementFiles,
     documentRepository,
     now = () => new Date(),
-  } = {}) {
+  }) {
     async function prepare({ client, workspaceOwnerId }) {
       const records = await loadBackupRecords(client);
       const { entries, includedFiles } = await collectBackupAgreementFiles({

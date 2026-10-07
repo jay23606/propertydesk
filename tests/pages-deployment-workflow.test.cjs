@@ -13,4 +13,13 @@ test("Pages deployment uses a unique artifact for each workflow attempt", () => 
 
   assert.ok(workflow.includes(`name: ${artifactName}`));
   assert.ok(workflow.includes(`artifact_name: ${artifactName}`));
+  assert.ok(workflow.includes("actions: read"));
+  const upload = workflow.indexOf("uses: actions/upload-pages-artifact@v5");
+  const wait = workflow.indexOf(
+    "Wait for uploaded Pages artifact to become visible",
+  );
+  const deploy = workflow.indexOf("uses: actions/deploy-pages@v5");
+  assert.ok(upload >= 0 && upload < wait && wait < deploy);
+  assert.ok(workflow.includes('GITHUB_RUN_ID}/artifacts"'));
+  assert.ok(workflow.includes("sleep 5"));
 });

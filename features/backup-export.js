@@ -9,7 +9,7 @@
       createBackup,
       todayIso,
       toast,
-      downloadBlob = window.PropertyDeskDownloadUtils.downloadBlob,
+      downloadBlob,
       zipUtils,
       loadBackupRecords,
       collectBackupAgreementFiles,

@@ -4,6 +4,14 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("app supplies all backup archive and download dependencies", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(
+    app,
+    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?loadBackupRecords: window\.PropertyDeskBackupRecords\.load,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: window\.PropertyDeskDocumentRepository\.create\(/,
+  );
+});
+
 test("backup agreement collector downloads only workspace-scoped files into the archive manifest", async () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -147,6 +155,9 @@ test("backup export aborts before download when a private document path escapes 
     prettyType: (value) => value,
     accountBalance: () => 0,
     downloadBlob: (blob) => downloads.push(blob),
+    loadBackupRecords: context.window.PropertyDeskBackupRecords.load,
+    collectBackupAgreementFiles:
+      context.window.PropertyDeskBackupAgreementFiles.collect,
     documentRepository: context.window.PropertyDeskDocumentRepository.create(
       () => state.client,
     ),
@@ -263,6 +274,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     },
     todayIso: () => "2026-10-04",
     toast() {},
+    loadBackupRecords: context.window.PropertyDeskBackupRecords.load,
     downloadBlob(blob, filename) {
       download = { blob, filename };
     },

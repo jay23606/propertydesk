@@ -324,6 +324,11 @@
       createBackup,
       todayIso,
       toast,
+      downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+      zipUtils: window.PropertyDeskZipUtils,
+      loadBackupRecords: window.PropertyDeskBackupRecords.load,
+      collectBackupAgreementFiles:
+        window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: window.PropertyDeskDocumentRepository.create(
         () => state.client,
       ),
