@@ -129,16 +129,13 @@ test("import workflow keeps file import handlers inside its event bindings", () 
           return accounts;
         },
       },
-      PropertyDeskPaymentImport: {
+      PropertyDeskTransactionImportFeature: {
         create: (options) => {
-          passed.payment = options;
-          return payments;
-        },
-      },
-      PropertyDeskExpenseImport: {
-        create: (options) => {
-          passed.expense = options;
-          return expenses;
+          passed.transactions = options;
+          return {
+            attachPaymentEvents: payments.attachEvents,
+            attachExpenseEvents: expenses.attachEvents,
+          };
         },
       },
     },
@@ -187,14 +184,16 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     passed.account.buildPayloads,
     context.window.PropertyDeskAccountImportPayload.build,
   );
+  assert.deepEqual(Object.keys(passed.transactions.shared).sort(), [
+    "$",
+    "createFileWorkflow",
+    "createImportLookup",
+    "createTransactionImportWorkflow",
+  ]);
   assert.deepEqual(
-    Object.keys(passed.payment).sort(),
+    Object.keys(passed.transactions.payment).sort(),
     [
-      "$",
       "commitTransactions",
-      "createFileWorkflow",
-      "createImportLookup",
-      "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
       "state",
@@ -202,28 +201,22 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     ].sort(),
   );
   assert.deepEqual(
-    Object.keys(passed.expense).sort(),
+    Object.keys(passed.transactions.expense).sort(),
     [
-      "$",
       "commitTransactions",
-      "createFileWorkflow",
-      "createImportLookup",
-      "createTransactionImportWorkflow",
       "importReview",
       "parseCSV",
       "state",
       "validateExpenseRows",
     ].sort(),
   );
-  assert.equal(passed.account.importReview, passed.payment.importReview);
-  assert.equal(passed.payment.importReview, passed.expense.importReview);
   assert.equal(
-    passed.payment.createImportLookup,
-    context.window.PropertyDeskImportRows.createImportLookup,
+    passed.account.importReview,
+    passed.transactions.payment.importReview,
   );
   assert.equal(
-    passed.expense.createImportLookup,
-    context.window.PropertyDeskImportRows.createImportLookup,
+    passed.transactions.payment.importReview,
+    passed.transactions.expense.importReview,
   );
   assert.equal(
     passed.account.validateAccountRows,
@@ -241,6 +234,71 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "payment events",
     "expense events",
   ]);
+});
+
+test("transaction import feature shares setup without mixing payment and expense inputs", () => {
+  const passed = {};
+  const paymentEvents = () => {};
+  const expenseEvents = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPaymentImport: {
+        create: (options) => {
+          passed.payment = options;
+          return { attachEvents: paymentEvents };
+        },
+      },
+      PropertyDeskExpenseImport: {
+        create: (options) => {
+          passed.expense = options;
+          return { attachEvents: expenseEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "transaction-import-feature.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const shared = {
+    $() {},
+    createImportLookup() {},
+    createFileWorkflow() {},
+    createTransactionImportWorkflow() {},
+  };
+  const payment = {
+    state: {},
+    parseCSV() {},
+    validatePaymentRows() {},
+    commitTransactions() {},
+    importReview: {},
+  };
+  const expense = {
+    state: {},
+    parseCSV() {},
+    validateExpenseRows() {},
+    commitTransactions() {},
+    importReview: {},
+  };
+  const feature = context.window.PropertyDeskTransactionImportFeature.create({
+    shared,
+    payment,
+    expense,
+  });
+
+  assert.equal(passed.payment.$, shared.$);
+  assert.equal(passed.expense.$, shared.$);
+  assert.equal(passed.payment.state, payment.state);
+  assert.equal(passed.expense.state, expense.state);
+  assert.equal(passed.payment.validatePaymentRows, payment.validatePaymentRows);
+  assert.equal(passed.expense.validateExpenseRows, expense.validateExpenseRows);
+  assert.equal("validateExpenseRows" in passed.payment, false);
+  assert.equal("validatePaymentRows" in passed.expense, false);
+  assert.equal(feature.attachPaymentEvents, paymentEvents);
+  assert.equal(feature.attachExpenseEvents, expenseEvents);
 });
 
 test("shared import review stages validation and maps only approved rows before commit", async () => {

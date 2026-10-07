@@ -58,36 +58,35 @@
       importReview,
       createFileWorkflow: window.PropertyDeskCsvImportFile.create,
     });
-    const payments = window.PropertyDeskPaymentImport.create({
-      $,
-      state,
-      parseCSV,
-      validatePaymentRows,
-      commitTransactions,
-      importReview,
-      createImportLookup,
-      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
-      createTransactionImportWorkflow:
-        window.PropertyDeskTransactionImportWorkflow.create,
-    });
-    const expenses = window.PropertyDeskExpenseImport.create({
-      $,
-      state,
-      parseCSV,
-      validateExpenseRows,
-      commitTransactions,
-      importReview,
-      createImportLookup,
-      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
-      createTransactionImportWorkflow:
-        window.PropertyDeskTransactionImportWorkflow.create,
+    const transactions = window.PropertyDeskTransactionImportFeature.create({
+      shared: {
+        $,
+        createImportLookup,
+        createFileWorkflow: window.PropertyDeskCsvImportFile.create,
+        createTransactionImportWorkflow:
+          window.PropertyDeskTransactionImportWorkflow.create,
+      },
+      payment: {
+        state,
+        parseCSV,
+        validatePaymentRows,
+        commitTransactions,
+        importReview,
+      },
+      expense: {
+        state,
+        parseCSV,
+        validateExpenseRows,
+        commitTransactions,
+        importReview,
+      },
     });
 
     return {
       attachPreviewEvents,
       attachAccountEvents: accounts.attachEvents,
-      attachPaymentEvents: payments.attachEvents,
-      attachExpenseEvents: expenses.attachEvents,
+      attachPaymentEvents: transactions.attachPaymentEvents,
+      attachExpenseEvents: transactions.attachExpenseEvents,
     };
   }
 

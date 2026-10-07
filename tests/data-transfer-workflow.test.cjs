@@ -40,6 +40,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   for (const script of [
     "features/imports.js",
+    "features/transaction-import-feature.js",
     "features/backup-export.js",
     "features/backup-workspace-workflow.js",
   ]) {
