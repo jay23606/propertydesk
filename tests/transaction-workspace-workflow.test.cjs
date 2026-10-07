@@ -76,4 +76,20 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[2][1].updatePaymentGuidance, updatePaymentGuidance);
   assert.equal(workflow.openPayment, openPayment);
   assert.equal(workflow.renderPayments instanceof Function, true);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachAccountFormEvents",
+    "attachCreateActionEvents",
+    "attachLedgerEntryFormEvents",
+    "attachPropertyFormEvents",
+    "attachTransactionActionEvents",
+    "attachTransactionViewEvents",
+    "editAccount",
+    "openAccountForProperty",
+    "openExpense",
+    "openPayment",
+    "openPropertyPayment",
+    "renderPayments",
+    "resetPropertyForm",
+    "updatePaymentGuidance",
+  ]);
 });

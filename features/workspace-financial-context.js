@@ -12,7 +12,12 @@
       ...deposit,
     });
 
-    return { ...ledgerContext, ...depositContext };
+    return {
+      accountBalance: ledgerContext.accountBalance,
+      scheduledMonthlyRunRate: ledgerContext.scheduledMonthlyRunRate,
+      collectedSince: ledgerContext.collectedSince,
+      depositLedger: depositContext.depositLedger,
+    };
   }
 
   window.PropertyDeskWorkspaceFinancialContext = Object.freeze({

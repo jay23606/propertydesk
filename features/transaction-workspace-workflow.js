@@ -23,7 +23,22 @@
       updatePaymentGuidance: entry.updatePaymentGuidance,
     });
 
-    return { ...entry, ...screen };
+    return {
+      resetPropertyForm: entry.resetPropertyForm,
+      editAccount: entry.editAccount,
+      openAccountForProperty: entry.openAccountForProperty,
+      updatePaymentGuidance: entry.updatePaymentGuidance,
+      openPayment: entry.openPayment,
+      openPropertyPayment: entry.openPropertyPayment,
+      openExpense: entry.openExpense,
+      attachPropertyFormEvents: entry.attachPropertyFormEvents,
+      attachAccountFormEvents: entry.attachAccountFormEvents,
+      attachLedgerEntryFormEvents: entry.attachLedgerEntryFormEvents,
+      attachCreateActionEvents: entry.attachCreateActionEvents,
+      renderPayments: screen.renderPayments,
+      attachTransactionViewEvents: screen.attachTransactionViewEvents,
+      attachTransactionActionEvents: screen.attachTransactionActionEvents,
+    };
   }
 
   window.PropertyDeskTransactionWorkspaceWorkflow = Object.freeze({

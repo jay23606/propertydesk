@@ -12,7 +12,11 @@
 
     return {
       previewReminderEmail: reminders.previewReminderEmail,
-      ...workspace,
+      updateGreeting: workspace.updateGreeting,
+      attachProfileEvents: workspace.attachProfileEvents,
+      attachWorkspaceMemberEvents: workspace.attachWorkspaceMemberEvents,
+      navigate: workspace.navigate,
+      attachNavigationEvents: workspace.attachNavigationEvents,
     };
   }
 

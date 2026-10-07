@@ -16,7 +16,13 @@ test("property workspace shares detail actions across overview and grid", () => 
       PropertyDeskPropertyScreenWorkflow: {
         create(options) {
           calls.push(["detail", options]);
-          return { openPropertyDetails, attachPropertyDetailEvents() {} };
+          return {
+            openPropertyDetails,
+            attachPropertyDetailEvents() {},
+            attachPropertyQuickActionEvents() {},
+            attachPropertyHolderEvents() {},
+            attachPropertyDocumentEvents() {},
+          };
         },
       },
       PropertyDeskOverviewWorkflow: {
@@ -28,7 +34,11 @@ test("property workspace shares detail actions across overview and grid", () => 
       PropertyDeskPropertyPortfolioWorkflow: {
         create(options) {
           calls.push(["portfolio", options]);
-          return { renderProperties() {}, attachPropertyGridEvents() {} };
+          return {
+            renderProperties() {},
+            attachPropertyGridEvents() {},
+            attachPropertyActionEvents() {},
+          };
         },
       },
     },
@@ -57,8 +67,12 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(workspace.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workspace).sort(), [
     "attachOverviewEvents",
+    "attachPropertyActionEvents",
     "attachPropertyDetailEvents",
+    "attachPropertyDocumentEvents",
     "attachPropertyGridEvents",
+    "attachPropertyHolderEvents",
+    "attachPropertyQuickActionEvents",
     "openPropertyDetails",
     "renderOverview",
     "renderProperties",

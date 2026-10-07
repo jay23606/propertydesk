@@ -12,7 +12,14 @@
       },
     );
 
-    return { ...details, ...actions };
+    return {
+      openAccountDetails: details.openAccountDetails,
+      depositSectionHTML: details.depositSectionHTML,
+      recordDepositAdjustment: actions.recordDepositAdjustment,
+      closeAccount: actions.closeAccount,
+      attachDepositEvents: actions.attachDepositEvents,
+      attachAccountDetailActionEvents: actions.attachAccountDetailActionEvents,
+    };
   }
 
   window.PropertyDeskAccountScreenWorkflow = Object.freeze({

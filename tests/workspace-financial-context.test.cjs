@@ -56,4 +56,10 @@ test("workspace financial context shares state with ledger and deposit models", 
   );
   assert.equal(workflow.accountBalance, accountBalance);
   assert.equal(workflow.depositLedger, depositLedger);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "accountBalance",
+    "collectedSince",
+    "depositLedger",
+    "scheduledMonthlyRunRate",
+  ]);
 });

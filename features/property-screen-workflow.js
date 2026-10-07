@@ -10,7 +10,13 @@
       openPropertyDetails: details.openPropertyDetails,
     });
 
-    return { ...details, ...actions };
+    return {
+      openPropertyDetails: details.openPropertyDetails,
+      attachPropertyDetailEvents: actions.attachPropertyDetailEvents,
+      attachPropertyQuickActionEvents: actions.attachPropertyQuickActionEvents,
+      attachPropertyHolderEvents: actions.attachPropertyHolderEvents,
+      attachPropertyDocumentEvents: actions.attachPropertyDocumentEvents,
+    };
   }
 
   window.PropertyDeskPropertyScreenWorkflow = Object.freeze({

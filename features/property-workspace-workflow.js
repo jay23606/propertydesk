@@ -14,7 +14,20 @@
       openPropertyDetails: propertyDetails.openPropertyDetails,
     });
 
-    return { ...propertyDetails, ...propertyOverview, ...properties };
+    return {
+      openPropertyDetails: propertyDetails.openPropertyDetails,
+      attachPropertyDetailEvents: propertyDetails.attachPropertyDetailEvents,
+      attachPropertyQuickActionEvents:
+        propertyDetails.attachPropertyQuickActionEvents,
+      attachPropertyHolderEvents: propertyDetails.attachPropertyHolderEvents,
+      attachPropertyDocumentEvents:
+        propertyDetails.attachPropertyDocumentEvents,
+      renderOverview: propertyOverview.renderOverview,
+      attachOverviewEvents: propertyOverview.attachOverviewEvents,
+      renderProperties: properties.renderProperties,
+      attachPropertyGridEvents: properties.attachPropertyGridEvents,
+      attachPropertyActionEvents: properties.attachPropertyActionEvents,
+    };
   }
 
   window.PropertyDeskPropertyWorkspaceWorkflow = Object.freeze({
