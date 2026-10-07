@@ -406,32 +406,18 @@
     window.PropertyDeskImportUtils;
   const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
     window.PropertyDeskImportWorkflows;
-  const importPreview = window.PropertyDeskImportPreview.create({
-    $,
-    state,
-    selectImportRows,
-    esc,
-    openModal,
-  });
-  const stageImport = importPreview.stageImport;
-  const { attachEvents: attachImportPreviewEvents } =
-    window.PropertyDeskImportPreviewEvents.create({
-      $,
-      state,
-      selectImportRows,
-      renderImportPreview: importPreview.renderImportPreview,
-      updateImportCommitButton: importPreview.updateImportCommitButton,
-      closeModal,
-      toast,
-    });
   const {
+    attachPreviewEvents: attachImportPreviewEvents,
     attachAccountEvents: attachAccountImportEvents,
     attachPaymentEvents: attachPaymentImportEvents,
     attachExpenseEvents: attachExpenseImportEvents,
   } = window.PropertyDeskImportFeature.create({
     $,
     state,
-    stageImport,
+    selectImportRows,
+    esc,
+    openModal,
+    closeModal,
     parseCSV,
     createImportLookup,
     validateAccountRows,

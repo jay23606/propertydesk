@@ -38,17 +38,22 @@ test("CSV import feature loads as an isolated browser module", () => {
     createImportLookup() {},
   });
   assert.deepEqual(Object.keys(feature), [
+    "attachPreviewEvents",
     "attachAccountEvents",
     "attachPaymentEvents",
     "attachExpenseEvents",
   ]);
   assert.equal(typeof previewEvents.attachEvents, "function");
+  feature.attachPreviewEvents();
   feature.attachAccountEvents();
   feature.attachPaymentEvents();
   feature.attachExpenseEvents();
   assert.deepEqual(
     [...handlers.keys()],
     [
+      "import-correction-body:change",
+      "import-include-duplicates:change",
+      "import-commit:click",
       "import-file:change",
       "payment-import-file:change",
       "expense-import-file:change",
@@ -65,6 +70,16 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
+      PropertyDeskImportPreview: {
+        create: () => ({
+          stageImport() {},
+          renderImportPreview() {},
+          updateImportCommitButton() {},
+        }),
+      },
+      PropertyDeskImportPreviewEvents: {
+        create: () => ({ attachEvents() {} }),
+      },
       PropertyDeskAccountImportPayload: { build() {} },
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
@@ -121,6 +136,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
   assert.deepEqual(Object.keys(imports), [
+    "attachPreviewEvents",
     "attachAccountEvents",
     "attachPaymentEvents",
     "attachExpenseEvents",

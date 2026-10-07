@@ -9,21 +9,17 @@ test("app wires CSV import and private backup export independently", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  const importOrder = [
-    "PropertyDeskImportPreview.create(",
-    "PropertyDeskImportPreviewEvents.create(",
-    "PropertyDeskImportFeature.create(",
-  ].map((marker) => app.indexOf(marker));
-  assert.ok(importOrder.every((position) => position >= 0));
-  assert.deepEqual(
-    importOrder,
-    [...importOrder].sort((left, right) => left - right),
-  );
-  assert.match(app, /stageImport,/);
   assert.match(
     app,
-    /renderImportPreview: importPreview\.renderImportPreview,[\s\S]*?updateImportCommitButton: importPreview\.updateImportCommitButton,/,
+    /PropertyDeskImportFeature\.create\(\{[\s\S]*?selectImportRows,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,/,
   );
+  const imports = fs.readFileSync(
+    path.join(root, "features", "imports.js"),
+    "utf8",
+  );
+  assert.match(imports, /PropertyDeskImportPreview\.create\(/);
+  assert.match(imports, /PropertyDeskImportPreviewEvents\.create\(/);
+  assert.match(imports, /context\.stageImport \|\| importPreview\.stageImport/);
   assert.match(
     app,
     /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,

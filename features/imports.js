@@ -6,7 +6,10 @@
     const {
       $,
       state,
-      stageImport,
+      selectImportRows,
+      esc,
+      openModal,
+      closeModal,
       parseCSV,
       createImportLookup,
       validateAccountRows,
@@ -16,6 +19,24 @@
       fetchAll,
       toast,
     } = context;
+    const importPreview = window.PropertyDeskImportPreview.create({
+      $,
+      state,
+      selectImportRows,
+      esc,
+      openModal,
+    });
+    const { attachEvents: attachPreviewEvents } =
+      window.PropertyDeskImportPreviewEvents.create({
+        $,
+        state,
+        selectImportRows,
+        renderImportPreview: importPreview.renderImportPreview,
+        updateImportCommitButton: importPreview.updateImportCommitButton,
+        closeModal,
+        toast,
+      });
+    const stageImport = context.stageImport || importPreview.stageImport;
     const { commitAccounts, commitTransactions } =
       window.PropertyDeskImportCommit.create({
         state,
@@ -63,6 +84,7 @@
     });
 
     return {
+      attachPreviewEvents,
       attachAccountEvents: accounts.attachEvents,
       attachPaymentEvents: payments.attachEvents,
       attachExpenseEvents: expenses.attachEvents,

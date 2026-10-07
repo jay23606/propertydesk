@@ -163,6 +163,8 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/transaction-options.js", "features/form-options.js"],
     ["features/import-repository.js", "features/import-commit.js"],
     ["features/import-preview.js", "features/import-preview-events.js"],
+    ["features/import-preview.js", "features/imports.js"],
+    ["features/import-preview-events.js", "features/imports.js"],
     [
       "features/import-correction-view.js",
       "features/import-preview-rendering.js",
