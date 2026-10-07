@@ -6,7 +6,6 @@
     const {
       $,
       state,
-      depositLedger,
       money,
       fmtDate,
       esc,
@@ -20,14 +19,8 @@
       todayIso,
       openModal,
       propertyAddress,
+      depositSectionHTML,
     } = context;
-    const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-    });
     const { renderAccountHistory } =
       window.PropertyDeskAccountHistoryDetails.create({
         state,
@@ -70,7 +63,7 @@
       openModal,
     });
 
-    return { openAccountDetails, depositSectionHTML };
+    return { openAccountDetails };
   }
 
   window.PropertyDeskAccountDetailContentWorkflow = Object.freeze({ create });

@@ -202,11 +202,17 @@
       OptionClass: Option,
       documentRef: document,
     });
-  const { openAccountDetails, depositSectionHTML } =
+  const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
+    state,
+    depositLedger,
+    money,
+    fmtDate,
+    esc,
+  });
+  const { openAccountDetails } =
     window.PropertyDeskAccountDetailContentWorkflow.create({
       $,
       state,
-      depositLedger,
       money,
       fmtDate,
       esc,
@@ -220,6 +226,7 @@
       todayIso,
       openModal,
       propertyAddress,
+      depositSectionHTML,
     });
   const { attachEvents: attachDepositEvents } =
     window.PropertyDeskDepositMaintenanceWorkflow.create({

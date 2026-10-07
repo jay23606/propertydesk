@@ -23,6 +23,7 @@ test("app root composes financial screens and maintenance boundaries directly", 
     "PropertyDeskTransactionHistoryWorkflow.create(",
     "PropertyDeskCreateActions.create(",
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
+    "PropertyDeskDepositDetails.create(",
     "PropertyDeskAccountDetailContentWorkflow.create(",
     "PropertyDeskDepositMaintenanceWorkflow.create(",
     "PropertyDeskAccountDetailActionsWorkflow.create(",
@@ -48,12 +49,13 @@ test("app root composes financial screens and maintenance boundaries directly", 
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositLedger,[\s\S]*?amortizationSchedule,/,
+    /PropertyDeskDepositDetails\.create\(\{[\s\S]*?depositLedger,/,
   );
-  assert.doesNotMatch(
+  assert.match(
     app,
-    /PropertyDesk(?:DepositDetails|AccountHistoryDetails)\.create\(/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule,[\s\S]*?depositSectionHTML,/,
   );
+  assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
     /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
