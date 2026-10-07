@@ -219,14 +219,6 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-detail-actions-workflow.js",
     ],
     [
-      "features/property-holder-events.js",
-      "features/property-holder-workflow.js",
-    ],
-    [
-      "features/property-holder-management.js",
-      "features/property-holder-workflow.js",
-    ],
-    [
       "features/property-quick-note.js",
       "features/property-detail-actions-workflow.js",
     ],

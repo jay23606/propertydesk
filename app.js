@@ -281,14 +281,15 @@
       openAccountForProperty,
       openAccountDetails,
     });
-  const { attachEvents: attachPropertyHolderEvents } =
-    window.PropertyDeskPropertyHolderWorkflow.create({
-      $,
+  const { savePropertyHolders } =
+    window.PropertyDeskPropertyHolderManagement.create({
       state,
       toast,
       fetchAll,
       openPropertyDetails,
     });
+  const { attachEvents: attachPropertyHolderEvents } =
+    window.PropertyDeskPropertyHolderEvents.create({ $, savePropertyHolders });
   const { attachPropertyDocumentEvents } =
     window.PropertyDeskPropertyDocumentWorkflow.create({
       $,
