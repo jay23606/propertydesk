@@ -64,6 +64,23 @@ test("property portfolio indexes accounts and holders once per grid build", () =
     ),
     context,
   );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-filter-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const filterModel =
+    context.window.PropertyDeskPropertyPortfolioFilterModel.create({
+      state,
+      propertyAddress: (property) => property.address,
+    });
   const model = context.window.PropertyDeskPropertyPortfolioModel.create({
     state,
     accountRowModel: {
@@ -76,8 +93,8 @@ test("property portfolio indexes accounts and holders once per grid build", () =
         property,
       }),
     },
-    propertyAddress: (property) => property.address,
     streetAddress: (property) => property.name,
+    filterModel,
   });
 
   const rows = model.buildRows({

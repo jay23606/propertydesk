@@ -56,11 +56,15 @@
         paymentStatusInMonth,
         reminderModel,
       });
+    const filterModel = window.PropertyDeskPropertyPortfolioFilterModel.create({
+      state,
+      propertyAddress,
+    });
     const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
       state,
       accountRowModel,
-      propertyAddress,
       streetAddress,
+      filterModel,
     });
     const propertyViews = window.PropertyDeskPropertyViews.create({
       $,

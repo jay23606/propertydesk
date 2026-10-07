@@ -5,38 +5,9 @@
   function createPropertyPortfolioModel({
     state,
     accountRowModel,
-    propertyAddress,
     streetAddress,
+    filterModel,
   }) {
-    function holdersByProperty() {
-      const holdersByProperty = new Map();
-      for (const row of state.propertyHolders) {
-        const holders = holdersByProperty.get(row.property_id) || new Set();
-        holders.add(row.member_user_id);
-        holdersByProperty.set(row.property_id, holders);
-      }
-      return holdersByProperty;
-    }
-
-    function accountMatches(property, account, { query, type }) {
-      return (
-        (type === "all" || account.account_type === type) &&
-        (!query ||
-          `${property.name} ${propertyAddress(property)} ${property.notes || ""} ${account.name} ${account.party_name || ""}`
-            .toLowerCase()
-            .includes(query))
-      );
-    }
-
-    function propertyMatchesQuery(property, query) {
-      return (
-        !query ||
-        `${property.name} ${propertyAddress(property)} ${property.notes || ""}`
-          .toLowerCase()
-          .includes(query)
-      );
-    }
-
     function emptyPropertyRow(property, street) {
       return {
         hasAccount: false,
@@ -49,62 +20,23 @@
       };
     }
 
-    function propertyIsVisible(property, filters, assignedHolders) {
-      const { holderId, showArchived } = filters;
-      if (property.archived_at && !showArchived) return false;
-      if (
-        holderId !== "all" &&
-        !assignedHolders.get(property.id)?.has(holderId)
-      )
-        return false;
-      return true;
-    }
-
-    function activeAccountsForProperty(accounts, showArchived) {
-      return accounts.filter(
-        (account) => showArchived || (account.status || "active") === "active",
-      );
-    }
-
-    function shouldShowEmptyProperty(property, allRelated, filters) {
-      return (
-        allRelated.length === 0 &&
-        filters.type === "all" &&
-        propertyMatchesQuery(property, filters.query)
-      );
-    }
-
-    function compareRows(a, b) {
-      const compare = (left, right) =>
-        String(left || "").localeCompare(String(right || ""), undefined, {
-          sensitivity: "base",
-          numeric: true,
-        });
-      return (
-        Number(b.hasAccount) - Number(a.hasAccount) ||
-        compare(a.party, b.party) ||
-        compare(a.account, b.account) ||
-        compare(a.address, b.address) ||
-        compare(a.id, b.id)
-      );
-    }
-
     function rowsForProperty(
       property,
       filters,
       accountsByProperty,
       assignedHolders,
     ) {
-      if (!propertyIsVisible(property, filters, assignedHolders)) return [];
+      if (!filterModel.propertyIsVisible(property, filters, assignedHolders))
+        return [];
 
       const allRelated = accountsByProperty.get(property.id) || [];
-      const visible = activeAccountsForProperty(
+      const visible = filterModel.activeAccountsForProperty(
         allRelated,
         filters.showArchived,
       );
       const street = streetAddress(property);
       const matches = visible.filter((account) =>
-        accountMatches(property, account, filters),
+        filterModel.accountMatches(property, account, filters),
       );
 
       if (matches.length) {
@@ -112,7 +44,7 @@
           accountRowModel.buildAccountRow(property, account, street),
         );
       }
-      if (shouldShowEmptyProperty(property, allRelated, filters))
+      if (filterModel.shouldShowEmptyProperty(property, allRelated, filters))
         return [emptyPropertyRow(property, street)];
       return [];
     }
@@ -120,7 +52,7 @@
     function buildRows({ query, type, holderId, showArchived }) {
       const accountsByProperty =
         window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
-      const assignedHolders = holdersByProperty();
+      const assignedHolders = filterModel.holdersByProperty();
       const rows = [];
 
       for (const property of state.properties) {
@@ -134,7 +66,7 @@
         );
       }
 
-      return rows.sort(compareRows);
+      return rows.sort(filterModel.compareRows);
     }
 
     function totalsFor(rows) {

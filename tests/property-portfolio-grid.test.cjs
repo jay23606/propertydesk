@@ -18,6 +18,7 @@ test("app composes the Properties grid and action workflows explicitly", () => {
     "PropertyDeskPropertyPortfolioTable.create(",
     "PropertyDeskPropertyPortfolioReminderModel.create(",
     "PropertyDeskPropertyPortfolioAccountRowModel.create(",
+    "PropertyDeskPropertyPortfolioFilterModel.create(",
     "PropertyDeskPropertyPortfolioModel.create(",
     "PropertyDeskPropertyViews.create(",
     "PropertyDeskPropertyPortfolioActionsWorkflow.create(",
@@ -72,6 +73,12 @@ test("Properties workflow returns explicit view and action operations", () => {
           return {};
         },
       },
+      PropertyDeskPropertyPortfolioFilterModel: {
+        create: () => {
+          calls.push("filter model");
+          return {};
+        },
+      },
       PropertyDeskPropertyViews: {
         create: () => {
           calls.push("property views");
@@ -102,6 +109,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     "table",
     "reminder model",
     "account rows",
+    "filter model",
     "portfolio model",
     "property views",
     "portfolio actions",
@@ -332,6 +340,18 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-filter-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "property-views.js"),
       "utf8",
     ),
@@ -413,12 +433,17 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
           money,
         }),
     });
+  const filterModel =
+    context.window.PropertyDeskPropertyPortfolioFilterModel.create({
+      state,
+      propertyAddress: dependencies.propertyAddress,
+    });
   const portfolioModel =
     context.window.PropertyDeskPropertyPortfolioModel.create({
       state,
       accountRowModel,
-      propertyAddress: dependencies.propertyAddress,
       streetAddress: dependencies.streetAddress,
+      filterModel,
     });
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
