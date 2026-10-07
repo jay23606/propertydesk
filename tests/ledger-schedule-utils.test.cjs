@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const dateUtils = require("../features/date-utils.js");
 require("../ledger-schedule-utils.js");
 require("../loan-amortization-utils.js");
+require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("../ledger-utils.js");
 const { amountDueSince, unpaidDueAccrualStart } = ledgerUtils;
 

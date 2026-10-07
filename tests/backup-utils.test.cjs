@@ -4,6 +4,7 @@ require("../workspace-table-catalog.js");
 require("../features/date-utils.js");
 require("../ledger-schedule-utils.js");
 require("../loan-amortization-utils.js");
+require("../features/deposit-ledger-utils.js");
 const { createBackup } = require("../backup-utils.js");
 const ledgerUtils = require("../ledger-utils.js");
 

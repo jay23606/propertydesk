@@ -74,26 +74,6 @@
     );
   }
 
-  function securityDepositBalance(entries, payments, expenses) {
-    const paymentById = new Map(payments.map((row) => [row.id, row])),
-      expenseById = new Map(expenses.map((row) => [row.id, row]));
-    const active = entries.filter(
-      (row) =>
-        row.entry_type === "retained" ||
-        row.entry_type === "restored" ||
-        (row.entry_type === "received" &&
-          isPosted(paymentById.get(row.source_payment_id))) ||
-        (row.entry_type === "refunded" &&
-          isPosted(expenseById.get(row.source_expense_id))),
-    );
-    const totals = { received: 0, refunded: 0, retained: 0, restored: 0 };
-    for (const entry of active)
-      totals[entry.entry_type] += Number(entry.amount || 0);
-    totals.held =
-      totals.received - totals.refunded - totals.retained + totals.restored;
-    return { active, totals };
-  }
-
   const scheduleFactory = globalThis.PropertyDeskScheduleUtils;
   if (!scheduleFactory)
     throw new Error(
@@ -106,6 +86,12 @@
     );
   const schedule = scheduleFactory.create({ isPosted });
   const loans = loanFactory.create({ sumPosted });
+  const depositFactory = globalThis.PropertyDeskDepositLedgerUtils;
+  if (!depositFactory)
+    throw new Error(
+      "PropertyDeskDepositLedgerUtils must load before PropertyDeskLedgerUtils.",
+    );
+  const deposits = depositFactory.create({ isPosted });
   const helpers = Object.freeze({
     amountDueSince: schedule.amountDueSince,
     amortizationSchedule: loans.amortizationSchedule,
@@ -117,7 +103,7 @@
     postedPaymentTotalInMonth,
     principalBalance: loans.principalBalance,
     scheduledLoanBalance: loans.scheduledLoanBalance,
-    securityDepositBalance,
+    securityDepositBalance: deposits.securityDepositBalance,
     sumIncome,
     sumOperatingExpenses,
     sumPosted,

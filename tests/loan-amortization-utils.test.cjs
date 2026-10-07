@@ -5,6 +5,7 @@ const path = require("node:path");
 require("../features/date-utils.js");
 const scheduleFactory = require("../ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../loan-amortization-utils.js");
+require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("../ledger-utils.js");
 const scheduleUtils = scheduleFactory.create({
   isPosted: ledgerUtils.isPosted,
@@ -32,8 +33,13 @@ test("due schedule and loan amortization utilities load before the stable ledger
     html.indexOf("loan-amortization-utils.js") <
       html.indexOf("ledger-utils.js"),
   );
+  assert.ok(
+    html.indexOf("features/deposit-ledger-utils.js") <
+      html.indexOf("ledger-utils.js"),
+  );
   assert.match(worker, /'\.\/ledger-schedule-utils\.js'/);
   assert.match(worker, /'\.\/loan-amortization-utils\.js'/);
+  assert.match(worker, /'\.\/features\/deposit-ledger-utils\.js'/);
   assert.equal(typeof scheduleUtils.amountDueSince, "function");
   assert.equal(typeof loanUtils.amortizationSchedule, "function");
   assert.equal(typeof ledgerUtils.amortizationSchedule, "function");
