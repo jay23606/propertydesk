@@ -314,7 +314,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
       ledger,
       ["openPayment", "openPropertyPayment", "openExpense", "attachEvents"],
     ],
-    [actions, ["attachEvents"]],
+    [actions, ["attachCreateActionEvents"]],
   ]) {
     for (const name of names)
       assert.equal(typeof feature[name], "function", name);

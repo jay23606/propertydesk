@@ -131,7 +131,7 @@ test("record-entry feature owns create actions and handles empty workspace state
     openExpense: () => calls.push("open-expense"),
     navigate,
   });
-  feature.attachEvents();
+  feature.attachCreateActionEvents();
   handlers.get("account:click")();
   handlers.get("payment:click")();
   handlers.get("expense:click")();
@@ -157,5 +157,5 @@ test("record-entry feature owns create actions and handles empty workspace state
   ]);
 
   calls.length = 0;
-  assert.deepEqual(Object.keys(feature), ["attachEvents"]);
+  assert.deepEqual(Object.keys(feature), ["attachCreateActionEvents"]);
 });

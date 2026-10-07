@@ -13,7 +13,7 @@ test("create actions workflow exposes the global launcher event binder", () => {
       PropertyDeskCreateActions: {
         create(options) {
           passed = options;
-          return { attachEvents };
+          return { attachCreateActionEvents: attachEvents };
         },
       },
     },

@@ -4,7 +4,7 @@
 
   function create(context) {
     const actions = window.PropertyDeskCreateActions.create(context);
-    return { attachCreateActionEvents: actions.attachEvents };
+    return { attachCreateActionEvents: actions.attachCreateActionEvents };
   }
 
   window.PropertyDeskCreateActionsWorkflow = Object.freeze({ create });

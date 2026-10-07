@@ -16,7 +16,7 @@
       documentRef,
     } = context;
 
-    function attachCreateActions() {
+    function attachCreateActionEvents() {
       const browserDocument = documentRef || document;
       browserDocument
         .querySelectorAll('[data-open="property-modal"]')
@@ -67,7 +67,7 @@
         });
     }
 
-    return { attachEvents: attachCreateActions };
+    return { attachCreateActionEvents };
   }
 
   window.PropertyDeskCreateActions = Object.freeze({ create: createActions });
