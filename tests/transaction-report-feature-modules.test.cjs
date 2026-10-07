@@ -187,7 +187,7 @@ test("transaction action router routes correction and void actions to maintenanc
     correctTransaction: (...args) => calls.push(["correct", ...args]),
     voidTransaction: (...args) => calls.push(["void", ...args]),
   });
-  feature.attachEvents();
+  feature.attachTransactionActionEvents();
 
   for (const [selector, dataset] of [
     ["[data-correct-transaction]", { kind: "income", id: "payment-1" }],

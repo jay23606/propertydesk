@@ -7,7 +7,7 @@
     correctTransaction,
     voidTransaction,
   }) {
-    function attachEvents() {
+    function attachTransactionActionEvents() {
       documentRef.addEventListener("click", (event) => {
         const correction = event.target.closest("[data-correct-transaction]");
         if (correction) {
@@ -21,7 +21,7 @@
       });
     }
 
-    return { attachEvents };
+    return { attachTransactionActionEvents };
   }
 
   window.PropertyDeskTransactionViewEvents = Object.freeze({

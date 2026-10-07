@@ -41,7 +41,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
       PropertyDeskTransactionViewEvents: {
         create: (options) => {
           passed.events = options;
-          return { attachEvents };
+          return { attachTransactionActionEvents: attachEvents };
         },
       },
     },
