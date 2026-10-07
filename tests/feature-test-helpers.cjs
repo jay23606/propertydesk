@@ -2,6 +2,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function loadRepositoryWriteFeedback(context) {
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+}
+
 function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
@@ -141,6 +151,7 @@ function formElements(values = {}) {
 }
 
 module.exports = {
+  loadRepositoryWriteFeedback,
   loadAuthFeatures,
   loadWorkspaceFeatures,
   loadLedgerEntryForms,

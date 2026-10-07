@@ -3,16 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function loadRepositoryWriteFeedback(context) {
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
-}
+const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
 test("deposit maintenance workflow composes adjustments with detail events", () => {
   const passed = {};
