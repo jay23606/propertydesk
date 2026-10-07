@@ -183,7 +183,7 @@ test("notification feature replaces its timer and hides transient feedback", () 
   assert.equal(classes.has("show"), false);
 });
 
-test("ledger context scopes balance, collections, and deposits to workspace state", () => {
+test("ledger context scopes balances and collections to workspace state", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -197,14 +197,9 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
     { account_id: "a1", received_date: "2026-10-01", amount: 20 },
     { account_id: "a1", received_date: "2026-09-30", amount: 100 },
   ];
-  const depositEntries = [
-    { account_id: "a1", amount: 40 },
-    { account_id: "a2", amount: 90 },
-  ];
-  const expenses = [{ account_id: "a1", amount: 5 }];
   const calls = [];
   const ledger = context.window.PropertyDeskLedgerContext.create({
-    state: { accounts, payments, depositEntries, expenses },
+    state: { accounts, payments },
     todayIso: () => "2026-10-04",
     scheduledLoanBalance: (account, date) => {
       calls.push(["balance", account.id, date]);
@@ -218,17 +213,52 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
           String(row[field]) >= start,
       ),
     sumPosted: (rows) => rows.reduce((sum, row) => sum + row.amount, 0),
-    securityDepositBalance: (entries) => ({
-      active: entries,
-      totals: { held: entries.reduce((sum, row) => sum + row.amount, 0) },
-    }),
   });
 
   assert.equal(ledger.accountBalance(accounts[0]), 500);
   assert.equal(ledger.accountBalance(accounts[0], "2026-08-01"), 500);
   assert.equal(ledger.scheduledMonthlyRunRate(), 1200);
   assert.equal(ledger.collectedSince("2026-10-01"), 20);
-  const deposit = ledger.depositLedger("a1");
+  assert.deepEqual(Object.keys(ledger).sort(), [
+    "accountBalance",
+    "collectedSince",
+    "scheduledMonthlyRunRate",
+  ]);
+  assert.deepEqual(calls, [
+    ["balance", "a1", "2026-10-04"],
+    ["balance", "a1", "2026-08-01"],
+  ]);
+});
+
+test("deposit context scopes held-balance calculations to the selected account", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-context.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const depositEntries = [
+    { account_id: "a1", amount: 40 },
+    { account_id: "a2", amount: 90 },
+  ];
+  const payments = [{ id: "p1" }];
+  const expenses = [{ id: "e1" }];
+  const passed = {};
+  const deposit = context.window.PropertyDeskDepositContext.create({
+    state: { depositEntries, payments, expenses },
+    securityDepositBalance(entries, passedPayments, passedExpenses) {
+      passed.entries = entries;
+      passed.payments = passedPayments;
+      passed.expenses = passedExpenses;
+      return {
+        active: entries,
+        totals: { held: entries.reduce((sum, row) => sum + row.amount, 0) },
+      };
+    },
+  }).depositLedger("a1");
+
   assert.equal(deposit.entries.length, 1);
   assert.equal(deposit.entries[0], depositEntries[0]);
   assert.deepEqual(
@@ -237,8 +267,7 @@ test("ledger context scopes balance, collections, and deposits to workspace stat
   );
   assert.equal(deposit.active.length, 1);
   assert.equal(deposit.totals.held, 40);
-  assert.deepEqual(calls, [
-    ["balance", "a1", "2026-10-04"],
-    ["balance", "a1", "2026-08-01"],
-  ]);
+  assert.equal(passed.entries[0], depositEntries[0]);
+  assert.equal(passed.payments, payments);
+  assert.equal(passed.expenses, expenses);
 });

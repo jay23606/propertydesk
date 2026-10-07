@@ -16,8 +16,10 @@ test("app root composes financial screens and maintenance boundaries directly", 
     "features/account-detail-actions-workflow.js",
     "features/account-history-details.js",
     "features/account-detail-content-workflow.js",
+    "features/deposit-context.js",
   ];
   const creationOrder = [
+    "PropertyDeskDepositContext.create(",
     "PropertyDeskTransactionCorrections.create(",
     "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskTransactionViews.create(",
@@ -39,6 +41,10 @@ test("app root composes financial screens and maintenance boundaries directly", 
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*\$,\s*state,[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,/,
   );
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(
+    app,
+    /PropertyDeskDepositContext\.create\(\{\s*state,\s*securityDepositBalance,\s*\}\)/,
+  );
   assert.match(
     app,
     /PropertyDeskAccountDetailActionsWorkflow\.create\(\{[\s\S]*?editAccount,[\s\S]*?openPayment,/,

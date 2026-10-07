@@ -9,7 +9,6 @@
     monthlyScheduledEstimate,
     postedOnOrAfter,
     sumPosted,
-    securityDepositBalance,
   }) {
     function accountBalance(account, asOf = todayIso()) {
       return scheduledLoanBalance(account, asOf);
@@ -24,23 +23,10 @@
       return sumPosted(payments);
     }
 
-    function depositLedger(accountId) {
-      const entries = state.depositEntries.filter(
-        (row) => row.account_id === accountId,
-      );
-      const result = securityDepositBalance(
-        entries,
-        state.payments,
-        state.expenses,
-      );
-      return { active: result.active, totals: result.totals, entries };
-    }
-
     return {
       accountBalance,
       scheduledMonthlyRunRate,
       collectedSince,
-      depositLedger,
     };
   }
 

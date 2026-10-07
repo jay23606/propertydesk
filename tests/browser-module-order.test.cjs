@@ -102,6 +102,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/account-maintenance.js",
     ],
     ["features/ledger-context.js", "features/app-services.js"],
+    ["features/deposit-context.js", "app.js"],
     ["features/notifications.js", "features/app-services.js"],
     ["features/workspace-refresh.js", "features/app-services.js"],
     ["features/auth-form-view.js", "features/auth-form.js"],

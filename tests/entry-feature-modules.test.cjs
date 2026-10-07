@@ -223,6 +223,7 @@ test("app coordinator delegates shared setup to the app services workflow", () =
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAppServices\.create\(/);
   assert.match(app, /PropertyDeskLedgerContext\.create\(/);
+  assert.match(app, /PropertyDeskDepositContext\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
