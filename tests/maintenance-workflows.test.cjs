@@ -99,6 +99,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
 
 test("account and deposit coordinator wires entry actions to workspace details", () => {
   const passed = {};
+  const repository = { close() {} };
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
   const attachDepositEvents = () => {};
@@ -113,6 +114,7 @@ test("account and deposit coordinator wires entry actions to workspace details",
   const closeModal = (element) => (passed.closedModal = element);
   const context = vm.createContext({
     window: {
+      PropertyDeskAccountRepository: repository,
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.depositMaintenance = options;
@@ -181,6 +183,7 @@ test("account and deposit coordinator wires entry actions to workspace details",
     recordDepositAdjustment,
   );
   assert.equal(passed.closeMaintenance.state, dependencies.state);
+  assert.equal(passed.closeMaintenance.repository, repository);
   assert.equal(passed.closeEntry.saveCloseAccount, saveCloseAccount);
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.editAccount, dependencies.editAccount);

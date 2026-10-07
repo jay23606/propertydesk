@@ -41,6 +41,7 @@
         toast,
         fetchAll,
         closeAccountDetails: () => closeModal($("detail-modal")),
+        repository: window.PropertyDeskAccountRepository,
       });
     const { closeAccount } = window.PropertyDeskAccountCloseEntry.create({
       saveCloseAccount,

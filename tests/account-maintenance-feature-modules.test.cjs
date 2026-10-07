@@ -50,6 +50,7 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
     workflow,
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
   );
+  assert.match(workflow, /repository: window\.PropertyDeskAccountRepository/);
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
@@ -300,6 +301,7 @@ test("account close maintenance preserves the account history", async () => {
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
+    repository: context.window.PropertyDeskAccountRepository,
     closeAccountDetails: () => calls.push(["close-details"]),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),
@@ -352,6 +354,7 @@ test("account close maintenance reports rejected requests without closing detail
         }),
       },
     },
+    repository: context.window.PropertyDeskAccountRepository,
     closeAccountDetails: () => calls.push("close-details"),
     fetchAll: async () => calls.push("refresh"),
     toast: (message) => messages.push(message),

@@ -2,13 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    fetchAll,
-    closeAccountDetails,
-    repository = window.PropertyDeskAccountRepository,
-  }) {
+  function create({ state, toast, fetchAll, closeAccountDetails, repository }) {
     async function saveCloseAccount(account) {
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () => repository.close(state.client, account.id),
