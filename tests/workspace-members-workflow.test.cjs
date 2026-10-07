@@ -7,7 +7,7 @@ const vm = require("node:vm");
 test("workspace members workflow joins roster rendering with membership actions", () => {
   const passed = {};
   const renderWorkspaceMembers = () => {};
-  const attachEvents = () => {};
+  const attachWorkspaceMemberEvents = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskWorkspaceMembersView: {
@@ -19,7 +19,7 @@ test("workspace members workflow joins roster rendering with membership actions"
       PropertyDeskWorkspaceMembers: {
         create(options) {
           passed.members = options;
-          return { attachEvents };
+          return { attachWorkspaceMemberEvents };
         },
       },
     },
@@ -62,5 +62,8 @@ test("workspace members workflow joins roster rendering with membership actions"
     "renderWorkspaceMembers",
   ]);
   assert.equal(workflow.renderWorkspaceMembers, renderWorkspaceMembers);
-  assert.equal(workflow.attachWorkspaceMemberEvents, attachEvents);
+  assert.equal(
+    workflow.attachWorkspaceMemberEvents,
+    attachWorkspaceMemberEvents,
+  );
 });

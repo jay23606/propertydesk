@@ -57,13 +57,13 @@
       toast("Workspace access removed");
     }
 
-    function attachEvents() {
+    function attachWorkspaceMemberEvents() {
       view.attachEvents({ addWorkspaceMember, removeWorkspaceMember });
     }
 
     return {
       renderWorkspaceMembers: view.renderWorkspaceMembers,
-      attachEvents,
+      attachWorkspaceMemberEvents,
     };
   }
 

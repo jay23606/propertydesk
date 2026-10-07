@@ -20,7 +20,7 @@
 
     return {
       renderWorkspaceMembers: memberView.renderWorkspaceMembers,
-      attachWorkspaceMemberEvents: members.attachEvents,
+      attachWorkspaceMemberEvents: members.attachWorkspaceMemberEvents,
     };
   }
 

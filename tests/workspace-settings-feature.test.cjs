@@ -80,10 +80,10 @@ test("adding a workspace member clears the address only after successful refresh
   });
 
   assert.deepEqual(Object.keys(feature).sort(), [
-    "attachEvents",
+    "attachWorkspaceMemberEvents",
     "renderWorkspaceMembers",
   ]);
-  feature.attachEvents();
+  feature.attachWorkspaceMemberEvents();
   await handlers.get("member-add-form:submit")({ preventDefault() {} });
 
   assert.equal(calls.length, 3);
@@ -138,7 +138,7 @@ test("adding a workspace member keeps the address when refresh fails", async () 
     }),
   });
 
-  feature.attachEvents();
+  feature.attachWorkspaceMemberEvents();
   await handlers.get("member-add-form:submit")({ preventDefault() {} });
 
   assert.equal(element("member-email").value, " spouse@example.test ");
