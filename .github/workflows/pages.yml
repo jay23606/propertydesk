@@ -123,7 +123,7 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Check the deployed app in Chromium
         run: |
           for attempt in 1 2 3; do
