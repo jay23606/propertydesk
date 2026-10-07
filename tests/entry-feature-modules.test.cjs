@@ -182,11 +182,7 @@ test("app wires reminder activity and preview through the workspace workflow", (
   assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspaceSettings: workspace\.renderWorkspaceSettings,/,
+    /PropertyDeskWorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
   );
   assert.match(app, /previewReminderEmail,/);
 });

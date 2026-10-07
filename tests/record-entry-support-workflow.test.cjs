@@ -15,7 +15,7 @@ test("app uses the workspace reminder coordinator for email preview and activity
   );
   assert.match(
     app,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
+    /PropertyDeskWorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(
     app,

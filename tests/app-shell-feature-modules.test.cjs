@@ -166,8 +166,7 @@ test("theme controller loads before app startup and is precached", () => {
     /PropertyDeskTheme\.create\(\)/,
   );
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskWorkspace\.create/);
-  assert.match(app, /PropertyDeskNavigation\.create/);
+  assert.match(app, /PropertyDeskWorkspaceNavigationWorkflow\.create/);
   assert.match(app, /attachThemeEvents,/);
 });
 
