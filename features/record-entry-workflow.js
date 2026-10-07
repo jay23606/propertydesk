@@ -11,7 +11,9 @@
       toast,
       closeModal,
       fetchAll,
+      fillSelect,
       populateFormOptions,
+      prettyType,
       openModal,
       previewReminderEmail,
       saveCorrection,
@@ -22,24 +24,7 @@
       transactionRepository,
       transactionPayloads,
     } = context;
-    const propertyAccountEntry =
-      window.PropertyDeskPropertyAccountEntryWorkflow.create({
-        $,
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        closeModal,
-        fetchAll,
-        populateFormOptions,
-        openModal,
-        previewReminderEmail,
-        propertyRepository,
-        accountRepository,
-        accountPayload,
-        accountFormModel,
-      });
-    const ledgerEntry = window.PropertyDeskLedgerEntryWorkflow.create({
+    const sharedEntryContext = {
       $,
       state,
       moneyInput,
@@ -47,10 +32,22 @@
       toast,
       closeModal,
       fetchAll,
-      fillSelect: context.fillSelect,
       populateFormOptions,
-      prettyType: context.prettyType,
       openModal,
+    };
+    const propertyAccountEntry =
+      window.PropertyDeskPropertyAccountEntryWorkflow.create({
+        ...sharedEntryContext,
+        previewReminderEmail,
+        propertyRepository,
+        accountRepository,
+        accountPayload,
+        accountFormModel,
+      });
+    const ledgerEntry = window.PropertyDeskLedgerEntryWorkflow.create({
+      ...sharedEntryContext,
+      fillSelect,
+      prettyType,
       saveCorrection,
       transactionRepository,
       transactionPayloads,
