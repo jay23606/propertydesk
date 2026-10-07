@@ -2,14 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    $,
-    state,
-    toast,
-    fetchAll,
-    closeModal,
-    repository = window.PropertyDeskTransactionRepository,
-  }) {
+  function create({ $, state, toast, fetchAll, closeModal, repository }) {
     async function saveCorrection(kind, correction) {
       const pending = state.pendingCorrection;
       if (!pending || pending.kind !== kind) {

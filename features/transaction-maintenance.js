@@ -10,7 +10,7 @@
     resolveVoidTarget = window.PropertyDeskTransactionVoidModel
       .resolveVoidTarget,
     buildVoidPayload = window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-    repository = window.PropertyDeskTransactionRepository,
+    repository,
   }) {
     async function saveVoidTransaction(kind, id, reason) {
       const target = resolveVoidTarget(kind);

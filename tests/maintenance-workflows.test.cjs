@@ -13,6 +13,7 @@ function loadWorkflow(context, filename) {
 
 test("transaction maintenance coordinator joins correction and void actions", () => {
   const passed = {};
+  const transactionRepository = { voidPosted() {}, correct() {} };
   const saveCorrection = () => {};
   const saveVoidTransaction = () => {};
   const voidTransaction = () => {};
@@ -23,6 +24,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
     Option: class MockOption {},
     document: {},
     window: {
+      PropertyDeskTransactionRepository: transactionRepository,
       PropertyDeskTransactionCorrections: {
         create: (options) => {
           passed.corrections = options;
@@ -83,7 +85,9 @@ test("transaction maintenance coordinator joins correction and void actions", ()
 
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.corrections.state, dependencies.state);
+  assert.equal(passed.corrections.repository, transactionRepository);
   assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.maintenance.repository, transactionRepository);
   assert.equal(passed.voidEntry.saveVoidTransaction, saveVoidTransaction);
   assert.equal(passed.correctionForm.openPayment, openPayment);
   assert.equal(passed.correctionForm.openExpense, openExpense);

@@ -27,6 +27,7 @@ function captureFormSubmissions(getElement, formIds) {
 test("ledger entry workflow publishes an explicit payment and expense interface", () => {
   const calls = [];
   const passed = {};
+  const transactionRepository = { insert() {} };
   const buildPaymentPayload = () => ({ payment_payload: true });
   const buildExpensePayload = () => ({ expense_payload: true });
   const buildPaymentCorrection = () => ({ payment_correction: true });
@@ -44,6 +45,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   };
   const context = vm.createContext({
     window: {
+      PropertyDeskTransactionRepository: transactionRepository,
       PropertyDeskTransactionPayloads: {
         buildPayment: buildPaymentPayload,
         buildExpense: buildExpensePayload,
@@ -166,6 +168,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.equal(passed.expense.insertTransaction, insertTransaction);
   assert.equal(passed.persistenceOptions.state, dependencies.state);
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
+  assert.equal(passed.persistenceOptions.repository, transactionRepository);
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
   assert.equal(passed.saveWorkflowOptions.fetchAll, dependencies.fetchAll);
   assert.equal(passed.payment.finishSuccessfulEntry(), "finished");

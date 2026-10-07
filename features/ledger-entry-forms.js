@@ -26,6 +26,7 @@
     const { insertTransaction } = window.PropertyDeskTransactionInserts.create({
       state,
       toast,
+      repository: window.PropertyDeskTransactionRepository,
     });
     const { finishSuccessfulEntry } =
       window.PropertyDeskLedgerEntrySaveWorkflow.create({

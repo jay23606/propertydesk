@@ -59,6 +59,7 @@ test("transaction corrections save payment and expense changes with their audit 
     closeModal: (modal) => events.push(["close", modal.id]),
     fetchAll: async () => events.push("refresh"),
     toast: (message) => events.push(["toast", message]),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), true);
@@ -130,6 +131,7 @@ test("transaction correction failures preserve the open form and pending correct
       refreshes += 1;
     },
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
@@ -171,6 +173,7 @@ test("transaction correction database errors keep the correction open", async ()
     closeModal: () => closes++,
     fetchAll: async () => refreshes++,
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);

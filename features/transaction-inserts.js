@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    repository = window.PropertyDeskTransactionRepository,
-  }) {
+  function create({ state, toast, repository }) {
     function insertTransaction({ table, payload, failureMessage }) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () => repository.insert(state.client, table, payload),

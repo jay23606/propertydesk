@@ -21,6 +21,7 @@
         toast,
         fetchAll,
         closeModal,
+        repository: window.PropertyDeskTransactionRepository,
       },
     );
     const { saveVoidTransaction } =
@@ -28,6 +29,7 @@
         state,
         toast,
         fetchAll,
+        repository: window.PropertyDeskTransactionRepository,
       });
     const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
       toast,

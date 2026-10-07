@@ -199,6 +199,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   };
   const feature = context.window.PropertyDeskTransactionMaintenance.create({
     state,
+    repository: context.window.PropertyDeskTransactionRepository,
     timestamp: () => "2026-10-04T12:00:00.000Z",
     fetchAll: async () => {
       refreshes += 1;
@@ -239,6 +240,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
     },
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 
   await feature.saveVoidTransaction("unexpected", "transaction-1", "reason");
@@ -287,6 +289,7 @@ test("transaction maintenance reports rejected void requests without refreshing"
     },
     fetchAll: async () => assert.fail("failed void request must not refresh"),
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 
   await assert.doesNotReject(

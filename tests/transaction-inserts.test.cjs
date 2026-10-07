@@ -37,6 +37,7 @@ function loadTransactionInserts(client, messages = []) {
   return context.window.PropertyDeskTransactionInserts.create({
     state: { client },
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskTransactionRepository,
   });
 }
 
