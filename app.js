@@ -186,8 +186,12 @@
     openExpense,
     updatePaymentGuidance,
   });
-  const { openAccountDetails, depositSectionHTML } =
-    window.PropertyDeskAccountDetailContentWorkflow.create({
+  const {
+    openAccountDetails,
+    attachDepositEvents,
+    attachAccountDetailActionEvents,
+  } = window.PropertyDeskAccountScreenWorkflow.create({
+    content: {
       $,
       state,
       money,
@@ -204,9 +208,8 @@
       openModal,
       propertyAddress,
       depositLedger,
-    });
-  const { attachDepositEvents, attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountDepositMaintenanceWorkflow.create({
+    },
+    maintenance: {
       $,
       state,
       todayIso,
@@ -215,9 +218,9 @@
       closeModal,
       editAccount,
       openPayment,
-      depositSectionHTML,
       moneyInput,
-    });
+    },
+  });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailContentWorkflow.create({
       $,

@@ -7,15 +7,26 @@ const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
 test("app delegates account closure and deposit adjustments to one workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositLedger,/,
+    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositLedger,[\s\S]*?maintenance:/,
   );
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
-  assert.match(
+  assert.doesNotMatch(
     app,
-    /PropertyDeskAccountDepositMaintenanceWorkflow\.create\(\{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?depositSectionHTML,[\s\S]*?moneyInput,/,
+    /PropertyDeskAccountDepositMaintenanceWorkflow\.create/,
+  );
+  const accountScreenWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-screen-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    accountScreenWorkflow,
+    /AccountDetailContentWorkflow\.create\(\s*content,?\s*\)/,
+  );
+  assert.match(
+    accountScreenWorkflow,
+    /AccountDepositMaintenanceWorkflow\.create\(\s*\{[\s\S]*?depositSectionHTML: details\.depositSectionHTML/,
   );
   const workflow = fs.readFileSync(
     path.join(
@@ -45,6 +56,56 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
     /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
+});
+
+test("account screen workflow shares its deposit renderer with adjustment events", () => {
+  const calls = [];
+  const depositSectionHTML = () => "deposit";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskAccountDetailContentWorkflow: {
+        create(content) {
+          calls.push(["content", content]);
+          return { openAccountDetails() {}, depositSectionHTML };
+        },
+      },
+      PropertyDeskAccountDepositMaintenanceWorkflow: {
+        create(maintenance) {
+          calls.push(["maintenance", maintenance]);
+          return {
+            attachDepositEvents() {},
+            attachAccountDetailActionEvents() {},
+          };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-screen-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const content = { state: {} };
+  const maintenance = { closeModal() {}, moneyInput() {} };
+  const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
+    content,
+    maintenance,
+  });
+
+  assert.equal(calls[0][0], "content");
+  assert.equal(calls[0][1], content);
+  assert.equal(calls[1][0], "maintenance");
+  assert.equal(calls[1][1].closeModal, maintenance.closeModal);
+  assert.equal(calls[1][1].moneyInput, maintenance.moneyInput);
+  assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachAccountDetailActionEvents",
+    "attachDepositEvents",
+    "depositSectionHTML",
+    "openAccountDetails",
+  ]);
 });
 
 test("account detail content workflow composes schedule, history, and account", async () => {
