@@ -8,6 +8,13 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "account-financial-summary.js"),
       "utf8",
     ),

@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const workspaceTables = require("../workspace-table-catalog.js");
 require("../features/date-utils.js");
+require("../features/account-status-utils.js");
 require("../features/ledger-schedule-utils.js");
 require("../features/loan-amortization-utils.js");
 require("../features/deposit-ledger-utils.js");

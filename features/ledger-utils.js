@@ -93,7 +93,15 @@
     throw new Error(
       "PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.",
     );
-  const schedule = scheduleFactory.create({ isDueReducingPayment });
+  const accountStatus = globalThis.PropertyDeskAccountStatusUtils;
+  if (!accountStatus)
+    throw new Error(
+      "PropertyDeskAccountStatusUtils must load before PropertyDeskLedgerUtils.",
+    );
+  const schedule = scheduleFactory.create({
+    isDueReducingPayment,
+    isActiveAccount: accountStatus.isActiveAccount,
+  });
   const loans = loanFactory.create({ sumPosted });
   const depositFactory = globalThis.PropertyDeskDepositLedgerUtils;
   if (!depositFactory)

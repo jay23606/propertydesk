@@ -3,12 +3,14 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 require("../features/date-utils.js");
+const accountStatus = require("../features/account-status-utils.js");
 const scheduleFactory = require("../features/ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../features/loan-amortization-utils.js");
 require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("../features/ledger-utils.js");
 const scheduleUtils = scheduleFactory.create({
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
+  isActiveAccount: accountStatus.isActiveAccount,
 });
 const loanUtils = loanAmortizationFactory.create({
   sumPosted: ledgerUtils.sumPosted,

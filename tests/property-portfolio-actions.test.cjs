@@ -52,6 +52,13 @@ test("property portfolio indexes accounts and holders once per grid build", () =
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "property-account-index.js"),
       "utf8",
     ),

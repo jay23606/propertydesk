@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
+
   function createPropertyPortfolioFilterModel({ state, propertyAddress }) {
     function holdersByProperty() {
       const holdersByProperty = new Map();
@@ -45,7 +47,7 @@
 
     function activeAccountsForProperty(accounts, showArchived) {
       return accounts.filter(
-        (account) => showArchived || (account.status || "active") === "active",
+        (account) => showArchived || isActiveAccount(account),
       );
     }
 

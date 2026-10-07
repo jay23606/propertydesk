@@ -61,6 +61,20 @@ test("browser feature scripts load after their dependencies", () => {
     .filter(Boolean)
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const dependencies = [
+    ["features/account-status-utils.js", "features/ledger-schedule-utils.js"],
+    ["features/account-status-utils.js", "features/overview-model.js"],
+    [
+      "features/account-status-utils.js",
+      "features/overview-property-summary-model.js",
+    ],
+    [
+      "features/account-status-utils.js",
+      "features/property-portfolio-filter-model.js",
+    ],
+    [
+      "features/account-status-utils.js",
+      "features/property-portfolio-table.js",
+    ],
     ["features/auth-client.js", "features/workspace-runtime.js"],
     ["features/repository-registry.js", "features/workspace-runtime.js"],
     ["features/auth-client.js", "features/profile-settings.js"],

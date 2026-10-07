@@ -215,6 +215,13 @@ test("Properties table templates escape untrusted labels and render visible tota
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "property-portfolio-table.js"),
       "utf8",
     ),

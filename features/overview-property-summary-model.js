@@ -2,15 +2,15 @@
 (() => {
   "use strict";
 
+  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
+
   function createOverviewPropertySummaryModel({
     state,
     monthlyScheduledEstimate,
     summarizeAccount,
   }) {
     function summarizeProperty(property, relatedAccounts) {
-      const active = relatedAccounts.filter(
-        (account) => (account.status || "active") === "active",
-      );
+      const active = relatedAccounts.filter(isActiveAccount);
       const financials = active.map((account) =>
         summarizeAccount(account, state.payments),
       );

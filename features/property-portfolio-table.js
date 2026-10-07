@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
+
   function create({ esc, money, paymentFrequencyLabel }) {
     function propertyAddressCell(property, street) {
       const note = String(property.notes || "").trim();
@@ -41,8 +43,7 @@
         account.payment_frequency === "monthly"
           ? "Monthly"
           : `${money(account.payment_amount)} / ${paymentFrequencyLabel(account.payment_frequency).toLowerCase()}`;
-      const inactiveHint =
-        (account.status || "active") !== "active" ? " · Inactive" : "";
+      const inactiveHint = isActiveAccount(account) ? "" : " · Inactive";
 
       return `<tr>
         <td class="${paymentClasses[paymentStatus]}" title="${paymentTitles[paymentStatus]}">

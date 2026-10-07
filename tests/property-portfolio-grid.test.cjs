@@ -162,6 +162,13 @@ test("Properties account-row model derives balances and reminder details", () =>
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "account-financial-summary.js"),
       "utf8",
     ),
@@ -267,6 +274,13 @@ test("Properties reminder model builds the manual reminder details", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(
         __dirname,
         "..",
@@ -327,6 +341,13 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     return elements.get(id);
   };
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-status-utils.js"),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(

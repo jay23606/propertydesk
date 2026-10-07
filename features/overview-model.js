@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
+
   function createOverviewModel({
     state,
     propertySummaryModel,
@@ -43,7 +45,7 @@
         propertyCount: activeProperties.length,
         accountCount: state.accounts.filter(
           (account) =>
-            (account.status || "active") === "active" &&
+            isActiveAccount(account) &&
             !propertyById.get(account.property_id)?.archived_at,
         ).length,
         collected: collectedSince(currentMonthStart),

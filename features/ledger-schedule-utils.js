@@ -1,7 +1,7 @@
 /* Projected rent and installment due dates, separate from posted ledger totals. */
 (() => {
   "use strict";
-  function createScheduleUtils({ isDueReducingPayment }) {
+  function createScheduleUtils({ isDueReducingPayment, isActiveAccount }) {
     const monthDateWithAnchor =
       globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
     if (!monthDateWithAnchor)
@@ -24,7 +24,7 @@
         annual: 1 / 12,
       };
       const estimate = accounts
-        .filter((account) => (account.status || "active") === "active")
+        .filter(isActiveAccount)
         .reduce(
           (sum, account) =>
             sum +
@@ -105,7 +105,7 @@
 
     function scheduledDues(accounts, range) {
       return accounts
-        .filter((account) => (account.status || "active") === "active")
+        .filter(isActiveAccount)
         .reduce(
           (sum, account) => sum + scheduledAmountForAccount(account, range),
           0,
