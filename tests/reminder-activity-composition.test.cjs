@@ -1,33 +1,34 @@
 const assert = require("node:assert/strict");
-const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
+const test = require("node:test");
 
-test("app composes the reminder activity model into its display view", () => {
+test("workspace reminder workflow composes activity and reminder preview", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const model = app.indexOf("PropertyDeskReminderActivityModel.create(");
-  const view = app.indexOf("PropertyDeskReminderActivityView.create(");
+  const workflow = fs.readFileSync(
+    path.join(root, "features", "workspace-reminder-workflow.js"),
+    "utf8",
+  );
+  const create = app.indexOf("PropertyDeskWorkspaceReminderWorkflow.create(");
   const workspace = app.indexOf("PropertyDeskWorkspace.create(");
 
-  assert.ok(model >= 0);
-  assert.ok(view > model);
-  assert.ok(workspace > view);
+  assert.ok(create >= 0 && workspace > create);
   assert.match(
-    app,
-    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: reminderActivityModel,/,
+    workflow,
+    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
+  );
+  assert.match(
+    workflow,
+    /PropertyDeskReminderPreview\.create\(\{[\s\S]*?model: previewModel/,
   );
   assert.match(
     app,
     /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
-  assert.doesNotMatch(app, /PropertyDeskReminderActivityWorkflow/);
-  assert.doesNotMatch(html, /features\/reminder-activity-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/reminder-activity-workflow\.js/);
-  assert.equal(
-    fs.existsSync(path.join(root, "features", "reminder-activity-workflow.js")),
-    false,
-  );
+  const asset = "features/workspace-reminder-workflow.js";
+  assert.ok(html.includes(asset));
+  assert.ok(worker.includes(`'./${asset}'`));
 });

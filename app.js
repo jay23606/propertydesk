@@ -88,38 +88,24 @@
       propertyAddress,
       prettyType,
     });
-  const reminderActivityModel = window.PropertyDeskReminderActivityModel.create(
-    {
-      state,
-    },
-  );
-  const { renderReminderActivity } =
-    window.PropertyDeskReminderActivityView.create({
+  const { renderReminderActivity, previewReminderEmail } =
+    window.PropertyDeskWorkspaceReminderWorkflow.create({
       $,
+      state,
       esc,
       fmtDate,
       money,
-      model: reminderActivityModel,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      monthEnd,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      todayIso,
+      moneyInput,
+      toast,
+      openModal: modal.openModal,
     });
-  const reminderPreviewModel = window.PropertyDeskReminderPreviewModel.create({
-    amountDueSince,
-    unpaidDueAccrualStart,
-    monthEnd,
-    dateOnly,
-    monthStart,
-    propertyAddress,
-    money,
-  });
-  const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-    $,
-    state,
-    todayIso,
-    moneyInput,
-    toast,
-    esc,
-    model: reminderPreviewModel,
-    openModal: modal.openModal,
-  });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const workspace = window.PropertyDeskWorkspace.create({

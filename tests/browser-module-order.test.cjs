@@ -242,6 +242,19 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-detail-management-workflow.js",
     ],
     [
+      "features/reminder-activity-model.js",
+      "features/workspace-reminder-workflow.js",
+    ],
+    [
+      "features/reminder-activity-view.js",
+      "features/workspace-reminder-workflow.js",
+    ],
+    [
+      "features/reminder-preview-model.js",
+      "features/workspace-reminder-workflow.js",
+    ],
+    ["features/reminder-preview.js", "features/workspace-reminder-workflow.js"],
+    [
       "features/import-correction-view.js",
       "features/import-preview-rendering.js",
     ],

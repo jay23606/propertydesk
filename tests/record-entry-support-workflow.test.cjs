@@ -3,53 +3,36 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app composes reminder activity separately from modal and form options", () => {
+test("app uses the workspace reminder coordinator for email preview and activity", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  const createOrder = [
-    "PropertyDeskModalController.create(",
-    "PropertyDeskFormOptions.create(",
-    "PropertyDeskReminderActivityModel.create(",
-    "PropertyDeskReminderActivityView.create(",
-    "PropertyDeskReminderPreview.create(",
-  ].map((marker) => app.indexOf(marker));
-  assert.ok(createOrder.every((position) => position >= 0));
-  assert.deepEqual(
-    createOrder,
-    [...createOrder].sort((left, right) => left - right),
-  );
   assert.match(
     app,
-    /PropertyDeskReminderPreview\.create\(\{[\s\S]*?openModal: modal\.openModal/,
+    /const \{ renderReminderActivity, previewReminderEmail \} =\s*window\.PropertyDeskWorkspaceReminderWorkflow\.create\(/,
   );
-  assert.match(app, /attachEvents: attachModalEvents/);
   assert.match(
     app,
     /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
-  assert.match(app, /previewReminderEmail,/);
   assert.match(
     app,
-    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: reminderActivityModel,/,
+    /PropertyDeskRecordEntryWorkflow\.create\(\{[\s\S]*?previewReminderEmail,/,
   );
-  assert.doesNotMatch(app, /PropertyDeskRecordEntrySupportWorkflow/);
-
   for (const feature of [
-    "features/modal-controller.js",
-    "features/form-options.js",
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",
     "features/reminder-preview.js",
+    "features/reminder-preview-model.js",
+    "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(
       html.indexOf(feature) >= 0 &&
         html.indexOf(feature) < html.indexOf("app.js"),
-      `${feature} loads before app.js`,
     );
-    assert.match(worker, new RegExp(`'\\./${feature.replaceAll("/", "\\/")}'`));
+    assert.ok(worker.includes(`'./${feature}'`));
   }
   assert.doesNotMatch(html, /record-entry-support-workflow\.js/);
   assert.doesNotMatch(worker, /record-entry-support-workflow\.js/);

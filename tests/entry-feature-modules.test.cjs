@@ -173,28 +173,13 @@ test("app root composes independent property screens and shares detail actions",
   );
 });
 
-test("app wires reminder activity and email preview separately", () => {
+test("app wires reminder activity and preview through the workspace workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  const createOrder = [
-    "PropertyDeskReminderActivityModel.create(",
-    "PropertyDeskReminderActivityView.create(",
-    "PropertyDeskReminderPreviewModel.create(",
-    "PropertyDeskReminderPreview.create(",
-  ].map((marker) => app.indexOf(marker));
-  assert.ok(createOrder.every((position) => position >= 0));
-  assert.deepEqual(
-    createOrder,
-    [...createOrder].sort((left, right) => left - right),
-  );
   assert.match(
     app,
-    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: reminderActivityModel,/,
+    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
   );
-  assert.match(
-    app,
-    /PropertyDeskReminderPreview.create\(\{[\s\S]*?model: reminderPreviewModel,[\s\S]*?openModal: modal\.openModal/,
-  );
-  assert.doesNotMatch(app, /function renderWorkspaceSettings\(\)/);
+  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
@@ -204,7 +189,6 @@ test("app wires reminder activity and email preview separately", () => {
     /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspaceSettings: workspace\.renderWorkspaceSettings,/,
   );
   assert.match(app, /previewReminderEmail,/);
-  assert.doesNotMatch(app, /PropertyDeskReminderWorkflow/);
 });
 
 test("app root composes shared state and workspace services directly", () => {
