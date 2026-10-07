@@ -101,9 +101,20 @@ test("reminder due calculation follows monthly schedules and carries unpaid amou
     ]),
     { total: 550, dueThisMonth: 550 },
   );
+  assert.deepEqual(
+    utils.calculateUnpaidDue(account, "2026-11-01", "2026-11-30", [
+      {
+        status: "posted",
+        income_category: "other",
+        received_date: "2026-10-15",
+        amount: 550,
+      },
+    ]),
+    { total: 550, dueThisMonth: 550 },
+  );
 });
 
-test("only posted rent or installment-like payments in the calendar month suppress reminders", async () => {
+test("only posted due-reducing payments in the calendar month suppress reminders", async () => {
   const utils = await utilsPromise;
   const month = "2026-10-01",
     end = "2026-10-31";
@@ -113,6 +124,20 @@ test("only posted rent or installment-like payments in the calendar month suppre
         {
           status: "posted",
           income_category: "rent",
+          received_date: "2026-10-01",
+        },
+      ],
+      month,
+      end,
+    ),
+    true,
+  );
+  assert.equal(
+    utils.hasQualifyingPaymentInMonth(
+      [
+        {
+          status: "posted",
+          income_category: "other",
           received_date: "2026-10-01",
         },
       ],

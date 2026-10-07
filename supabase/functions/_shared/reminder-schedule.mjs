@@ -1,4 +1,12 @@
 export const TRACKING_START = "2026-10-01";
+const excludedDuePaymentCategories = new Set(["deposit", "late_fee"]);
+
+function isDueReducingPayment(payment) {
+  return (
+    payment.status === "posted" &&
+    !excludedDuePaymentCategories.has(payment.income_category)
+  );
+}
 
 function datePartsInNewYork(date) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -91,8 +99,7 @@ export function calculateUnpaidDue(account, monthStart, monthEnd, payments) {
   const received = payments
     .filter(
       (payment) =>
-        payment.status === "posted" &&
-        !["deposit", "late_fee"].includes(payment.income_category) &&
+        isDueReducingPayment(payment) &&
         payment.received_date >= TRACKING_START &&
         payment.received_date <= monthEnd,
     )
@@ -118,8 +125,7 @@ export function parseReminderRecipients(value) {
 export function hasQualifyingPaymentInMonth(payments, monthStart, monthEnd) {
   return payments.some(
     (payment) =>
-      payment.status === "posted" &&
-      !["deposit", "late_fee"].includes(payment.income_category) &&
+      isDueReducingPayment(payment) &&
       payment.received_date >= monthStart &&
       payment.received_date <= monthEnd,
   );
