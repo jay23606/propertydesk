@@ -9,7 +9,11 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   const renderReminderActivity = () => "activity";
   const previewReminderEmail = () => "preview";
   const reminder = { state: {} };
-  const navigation = { documentRef: {}, windowRef: {} };
+  const navigation = {
+    documentRef: {},
+    windowRef: {},
+    unusedDependency: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskWorkspaceReminderWorkflow: {
@@ -50,6 +54,7 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   assert.equal(calls[1][0], "navigation");
   assert.equal(calls[1][1].documentRef, navigation.documentRef);
   assert.equal(calls[1][1].windowRef, navigation.windowRef);
+  assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].renderReminderActivity, renderReminderActivity);
   assert.equal(workflow.previewReminderEmail, previewReminderEmail);
   assert.equal("renderReminderActivity" in workflow, false);

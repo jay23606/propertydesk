@@ -11,7 +11,11 @@ test("transaction workspace shares corrections and entry actions across its flow
   const openExpense = () => "expense";
   const updatePaymentGuidance = () => "guidance";
   const maintenance = { closeModal() {} };
-  const entry = { toast() {}, previewReminderEmail() {} };
+  const entry = {
+    toast() {},
+    previewReminderEmail() {},
+    unusedDependency: true,
+  };
   const screen = { state: {} };
   const context = vm.createContext({
     window: {
@@ -64,6 +68,7 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[1][0], "entry");
   assert.equal(calls[1][1].toast, entry.toast);
   assert.equal(calls[1][1].previewReminderEmail, entry.previewReminderEmail);
+  assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].saveCorrection, saveCorrection);
   assert.equal(calls[2][0], "screen");
   assert.equal(calls[2][1].state, screen.state);

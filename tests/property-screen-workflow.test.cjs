@@ -8,7 +8,11 @@ test("property screen workflow passes detail actions to management and returns b
   const calls = [];
   const openPropertyDetails = () => "details";
   const content = { state: {} };
-  const management = { closeModal() {}, toast() {} };
+  const management = {
+    closeModal() {},
+    toast() {},
+    unusedDependency: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDetailContentWorkflow: {
@@ -48,6 +52,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[1][0], "management");
   assert.equal(calls[1][1].closeModal, management.closeModal);
   assert.equal(calls[1][1].toast, management.toast);
+  assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [

@@ -90,7 +90,11 @@ test("account screen workflow shares its deposit renderer with adjustment events
     context,
   );
   const content = { state: {} };
-  const maintenance = { closeModal() {}, moneyInput() {} };
+  const maintenance = {
+    closeModal() {},
+    moneyInput() {},
+    unusedDependency: true,
+  };
   const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
     content,
     maintenance,
@@ -101,6 +105,7 @@ test("account screen workflow shares its deposit renderer with adjustment events
   assert.equal(calls[1][0], "maintenance");
   assert.equal(calls[1][1].closeModal, maintenance.closeModal);
   assert.equal(calls[1][1].moneyInput, maintenance.moneyInput);
+  assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",

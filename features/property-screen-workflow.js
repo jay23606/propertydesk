@@ -6,8 +6,21 @@
     const details =
       window.PropertyDeskPropertyDetailContentWorkflow.create(content);
     const actions = window.PropertyDeskPropertyDetailManagementWorkflow.create({
-      ...management,
+      $: management.$,
+      state: management.state,
+      toast: management.toast,
+      fetchAll: management.fetchAll,
+      todayIso: management.todayIso,
       openPropertyDetails: details.openPropertyDetails,
+      closeModal: management.closeModal,
+      editAccount: management.editAccount,
+      openAccountDetails: management.openAccountDetails,
+      openPayment: management.openPayment,
+      openExpense: management.openExpense,
+      openAccountForProperty: management.openAccountForProperty,
+      makeId: management.makeId,
+      confirm: management.confirm,
+      openWindow: management.openWindow,
     });
 
     return {

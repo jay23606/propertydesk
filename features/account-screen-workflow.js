@@ -7,8 +7,16 @@
       window.PropertyDeskAccountDetailContentWorkflow.create(content);
     const actions = window.PropertyDeskAccountDepositMaintenanceWorkflow.create(
       {
-        ...maintenance,
+        $: maintenance.$,
+        state: maintenance.state,
+        todayIso: maintenance.todayIso,
+        toast: maintenance.toast,
+        fetchAll: maintenance.fetchAll,
+        closeModal: maintenance.closeModal,
+        editAccount: maintenance.editAccount,
+        openPayment: maintenance.openPayment,
         depositSectionHTML: details.depositSectionHTML,
+        moneyInput: maintenance.moneyInput,
       },
     );
 

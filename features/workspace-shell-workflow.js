@@ -6,8 +6,15 @@
     const reminders =
       window.PropertyDeskWorkspaceReminderWorkflow.create(reminder);
     const workspace = window.PropertyDeskWorkspaceNavigationWorkflow.create({
-      ...navigation,
+      $: navigation.$,
+      state: navigation.state,
+      esc: navigation.esc,
+      toast: navigation.toast,
+      fetchAll: navigation.fetchAll,
       renderReminderActivity: reminders.renderReminderActivity,
+      documentRef: navigation.documentRef,
+      windowRef: navigation.windowRef,
+      confirmAction: navigation.confirmAction,
     });
 
     return {
