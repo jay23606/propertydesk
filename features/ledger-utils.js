@@ -15,6 +15,14 @@
     );
   }
 
+  function isDueReducingPaymentInMonth(payment, accountId, yearMonth) {
+    return (
+      payment.account_id === accountId &&
+      isDueReducingPayment(payment) &&
+      String(payment.received_date || "").slice(0, 7) === yearMonth
+    );
+  }
+
   function postedOnOrAfter(transactions, dateField, startDate) {
     return transactions.filter(
       (transaction) =>
@@ -25,11 +33,8 @@
   function hasPostedPaymentInMonth(payments, accountId, month) {
     const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return false;
-    return payments.some(
-      (payment) =>
-        payment.account_id === accountId &&
-        isDueReducingPayment(payment) &&
-        String(payment.received_date || "").slice(0, 7) === yearMonth,
+    return payments.some((payment) =>
+      isDueReducingPaymentInMonth(payment, accountId, yearMonth),
     );
   }
 
@@ -37,11 +42,8 @@
     const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return 0;
     const total = payments
-      .filter(
-        (payment) =>
-          payment.account_id === accountId &&
-          isDueReducingPayment(payment) &&
-          String(payment.received_date || "").slice(0, 7) === yearMonth,
+      .filter((payment) =>
+        isDueReducingPaymentInMonth(payment, accountId, yearMonth),
       )
       .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
     return Math.round((total + Number.EPSILON) * 100) / 100;
