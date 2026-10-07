@@ -62,22 +62,84 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
-test("app composes report rendering separately from CSV export", () => {
+test("app delegates Reports rendering and export composition to its workflow", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(
+  assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
+  assert.doesNotMatch(
     app,
-    /PropertyDeskReportModel\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?accountBalance,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskReportViews\.create\(\{[\s\S]*?buildReportModel,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskReportExport\.create\(\{[\s\S]*?todayIso,[\s\S]*?accountBalance,/,
+    /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
   );
   assert.match(app, /renderers:[\s\S]*?renderReports/);
   assert.match(app, /eventBinders:[\s\S]*?attachReportExportEvents/);
+});
+
+test("Reports workflow composes calculation, view, and export modules", () => {
+  const received = {};
+  const renderReports = () => {};
+  const attachReportExportEvents = () => {};
+  const buildReportModel = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReportModel: {
+        create: (options) => {
+          received.model = options;
+          return { buildReportModel };
+        },
+      },
+      PropertyDeskReportViews: {
+        create: (options) => {
+          received.view = options;
+          return { renderReports };
+        },
+      },
+      PropertyDeskReportExport: {
+        create: (options) => {
+          received.export = options;
+          return { attachEvents: attachReportExportEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "report-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const dependencies = {
+    $() {},
+    state: {},
+    dateOnly() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    accountBalance() {},
+    esc() {},
+    money() {},
+    todayIso() {},
+    prettyType() {},
+  };
+  const workflow =
+    context.window.PropertyDeskReportWorkflow.create(dependencies);
+
+  assert.equal(received.model.state, dependencies.state);
+  assert.equal(received.model.dateOnly, dependencies.dateOnly);
+  assert.equal(received.model.sumIncome, dependencies.sumIncome);
+  assert.equal(
+    received.model.sumOperatingExpenses,
+    dependencies.sumOperatingExpenses,
+  );
+  assert.equal(received.model.accountBalance, dependencies.accountBalance);
+  assert.equal(received.view.$, dependencies.$);
+  assert.equal(received.view.esc, dependencies.esc);
+  assert.equal(received.view.money, dependencies.money);
+  assert.equal(received.view.buildReportModel, buildReportModel);
+  assert.equal(received.export.state, dependencies.state);
+  assert.equal(received.export.todayIso, dependencies.todayIso);
+  assert.equal(received.export.prettyType, dependencies.prettyType);
+  assert.equal(received.export.accountBalance, dependencies.accountBalance);
+  assert.equal(workflow.renderReports, renderReports);
+  assert.equal(workflow.attachReportExportEvents, attachReportExportEvents);
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {

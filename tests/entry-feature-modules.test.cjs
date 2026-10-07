@@ -23,9 +23,11 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskReportModel\.create\(/);
-  assert.match(app, /PropertyDeskReportViews\.create\(/);
-  assert.match(app, /PropertyDeskReportExport\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
+  );
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
   assert.match(
