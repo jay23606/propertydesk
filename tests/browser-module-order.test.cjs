@@ -328,7 +328,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview-events.js", "app.js"],
     ["csv-parser.js", "features/imports.js"],
     ["import-utils.js", "features/imports.js"],
-    ["import-workflows.js", "features/imports.js"],
+    ["features/import-validation-api.js", "features/imports.js"],
     ["features/account-import.js", "features/imports.js"],
     ["features/expense-import.js", "features/imports.js"],
     ["features/payment-import.js", "features/imports.js"],
@@ -521,9 +521,18 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/profile-settings.js", "features/workspace.js"],
     ["features/workspace-members.js", "features/workspace.js"],
     ["csv-parser.js", "import-utils.js"],
-    ["features/account-import-validation.js", "import-workflows.js"],
-    ["features/expense-import-validation.js", "import-workflows.js"],
-    ["features/payment-import-validation.js", "import-workflows.js"],
+    [
+      "features/account-import-validation.js",
+      "features/import-validation-api.js",
+    ],
+    [
+      "features/expense-import-validation.js",
+      "features/import-validation-api.js",
+    ],
+    [
+      "features/payment-import-validation.js",
+      "features/import-validation-api.js",
+    ],
     [
       "features/transaction-options.js",
       "features/payment-import-validation.js",

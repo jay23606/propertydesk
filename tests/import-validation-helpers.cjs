@@ -9,7 +9,7 @@ const { selectImportRows } = require("../import-utils.js");
 require("../features/account-import-validation.js");
 require("../features/expense-import-validation.js");
 require("../features/payment-import-validation.js");
-const importWorkflows = require("../import-workflows.js");
+const importWorkflows = require("../features/import-validation-api.js");
 
 const properties = [{ id: "p1", name: "Oak House", address: "10 Oak St" }];
 const accounts = [
