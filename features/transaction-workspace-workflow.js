@@ -27,6 +27,8 @@
       navigate: entryContext.navigate,
       documentRef: entryContext.documentRef,
       accountRepository: entryContext.accountRepository,
+      accountPayload: entryContext.accountPayload,
+      accountFormModel: entryContext.accountFormModel,
       transactionRepository: entryContext.transactionRepository,
       transactionPayloads: entryContext.transactionPayloads,
       saveCorrection: maintenance.saveCorrection,

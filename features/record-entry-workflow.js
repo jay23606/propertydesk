@@ -20,6 +20,8 @@
       navigate,
       documentRef,
       accountRepository,
+      accountPayload,
+      accountFormModel,
       transactionRepository,
       transactionPayloads,
     } = context;
@@ -41,8 +43,8 @@
       populateFormOptions,
       openModal,
       previewReminderEmail,
-      buildAccountPayload: window.PropertyDeskAccountPayload.build,
-      formModel: window.PropertyDeskAccountFormModel,
+      buildAccountPayload: accountPayload,
+      formModel: accountFormModel,
       repository: accountRepository,
     });
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({

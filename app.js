@@ -189,6 +189,8 @@
       navigate,
       documentRef: document,
       accountRepository: window.PropertyDeskAccountRepository,
+      accountPayload: window.PropertyDeskAccountPayload.build,
+      accountFormModel: window.PropertyDeskAccountFormModel,
       transactionRepository: window.PropertyDeskTransactionRepository,
       transactionPayloads: window.PropertyDeskTransactionPayloads,
     },
