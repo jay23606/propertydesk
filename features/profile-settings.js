@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createProfileSettings({ state, toast, updateGreeting }) {
+  function createProfileSettings({ state, authClient, toast, updateGreeting }) {
     async function saveProfile(displayName) {
       if (!displayName) {
         toast("Enter a display name");
@@ -12,7 +12,7 @@
       let data;
       let error;
       try {
-        ({ data, error } = await state.client.auth.updateUser({
+        ({ data, error } = await authClient.updateUser({
           data: { display_name: displayName },
         }));
       } catch {

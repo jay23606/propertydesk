@@ -15,6 +15,7 @@ function loadRepositoryWriteFeedback(context) {
 function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
+    "auth-client.js",
     "auth-screens.js",
     "auth-recovery-view.js",
     "auth-reset-request.js",
@@ -31,8 +32,15 @@ function loadAuthFeatures(context) {
   }
 }
 
+function createAuthClient(context, state) {
+  return context.window.PropertyDeskAuthClient.create({
+    getClient: () => state.client,
+  });
+}
+
 function loadWorkspaceFeatures(context) {
   for (const filename of [
+    "auth-client.js",
     "profile-display.js",
     "profile-settings-view.js",
     "profile-settings.js",
@@ -185,6 +193,7 @@ function formElements(values = {}) {
 module.exports = {
   loadRepositoryWriteFeedback,
   loadAuthFeatures,
+  createAuthClient,
   loadWorkspaceFeatures,
   loadLedgerEntryForms,
   ledgerEntryDependencies,

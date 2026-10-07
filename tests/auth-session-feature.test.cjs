@@ -1,8 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadAuthFeatures } = require("./feature-test-helpers.cjs");
-const fs = require("node:fs");
-const path = require("node:path");
+const {
+  createAuthClient,
+  loadAuthFeatures,
+} = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
 
 test("auth feature delegates session restoration and state changes to its session module", async () => {
@@ -45,6 +46,7 @@ test("auth feature delegates session restoration and state changes to its sessio
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    authClient: createAuthClient(context, state),
     fetchAll: async () => calls.push("fetch-workspace"),
     toast() {},
     windowRef: {
@@ -128,6 +130,7 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    authClient: createAuthClient(context, state),
     fetchAll: async () => {},
     toast() {},
     documentRef: { querySelector: () => element("auth-intro") },
@@ -193,19 +196,21 @@ test("auth feature restores login controls when the auth request rejects", async
       });
     return elements.get(id);
   };
-  const feature = context.window.PropertyDeskAuth.create({
-    $: element,
-    state: {
-      user: null,
-      passwordRecoveryInProgress: false,
-      client: {
-        auth: {
-          async signInWithPassword() {
-            throw new Error("network unavailable");
-          },
+  const state = {
+    user: null,
+    passwordRecoveryInProgress: false,
+    client: {
+      auth: {
+        async signInWithPassword() {
+          throw new Error("network unavailable");
         },
       },
     },
+  };
+  const feature = context.window.PropertyDeskAuth.create({
+    $: element,
+    state,
+    authClient: createAuthClient(context, state),
     fetchAll: async () => {},
     toast() {},
     documentRef: { querySelector: () => element("auth-intro") },
@@ -228,21 +233,8 @@ test("auth feature restores login controls when the auth request rejects", async
 });
 
 test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to verify", async () => {
-  const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "auth-form-view.js"),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "auth-form.js"),
-      "utf8",
-    ),
-    context,
-  );
+  const context = vm.createContext({ window: {}, document: {} });
+  loadAuthFeatures(context);
   const handlers = new Map();
   const elements = new Map();
   const element = (id) => {
@@ -282,6 +274,7 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
   const form = context.window.PropertyDeskAuthForm.create({
     $: element,
     state,
+    authClient: createAuthClient(context, state),
     startWorkspace: async () => {
       workspaceStarts += 1;
     },
@@ -336,6 +329,7 @@ test("auth session restore and sign-out report rejected requests without clearin
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    authClient: createAuthClient(context, state),
     fetchAll: async () => assert.fail("session failure must not load records"),
     toast: (message) => messages.push(message),
     documentRef: { querySelector: () => element() },

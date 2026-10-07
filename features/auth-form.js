@@ -5,6 +5,7 @@
   function createAuthForm({
     $,
     state,
+    authClient,
     startWorkspace,
     documentRef = document,
   }) {
@@ -16,10 +17,9 @@
       view.setSubmitting(true, signup);
       let result;
       try {
-        if (signup)
-          result = await state.client.auth.signUp({ email, password });
+        if (signup) result = await authClient.signUp({ email, password });
         else
-          result = await state.client.auth.signInWithPassword({
+          result = await authClient.signInWithPassword({
             email,
             password,
           });

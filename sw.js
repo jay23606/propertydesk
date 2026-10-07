@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v532';
+const CACHE_NAME = 'propertydesk-shell-v533';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -34,6 +34,7 @@ const SHELL_FILES = [
   './features/repository-write-feedback.js',
   './features/backup-utils.js',
   './features/zip-utils.js',
+  './features/auth-client.js',
   './features/profile-display.js',
   './features/profile-settings-view.js',
   './features/profile-settings.js',

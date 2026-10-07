@@ -5,6 +5,8 @@ const test = require("node:test");
 
 const repositoryFactory = /window\.PropertyDesk\w*Repository\.create\s*\(/g;
 const databaseAccess = /\.(?:from|rpc)\s*\(/;
+const authClientAccess =
+  /\.auth\.(?:onAuthStateChange|signUp|signInWithPassword|getSession|signOut|resetPasswordForEmail|updateUser)\s*\(/;
 const dataAccessModules = new Set([
   "account-history-repository.js",
   "account-repository.js",
@@ -36,6 +38,13 @@ test("feature workflows receive repository instances from the app composition ro
     return databaseAccess.test(source);
   });
   assert.deepEqual(directDataAccess, []);
+
+  const directAuthAccess = featureFiles.filter((file) => {
+    if (file === "auth-client.js") return false;
+    const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
+    return authClientAccess.test(source);
+  });
+  assert.deepEqual(directAuthAccess, []);
 
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskRepositoryRegistry\.create\(/);

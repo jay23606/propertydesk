@@ -36,7 +36,7 @@
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const { backend, state, fetchAll, workspaceQuery } =
+  const { backend, state, fetchAll, workspaceQuery, authClient } =
     window.PropertyDeskWorkspaceRuntime.create({
       config: window.PROPERTYDESK_CONFIG || {},
       supabase: window.supabase,
@@ -140,6 +140,7 @@
       toast,
       fetchAll,
       memberRepository: repositories.workspaceMembers,
+      authClient,
       documentRef: document,
       windowRef: window,
     },
@@ -372,7 +373,8 @@
     backend,
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
-    authContext: { $, state, fetchAll, toast },
+    authClient,
+    authContext: { $, state, authClient, fetchAll, toast },
     renderers: [
       updateGreeting,
       renderOverview,

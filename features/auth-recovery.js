@@ -5,6 +5,7 @@
   function createAuthRecovery({
     $,
     state,
+    authClient,
     toast,
     setAuthMode,
     startWorkspace,
@@ -15,7 +16,7 @@
     const view = window.PropertyDeskAuthRecoveryView.create({ $, documentRef });
     const { requestPasswordReset } = window.PropertyDeskAuthResetRequest.create(
       {
-        state,
+        authClient,
         view,
         windowRef,
       },
@@ -37,7 +38,7 @@
       view.setSubmitBusy(true);
       let result;
       try {
-        result = await state.client.auth.updateUser({ password });
+        result = await authClient.updateUser({ password });
       } catch {
         view.setMessage("Unable to update your password right now. Try again.");
         return;

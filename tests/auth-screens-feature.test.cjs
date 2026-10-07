@@ -72,18 +72,22 @@ test("password reset requests keep generic feedback and restore the submit contr
     return elements.get(id);
   };
   const resetCalls = [];
-  const feature = context.window.PropertyDeskAuthRecovery.create({
-    $: element,
-    state: {
-      client: {
-        auth: {
-          async resetPasswordForEmail(...args) {
-            resetCalls.push(args);
-            return { error: { message: "account-specific failure" } };
-          },
+  const state = {
+    client: {
+      auth: {
+        async resetPasswordForEmail(...args) {
+          resetCalls.push(args);
+          return { error: { message: "account-specific failure" } };
         },
       },
     },
+  };
+  const feature = context.window.PropertyDeskAuthRecovery.create({
+    $: element,
+    state,
+    authClient: context.window.PropertyDeskAuthClient.create({
+      getClient: () => state.client,
+    }),
     fetchAll: async () => {},
     toast() {},
     setAuthMode() {},

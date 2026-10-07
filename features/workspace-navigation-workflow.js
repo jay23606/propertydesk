@@ -11,6 +11,7 @@
       fetchAll,
       renderReminderActivity,
       memberRepository,
+      authClient,
       documentRef,
       windowRef,
       confirmAction,
@@ -23,6 +24,7 @@
       fetchAll,
       renderReminderActivity,
       memberRepository,
+      authClient,
       confirmAction,
     });
     const navigation = window.PropertyDeskNavigation.create({

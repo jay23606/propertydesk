@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadAuthFeatures } = require("./feature-test-helpers.cjs");
+const {
+  createAuthClient,
+  loadAuthFeatures,
+} = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
 
 test("password recovery saves the new password before resuming workspace access", async () => {
@@ -39,6 +42,7 @@ test("password recovery saves the new password before resuming workspace access"
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
     state,
+    authClient: createAuthClient(context, state),
     toast: (message) => calls.push(["toast", message]),
     setAuthMode: (signup) => calls.push(["auth-mode", signup]),
     startWorkspace: async () => calls.push(["workspace"]),
@@ -81,19 +85,21 @@ test("password recovery restores its submit control when the auth request reject
     return elements.get(id);
   };
   element("reset-password-confirm").value = "new-password-value";
-  const feature = context.window.PropertyDeskAuthRecovery.create({
-    $: element,
-    state: {
-      user: { id: "owner-1" },
-      passwordRecoveryInProgress: true,
-      client: {
-        auth: {
-          async updateUser() {
-            throw new Error("network unavailable");
-          },
+  const state = {
+    user: { id: "owner-1" },
+    passwordRecoveryInProgress: true,
+    client: {
+      auth: {
+        async updateUser() {
+          throw new Error("network unavailable");
         },
       },
     },
+  };
+  const feature = context.window.PropertyDeskAuthRecovery.create({
+    $: element,
+    state,
+    authClient: createAuthClient(context, state),
     toast() {},
     setAuthMode() {},
     startWorkspace: async () => {},

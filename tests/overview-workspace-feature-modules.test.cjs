@@ -401,6 +401,9 @@ test("profile settings save the display label and refresh the shared shell", asy
   const feature = context.window.PropertyDeskProfileSettings.create({
     $: (id) => elements[id],
     state,
+    authClient: {
+      updateUser: (...args) => state.client.auth.updateUser(...args),
+    },
     toast: (message) => messages.push(message),
     updateGreeting: () => calls.push("refresh-greeting"),
   });

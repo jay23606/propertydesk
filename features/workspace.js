@@ -10,6 +10,7 @@
     fetchAll,
     renderReminderActivity = () => {},
     memberRepository,
+    authClient,
     confirmAction = (message) => window.confirm(message),
   }) {
     const profileDisplay = window.PropertyDeskProfileDisplay.create({
@@ -20,6 +21,7 @@
     const profileView = window.PropertyDeskProfileSettingsView.create({ $ });
     const profile = window.PropertyDeskProfileSettings.create({
       state,
+      authClient,
       toast,
       updateGreeting,
     });

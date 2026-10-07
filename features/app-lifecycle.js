@@ -6,6 +6,7 @@
     $,
     state,
     backend,
+    authClient,
     todayIso,
     registerShell,
     auth,
@@ -33,7 +34,7 @@
       }
 
       state.client = backend.createClient();
-      state.client.auth.onAuthStateChange(auth.handleAuthStateChange);
+      authClient.onAuthStateChange(auth.handleAuthStateChange);
       await auth.restoreAuthSession();
     }
 

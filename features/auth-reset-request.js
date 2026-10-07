@@ -2,14 +2,14 @@
 (() => {
   "use strict";
 
-  function createAuthResetRequest({ state, view, windowRef }) {
+  function createAuthResetRequest({ authClient, view, windowRef }) {
     async function requestPasswordReset() {
       const email = view.requestEmail();
       if (!view.requestEmailIsValid()) return;
       view.setRequestDisabled(true);
       try {
         const redirectTo = `${windowRef.location.origin}${windowRef.location.pathname}`;
-        const { error } = await state.client.auth.resetPasswordForEmail(email, {
+        const { error } = await authClient.resetPasswordForEmail(email, {
           redirectTo,
         });
         view.setMessage(

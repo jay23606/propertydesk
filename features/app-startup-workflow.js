@@ -7,6 +7,7 @@
       $,
       state,
       backend,
+      authClient,
       todayIso,
       registerShell,
       authContext,
@@ -19,6 +20,7 @@
       $,
       state,
       backend,
+      authClient,
       todayIso,
       registerShell,
       auth: {

@@ -8,6 +8,9 @@
       supabase,
     });
     const state = window.PropertyDeskAppState.create();
+    const authClient = window.PropertyDeskAuthClient.create({
+      getClient: () => state.client,
+    });
     const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
       getClient: () => state.client,
     });
@@ -22,7 +25,7 @@
       render,
     });
 
-    return { backend, state, fetchAll, workspaceQuery };
+    return { backend, state, fetchAll, workspaceQuery, authClient };
   }
 
   window.PropertyDeskWorkspaceRuntime = Object.freeze({

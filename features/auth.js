@@ -5,6 +5,7 @@
   function create({
     $,
     state,
+    authClient,
     fetchAll,
     toast,
     windowRef = window,
@@ -17,6 +18,7 @@
       window.PropertyDeskAuthForm.create({
         $,
         state,
+        authClient,
         documentRef,
         startWorkspace,
       });
@@ -28,6 +30,7 @@
     } = window.PropertyDeskAuthRecovery.create({
       $,
       state,
+      authClient,
       toast,
       setAuthMode,
       startWorkspace,
@@ -48,6 +51,7 @@
     const { handleAuthStateChange, restoreAuthSession, signOut } =
       window.PropertyDeskAuthSession.create({
         state,
+        authClient,
         toast,
         showAuth,
         setAuthMode,

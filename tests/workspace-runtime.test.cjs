@@ -31,6 +31,12 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
           return state;
         },
       },
+      PropertyDeskAuthClient: {
+        create(received) {
+          calls.push(["auth-client", received]);
+          return { id: "auth-client" };
+        },
+      },
       PropertyDeskWorkspaceTables: { properties: "pd_properties" },
       PropertyDeskWorkspaceQuery: {
         create(received) {
@@ -66,19 +72,22 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[0][1].config, options.config);
   assert.equal(calls[0][1].supabase, options.supabase);
   assert.equal(calls[1][0], "state");
-  assert.equal(calls[2][0], "query");
+  assert.equal(calls[2][0], "auth-client");
   state.client = { id: "authenticated-client" };
   assert.equal(calls[2][1].getClient(), state.client);
-  assert.equal(calls[3][0], "data");
-  assert.equal(calls[3][1].tables, context.window.PropertyDeskWorkspaceTables);
-  assert.equal(calls[3][1].workspaceQuery, workspaceQuery);
-  assert.equal(calls[4][0], "refresh");
-  assert.equal(calls[4][1].state, state);
-  assert.equal(calls[4][1].workspaceData, workspaceData);
-  assert.equal(calls[4][1].toast, options.toast);
-  assert.equal(calls[4][1].render, options.render);
+  assert.equal(calls[3][0], "query");
+  state.client = { id: "authenticated-client" };
+  assert.equal(calls[4][0], "data");
+  assert.equal(calls[4][1].tables, context.window.PropertyDeskWorkspaceTables);
+  assert.equal(calls[4][1].workspaceQuery, workspaceQuery);
+  assert.equal(calls[5][0], "refresh");
+  assert.equal(calls[5][1].state, state);
+  assert.equal(calls[5][1].workspaceData, workspaceData);
+  assert.equal(calls[5][1].toast, options.toast);
+  assert.equal(calls[5][1].render, options.render);
   assert.equal(runtime.backend, backend);
   assert.equal(runtime.state, state);
   assert.equal(runtime.fetchAll, fetchAll);
   assert.equal(runtime.workspaceQuery, workspaceQuery);
+  assert.equal(runtime.authClient.id, "auth-client");
 });

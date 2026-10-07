@@ -4,6 +4,7 @@
 
   function createAuthSession({
     state,
+    authClient,
     toast,
     showAuth,
     setAuthMode,
@@ -45,7 +46,7 @@
     async function restoreAuthSession() {
       let session;
       try {
-        const { data, error } = await state.client.auth.getSession();
+        const { data, error } = await authClient.getSession();
         if (error) throw error;
         session = data?.session;
       } catch {
@@ -67,7 +68,7 @@
 
     async function signOut() {
       try {
-        const result = await state.client.auth.signOut();
+        const result = await authClient.signOut();
         const error = result?.error;
         if (error) {
           toast(error.message);

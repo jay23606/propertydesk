@@ -15,6 +15,7 @@
       documentRef: navigation.documentRef,
       windowRef: navigation.windowRef,
       memberRepository: navigation.memberRepository,
+      authClient: navigation.authClient,
       confirmAction: navigation.confirmAction,
     });
 
