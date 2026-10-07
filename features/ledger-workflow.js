@@ -43,7 +43,6 @@
     });
     return {
       resetPropertyForm: entries.resetPropertyForm,
-      resetAccountForm: entries.resetAccountForm,
       editAccount: entries.editAccount,
       updatePaymentGuidance: entries.updatePaymentGuidance,
       openPayment: entries.openPayment,

@@ -13,7 +13,6 @@ test("ledger workflow injects audited corrections into entry forms", () => {
     openExpense: () => "expense form",
     updatePaymentGuidance: () => "preview updated",
     resetPropertyForm() {},
-    resetAccountForm() {},
     editAccount() {},
     openPropertyPayment() {},
     attachPropertyFormEvents() {},
@@ -71,7 +70,6 @@ test("ledger workflow injects audited corrections into entry forms", () => {
     Object.keys(workflow).sort(),
     [
       "resetPropertyForm",
-      "resetAccountForm",
       "editAccount",
       "updatePaymentGuidance",
       "openPayment",

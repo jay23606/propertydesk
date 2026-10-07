@@ -108,7 +108,6 @@ test("record entry workflow composes forms and exposes their actions and binders
   assert.equal(passed.propertyAccountAction.openModal, dependencies.openModal);
   for (const [name, expected] of Object.entries({
     resetPropertyForm: propertyReset,
-    resetAccountForm: accountReset,
     editAccount,
     openAccountForProperty,
     updatePaymentGuidance,
