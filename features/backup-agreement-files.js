@@ -37,12 +37,10 @@
     );
   }
 
-  async function collect({ documents, client, workspaceOwnerId }) {
+  async function collect({ documents, repository, workspaceOwnerId }) {
     const includedFiles = [];
     const entries = [];
     const ownerPrefix = `${workspaceOwnerId}/`;
-    const repository = window.PropertyDeskDocumentRepository.create(client);
-
     for (const doc of documents) {
       assertWorkspacePath(doc, ownerPrefix);
       const data = await downloadAgreement(repository, doc);

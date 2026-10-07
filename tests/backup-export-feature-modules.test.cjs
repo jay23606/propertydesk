@@ -36,7 +36,7 @@ test("backup agreement collector downloads only workspace-scoped files into the 
         },
       ],
       workspaceOwnerId: "workspace-1",
-      client: {
+      repository: context.window.PropertyDeskDocumentRepository.create({
         storage: {
           from(bucket) {
             assert.equal(bucket, "pd-private-agreements");
@@ -55,7 +55,7 @@ test("backup agreement collector downloads only workspace-scoped files into the 
             };
           },
         },
-      },
+      }),
     });
 
   assert.equal(
@@ -147,6 +147,9 @@ test("backup export aborts before download when a private document path escapes 
     prettyType: (value) => value,
     accountBalance: () => 0,
     downloadBlob: (blob) => downloads.push(blob),
+    documentRepository: context.window.PropertyDeskDocumentRepository.create(
+      () => state.client,
+    ),
     zipUtils: {
       createZip: () =>
         assert.fail("invalid paths must stop before zip creation"),
@@ -263,6 +266,9 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     downloadBlob(blob, filename) {
       download = { blob, filename };
     },
+    documentRepository: context.window.PropertyDeskDocumentRepository.create(
+      () => state.client,
+    ),
     collectBackupAgreementFiles(options) {
       agreementCollectionCalls += 1;
       return collectBackupAgreementFiles(options);

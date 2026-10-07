@@ -324,6 +324,9 @@
       createBackup,
       todayIso,
       toast,
+      documentRepository: window.PropertyDeskDocumentRepository.create(
+        () => state.client,
+      ),
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,

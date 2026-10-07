@@ -8,13 +8,14 @@
     loadBackupRecords = window.PropertyDeskBackupRecords.load,
     collectBackupAgreementFiles = window.PropertyDeskBackupAgreementFiles
       .collect,
+    documentRepository,
     now = () => new Date(),
   } = {}) {
     async function prepare({ client, workspaceOwnerId }) {
       const records = await loadBackupRecords(client);
       const { entries, includedFiles } = await collectBackupAgreementFiles({
         documents: records.pd_documents,
-        client,
+        repository: documentRepository,
         workspaceOwnerId,
       });
       const backup = createBackup(records, now().toISOString(), includedFiles);

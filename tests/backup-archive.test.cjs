@@ -32,6 +32,7 @@ test("backup archive assembles records and agreement files before ZIP encoding",
     context,
   );
   const archive = context.window.PropertyDeskBackupArchive.create({
+    documentRepository: { kind: "document repository" },
     loadBackupRecords: async (client) => {
       calls.push(["load", client]);
       return records;
@@ -65,6 +66,7 @@ test("backup archive assembles records and agreement files before ZIP encoding",
   );
   assert.equal(calls[0][1], client);
   assert.equal(calls[1][1].documents, records.pd_documents);
+  assert.equal(calls[1][1].repository.kind, "document repository");
   assert.equal(calls[1][1].workspaceOwnerId, "owner-1");
   assert.equal(calls[2][2], "2026-10-06T13:00:00.000Z");
   assert.equal(calls[2][3], includedFiles);

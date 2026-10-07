@@ -13,12 +13,14 @@
       zipUtils,
       loadBackupRecords,
       collectBackupAgreementFiles,
+      documentRepository,
     } = context;
     const archive = window.PropertyDeskBackupArchive.create({
       createBackup,
       zipUtils,
       loadBackupRecords,
       collectBackupAgreementFiles,
+      documentRepository,
     });
 
     async function exportAll() {
