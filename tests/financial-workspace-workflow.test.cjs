@@ -13,7 +13,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.match(
     app,
-    /AccountScreenWorkflow\.create\(\{[\s\S]*?accountActions: \{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?deposit: \{[\s\S]*?moneyInput,/,
+    /AccountScreenWorkflow\.create\(\{[\s\S]*?depositDetails: \{[\s\S]*?depositLedger,[\s\S]*?accountActions: \{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?deposit: \{[\s\S]*?moneyInput,/,
   );
   assert.match(
     app,
@@ -22,6 +22,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
 
   for (const feature of [
     "account-detail-action-workflow",
+    "deposit-details-workflow",
     "deposit-adjustment-workflow",
     "account-screen-workflow",
     "transaction-maintenance-workflow",

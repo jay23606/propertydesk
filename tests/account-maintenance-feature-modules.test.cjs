@@ -9,7 +9,7 @@ test("app delegates account actions and deposit adjustments to separate workflow
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositLedger,[\s\S]*?accountActions:[\s\S]*?deposit:/,
+    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositDetails: \{[\s\S]*?depositLedger,[\s\S]*?accountActions:[\s\S]*?deposit:/,
   );
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create/);
@@ -23,11 +23,15 @@ test("app delegates account actions and deposit adjustments to separate workflow
   );
   assert.match(
     accountScreenWorkflow,
+    /DepositDetailsWorkflow\.create\(\{[\s\S]*?depositLedger: depositDetailsContext\.depositLedger/,
+  );
+  assert.match(
+    accountScreenWorkflow,
     /AccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: accountActions\.repository/,
   );
   assert.match(
     accountScreenWorkflow,
-    /DepositAdjustmentWorkflow\.create\(\{[\s\S]*?depositSectionHTML: details\.depositSectionHTML/,
+    /DepositAdjustmentWorkflow\.create\(\{[\s\S]*?depositSectionHTML,/,
   );
   const accountWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "account-detail-action-workflow.js"),
@@ -91,10 +95,16 @@ test("account screen workflow composes isolated detail actions and deposits", ()
   const depositSectionHTML = () => "deposit";
   const context = vm.createContext({
     window: {
+      PropertyDeskDepositDetailsWorkflow: {
+        create(options) {
+          calls.push(["depositDetails", options]);
+          return { depositSectionHTML };
+        },
+      },
       PropertyDeskAccountDetailContentWorkflow: {
         create(content) {
           calls.push(["content", content]);
-          return { openAccountDetails() {}, depositSectionHTML };
+          return { openAccountDetails() {} };
         },
       },
       PropertyDeskAccountDetailActionWorkflow: {
@@ -131,9 +141,16 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     amortizationSchedule() {},
     openModal() {},
     propertyAddress() {},
-    depositLedger() {},
     accountHistoryRepository: {},
     unusedContentValue: true,
+  };
+  const depositDetails = {
+    state: {},
+    depositLedger() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    unusedDepositDetailsValue: true,
   };
   const accountActions = {
     $() {},
@@ -161,22 +178,36 @@ test("account screen workflow composes isolated detail actions and deposits", ()
   const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
     content,
     accountActions,
+    depositDetails,
     deposit,
   });
 
-  assert.equal(calls[0][0], "content");
-  assert.equal(calls[0][1].state, content.state);
-  assert.equal(calls[0][1].depositLedger, content.depositLedger);
+  assert.equal(calls[0][0], "depositDetails");
+  assert.equal(calls[0][1].state, depositDetails.state);
+  assert.equal(calls[0][1].depositLedger, depositDetails.depositLedger);
+  assert.equal(calls[0][1].money, depositDetails.money);
+  assert.equal("unusedDepositDetailsValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+    "state",
+  ]);
+
+  assert.equal(calls[1][0], "content");
+  assert.equal(calls[1][1].state, content.state);
   assert.equal(
-    calls[0][1].accountHistoryRepository,
+    calls[1][1].accountHistoryRepository,
     content.accountHistoryRepository,
   );
-  assert.equal("unusedContentValue" in calls[0][1], false);
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+  assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
+  assert.equal("unusedContentValue" in calls[1][1], false);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
     "$",
     "accountHistoryRepository",
     "amortizationSchedule",
-    "depositLedger",
+    "depositSectionHTML",
     "esc",
     "fmtDate",
     "money",
@@ -188,10 +219,10 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     "sumPosted",
     "summarizeAccount",
   ]);
-  assert.equal(calls[1][0], "accountActions");
-  assert.equal(calls[1][1].repository, accountActions.repository);
-  assert.equal("unusedDependency" in calls[1][1], false);
-  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+  assert.equal(calls[2][0], "accountActions");
+  assert.equal(calls[2][1].repository, accountActions.repository);
+  assert.equal("unusedDependency" in calls[2][1], false);
+  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
     "$",
     "closeModal",
     "editAccount",
@@ -201,13 +232,13 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     "state",
     "toast",
   ]);
-  assert.equal(calls[2][0], "deposit");
-  assert.equal(calls[2][1].repository, deposit.repository);
-  assert.equal(calls[2][1].prepareAdjustment, deposit.prepareAdjustment);
-  assert.equal(calls[2][1].validateAdjustment, deposit.validateAdjustment);
-  assert.equal(calls[2][1].depositSectionHTML, depositSectionHTML);
-  assert.equal("closeModal" in calls[2][1], false);
-  assert.equal("unusedDependency" in calls[2][1], false);
+  assert.equal(calls[3][0], "deposit");
+  assert.equal(calls[3][1].repository, deposit.repository);
+  assert.equal(calls[3][1].prepareAdjustment, deposit.prepareAdjustment);
+  assert.equal(calls[3][1].validateAdjustment, deposit.validateAdjustment);
+  assert.equal(calls[3][1].depositSectionHTML, depositSectionHTML);
+  assert.equal("closeModal" in calls[3][1], false);
+  assert.equal("unusedDependency" in calls[3][1], false);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",
     "attachDepositAdjustmentEvents",
@@ -249,25 +280,6 @@ test("account detail content workflow composes schedule, history, and account", 
           return { openAccountDetails };
         },
       },
-      PropertyDeskDepositDetailsModel: {
-        create: (options) => {
-          passed.depositModel = options;
-          return {
-            buildDepositDetails: (account) => ({ account }),
-          };
-        },
-      },
-      PropertyDeskDepositDetailsView: {
-        create: (options) => {
-          passed.depositView = options;
-          return {
-            depositSectionHTML: (details) => {
-              passed.depositDetails = details;
-              return depositSectionHTML();
-            },
-          };
-        },
-      },
       PropertyDeskAccountHistoryModel: {
         create: (options) => {
           passed.historyModel = options;
@@ -307,7 +319,7 @@ test("account detail content workflow composes schedule, history, and account", 
     amortizationSchedule() {},
     openModal() {},
     propertyAddress() {},
-    depositLedger: () => ({ entries: [], active: [], totals: {} }),
+    depositSectionHTML,
     accountHistoryRepository: { loadAccountAuditEvents() {} },
   };
   const workflow =
@@ -322,11 +334,6 @@ test("account detail content workflow composes schedule, history, and account", 
     dependencies.accountHistoryRepository,
   );
   assert.equal(passed.historyView.esc, dependencies.esc);
-  assert.equal(passed.depositModel.state, dependencies.state);
-  assert.equal(passed.depositModel.depositLedger, dependencies.depositLedger);
-  assert.equal(passed.depositView.money, dependencies.money);
-  assert.equal(passed.depositView.fmtDate, dependencies.fmtDate);
-  assert.equal(passed.depositView.esc, dependencies.esc);
   assert.equal(passed.model.state, dependencies.state);
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(passed.model.summarizeAccount, dependencies.summarizeAccount);
@@ -336,14 +343,8 @@ test("account detail content workflow composes schedule, history, and account", 
     await passed.details.renderAccountHistory({}, []),
     accountHistoryHTML(),
   );
-  const rentalAccount = { account_type: "rental" };
-  assert.equal(workflow.depositSectionHTML(rentalAccount), "deposit");
-  assert.equal(passed.depositDetails.account, rentalAccount);
-  assert.equal(passed.details.depositSectionHTML, workflow.depositSectionHTML);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "depositSectionHTML",
-    "openAccountDetails",
-  ]);
+  assert.equal(passed.details.depositSectionHTML, depositSectionHTML);
+  assert.deepEqual(Object.keys(workflow).sort(), ["openAccountDetails"]);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
 });
 

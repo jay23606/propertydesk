@@ -9,6 +9,7 @@ test("deposit details render rental-only ledger rows and preserve voided markers
   for (const filename of [
     "deposit-details-model.js",
     "deposit-details-view.js",
+    "deposit-details-workflow.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -20,9 +21,12 @@ test("deposit details render rental-only ledger rows and preserve voided markers
     payments: [{ id: "payment-1", memo: "Move-in" }],
     expenses: [],
   };
-  const { buildDepositDetails } =
-    context.window.PropertyDeskDepositDetailsModel.create({
+  const { depositSectionHTML } =
+    context.window.PropertyDeskDepositDetailsWorkflow.create({
       state,
+      money: (value) => `$${value.toFixed(2)}`,
+      fmtDate: (value) => value,
+      esc: (value) => String(value).replaceAll("<", "&lt;"),
       depositLedger: () => {
         ledgerReads += 1;
         return {
@@ -53,14 +57,6 @@ test("deposit details render rental-only ledger rows and preserve voided markers
         };
       },
     });
-  const { depositSectionHTML: renderDepositSection } =
-    context.window.PropertyDeskDepositDetailsView.create({
-      money: (value) => `$${value.toFixed(2)}`,
-      fmtDate: (value) => value,
-      esc: (value) => String(value).replaceAll("<", "&lt;"),
-    });
-  const depositSectionHTML = (account) =>
-    renderDepositSection(buildDepositDetails(account));
 
   assert.equal(depositSectionHTML({ id: "note-1", account_type: "note" }), "");
   assert.equal(ledgerReads, 0);

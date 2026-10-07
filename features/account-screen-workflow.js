@@ -2,7 +2,20 @@
 (() => {
   "use strict";
 
-  function createAccountScreenWorkflow({ content, accountActions, deposit }) {
+  function createAccountScreenWorkflow({
+    content,
+    accountActions,
+    depositDetails: depositDetailsContext,
+    deposit,
+  }) {
+    const { depositSectionHTML } =
+      window.PropertyDeskDepositDetailsWorkflow.create({
+        state: depositDetailsContext.state,
+        depositLedger: depositDetailsContext.depositLedger,
+        money: depositDetailsContext.money,
+        fmtDate: depositDetailsContext.fmtDate,
+        esc: depositDetailsContext.esc,
+      });
     const details = window.PropertyDeskAccountDetailContentWorkflow.create({
       $: content.$,
       state: content.state,
@@ -16,7 +29,7 @@
       amortizationSchedule: content.amortizationSchedule,
       openModal: content.openModal,
       propertyAddress: content.propertyAddress,
-      depositLedger: content.depositLedger,
+      depositSectionHTML,
       accountHistoryRepository: content.accountHistoryRepository,
     });
     const accountDetailActions =
@@ -36,7 +49,7 @@
       todayIso: deposit.todayIso,
       toast: deposit.toast,
       fetchAll: deposit.fetchAll,
-      depositSectionHTML: details.depositSectionHTML,
+      depositSectionHTML,
       moneyInput: deposit.moneyInput,
       repository: deposit.repository,
       prepareAdjustment: deposit.prepareAdjustment,

@@ -16,16 +16,9 @@
       amortizationSchedule,
       openModal,
       propertyAddress,
-      depositLedger,
+      depositSectionHTML,
       accountHistoryRepository,
     } = context;
-    const { buildDepositDetails } =
-      window.PropertyDeskDepositDetailsModel.create({ state, depositLedger });
-    const { depositSectionHTML: renderDepositDetails } =
-      window.PropertyDeskDepositDetailsView.create({ money, fmtDate, esc });
-    function depositSectionHTML(account) {
-      return renderDepositDetails(buildDepositDetails(account));
-    }
     const { loadAccountHistory } =
       window.PropertyDeskAccountHistoryModel.create({
         state,
@@ -71,7 +64,7 @@
       openModal,
     });
 
-    return { openAccountDetails, depositSectionHTML };
+    return { openAccountDetails };
   }
 
   window.PropertyDeskAccountDetailContentWorkflow = Object.freeze({ create });

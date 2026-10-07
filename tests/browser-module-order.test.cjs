@@ -105,11 +105,15 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/deposit-details-model.js",
-      "features/account-detail-content-workflow.js",
+      "features/deposit-details-workflow.js",
     ],
     [
       "features/deposit-details-view.js",
-      "features/account-detail-content-workflow.js",
+      "features/deposit-details-workflow.js",
+    ],
+    [
+      "features/deposit-details-workflow.js",
+      "features/account-screen-workflow.js",
     ],
     [
       "features/account-detail-content-workflow.js",

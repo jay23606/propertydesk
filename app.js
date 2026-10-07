@@ -244,8 +244,14 @@
       amortizationSchedule,
       openModal,
       propertyAddress,
-      depositLedger,
       accountHistoryRepository: repositories.accountHistory,
+    },
+    depositDetails: {
+      state,
+      depositLedger,
+      money,
+      fmtDate,
+      esc,
     },
     accountActions: {
       $,
