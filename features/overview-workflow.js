@@ -38,10 +38,12 @@
     const overviewModel = window.PropertyDeskOverviewModel.create({
       state,
       propertySummaryModel,
+      activityModel: window.PropertyDeskOverviewActivityModel.create({
+        isPosted,
+      }),
       collectedSince,
       scheduledMonthlyRunRate,
       monthStart,
-      isPosted,
       postedOnOrAfter,
     });
     const overview = window.PropertyDeskOverview.create({

@@ -8,8 +8,8 @@
     collectedSince,
     scheduledMonthlyRunRate,
     monthStart,
-    isPosted,
     postedOnOrAfter,
+    activityModel,
   }) {
     function buildOverview() {
       const currentMonthStart = monthStart();
@@ -29,29 +29,15 @@
         "received_date",
         currentMonthStart,
       );
-      const upcoming = state.accounts
-        .filter(
-          (account) => account.status === "active" && account.next_due_date,
-        )
-        .sort((a, b) =>
-          String(a.next_due_date).localeCompare(String(b.next_due_date)),
-        )
-        .slice(0, 4)
-        .map((account) => ({
-          account,
-          property: propertyById.get(account.property_id),
-        }));
-      const recent = state.payments
-        .filter(isPosted)
-        .slice(0, 4)
-        .map((payment) => {
-          const account = accountById.get(payment.account_id);
-          return {
-            payment,
-            account,
-            property: propertyById.get(account?.property_id),
-          };
-        });
+      const upcoming = activityModel.upcomingPayments(
+        state.accounts,
+        propertyById,
+      );
+      const recent = activityModel.recentPayments(
+        state.payments,
+        accountById,
+        propertyById,
+      );
 
       return {
         propertyCount: activeProperties.length,

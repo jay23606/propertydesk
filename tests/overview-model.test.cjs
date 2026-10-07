@@ -16,6 +16,7 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
   for (const moduleName of [
     "property-account-index.js",
     "overview-property-summary-model.js",
+    "overview-activity-model.js",
     "overview-model.js",
   ]) {
     vm.runInContext(
@@ -110,10 +111,12 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
   const model = context.window.PropertyDeskOverviewModel.create({
     state,
     propertySummaryModel,
+    activityModel: context.window.PropertyDeskOverviewActivityModel.create({
+      isPosted: (payment) => payment.status !== "voided",
+    }),
     collectedSince: (start) => (start === "2026-10-01" ? 800 : 0),
     scheduledMonthlyRunRate: () => 1300,
     monthStart: () => "2026-10-01",
-    isPosted: (payment) => payment.status !== "voided",
     postedOnOrAfter: (rows, field, start) =>
       rows.filter(
         (row) => row.status !== "voided" && String(row[field]) >= start,

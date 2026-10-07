@@ -270,6 +270,8 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-account-index.js",
       "features/property-portfolio-model.js",
     ],
+    ["features/overview-activity-model.js", "features/overview-model.js"],
+    ["features/overview-activity-model.js", "features/overview-workflow.js"],
     [
       "features/property-portfolio-table.js",
       "features/property-portfolio-model.js",

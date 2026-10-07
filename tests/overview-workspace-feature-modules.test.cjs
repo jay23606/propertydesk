@@ -153,6 +153,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
   const order = [
     "PropertyDeskOverviewPropertySummaryModel.create(",
     "PropertyDeskOverviewModel.create(",
+    "PropertyDeskOverviewActivityModel.create(",
     "PropertyDeskOverview.create(",
     "PropertyDeskOverviewEvents.create(",
   ].map((marker) => workflow.indexOf(marker));
@@ -199,6 +200,13 @@ test("overview workflow exposes its renderer and event binder directly", () => {
           return overviewModel;
         },
       },
+      PropertyDeskOverviewActivityModel: {
+        create: (options) => {
+          calls.push("activity model");
+          passed.activityModelOptions = options;
+          return {};
+        },
+      },
       PropertyDeskOverview: {
         create: (options) => {
           calls.push("view");
@@ -225,12 +233,21 @@ test("overview workflow exposes its renderer and event binder directly", () => {
 
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
+  const isPosted = () => true;
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
     openPropertyDetails,
     openPropertyPayment,
+    isPosted,
   });
 
-  assert.deepEqual(calls, ["property summary", "summary", "view", "events"]);
+  assert.deepEqual(calls, [
+    "property summary",
+    "activity model",
+    "summary",
+    "view",
+    "events",
+  ]);
+  assert.equal(passed.activityModelOptions.isPosted, isPosted);
   assert.equal(passed.model.propertySummaryModel, propertySummaryModel);
   assert.equal(passed.view.overviewModel, overviewModel);
   assert.equal(passed.events.openPropertyDetails, openPropertyDetails);
