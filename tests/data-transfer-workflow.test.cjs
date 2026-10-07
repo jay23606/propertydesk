@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app wires CSV import and private backup export independently", () => {
+test("app wires CSV import and private backup workspace workflow independently", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -29,7 +29,7 @@ test("app wires CSV import and private backup export independently", () => {
   );
   assert.match(
     app,
-    /PropertyDeskBackupExport\.create\(\{[\s\S]*?createBackup,[\s\S]*?toast,[\s\S]*?\}\);/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: window\.PropertyDeskWorkspaceQuery\.loadAllPages,[\s\S]*?\}\);/,
   );
   assert.match(
     app,
@@ -38,7 +38,11 @@ test("app wires CSV import and private backup export independently", () => {
   assert.match(app, /attachEvents: attachExportEvents/);
   assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
 
-  for (const script of ["features/imports.js", "features/backup-export.js"]) {
+  for (const script of [
+    "features/imports.js",
+    "features/backup-export.js",
+    "features/backup-workspace-workflow.js",
+  ]) {
     assert.ok(
       html.indexOf(script) >= 0 &&
         html.indexOf(script) < html.indexOf("app.js"),

@@ -4,21 +4,86 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("app supplies all backup archive and download dependencies", () => {
+test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupUtils\.create\(\{\s*workspaceTables: window\.PropertyDeskWorkspaceTables,/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: window\.PropertyDeskWorkspaceQuery\.loadAllPages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
   );
   assert.match(
     app,
-    /PropertyDeskBackupRecords\.create\(\{\s*tables: backupUtils\.tables,\s*loadAllPages: window\.PropertyDeskWorkspaceQuery\.loadAllPages,/,
+    /downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,/,
   );
-  assert.match(app, /loadBackupRecords: backupRecords\.load/);
-  assert.match(
-    app,
-    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
+});
+
+test("backup workspace workflow wires the manifest, record loader, and export action", () => {
+  const calls = {};
+  const attachEvents = () => {};
+  const tables = ["pd_properties", "pd_documents"];
+  const load = async () => ({ pd_properties: [], pd_documents: [] });
+  const createBackup = () => ({ manifest: {}, data: {} });
+  const context = vm.createContext({
+    window: {
+      PropertyDeskBackupUtils: {
+        create(options) {
+          calls.utils = options;
+          return { tables, createBackup };
+        },
+      },
+      PropertyDeskBackupRecords: {
+        create(options) {
+          calls.records = options;
+          return { load };
+        },
+      },
+      PropertyDeskBackupExport: {
+        create(options) {
+          calls.exporter = options;
+          return { attachEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "backup-workspace-workflow.js"),
+      "utf8",
+    ),
+    context,
   );
+
+  const dependencies = {
+    $: () => null,
+    state: { user: null, client: null },
+    todayIso: () => "2026-10-07",
+    toast: () => {},
+    downloadBlob: () => {},
+    zipUtils: { createZip: () => {} },
+    workspaceTables: { properties: "pd_properties", documents: "pd_documents" },
+    loadAllPages: async () => [],
+    collectBackupAgreementFiles: async () => ({
+      entries: [],
+      includedFiles: [],
+    }),
+    documentRepository: {},
+  };
+  const workflow =
+    context.window.PropertyDeskBackupWorkspaceWorkflow.create(dependencies);
+
+  assert.equal(calls.utils.workspaceTables, dependencies.workspaceTables);
+  assert.deepEqual(calls.records.tables, tables);
+  assert.equal(calls.records.loadAllPages, dependencies.loadAllPages);
+  assert.equal(calls.exporter.createBackup, createBackup);
+  assert.equal(calls.exporter.loadBackupRecords, load);
+  assert.equal(
+    calls.exporter.collectBackupAgreementFiles,
+    dependencies.collectBackupAgreementFiles,
+  );
+  assert.equal(
+    calls.exporter.documentRepository,
+    dependencies.documentRepository,
+  );
+  assert.equal(workflow.attachEvents, attachEvents);
 });
 
 test("backup agreement collector downloads only workspace-scoped files into the archive manifest", async () => {

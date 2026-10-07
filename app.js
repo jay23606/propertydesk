@@ -21,14 +21,6 @@
     sumPosted,
     unpaidDueAccrualStart,
   } = window.PropertyDeskLedgerUtils;
-  const backupUtils = window.PropertyDeskBackupUtils.create({
-    workspaceTables: window.PropertyDeskWorkspaceTables,
-  });
-  const { createBackup } = backupUtils;
-  const backupRecords = window.PropertyDeskBackupRecords.create({
-    tables: backupUtils.tables,
-    loadAllPages: window.PropertyDeskWorkspaceQuery.loadAllPages,
-  });
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -366,15 +358,15 @@
     repository: repositories.imports,
   });
   const { attachEvents: attachExportEvents } =
-    window.PropertyDeskBackupExport.create({
+    window.PropertyDeskBackupWorkspaceWorkflow.create({
       $,
       state,
-      createBackup,
       todayIso,
       toast,
       downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       zipUtils: window.PropertyDeskZipUtils,
-      loadBackupRecords: backupRecords.load,
+      workspaceTables: window.PropertyDeskWorkspaceTables,
+      loadAllPages: window.PropertyDeskWorkspaceQuery.loadAllPages,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: repositories.documents,
