@@ -6,9 +6,9 @@ require("../features/domain-options.js");
 require("../features/transaction-options.js");
 require("../features/expense-account-policy.js");
 const { selectImportRows } = require("../import-utils.js");
-require("../account-import-validation.js");
-require("../expense-import-validation.js");
-require("../payment-import-validation.js");
+require("../features/account-import-validation.js");
+require("../features/expense-import-validation.js");
+require("../features/payment-import-validation.js");
 const importWorkflows = require("../import-workflows.js");
 
 const properties = [{ id: "p1", name: "Oak House", address: "10 Oak St" }];

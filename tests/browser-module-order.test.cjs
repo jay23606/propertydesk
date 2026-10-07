@@ -61,9 +61,12 @@ test("browser feature scripts load after their dependencies", () => {
     .filter(Boolean)
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const dependencies = [
-    ["features/domain-options.js", "account-import-validation.js"],
+    ["features/domain-options.js", "features/account-import-validation.js"],
     ["workspace-table-catalog.js", "backup-utils.js"],
-    ["features/transaction-options.js", "expense-import-validation.js"],
+    [
+      "features/transaction-options.js",
+      "features/expense-import-validation.js",
+    ],
     ["features/account-repository.js", "features/account-close-maintenance.js"],
     [
       "features/repository-write-feedback.js",
@@ -154,7 +157,10 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/domain-options.js", "features/display-utils.js"],
     ["features/transaction-options.js", "features/display-utils.js"],
     ["features/transaction-options.js", "features/expense-account-policy.js"],
-    ["features/expense-account-policy.js", "expense-import-validation.js"],
+    [
+      "features/expense-account-policy.js",
+      "features/expense-import-validation.js",
+    ],
     ["features/expense-account-policy.js", "features/expense-entry-view.js"],
     ["features/expense-account-policy.js", "features/expense-entry-form.js"],
     ["features/document-delete.js", "features/document-actions.js"],
@@ -515,10 +521,13 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/profile-settings.js", "features/workspace.js"],
     ["features/workspace-members.js", "features/workspace.js"],
     ["csv-parser.js", "import-utils.js"],
-    ["account-import-validation.js", "import-workflows.js"],
-    ["expense-import-validation.js", "import-workflows.js"],
-    ["payment-import-validation.js", "import-workflows.js"],
-    ["features/transaction-options.js", "payment-import-validation.js"],
+    ["features/account-import-validation.js", "import-workflows.js"],
+    ["features/expense-import-validation.js", "import-workflows.js"],
+    ["features/payment-import-validation.js", "import-workflows.js"],
+    [
+      "features/transaction-options.js",
+      "features/payment-import-validation.js",
+    ],
     ["workspace-table-catalog.js", "workspace-data.js"],
   ];
 
