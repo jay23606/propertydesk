@@ -246,10 +246,22 @@ test("app composes property detail content, actions, and document routes", () =>
     "PropertyDeskPropertyDetailQuickActions",
     "PropertyDeskPropertyHolderManagement",
     "PropertyDeskPropertyHolderEvents",
-    "PropertyDeskDocuments",
-    "PropertyDeskPropertyDetailDocumentEvents",
   ])
     assert.match(workflow, new RegExp(`${feature}\\.create\\(`));
+  const documentWorkflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-document-management-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.match(documentWorkflow, /PropertyDeskDocuments\.create\(context\)/);
+  assert.match(
+    documentWorkflow,
+    /PropertyDeskPropertyDetailDocumentEvents\.create\(/,
+  );
   assert.match(
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,

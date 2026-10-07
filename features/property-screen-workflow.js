@@ -1,8 +1,8 @@
-/* Compose property detail content with property management actions. */
+/* Compose property detail content with its management and document actions. */
 (() => {
   "use strict";
 
-  function createPropertyScreenWorkflow({ content, management }) {
+  function createPropertyScreenWorkflow({ content, management, documents }) {
     const details =
       window.PropertyDeskPropertyDetailContentWorkflow.create(content);
     const actions = window.PropertyDeskPropertyDetailManagementWorkflow.create({
@@ -20,18 +20,20 @@
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
       propertyHolderRepository: management.propertyHolderRepository,
-      documentRepository: management.documentRepository,
-      makeId: management.makeId,
-      confirm: management.confirm,
-      openWindow: management.openWindow,
     });
+    const propertyDocuments =
+      window.PropertyDeskPropertyDocumentManagementWorkflow.create({
+        ...documents,
+        openPropertyDetails: details.openPropertyDetails,
+      });
 
     return {
       openPropertyDetails: details.openPropertyDetails,
       attachPropertyDetailEvents: actions.attachPropertyDetailEvents,
       attachPropertyQuickActionEvents: actions.attachPropertyQuickActionEvents,
       attachPropertyHolderEvents: actions.attachPropertyHolderEvents,
-      attachPropertyDocumentEvents: actions.attachPropertyDocumentEvents,
+      attachPropertyDocumentEvents:
+        propertyDocuments.attachPropertyDocumentEvents,
     };
   }
 

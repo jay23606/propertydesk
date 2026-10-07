@@ -4,13 +4,12 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("property detail coordinator connects archive, holder, and document actions", () => {
+test("property detail coordinator connects archive, holder, and quick actions", () => {
   const passed = {};
   const binders = {
     detail: () => {},
     quick: () => {},
     holders: () => {},
-    documents: () => {},
   };
   const context = vm.createContext({
     window: {
@@ -50,28 +49,6 @@ test("property detail coordinator connects archive, holder, and document actions
           return { attachEvents: binders.holders };
         },
       },
-      PropertyDeskDocumentRepository: {
-        create: (getClient) => {
-          passed.getClient = getClient;
-          return { kind: "repository" };
-        },
-      },
-      PropertyDeskDocuments: {
-        create: (options) => {
-          passed.documents = options;
-          return {
-            uploadPropertyDocument() {},
-            deletePropertyDocument() {},
-            openPropertyDocument() {},
-          };
-        },
-      },
-      PropertyDeskPropertyDetailDocumentEvents: {
-        create: (options) => {
-          passed.documentEvents = options;
-          return { attachEvents: binders.documents };
-        },
-      },
     },
   });
   vm.runInContext(
@@ -94,7 +71,6 @@ test("property detail coordinator connects archive, holder, and document actions
   const openAccountForProperty = () => {};
   const propertyRepository = { updateOwned() {} };
   const propertyHolderRepository = { kind: "holder-repository" };
-  const documentRepository = { kind: "document-repository" };
   const dependencies = {
     $() {},
     state,
@@ -110,7 +86,6 @@ test("property detail coordinator connects archive, holder, and document actions
     openAccountForProperty,
     propertyRepository,
     propertyHolderRepository,
-    documentRepository,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailManagementWorkflow.create(
@@ -128,20 +103,12 @@ test("property detail coordinator connects archive, holder, and document actions
   );
   assert.equal(passed.holderManagement.repository, propertyHolderRepository);
   assert.equal(passed.holderRepository, undefined);
-  assert.equal(passed.documents.openPropertyDetails, openPropertyDetails);
-  assert.equal(passed.documents.repository, documentRepository);
-  assert.equal(passed.getClient, undefined);
-  assert.equal(typeof passed.documentEvents.uploadPropertyDocument, "function");
-  assert.equal(typeof passed.documentEvents.deletePropertyDocument, "function");
-  assert.equal(typeof passed.documentEvents.openPropertyDocument, "function");
   assert.deepEqual(Object.keys(workflow), [
     "attachPropertyDetailEvents",
     "attachPropertyQuickActionEvents",
     "attachPropertyHolderEvents",
-    "attachPropertyDocumentEvents",
   ]);
   assert.equal(workflow.attachPropertyDetailEvents, binders.detail);
   assert.equal(workflow.attachPropertyQuickActionEvents, binders.quick);
   assert.equal(workflow.attachPropertyHolderEvents, binders.holders);
-  assert.equal(workflow.attachPropertyDocumentEvents, binders.documents);
 });

@@ -12,9 +12,16 @@ test("property screen workflow passes detail actions to management and returns b
     closeModal() {},
     toast() {},
     propertyHolderRepository: { kind: "holder-repository" },
-    documentRepository: { kind: "document-repository" },
     unusedDependency: true,
   };
+  const documents = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    documentRepository: { kind: "document-repository" },
+  };
+  const attachPropertyDocumentEvents = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDetailContentWorkflow: {
@@ -30,8 +37,13 @@ test("property screen workflow passes detail actions to management and returns b
             attachPropertyDetailEvents() {},
             attachPropertyQuickActionEvents() {},
             attachPropertyHolderEvents() {},
-            attachPropertyDocumentEvents() {},
           };
+        },
+      },
+      PropertyDeskPropertyDocumentManagementWorkflow: {
+        create(options) {
+          calls.push(["documents", options]);
+          return { attachPropertyDocumentEvents };
         },
       },
     },
@@ -47,6 +59,7 @@ test("property screen workflow passes detail actions to management and returns b
   const workflow = context.window.PropertyDeskPropertyScreenWorkflow.create({
     content,
     management,
+    documents,
   });
 
   assert.equal(calls[0][0], "content");
@@ -60,7 +73,11 @@ test("property screen workflow passes detail actions to management and returns b
     calls[1][1].propertyHolderRepository,
     management.propertyHolderRepository,
   );
-  assert.equal(calls[1][1].documentRepository, management.documentRepository);
+  assert.equal("documentRepository" in calls[1][1], false);
+  assert.equal(calls[2][0], "documents");
+  assert.equal(calls[2][1].$, documents.$);
+  assert.equal(calls[2][1].documentRepository, documents.documentRepository);
+  assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",
@@ -69,4 +86,8 @@ test("property screen workflow passes detail actions to management and returns b
     "attachPropertyQuickActionEvents",
     "openPropertyDetails",
   ]);
+  assert.equal(
+    workflow.attachPropertyDocumentEvents,
+    attachPropertyDocumentEvents,
+  );
 });
