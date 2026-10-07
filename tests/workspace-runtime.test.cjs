@@ -17,10 +17,13 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   const state = {};
   const workspaceData = { loadWorkspaceId() {}, loadWorkspaceRecords() {} };
   const workspaceQuery = { loadAllPages() {} };
+  const repositories = { accounts: { name: "account-repository" } };
+  const repositoryAdapters = { accounts: { name: "accounts" } };
   const fetchAll = async () => {};
   const options = {
     config: { supabaseUrl: "https://example.test" },
     supabase: { createClient() {} },
+    repositories,
     toast() {},
     render() {},
   };
@@ -42,6 +45,12 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
         create(received) {
           calls.push(["auth-client", received]);
           return { id: "auth-client" };
+        },
+      },
+      PropertyDeskRepositoryRegistry: {
+        create(received) {
+          calls.push(["repositories", received]);
+          return repositoryAdapters;
         },
       },
       PropertyDeskWorkspaceTables: { properties: "pd_properties" },
@@ -81,19 +90,22 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[1][0], "state");
   assert.equal(calls[2][0], "auth-client");
   assert.equal(calls[2][1].getClient(), null);
-  assert.equal(calls[3][0], "query");
+  assert.equal(calls[3][0], "repositories");
+  assert.equal(calls[3][1].repositories, repositories);
   assert.equal(calls[3][1].getClient(), null);
-  assert.equal(calls[4][0], "data");
-  assert.equal(calls[4][1].tables, context.window.PropertyDeskWorkspaceTables);
-  assert.equal(calls[4][1].workspaceQuery, workspaceQuery);
-  assert.equal(calls[5][0], "refresh");
-  assert.equal(calls[5][1].state, state);
-  assert.equal(calls[5][1].workspaceData, workspaceData);
-  assert.equal(calls[5][1].toast, options.toast);
-  assert.equal(calls[5][1].render, options.render);
+  assert.equal(calls[4][0], "query");
+  assert.equal(calls[4][1].getClient(), null);
+  assert.equal(calls[5][0], "data");
+  assert.equal(calls[5][1].tables, context.window.PropertyDeskWorkspaceTables);
+  assert.equal(calls[5][1].workspaceQuery, workspaceQuery);
+  assert.equal(calls[6][0], "refresh");
+  assert.equal(calls[6][1].state, state);
+  assert.equal(calls[6][1].workspaceData, workspaceData);
+  assert.equal(calls[6][1].toast, options.toast);
+  assert.equal(calls[6][1].render, options.render);
   assert.equal(runtime.isClientReady(), false);
   assert.equal(runtime.initializeClient(), client);
-  assert.equal(calls[6][0], "create-client");
+  assert.equal(calls[7][0], "create-client");
   assert.equal(calls[2][1].getClient(), client);
   assert.equal(calls[3][1].getClient(), client);
   assert.equal(runtime.getClient(), client);
@@ -103,4 +115,5 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(runtime.fetchAll, fetchAll);
   assert.equal(runtime.workspaceQuery, workspaceQuery);
   assert.equal(runtime.authClient.id, "auth-client");
+  assert.equal(runtime.repositories, repositoryAdapters);
 });

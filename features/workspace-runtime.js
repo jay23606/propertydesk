@@ -2,7 +2,13 @@
 (() => {
   "use strict";
 
-  function createWorkspaceRuntime({ config, supabase, toast, render }) {
+  function createWorkspaceRuntime({
+    config,
+    supabase,
+    repositories,
+    toast,
+    render,
+  }) {
     const backend = window.PropertyDeskBackendClient.create({
       config,
       supabase,
@@ -15,6 +21,10 @@
       return client;
     };
     const authClient = window.PropertyDeskAuthClient.create({
+      getClient,
+    });
+    const repositoryAdapters = window.PropertyDeskRepositoryRegistry.create({
+      repositories,
       getClient,
     });
     const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
@@ -37,6 +47,7 @@
       fetchAll,
       workspaceQuery,
       authClient,
+      repositories: repositoryAdapters,
       getClient,
       initializeClient,
       isClientReady: () => Boolean(client),

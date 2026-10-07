@@ -62,6 +62,7 @@ test("browser feature scripts load after their dependencies", () => {
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const dependencies = [
     ["features/auth-client.js", "features/workspace-runtime.js"],
+    ["features/repository-registry.js", "features/workspace-runtime.js"],
     ["features/auth-client.js", "features/profile-settings.js"],
     ["features/auth-client.js", "features/auth-reset-request.js"],
     ["features/auth-client.js", "features/auth-form.js"],

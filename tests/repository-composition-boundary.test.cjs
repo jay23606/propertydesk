@@ -47,6 +47,10 @@ test("feature workflows receive repository instances from the app composition ro
   assert.deepEqual(directAuthAccess, []);
 
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskRepositoryRegistry\.create\(/);
+  const runtime = fs.readFileSync(
+    path.join(featureDirectory, "workspace-runtime.js"),
+    "utf8",
+  );
+  assert.match(runtime, /PropertyDeskRepositoryRegistry\.create\(/);
   assert.doesNotMatch(app, repositoryFactory);
 });

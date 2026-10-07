@@ -41,17 +41,13 @@
     state,
     fetchAll,
     workspaceQuery,
+    repositories,
     authClient,
-    getClient,
     initializeClient,
     isClientReady,
   } = window.PropertyDeskWorkspaceRuntime.create({
     config: window.PROPERTYDESK_CONFIG || {},
     supabase: window.supabase,
-    toast,
-    render,
-  });
-  const repositories = window.PropertyDeskRepositoryRegistry.create({
     repositories: {
       accounts: window.PropertyDeskAccountRepository,
       accountHistory: window.PropertyDeskAccountHistoryRepository,
@@ -63,7 +59,8 @@
       transactions: window.PropertyDeskTransactionRepository,
       workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
     },
-    getClient,
+    toast,
+    render,
   });
   const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,

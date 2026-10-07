@@ -12,7 +12,7 @@ test("record entry workflow owns forms and their global create actions", () => {
   );
   assert.match(
     app,
-    /PropertyDeskWorkspaceRuntime\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,/,
+    /PropertyDeskWorkspaceRuntime\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,\s*repositories:/,
   );
   assert.doesNotMatch(
     app,
