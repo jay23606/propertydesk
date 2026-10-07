@@ -4,7 +4,13 @@
 
   function createPropertyHolderWorkflow(context) {
     const { savePropertyHolders } =
-      window.PropertyDeskPropertyHolderManagement.create(context);
+      window.PropertyDeskPropertyHolderManagement.create({
+        state: context.state,
+        toast: context.toast,
+        fetchAll: context.fetchAll,
+        openPropertyDetails: context.openPropertyDetails,
+        repository: context.repository,
+      });
     const { attachPropertyHolderEvents } =
       window.PropertyDeskPropertyHolderEvents.create({
         $: context.$,

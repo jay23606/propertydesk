@@ -44,7 +44,15 @@ test("property holder workflow connects saves to its delegated event binder", ()
   const workflow =
     context.window.PropertyDeskPropertyHolderWorkflow.create(dependencies);
 
-  assert.equal(passed.management, dependencies);
+  assert.equal(passed.management.state, dependencies.state);
+  assert.equal(passed.management.toast, dependencies.toast);
+  assert.equal(passed.management.fetchAll, dependencies.fetchAll);
+  assert.equal(
+    passed.management.openPropertyDetails,
+    dependencies.openPropertyDetails,
+  );
+  assert.equal(passed.management.repository, dependencies.repository);
+  assert.equal("$" in passed.management, false);
   assert.equal(passed.events.$, dependencies.$);
   assert.equal(passed.events.savePropertyHolders, savePropertyHolders);
   assert.deepEqual(Object.keys(workflow), ["attachPropertyHolderEvents"]);
