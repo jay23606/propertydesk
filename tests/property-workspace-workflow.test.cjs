@@ -9,8 +9,24 @@ test("property workspace shares detail actions across overview and grid", () => 
   const calls = [];
   const openPropertyDetails = () => "details";
   const detail = { content: {}, management: {} };
-  const overview = { openPropertyPayment() {} };
-  const portfolio = { openPayment() {} };
+  const openPropertyPayment = () => "overview-payment";
+  const openPayment = () => "grid-payment";
+  const state = {};
+  const propertyAddress = () => "address";
+  const lateReminderMailto = () => "reminder";
+  const overview = {
+    state,
+    propertyAddress,
+    openPropertyPayment,
+    unusedDependency: true,
+  };
+  const portfolio = {
+    state,
+    propertyAddress,
+    lateReminderMailto,
+    openPayment,
+    unusedDependency: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyScreenWorkflow: {
@@ -60,10 +76,17 @@ test("property workspace shares detail actions across overview and grid", () => 
     ["detail", "overview", "portfolio"],
   );
   assert.equal(calls[0][1], detail);
+  assert.equal(calls[1][1].state, state);
+  assert.equal(calls[1][1].propertyAddress, propertyAddress);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
+  assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
+  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.equal(calls[2][1].state, state);
+  assert.equal(calls[2][1].propertyAddress, propertyAddress);
+  assert.equal(calls[2][1].lateReminderMailto, lateReminderMailto);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
-  assert.equal(typeof calls[1][1].openPropertyPayment, "function");
-  assert.equal(typeof calls[2][1].openPayment, "function");
+  assert.equal(calls[2][1].openPayment, openPayment);
+  assert.equal("unusedDependency" in calls[2][1], false);
   assert.equal(workspace.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workspace).sort(), [
     "attachOverviewEvents",
