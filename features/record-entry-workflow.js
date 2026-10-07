@@ -44,7 +44,7 @@
         accountPayload,
         accountFormModel,
       });
-    const ledgerEntry = window.PropertyDeskLedgerEntryWorkflow.create({
+    const ledgerEntry = window.PropertyDeskLedgerEntryForms.create({
       ...sharedEntryContext,
       fillSelect,
       prettyType,

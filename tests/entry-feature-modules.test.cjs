@@ -58,16 +58,17 @@ test("record entry forms and global create actions use separate workflows", () =
     ),
     "utf8",
   );
-  const ledgerEntryWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "ledger-entry-workflow.js"),
+  const ledgerEntryForms = fs.readFileSync(
+    path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
     "utf8",
   );
   assert.match(propertyAccountEntry, /PropertyDeskPropertyForm\.create\(/);
   assert.match(propertyAccountEntry, /PropertyDeskAccountForm\.create\(/);
-  assert.match(ledgerEntryWorkflow, /PropertyDeskLedgerEntryForms\.create\(/);
+  assert.match(workflow, /PropertyDeskLedgerEntryForms\.create\(/);
+  assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
   assert.match(
     workflow,
-    /PropertyDeskPropertyAccountEntryWorkflow\.create\([\s\S]*?PropertyDeskLedgerEntryWorkflow\.create\(/,
+    /PropertyDeskPropertyAccountEntryWorkflow\.create\([\s\S]*?PropertyDeskLedgerEntryForms\.create\(/,
   );
   assert.doesNotMatch(workflow, /PropertyDeskCreateActions\.create\(/);
   assert.match(propertyAccountEntry, /repository: context\.accountRepository/);

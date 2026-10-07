@@ -164,7 +164,7 @@ test("recording a loan payment does not invent principal or interest splits", as
     ...ledgerEntryDependencies(context, state),
   });
 
-  feature.attachEvents();
+  feature.attachLedgerEntryFormEvents();
   await handlers.get("payment-form:submit")({ preventDefault() {} });
 
   assert.equal(state.savedPayment.amount, 550);

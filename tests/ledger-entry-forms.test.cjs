@@ -27,7 +27,7 @@ function captureFormSubmissions(getElement, formIds) {
   return { $, handlers };
 }
 
-test("ledger entry workflow publishes an explicit payment and expense interface", () => {
+test("ledger entry forms publish an explicit payment and expense interface", () => {
   const calls = [];
   const passed = {};
   const transactionRepository = { insertPayment() {}, insertExpense() {} };
@@ -113,7 +113,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
   assert.deepEqual(
     Object.keys(forms).sort(),
     [
-      "attachEvents",
+      "attachLedgerEntryFormEvents",
       "openExpense",
       "openPayment",
       "openPropertyPayment",
@@ -180,7 +180,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     passed.expense.finishSuccessfulEntry,
     passed.payment.finishSuccessfulEntry,
   );
-  forms.attachEvents();
+  forms.attachLedgerEntryFormEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
@@ -312,7 +312,12 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     [account, ["openAccountForProperty", "editAccount", "attachEvents"]],
     [
       ledger,
-      ["openPayment", "openPropertyPayment", "openExpense", "attachEvents"],
+      [
+        "openPayment",
+        "openPropertyPayment",
+        "openExpense",
+        "attachLedgerEntryFormEvents",
+      ],
     ],
     [actions, ["attachCreateActionEvents"]],
   ]) {
@@ -470,7 +475,7 @@ test("payment and expense forms report rejected saves without clearing the entri
     ...ledgerEntryDependencies(context),
   });
 
-  forms.attachEvents();
+  forms.attachLedgerEntryFormEvents();
   await assert.doesNotReject(
     handlers.get("payment-form:submit")({ preventDefault() {} }),
   );

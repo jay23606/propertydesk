@@ -79,7 +79,7 @@ test("expense entry saves a property-level contractor expense through the expens
     ...ledgerEntryDependencies(context, state),
   });
 
-  forms.attachEvents();
+  forms.attachLedgerEntryFormEvents();
   await captured.handlers.get("expense-form:submit")({ preventDefault() {} });
 
   assert.deepEqual(JSON.parse(JSON.stringify(state.savedExpense)), {
@@ -132,7 +132,7 @@ test("expense entry requires a rental account before recording a deposit refund"
     ...ledgerEntryDependencies(context),
   });
 
-  forms.attachEvents();
+  forms.attachLedgerEntryFormEvents();
   await captured.handlers.get("expense-form:submit")({ preventDefault() {} });
   assert.deepEqual(calls, [
     "Choose a rental account for a security deposit refund",

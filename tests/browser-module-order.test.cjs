@@ -388,12 +388,11 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-account-entry-workflow.js",
     ],
     ["features/account-form.js", "features/property-account-entry-workflow.js"],
-    ["features/ledger-entry-forms.js", "features/ledger-entry-workflow.js"],
     [
       "features/property-account-entry-workflow.js",
       "features/record-entry-workflow.js",
     ],
-    ["features/ledger-entry-workflow.js", "features/record-entry-workflow.js"],
+    ["features/ledger-entry-forms.js", "features/record-entry-workflow.js"],
     ["features/create-actions.js", "features/create-actions-workflow.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/transaction-corrections.js", "app.js"],

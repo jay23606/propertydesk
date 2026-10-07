@@ -70,7 +70,7 @@
       buildExpenseCorrection,
     });
 
-    function attachEvents() {
+    function attachLedgerEntryFormEvents() {
       payments.attachEvents();
       expenses.attachEvents();
     }
@@ -81,7 +81,7 @@
       openPayment: payments.openPayment,
       openPropertyPayment: payments.openPropertyPayment,
       openExpense: expenses.openExpense,
-      attachEvents,
+      attachLedgerEntryFormEvents,
     };
   }
 

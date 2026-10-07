@@ -66,7 +66,7 @@ test("record-entry feature owns form event bindings and category hints", () => {
 
   propertyForm.attachEvents();
   accountForm.attachEvents();
-  entryForms.attachEvents();
+  entryForms.attachLedgerEntryFormEvents();
   assert.equal(typeof handlers.get("property-form:submit"), "function");
   assert.equal(typeof handlers.get("payment-form:submit"), "function");
   handlers.get("account-type:change")();

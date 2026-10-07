@@ -33,7 +33,7 @@ test("record entry workflow composes forms and exposes their actions and binders
           };
         },
       },
-      PropertyDeskLedgerEntryWorkflow: {
+      PropertyDeskLedgerEntryForms: {
         create(dependencies) {
           passed.ledger = dependencies;
           return {
