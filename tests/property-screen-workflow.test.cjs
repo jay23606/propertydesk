@@ -19,6 +19,7 @@ test("property screen workflow passes detail actions to management and returns b
     toast() {},
     fetchAll() {},
     repository: { kind: "holder-repository" },
+    unusedDependency: true,
   };
   const documents = {
     $() {},
@@ -26,6 +27,7 @@ test("property screen workflow passes detail actions to management and returns b
     toast() {},
     fetchAll() {},
     documentRepository: { kind: "document-repository" },
+    unusedDependency: true,
   };
   const attachPropertyDocumentEvents = () => {};
   const attachPropertyHolderEvents = () => {};
@@ -88,9 +90,11 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[2][1].$, holders.$);
   assert.equal(calls[2][1].repository, holders.repository);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
+  assert.equal("unusedDependency" in calls[2][1], false);
   assert.equal(calls[3][0], "documents");
   assert.equal(calls[3][1].documentRepository, documents.documentRepository);
   assert.equal(calls[3][1].openPropertyDetails, openPropertyDetails);
+  assert.equal("unusedDependency" in calls[3][1], false);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",

@@ -26,12 +26,20 @@
       propertyRepository: management.propertyRepository,
     });
     const propertyHolders = window.PropertyDeskPropertyHolderWorkflow.create({
-      ...holders,
+      $: holders.$,
+      state: holders.state,
+      toast: holders.toast,
+      fetchAll: holders.fetchAll,
+      repository: holders.repository,
       openPropertyDetails: details.openPropertyDetails,
     });
     const propertyDocuments =
       window.PropertyDeskPropertyDocumentManagementWorkflow.create({
-        ...documents,
+        $: documents.$,
+        state: documents.state,
+        toast: documents.toast,
+        fetchAll: documents.fetchAll,
+        documentRepository: documents.documentRepository,
         openPropertyDetails: details.openPropertyDetails,
       });
 
