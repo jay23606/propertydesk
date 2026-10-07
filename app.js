@@ -40,7 +40,7 @@
     backendConfigured,
     state,
     fetchAll,
-    workspaceQuery,
+    loadAllWorkspacePages,
     repositories,
     authClient,
     initializeClient,
@@ -392,7 +392,7 @@
       downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       zipUtils: window.PropertyDeskZipUtils,
       workspaceTables: window.PropertyDeskWorkspaceTables,
-      loadAllPages: workspaceQuery.loadAllPages,
+      loadAllPages: loadAllWorkspacePages,
       isClientReady,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,

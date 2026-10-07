@@ -45,7 +45,7 @@
       backendConfigured: backend.configured,
       state,
       fetchAll,
-      workspaceQuery,
+      loadAllWorkspacePages: workspaceQuery.loadAllPages,
       authClient,
       repositories: repositoryAdapters,
       initializeClient,

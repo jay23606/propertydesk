@@ -112,7 +112,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(runtime.backendConfigured, true);
   assert.equal(runtime.state, state);
   assert.equal(runtime.fetchAll, fetchAll);
-  assert.equal(runtime.workspaceQuery, workspaceQuery);
+  assert.equal(runtime.loadAllWorkspacePages, workspaceQuery.loadAllPages);
   assert.equal(runtime.authClient.id, "auth-client");
   assert.equal(runtime.repositories, repositoryAdapters);
   assert.deepEqual(Object.keys(runtime).sort(), [
@@ -121,8 +121,8 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     "fetchAll",
     "initializeClient",
     "isClientReady",
+    "loadAllWorkspacePages",
     "repositories",
     "state",
-    "workspaceQuery",
   ]);
 });

@@ -29,7 +29,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: workspaceQuery\.loadAllPages,[\s\S]*?\}\);/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?\}\);/,
   );
   assert.match(
     app,
