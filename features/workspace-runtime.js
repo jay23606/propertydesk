@@ -48,7 +48,6 @@
       workspaceQuery,
       authClient,
       repositories: repositoryAdapters,
-      getClient,
       initializeClient,
       isClientReady: () => Boolean(client),
     };
