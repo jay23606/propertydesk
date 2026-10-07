@@ -156,6 +156,9 @@ test("property holder and archive workflows report rejected writes without runni
       fetchAll: async () => assert.fail("a rejected write must not refresh"),
       openPropertyDetails: () =>
         assert.fail("a rejected write must not reopen details"),
+      repository: context.window.PropertyDeskPropertyHolderRepository.create({
+        getClient: () => state.client,
+      }),
     });
   const archive = context.window.PropertyDeskPropertyArchive.create({
     state,
@@ -298,6 +301,9 @@ test("property holder save persists the member IDs supplied by the event layer",
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
     openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
+    repository: context.window.PropertyDeskPropertyHolderRepository.create({
+      getClient: () => state.client,
+    }),
   });
 
   await workflow.savePropertyHolders(["member-1", "member-2"]);

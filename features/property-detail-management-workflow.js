@@ -53,6 +53,9 @@
         toast,
         fetchAll,
         openPropertyDetails,
+        repository: window.PropertyDeskPropertyHolderRepository.create({
+          getClient: () => state.client,
+        }),
       });
     const { attachEvents: attachPropertyHolderEvents } =
       window.PropertyDeskPropertyHolderEvents.create({

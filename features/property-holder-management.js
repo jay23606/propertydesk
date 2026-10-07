@@ -2,15 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    fetchAll,
-    openPropertyDetails,
-    repository = window.PropertyDeskPropertyHolderRepository.create({
-      getClient: () => state.client,
-    }),
-  }) {
+  function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
     async function savePropertyHolders(selectedMemberIds = []) {
       const id = state.selectedPropertyId;
       if (!id) return;

@@ -38,6 +38,12 @@ test("property detail coordinator connects archive, holder, and document actions
           return { savePropertyHolders() {} };
         },
       },
+      PropertyDeskPropertyHolderRepository: {
+        create: ({ getClient }) => {
+          passed.holderRepository = getClient;
+          return { kind: "holder-repository" };
+        },
+      },
       PropertyDeskPropertyHolderEvents: {
         create: (options) => {
           passed.holderEvents = options;
@@ -113,6 +119,8 @@ test("property detail coordinator connects archive, holder, and document actions
     passed.holderManagement.openPropertyDetails,
     openPropertyDetails,
   );
+  assert.equal(passed.holderManagement.repository.kind, "holder-repository");
+  assert.equal(passed.holderRepository(), state.client);
   assert.equal(passed.documents.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.documents.repository.kind, "repository");
   assert.equal(passed.getClient(), state.client);
