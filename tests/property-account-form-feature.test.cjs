@@ -94,6 +94,7 @@ test("property and account maintenance save inserts and updates to their own tab
   const account = context.window.PropertyDeskAccountMaintenance.create({
     state,
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskAccountRepository,
   });
   assert.deepEqual(Object.keys(account), ["saveAccount"]);
 

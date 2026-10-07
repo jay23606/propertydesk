@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    repository = window.PropertyDeskAccountRepository,
-  }) {
+  function create({ state, toast, repository }) {
     function saveAccount(payload, accountId) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () => repository.save(state.client, payload, accountId),

@@ -24,7 +24,11 @@
       openModal,
     });
     const { saveAccount: persistAccount } =
-      window.PropertyDeskAccountMaintenance.create({ state, toast });
+      window.PropertyDeskAccountMaintenance.create({
+        state,
+        toast,
+        repository: window.PropertyDeskAccountRepository,
+      });
     const { resetAccountForm, readValues, editAccount } = formView;
     const { openAccountForProperty } =
       window.PropertyDeskPropertyAccountAction.create({
