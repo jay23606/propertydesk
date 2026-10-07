@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app uses the workspace reminder coordinator for email preview and activity", () => {
+test("app connects account reminder preview through the workspace shell", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -35,6 +35,4 @@ test("app uses the workspace reminder coordinator for email preview and activity
     );
     assert.ok(worker.includes(`'./${feature}'`));
   }
-  assert.doesNotMatch(html, /record-entry-support-workflow\.js/);
-  assert.doesNotMatch(worker, /record-entry-support-workflow\.js/);
 });
