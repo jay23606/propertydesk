@@ -20,6 +20,7 @@
         todayIso,
         toast,
         fetchAll,
+        repository: window.PropertyDeskDepositRepository,
       });
     const { recordDepositAdjustment } =
       window.PropertyDeskDepositAdjustmentEntry.create({

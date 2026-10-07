@@ -122,6 +122,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
     fetchAll: async () => {
       refreshes += 1;
     },
+    repository: context.window.PropertyDeskDepositRepository,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,
@@ -270,6 +271,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
+    repository: context.window.PropertyDeskDepositRepository,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,

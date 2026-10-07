@@ -100,6 +100,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
 test("account and deposit coordinator wires entry actions to workspace details", () => {
   const passed = {};
   const repository = { close() {} };
+  const depositRepository = { insert() {} };
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
   const attachDepositEvents = () => {};
@@ -115,6 +116,7 @@ test("account and deposit coordinator wires entry actions to workspace details",
   const context = vm.createContext({
     window: {
       PropertyDeskAccountRepository: repository,
+      PropertyDeskDepositRepository: depositRepository,
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.depositMaintenance = options;
@@ -173,6 +175,7 @@ test("account and deposit coordinator wires entry actions to workspace details",
     );
 
   assert.equal(passed.depositMaintenance.state, dependencies.state);
+  assert.equal(passed.depositMaintenance.repository, depositRepository);
   assert.equal(
     passed.depositEntry.saveDepositAdjustment,
     saveDepositAdjustment,

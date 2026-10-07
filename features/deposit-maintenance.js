@@ -16,7 +16,7 @@
     toast,
     fetchAll,
     prepareAdjustment = window.PropertyDeskDepositAdjustmentModel.prepare,
-    repository = window.PropertyDeskDepositRepository,
+    repository,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {
       const account = state.accounts.find((row) => row.id === accountId);
