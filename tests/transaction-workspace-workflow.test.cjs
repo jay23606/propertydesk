@@ -89,7 +89,5 @@ test("transaction workspace shares corrections and entry actions across its flow
     "openPayment",
     "openPropertyPayment",
     "renderPayments",
-    "resetPropertyForm",
-    "updatePaymentGuidance",
   ]);
 });

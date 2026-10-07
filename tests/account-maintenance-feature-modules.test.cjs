@@ -105,10 +105,7 @@ test("account screen workflow shares its deposit renderer with adjustment events
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",
     "attachDepositEvents",
-    "closeAccount",
-    "depositSectionHTML",
     "openAccountDetails",
-    "recordDepositAdjustment",
   ]);
 });
 

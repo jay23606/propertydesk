@@ -24,10 +24,8 @@
     });
 
     return {
-      resetPropertyForm: entry.resetPropertyForm,
       editAccount: entry.editAccount,
       openAccountForProperty: entry.openAccountForProperty,
-      updatePaymentGuidance: entry.updatePaymentGuidance,
       openPayment: entry.openPayment,
       openPropertyPayment: entry.openPropertyPayment,
       openExpense: entry.openExpense,
