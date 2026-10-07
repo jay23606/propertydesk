@@ -347,25 +347,13 @@
       todayIso,
       toast,
     });
-  const {
-    showConfigError,
-    setAuthMode,
-    handleAuthStateChange,
-    restoreAuthSession,
-    attachEvents: attachAuthEvents,
-  } = window.PropertyDeskAuth.create({ $, state, fetchAll, toast });
-  appLifecycle = window.PropertyDeskAppLifecycle.create({
+  appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,
     state,
     backend,
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
-    auth: {
-      setAuthMode,
-      showConfigError,
-      handleAuthStateChange,
-      restoreAuthSession,
-    },
+    authContext: { $, state, fetchAll, toast },
     renderers: [
       updateGreeting,
       renderOverview,
@@ -373,7 +361,7 @@
       renderPayments,
       renderReports,
     ],
-    eventBinders: [
+    eventBindersBeforeAuth: [
       attachModalEvents,
       attachThemeEvents,
       attachNavigationEvents,
@@ -394,7 +382,8 @@
       attachPropertyHolderEvents,
       attachPropertyQuickActionEvents,
       attachPropertyDocumentEvents,
-      attachAuthEvents,
+    ],
+    eventBindersAfterAuth: [
       attachImportPreviewEvents,
       attachAccountImportEvents,
       attachPaymentImportEvents,

@@ -31,7 +31,7 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
   );
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
   );
   for (const script of [
     "features/workspace.js",

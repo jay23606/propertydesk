@@ -21,7 +21,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   );
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
 
   for (const feature of [

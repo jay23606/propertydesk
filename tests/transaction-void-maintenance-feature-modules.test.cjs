@@ -135,7 +135,7 @@ test("app composes transaction history through its maintenance coordinator", () 
   assert.match(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,
   );
   assert.doesNotMatch(app, /function attachTransactionEvents\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);

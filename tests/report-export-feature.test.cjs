@@ -70,7 +70,7 @@ test("app delegates Reports rendering and export composition to its workflow", (
     /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
   );
   assert.match(app, /renderers:[\s\S]*?renderReports/);
-  assert.match(app, /eventBinders:[\s\S]*?attachReportExportEvents/);
+  assert.match(app, /eventBindersAfterAuth:[\s\S]*?attachReportExportEvents/);
 });
 
 test("Reports workflow composes calculation, view, and export modules", () => {

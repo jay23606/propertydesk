@@ -169,7 +169,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
     /PropertyDeskOverviewModel.create\(\{\s*state,\s*propertySummaryModel,[\s\S]*?postedOnOrAfter,/,
   );
   assert.match(app, /renderers:[\s\S]*?renderOverview/);
-  assert.match(app, /eventBinders:[\s\S]*?attachOverviewEvents/);
+  assert.match(app, /eventBindersBeforeAuth:[\s\S]*?attachOverviewEvents/);
   const script = "features/overview-workflow.js";
   assert.ok(
     html.indexOf(script) < html.indexOf("app.js"),

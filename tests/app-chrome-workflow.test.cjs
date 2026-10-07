@@ -12,7 +12,7 @@ test("device-local theme controls remain independent at the app root", () => {
   assert.match(app, /PropertyDeskTheme\.create\(\)/);
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
   );
   assert.match(app, /attachEvents: attachThemeEvents/);
   assert.doesNotMatch(app, /PropertyDeskAppChromeWorkflow/);

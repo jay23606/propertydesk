@@ -42,7 +42,7 @@ test("app delegates account closure and deposit adjustments to one workflow", ()
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });

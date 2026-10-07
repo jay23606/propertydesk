@@ -244,7 +244,7 @@ test("app composes property detail content, actions, and document routes", () =>
     assert.match(workflow, new RegExp(`${feature}\\.create\\(`));
   assert.match(
     app,
-    /eventBinders:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,
+    /eventBindersBeforeAuth:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,
   );
   assert.match(app, /attachPropertyQuickActionEvents/);
 });

@@ -256,6 +256,8 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/reminder-preview.js", "features/workspace-reminder-workflow.js"],
     ["features/workspace.js", "features/workspace-navigation-workflow.js"],
     ["features/navigation.js", "features/workspace-navigation-workflow.js"],
+    ["features/auth.js", "features/app-startup-workflow.js"],
+    ["features/app-lifecycle.js", "features/app-startup-workflow.js"],
     [
       "features/import-correction-view.js",
       "features/import-preview-rendering.js",
