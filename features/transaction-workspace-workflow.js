@@ -24,8 +24,6 @@
       prettyType: entryContext.prettyType,
       openModal: entryContext.openModal,
       previewReminderEmail: entryContext.previewReminderEmail,
-      navigate: entryContext.navigate,
-      documentRef: entryContext.documentRef,
       propertyRepository: entryContext.propertyRepository,
       accountRepository: entryContext.accountRepository,
       accountPayload: entryContext.accountPayload,

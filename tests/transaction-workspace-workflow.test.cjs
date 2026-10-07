@@ -20,6 +20,8 @@ test("transaction workspace shares corrections and entry actions across its flow
     propertyRepository: {},
     accountPayload: () => {},
     accountFormModel: {},
+    navigate() {},
+    documentRef: {},
     unusedDependency: true,
   };
   const screen = { state: {} };
@@ -89,6 +91,8 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[1][1].propertyRepository, entry.propertyRepository);
   assert.equal(calls[1][1].accountPayload, entry.accountPayload);
   assert.equal(calls[1][1].accountFormModel, entry.accountFormModel);
+  assert.equal("navigate" in calls[1][1], false);
+  assert.equal("documentRef" in calls[1][1], false);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].saveCorrection, saveCorrection);
   assert.equal(calls[2][0], "create-actions");
@@ -96,6 +100,8 @@ test("transaction workspace shares corrections and entry actions across its flow
   assert.equal(calls[2][1].openExpense, openExpense);
   assert.equal(calls[2][1].openAccountForProperty, openAccountForProperty);
   assert.equal(calls[2][1].resetPropertyForm, resetPropertyForm);
+  assert.equal(calls[2][1].navigate, entry.navigate);
+  assert.equal(calls[2][1].documentRef, entry.documentRef);
   assert.equal(calls[3][0], "screen");
   assert.equal(calls[3][1].state, screen.state);
   assert.equal(
