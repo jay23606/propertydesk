@@ -258,56 +258,25 @@
       openModal,
       propertyAddress,
     });
-  const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create({
+  const {
+    attachPropertyDetailEvents,
+    attachPropertyQuickActionEvents,
+    attachPropertyHolderEvents,
+    attachPropertyDocumentEvents,
+  } = window.PropertyDeskPropertyDetailManagementWorkflow.create({
+    $,
     state,
     toast,
     fetchAll,
     todayIso,
     openPropertyDetails,
+    closeModal,
+    editAccount,
+    openAccountDetails,
+    openPayment,
+    openExpense,
+    openAccountForProperty,
   });
-  const { attachEvents: attachPropertyDetailEvents } =
-    window.PropertyDeskPropertyDetailEvents.create({
-      $,
-      state,
-      closeModal,
-      editAccount,
-      openAccountDetails,
-    });
-  const { attachEvents: attachPropertyQuickActionEvents } =
-    window.PropertyDeskPropertyDetailQuickActions.create({
-      $,
-      state,
-      closeModal,
-      openPayment,
-      openExpense,
-      openAccountForProperty,
-      toggleArchiveProperty,
-    });
-  const { savePropertyHolders } =
-    window.PropertyDeskPropertyHolderManagement.create({
-      state,
-      toast,
-      fetchAll,
-      openPropertyDetails,
-    });
-  const { attachEvents: attachPropertyHolderEvents } =
-    window.PropertyDeskPropertyHolderEvents.create({ $, savePropertyHolders });
-  const propertyDocuments = window.PropertyDeskDocuments.create({
-    state,
-    toast,
-    fetchAll,
-    openPropertyDetails,
-    repository: window.PropertyDeskDocumentRepository.create(
-      () => state.client,
-    ),
-  });
-  const { attachEvents: attachPropertyDocumentEvents } =
-    window.PropertyDeskPropertyDetailDocumentEvents.create({
-      $,
-      uploadPropertyDocument: propertyDocuments.uploadPropertyDocument,
-      deletePropertyDocument: propertyDocuments.deletePropertyDocument,
-      openPropertyDocument: propertyDocuments.openPropertyDocument,
-    });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({
       $,

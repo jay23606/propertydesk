@@ -85,17 +85,11 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
   assert.match(app, /PropertyDeskPropertyDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyArchive\.create\(/);
-  assert.match(app, /PropertyDeskPropertyDetailEvents\.create\(/);
-  assert.match(app, /PropertyDeskPropertyDetailQuickActions\.create\(/);
-  assert.match(app, /PropertyDeskPropertyHolderManagement\.create\(/);
-  assert.match(app, /PropertyDeskPropertyHolderEvents\.create\(/);
-  assert.match(app, /PropertyDeskDocuments\.create\(/);
-  assert.match(app, /PropertyDeskDocumentRepository\.create\(/);
-  assert.match(app, /PropertyDeskPropertyDetailDocumentEvents\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailManagementWorkflow\.create\(/);
+  assert.match(app, /attachPropertyHolderEvents/);
   assert.match(app, /attachPropertyDetailEvents/);
   assert.match(app, /attachPropertyQuickActionEvents/);
-  assert.match(app, /PropertyDeskPropertyHolderManagement\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailManagementWorkflow\.create\(/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
@@ -134,11 +128,7 @@ test("app root composes independent property screens and shares detail actions",
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
     "PropertyDeskPropertyDetailContentWorkflow.create(",
-    "PropertyDeskPropertyArchive.create(",
-    "PropertyDeskPropertyDetailEvents.create(",
-    "PropertyDeskPropertyDetailQuickActions.create(",
-    "PropertyDeskPropertyHolderManagement.create(",
-    "PropertyDeskPropertyDetailDocumentEvents.create(",
+    "PropertyDeskPropertyDetailManagementWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
@@ -153,14 +143,7 @@ test("app root composes independent property screens and shares detail actions",
   );
   for (const script of [
     "features/property-detail-content-workflow.js",
-    "features/property-archive.js",
-    "features/property-detail-events.js",
-    "features/property-detail-quick-actions.js",
-    "features/property-holder-management.js",
-    "features/property-holder-events.js",
-    "features/documents.js",
-    "features/document-repository.js",
-    "features/property-detail-document-events.js",
+    "features/property-detail-management-workflow.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview.js",

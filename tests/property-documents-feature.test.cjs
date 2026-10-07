@@ -86,19 +86,18 @@ test("app connects private document actions to their detail event router", () =>
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  const documents = app.indexOf("PropertyDeskDocuments.create(");
-  const repository = app.indexOf("PropertyDeskDocumentRepository.create(");
-  const events = app.indexOf(
-    "PropertyDeskPropertyDetailDocumentEvents.create(",
-  );
-  assert.ok(documents >= 0 && documents < repository && repository < events);
-  assert.match(
-    app,
-    /repository: window\.PropertyDeskDocumentRepository\.create\(\s*\(\) => state\.client,/,
+  assert.match(app, /PropertyDeskPropertyDetailManagementWorkflow\.create\(/);
+  const workflow = fs.readFileSync(
+    path.join(root, "features", "property-detail-management-workflow.js"),
+    "utf8",
   );
   assert.match(
-    app,
-    /PropertyDeskPropertyDetailDocumentEvents.create\(\{[\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
+    workflow,
+    /PropertyDeskDocuments\.create\([\s\S]*?repository: window\.PropertyDeskDocumentRepository\.create\(/,
+  );
+  assert.match(
+    workflow,
+    /PropertyDeskPropertyDetailDocumentEvents\.create\([\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
   );
   assert.match(app, /attachPropertyDocumentEvents/);
   assert.equal(

@@ -210,6 +210,38 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-maintenance-workflow.js",
     ],
     [
+      "features/property-archive.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/property-detail-events.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/property-detail-quick-actions.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/property-holder-management.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/property-holder-events.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/documents.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/document-repository.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
+      "features/property-detail-document-events.js",
+      "features/property-detail-management-workflow.js",
+    ],
+    [
       "features/import-correction-view.js",
       "features/import-preview-rendering.js",
     ],

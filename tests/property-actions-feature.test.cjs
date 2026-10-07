@@ -212,11 +212,7 @@ test("app composes property detail content, actions, and document routes", () =>
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const order = [
     "PropertyDeskPropertyDetailContentWorkflow.create(",
-    "PropertyDeskPropertyArchive.create(",
-    "PropertyDeskPropertyDetailEvents.create(",
-    "PropertyDeskPropertyDetailQuickActions.create(",
-    "PropertyDeskPropertyHolderManagement.create(",
-    "PropertyDeskPropertyDetailDocumentEvents.create(",
+    "PropertyDeskPropertyDetailManagementWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -225,35 +221,30 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /PropertyDeskDocuments.create\(\{[\s\S]*?openPropertyDetails,[\s\S]*?repository: window\.PropertyDeskDocumentRepository\.create\(/,
+    /PropertyDeskPropertyDetailManagementWorkflow\.create\(\{[\s\S]*?openPropertyDetails,[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openAccountDetails,[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?openAccountForProperty,/,
   );
-  assert.match(
-    app,
-    /PropertyDeskPropertyDetailDocumentEvents.create\(\{[\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
+  const workflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-detail-management-workflow.js",
+    ),
+    "utf8",
   );
-  assert.match(
-    app,
-    /PropertyDeskPropertyArchive\.create\(\{[\s\S]*?openPropertyDetails,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskPropertyDetailEvents\.create\(\{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openAccountDetails,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskPropertyDetailQuickActions\.create\(\{[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?openAccountForProperty,[\s\S]*?toggleArchiveProperty,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskPropertyHolderEvents\.create\(\{\s*\$,\s*savePropertyHolders\s*\}\)/,
-  );
+  for (const feature of [
+    "PropertyDeskPropertyArchive",
+    "PropertyDeskPropertyDetailEvents",
+    "PropertyDeskPropertyDetailQuickActions",
+    "PropertyDeskPropertyHolderManagement",
+    "PropertyDeskPropertyHolderEvents",
+    "PropertyDeskDocuments",
+    "PropertyDeskPropertyDetailDocumentEvents",
+  ])
+    assert.match(workflow, new RegExp(`${feature}\\.create\\(`));
   assert.match(
     app,
     /eventBinders:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,
   );
-  assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskPropertyDetailActionsWorkflow\.create\(/,
-  );
+  assert.match(app, /attachPropertyQuickActionEvents/);
 });
