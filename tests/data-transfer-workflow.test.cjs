@@ -35,7 +35,7 @@ test("app wires CSV import and private backup workspace workflow independently",
     app,
     /attachImportPreviewEvents,\s*attachAccountImportEvents,\s*attachPaymentImportEvents,\s*attachExpenseImportEvents,/,
   );
-  assert.match(app, /attachEvents: attachExportEvents/);
+  assert.match(app, /attachBackupEvents: attachExportEvents/);
   assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
 
   for (const script of [

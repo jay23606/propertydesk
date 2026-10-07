@@ -130,7 +130,8 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     calls.exporter.documentRepository,
     dependencies.documentRepository,
   );
-  assert.equal(workflow.attachEvents, attachEvents);
+  assert.equal(workflow.attachBackupEvents, attachEvents);
+  assert.deepEqual(Object.keys(workflow), ["attachBackupEvents"]);
 });
 
 test("backup agreement collector downloads only workspace-scoped files into the archive manifest", async () => {

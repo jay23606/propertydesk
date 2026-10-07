@@ -384,7 +384,7 @@
     toast,
     repository: repositories.imports,
   });
-  const { attachEvents: attachExportEvents } =
+  const { attachBackupEvents: attachExportEvents } =
     window.PropertyDeskBackupWorkspaceWorkflow.create({
       $,
       state,
