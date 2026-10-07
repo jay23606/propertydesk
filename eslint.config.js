@@ -26,4 +26,16 @@ module.exports = [
       "no-unused-vars": "error",
     },
   },
+  {
+    files: ["supabase/functions/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: globals.browser,
+    },
+    rules: {
+      "no-undef": "error",
+      "no-unused-vars": "error",
+    },
+  },
 ];
