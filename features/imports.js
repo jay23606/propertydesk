@@ -32,6 +32,9 @@
         fetchAll,
         status: $("import-status"),
         toast,
+        repository: window.PropertyDeskImportRepository.create({
+          getClient: () => state.client,
+        }),
       });
     const importReview = window.PropertyDeskImportReview.create({
       stageImport: importPreview.stageImport,

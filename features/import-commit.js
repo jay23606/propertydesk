@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function createImportCommit({ state, fetchAll, status, toast }) {
-    const repository = window.PropertyDeskImportRepository.create({
-      getClient: () => state.client,
-    });
-
+  function createImportCommit({ fetchAll, status, toast, repository }) {
     async function finish({ data, fallbackCount, total, label, toastMessage }) {
       await fetchAll();
       const imported = Number(data?.rows_accepted ?? fallbackCount);

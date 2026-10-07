@@ -12,7 +12,10 @@ function loadCommitFeature() {
       context,
     );
   }
-  return context.window.PropertyDeskImportCommit;
+  return {
+    commit: context.window.PropertyDeskImportCommit,
+    repository: context.window.PropertyDeskImportRepository,
+  };
 }
 
 test("account and transaction imports share the commit refresh and result reporting", async () => {
@@ -23,15 +26,16 @@ test("account and transaction imports share the commit refresh and result report
     textContent: "",
     classList: { add: (name) => refreshes.push(name) },
   };
-  const commit = loadCommitFeature().create({
-    state: {
-      client: {
-        async rpc(name, args) {
-          rpcCalls.push({ name, args });
-          return { data: { rows_accepted: 1 }, error: null };
-        },
-      },
+  const client = {
+    async rpc(name, args) {
+      rpcCalls.push({ name, args });
+      return { data: { rows_accepted: 1 }, error: null };
     },
+  };
+  const { commit: feature, repository } = loadCommitFeature();
+  const commit = feature.create({
+    state: { client },
+    repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshes.push("workspace refreshed"),
     status,
     toast: (message) => messages.push(message),
@@ -83,14 +87,15 @@ test("account and transaction imports share the commit refresh and result report
 test("failed import commits do not refresh or report success", async () => {
   const messages = [];
   let refreshCount = 0;
-  const commit = loadCommitFeature().create({
-    state: {
-      client: {
-        async rpc() {
-          return { data: null, error: new Error("database offline") };
-        },
-      },
+  const client = {
+    async rpc() {
+      return { data: null, error: new Error("database offline") };
     },
+  };
+  const { commit: feature, repository } = loadCommitFeature();
+  const commit = feature.create({
+    state: { client },
+    repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshCount++,
     status: { textContent: "", classList: { add() {} } },
     toast: (message) => messages.push(message),

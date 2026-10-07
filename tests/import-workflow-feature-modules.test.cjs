@@ -27,6 +27,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       PropertyDeskImportCommit: {
         create: () => ({ commitAccounts() {}, commitTransactions() {} }),
       },
+      PropertyDeskImportRepository: { create: () => ({}) },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
     },
   });
@@ -103,7 +104,16 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       },
       PropertyDeskAccountImportPayload: { build() {} },
       PropertyDeskImportCommit: {
-        create: () => ({ commitAccounts() {}, commitTransactions() {} }),
+        create: (options) => {
+          passed.commit = options;
+          return { commitAccounts() {}, commitTransactions() {} };
+        },
+      },
+      PropertyDeskImportRepository: {
+        create: (options) => {
+          passed.importRepository = options;
+          return { kind: "import-repository" };
+        },
       },
       PropertyDeskTransactionImportWorkflow: { create() {} },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
@@ -156,6 +166,8 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachPaymentEvents",
     "attachExpenseEvents",
   ]);
+  assert.equal(passed.commit.repository.kind, "import-repository");
+  assert.equal(passed.importRepository.getClient(), dependencies.state.client);
   assert.deepEqual(
     Object.keys(passed.account).sort(),
     [
