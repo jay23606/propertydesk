@@ -307,20 +307,30 @@
       openModal,
       propertyAddress,
     });
-  const { attachPropertyDetailEvents, attachPropertyQuickActionEvents } =
-    window.PropertyDeskPropertyDetailActionsWorkflow.create({
+  const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create({
+    state,
+    toast,
+    fetchAll,
+    todayIso,
+    openPropertyDetails,
+  });
+  const { attachEvents: attachPropertyDetailEvents } =
+    window.PropertyDeskPropertyDetailEvents.create({
       $,
       state,
-      toast,
-      fetchAll,
-      todayIso,
-      openPropertyDetails,
       closeModal,
       editAccount,
+      openAccountDetails,
+    });
+  const { attachEvents: attachPropertyQuickActionEvents } =
+    window.PropertyDeskPropertyDetailQuickActions.create({
+      $,
+      state,
+      closeModal,
       openPayment,
       openExpense,
       openAccountForProperty,
-      openAccountDetails,
+      toggleArchiveProperty,
     });
   const { savePropertyHolders } =
     window.PropertyDeskPropertyHolderManagement.create({

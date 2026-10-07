@@ -212,7 +212,9 @@ test("app composes property detail content, actions, and document routes", () =>
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const order = [
     "PropertyDeskPropertyDetailContentWorkflow.create(",
-    "PropertyDeskPropertyDetailActionsWorkflow.create(",
+    "PropertyDeskPropertyArchive.create(",
+    "PropertyDeskPropertyDetailEvents.create(",
+    "PropertyDeskPropertyDetailQuickActions.create(",
     "PropertyDeskPropertyHolderManagement.create(",
     "PropertyDeskPropertyDetailDocumentEvents.create(",
   ].map((marker) => app.indexOf(marker));
@@ -231,7 +233,15 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /attachPropertyDetailEvents,\s*attachPropertyQuickActionEvents\s*\}/,
+    /PropertyDeskPropertyArchive\.create\(\{[\s\S]*?openPropertyDetails,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyDetailEvents\.create\(\{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openAccountDetails,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyDetailQuickActions\.create\(\{[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?openAccountForProperty,[\s\S]*?toggleArchiveProperty,/,
   );
   assert.match(
     app,
@@ -242,64 +252,8 @@ test("app composes property detail content, actions, and document routes", () =>
     /eventBinders:[\s\S]*?attachPropertyDetailEvents,\s*attachPropertyHolderEvents,\s*attachPropertyQuickActionEvents,\s*attachPropertyDocumentEvents/,
   );
   assert.doesNotMatch(app, /PropertyDeskPropertyDetailsWorkflow\.create\(/);
-});
-
-test("property detail actions workflow composes archive and modal actions", () => {
-  const passed = {};
-  const action = () => {};
-  const attachCalls = [];
-  const context = vm.createContext({
-    window: {
-      PropertyDeskPropertyArchive: {
-        create: () => ({ toggleArchiveProperty: action }),
-      },
-      PropertyDeskPropertyDetailEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: () => attachCalls.push("content") };
-        },
-      },
-      PropertyDeskPropertyDetailQuickActions: {
-        create: (options) => {
-          passed.quickActions = options;
-          return {
-            attachEvents: () =>
-              attachCalls.push(passed.quickActions.toggleArchiveProperty),
-          };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "property-detail-actions-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskPropertyDetailActionsWorkflow\.create\(/,
   );
-  const quickActionDependencies = {
-    state: {},
-    closeModal: action,
-    openPayment: action,
-    openExpense: action,
-    openAccountForProperty: action,
-  };
-  const workflow =
-    context.window.PropertyDeskPropertyDetailActionsWorkflow.create(
-      quickActionDependencies,
-    );
-
-  assert.equal(passed.quickActions.openPayment, action);
-  assert.equal(passed.quickActions.openExpense, action);
-  assert.equal(passed.quickActions.openAccountForProperty, action);
-  assert.equal(passed.quickActions.toggleArchiveProperty, action);
-  assert.equal(Object.hasOwn(workflow, "editPropertyQuickNote"), false);
-  workflow.attachPropertyDetailEvents();
-  workflow.attachPropertyQuickActionEvents();
-  assert.deepEqual(attachCalls, ["content", action]);
 });
