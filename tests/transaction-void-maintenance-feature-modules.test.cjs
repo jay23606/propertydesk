@@ -163,7 +163,7 @@ test("app composes transaction history and actions through its screen workflow",
   assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);
 });
 
-test("transaction maintenance voids a posted row with an audit reason", async () => {
+test("transaction void maintenance voids a posted row with an audit reason", async () => {
   const context = vm.createContext({
     window: {},
     Event: class MockEvent {},
@@ -240,7 +240,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   assert.equal(refreshes, 1);
 });
 
-test("transaction maintenance rejects unsupported kinds before prompting or writing", async () => {
+test("transaction void maintenance rejects unsupported kinds before prompting or writing", async () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
@@ -275,7 +275,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
   assert.deepEqual(messages, ["This transaction type can't be voided"]);
 });
 
-test("transaction maintenance reports rejected void requests without refreshing", async () => {
+test("transaction void maintenance reports rejected requests without refreshing", async () => {
   const context = vm.createContext({
     window: {},
     Event: class MockEvent {},
@@ -345,7 +345,7 @@ test("transaction maintenance reports rejected void requests without refreshing"
   ]);
 });
 
-test("transaction maintenance reports returned database errors without refreshing", async () => {
+test("transaction void maintenance reports database errors without refreshing", async () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
@@ -376,7 +376,7 @@ test("transaction maintenance reports returned database errors without refreshin
   assert.deepEqual(messages, ["Permission denied"]);
 });
 
-test("transaction maintenance reports an already-changed row without refreshing", async () => {
+test("transaction void maintenance reports an already-changed row without refreshing", async () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
