@@ -20,14 +20,20 @@
     } = context;
     const { propertyDocumentsHTML } =
       window.PropertyDeskPropertyDocumentsView.create({ fmtDate, esc });
-    const { propertyDetailsHTML } =
-      window.PropertyDeskPropertyDetailsView.create({
+    const { propertyAccountsHTML } =
+      window.PropertyDeskPropertyDetailsAccountTable.create({
         money,
         esc,
         prettyType,
         paymentFrequencyLabel,
         accountBalance,
+      });
+    const { propertyDetailsHTML } =
+      window.PropertyDeskPropertyDetailsView.create({
+        money,
+        esc,
         propertyDocumentsHTML,
+        propertyAccountsHTML,
       });
     const { renderPropertyActivity } =
       window.PropertyDeskPropertyActivityDetails.create({

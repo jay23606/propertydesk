@@ -228,6 +228,14 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-documents-view.js",
       "features/property-details-view.js",
     ],
+    [
+      "features/property-details-account-table.js",
+      "features/property-details-view.js",
+    ],
+    [
+      "features/property-details-account-table.js",
+      "features/property-detail-content-workflow.js",
+    ],
     ["features/property-activity-details.js", "features/property-details.js"],
     ["features/property-details-view.js", "features/property-details.js"],
     ["features/documents.js", "features/property-document-workflow.js"],

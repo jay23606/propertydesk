@@ -64,6 +64,7 @@ test("opening a property delegates modal markup and preserves scoped details", (
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "property-documents-view.js",
+    "property-details-account-table.js",
     "property-details-view.js",
     "property-details-model.js",
     "property-details.js",
@@ -119,8 +120,26 @@ test("opening a property delegates modal markup and preserves scoped details", (
       ),
     prettyType: (value) => value,
     paymentFrequencyLabel: () => "Monthly",
-    accountBalance: () => 9000,
     propertyDocumentsHTML: documentsView.propertyDocumentsHTML,
+    propertyAccountsHTML:
+      context.window.PropertyDeskPropertyDetailsAccountTable.create({
+        money: (value) => `$${Number(value).toFixed(2)}`,
+        esc: (value) =>
+          String(value ?? "").replace(
+            /[&<>"']/g,
+            (char) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[char],
+          ),
+        prettyType: (value) => value,
+        paymentFrequencyLabel: () => "Monthly",
+        accountBalance: () => 9000,
+      }).propertyAccountsHTML,
   });
   const state = {
     auditRequestId: 0,

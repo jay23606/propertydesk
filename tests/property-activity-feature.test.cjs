@@ -137,6 +137,7 @@ test("property detail content workflow connects activity summaries to property r
   let viewContext;
   let activityContext;
   let modelContext;
+  let accountTableContext;
   const renderPropertyActivity = () => "activity";
   const propertyDetailsHTML = () => "property details html";
   const propertyDocumentsHTML = () => "documents html";
@@ -146,6 +147,12 @@ test("property detail content workflow connects activity summaries to property r
         create: (options) => {
           viewContext = options;
           return { propertyDocumentsHTML };
+        },
+      },
+      PropertyDeskPropertyDetailsAccountTable: {
+        create: (options) => {
+          accountTableContext = options;
+          return { propertyAccountsHTML: () => "accounts html" };
         },
       },
       PropertyDeskPropertyDetailsView: {
@@ -211,9 +218,7 @@ test("property detail content workflow connects activity summaries to property r
   const detailsViewDependencies = {
     money: detailsDependencies.money,
     esc: detailsDependencies.esc,
-    prettyType: detailsDependencies.prettyType,
-    paymentFrequencyLabel: detailsDependencies.paymentFrequencyLabel,
-    accountBalance: detailsDependencies.accountBalance,
+    propertyAccountsHTML: viewContext.details.propertyAccountsHTML,
   };
   assert.deepEqual(
     Object.keys(viewContext.details).sort(),
@@ -222,6 +227,11 @@ test("property detail content workflow connects activity summaries to property r
   assert.equal(
     viewContext.details.propertyDocumentsHTML,
     propertyDocumentsHTML,
+  );
+  assert.equal(accountTableContext.money, detailsDependencies.money);
+  assert.equal(
+    accountTableContext.accountBalance,
+    detailsDependencies.accountBalance,
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
