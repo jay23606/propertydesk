@@ -44,6 +44,12 @@ test("workspace workflow owns profile display alongside profile settings", () =>
           };
         },
       },
+      PropertyDeskWorkspaceMemberRepository: {
+        create(options) {
+          passed.memberRepository = options;
+          return { kind: "member-repository" };
+        },
+      },
       PropertyDeskWorkspaceMembers: {
         create(options) {
           passed.members = options;
@@ -70,6 +76,8 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   assert.equal(passed.profileDisplay.state, state);
   assert.equal(passed.profileSettings.updateGreeting, updateGreeting);
   assert.equal(passed.profileSettings.state, state);
+  assert.equal(passed.members.repository.kind, "member-repository");
+  assert.equal(passed.memberRepository.getClient(), state.client);
   assert.equal(typeof passed.profileSettingsView.$, "function");
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();

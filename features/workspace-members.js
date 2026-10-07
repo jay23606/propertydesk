@@ -8,12 +8,9 @@
     fetchAll,
     view,
     refreshWorkspaceSettings,
+    repository,
     confirmAction = (message) => window.confirm(message),
   }) {
-    const repository = window.PropertyDeskWorkspaceMemberRepository.create({
-      getClient: () => state.client,
-    });
-
     async function addWorkspaceMember(email) {
       if (!email) return;
       const saved = await window.PropertyDeskRepositoryWriteFeedback.run({

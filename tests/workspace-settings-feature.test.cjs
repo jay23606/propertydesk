@@ -70,6 +70,9 @@ test("adding a workspace member clears the address only after successful refresh
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
     refreshWorkspaceSettings: () => calls.push(["render-reminders"]),
+    repository: context.window.PropertyDeskWorkspaceMemberRepository.create({
+      getClient: () => state.client,
+    }),
   });
 
   assert.deepEqual(Object.keys(feature).sort(), [
@@ -104,13 +107,14 @@ test("adding a workspace member keeps the address when refresh fails", async () 
       });
     return elements.get(id);
   };
+  const state = {
+    client: { rpc: async () => ({ error: null }) },
+    workspaceMembers: [],
+    user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
+    workspaceOwnerId: "owner-1",
+  };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    state: {
-      client: { rpc: async () => ({ error: null }) },
-      workspaceMembers: [],
-      user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
-      workspaceOwnerId: "owner-1",
-    },
+    state,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state: {
@@ -125,6 +129,9 @@ test("adding a workspace member keeps the address when refresh fails", async () 
       throw new Error("offline");
     },
     refreshWorkspaceSettings() {},
+    repository: context.window.PropertyDeskWorkspaceMemberRepository.create({
+      getClient: () => state.client,
+    }),
   });
 
   feature.attachEvents();

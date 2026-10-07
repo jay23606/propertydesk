@@ -44,6 +44,9 @@
       fetchAll,
       view: memberView,
       refreshWorkspaceSettings: renderWorkspaceSettings,
+      repository: window.PropertyDeskWorkspaceMemberRepository.create({
+        getClient: () => state.client,
+      }),
       confirmAction,
     });
 
