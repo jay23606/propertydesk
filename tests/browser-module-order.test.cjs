@@ -327,7 +327,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview-rendering.js", "features/import-preview.js"],
     ["features/import-preview.js", "app.js"],
     ["features/import-preview-events.js", "app.js"],
-    ["csv-parser.js", "features/imports.js"],
+    ["features/csv-parser.js", "features/imports.js"],
     ["features/import-utils.js", "features/imports.js"],
     ["features/import-validation-api.js", "features/imports.js"],
     ["features/account-import.js", "features/imports.js"],
@@ -521,7 +521,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/profile-settings.js", "features/workspace.js"],
     ["features/workspace-members.js", "features/workspace.js"],
-    ["csv-parser.js", "features/import-utils.js"],
+    ["features/csv-parser.js", "features/import-utils.js"],
     [
       "features/account-import-validation.js",
       "features/import-validation-api.js",

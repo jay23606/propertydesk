@@ -114,7 +114,7 @@ function loadPropertyAndAccountForms(context) {
 function loadImportFeatures(context) {
   loadImportPreview(context);
   require("../features/money-input-utils.js");
-  context.window.PropertyDeskCsvParser = require("../csv-parser.js");
+  context.window.PropertyDeskCsvParser = require("../features/csv-parser.js");
   context.window.PropertyDeskImportUtils = require("../features/import-utils.js");
   for (const filename of [
     "account-import-payload.js",
