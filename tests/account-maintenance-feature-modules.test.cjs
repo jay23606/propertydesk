@@ -249,6 +249,7 @@ test("account detail content workflow composes schedule, history, and account", 
     openModal() {},
     propertyAddress() {},
     depositLedger: () => ({ entries: [], active: [], totals: {} }),
+    accountHistoryRepository: { loadAccountAuditEvents() {} },
   };
   const workflow =
     context.window.PropertyDeskAccountDetailContentWorkflow.create(
@@ -257,6 +258,10 @@ test("account detail content workflow composes schedule, history, and account", 
 
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
   assert.equal(passed.historyModel.state, dependencies.state);
+  assert.equal(
+    passed.historyModel.repository,
+    dependencies.accountHistoryRepository,
+  );
   assert.equal(passed.historyView.esc, dependencies.esc);
   assert.equal(passed.depositModel.state, dependencies.state);
   assert.equal(passed.depositModel.depositLedger, dependencies.depositLedger);

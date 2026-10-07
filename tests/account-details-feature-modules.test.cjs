@@ -389,7 +389,10 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   const money = (value) => `$${Number(value || 0).toFixed(2)}`;
   const fmtDate = (value) => value || "—";
   const { loadAccountHistory } =
-    context.window.PropertyDeskAccountHistoryModel.create({ state });
+    context.window.PropertyDeskAccountHistoryModel.create({
+      state,
+      repository: context.window.PropertyDeskAccountHistoryRepository,
+    });
   const { accountHistoryHTML } =
     context.window.PropertyDeskAccountHistoryView.create({
       esc,

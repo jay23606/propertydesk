@@ -20,6 +20,7 @@
       openModal,
       propertyAddress,
       depositLedger,
+      accountHistoryRepository,
     } = context;
     const { buildDepositDetails } =
       window.PropertyDeskDepositDetailsModel.create({ state, depositLedger });
@@ -29,7 +30,10 @@
       return renderDepositDetails(buildDepositDetails(account));
     }
     const { loadAccountHistory } =
-      window.PropertyDeskAccountHistoryModel.create({ state });
+      window.PropertyDeskAccountHistoryModel.create({
+        state,
+        repository: accountHistoryRepository,
+      });
     const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create(
       {
         esc,

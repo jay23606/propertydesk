@@ -25,6 +25,10 @@ test("record entry workflow owns forms and their global create actions", () => {
     /PropertyDesk(?:TransactionMaintenance|RecordEntry|TransactionScreen)Workflow\.create\(/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
+  assert.match(
+    app,
+    /accountHistoryRepository: window\.PropertyDeskAccountHistoryRepository/,
+  );
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
   assert.doesNotMatch(
     app,

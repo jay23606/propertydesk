@@ -221,6 +221,7 @@
       openModal,
       propertyAddress,
       depositLedger,
+      accountHistoryRepository: window.PropertyDeskAccountHistoryRepository,
     },
     maintenance: {
       $,
