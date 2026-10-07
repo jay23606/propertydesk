@@ -33,6 +33,16 @@
       money,
       paymentFrequencyLabel,
     });
+    const reminderModel =
+      window.PropertyDeskPropertyPortfolioReminderModel.create({
+        state,
+        propertyAddress,
+        monthStart,
+        dateOnly,
+        monthEnd,
+        lateReminderMailto,
+        money,
+      });
     const accountRowModel =
       window.PropertyDeskPropertyPortfolioAccountRowModel.create({
         state,
@@ -41,13 +51,10 @@
         amountDueSince,
         unpaidDueAccrualStart,
         todayIso,
-        propertyAddress,
         monthStart,
-        dateOnly,
         monthEnd,
-        lateReminderMailto,
         paymentStatusInMonth,
-        money,
+        reminderModel,
       });
     const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
       state,

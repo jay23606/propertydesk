@@ -9,13 +9,10 @@
     amountDueSince,
     unpaidDueAccrualStart,
     todayIso,
-    propertyAddress,
     monthStart,
-    dateOnly,
     monthEnd,
-    lateReminderMailto,
     paymentStatusInMonth,
-    money,
+    reminderModel,
   }) {
     const { summarizeAccount } =
       window.PropertyDeskAccountFinancialSummary.create({
@@ -34,23 +31,8 @@
         { ...account, status: "active" },
       ]);
       const partyName = account.party_name || account.name;
-      const address = propertyAddress(property);
-      const reminderHref = lateReminderMailto({
-        email: account.party_email,
-        address,
-        unpaidDue: money(unpaidDue),
-        senderName:
-          state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
-        recipientName: partyName,
-        month: dateOnly(monthStart()).toLocaleDateString(undefined, {
-          month: "long",
-          year: "numeric",
-        }),
-        asOf: monthEnd(),
-      });
-      const recipientHint = account.party_email
-        ? "Draft late reminder email"
-        : "No email saved; opens an unaddressed late reminder draft";
+      const { reminderHref, recipientHint } =
+        reminderModel.buildReminderDetails(property, account, unpaidDue);
       const scheduledThisMonth =
         amountDueSince(
           [{ ...account, status: "active" }],

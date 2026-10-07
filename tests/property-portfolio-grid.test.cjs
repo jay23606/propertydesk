@@ -16,6 +16,7 @@ test("app composes the Properties grid and action workflows explicitly", () => {
 
   const order = [
     "PropertyDeskPropertyPortfolioTable.create(",
+    "PropertyDeskPropertyPortfolioReminderModel.create(",
     "PropertyDeskPropertyPortfolioAccountRowModel.create(",
     "PropertyDeskPropertyPortfolioModel.create(",
     "PropertyDeskPropertyViews.create(",
@@ -59,6 +60,12 @@ test("Properties workflow returns explicit view and action operations", () => {
           return {};
         },
       },
+      PropertyDeskPropertyPortfolioReminderModel: {
+        create: () => {
+          calls.push("reminder model");
+          return {};
+        },
+      },
       PropertyDeskPropertyPortfolioModel: {
         create: () => {
           calls.push("portfolio model");
@@ -93,6 +100,7 @@ test("Properties workflow returns explicit view and action operations", () => {
 
   assert.deepEqual(calls, [
     "table",
+    "reminder model",
     "account rows",
     "portfolio model",
     "property views",
@@ -120,6 +128,18 @@ test("Properties account-row model derives balances and reminder details", () =>
         __dirname,
         "..",
         "features",
+        "property-portfolio-reminder-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
         "property-portfolio-account-row-model.js",
       ),
       "utf8",
@@ -131,14 +151,9 @@ test("Properties account-row model derives balances and reminder details", () =>
     user: { user_metadata: { display_name: "Owner" } },
   };
   let reminderOptions;
-  const model =
-    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
+  const reminderModel =
+    context.window.PropertyDeskPropertyPortfolioReminderModel.create({
       state,
-      monthlyScheduledEstimate: ([account]) => account.payment_amount,
-      accountBalance: () => 5000,
-      amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
-      unpaidDueAccrualStart: () => "2026-10-01",
-      todayIso: () => "2026-10-05",
       propertyAddress: (property) => property.address,
       monthStart: () => "2026-10-01",
       dateOnly: () => new Date("2026-10-01T12:00:00"),
@@ -147,9 +162,21 @@ test("Properties account-row model derives balances and reminder details", () =>
         reminderOptions = options;
         return `mailto:${options.email || ""}`;
       },
+      money: (amount) => `$${amount.toFixed(2)}`,
+    });
+  const model =
+    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
+      state,
+      monthlyScheduledEstimate: ([account]) => account.payment_amount,
+      accountBalance: () => 5000,
+      amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
+      unpaidDueAccrualStart: () => "2026-10-01",
+      todayIso: () => "2026-10-05",
+      monthStart: () => "2026-10-01",
+      monthEnd: () => "2026-10-31",
       paymentStatusInMonth: (_payments, _id, _monthStart, scheduled) =>
         scheduled === 100 ? "partial" : "none",
-      money: (amount) => `$${amount.toFixed(2)}`,
+      reminderModel,
     });
   const property = { address: "1 Oak St" };
   const landContract = {
@@ -187,6 +214,55 @@ test("Properties account-row model derives balances and reminder details", () =>
   );
 });
 
+test("Properties reminder model builds the manual reminder details", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-reminder-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const options = [];
+  const model =
+    context.window.PropertyDeskPropertyPortfolioReminderModel.create({
+      state: { user: { user_metadata: { display_name: " Owner " } } },
+      propertyAddress: (property) => property.address,
+      monthStart: () => "2026-10-01",
+      dateOnly: () => new Date("2026-10-01T12:00:00"),
+      monthEnd: () => "2026-10-31",
+      lateReminderMailto: (value) => {
+        options.push(value);
+        return "mailto:buyer@example.test";
+      },
+      money: (value) => `$${value.toFixed(2)}`,
+    });
+
+  const property = { address: "1 Oak St" };
+  const account = {
+    party_name: "Buyer",
+    party_email: "buyer@example.test",
+  };
+  const reminder = model.buildReminderDetails(property, account, 35);
+
+  assert.equal(reminder.reminderHref, "mailto:buyer@example.test");
+  assert.equal(reminder.recipientHint, "Draft late reminder email");
+  assert.deepEqual(JSON.parse(JSON.stringify(options[0])), {
+    email: "buyer@example.test",
+    address: "1 Oak St",
+    unpaidDue: "$35.00",
+    senderName: "Owner",
+    recipientName: "Buyer",
+    month: "October 2026",
+    asOf: "2026-10-31",
+  });
+});
+
 test("Properties grid totals the visible due, monthly payments, and loan balances", () => {
   const elements = new Map();
   const getElement = (id) => {
@@ -202,6 +278,18 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     return elements.get(id);
   };
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-portfolio-reminder-model.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "account-financial-summary.js"),
@@ -304,9 +392,27 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
       paymentFrequencyLabel: () => "Monthly",
     });
   const accountRowModel =
-    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create(
-      dependencies,
-    );
+    context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
+      state,
+      monthlyScheduledEstimate: dependencies.monthlyScheduledEstimate,
+      accountBalance: dependencies.accountBalance,
+      amountDueSince: dependencies.amountDueSince,
+      unpaidDueAccrualStart: dependencies.unpaidDueAccrualStart,
+      todayIso: dependencies.todayIso,
+      monthStart: dependencies.monthStart,
+      monthEnd: dependencies.monthEnd,
+      paymentStatusInMonth: dependencies.paymentStatusInMonth,
+      reminderModel:
+        context.window.PropertyDeskPropertyPortfolioReminderModel.create({
+          state,
+          propertyAddress: dependencies.propertyAddress,
+          monthStart: dependencies.monthStart,
+          dateOnly: dependencies.dateOnly,
+          monthEnd: dependencies.monthEnd,
+          lateReminderMailto: dependencies.lateReminderMailto,
+          money,
+        }),
+    });
   const portfolioModel =
     context.window.PropertyDeskPropertyPortfolioModel.create({
       state,

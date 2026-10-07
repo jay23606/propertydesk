@@ -250,6 +250,14 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-portfolio-account-row-model.js",
     ],
     [
+      "features/property-portfolio-reminder-model.js",
+      "features/property-portfolio-workflow.js",
+    ],
+    [
+      "features/property-portfolio-reminder-model.js",
+      "features/property-portfolio-account-row-model.js",
+    ],
+    [
       "features/property-account-index.js",
       "features/property-portfolio-model.js",
     ],
