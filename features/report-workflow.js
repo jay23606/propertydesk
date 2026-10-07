@@ -14,6 +14,7 @@
       money,
       todayIso,
       prettyType,
+      downloadBlob,
     } = context;
     const { buildReportModel } = window.PropertyDeskReportModel.create({
       state,
@@ -35,6 +36,7 @@
         todayIso,
         prettyType,
         accountBalance,
+        downloadBlob,
       });
 
     return { renderReports, attachReportExportEvents };

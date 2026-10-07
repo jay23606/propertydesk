@@ -75,6 +75,7 @@
       money,
       todayIso,
       prettyType,
+      downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
     });
   const modal = window.PropertyDeskModalController.create({
     $,

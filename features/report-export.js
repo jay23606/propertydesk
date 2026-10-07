@@ -8,7 +8,7 @@
     todayIso,
     prettyType,
     accountBalance,
-    downloadBlob = window.PropertyDeskDownloadUtils.downloadBlob,
+    downloadBlob,
   }) {
     function csvCell(value) {
       const text = String(value ?? "");

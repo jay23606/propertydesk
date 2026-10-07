@@ -118,6 +118,7 @@ test("Reports workflow composes calculation, view, and export modules", () => {
     money() {},
     todayIso() {},
     prettyType() {},
+    downloadBlob() {},
   };
   const workflow =
     context.window.PropertyDeskReportWorkflow.create(dependencies);
@@ -138,6 +139,7 @@ test("Reports workflow composes calculation, view, and export modules", () => {
   assert.equal(received.export.todayIso, dependencies.todayIso);
   assert.equal(received.export.prettyType, dependencies.prettyType);
   assert.equal(received.export.accountBalance, dependencies.accountBalance);
+  assert.equal(received.export.downloadBlob, dependencies.downloadBlob);
   assert.equal(workflow.renderReports, renderReports);
   assert.equal(workflow.attachReportExportEvents, attachReportExportEvents);
 });
