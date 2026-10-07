@@ -237,19 +237,7 @@
       correctTransaction,
       voidTransaction,
     });
-  const { buildDepositDetails } = window.PropertyDeskDepositDetailsModel.create(
-    { state, depositLedger },
-  );
-  const { depositSectionHTML: renderDepositSection } =
-    window.PropertyDeskDepositDetailsView.create({
-      money,
-      fmtDate,
-      esc,
-    });
-  function depositSectionHTML(account) {
-    return renderDepositSection(buildDepositDetails(account));
-  }
-  const { openAccountDetails } =
+  const { openAccountDetails, depositSectionHTML } =
     window.PropertyDeskAccountDetailContentWorkflow.create({
       $,
       state,
@@ -266,7 +254,7 @@
       todayIso,
       openModal,
       propertyAddress,
-      depositSectionHTML,
+      depositLedger,
     });
   const { saveDepositAdjustment } =
     window.PropertyDeskDepositMaintenance.create({

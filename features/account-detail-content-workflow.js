@@ -1,4 +1,4 @@
-/* Compose the account detail view, history, schedule, and lookup actions. */
+/* Compose account details, schedule, history, and rental deposit rendering. */
 (() => {
   "use strict";
 
@@ -19,8 +19,15 @@
       todayIso,
       openModal,
       propertyAddress,
-      depositSectionHTML,
+      depositLedger,
     } = context;
+    const { buildDepositDetails } =
+      window.PropertyDeskDepositDetailsModel.create({ state, depositLedger });
+    const { depositSectionHTML: renderDepositDetails } =
+      window.PropertyDeskDepositDetailsView.create({ money, fmtDate, esc });
+    function depositSectionHTML(account) {
+      return renderDepositDetails(buildDepositDetails(account));
+    }
     const { loadAccountHistory } =
       window.PropertyDeskAccountHistoryModel.create({ state });
     const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create(
@@ -68,7 +75,7 @@
       openModal,
     });
 
-    return { openAccountDetails };
+    return { openAccountDetails, depositSectionHTML };
   }
 
   window.PropertyDeskAccountDetailContentWorkflow = Object.freeze({ create });

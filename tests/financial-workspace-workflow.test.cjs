@@ -37,8 +37,6 @@ test("app root wires account, deposit, and transaction actions directly", () => 
     "PropertyDeskTransactionVoidEntry.create(",
     "PropertyDeskTransactionCorrectionForm.create(",
     "PropertyDeskTransactionViewEvents.create(",
-    "PropertyDeskDepositDetailsModel.create(",
-    "PropertyDeskDepositDetailsView.create(",
     "PropertyDeskAccountDetailContentWorkflow.create(",
     "PropertyDeskDepositMaintenance.create(",
     "PropertyDeskDepositAdjustmentEntry.create(",

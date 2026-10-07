@@ -8,9 +8,11 @@ const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 test("app connects account and deposit actions without workflow wrappers", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositDetailsModel\.create\(/);
-  assert.match(app, /PropertyDeskDepositDetailsView\.create\(/);
-  assert.match(app, /renderDepositSection\(buildDepositDetails\(account\)\)/);
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositLedger,/,
+  );
+  assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   const accountMaintenance = app.indexOf(
     "PropertyDeskAccountCloseMaintenance.create(",
   );
@@ -93,6 +95,25 @@ test("account detail content workflow composes schedule, history, and account", 
           return { openAccountDetails };
         },
       },
+      PropertyDeskDepositDetailsModel: {
+        create: (options) => {
+          passed.depositModel = options;
+          return {
+            buildDepositDetails: (account) => ({ account }),
+          };
+        },
+      },
+      PropertyDeskDepositDetailsView: {
+        create: (options) => {
+          passed.depositView = options;
+          return {
+            depositSectionHTML: (details) => {
+              passed.depositDetails = details;
+              return depositSectionHTML();
+            },
+          };
+        },
+      },
       PropertyDeskAccountHistoryModel: {
         create: (options) => {
           passed.historyModel = options;
@@ -135,7 +156,7 @@ test("account detail content workflow composes schedule, history, and account", 
     todayIso() {},
     openModal() {},
     propertyAddress() {},
-    depositSectionHTML,
+    depositLedger: () => ({ entries: [], active: [], totals: {} }),
   };
   const workflow =
     context.window.PropertyDeskAccountDetailContentWorkflow.create(
@@ -145,6 +166,11 @@ test("account detail content workflow composes schedule, history, and account", 
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
   assert.equal(passed.historyModel.state, dependencies.state);
   assert.equal(passed.historyView.esc, dependencies.esc);
+  assert.equal(passed.depositModel.state, dependencies.state);
+  assert.equal(passed.depositModel.depositLedger, dependencies.depositLedger);
+  assert.equal(passed.depositView.money, dependencies.money);
+  assert.equal(passed.depositView.fmtDate, dependencies.fmtDate);
+  assert.equal(passed.depositView.esc, dependencies.esc);
   assert.equal(passed.model.state, dependencies.state);
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(
@@ -158,11 +184,14 @@ test("account detail content workflow composes schedule, history, and account", 
     await passed.details.renderAccountHistory({}, []),
     accountHistoryHTML(),
   );
-  assert.equal(
-    passed.details.depositSectionHTML,
-    dependencies.depositSectionHTML,
-  );
-  assert.deepEqual(Object.keys(workflow), ["openAccountDetails"]);
+  const rentalAccount = { account_type: "rental" };
+  assert.equal(workflow.depositSectionHTML(rentalAccount), "deposit");
+  assert.equal(passed.depositDetails.account, rentalAccount);
+  assert.equal(passed.details.depositSectionHTML, workflow.depositSectionHTML);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "depositSectionHTML",
+    "openAccountDetails",
+  ]);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
 });
 
