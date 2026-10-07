@@ -1,10 +1,10 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/date-utils.js");
-require("../ledger-schedule-utils.js");
-require("../loan-amortization-utils.js");
+require("../features/ledger-schedule-utils.js");
+require("../features/loan-amortization-utils.js");
 require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../ledger-utils.js");
+const ledgerUtils = require("../features/ledger-utils.js");
 const {
   hasPostedPaymentInMonth,
   isPosted,

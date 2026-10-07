@@ -3,10 +3,10 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 require("../features/date-utils.js");
-const scheduleFactory = require("../ledger-schedule-utils.js");
-const loanAmortizationFactory = require("../loan-amortization-utils.js");
+const scheduleFactory = require("../features/ledger-schedule-utils.js");
+const loanAmortizationFactory = require("../features/loan-amortization-utils.js");
 require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../ledger-utils.js");
+const ledgerUtils = require("../features/ledger-utils.js");
 const scheduleUtils = scheduleFactory.create({
   isPosted: ledgerUtils.isPosted,
 });
@@ -24,21 +24,22 @@ test("due schedule and loan amortization utilities load before the stable ledger
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
     html.indexOf("features/date-utils.js") <
-      html.indexOf("ledger-schedule-utils.js"),
+      html.indexOf("features/ledger-schedule-utils.js"),
   );
   assert.ok(
-    html.indexOf("ledger-schedule-utils.js") < html.indexOf("ledger-utils.js"),
+    html.indexOf("features/ledger-schedule-utils.js") <
+      html.indexOf("features/ledger-utils.js"),
   );
   assert.ok(
-    html.indexOf("loan-amortization-utils.js") <
-      html.indexOf("ledger-utils.js"),
+    html.indexOf("features/loan-amortization-utils.js") <
+      html.indexOf("features/ledger-utils.js"),
   );
   assert.ok(
     html.indexOf("features/deposit-ledger-utils.js") <
-      html.indexOf("ledger-utils.js"),
+      html.indexOf("features/ledger-utils.js"),
   );
-  assert.match(worker, /'\.\/ledger-schedule-utils\.js'/);
-  assert.match(worker, /'\.\/loan-amortization-utils\.js'/);
+  assert.match(worker, /'\.\/features\/ledger-schedule-utils\.js'/);
+  assert.match(worker, /'\.\/features\/loan-amortization-utils\.js'/);
   assert.match(worker, /'\.\/features\/deposit-ledger-utils\.js'/);
   assert.equal(typeof scheduleUtils.amountDueSince, "function");
   assert.equal(typeof loanUtils.amortizationSchedule, "function");
