@@ -4,6 +4,7 @@ const { parseCSV } = require("../csv-parser.js");
 require("../features/money-input-utils.js");
 require("../features/domain-options.js");
 require("../features/transaction-options.js");
+require("../features/expense-account-policy.js");
 const { selectImportRows } = require("../import-utils.js");
 require("../account-import-validation.js");
 require("../expense-import-validation.js");

@@ -39,6 +39,13 @@ function createView() {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "expense-account-policy.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "expense-entry-view.js"),
       "utf8",
     ),

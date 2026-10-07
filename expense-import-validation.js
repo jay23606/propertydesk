@@ -77,7 +77,12 @@
       method = row.payment_method || defaultPaymentMethod;
     if (!expenseCategoryValues.has(category))
       throw new Error(`Invalid expense category “${category}”.`);
-    if (category === "deposit_refund" && account?.account_type !== "rental")
+    if (
+      !globalThis.PropertyDeskExpenseAccountPolicy.accountMatchesCategory(
+        category,
+        account,
+      )
+    )
       throw new Error(
         "A security deposit refund must be linked to a rental account.",
       );

@@ -2,8 +2,6 @@
 (() => {
   "use strict";
 
-  const { depositRefundCategory } = window.PropertyDeskTransactionOptions;
-
   function createExpenseEntryForm(context) {
     const {
       $,
@@ -47,8 +45,10 @@
       } = expenseView.readValues();
       const account = state.accounts.find((item) => item.id === accountId);
       if (
-        category === depositRefundCategory &&
-        account?.account_type !== "rental"
+        !window.PropertyDeskExpenseAccountPolicy.accountMatchesCategory(
+          category,
+          account,
+        )
       ) {
         toast("Choose a rental account for a security deposit refund");
         return;
