@@ -132,11 +132,11 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     todayIso() {},
     toast() {},
     fetchAll() {},
-    closeModal() {},
     moneyInput() {},
     repository: { insert() {} },
     prepareAdjustment() {},
     validateAdjustment() {},
+    unusedDependency: true,
   };
   const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
     content,
@@ -153,6 +153,8 @@ test("account screen workflow composes isolated detail actions and deposits", ()
   assert.equal(calls[2][1].prepareAdjustment, deposit.prepareAdjustment);
   assert.equal(calls[2][1].validateAdjustment, deposit.validateAdjustment);
   assert.equal(calls[2][1].depositSectionHTML, depositSectionHTML);
+  assert.equal("closeModal" in calls[2][1], false);
+  assert.equal("unusedDependency" in calls[2][1], false);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",
     "attachDepositAdjustmentEvents",

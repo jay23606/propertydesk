@@ -8,8 +8,16 @@
     const accountDetailActions =
       window.PropertyDeskAccountDetailActionWorkflow.create(accountActions);
     const depositActions = window.PropertyDeskDepositAdjustmentWorkflow.create({
-      ...deposit,
+      $: deposit.$,
+      state: deposit.state,
+      todayIso: deposit.todayIso,
+      toast: deposit.toast,
+      fetchAll: deposit.fetchAll,
       depositSectionHTML: details.depositSectionHTML,
+      moneyInput: deposit.moneyInput,
+      repository: deposit.repository,
+      prepareAdjustment: deposit.prepareAdjustment,
+      validateAdjustment: deposit.validateAdjustment,
     });
 
     return {
