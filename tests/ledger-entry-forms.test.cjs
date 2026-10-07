@@ -2,6 +2,8 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   loadLedgerEntryForms,
+  ledgerEntryDependencies,
+  accountFormDependencies,
   loadPropertyAndAccountForms,
   formElements,
 } = require("./feature-test-helpers.cjs");
@@ -101,6 +103,7 @@ test("ledger entry workflow publishes an explicit payment and expense interface"
     previewReminderEmail: () => {},
     saveCorrection() {},
     unrelatedDependency() {},
+    ...ledgerEntryDependencies(context),
   };
   const forms =
     context.window.PropertyDeskLedgerEntryForms.create(dependencies);
@@ -224,6 +227,8 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
       if (failRefresh) throw new Error("refresh failed");
     },
     toast: (message) => calls.push(`toast:${message}`),
+    transactionPayloads: context.window.PropertyDeskTransactionPayloads,
+    transactionRepository: {},
   });
 
   await passed.payment.finishSuccessfulEntry({
@@ -292,8 +297,11 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
+    ...accountFormDependencies(context),
   });
-  const ledger = context.window.PropertyDeskLedgerEntryForms.create({});
+  const ledger = context.window.PropertyDeskLedgerEntryForms.create({
+    ...ledgerEntryDependencies(context),
+  });
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
     [property, ["resetPropertyForm", "attachEvents"]],
@@ -455,6 +463,7 @@ test("payment and expense forms report rejected saves without clearing the entri
     prettyType: (type) => type,
     openModal() {},
     saveCorrection: (...args) => corrections.push(args),
+    ...ledgerEntryDependencies(context),
   });
 
   forms.attachEvents();

@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadLedgerEntryForms } = require("./feature-test-helpers.cjs");
+const {
+  loadLedgerEntryForms,
+  ledgerEntryDependencies,
+} = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -158,6 +161,7 @@ test("recording a loan payment does not invent principal or interest splits", as
     prettyType: (value) => value,
     paymentFrequencyLabel: (value) => value,
     openModal() {},
+    ...ledgerEntryDependencies(context),
   });
 
   feature.attachEvents();

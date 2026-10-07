@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadLedgerEntryForms } = require("./feature-test-helpers.cjs");
+const {
+  loadLedgerEntryForms,
+  ledgerEntryDependencies,
+} = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
 
 function captureFormSubmissions(getElement, formIds) {
@@ -73,6 +76,7 @@ test("expense entry saves a property-level contractor expense through the expens
     populateFormOptions() {},
     prettyType: (value) => value,
     openModal() {},
+    ...ledgerEntryDependencies(context),
   });
 
   forms.attachEvents();
@@ -125,6 +129,7 @@ test("expense entry requires a rental account before recording a deposit refund"
     populateFormOptions() {},
     prettyType: (value) => value,
     openModal() {},
+    ...ledgerEntryDependencies(context),
   });
 
   forms.attachEvents();

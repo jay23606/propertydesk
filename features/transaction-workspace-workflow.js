@@ -26,6 +26,9 @@
       previewReminderEmail: entryContext.previewReminderEmail,
       navigate: entryContext.navigate,
       documentRef: entryContext.documentRef,
+      accountRepository: entryContext.accountRepository,
+      transactionRepository: entryContext.transactionRepository,
+      transactionPayloads: entryContext.transactionPayloads,
       saveCorrection: maintenance.saveCorrection,
     });
     const screen = window.PropertyDeskTransactionScreenWorkflow.create({

@@ -19,6 +19,9 @@
       saveCorrection,
       navigate,
       documentRef,
+      accountRepository,
+      transactionRepository,
+      transactionPayloads,
     } = context;
     const propertyForm = window.PropertyDeskPropertyForm.create({
       $,
@@ -40,6 +43,7 @@
       previewReminderEmail,
       buildAccountPayload: window.PropertyDeskAccountPayload.build,
       formModel: window.PropertyDeskAccountFormModel,
+      repository: accountRepository,
     });
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
       $,
@@ -54,6 +58,8 @@
       prettyType,
       openModal,
       saveCorrection,
+      transactionRepository,
+      transactionPayloads,
     });
     const createActions = window.PropertyDeskCreateActions.create({
       $,

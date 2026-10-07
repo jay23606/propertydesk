@@ -73,6 +73,17 @@ function loadLedgerEntryForms(context) {
   }
 }
 
+function ledgerEntryDependencies(context) {
+  return {
+    transactionRepository: context.window.PropertyDeskTransactionRepository,
+    transactionPayloads: context.window.PropertyDeskTransactionPayloads,
+  };
+}
+
+function accountFormDependencies(context) {
+  return { repository: context.window.PropertyDeskAccountRepository };
+}
+
 function loadPropertyAndAccountForms(context) {
   for (const filename of [
     "repository-query-utils.js",
@@ -160,6 +171,8 @@ module.exports = {
   loadAuthFeatures,
   loadWorkspaceFeatures,
   loadLedgerEntryForms,
+  ledgerEntryDependencies,
+  accountFormDependencies,
   loadPropertyAndAccountForms,
   loadImportFeatures,
   loadImportPreview,

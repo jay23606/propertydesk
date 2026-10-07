@@ -181,6 +181,9 @@
       previewReminderEmail,
       navigate,
       documentRef: document,
+      accountRepository: window.PropertyDeskAccountRepository,
+      transactionRepository: window.PropertyDeskTransactionRepository,
+      transactionPayloads: window.PropertyDeskTransactionPayloads,
     },
     screen: {
       $,

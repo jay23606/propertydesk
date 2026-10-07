@@ -49,6 +49,13 @@ test("record entry workflow owns forms and their global create actions", () => {
     assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
   }
   assert.match(workflow, /PropertyDeskCreateActions\.create\(/);
+  assert.match(workflow, /repository: accountRepository/);
+  assert.match(workflow, /transactionRepository,/);
+  assert.match(workflow, /transactionPayloads,/);
+  assert.match(
+    app,
+    /accountRepository: window\.PropertyDeskAccountRepository,[\s\S]*?transactionRepository: window\.PropertyDeskTransactionRepository,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,/,
+  );
   assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /attachCreateActionEvents/);
   const transactionWorkflow = fs.readFileSync(
@@ -57,7 +64,7 @@ test("record entry workflow owns forms and their global create actions", () => {
   );
   assert.match(
     transactionWorkflow,
-    /TransactionMaintenanceWorkflow\.create\([\s\S]*?RecordEntryWorkflow\.create\(\{[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
+    /TransactionMaintenanceWorkflow\.create\([\s\S]*?RecordEntryWorkflow\.create\(\{[\s\S]*?accountRepository: entryContext\.accountRepository,[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
   );
   assert.match(
     transactionWorkflow,

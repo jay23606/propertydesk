@@ -16,6 +16,7 @@
       buildAccountPayload,
       formModel,
       previewReminderEmail,
+      repository,
     } = context;
     const formView = window.PropertyDeskAccountFormView.create({
       $,
@@ -27,7 +28,7 @@
       window.PropertyDeskAccountMaintenance.create({
         state,
         toast,
-        repository: window.PropertyDeskAccountRepository,
+        repository,
       });
     const { resetAccountForm, readValues, editAccount } = formView;
     const { openAccountForProperty } =

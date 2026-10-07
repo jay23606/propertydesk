@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   loadPropertyAndAccountForms,
+  accountFormDependencies,
   formElements,
 } = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
@@ -36,6 +37,7 @@ test("property and account form modules expose separate APIs", () => {
     ...dependencies,
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
+    ...accountFormDependencies(context),
   });
 
   assert.deepEqual(Object.keys(accountViewDependencies).sort(), [
@@ -319,6 +321,7 @@ test("property and account forms report rejected saves without running success a
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: context.window.PropertyDeskAccountFormModel,
+    ...accountFormDependencies(context),
   });
 
   property.attachEvents();

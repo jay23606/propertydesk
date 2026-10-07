@@ -4,12 +4,6 @@
 
   function createLedgerEntryForms(context) {
     const {
-      buildPayment,
-      buildExpense,
-      buildPaymentCorrection,
-      buildExpenseCorrection,
-    } = window.PropertyDeskTransactionPayloads;
-    const {
       $,
       state,
       moneyInput,
@@ -22,11 +16,19 @@
       prettyType,
       openModal,
       saveCorrection,
+      transactionPayloads,
+      transactionRepository,
     } = context;
+    const {
+      buildPayment,
+      buildExpense,
+      buildPaymentCorrection,
+      buildExpenseCorrection,
+    } = transactionPayloads;
     const { insertTransaction } = window.PropertyDeskTransactionInserts.create({
       state,
       toast,
-      repository: window.PropertyDeskTransactionRepository,
+      repository: transactionRepository,
     });
     const { finishSuccessfulEntry } =
       window.PropertyDeskLedgerEntrySaveWorkflow.create({
