@@ -77,11 +77,29 @@ test("record entry workflow composes forms and exposes their actions and binders
     saveCorrection: () => {},
     transactionRepository: {},
     transactionPayloads: {},
+    unusedEntryValue: true,
   };
   const workflow =
     context.window.PropertyDeskRecordEntryWorkflow.create(dependencies);
 
   assert.equal(passed.propertyAccount.state, dependencies.state);
+  assert.equal(passed.propertyAccount.$, dependencies.$);
+  assert.equal(passed.propertyAccount.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.propertyAccount.todayIso, dependencies.todayIso);
+  assert.equal(passed.propertyAccount.toast, dependencies.toast);
+  assert.equal(passed.propertyAccount.closeModal, dependencies.closeModal);
+  assert.equal(passed.propertyAccount.fetchAll, dependencies.fetchAll);
+  assert.equal(
+    passed.propertyAccount.populateFormOptions,
+    dependencies.populateFormOptions,
+  );
+  assert.equal(passed.propertyAccount.openModal, dependencies.openModal);
+  assert.equal("fillSelect" in passed.propertyAccount, false);
+  assert.equal("prettyType" in passed.propertyAccount, false);
+  assert.equal("saveCorrection" in passed.propertyAccount, false);
+  assert.equal("transactionRepository" in passed.propertyAccount, false);
+  assert.equal("transactionPayloads" in passed.propertyAccount, false);
+  assert.equal("unusedEntryValue" in passed.propertyAccount, false);
   assert.equal(
     passed.propertyAccount.propertyRepository,
     dependencies.propertyRepository,
@@ -95,12 +113,30 @@ test("record entry workflow composes forms and exposes their actions and binders
     context.window.PropertyDeskAccountFormModel,
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
+  assert.equal(passed.ledger.$, dependencies.$);
+  assert.equal(passed.ledger.state, dependencies.state);
+  assert.equal(passed.ledger.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.ledger.todayIso, dependencies.todayIso);
+  assert.equal(passed.ledger.toast, dependencies.toast);
+  assert.equal(passed.ledger.closeModal, dependencies.closeModal);
+  assert.equal(passed.ledger.fetchAll, dependencies.fetchAll);
+  assert.equal(
+    passed.ledger.populateFormOptions,
+    dependencies.populateFormOptions,
+  );
+  assert.equal(passed.ledger.openModal, dependencies.openModal);
   assert.equal(passed.ledger.fillSelect, dependencies.fillSelect);
   assert.equal(
     passed.ledger.transactionRepository,
     dependencies.transactionRepository,
   );
   assert.equal(passed.propertyAccount.previewReminderEmail, preview);
+  assert.equal("previewReminderEmail" in passed.ledger, false);
+  assert.equal("propertyRepository" in passed.ledger, false);
+  assert.equal("accountRepository" in passed.ledger, false);
+  assert.equal("accountPayload" in passed.ledger, false);
+  assert.equal("accountFormModel" in passed.ledger, false);
+  assert.equal("unusedEntryValue" in passed.ledger, false);
   assert.equal(workflow.resetPropertyForm, propertyReset);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountFormEvents",
