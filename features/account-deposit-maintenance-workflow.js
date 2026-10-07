@@ -56,8 +56,6 @@
       });
 
     return {
-      recordDepositAdjustment,
-      closeAccount,
       attachDepositEvents,
       attachAccountDetailActionEvents,
     };

@@ -185,13 +185,15 @@ test("account and deposit coordinator wires entry actions to workspace details",
   assert.equal(passed.closeEntry.saveCloseAccount, saveCloseAccount);
   assert.equal(passed.accountEvents.closeAccount, closeAccount);
   assert.equal(passed.accountEvents.editAccount, dependencies.editAccount);
-  assert.equal(workflow.recordDepositAdjustment, recordDepositAdjustment);
-  assert.equal(workflow.closeAccount, closeAccount);
   assert.equal(workflow.attachDepositEvents, attachDepositEvents);
   assert.equal(
     workflow.attachAccountDetailActionEvents,
     attachAccountDetailActionEvents,
   );
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachAccountDetailActionEvents",
+    "attachDepositEvents",
+  ]);
 
   passed.closeMaintenance.closeAccountDetails();
   assert.equal(passed.closedModal, elements.get("detail-modal"));
