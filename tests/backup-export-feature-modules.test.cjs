@@ -8,7 +8,12 @@ test("app supplies all backup archive and download dependencies", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?loadBackupRecords: window\.PropertyDeskBackupRecords\.load,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: window\.PropertyDeskDocumentRepository\.create\(/,
+    /PropertyDeskBackupRecords\.create\(\{\s*tables: window\.PropertyDeskBackupUtils\.tables,\s*loadAllPages: window\.PropertyDeskWorkspaceQuery\.loadAllPages,/,
+  );
+  assert.match(app, /loadBackupRecords: backupRecords\.load/);
+  assert.match(
+    app,
+    /PropertyDeskBackupExport\.create\(\{[\s\S]*?downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: window\.PropertyDeskDocumentRepository\.create\(/,
   );
 });
 
@@ -100,7 +105,11 @@ test("backup export aborts before download when a private document path escapes 
       context,
     );
   }
-  const tables = context.window.PropertyDeskBackupRecords.tables;
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+  });
+  const tables = backupRecords.tables;
   let exportHandler;
   const button = {
     textContent: "Export backup",
@@ -155,7 +164,7 @@ test("backup export aborts before download when a private document path escapes 
     prettyType: (value) => value,
     accountBalance: () => 0,
     downloadBlob: (blob) => downloads.push(blob),
-    loadBackupRecords: context.window.PropertyDeskBackupRecords.load,
+    loadBackupRecords: backupRecords.load,
     collectBackupAgreementFiles:
       context.window.PropertyDeskBackupAgreementFiles.collect,
     documentRepository: context.window.PropertyDeskDocumentRepository.create(
@@ -201,7 +210,11 @@ test("backup export adds the validated private agreement to the ZIP and manifest
       context,
     );
   }
-  const tables = context.window.PropertyDeskBackupRecords.tables;
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+  });
+  const tables = backupRecords.tables;
   const agreement = {
     id: "doc-1",
     user_id: "workspace-1",
@@ -274,7 +287,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     },
     todayIso: () => "2026-10-04",
     toast() {},
-    loadBackupRecords: context.window.PropertyDeskBackupRecords.load,
+    loadBackupRecords: backupRecords.load,
     downloadBlob(blob, filename) {
       download = { blob, filename };
     },

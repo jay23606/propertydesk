@@ -24,6 +24,10 @@ test("backup record loader paginates each workspace table into named records", a
     ),
     context,
   );
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+  });
 
   const calls = [];
   const client = {
@@ -49,29 +53,19 @@ test("backup record loader paginates each workspace table into named records", a
     },
   };
 
-  const records = await context.window.PropertyDeskBackupRecords.load(client);
+  const records = await backupRecords.load(client);
 
-  assert.equal(
-    calls.length,
-    context.window.PropertyDeskBackupRecords.tables.length + 1,
-  );
+  assert.equal(calls.length, backupRecords.tables.length + 1);
   assert.deepEqual(Array.from(records.pd_payments.slice(0, 2)), [0, 1]);
   assert.equal(records.pd_payments.length, 501);
   assert.equal(records.pd_payments.at(-1).id, "last-payment");
-  assert.ok(
-    context.window.PropertyDeskBackupRecords.tables.every(
-      (table) => table in records,
-    ),
-  );
+  assert.ok(backupRecords.tables.every((table) => table in records));
   assert.deepEqual(
-    Array.from(context.window.PropertyDeskBackupRecords.tables),
+    Array.from(backupRecords.tables),
     Object.values(workspaceTables),
   );
   const backup = context.window.PropertyDeskBackupUtils.createBackup(records);
-  assert.deepEqual(
-    backup.manifest.included_tables,
-    context.window.PropertyDeskBackupRecords.tables,
-  );
+  assert.deepEqual(backup.manifest.included_tables, backupRecords.tables);
   assert.ok(Array.isArray(backup.data.pd_reminder_logs));
 });
 
@@ -90,9 +84,13 @@ test("backup record loader stops when a table query fails", async () => {
     ),
     context,
   );
+  const backupRecords = context.window.PropertyDeskBackupRecords.create({
+    tables: context.window.PropertyDeskBackupUtils.tables,
+    loadAllPages: context.window.PropertyDeskWorkspaceQuery.loadAllPages,
+  });
 
   await assert.rejects(
-    context.window.PropertyDeskBackupRecords.load({
+    backupRecords.load({
       from: () => ({
         select: () => ({
           range: async () => ({ data: null, error: new Error("offline") }),

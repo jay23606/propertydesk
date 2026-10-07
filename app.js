@@ -22,6 +22,10 @@
     unpaidDueAccrualStart,
   } = window.PropertyDeskLedgerUtils;
   const { createBackup } = window.PropertyDeskBackupUtils;
+  const backupRecords = window.PropertyDeskBackupRecords.create({
+    tables: window.PropertyDeskBackupUtils.tables,
+    loadAllPages: window.PropertyDeskWorkspaceQuery.loadAllPages,
+  });
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -327,7 +331,7 @@
       toast,
       downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       zipUtils: window.PropertyDeskZipUtils,
-      loadBackupRecords: window.PropertyDeskBackupRecords.load,
+      loadBackupRecords: backupRecords.load,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: window.PropertyDeskDocumentRepository.create(

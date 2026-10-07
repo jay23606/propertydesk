@@ -2,20 +2,18 @@
 (() => {
   "use strict";
 
-  const { tables } = window.PropertyDeskBackupUtils;
-  const { loadAllPages } = window.PropertyDeskWorkspaceQuery;
+  function create({ tables, loadAllPages }) {
+    async function load(client) {
+      const values = await Promise.all(
+        tables.map((table) => loadAllPages(client, table)),
+      );
+      return Object.fromEntries(
+        tables.map((table, index) => [table, values[index]]),
+      );
+    }
 
-  async function loadBackupRecords(client) {
-    const values = await Promise.all(
-      tables.map((table) => loadAllPages(client, table)),
-    );
-    return Object.fromEntries(
-      tables.map((table, index) => [table, values[index]]),
-    );
+    return { tables, load };
   }
 
-  window.PropertyDeskBackupRecords = Object.freeze({
-    tables,
-    load: loadBackupRecords,
-  });
+  window.PropertyDeskBackupRecords = Object.freeze({ create });
 })();
