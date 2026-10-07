@@ -165,10 +165,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/import-preview-rendering.js",
     ],
     ["features/import-preview-rendering.js", "features/import-preview.js"],
+    ["features/import-preview.js", "app.js"],
+    ["features/import-preview-events.js", "app.js"],
     ["features/account-import.js", "features/imports.js"],
     ["features/expense-import.js", "features/imports.js"],
-    ["features/import-preview-events.js", "features/imports.js"],
-    ["features/import-preview.js", "features/imports.js"],
     ["features/payment-import.js", "features/imports.js"],
     ["features/expense-entry-form.js", "features/ledger-entry-forms.js"],
     [

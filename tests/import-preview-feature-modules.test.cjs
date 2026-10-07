@@ -5,65 +5,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("CSV preview workflow connects staging and review events", () => {
-  const passed = {};
-  const stageImport = () => "staged";
-  const renderImportPreview = () => "rendered";
-  const updateImportCommitButton = () => "updated";
-  let attached = 0;
-  const context = vm.createContext({
-    window: {
-      PropertyDeskImportPreview: {
-        create: (options) => {
-          passed.preview = options;
-          return { stageImport, renderImportPreview, updateImportCommitButton };
-        },
-      },
-      PropertyDeskImportPreviewEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: () => attached++ };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "import-preview-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    selectImportRows() {},
-    esc() {},
-    openModal() {},
-    closeModal() {},
-    toast() {},
-  };
-  const workflow =
-    context.window.PropertyDeskImportPreviewWorkflow.create(dependencies);
-
-  assert.equal(passed.preview.state, dependencies.state);
-  assert.equal(passed.preview.openModal, dependencies.openModal);
-  assert.equal(passed.events.selectImportRows, dependencies.selectImportRows);
-  assert.equal(passed.events.renderImportPreview, renderImportPreview);
-  assert.equal(
-    passed.events.updateImportCommitButton,
-    updateImportCommitButton,
-  );
-  assert.equal(passed.events.closeModal, dependencies.closeModal);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachEvents",
-    "stageImport",
-  ]);
-  assert.equal(workflow.stageImport, stageImport);
-  workflow.attachEvents();
-  assert.equal(attached, 1);
-});
-
 test("CSV preview renderer receives only rendering dependencies", () => {
   const passed = {};
   const context = vm.createContext({
