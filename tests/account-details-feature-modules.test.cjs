@@ -143,7 +143,7 @@ test("account details render action targets without owning action listeners", as
     buildAccountDetailData: model.buildAccountDetailData,
     fmtDate: () => "today",
     openModal() {},
-    depositSectionHTML: () => "",
+    depositSectionHTML: () => "<p>Held deposit</p>",
     renderAccountHistory: async () => "",
     renderAccountDetails: context.window.PropertyDeskAccountDetailsView.create({
       money: (value) => `$${value}`,
@@ -169,6 +169,10 @@ test("account details render action targets without owning action listeners", as
   assert.match(
     elements.get("detail-content").innerHTML,
     /data-account-detail-close="account-1"/,
+  );
+  assert.equal(
+    elements.get("detail-deposit-section").innerHTML,
+    "<p>Held deposit</p>",
   );
 });
 
@@ -228,7 +232,6 @@ test("account detail view renders estimates and escapes payment history text", (
     estimatedLoanBalance: 9000,
     unpaidDue: 0,
     unpaidSinceLabel: "Oct 1, 2026",
-    depositHTML: "Deposit details",
     schedule: [
       {
         i: 1,
@@ -256,7 +259,7 @@ test("account detail view renders estimates and escapes payment history text", (
   assert.match(html, /Taxes\/insurance escrow is excluded/);
   assert.match(html, /Estimated loan balance · on-time schedule/);
   assert.match(html, /unpaid due tracked since Oct 1, 2026: \$0\.00/);
-  assert.match(html, /Deposit details/);
+  assert.match(html, /id="detail-deposit-section"><\/div>/);
   assert.match(html, /Prior terms/);
   assert.match(html, /Voided/);
   assert.match(html, /&lt;duplicate&gt;/);

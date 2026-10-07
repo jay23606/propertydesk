@@ -30,9 +30,12 @@
           day: "numeric",
           year: "numeric",
         }),
-        depositHTML: depositSectionHTML(account),
         historyHTML,
       });
+      const depositSection = $("detail-deposit-section");
+      if (depositSection) {
+        depositSection.innerHTML = depositSectionHTML(account);
+      }
       openModal("detail-modal");
     }
 

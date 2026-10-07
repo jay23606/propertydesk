@@ -18,7 +18,6 @@
       estimatedLoanBalance,
       unpaidDue,
       unpaidSinceLabel,
-      depositHTML,
       schedule,
       historyHTML,
       payments,
@@ -50,7 +49,7 @@
         <button type="button" data-account-detail-edit="${esc(account.id)}" class="button secondary compact">Edit</button>
         <button type="button" data-account-detail-payment="${esc(account.id)}" class="button primary compact">Record payment</button>
         </div>
-        </div><div id="detail-deposit-section">${depositHTML}</div>${scheduleHTML}${historyHTML}<div class="detail-section">
+        </div><div id="detail-deposit-section"></div>${scheduleHTML}${historyHTML}<div class="detail-section">
         <h3>Payment history (${payments.length})</h3>${
           payments.length
             ? `<div class="schedule-table">
