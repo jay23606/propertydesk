@@ -37,17 +37,13 @@
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const backend = window.PropertyDeskBackendClient.create({
-    config: window.PROPERTYDESK_CONFIG || {},
-    supabase: window.supabase,
-  });
-  const state = window.PropertyDeskAppState.create();
-  const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
-    state,
-    workspaceData: window.PropertyDeskWorkspaceData.create(),
-    toast,
-    render,
-  });
+  const { backend, state, fetchAll } =
+    window.PropertyDeskWorkspaceRuntime.create({
+      config: window.PROPERTYDESK_CONFIG || {},
+      supabase: window.supabase,
+      toast,
+      render,
+    });
   const { accountBalance, scheduledMonthlyRunRate, collectedSince } =
     window.PropertyDeskLedgerContext.create({
       state,

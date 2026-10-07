@@ -280,6 +280,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/workspace-navigation-workflow.js",
       "features/workspace-shell-workflow.js",
     ],
+    ["features/app-state.js", "features/workspace-runtime.js"],
+    ["features/backend-client.js", "features/workspace-runtime.js"],
+    ["features/workspace-refresh.js", "features/workspace-runtime.js"],
+    ["workspace-data.js", "features/workspace-runtime.js"],
     ["features/auth.js", "features/app-startup-workflow.js"],
     ["features/app-lifecycle.js", "features/app-startup-workflow.js"],
     [

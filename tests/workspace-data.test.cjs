@@ -174,6 +174,10 @@ test("workspace data modules load before app root and are precached", () => {
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const runtime = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-runtime.js"),
+    "utf8",
+  );
   assert.ok(html.indexOf("workspace-data.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("workspace-table-catalog.js") <
@@ -196,11 +200,16 @@ test("workspace data modules load before app root and are precached", () => {
   assert.ok(
     html.indexOf("features/workspace-refresh.js") < html.indexOf("app.js"),
   );
+  assert.ok(
+    html.indexOf("features/workspace-runtime.js") < html.indexOf("app.js"),
+  );
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
-  assert.match(app, /PropertyDeskWorkspaceData\.create\(\)/);
-  assert.match(app, /PropertyDeskWorkspaceRefresh\.create\(/);
+  assert.match(worker, /'\.\/features\/workspace-runtime\.js'/);
+  assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
+  assert.match(runtime, /PropertyDeskWorkspaceData\.create\(\)/);
+  assert.match(runtime, /PropertyDeskWorkspaceRefresh\.create\(/);
   assert.match(
-    app,
+    runtime,
     /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData: window\.PropertyDeskWorkspaceData\.create\(\),\s*toast,\s*render,/,
   );
 });

@@ -8,14 +8,16 @@ test("record entry workflow owns forms and their global create actions", () => {
 
   assert.ok(
     app.indexOf("PropertyDeskNotifications.create(") <
-      app.indexOf("PropertyDeskBackendClient.create("),
+      app.indexOf("PropertyDeskWorkspaceRuntime.create("),
   );
   assert.match(
     app,
-    /PropertyDeskBackendClient\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,/,
+    /PropertyDeskWorkspaceRuntime\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,/,
   );
-  assert.match(app, /PropertyDeskAppState\.create\(\)/);
-  assert.match(app, /PropertyDeskWorkspaceRefresh\.create\(\{[\s\S]*?toast,/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
+  );
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
@@ -179,13 +181,11 @@ test("app wires reminder activity and preview through the workspace workflow", (
 
 test("app root composes shared state and workspace services directly", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(
+  assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
+  assert.doesNotMatch(
     app,
-    /PropertyDeskBackendClient\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,/,
+    /PropertyDesk(?:BackendClient|AppState|WorkspaceData|WorkspaceRefresh)\.create\(/,
   );
-  assert.match(app, /PropertyDeskAppState\.create\(\)/);
-  assert.match(app, /PropertyDeskWorkspaceData\.create\(\)/);
-  assert.match(app, /PropertyDeskWorkspaceRefresh\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAppServices/);
   assert.match(app, /PropertyDeskLedgerContext\.create\(/);
   assert.match(app, /PropertyDeskDepositContext\.create\(/);
