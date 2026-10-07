@@ -52,7 +52,7 @@ test("property and account form modules expose separate APIs", () => {
   assert.deepEqual(Object.keys(account).sort(), [
     "attachEvents",
     "editAccount",
-    "resetAccountForm",
+    "openAccountForProperty",
   ]);
 });
 

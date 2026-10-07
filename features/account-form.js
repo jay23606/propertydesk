@@ -26,6 +26,13 @@
     const { saveAccount: persistAccount } =
       window.PropertyDeskAccountMaintenance.create({ state, toast });
     const { resetAccountForm, readValues, editAccount } = formView;
+    const { openAccountForProperty } =
+      window.PropertyDeskPropertyAccountAction.create({
+        $,
+        resetAccountForm,
+        populateFormOptions,
+        openModal,
+      });
 
     async function saveAccount(event) {
       event.preventDefault();
@@ -83,7 +90,7 @@
     }
 
     return {
-      resetAccountForm,
+      openAccountForProperty,
       editAccount,
       attachEvents,
     };

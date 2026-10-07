@@ -39,13 +39,6 @@
       buildAccountPayload: window.PropertyDeskAccountPayload.build,
       formModel: window.PropertyDeskAccountFormModel,
     });
-    const { openAccountForProperty } =
-      window.PropertyDeskPropertyAccountAction.create({
-        $,
-        resetAccountForm: accountForm.resetAccountForm,
-        populateFormOptions,
-        openModal,
-      });
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
       $,
       state,
@@ -63,7 +56,7 @@
     return {
       resetPropertyForm: propertyForm.resetPropertyForm,
       editAccount: accountForm.editAccount,
-      openAccountForProperty,
+      openAccountForProperty: accountForm.openAccountForProperty,
       updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,

@@ -8,7 +8,6 @@ test("record entry workflow composes forms and exposes their actions and binders
   const passed = {};
   const calls = [];
   const propertyReset = () => calls.push("property reset");
-  const accountReset = () => calls.push("account reset");
   const editAccount = () => calls.push("edit account");
   const openPayment = () => calls.push("payment");
   const openPropertyPayment = () => calls.push("property payment");
@@ -34,7 +33,7 @@ test("record entry workflow composes forms and exposes their actions and binders
         create(dependencies) {
           passed.account = dependencies;
           return {
-            resetAccountForm: accountReset,
+            openAccountForProperty,
             editAccount,
             attachEvents: () =>
               accountAttach(dependencies.previewReminderEmail),
@@ -51,12 +50,6 @@ test("record entry workflow composes forms and exposes their actions and binders
             openExpense,
             attachEvents: ledgerAttach,
           };
-        },
-      },
-      PropertyDeskPropertyAccountAction: {
-        create(dependencies) {
-          passed.propertyAccountAction = dependencies;
-          return { openAccountForProperty };
         },
       },
       PropertyDeskAccountPayload: { build: () => "account payload" },
@@ -100,12 +93,6 @@ test("record entry workflow composes forms and exposes their actions and binders
   );
   assert.equal(passed.ledger.saveCorrection, dependencies.saveCorrection);
   assert.equal(passed.account.previewReminderEmail, preview);
-  assert.equal(passed.propertyAccountAction.resetAccountForm, accountReset);
-  assert.equal(
-    passed.propertyAccountAction.populateFormOptions,
-    dependencies.populateFormOptions,
-  );
-  assert.equal(passed.propertyAccountAction.openModal, dependencies.openModal);
   for (const [name, expected] of Object.entries({
     resetPropertyForm: propertyReset,
     editAccount,
