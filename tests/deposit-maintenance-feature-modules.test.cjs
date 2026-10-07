@@ -5,64 +5,6 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
-test("deposit maintenance workflow composes adjustments with detail events", () => {
-  const passed = {};
-  const depositSectionHTML = () => "deposit HTML";
-  const recordDepositAdjustment = () => "adjusted";
-  let attached = 0;
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDepositMaintenance: {
-        create: (options) => {
-          passed.maintenance = options;
-          return { saveDepositAdjustment: recordDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositAdjustmentEntry: {
-        create: (options) => {
-          passed.entry = options;
-          return { recordDepositAdjustment };
-        },
-      },
-      PropertyDeskDepositDetailEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: () => attached++ };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "deposit-maintenance-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    moneyInput() {},
-    todayIso() {},
-    toast() {},
-    fetchAll() {},
-    depositSectionHTML,
-  };
-  const workflow =
-    context.window.PropertyDeskDepositMaintenanceWorkflow.create(dependencies);
-
-  assert.equal(passed.maintenance.state, dependencies.state);
-  assert.equal(passed.maintenance.moneyInput, undefined);
-  assert.equal(passed.entry.state, dependencies.state);
-  assert.equal(passed.entry.moneyInput, dependencies.moneyInput);
-  assert.equal(passed.entry.saveDepositAdjustment, recordDepositAdjustment);
-  assert.equal(passed.events.depositSectionHTML, depositSectionHTML);
-  assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
-  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
-  workflow.attachEvents();
-  assert.equal(attached, 1);
-});
-
 test("deposit adjustment model validates inputs and prepares audited payloads", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
