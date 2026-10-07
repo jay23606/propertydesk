@@ -314,10 +314,6 @@
     openPropertyDetails,
     openAccountForProperty,
   });
-  const { selectImportRows, parseCSV, createImportLookup } =
-    window.PropertyDeskImportUtils;
-  const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
-    window.PropertyDeskImportWorkflows;
   const {
     attachPreviewEvents: attachImportPreviewEvents,
     attachAccountEvents: attachAccountImportEvents,
@@ -326,15 +322,9 @@
   } = window.PropertyDeskImportFeature.create({
     $,
     state,
-    selectImportRows,
     esc,
     openModal,
     closeModal,
-    parseCSV,
-    createImportLookup,
-    validateAccountRows,
-    validatePaymentRows,
-    validateExpenseRows,
     todayIso,
     fetchAll,
     toast,

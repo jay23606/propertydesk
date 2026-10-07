@@ -70,6 +70,16 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
+      PropertyDeskImportUtils: {
+        selectImportRows: (rows) => rows,
+        parseCSV() {},
+        createImportLookup,
+      },
+      PropertyDeskImportWorkflows: {
+        validateAccountRows() {},
+        validatePaymentRows() {},
+        validateExpenseRows() {},
+      },
       PropertyDeskImportPreview: {
         create: () => ({
           stageImport() {},
@@ -123,12 +133,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     $() {},
     state: {},
     stageImport() {},
-    parseCSV() {},
     todayIso() {},
-    validateAccountRows() {},
-    validatePaymentRows() {},
-    validateExpenseRows() {},
-    createImportLookup,
     fetchAll() {},
     toast() {},
     unrelatedDependency() {},
@@ -185,8 +190,18 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   );
   assert.equal(passed.account.importReview, passed.payment.importReview);
   assert.equal(passed.payment.importReview, passed.expense.importReview);
-  assert.equal(passed.payment.createImportLookup, createImportLookup);
-  assert.equal(passed.expense.createImportLookup, createImportLookup);
+  assert.equal(
+    passed.payment.createImportLookup,
+    context.window.PropertyDeskImportUtils.createImportLookup,
+  );
+  assert.equal(
+    passed.expense.createImportLookup,
+    context.window.PropertyDeskImportUtils.createImportLookup,
+  );
+  assert.equal(
+    passed.account.validateAccountRows,
+    context.window.PropertyDeskImportWorkflows.validateAccountRows,
+  );
   assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
@@ -339,6 +354,29 @@ test("payment and expense CSV importers save their own validated transaction pay
       },
     },
   };
+  const baseCreateImportLookup =
+    context.window.PropertyDeskImportUtils.createImportLookup;
+  context.window.PropertyDeskImportUtils = {
+    ...context.window.PropertyDeskImportUtils,
+    parseCSV: (content) => JSON.parse(content),
+    createImportLookup(properties, accounts) {
+      lookupBuilds++;
+      return baseCreateImportLookup(properties, accounts);
+    },
+  };
+  context.window.PropertyDeskImportWorkflows = {
+    validateAccountRows: () => ({ valid: [], total: 0, errors: [] }),
+    validateExpenseRows: (rows) => ({
+      valid: rows,
+      total: rows.length,
+      errors: [],
+    }),
+    validatePaymentRows: (rows) => ({
+      valid: rows,
+      total: rows.length,
+      errors: [],
+    }),
+  };
   const calls = [];
   const staged = [];
   const fileHandlers = new Map();
@@ -354,25 +392,6 @@ test("payment and expense CSV importers save their own validated transaction pay
     state,
     stageImport: (title, rows, commit, note, report) =>
       staged.push({ title, rows, commit, note, report }),
-    parseCSV: (content) => JSON.parse(content),
-    createImportLookup(properties, accounts) {
-      lookupBuilds++;
-      return context.window.PropertyDeskImportUtils.createImportLookup(
-        properties,
-        accounts,
-      );
-    },
-    validateAccountRows: () => ({ valid: [], total: 0, errors: [] }),
-    validateExpenseRows: (rows) => ({
-      valid: rows,
-      total: rows.length,
-      errors: [],
-    }),
-    validatePaymentRows: (rows) => ({
-      valid: rows,
-      total: rows.length,
-      errors: [],
-    }),
     fetchAll: async () => {},
     toast() {},
   });
@@ -535,13 +554,11 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     properties: [],
     client: { rpc: async () => ({ data: { rows_accepted: 0 }, error: null }) },
   };
-  const feature = context.window.PropertyDeskImportFeature.create({
-    $: element,
-    state,
-    stageImport(title, rows, commit, note, report) {
-      state.pendingImport = { title, rows, commit, note, ...report };
-    },
+  context.window.PropertyDeskImportUtils = {
+    ...context.window.PropertyDeskImportUtils,
     parseCSV: () => [{}],
+  };
+  context.window.PropertyDeskImportWorkflows = {
     validateAccountRows: () => ({
       valid: [{ account_name: "Test" }],
       errors: [],
@@ -549,6 +566,13 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     }),
     validateExpenseRows() {},
     validatePaymentRows() {},
+  };
+  const feature = context.window.PropertyDeskImportFeature.create({
+    $: element,
+    state,
+    stageImport(title, rows, commit, note, report) {
+      state.pendingImport = { title, rows, commit, note, ...report };
+    },
     esc: (value) => String(value ?? ""),
     todayIso: () => "2026-10-04",
     openModal() {},

@@ -3,22 +3,12 @@
   "use strict";
 
   function createImportWorkflows(context) {
-    const {
-      $,
-      state,
-      selectImportRows,
-      esc,
-      openModal,
-      closeModal,
-      parseCSV,
-      createImportLookup,
-      validateAccountRows,
-      validatePaymentRows,
-      validateExpenseRows,
-      todayIso,
-      fetchAll,
-      toast,
-    } = context;
+    const { $, state, esc, openModal, closeModal, todayIso, fetchAll, toast } =
+      context;
+    const { selectImportRows, parseCSV, createImportLookup } =
+      window.PropertyDeskImportUtils;
+    const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
+      window.PropertyDeskImportWorkflows;
     const importPreview = window.PropertyDeskImportPreview.create({
       $,
       state,
