@@ -16,10 +16,19 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
     path.join(root, "features", "workspace-navigation-workflow.js"),
     "utf8",
   );
+  const shell = fs.readFileSync(
+    path.join(root, "features", "workspace-shell-workflow.js"),
+    "utf8",
+  );
 
   assert.match(
     app,
-    /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
+    /WorkspaceShellWorkflow\.create\(\{[\s\S]*?navigation: \{[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
+  );
+  assert.match(shell, /WorkspaceReminderWorkflow\.create\(\s*reminder\s*\)/);
+  assert.match(
+    shell,
+    /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
   );
   assert.match(
     workflow,
@@ -37,6 +46,7 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
     "features/workspace.js",
     "features/navigation.js",
     "features/workspace-navigation-workflow.js",
+    "features/workspace-shell-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));
     assert.ok(worker.includes(`'./${script}'`));

@@ -11,12 +11,9 @@ test("app uses the workspace reminder coordinator for email preview and activity
 
   assert.match(
     app,
-    /const \{ renderReminderActivity, previewReminderEmail \} =\s*window\.PropertyDeskWorkspaceReminderWorkflow\.create\(/,
+    /previewReminderEmail,[\s\S]*?\} = window\.PropertyDeskWorkspaceShellWorkflow\.create\(/,
   );
-  assert.match(
-    app,
-    /PropertyDeskWorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
-  );
+  assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskRecordEntryWorkflow\.create\(\{[\s\S]*?previewReminderEmail,/,
@@ -27,6 +24,8 @@ test("app uses the workspace reminder coordinator for email preview and activity
     "features/reminder-preview.js",
     "features/reminder-preview-model.js",
     "features/workspace-reminder-workflow.js",
+    "features/workspace-navigation-workflow.js",
+    "features/workspace-shell-workflow.js",
   ]) {
     assert.ok(
       html.indexOf(feature) >= 0 &&

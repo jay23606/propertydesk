@@ -16,12 +16,16 @@ test("reminder activity flows through reminder and workspace navigation workflow
     path.join(root, "features", "workspace-navigation-workflow.js"),
     "utf8",
   );
-  const reminder = app.indexOf("PropertyDeskWorkspaceReminderWorkflow.create(");
-  const workspace = app.indexOf(
-    "PropertyDeskWorkspaceNavigationWorkflow.create(",
+  const shellWorkflow = fs.readFileSync(
+    path.join(root, "features", "workspace-shell-workflow.js"),
+    "utf8",
   );
 
-  assert.ok(reminder >= 0 && workspace > reminder);
+  assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
+  assert.match(
+    shellWorkflow,
+    /WorkspaceReminderWorkflow\.create\(\s*reminder\s*\)[\s\S]*?WorkspaceNavigationWorkflow\.create\([\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
+  );
   assert.match(
     reminderWorkflow,
     /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
@@ -41,6 +45,7 @@ test("reminder activity flows through reminder and workspace navigation workflow
   for (const feature of [
     "features/workspace-reminder-workflow.js",
     "features/workspace-navigation-workflow.js",
+    "features/workspace-shell-workflow.js",
   ]) {
     assert.ok(html.includes(feature));
     assert.ok(worker.includes(`'./${feature}'`));

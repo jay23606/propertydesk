@@ -88,8 +88,15 @@
       propertyAddress,
       prettyType,
     });
-  const { renderReminderActivity, previewReminderEmail } =
-    window.PropertyDeskWorkspaceReminderWorkflow.create({
+  const {
+    previewReminderEmail,
+    updateGreeting,
+    attachProfileEvents,
+    attachWorkspaceMemberEvents,
+    navigate,
+    attachNavigationEvents,
+  } = window.PropertyDeskWorkspaceShellWorkflow.create({
+    reminder: {
       $,
       state,
       esc,
@@ -105,25 +112,19 @@
       moneyInput,
       toast,
       openModal: modal.openModal,
-    });
+    },
+    navigation: {
+      $,
+      state,
+      esc,
+      toast,
+      fetchAll,
+      documentRef: document,
+      windowRef: window,
+    },
+  });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
-  const {
-    updateGreeting,
-    attachProfileEvents,
-    attachWorkspaceMemberEvents,
-    navigate,
-    attachNavigationEvents,
-  } = window.PropertyDeskWorkspaceNavigationWorkflow.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    renderReminderActivity,
-    documentRef: document,
-    windowRef: window,
-  });
   const transactionMaintenance =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
       $,

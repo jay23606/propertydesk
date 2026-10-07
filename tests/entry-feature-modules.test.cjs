@@ -171,13 +171,9 @@ test("app wires reminder activity and preview through the workspace workflow", (
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
+    /WorkspaceShellWorkflow\.create\(\{[\s\S]*?reminder: \{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
   );
-  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
-  assert.match(
-    app,
-    /PropertyDeskWorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
-  );
+  assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
 });
 
