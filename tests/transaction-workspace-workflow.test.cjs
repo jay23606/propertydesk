@@ -56,7 +56,7 @@ test("transaction workspace shares corrections and entry actions across its flow
           calls.push(["screen", options]);
           return {
             renderPayments() {},
-            attachTransactionViewEvents() {},
+            attachTransactionFilterEvents() {},
             attachTransactionActionEvents() {},
           };
         },
@@ -119,7 +119,7 @@ test("transaction workspace shares corrections and entry actions across its flow
     "attachLedgerEntryFormEvents",
     "attachPropertyFormEvents",
     "attachTransactionActionEvents",
-    "attachTransactionViewEvents",
+    "attachTransactionFilterEvents",
     "editAccount",
     "openAccountForProperty",
     "openExpense",

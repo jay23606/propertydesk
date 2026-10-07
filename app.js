@@ -153,7 +153,7 @@
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const {
     renderPayments,
-    attachTransactionViewEvents,
+    attachTransactionFilterEvents,
     attachTransactionActionEvents,
     editAccount,
     openAccountForProperty,
@@ -422,7 +422,7 @@
       attachOverviewEvents,
       attachPropertyGridEvents,
       attachPropertyActionEvents,
-      attachTransactionViewEvents,
+      attachTransactionFilterEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,
       attachDepositAdjustmentEvents,

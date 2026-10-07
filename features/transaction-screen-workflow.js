@@ -42,7 +42,7 @@
 
     return {
       renderPayments: views.renderPayments,
-      attachTransactionViewEvents: views.attachEvents,
+      attachTransactionFilterEvents: views.attachTransactionFilterEvents,
       attachTransactionActionEvents,
     };
   }

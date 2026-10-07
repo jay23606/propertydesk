@@ -14,7 +14,10 @@ test("transaction screen workflow joins view rendering and maintenance actions",
       PropertyDeskTransactionViews: {
         create(dependencies) {
           passed.view = dependencies;
-          return { renderPayments, attachEvents: attachViewEvents };
+          return {
+            renderPayments,
+            attachTransactionFilterEvents: attachViewEvents,
+          };
         },
       },
     },
@@ -61,11 +64,11 @@ test("transaction screen workflow joins view rendering and maintenance actions",
   );
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachTransactionActionEvents",
-    "attachTransactionViewEvents",
+    "attachTransactionFilterEvents",
     "renderPayments",
   ]);
   assert.equal(workflow.renderPayments, renderPayments);
-  assert.equal(workflow.attachTransactionViewEvents, attachViewEvents);
+  assert.equal(workflow.attachTransactionFilterEvents, attachViewEvents);
   assert.equal(workflow.attachTransactionActionEvents, attachActionEvents);
 });
 

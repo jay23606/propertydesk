@@ -157,7 +157,7 @@ test("app composes transaction history and actions through its screen workflow",
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,/,
   );
   assert.doesNotMatch(app, /function attachTransactionEvents\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);

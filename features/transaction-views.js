@@ -41,7 +41,7 @@
       },
     );
 
-    function attachEvents() {
+    function attachTransactionFilterEvents() {
       $("payment-search").addEventListener("input", renderPayments);
       $("payment-period").addEventListener("change", renderPayments);
       $("transaction-type").addEventListener("change", renderPayments);
@@ -64,7 +64,7 @@
       $("net-cash-flow").textContent = money(totals.netCashFlow);
     }
 
-    return { renderPayments, attachEvents };
+    return { renderPayments, attachTransactionFilterEvents };
   }
 
   window.PropertyDeskTransactionViews = Object.freeze({

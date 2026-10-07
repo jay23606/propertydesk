@@ -22,7 +22,10 @@ test("transaction screen workflow composes history views with maintenance action
     workflow,
     /transactionMaintenance\.createTransactionActionHandlers\(/,
   );
-  assert.match(workflow, /attachTransactionViewEvents: views\.attachEvents/);
+  assert.match(
+    workflow,
+    /attachTransactionFilterEvents: views\.attachTransactionFilterEvents/,
+  );
   assert.match(
     workflow,
     /const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\(/,

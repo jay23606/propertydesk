@@ -58,8 +58,12 @@ test("property and transaction views own their search and filter bindings", () =
       voidTransaction() {},
     });
 
-    assert.equal(typeof feature.attachEvents, "function");
-    feature.attachEvents();
+    const attachFilters =
+      file === "transaction-views.js"
+        ? feature.attachTransactionFilterEvents
+        : feature.attachEvents;
+    assert.equal(typeof attachFilters, "function");
+    attachFilters();
     assert.deepEqual([...handlers.keys()], expected);
     assert.ok(
       [...handlers.values()].every((handler) => typeof handler === "function"),

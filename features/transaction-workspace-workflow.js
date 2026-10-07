@@ -73,7 +73,7 @@
       attachLedgerEntryFormEvents: entry.attachLedgerEntryFormEvents,
       attachCreateActionEvents: createActions.attachCreateActionEvents,
       renderPayments: screen.renderPayments,
-      attachTransactionViewEvents: screen.attachTransactionViewEvents,
+      attachTransactionFilterEvents: screen.attachTransactionFilterEvents,
       attachTransactionActionEvents: screen.attachTransactionActionEvents,
     };
   }
