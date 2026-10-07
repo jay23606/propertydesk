@@ -10,6 +10,17 @@ test("app startup composes auth and lifecycle at the original event position", (
       PropertyDeskAuth: {
         create(authContext) {
           assert.equal(authContext.state.name, "shared-state");
+          assert.equal(authContext.$, selector);
+          assert.equal(authContext.authClient, authClient);
+          assert.equal(authContext.fetchAll, fetchAll);
+          assert.equal(authContext.toast, toast);
+          assert.deepEqual(Object.keys(authContext).sort(), [
+            "$",
+            "authClient",
+            "fetchAll",
+            "state",
+            "toast",
+          ]);
           return {
             setAuthMode() {},
             showConfigError() {},
@@ -50,8 +61,18 @@ test("app startup composes auth and lifecycle at the original event position", (
   const thirdBinder = () => {};
   const initializeClient = () => {};
   const authClient = {};
+  const selector = () => {};
+  const fetchAll = async () => {};
+  const toast = () => {};
   const lifecycle = context.window.PropertyDeskAppStartupWorkflow.create({
-    authContext: { state: { name: "shared-state" } },
+    authContext: {
+      $: selector,
+      state: { name: "shared-state" },
+      authClient,
+      fetchAll,
+      toast,
+      unusedStartupValue: true,
+    },
     backendConfigured: true,
     initializeClient,
     authClient,

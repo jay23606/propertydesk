@@ -15,7 +15,13 @@
       eventBindersBeforeAuth,
       eventBindersAfterAuth,
     } = context;
-    const auth = window.PropertyDeskAuth.create(authContext);
+    const auth = window.PropertyDeskAuth.create({
+      $: authContext.$,
+      state: authContext.state,
+      authClient: authContext.authClient,
+      fetchAll: authContext.fetchAll,
+      toast: authContext.toast,
+    });
     const lifecycle = window.PropertyDeskAppLifecycle.create({
       $,
       backendConfigured,
