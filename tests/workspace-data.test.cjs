@@ -21,7 +21,11 @@ function loadModule() {
     fs.readFileSync(path.join(__dirname, "..", "workspace-data.js"), "utf8"),
     context,
   );
-  return context.window.PropertyDeskWorkspaceData.create();
+  return context.window.PropertyDeskWorkspaceData.create({
+    tables: context.window.PropertyDeskWorkspaceTables,
+    runWorkspaceRead:
+      context.window.PropertyDeskWorkspaceQuery.runWorkspaceRead,
+  });
 }
 
 test("workspace data delegates active workspace lookup to its data adapter", async () => {
@@ -206,10 +210,10 @@ test("workspace data modules load before app root and are precached", () => {
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
   assert.match(worker, /'\.\/features\/workspace-runtime\.js'/);
   assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
-  assert.match(runtime, /PropertyDeskWorkspaceData\.create\(\)/);
+  assert.match(runtime, /PropertyDeskWorkspaceData\.create\(\{/);
   assert.match(runtime, /PropertyDeskWorkspaceRefresh\.create\(/);
   assert.match(
     runtime,
-    /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData: window\.PropertyDeskWorkspaceData\.create\(\),\s*toast,\s*render,/,
+    /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData: window\.PropertyDeskWorkspaceData\.create\(\{\s*tables: window\.PropertyDeskWorkspaceTables,\s*runWorkspaceRead: window\.PropertyDeskWorkspaceQuery\.runWorkspaceRead,/,
   );
 });

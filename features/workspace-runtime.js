@@ -10,7 +10,10 @@
     const state = window.PropertyDeskAppState.create();
     const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
       state,
-      workspaceData: window.PropertyDeskWorkspaceData.create(),
+      workspaceData: window.PropertyDeskWorkspaceData.create({
+        tables: window.PropertyDeskWorkspaceTables,
+        runWorkspaceRead: window.PropertyDeskWorkspaceQuery.runWorkspaceRead,
+      }),
       toast,
       render,
     });

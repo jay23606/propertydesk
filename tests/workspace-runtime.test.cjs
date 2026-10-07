@@ -30,9 +30,11 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
           return state;
         },
       },
+      PropertyDeskWorkspaceTables: { properties: "pd_properties" },
+      PropertyDeskWorkspaceQuery: { runWorkspaceRead() {} },
       PropertyDeskWorkspaceData: {
-        create() {
-          calls.push(["data"]);
+        create(received) {
+          calls.push(["data", received]);
           return workspaceData;
         },
       },
@@ -59,6 +61,11 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[0][1].supabase, options.supabase);
   assert.equal(calls[1][0], "state");
   assert.equal(calls[2][0], "data");
+  assert.equal(calls[2][1].tables, context.window.PropertyDeskWorkspaceTables);
+  assert.equal(
+    calls[2][1].runWorkspaceRead,
+    context.window.PropertyDeskWorkspaceQuery.runWorkspaceRead,
+  );
   assert.equal(calls[3][0], "refresh");
   assert.equal(calls[3][1].state, state);
   assert.equal(calls[3][1].workspaceData, workspaceData);
