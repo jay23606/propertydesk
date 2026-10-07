@@ -42,7 +42,7 @@
 
     return {
       updateGreeting: profileWorkflow.updateGreeting,
-      renderWorkspaceSettings: renderWorkspacePage,
+      renderWorkspacePage,
       attachProfileEvents: profileWorkflow.attachProfileEvents,
       attachWorkspaceMemberEvents: members.attachWorkspaceMemberEvents,
     };

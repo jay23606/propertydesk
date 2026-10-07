@@ -5,7 +5,7 @@
   function create({
     $,
     state,
-    renderWorkspaceSettings,
+    renderWorkspacePage,
     documentRef = document,
     windowRef = window,
   }) {
@@ -25,12 +25,12 @@
     function attachEvents() {
       documentRef.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", () => {
-          if (link.dataset.view === "workspace") renderWorkspaceSettings();
+          if (link.dataset.view === "workspace") renderWorkspacePage();
           navigate(link.dataset.view);
         });
       });
       $("user-menu").addEventListener("click", () => {
-        renderWorkspaceSettings();
+        renderWorkspacePage();
         navigate("workspace");
       });
       documentRef.querySelectorAll("[data-goto]").forEach((link) => {

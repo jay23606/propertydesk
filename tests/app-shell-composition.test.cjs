@@ -32,7 +32,7 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
   );
   assert.match(
     workflow,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspaceSettings: workspace\.renderWorkspaceSettings,/,
+    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
   );
   assert.match(
     workspace,

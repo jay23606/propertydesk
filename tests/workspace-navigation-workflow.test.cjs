@@ -20,7 +20,7 @@ test("workspace navigation coordinator connects settings render and route events
           passed.workspace = options;
           return {
             updateGreeting: handlers.greeting,
-            renderWorkspaceSettings() {},
+            renderWorkspacePage() {},
             attachProfileEvents: handlers.profile,
             attachWorkspaceMemberEvents: handlers.members,
           };
@@ -72,7 +72,7 @@ test("workspace navigation coordinator connects settings render and route events
     passed.workspace.memberRepository,
     dependencies.memberRepository,
   );
-  assert.equal(typeof passed.navigation.renderWorkspaceSettings, "function");
+  assert.equal(typeof passed.navigation.renderWorkspacePage, "function");
   assert.equal(passed.navigation.documentRef, dependencies.documentRef);
   assert.equal(passed.navigation.windowRef, dependencies.windowRef);
   assert.deepEqual(Object.keys(workflow), [

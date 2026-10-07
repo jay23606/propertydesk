@@ -51,7 +51,7 @@ test("navigation owns page routing and workspace settings navigation", () => {
     $: (id) =>
       id === "page-crumb" ? crumb : id === "user-menu" ? userMenu : null,
     state,
-    renderWorkspaceSettings: () => routes.push("workspace-settings"),
+    renderWorkspacePage: () => routes.push("workspace-page"),
     documentRef,
     windowRef: { scrollTo: () => routes.push("scroll") },
   });
@@ -64,13 +64,13 @@ test("navigation owns page routing and workspace settings navigation", () => {
   assert.ok(classes.has("page-workspace:active"));
   assert.ok(classes.has("page-reports:active") === false);
   assert.ok(classes.has("workspace-link:active"));
-  assert.deepEqual(routes.slice(0, 2), ["workspace-settings", "scroll"]);
+  assert.deepEqual(routes.slice(0, 2), ["workspace-page", "scroll"]);
 
   handlers.get("goto-link:click")();
   assert.equal(state.view, "reports");
   handlers.get("user-menu:click")();
   assert.equal(state.view, "workspace");
-  assert.deepEqual(routes.slice(-2), ["workspace-settings", "scroll"]);
+  assert.deepEqual(routes.slice(-2), ["workspace-page", "scroll"]);
 });
 
 test("theme controller synchronizes toggles and persists theme changes", () => {

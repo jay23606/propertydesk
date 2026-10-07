@@ -57,7 +57,7 @@ test("workspace workflow composes profile settings with member settings", () => 
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
   assert.equal(passed.memberWorkflow.repository, memberRepository);
   assert.equal(workflow.updateGreeting, updateGreeting);
-  workflow.renderWorkspaceSettings();
+  workflow.renderWorkspacePage();
   assert.equal(passed.displayName, "Owner");
   assert.equal(reminderActivityRenders, 1);
   passed.memberWorkflow.refreshWorkspaceSettings();

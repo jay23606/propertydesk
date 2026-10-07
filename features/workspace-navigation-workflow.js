@@ -30,7 +30,7 @@
     const navigation = window.PropertyDeskNavigation.create({
       $,
       state,
-      renderWorkspaceSettings: workspace.renderWorkspaceSettings,
+      renderWorkspacePage: workspace.renderWorkspacePage,
       documentRef,
       windowRef,
     });

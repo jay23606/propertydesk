@@ -69,7 +69,7 @@ test("workspace settings render member labels and escape untrusted text", () => 
     confirmAction: () => true,
   });
 
-  feature.renderWorkspaceSettings();
+  feature.renderWorkspacePage();
 
   assert.equal(element("display-name").value, "Owner");
   assert.match(element("workspace-members").innerHTML, /&lt;Owner&gt;/);

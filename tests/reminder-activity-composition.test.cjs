@@ -40,7 +40,7 @@ test("reminder activity flows through reminder and workspace navigation workflow
   );
   assert.match(
     navigationWorkflow,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspaceSettings: workspace\.renderWorkspaceSettings,/,
+    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
   );
   for (const feature of [
     "features/workspace-reminder-workflow.js",
