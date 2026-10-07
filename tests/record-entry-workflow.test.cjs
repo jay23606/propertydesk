@@ -112,7 +112,6 @@ test("record entry workflow composes forms and exposes their actions and binders
   assert.equal(createActionDependencies.navigate, dependencies.navigate);
   assert.equal(createActionDependencies.documentRef, dependencies.documentRef);
   for (const [name, expected] of Object.entries({
-    resetPropertyForm: propertyReset,
     editAccount,
     openAccountForProperty,
     updatePaymentGuidance,
@@ -122,6 +121,7 @@ test("record entry workflow composes forms and exposes their actions and binders
   })) {
     assert.equal(workflow[name], expected, name);
   }
+  assert.equal("resetPropertyForm" in workflow, false);
 
   workflow.attachPropertyFormEvents();
   workflow.attachAccountFormEvents();

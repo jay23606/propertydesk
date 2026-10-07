@@ -68,7 +68,6 @@
       documentRef,
     });
     return {
-      resetPropertyForm: propertyForm.resetPropertyForm,
       editAccount: accountForm.editAccount,
       openAccountForProperty: accountForm.openAccountForProperty,
       updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
