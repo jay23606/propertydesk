@@ -331,13 +331,21 @@
     });
   const { attachEvents: attachPropertyHolderEvents } =
     window.PropertyDeskPropertyHolderEvents.create({ $, savePropertyHolders });
-  const { attachPropertyDocumentEvents } =
-    window.PropertyDeskPropertyDocumentWorkflow.create({
+  const propertyDocuments = window.PropertyDeskDocuments.create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    repository: window.PropertyDeskDocumentRepository.create(
+      () => state.client,
+    ),
+  });
+  const { attachEvents: attachPropertyDocumentEvents } =
+    window.PropertyDeskPropertyDetailDocumentEvents.create({
       $,
-      state,
-      toast,
-      fetchAll,
-      openPropertyDetails,
+      uploadPropertyDocument: propertyDocuments.uploadPropertyDocument,
+      deletePropertyDocument: propertyDocuments.deletePropertyDocument,
+      openPropertyDocument: propertyDocuments.openPropertyDocument,
     });
   const { renderOverview, attachOverviewEvents } =
     window.PropertyDeskOverviewWorkflow.create({

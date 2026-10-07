@@ -82,7 +82,9 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyDetailActionsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyHolderManagement\.create\(/);
   assert.match(app, /PropertyDeskPropertyHolderEvents\.create\(/);
-  assert.match(app, /PropertyDeskPropertyDocumentWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDocuments\.create\(/);
+  assert.match(app, /PropertyDeskDocumentRepository\.create\(/);
+  assert.match(app, /PropertyDeskPropertyDetailDocumentEvents\.create\(/);
   assert.match(
     app,
     /attachPropertyDetailEvents,\s*attachPropertyQuickActionEvents\s*\}/,
@@ -91,7 +93,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:PropertyDetailEvents|PropertyDetailDocumentEvents|Documents|DocumentRepository|PropertyQuickNote|PropertyManagement)\.create/,
+    /PropertyDesk(?:PropertyDetailEvents|PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
@@ -129,7 +131,7 @@ test("app root composes independent property screens and shares detail actions",
     "PropertyDeskPropertyDetailContentWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
     "PropertyDeskPropertyHolderManagement.create(",
-    "PropertyDeskPropertyDocumentWorkflow.create(",
+    "PropertyDeskPropertyDetailDocumentEvents.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
   ].map((marker) => app.indexOf(marker));
@@ -147,7 +149,9 @@ test("app root composes independent property screens and shares detail actions",
     "features/property-detail-actions-workflow.js",
     "features/property-holder-management.js",
     "features/property-holder-events.js",
-    "features/property-document-workflow.js",
+    "features/documents.js",
+    "features/document-repository.js",
+    "features/property-detail-document-events.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview.js",

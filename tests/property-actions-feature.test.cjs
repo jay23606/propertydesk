@@ -214,7 +214,7 @@ test("app composes property detail content, actions, and document routes", () =>
     "PropertyDeskPropertyDetailContentWorkflow.create(",
     "PropertyDeskPropertyDetailActionsWorkflow.create(",
     "PropertyDeskPropertyHolderManagement.create(",
-    "PropertyDeskPropertyDocumentWorkflow.create(",
+    "PropertyDeskPropertyDetailDocumentEvents.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -223,7 +223,11 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     app,
-    /PropertyDeskPropertyDocumentWorkflow.create\(\{[\s\S]*?openPropertyDetails,/,
+    /PropertyDeskDocuments.create\(\{[\s\S]*?openPropertyDetails,[\s\S]*?repository: window\.PropertyDeskDocumentRepository\.create\(/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyDetailDocumentEvents.create\(\{[\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
   );
   assert.match(
     app,

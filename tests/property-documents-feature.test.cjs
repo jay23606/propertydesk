@@ -80,57 +80,34 @@ test("property detail document events route private document actions to document
   ]);
 });
 
-test("property document workflow composes private file actions and event routing", () => {
-  const passed = {};
-  const action = () => {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDocuments: {
-        create: (options) => {
-          passed.documents = options;
-          return {
-            uploadPropertyDocument: action,
-            deletePropertyDocument: action,
-            openPropertyDocument: action,
-          };
-        },
-      },
-      PropertyDeskDocumentRepository: {
-        create: (clientSource) => {
-          passed.clientSource = clientSource;
-          return {};
-        },
-      },
-      PropertyDeskPropertyDetailDocumentEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: action };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "property-document-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const state = { client: null };
-  const attach = context.window.PropertyDeskPropertyDocumentWorkflow.create({
-    $: action,
-    state,
-    toast: action,
-    fetchAll: action,
-    openPropertyDetails: action,
-  }).attachPropertyDocumentEvents;
+test("app connects private document actions to their detail event router", () => {
+  const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.equal(typeof attach, "function");
-  assert.equal(passed.clientSource(), null);
-  const client = {};
-  state.client = client;
-  assert.equal(passed.clientSource(), client);
-  assert.equal(passed.events.uploadPropertyDocument, action);
-  assert.equal(passed.events.deletePropertyDocument, action);
-  assert.equal(passed.events.openPropertyDocument, action);
+  const documents = app.indexOf("PropertyDeskDocuments.create(");
+  const repository = app.indexOf("PropertyDeskDocumentRepository.create(");
+  const events = app.indexOf(
+    "PropertyDeskPropertyDetailDocumentEvents.create(",
+  );
+  assert.ok(documents >= 0 && documents < repository && repository < events);
+  assert.match(
+    app,
+    /repository: window\.PropertyDeskDocumentRepository\.create\(\s*\(\) => state\.client,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskPropertyDetailDocumentEvents.create\(\{[\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
+  );
+  assert.match(app, /attachPropertyDocumentEvents/);
+  assert.equal(
+    fs.existsSync(path.join(root, "features", "property-document-workflow.js")),
+    false,
+  );
+  assert.equal(html.includes("features/property-document-workflow.js"), false);
+  assert.equal(
+    worker.includes("features/property-document-workflow.js"),
+    false,
+  );
 });
