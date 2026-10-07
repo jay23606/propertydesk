@@ -17,6 +17,8 @@
       openModal,
       previewReminderEmail,
       saveCorrection,
+      navigate,
+      documentRef,
     } = context;
     const propertyForm = window.PropertyDeskPropertyForm.create({
       $,
@@ -53,6 +55,18 @@
       openModal,
       saveCorrection,
     });
+    const createActions = window.PropertyDeskCreateActions.create({
+      $,
+      state,
+      toast,
+      resetPropertyForm: propertyForm.resetPropertyForm,
+      openModal,
+      openAccountForProperty: accountForm.openAccountForProperty,
+      openPayment: ledgerEntryForms.openPayment,
+      openExpense: ledgerEntryForms.openExpense,
+      navigate,
+      documentRef,
+    });
     return {
       resetPropertyForm: propertyForm.resetPropertyForm,
       editAccount: accountForm.editAccount,
@@ -64,6 +78,7 @@
       attachPropertyFormEvents: propertyForm.attachEvents,
       attachAccountFormEvents: accountForm.attachEvents,
       attachLedgerEntryFormEvents: ledgerEntryForms.attachEvents,
+      attachCreateActionEvents: createActions.attachEvents,
     };
   }
 

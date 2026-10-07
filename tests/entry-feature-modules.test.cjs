@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("app root wires record entry forms and create actions directly", () => {
+test("record entry workflow owns forms and their global create actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
 
   assert.ok(
@@ -19,7 +19,6 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
-  assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
@@ -49,7 +48,9 @@ test("app root wires record entry forms and create actions directly", () => {
   for (const feature of ["PropertyForm", "AccountForm", "LedgerEntryForms"]) {
     assert.match(workflow, new RegExp(`PropertyDesk${feature}\\.create\\(`));
   }
-  assert.doesNotMatch(workflow, /PropertyDeskCreateActions/);
+  assert.match(workflow, /PropertyDeskCreateActions\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskCreateActions\.create\(/);
+  assert.match(app, /attachCreateActionEvents/);
   const creationOrder = [
     "PropertyDeskTransactionMaintenanceWorkflow.create(",
     "PropertyDeskRecordEntryWorkflow.create(",
@@ -96,7 +97,6 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /transactionMaintenance\.createActionHandlers\(/);
