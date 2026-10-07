@@ -8,7 +8,7 @@ const loanAmortizationFactory = require("../features/loan-amortization-utils.js"
 require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("../features/ledger-utils.js");
 const scheduleUtils = scheduleFactory.create({
-  isPosted: ledgerUtils.isPosted,
+  isDueReducingPayment: ledgerUtils.isDueReducingPayment,
 });
 const loanUtils = loanAmortizationFactory.create({
   sumPosted: ledgerUtils.sumPosted,
@@ -50,6 +50,7 @@ test("due schedule and loan amortization utilities load before the stable ledger
       "amountDueSince",
       "amortizationSchedule",
       "hasPostedPaymentInMonth",
+      "isDueReducingPayment",
       "isPosted",
       "monthlyScheduledEstimate",
       "paymentStatusInMonth",

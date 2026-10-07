@@ -6,6 +6,15 @@
     return !transaction?.status || transaction.status === "posted";
   }
 
+  const excludedDuePaymentCategories = new Set(["deposit", "late_fee"]);
+
+  function isDueReducingPayment(payment) {
+    return (
+      isPosted(payment) &&
+      !excludedDuePaymentCategories.has(payment.income_category)
+    );
+  }
+
   function postedOnOrAfter(transactions, dateField, startDate) {
     return transactions.filter(
       (transaction) =>
@@ -19,8 +28,7 @@
     return payments.some(
       (payment) =>
         payment.account_id === accountId &&
-        isPosted(payment) &&
-        !["deposit", "late_fee"].includes(payment.income_category) &&
+        isDueReducingPayment(payment) &&
         String(payment.received_date || "").slice(0, 7) === yearMonth,
     );
   }
@@ -32,8 +40,7 @@
       .filter(
         (payment) =>
           payment.account_id === accountId &&
-          isPosted(payment) &&
-          !["deposit", "late_fee"].includes(payment.income_category) &&
+          isDueReducingPayment(payment) &&
           String(payment.received_date || "").slice(0, 7) === yearMonth,
       )
       .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
@@ -84,7 +91,7 @@
     throw new Error(
       "PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.",
     );
-  const schedule = scheduleFactory.create({ isPosted });
+  const schedule = scheduleFactory.create({ isDueReducingPayment });
   const loans = loanFactory.create({ sumPosted });
   const depositFactory = globalThis.PropertyDeskDepositLedgerUtils;
   if (!depositFactory)
@@ -96,6 +103,7 @@
     amountDueSince: schedule.amountDueSince,
     amortizationSchedule: loans.amortizationSchedule,
     hasPostedPaymentInMonth,
+    isDueReducingPayment,
     isPosted,
     monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
     paymentStatusInMonth,

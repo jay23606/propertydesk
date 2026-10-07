@@ -1,7 +1,7 @@
 /* Projected rent and installment due dates, separate from posted ledger totals. */
 (() => {
   "use strict";
-  function createScheduleUtils({ isPosted }) {
+  function createScheduleUtils({ isDueReducingPayment }) {
     const monthDateWithAnchor =
       globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
     if (!monthDateWithAnchor)
@@ -118,8 +118,7 @@
         .filter(
           (item) =>
             accountIds.has(item.account_id) &&
-            isPosted(item) &&
-            !["deposit", "late_fee"].includes(item.income_category) &&
+            isDueReducingPayment(item) &&
             String(item.received_date || "") >= accrualStart &&
             String(item.received_date || "") <= asOf,
         )

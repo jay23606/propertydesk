@@ -7,6 +7,7 @@ require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("../features/ledger-utils.js");
 const {
   hasPostedPaymentInMonth,
+  isDueReducingPayment,
   isPosted,
   monthlyScheduledEstimate,
   paymentStatusInMonth,
@@ -18,6 +19,18 @@ const {
   sumOperatingExpenses,
   sumPosted,
 } = ledgerUtils;
+
+test("only posted non-deposit and non-late-fee payments reduce scheduled dues", () => {
+  assert.equal(isDueReducingPayment({ income_category: "installment" }), true);
+  assert.equal(isDueReducingPayment({ income_category: "rent" }), true);
+  assert.equal(isDueReducingPayment({ income_category: "other" }), true);
+  assert.equal(isDueReducingPayment({ income_category: "deposit" }), false);
+  assert.equal(isDueReducingPayment({ income_category: "late_fee" }), false);
+  assert.equal(
+    isDueReducingPayment({ income_category: "installment", status: "voided" }),
+    false,
+  );
+});
 
 test("postedOnOrAfter shares date filtering and excludes voided rows", () => {
   const rows = [
