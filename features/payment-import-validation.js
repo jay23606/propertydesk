@@ -2,13 +2,9 @@
 (() => {
   "use strict";
 
-  const {
-    csvMoney,
-    createImportLookup,
-    markPossibleDuplicates,
-    validIsoDate,
-    validateImportRows,
-  } = globalThis.PropertyDeskImportUtils;
+  const { createImportLookup, markPossibleDuplicates, validateImportRows } =
+    globalThis.PropertyDeskImportRows;
+  const { csvMoney, validIsoDate } = globalThis.PropertyDeskCsvValueUtils;
   const {
     incomeCategories,
     paymentMethods,

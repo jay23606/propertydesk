@@ -30,7 +30,7 @@ test("every feature module loads before app.js and every local script is precach
   );
   assert.ok(
     localScripts.indexOf("features/money-input-utils.js") <
-      localScripts.indexOf("features/import-utils.js"),
+      localScripts.indexOf("features/csv-value-utils.js"),
   );
   const featureModules = fs
     .readdirSync(path.join(__dirname, "..", "features"))
@@ -333,7 +333,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview.js", "app.js"],
     ["features/import-preview-events.js", "app.js"],
     ["features/csv-parser.js", "features/imports.js"],
-    ["features/import-utils.js", "features/imports.js"],
+    ["features/import-row-utils.js", "features/imports.js"],
     ["features/import-validation-api.js", "features/imports.js"],
     ["features/account-import.js", "features/imports.js"],
     ["features/expense-import.js", "features/imports.js"],
@@ -526,7 +526,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/profile-settings.js", "features/workspace.js"],
     ["features/workspace-members.js", "features/workspace.js"],
-    ["features/csv-parser.js", "features/import-utils.js"],
+    ["features/csv-value-utils.js", "features/import-validation-api.js"],
     [
       "features/account-import-validation.js",
       "features/import-validation-api.js",

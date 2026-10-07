@@ -2,8 +2,9 @@
 (() => {
   "use strict";
 
-  const { csvMoney, csvRate, validIsoDate, validateImportRows } =
-    globalThis.PropertyDeskImportUtils;
+  const { csvMoney, csvRate, validIsoDate } =
+    globalThis.PropertyDeskCsvValueUtils;
+  const { validateImportRows } = globalThis.PropertyDeskImportRows;
   const { accountTypes, paymentFrequencies, propertyKinds, defaults } =
     globalThis.PropertyDeskDomainOptions;
   const accountTypeValues = new Set(accountTypes.map(({ value }) => value));

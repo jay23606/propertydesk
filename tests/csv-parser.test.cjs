@@ -38,6 +38,9 @@ test("CSV parser rejects malformed headings and quoting and marks long rows", ()
   assert.throws(() => parseCSV('a,b\n1,un"closed'), /quote inside/i);
 });
 
-test("import helpers preserve the established parser function reference", () => {
-  assert.equal(require("../features/import-utils.js").parseCSV, parseCSV);
+test("CSV parsing stays separate from field value validation", () => {
+  assert.equal(typeof parseCSV, "function");
+  const valueUtils = require("../features/csv-value-utils.js");
+  assert.equal(typeof valueUtils.csvMoney, "function");
+  assert.equal("parseCSV" in valueUtils, false);
 });

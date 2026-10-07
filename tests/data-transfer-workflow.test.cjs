@@ -19,13 +19,13 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(imports, /PropertyDeskImportPreview\.create\(/);
   assert.match(imports, /PropertyDeskImportPreviewEvents\.create\(/);
-  assert.match(imports, /window\.PropertyDeskImportUtils/);
+  assert.match(imports, /window\.PropertyDeskImportRows/);
   assert.match(imports, /window\.PropertyDeskImportWorkflows/);
   assert.match(imports, /stageImport: importPreview\.stageImport/);
   assert.match(imports, /repository,\s*\n\s*\}\);/);
   assert.doesNotMatch(
     app,
-    /PropertyDeskImportUtils|PropertyDeskImportWorkflows/,
+    /PropertyDeskImportRows|PropertyDeskImportWorkflows/,
   );
   assert.match(
     app,

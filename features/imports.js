@@ -14,8 +14,9 @@
       toast,
       repository,
     } = context;
-    const { selectImportRows, parseCSV, createImportLookup } =
-      window.PropertyDeskImportUtils;
+    const { selectImportRows, createImportLookup } =
+      window.PropertyDeskImportRows;
+    const { parseCSV } = window.PropertyDeskCsvParser;
     const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
       window.PropertyDeskImportWorkflows;
     const importPreview = window.PropertyDeskImportPreview.create({

@@ -5,12 +5,14 @@ require("../features/money-input-utils.js");
 const {
   csvMoney,
   csvRate,
+  validIsoDate,
+} = require("../features/csv-value-utils.js");
+const {
   createImportLookup,
   markPossibleDuplicates,
   selectImportRows,
-  validIsoDate,
   validateImportRows,
-} = require("../features/import-utils.js");
+} = require("../features/import-row-utils.js");
 
 test("row validation keeps valid rows and reports every bad source row", () => {
   const rows = parseCSV(

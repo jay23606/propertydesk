@@ -78,11 +78,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const expenses = { attachEvents: () => calls.push("expense events") };
   const context = vm.createContext({
     window: {
-      PropertyDeskImportUtils: {
+      PropertyDeskImportRows: {
         selectImportRows: (rows) => rows,
-        parseCSV() {},
         createImportLookup,
       },
+      PropertyDeskCsvParser: { parseCSV() {} },
       PropertyDeskImportWorkflows: {
         validateAccountRows() {},
         validatePaymentRows() {},
@@ -219,11 +219,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   assert.equal(passed.payment.importReview, passed.expense.importReview);
   assert.equal(
     passed.payment.createImportLookup,
-    context.window.PropertyDeskImportUtils.createImportLookup,
+    context.window.PropertyDeskImportRows.createImportLookup,
   );
   assert.equal(
     passed.expense.createImportLookup,
-    context.window.PropertyDeskImportUtils.createImportLookup,
+    context.window.PropertyDeskImportRows.createImportLookup,
   );
   assert.equal(
     passed.account.validateAccountRows,
@@ -383,10 +383,12 @@ test("payment and expense CSV importers save their own validated transaction pay
     },
   };
   const baseCreateImportLookup =
-    context.window.PropertyDeskImportUtils.createImportLookup;
-  context.window.PropertyDeskImportUtils = {
-    ...context.window.PropertyDeskImportUtils,
+    context.window.PropertyDeskImportRows.createImportLookup;
+  context.window.PropertyDeskCsvParser = {
     parseCSV: (content) => JSON.parse(content),
+  };
+  context.window.PropertyDeskImportRows = {
+    ...context.window.PropertyDeskImportRows,
     createImportLookup(properties, accounts) {
       lookupBuilds++;
       return baseCreateImportLookup(properties, accounts);
@@ -586,10 +588,7 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     properties: [],
     client: { rpc: async () => ({ data: { rows_accepted: 0 }, error: null }) },
   };
-  context.window.PropertyDeskImportUtils = {
-    ...context.window.PropertyDeskImportUtils,
-    parseCSV: () => [{}],
-  };
+  context.window.PropertyDeskCsvParser = { parseCSV: () => [{}] };
   context.window.PropertyDeskImportWorkflows = {
     validateAccountRows: () => ({
       valid: [{ account_name: "Test" }],
