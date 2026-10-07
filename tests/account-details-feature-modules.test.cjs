@@ -291,7 +291,7 @@ test("account detail event router dispatches edit, payment, and close actions", 
     openPayment: (id) => calls.push(`payment:${id}`),
     closeAccount: (value) => calls.push(`account-close:${value.id}`),
   });
-  feature.attachEvents();
+  feature.attachAccountDetailActionEvents();
   const actions = [
     ["[data-account-detail-edit]", { accountDetailEdit: "account-1" }],
     ["[data-account-detail-payment]", { accountDetailPayment: "account-1" }],

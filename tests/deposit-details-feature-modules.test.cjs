@@ -110,7 +110,7 @@ test("deposit detail event router refreshes the ledger after a recorded adjustme
       return true;
     },
   });
-  feature.attachEvents();
+  feature.attachDepositAdjustmentEvents();
   await clickHandler({
     target: {
       closest: (selector) =>

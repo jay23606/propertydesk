@@ -23,7 +23,7 @@
     const { closeAccount } = window.PropertyDeskAccountCloseEntry.create({
       saveCloseAccount,
     });
-    const { attachEvents: attachAccountDetailActionEvents } =
+    const { attachAccountDetailActionEvents } =
       window.PropertyDeskAccountDetailEvents.create({
         $,
         state,

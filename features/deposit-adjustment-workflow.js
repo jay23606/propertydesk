@@ -31,7 +31,7 @@
         saveDepositAdjustment,
         validateAdjustment,
       });
-    const { attachEvents: attachDepositAdjustmentEvents } =
+    const { attachDepositAdjustmentEvents } =
       window.PropertyDeskDepositDetailEvents.create({
         $,
         state,

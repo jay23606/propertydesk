@@ -10,7 +10,7 @@
     openPayment,
     closeAccount,
   }) {
-    function attachEvents() {
+    function attachAccountDetailActionEvents() {
       $("detail-content").addEventListener("click", (event) => {
         const edit = event.target.closest("[data-account-detail-edit]");
         if (edit) {
@@ -44,7 +44,7 @@
       });
     }
 
-    return { attachEvents };
+    return { attachAccountDetailActionEvents };
   }
 
   window.PropertyDeskAccountDetailEvents = Object.freeze({

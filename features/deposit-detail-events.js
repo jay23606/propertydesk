@@ -8,7 +8,7 @@
     depositSectionHTML,
     recordDepositAdjustment,
   }) {
-    function attachEvents() {
+    function attachDepositAdjustmentEvents() {
       $("detail-content").addEventListener("click", async (event) => {
         const adjustment = event.target.closest("[data-deposit-adjustment]");
         if (!adjustment) return;
@@ -26,7 +26,7 @@
       });
     }
 
-    return { attachEvents };
+    return { attachDepositAdjustmentEvents };
   }
 
   window.PropertyDeskDepositDetailEvents = Object.freeze({

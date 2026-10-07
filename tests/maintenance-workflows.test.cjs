@@ -224,7 +224,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
       PropertyDeskDepositDetailEvents: {
         create: (options) => {
           passed.events = options;
-          return { attachEvents: attachDepositAdjustmentEvents };
+          return { attachDepositAdjustmentEvents };
         },
       },
     },
@@ -290,7 +290,7 @@ test("account detail action workflow wires only account close concerns", () => {
       PropertyDeskAccountDetailEvents: {
         create: (options) => {
           passed.events = options;
-          return { attachEvents };
+          return { attachAccountDetailActionEvents: attachEvents };
         },
       },
     },
