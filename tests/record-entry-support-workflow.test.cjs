@@ -12,7 +12,8 @@ test("app composes reminder activity separately from modal and form options", ()
   const createOrder = [
     "PropertyDeskModalController.create(",
     "PropertyDeskFormOptions.create(",
-    "PropertyDeskReminderActivityWorkflow.create(",
+    "PropertyDeskReminderActivityModel.create(",
+    "PropertyDeskReminderActivityView.create(",
     "PropertyDeskReminderPreview.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(createOrder.every((position) => position >= 0));
@@ -30,9 +31,9 @@ test("app composes reminder activity separately from modal and form options", ()
     /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(app, /previewReminderEmail,/);
-  assert.doesNotMatch(
+  assert.match(
     app,
-    /PropertyDeskReminderActivity(Model|View)\.create\(/,
+    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: reminderActivityModel,/,
   );
   assert.doesNotMatch(app, /PropertyDeskRecordEntrySupportWorkflow/);
 
@@ -41,7 +42,6 @@ test("app composes reminder activity separately from modal and form options", ()
     "features/form-options.js",
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",
-    "features/reminder-activity-workflow.js",
     "features/reminder-preview.js",
   ]) {
     assert.ok(

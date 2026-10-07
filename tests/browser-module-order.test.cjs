@@ -302,10 +302,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/reminder-activity-model.js",
       "features/reminder-activity-view.js",
     ],
-    [
-      "features/reminder-activity-view.js",
-      "features/reminder-activity-workflow.js",
-    ],
+    ["features/reminder-activity-view.js", "app.js"],
     ["features/reminder-preview-model.js", "features/reminder-preview.js"],
     ["features/report-model.js", "features/report-views.js"],
     ["features/report-export.js", "features/report-workflow.js"],

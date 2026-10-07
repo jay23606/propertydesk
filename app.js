@@ -82,13 +82,18 @@
       propertyAddress,
       prettyType,
     });
-  const { renderReminderActivity } =
-    window.PropertyDeskReminderActivityWorkflow.create({
-      $,
+  const reminderActivityModel = window.PropertyDeskReminderActivityModel.create(
+    {
       state,
+    },
+  );
+  const { renderReminderActivity } =
+    window.PropertyDeskReminderActivityView.create({
+      $,
       esc,
       fmtDate,
       money,
+      model: reminderActivityModel,
     });
   const reminderPreviewModel = window.PropertyDeskReminderPreviewModel.create({
     amountDueSince,
