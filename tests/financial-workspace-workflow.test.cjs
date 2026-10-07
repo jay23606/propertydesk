@@ -20,7 +20,8 @@ test("app root wires account, deposit, and transaction actions directly", () => 
     "features/transaction-void-entry.js",
     "features/transaction-correction-form.js",
     "features/transaction-view-events.js",
-    "features/account-history-details.js",
+    "features/account-history-model.js",
+    "features/account-history-view.js",
     "features/account-detail-content-workflow.js",
     "features/deposit-context.js",
   ];

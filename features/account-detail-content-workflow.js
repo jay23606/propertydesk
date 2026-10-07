@@ -21,13 +21,18 @@
       propertyAddress,
       depositSectionHTML,
     } = context;
-    const { renderAccountHistory } =
-      window.PropertyDeskAccountHistoryDetails.create({
-        state,
+    const { loadAccountHistory } =
+      window.PropertyDeskAccountHistoryModel.create({ state });
+    const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create(
+      {
         esc,
         money,
         fmtDate,
-      });
+      },
+    );
+    async function renderAccountHistory(account, payments) {
+      return accountHistoryHTML(await loadAccountHistory(account, payments));
+    }
     const { accountLoanScheduleHTML } =
       window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
     const { renderAccountDetails } =

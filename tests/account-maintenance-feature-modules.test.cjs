@@ -51,11 +51,12 @@ test("app connects account and deposit actions without workflow wrappers", () =>
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 
-test("account detail content workflow composes schedule and selected account", () => {
+test("account detail content workflow composes schedule, history, and account", async () => {
   const passed = {};
   const accountLoanScheduleHTML = () => "schedule";
   const renderAccountDetails = () => "details";
-  const renderAccountHistory = () => "history";
+  const accountHistoryHTML = () => "history";
+  const accountHistory = { auditError: false };
   const depositSectionHTML = () => "deposit";
   const openAccountDetails = () => "opened";
   const context = vm.createContext({
@@ -90,10 +91,16 @@ test("account detail content workflow composes schedule and selected account", (
           return { openAccountDetails };
         },
       },
-      PropertyDeskAccountHistoryDetails: {
+      PropertyDeskAccountHistoryModel: {
         create: (options) => {
-          passed.history = options;
-          return { renderAccountHistory };
+          passed.historyModel = options;
+          return { loadAccountHistory: async () => accountHistory };
+        },
+      },
+      PropertyDeskAccountHistoryView: {
+        create: (options) => {
+          passed.historyView = options;
+          return { accountHistoryHTML };
         },
       },
     },
@@ -134,8 +141,8 @@ test("account detail content workflow composes schedule and selected account", (
     );
 
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
-  assert.equal(passed.history.state, dependencies.state);
-  assert.equal(passed.history.esc, dependencies.esc);
+  assert.equal(passed.historyModel.state, dependencies.state);
+  assert.equal(passed.historyView.esc, dependencies.esc);
   assert.equal(passed.model.state, dependencies.state);
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(
@@ -145,54 +152,16 @@ test("account detail content workflow composes schedule and selected account", (
   assert.equal(typeof passed.model.summarizeAccount, "function");
   assert.equal(passed.details.renderAccountDetails, renderAccountDetails);
   assert.equal(typeof passed.details.buildAccountDetailData, "function");
-  assert.equal(passed.details.renderAccountHistory, renderAccountHistory);
+  assert.equal(
+    await passed.details.renderAccountHistory({}, []),
+    accountHistoryHTML(),
+  );
   assert.equal(
     passed.details.depositSectionHTML,
     dependencies.depositSectionHTML,
   );
   assert.deepEqual(Object.keys(workflow), ["openAccountDetails"]);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
-});
-
-test("account history details connect the history query and rendering", async () => {
-  const passed = {};
-  const accountHistoryHTML = (history) => history;
-  const history = { auditError: false };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountHistoryModel: {
-        create: (options) => {
-          passed.model = options;
-          return { loadAccountHistory: async () => history };
-        },
-      },
-      PropertyDeskAccountHistoryView: {
-        create: (options) => {
-          passed.view = options;
-          return { accountHistoryHTML };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-history-details.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    state: {},
-    esc() {},
-    money() {},
-    fmtDate() {},
-  };
-  const feature =
-    context.window.PropertyDeskAccountHistoryDetails.create(dependencies);
-
-  assert.equal(passed.model.state, dependencies.state);
-  assert.equal(await feature.renderAccountHistory({}, []), history);
-  assert.equal(passed.view.esc, dependencies.esc);
 });
 
 test("account close maintenance preserves the account history", async () => {

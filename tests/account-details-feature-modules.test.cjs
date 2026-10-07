@@ -317,7 +317,6 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
     "account-history-repository.js",
     "account-history-model.js",
     "account-history-view.js",
-    "account-history-details.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -385,15 +384,22 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
       },
     },
   };
-  const history = context.window.PropertyDeskAccountHistoryDetails.create({
-    state,
-    esc: (value) =>
-      String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
-    money: (value) => `$${Number(value || 0).toFixed(2)}`,
-    fmtDate: (value) => value || "—",
-  });
+  const esc = (value) =>
+    String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  const money = (value) => `$${Number(value || 0).toFixed(2)}`;
+  const fmtDate = (value) => value || "—";
+  const { loadAccountHistory } =
+    context.window.PropertyDeskAccountHistoryModel.create({ state });
+  const { accountHistoryHTML } =
+    context.window.PropertyDeskAccountHistoryView.create({
+      esc,
+      money,
+      fmtDate,
+    });
+  const renderAccountHistory = async (account, payments) =>
+    accountHistoryHTML(await loadAccountHistory(account, payments));
 
-  const html = await history.renderAccountHistory({ id: "account-1" }, [
+  const html = await renderAccountHistory({ id: "account-1" }, [
     { id: "payment-1", void_reason: "<duplicate>" },
   ]);
 
@@ -409,10 +415,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   state.client.from = () => {
     throw new Error("audit unavailable");
   };
-  const unavailableHTML = await history.renderAccountHistory(
-    { id: "account-1" },
-    [],
-  );
+  const unavailableHTML = await renderAccountHistory({ id: "account-1" }, []);
   assert.match(unavailableHTML, /Change history is temporarily unavailable/);
   assert.match(unavailableHTML, /Prior agreement terms/);
 });

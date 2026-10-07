@@ -83,9 +83,12 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/account-payload.js", "features/account-form.js"],
     [
       "features/account-history-model.js",
-      "features/account-history-details.js",
+      "features/account-detail-content-workflow.js",
     ],
-    ["features/account-history-view.js", "features/account-history-details.js"],
+    [
+      "features/account-history-view.js",
+      "features/account-detail-content-workflow.js",
+    ],
     [
       "features/account-history-repository.js",
       "features/account-history-model.js",
