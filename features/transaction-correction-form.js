@@ -14,8 +14,7 @@
     updatePaymentGuidance,
     EventClass = Event,
     OptionClass = Option,
-    findCorrectionTarget = window.PropertyDeskTransactionCorrectionModel
-      .findCorrectionTarget,
+    findCorrectionTarget,
   }) {
     const view = window.PropertyDeskTransactionCorrectionView.create({
       $,

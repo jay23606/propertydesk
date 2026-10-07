@@ -16,6 +16,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   const transactionRepository = { voidPosted() {}, correct() {} };
   const resolveVoidTarget = () => ({ table: "pd_payments" });
   const buildVoidPayload = () => ({ status: "voided" });
+  const findCorrectionTarget = () => null;
   const saveCorrection = () => {};
   const saveVoidTransaction = () => {};
   const voidTransaction = () => {};
@@ -31,6 +32,7 @@ test("transaction maintenance coordinator joins correction and void actions", ()
         resolveVoidTarget,
         buildVoidPayload,
       },
+      PropertyDeskTransactionCorrectionModel: { findCorrectionTarget },
       PropertyDeskTransactionCorrections: {
         create: (options) => {
           passed.corrections = options;
@@ -103,6 +105,10 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   assert.equal(
     passed.correctionForm.updatePaymentGuidance,
     updatePaymentGuidance,
+  );
+  assert.equal(
+    passed.correctionForm.findCorrectionTarget,
+    findCorrectionTarget,
   );
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);

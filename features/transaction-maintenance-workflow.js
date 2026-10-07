@@ -56,6 +56,8 @@
           openPayment,
           openExpense,
           updatePaymentGuidance,
+          findCorrectionTarget:
+            window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
           EventClass,
           OptionClass,
         });
