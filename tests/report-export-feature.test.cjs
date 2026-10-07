@@ -20,7 +20,7 @@ test("backup and report exports own separate button bindings", () => {
     if (file === "backup-export.js") {
       context.window.PropertyDeskWorkspaceTables = require("../workspace-table-catalog.js");
       context.window.PropertyDeskBackupUtils =
-        require("../backup-utils.js").create({
+        require("../features/backup-utils.js").create({
           workspaceTables: require("../workspace-table-catalog.js"),
         });
       vm.runInContext(

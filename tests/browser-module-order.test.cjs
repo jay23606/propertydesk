@@ -62,7 +62,7 @@ test("browser feature scripts load after their dependencies", () => {
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const dependencies = [
     ["features/domain-options.js", "features/account-import-validation.js"],
-    ["workspace-table-catalog.js", "backup-utils.js"],
+    ["workspace-table-catalog.js", "features/backup-utils.js"],
     [
       "features/transaction-options.js",
       "features/expense-import-validation.js",
@@ -137,7 +137,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/backup-records.js", "features/backup-archive.js"],
     ["features/backup-agreement-files.js", "features/backup-export.js"],
     ["features/backup-archive.js", "features/backup-export.js"],
-    ["backup-utils.js", "features/backup-records.js"],
+    ["features/backup-utils.js", "features/backup-records.js"],
     ["workspace-query.js", "features/backup-records.js"],
     [
       "features/deposit-adjustment-model.js",

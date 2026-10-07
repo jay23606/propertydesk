@@ -88,11 +88,10 @@ test("backup agreement collector downloads only workspace-scoped files into the 
 test("backup export aborts before download when a private document path escapes the workspace", async () => {
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskWorkspaceTables = require("../workspace-table-catalog.js");
-  context.window.PropertyDeskBackupUtils = require("../backup-utils.js").create(
-    {
+  context.window.PropertyDeskBackupUtils =
+    require("../features/backup-utils.js").create({
       workspaceTables: context.window.PropertyDeskWorkspaceTables,
-    },
-  );
+    });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
     context,
@@ -197,11 +196,10 @@ test("backup export aborts before download when a private document path escapes 
 test("backup export adds the validated private agreement to the ZIP and manifest", async () => {
   const context = vm.createContext({ window: {} });
   context.window.PropertyDeskWorkspaceTables = require("../workspace-table-catalog.js");
-  context.window.PropertyDeskBackupUtils = require("../backup-utils.js").create(
-    {
+  context.window.PropertyDeskBackupUtils =
+    require("../features/backup-utils.js").create({
       workspaceTables: context.window.PropertyDeskWorkspaceTables,
-    },
-  );
+    });
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
     context,
