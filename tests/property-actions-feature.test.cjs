@@ -229,7 +229,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     workspaceWorkflow,
-    /PropertyDeskPropertyScreenWorkflow\.create\(detail\)/,
+    /PropertyDeskPropertyScreenWorkflow\.create\(\{[\s\S]*?content: detail\.content,[\s\S]*?documents: detail\.documents/,
   );
   const workflow = fs.readFileSync(
     path.join(

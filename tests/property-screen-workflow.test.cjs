@@ -7,7 +7,22 @@ const vm = require("node:vm");
 test("property screen workflow passes detail actions to management and returns both", () => {
   const calls = [];
   const openPropertyDetails = () => "details";
-  const content = { state: {} };
+  const content = {
+    $() {},
+    state: {},
+    isPosted() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    accountBalance() {},
+    openModal() {},
+    propertyAddress() {},
+    unusedContentValue: true,
+  };
   const management = {
     closeModal() {},
     toast() {},
@@ -78,7 +93,25 @@ test("property screen workflow passes detail actions to management and returns b
   });
 
   assert.equal(calls[0][0], "content");
-  assert.equal(calls[0][1], content);
+  assert.equal(calls[0][1].state, content.state);
+  assert.equal(calls[0][1].isPosted, content.isPosted);
+  assert.equal(calls[0][1].propertyAddress, content.propertyAddress);
+  assert.equal("unusedContentValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "$",
+    "accountBalance",
+    "esc",
+    "fmtDate",
+    "isPosted",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "state",
+    "sumIncome",
+    "sumOperatingExpenses",
+  ]);
   assert.equal(calls[1][0], "management");
   assert.equal(calls[1][1].closeModal, management.closeModal);
   assert.equal(calls[1][1].toast, management.toast);

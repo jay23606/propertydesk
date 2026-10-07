@@ -8,7 +8,13 @@ test("property workspace shares detail actions across overview and grid", () => 
   const root = path.join(__dirname, "..");
   const calls = [];
   const openPropertyDetails = () => "details";
-  const detail = { content: {}, management: {} };
+  const detail = {
+    content: {},
+    management: {},
+    holders: {},
+    documents: {},
+    unusedDetailValue: true,
+  };
   const openPropertyPayment = () => "overview-payment";
   const openPayment = () => "grid-payment";
   const state = {};
@@ -75,7 +81,17 @@ test("property workspace shares detail actions across overview and grid", () => 
     calls.map(([name]) => name),
     ["detail", "overview", "portfolio"],
   );
-  assert.equal(calls[0][1], detail);
+  assert.equal(calls[0][1].content, detail.content);
+  assert.equal(calls[0][1].management, detail.management);
+  assert.equal(calls[0][1].holders, detail.holders);
+  assert.equal(calls[0][1].documents, detail.documents);
+  assert.equal("unusedDetailValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "content",
+    "documents",
+    "holders",
+    "management",
+  ]);
   assert.equal(calls[1][1].state, state);
   assert.equal(calls[1][1].propertyAddress, propertyAddress);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);

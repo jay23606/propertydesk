@@ -3,8 +3,12 @@
   "use strict";
 
   function createPropertyWorkspaceWorkflow({ detail, overview, portfolio }) {
-    const propertyDetails =
-      window.PropertyDeskPropertyScreenWorkflow.create(detail);
+    const propertyDetails = window.PropertyDeskPropertyScreenWorkflow.create({
+      content: detail.content,
+      management: detail.management,
+      holders: detail.holders,
+      documents: detail.documents,
+    });
     const propertyOverview = window.PropertyDeskOverviewWorkflow.create({
       $: overview.$,
       state: overview.state,

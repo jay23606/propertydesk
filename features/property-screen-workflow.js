@@ -8,8 +8,21 @@
     holders,
     documents,
   }) {
-    const details =
-      window.PropertyDeskPropertyDetailContentWorkflow.create(content);
+    const details = window.PropertyDeskPropertyDetailContentWorkflow.create({
+      $: content.$,
+      state: content.state,
+      isPosted: content.isPosted,
+      sumIncome: content.sumIncome,
+      sumOperatingExpenses: content.sumOperatingExpenses,
+      money: content.money,
+      fmtDate: content.fmtDate,
+      esc: content.esc,
+      prettyType: content.prettyType,
+      paymentFrequencyLabel: content.paymentFrequencyLabel,
+      accountBalance: content.accountBalance,
+      openModal: content.openModal,
+      propertyAddress: content.propertyAddress,
+    });
     const actions = window.PropertyDeskPropertyDetailManagementWorkflow.create({
       $: management.$,
       state: management.state,
