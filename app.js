@@ -90,18 +90,23 @@
       fmtDate,
       money,
     });
-  const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-    $,
-    state,
+  const reminderPreviewModel = window.PropertyDeskReminderPreviewModel.create({
     amountDueSince,
     unpaidDueAccrualStart,
-    todayIso,
     monthEnd,
-    moneyInput,
-    toast,
     dateOnly,
     monthStart,
     propertyAddress,
+    money,
+  });
+  const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
+    $,
+    state,
+    todayIso,
+    moneyInput,
+    toast,
+    esc,
+    model: reminderPreviewModel,
     openModal: modal.openModal,
   });
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;

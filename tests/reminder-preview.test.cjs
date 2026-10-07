@@ -37,22 +37,24 @@ test("reminder preview uses current form values and escapes recipient-facing tex
     payments: [],
   };
   const calls = [];
-  const feature = context.window.PropertyDeskReminderPreview.create({
-    $: (id) => values[id],
-    state,
+  const model = context.window.PropertyDeskReminderPreviewModel.create({
     amountDueSince: (accounts, payments, start, end) => {
       calls.push({ account: accounts[0], payments, start, end });
       return 550;
     },
     unpaidDueAccrualStart: () => "2026-10-01",
-    todayIso: () => "2026-10-04",
     monthEnd: () => "2026-10-31",
-    moneyInput: Number,
-    toast: (message) => calls.push(message),
     dateOnly: () => ({ toLocaleDateString: () => "October 2026" }),
     monthStart: () => "2026-10-01",
     propertyAddress: (property) => property.address,
     money: (value) => "USD " + Number(value).toFixed(2),
+  });
+  const feature = context.window.PropertyDeskReminderPreview.create({
+    $: (id) => values[id],
+    state,
+    todayIso: () => "2026-10-04",
+    moneyInput: Number,
+    toast: (message) => calls.push(message),
     esc: (value) =>
       String(value ?? "").replace(
         /[&<>"']/g,
@@ -66,6 +68,7 @@ test("reminder preview uses current form values and escapes recipient-facing tex
           })[char],
       ),
     openModal: (id) => calls.push(id),
+    model,
   });
 
   feature.previewReminderEmail();

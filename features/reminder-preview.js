@@ -5,32 +5,13 @@
   function create({
     $,
     state,
-    amountDueSince,
-    unpaidDueAccrualStart,
     todayIso,
-    monthEnd,
     moneyInput,
     toast,
-    dateOnly,
-    monthStart,
-    propertyAddress,
-    money,
     esc,
     openModal,
-    model,
+    model: previewModel,
   }) {
-    const previewModel =
-      model ||
-      window.PropertyDeskReminderPreviewModel.create({
-        amountDueSince,
-        unpaidDueAccrualStart,
-        monthEnd,
-        dateOnly,
-        monthStart,
-        propertyAddress,
-        money,
-      });
-
     function previewReminderEmail() {
       const property = state.properties.find(
         (item) => item.id === $("account-property").value,

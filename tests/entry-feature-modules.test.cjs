@@ -190,6 +190,7 @@ test("app wires reminder activity and email preview separately", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const createOrder = [
     "PropertyDeskReminderActivityWorkflow.create(",
+    "PropertyDeskReminderPreviewModel.create(",
     "PropertyDeskReminderPreview.create(",
   ].map((marker) => app.indexOf(marker));
   assert.ok(createOrder.every((position) => position >= 0));
@@ -203,7 +204,7 @@ test("app wires reminder activity and email preview separately", () => {
   );
   assert.match(
     app,
-    /PropertyDeskReminderPreview.create\(\{[\s\S]*?openModal: modal\.openModal/,
+    /PropertyDeskReminderPreview.create\(\{[\s\S]*?model: reminderPreviewModel,[\s\S]*?openModal: modal\.openModal/,
   );
   assert.match(
     app,
