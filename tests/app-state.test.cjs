@@ -15,8 +15,6 @@ test("AppState resets workspace-owned values while retaining shared app state", 
   );
   const appState = context.window.PropertyDeskAppState;
   const state = appState.create();
-  const client = { auth: {} };
-  state.client = client;
   state.view = "reports";
   state.auditRequestId = 8;
   state.user = { id: "owner" };
@@ -27,7 +25,6 @@ test("AppState resets workspace-owned values while retaining shared app state", 
 
   appState.resetWorkspaceState(state);
 
-  assert.equal(state.client, client);
   assert.equal(state.view, "reports");
   assert.equal(state.auditRequestId, 9);
   assert.equal(state.user, null);
@@ -40,7 +37,6 @@ test("AppState resets workspace-owned values while retaining shared app state", 
     JSON.parse(
       JSON.stringify({
         ...appState.create(),
-        client,
         view: "reports",
         auditRequestId: 9,
       }),

@@ -5,8 +5,8 @@
   function createAppStartupWorkflow(context) {
     const {
       $,
-      state,
       backend,
+      initializeClient,
       authClient,
       todayIso,
       registerShell,
@@ -18,8 +18,8 @@
     const auth = window.PropertyDeskAuth.create(authContext);
     const lifecycle = window.PropertyDeskAppLifecycle.create({
       $,
-      state,
       backend,
+      initializeClient,
       authClient,
       todayIso,
       registerShell,

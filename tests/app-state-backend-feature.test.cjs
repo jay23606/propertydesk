@@ -17,7 +17,7 @@ test("app state starts in Properties with fresh workspace collections", () => {
   const second = context.window.PropertyDeskAppState.create();
 
   assert.equal(first.view, "properties");
-  assert.equal(first.client, null);
+  assert.equal(Object.hasOwn(first, "client"), false);
   assert.equal(first.user, null);
   assert.equal(first.properties.length, 0);
   assert.equal(first.accounts.length, 0);

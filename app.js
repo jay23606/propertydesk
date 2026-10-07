@@ -36,13 +36,21 @@
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
   const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const { backend, state, fetchAll, workspaceQuery, authClient } =
-    window.PropertyDeskWorkspaceRuntime.create({
-      config: window.PROPERTYDESK_CONFIG || {},
-      supabase: window.supabase,
-      toast,
-      render,
-    });
+  const {
+    backend,
+    state,
+    fetchAll,
+    workspaceQuery,
+    authClient,
+    getClient,
+    initializeClient,
+    isClientReady,
+  } = window.PropertyDeskWorkspaceRuntime.create({
+    config: window.PROPERTYDESK_CONFIG || {},
+    supabase: window.supabase,
+    toast,
+    render,
+  });
   const repositories = window.PropertyDeskRepositoryRegistry.create({
     repositories: {
       accounts: window.PropertyDeskAccountRepository,
@@ -55,7 +63,7 @@
       transactions: window.PropertyDeskTransactionRepository,
       workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
     },
-    getClient: () => state.client,
+    getClient,
   });
   const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
@@ -363,14 +371,15 @@
       zipUtils: window.PropertyDeskZipUtils,
       workspaceTables: window.PropertyDeskWorkspaceTables,
       loadAllPages: workspaceQuery.loadAllPages,
+      isClientReady,
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: repositories.documents,
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,
-    state,
     backend,
+    initializeClient,
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
     authClient,

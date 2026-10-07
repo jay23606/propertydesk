@@ -16,6 +16,51 @@ test("backup workspace workflow owns backup dependency composition", () => {
   );
 });
 
+test("backup export requires an initialized runtime client", async () => {
+  const context = vm.createContext({ window: {} });
+  context.window.PropertyDeskBackupArchive = {
+    create: () => ({ prepare: async () => assert.fail("backup must not run") }),
+  };
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "backup-export.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  let exportHandler;
+  const button = {
+    textContent: "Export backup",
+    disabled: false,
+    addEventListener(_event, handler) {
+      exportHandler = handler;
+    },
+  };
+  const feature = context.window.PropertyDeskBackupExport.create({
+    $: () => button,
+    state: { user: { id: "owner" } },
+    isClientReady: () => false,
+    createBackup: () => assert.fail("backup must not be created before init"),
+    todayIso: () => "2026-10-07",
+    toast: (message) => messages.push(message),
+    downloadBlob: () => assert.fail("download must not start before init"),
+    zipUtils: {},
+    loadBackupRecords: async () => ({}),
+    collectBackupAgreementFiles: async () => ({}),
+    documentRepository: {},
+  });
+
+  feature.attachEvents();
+  await exportHandler();
+
+  assert.equal(button.disabled, false);
+  assert.equal(button.textContent, "Export backup");
+  assert.deepEqual(messages, [
+    "Sign in before exporting your private records.",
+  ]);
+});
+
 test("backup workspace workflow wires the manifest, record loader, and export action", () => {
   const calls = {};
   const attachEvents = () => {};
@@ -54,7 +99,8 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
 
   const dependencies = {
     $: () => null,
-    state: { user: null, client: null },
+    state: { user: null },
+    isClientReady: () => false,
     todayIso: () => "2026-10-07",
     toast: () => {},
     downloadBlob: () => {},
@@ -74,6 +120,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
   assert.deepEqual(calls.records.tables, tables);
   assert.equal(calls.records.loadAllPages, dependencies.loadAllPages);
   assert.equal(calls.exporter.createBackup, createBackup);
+  assert.equal(calls.exporter.isClientReady, dependencies.isClientReady);
   assert.equal(calls.exporter.loadBackupRecords, load);
   assert.equal(
     calls.exporter.collectBackupAgreementFiles,
@@ -235,6 +282,7 @@ test("backup export aborts before download when a private document path escapes 
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
+    isClientReady: () => true,
     createBackup: () =>
       assert.fail("invalid paths must stop before backup creation"),
     todayIso: () => "2026-10-04",
@@ -366,6 +414,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
+    isClientReady: () => true,
     createBackup(records, exportedAt, includedFiles) {
       backupContents = { records, exportedAt, includedFiles };
       return { records };

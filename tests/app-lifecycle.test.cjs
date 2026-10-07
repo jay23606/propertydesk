@@ -27,7 +27,6 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
   };
   const lifecycle = context.window.PropertyDeskAppLifecycle.create({
     $,
-    state: { client: null },
     authClient: {
       onAuthStateChange(handler) {
         assert.equal(handler, auth.handleAuthStateChange);
@@ -36,10 +35,10 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
     },
     backend: {
       configured: true,
-      createClient() {
-        calls.push("create-client");
-        return { auth: {} };
-      },
+    },
+    initializeClient() {
+      calls.push("create-client");
+      return { auth: {} };
     },
     todayIso: () => "2026-10-05",
     registerShell: () => calls.push("register-shell"),
@@ -79,13 +78,12 @@ test("app lifecycle shows the configuration error before creating a client", asy
   const calls = [];
   const lifecycle = context.window.PropertyDeskAppLifecycle.create({
     $: () => ({ value: "" }),
-    state: {},
     authClient: { onAuthStateChange() {} },
     backend: {
       configured: false,
-      createClient() {
-        calls.push("create-client");
-      },
+    },
+    initializeClient() {
+      calls.push("create-client");
     },
     todayIso: () => "2026-10-05",
     registerShell: () => calls.push("register-shell"),

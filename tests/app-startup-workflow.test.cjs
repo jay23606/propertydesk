@@ -21,7 +21,8 @@ test("app startup composes auth and lifecycle at the original event position", (
       },
       PropertyDeskAppLifecycle: {
         create(options) {
-          assert.equal(options.state.name, "shared-state");
+          assert.equal(options.initializeClient, initializeClient);
+          assert.equal(options.authClient, authClient);
           assert.equal(options.renderers, renderers);
           assert.equal(options.eventBinders[0], firstBinder);
           assert.equal(options.eventBinders[1], secondBinder);
@@ -46,9 +47,12 @@ test("app startup composes auth and lifecycle at the original event position", (
   const firstBinder = () => {};
   const secondBinder = () => {};
   const thirdBinder = () => {};
+  const initializeClient = () => {};
+  const authClient = {};
   const lifecycle = context.window.PropertyDeskAppStartupWorkflow.create({
-    state: { name: "shared-state" },
     authContext: { state: { name: "shared-state" } },
+    initializeClient,
+    authClient,
     renderers,
     eventBindersBeforeAuth: [firstBinder, secondBinder],
     eventBindersAfterAuth: [thirdBinder],

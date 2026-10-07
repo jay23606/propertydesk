@@ -5,6 +5,7 @@
   function createBackupWorkspaceWorkflow({
     $,
     state,
+    isClientReady,
     todayIso,
     toast,
     downloadBlob,
@@ -22,6 +23,7 @@
     const exporter = window.PropertyDeskBackupExport.create({
       $,
       state,
+      isClientReady,
       createBackup: backup.createBackup,
       todayIso,
       toast,

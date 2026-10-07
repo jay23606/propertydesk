@@ -6,6 +6,7 @@
     const {
       $,
       state,
+      isClientReady,
       createBackup,
       todayIso,
       toast,
@@ -24,7 +25,7 @@
     });
 
     async function exportAll() {
-      if (!state.user || !state.client) {
+      if (!state.user || !isClientReady()) {
         toast("Sign in before exporting your private records.");
         return;
       }

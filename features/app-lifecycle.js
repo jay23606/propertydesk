@@ -4,8 +4,8 @@
 
   function create({
     $,
-    state,
     backend,
+    initializeClient,
     authClient,
     todayIso,
     registerShell,
@@ -33,7 +33,7 @@
         return;
       }
 
-      state.client = backend.createClient();
+      initializeClient();
       authClient.onAuthStateChange(auth.handleAuthStateChange);
       await auth.restoreAuthSession();
     }

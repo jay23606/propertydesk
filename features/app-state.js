@@ -4,7 +4,6 @@
 
   function createAppState() {
     return {
-      client: null,
       user: null,
       workspaceOwnerId: null,
       workspaceMembers: [],
@@ -31,12 +30,11 @@
 
   function resetWorkspaceState(state) {
     const defaults = createAppState();
-    const client = state.client;
     const view = state.view;
     const auditRequestId = Number.isFinite(state.auditRequestId)
       ? state.auditRequestId + 1
       : 1;
-    Object.assign(state, defaults, { client, view, auditRequestId });
+    Object.assign(state, defaults, { view, auditRequestId });
   }
 
   window.PropertyDeskAppState = Object.freeze({

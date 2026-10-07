@@ -8,11 +8,17 @@
       supabase,
     });
     const state = window.PropertyDeskAppState.create();
+    let client = null;
+    const getClient = () => client;
+    const initializeClient = () => {
+      client = backend.createClient();
+      return client;
+    };
     const authClient = window.PropertyDeskAuthClient.create({
-      getClient: () => state.client,
+      getClient,
     });
     const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
-      getClient: () => state.client,
+      getClient,
     });
     const workspaceData = window.PropertyDeskWorkspaceData.create({
       tables: window.PropertyDeskWorkspaceTables,
@@ -25,7 +31,16 @@
       render,
     });
 
-    return { backend, state, fetchAll, workspaceQuery, authClient };
+    return {
+      backend,
+      state,
+      fetchAll,
+      workspaceQuery,
+      authClient,
+      getClient,
+      initializeClient,
+      isClientReady: () => Boolean(client),
+    };
   }
 
   window.PropertyDeskWorkspaceRuntime = Object.freeze({

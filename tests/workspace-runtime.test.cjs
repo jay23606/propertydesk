@@ -6,8 +6,15 @@ const vm = require("node:vm");
 
 test("workspace runtime connects backend, fresh state, and data refresh", () => {
   const calls = [];
-  const backend = { configured: true };
-  const state = { client: null };
+  const client = { id: "authenticated-client" };
+  const backend = {
+    configured: true,
+    createClient() {
+      calls.push(["create-client"]);
+      return client;
+    },
+  };
+  const state = {};
   const workspaceData = { loadWorkspaceId() {}, loadWorkspaceRecords() {} };
   const workspaceQuery = { loadAllPages() {} };
   const fetchAll = async () => {};
@@ -73,10 +80,9 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[0][1].supabase, options.supabase);
   assert.equal(calls[1][0], "state");
   assert.equal(calls[2][0], "auth-client");
-  state.client = { id: "authenticated-client" };
-  assert.equal(calls[2][1].getClient(), state.client);
+  assert.equal(calls[2][1].getClient(), null);
   assert.equal(calls[3][0], "query");
-  state.client = { id: "authenticated-client" };
+  assert.equal(calls[3][1].getClient(), null);
   assert.equal(calls[4][0], "data");
   assert.equal(calls[4][1].tables, context.window.PropertyDeskWorkspaceTables);
   assert.equal(calls[4][1].workspaceQuery, workspaceQuery);
@@ -85,6 +91,13 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[5][1].workspaceData, workspaceData);
   assert.equal(calls[5][1].toast, options.toast);
   assert.equal(calls[5][1].render, options.render);
+  assert.equal(runtime.isClientReady(), false);
+  assert.equal(runtime.initializeClient(), client);
+  assert.equal(calls[6][0], "create-client");
+  assert.equal(calls[2][1].getClient(), client);
+  assert.equal(calls[3][1].getClient(), client);
+  assert.equal(runtime.getClient(), client);
+  assert.equal(runtime.isClientReady(), true);
   assert.equal(runtime.backend, backend);
   assert.equal(runtime.state, state);
   assert.equal(runtime.fetchAll, fetchAll);
