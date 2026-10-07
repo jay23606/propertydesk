@@ -10,6 +10,8 @@ async function smokeSignedInWorkflows(browser, url) {
   const signedInPageErrors = [];
   const signedInConsoleErrors = [];
   const signedInPage = await signedInContext.newPage();
+  signedInPage.setDefaultTimeout(15000);
+  signedInPage.setDefaultNavigationTimeout(30000);
   await captureUnhandledRejections(signedInPage);
   signedInPage.on("pageerror", (error) =>
     signedInPageErrors.push(error.message),
@@ -181,7 +183,8 @@ async function smokeSignedInWorkflows(browser, url) {
     };
   });
 
-  await signedInPage.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+  console.log("Smoke: loading synthetic signed-in workspace.");
+  await signedInPage.goto(url, { waitUntil: "domcontentloaded" });
   await reloadThroughServiceWorker(signedInPage);
   assertNoBrowserErrors(
     signedInPageErrors,
@@ -199,6 +202,7 @@ async function smokeSignedInWorkflows(browser, url) {
       `Synthetic Properties row did not appear. Page text: ${body.slice(-2500)}. ${error.message}`,
     );
   }
+  console.log("Smoke: checking property, payment, and account details.");
   await signedInPage.locator('.nav-link[data-view="overview"]').click();
   await signedInPage
     .locator('#overview-properties [data-property-card="smoke-property"]')
@@ -324,6 +328,7 @@ async function smokeSignedInWorkflows(browser, url) {
     .waitFor({ state: "visible", timeout: 10000 });
   await signedInPage.locator("#detail-modal button[data-close]").click();
   await signedInPage.locator('.nav-link[data-view="payments"]').click();
+  console.log("Smoke: checking transaction correction and reporting.");
   signedInPage.once("dialog", (dialog) =>
     dialog.accept("Smoke-test correction"),
   );
@@ -381,6 +386,7 @@ async function smokeSignedInWorkflows(browser, url) {
     );
   }
   await signedInPage.locator('.nav-link[data-view="payments"]').click();
+  console.log("Smoke: checking transaction voiding and account closure.");
   const handleVoidDialogs = (dialog) => {
     if (dialog.type() === "confirm") {
       void dialog.accept();

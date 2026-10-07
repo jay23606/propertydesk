@@ -90,7 +90,7 @@ jobs:
   runtime-smoke:
     needs: deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -106,7 +106,7 @@ jobs:
       - name: Check the deployed app in Chromium
         run: |
           for attempt in 1 2 3; do
-            if npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"; then
+            if timeout --signal=TERM 180s npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"; then
               exit 0
             fi
             if [ "$attempt" -lt 3 ]; then

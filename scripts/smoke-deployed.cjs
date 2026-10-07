@@ -15,6 +15,8 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
+  page.setDefaultTimeout(15000);
+  page.setDefaultNavigationTimeout(30000);
   await captureUnhandledRejections(page);
   const runtimeErrors = [];
   const consoleErrors = [];
@@ -40,7 +42,8 @@ async function main() {
     await page.route("**/@supabase/supabase-js@2*", (route) =>
       route.fulfill({ contentType: "text/javascript", body: "" }),
     );
-    await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
+    console.log("Smoke: opening the sign-in screen.");
+    await page.goto(url, { waitUntil: "domcontentloaded" });
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Initial startup");
     try {
       await page.locator("#auth-title").waitFor({
@@ -57,10 +60,12 @@ async function main() {
         `The sign-in screen did not appear. Browser errors: ${[...runtimeErrors, ...consoleErrors].join(" | ") || "none"}. Page state: ${JSON.stringify(pageState)}. ${error.message}`,
       );
     }
+    console.log("Smoke: checking service-worker startup.");
     await reloadThroughServiceWorker(page);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
     await assertNoUnhandledRejections(page, "Startup");
 
+    console.log("Smoke: checking account amortization rendering.");
     const detailText = await page.evaluate(async () => {
       const utilities = window.PropertyDeskLedgerUtils;
       const details = window.PropertyDeskAccountDetails;
@@ -173,6 +178,7 @@ async function main() {
     );
     await assertNoUnhandledRejections(page, "Amortization rendering");
 
+    console.log("Smoke: checking signed-in workflows.");
     await smokeSignedInWorkflows(browser, url);
   } finally {
     await browser.close();

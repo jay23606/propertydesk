@@ -10,7 +10,7 @@ async function reloadThroughServiceWorker(page) {
       throw new Error("The PropertyDesk service worker did not become active.");
     }
   });
-  await page.reload({ waitUntil: "networkidle", timeout: 60000 });
+  await page.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForFunction(
     () => Boolean(navigator.serviceWorker.controller),
     null,
