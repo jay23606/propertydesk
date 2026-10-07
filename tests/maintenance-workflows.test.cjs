@@ -64,6 +64,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     prettyType() {},
     repository: {},
     findCorrectionTarget() {},
+    unusedCorrectionValue: true,
   };
   const voidingContext = {
     toast: correctionContext.toast,
@@ -71,8 +72,12 @@ test("transaction maintenance coordinator joins isolated correction and void act
     repository: correctionContext.repository,
     resolveVoidTarget() {},
     buildVoidPayload() {},
+    unusedVoidingValue: true,
   };
-  const eventsContext = { documentRef: { name: "document" } };
+  const eventsContext = {
+    documentRef: { name: "document" },
+    unusedEventValue: true,
+  };
   const dependencies = {
     correction: correctionContext,
     voiding: voidingContext,
@@ -90,8 +95,60 @@ test("transaction maintenance coordinator joins isolated correction and void act
   const handlers = workflow.createTransactionActionHandlers(actions);
 
   assert.equal(workflow.saveCorrection, saveCorrection);
-  assert.equal(passed.correctionWorkflow, correctionContext);
-  assert.equal(passed.voidMaintenance, voidingContext);
+  assert.equal(passed.correctionWorkflow.$, correctionContext.$);
+  assert.equal(passed.correctionWorkflow.state, correctionContext.state);
+  assert.equal(passed.correctionWorkflow.toast, correctionContext.toast);
+  assert.equal(passed.correctionWorkflow.fetchAll, correctionContext.fetchAll);
+  assert.equal(
+    passed.correctionWorkflow.closeModal,
+    correctionContext.closeModal,
+  );
+  assert.equal(
+    passed.correctionWorkflow.prettyType,
+    correctionContext.prettyType,
+  );
+  assert.equal(
+    passed.correctionWorkflow.repository,
+    correctionContext.repository,
+  );
+  assert.equal(
+    passed.correctionWorkflow.findCorrectionTarget,
+    correctionContext.findCorrectionTarget,
+  );
+  assert.equal("unusedCorrectionValue" in passed.correctionWorkflow, false);
+  assert.deepEqual(Object.keys(passed.correctionWorkflow).sort(), [
+    "$",
+    "EventClass",
+    "OptionClass",
+    "closeModal",
+    "fetchAll",
+    "findCorrectionTarget",
+    "prettyType",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
+  assert.equal(passed.voidMaintenance.fetchAll, voidingContext.fetchAll);
+  assert.equal(
+    passed.voidMaintenance.resolveVoidTarget,
+    voidingContext.resolveVoidTarget,
+  );
+  assert.equal(
+    passed.voidMaintenance.buildVoidPayload,
+    voidingContext.buildVoidPayload,
+  );
+  assert.equal(passed.voidMaintenance.repository, voidingContext.repository);
+  assert.equal("unusedVoidingValue" in passed.voidMaintenance, false);
+  assert.equal("state" in passed.voidMaintenance, false);
+  assert.deepEqual(Object.keys(passed.voidMaintenance).sort(), [
+    "buildVoidPayload",
+    "fetchAll",
+    "repository",
+    "resolveVoidTarget",
+    "timestamp",
+    "toast",
+  ]);
   assert.equal(passed.voidEntry.toast, voidingContext.toast);
   assert.equal(
     passed.voidEntry.saveVoidTransaction,
@@ -101,8 +158,21 @@ test("transaction maintenance coordinator joins isolated correction and void act
     passed.voidEntry.resolveVoidTarget,
     voidingContext.resolveVoidTarget,
   );
+  assert.deepEqual(Object.keys(passed.voidEntry).sort(), [
+    "resolveVoidTarget",
+    "saveVoidTransaction",
+    "toast",
+  ]);
   assert.equal("resolveVoidTarget" in passed.correctionWorkflow, false);
   assert.equal(passed.events.documentRef, eventsContext.documentRef);
+  assert.equal(passed.events.correctTransaction, correctTransaction);
+  assert.equal(passed.events.voidTransaction, voidTransaction);
+  assert.equal("unusedEventValue" in passed.events, false);
+  assert.deepEqual(Object.keys(passed.events).sort(), [
+    "correctTransaction",
+    "documentRef",
+    "voidTransaction",
+  ]);
   assert.equal(passed.correctionActions.openPayment, actions.openPayment);
   assert.equal(passed.correctionActions.openExpense, actions.openExpense);
   assert.equal(

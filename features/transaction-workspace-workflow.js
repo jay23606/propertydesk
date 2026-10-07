@@ -8,9 +8,11 @@
     screen: screenContext,
   }) {
     const maintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create(
-        maintenanceContext,
-      );
+      window.PropertyDeskTransactionMaintenanceWorkflow.create({
+        correction: maintenanceContext.correction,
+        voiding: maintenanceContext.voiding,
+        events: maintenanceContext.events,
+      });
     const entry = window.PropertyDeskRecordEntryWorkflow.create({
       $: entryContext.$,
       state: entryContext.state,

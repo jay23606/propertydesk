@@ -3,15 +3,33 @@
   "use strict";
 
   function createTransactionMaintenanceWorkflow(context) {
-    const correction = window.PropertyDeskTransactionCorrectionWorkflow.create(
-      context.correction,
-    );
+    const correctionContext = context.correction;
+    const voidingContext = context.voiding;
+    const correction = window.PropertyDeskTransactionCorrectionWorkflow.create({
+      $: correctionContext.$,
+      state: correctionContext.state,
+      toast: correctionContext.toast,
+      fetchAll: correctionContext.fetchAll,
+      closeModal: correctionContext.closeModal,
+      prettyType: correctionContext.prettyType,
+      EventClass: correctionContext.EventClass,
+      OptionClass: correctionContext.OptionClass,
+      repository: correctionContext.repository,
+      findCorrectionTarget: correctionContext.findCorrectionTarget,
+    });
     const { saveVoidTransaction } =
-      window.PropertyDeskTransactionVoidMaintenance.create(context.voiding);
+      window.PropertyDeskTransactionVoidMaintenance.create({
+        toast: voidingContext.toast,
+        fetchAll: voidingContext.fetchAll,
+        timestamp: voidingContext.timestamp,
+        resolveVoidTarget: voidingContext.resolveVoidTarget,
+        buildVoidPayload: voidingContext.buildVoidPayload,
+        repository: voidingContext.repository,
+      });
     const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
-      toast: context.voiding.toast,
+      toast: voidingContext.toast,
       saveVoidTransaction,
-      resolveVoidTarget: context.voiding.resolveVoidTarget,
+      resolveVoidTarget: voidingContext.resolveVoidTarget,
     });
 
     function createTransactionActionHandlers({

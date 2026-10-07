@@ -13,7 +13,12 @@ test("transaction workspace shares corrections and entry actions across its flow
   const openAccountForProperty = () => "new account";
   const resetPropertyForm = () => {};
   const attachCreateActionEvents = () => {};
-  const maintenance = { closeModal() {} };
+  const maintenance = {
+    correction: { name: "correction" },
+    voiding: { name: "voiding" },
+    events: { name: "events" },
+    unusedMaintenanceValue: true,
+  };
   const entry = {
     toast() {},
     previewReminderEmail() {},
@@ -84,7 +89,15 @@ test("transaction workspace shares corrections and entry actions across its flow
     });
 
   assert.equal(calls[0][0], "maintenance");
-  assert.equal(calls[0][1], maintenance);
+  assert.equal(calls[0][1].correction, maintenance.correction);
+  assert.equal(calls[0][1].voiding, maintenance.voiding);
+  assert.equal(calls[0][1].events, maintenance.events);
+  assert.equal("unusedMaintenanceValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "correction",
+    "events",
+    "voiding",
+  ]);
   assert.equal(calls[1][0], "entry");
   assert.equal(calls[1][1].toast, entry.toast);
   assert.equal(calls[1][1].previewReminderEmail, entry.previewReminderEmail);
