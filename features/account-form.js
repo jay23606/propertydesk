@@ -26,7 +26,6 @@
     });
     const { saveAccount: persistAccount } =
       window.PropertyDeskAccountMaintenance.create({
-        state,
         toast,
         repository,
       });
