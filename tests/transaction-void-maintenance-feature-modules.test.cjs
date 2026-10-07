@@ -132,91 +132,16 @@ test("app composes transaction history and maintenance without a broad wrapper",
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionHistoryWorkflow/);
   assert.match(app, /renderPayments,/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
+  assert.match(app, /PropertyDeskTransactionVoidEntry\.create\(/);
+  assert.match(app, /PropertyDeskTransactionCorrectionForm\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViewEvents\.create\(/);
   assert.match(
     app,
     /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,/,
   );
   assert.doesNotMatch(app, /function attachTransactionEvents\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);
-});
-
-test("transaction maintenance workflow composes correction and void actions", () => {
-  const passed = {};
-  const correctTransaction = () => "corrected";
-  const voidTransaction = () => "voided";
-  const context = vm.createContext({
-    window: {
-      PropertyDeskTransactionMaintenance: {
-        create: (options) => {
-          passed.void = options;
-          return { saveVoidTransaction: voidTransaction };
-        },
-      },
-      PropertyDeskTransactionVoidEntry: {
-        create: (options) => {
-          passed.voidEntry = options;
-          return { voidTransaction };
-        },
-      },
-      PropertyDeskTransactionCorrectionForm: {
-        create: (options) => {
-          passed.correction = options;
-          return { correctTransaction };
-        },
-      },
-      PropertyDeskTransactionViewEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: () => "action events" };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "transaction-maintenance-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $() {},
-    state: {},
-    toast() {},
-    fetchAll() {},
-    prettyType() {},
-    openPayment() {},
-    openExpense() {},
-    updatePaymentGuidance() {},
-    EventClass: class {},
-    OptionClass: class {},
-    documentRef: {},
-  };
-  const workflow =
-    context.window.PropertyDeskTransactionMaintenanceWorkflow.create(
-      dependencies,
-    );
-
-  assert.equal(passed.void.state, dependencies.state);
-  assert.equal(passed.void.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.void.confirmAction, undefined);
-  assert.equal(passed.voidEntry.toast, dependencies.toast);
-  assert.equal(passed.voidEntry.saveVoidTransaction, voidTransaction);
-  assert.equal(
-    passed.correction.updatePaymentGuidance,
-    dependencies.updatePaymentGuidance,
-  );
-  assert.equal(passed.correction.OptionClass, dependencies.OptionClass);
-  assert.equal(passed.events.correctTransaction, correctTransaction);
-  assert.equal(passed.events.voidTransaction, voidTransaction);
-  assert.deepEqual(Object.keys(workflow), ["attachTransactionActionEvents"]);
-  assert.equal(workflow.attachTransactionActionEvents(), "action events");
 });
 
 test("transaction maintenance voids a posted row with an audit reason", async () => {

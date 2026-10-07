@@ -16,7 +16,7 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportModel\.create\(/);
   assert.match(app, /PropertyDeskReportViews\.create\(/);
@@ -30,7 +30,7 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.match(app, /openAccountForProperty,/);
   assert.match(
     app,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{[\s\S]*?updatePaymentGuidance,/,
+    /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?updatePaymentGuidance,/,
   );
   assert.doesNotMatch(app, /entryWorkflow\./);
   assert.match(app, /attachAccountDetailActionEvents,\s*attachDepositEvents,/);
@@ -73,10 +73,8 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
   );
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:AccountDetailEvents|DepositDetailEvents)\.create/,
-  );
+  assert.match(app, /PropertyDeskAccountDetailEvents\.create/);
+  assert.match(app, /PropertyDeskDepositDetailEvents\.create/);
   assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
@@ -99,17 +97,12 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:TransactionViewEvents|TransactionCorrectionForm)\.create\(/,
-  );
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViewEvents\.create\(/);
+  assert.match(app, /PropertyDeskTransactionCorrectionForm\.create\(/);
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
-  assert.match(
-    app,
-    /window\.PropertyDeskAccountDetailActionsWorkflow\.create\(/,
-  );
-  assert.match(app, /window\.PropertyDeskDepositMaintenanceWorkflow\.create\(/);
+  assert.match(app, /window\.PropertyDeskAccountCloseMaintenance\.create\(/);
+  assert.match(app, /window\.PropertyDeskDepositMaintenance\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordMaintenance/);
   for (const filename of ["payment-entry-form.js", "expense-entry-form.js"]) {
     const source = fs.readFileSync(
@@ -118,15 +111,11 @@ test("app coordinator passes the amortization helper into account details", () =
     );
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskTransaction(?:ViewEvents|CorrectionForm)\.create/,
-  );
+  assert.match(app, /PropertyDeskTransactionViewEvents\.create/);
+  assert.match(app, /PropertyDeskTransactionCorrectionForm\.create/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:Deposit|Transaction)Maintenance\.create/,
-  );
+  assert.match(app, /PropertyDeskDepositMaintenance\.create/);
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create/);
 });
 
 test("app root composes independent property screens and shares detail actions", () => {
@@ -227,9 +216,9 @@ test("app coordinator delegates shared setup to the app services workflow", () =
     /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
   );
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenance\.create\(/);
+  assert.match(app, /PropertyDeskDepositMaintenance\.create\(/);
+  assert.match(app, /PropertyDeskAccountCloseMaintenance\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.doesNotMatch(
     app,

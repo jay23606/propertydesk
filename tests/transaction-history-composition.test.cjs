@@ -9,9 +9,7 @@ test("app composes transaction history views and aliases their event binder", ()
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const source = app.indexOf("PropertyDeskTransactionViews.create(");
-  const maintenance = app.indexOf(
-    "PropertyDeskTransactionMaintenanceWorkflow.create(",
-  );
+  const maintenance = app.indexOf("PropertyDeskTransactionMaintenance.create(");
 
   assert.ok(source >= 0);
   assert.ok(maintenance > source);
@@ -19,6 +17,9 @@ test("app composes transaction history views and aliases their event binder", ()
     app,
     /attachEvents: attachTransactionViewEvents\s*\}\s*=\s*window\.PropertyDeskTransactionViews\.create\(/,
   );
+  assert.match(app, /attachEvents: attachTransactionActionEvents/);
+  assert.match(app, /PropertyDeskTransactionCorrectionForm\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViewEvents\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionHistoryWorkflow/);
   assert.doesNotMatch(html, /features\/transaction-history-workflow\.js/);
   assert.doesNotMatch(worker, /features\/transaction-history-workflow\.js/);

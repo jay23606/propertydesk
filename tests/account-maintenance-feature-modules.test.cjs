@@ -5,88 +5,50 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
-test("app composes account detail and deposit features without a broad wrapper", () => {
+test("app connects account and deposit actions without workflow wrappers", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositDetails\.create\(/);
-  assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
+  const accountMaintenance = app.indexOf(
+    "PropertyDeskAccountCloseMaintenance.create(",
+  );
+  const accountEntry = app.indexOf("PropertyDeskAccountCloseEntry.create(");
+  const accountEvents = app.indexOf("PropertyDeskAccountDetailEvents.create(");
+  const depositMaintenance = app.indexOf(
+    "PropertyDeskDepositMaintenance.create(",
+  );
+  const depositEntry = app.indexOf(
+    "PropertyDeskDepositAdjustmentEntry.create(",
+  );
+  const depositEvents = app.indexOf("PropertyDeskDepositDetailEvents.create(");
+  assert.ok(accountMaintenance < accountEntry && accountEntry < accountEvents);
+  assert.ok(depositMaintenance < depositEntry && depositEntry < depositEvents);
+  assert.match(
+    app,
+    /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskAccountCloseEntry\.create\(\{\s*saveCloseAccount,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailEvents\.create\(\{[\s\S]*?closeAccount,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskDepositAdjustmentEntry\.create\(\{[\s\S]*?saveDepositAdjustment,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskDepositDetailEvents\.create\(\{[\s\S]*?recordDepositAdjustment,/,
+  );
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(
     app,
     /eventBinders:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
-});
-
-test("account detail actions workflow composes account closure with edit and payment routing", () => {
-  const passed = {};
-  const closeAccount = () => "closed";
-  const saveCloseAccount = () => "saved";
-  let attached = 0;
-  const modalCloses = [];
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountCloseMaintenance: {
-        create: (options) => {
-          passed.maintenance = options;
-          return { saveCloseAccount };
-        },
-      },
-      PropertyDeskAccountCloseEntry: {
-        create: (options) => {
-          passed.entry = options;
-          return { closeAccount };
-        },
-      },
-      PropertyDeskAccountDetailEvents: {
-        create: (options) => {
-          passed.events = options;
-          return { attachEvents: () => attached++ };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "account-detail-actions-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  const dependencies = {
-    $: (id) => ({ id }),
-    state: {},
-    toast() {},
-    fetchAll() {},
-    closeModal: (modal) => modalCloses.push(modal.id),
-    editAccount() {},
-    openPayment() {},
-  };
-  const workflow =
-    context.window.PropertyDeskAccountDetailActionsWorkflow.create(
-      dependencies,
-    );
-
-  assert.equal(passed.maintenance.state, dependencies.state);
-  assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
-  assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
-  assert.equal(passed.maintenance.$, undefined);
-  passed.maintenance.closeAccountDetails();
-  assert.deepEqual(modalCloses, ["detail-modal"]);
-  assert.equal(passed.entry.saveCloseAccount, saveCloseAccount);
-  assert.equal(passed.events.closeAccount, closeAccount);
-  assert.equal(passed.events.editAccount, dependencies.editAccount);
-  assert.equal(passed.events.openPayment, dependencies.openPayment);
-  assert.deepEqual(Object.keys(workflow), ["attachEvents"]);
-  workflow.attachEvents();
-  assert.equal(attached, 1);
 });
 
 test("account detail content workflow composes schedule and selected account", () => {

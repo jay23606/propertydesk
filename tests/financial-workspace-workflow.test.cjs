@@ -3,17 +3,23 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app root composes financial screens and maintenance boundaries directly", () => {
+test("app root wires account, deposit, and transaction actions directly", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const workflows = [
+  const requiredModules = [
     "features/transaction-views.js",
-    "features/transaction-maintenance-workflow.js",
-    "features/deposit-maintenance-workflow.js",
     "features/account-close-maintenance.js",
-    "features/account-detail-actions-workflow.js",
+    "features/account-close-entry.js",
+    "features/account-detail-events.js",
+    "features/deposit-maintenance.js",
+    "features/deposit-adjustment-entry.js",
+    "features/deposit-detail-events.js",
+    "features/transaction-maintenance.js",
+    "features/transaction-void-entry.js",
+    "features/transaction-correction-form.js",
+    "features/transaction-view-events.js",
     "features/account-history-details.js",
     "features/account-detail-content-workflow.js",
     "features/deposit-context.js",
@@ -24,11 +30,18 @@ test("app root composes financial screens and maintenance boundaries directly", 
     "PropertyDeskRecordEntryWorkflow.create(",
     "PropertyDeskTransactionViews.create(",
     "PropertyDeskCreateActions.create(",
-    "PropertyDeskTransactionMaintenanceWorkflow.create(",
+    "PropertyDeskTransactionMaintenance.create(",
+    "PropertyDeskTransactionVoidEntry.create(",
+    "PropertyDeskTransactionCorrectionForm.create(",
+    "PropertyDeskTransactionViewEvents.create(",
     "PropertyDeskDepositDetails.create(",
     "PropertyDeskAccountDetailContentWorkflow.create(",
-    "PropertyDeskDepositMaintenanceWorkflow.create(",
-    "PropertyDeskAccountDetailActionsWorkflow.create(",
+    "PropertyDeskDepositMaintenance.create(",
+    "PropertyDeskDepositAdjustmentEntry.create(",
+    "PropertyDeskDepositDetailEvents.create(",
+    "PropertyDeskAccountCloseMaintenance.create(",
+    "PropertyDeskAccountCloseEntry.create(",
+    "PropertyDeskAccountDetailEvents.create(",
   ].map((marker) => app.indexOf(marker));
 
   assert.ok(creationOrder.every((position) => position >= 0));
@@ -38,61 +51,44 @@ test("app root composes financial screens and maintenance boundaries directly", 
   );
   assert.match(
     app,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*\$,\s*state,[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,/,
-  );
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(
-    app,
-    /PropertyDeskDepositContext\.create\(\{\s*state,\s*securityDepositBalance,\s*\}\)/,
+    /PropertyDeskTransactionCorrectionForm\.create\(\{[\s\S]*?openPayment,[\s\S]*?openExpense,[\s\S]*?updatePaymentGuidance,[\s\S]*?EventClass: Event,[\s\S]*?OptionClass: Option,/,
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailActionsWorkflow\.create\(\{[\s\S]*?editAccount,[\s\S]*?openPayment,/,
+    /PropertyDeskDepositDetailEvents\.create\(\{[\s\S]*?depositSectionHTML,[\s\S]*?recordDepositAdjustment,/,
+  );
+  assert.match(
+    app,
+    /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailEvents\.create\(\{[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?closeAccount,/,
   );
   assert.match(
     app,
     /eventBinders:[\s\S]*?attachTransactionViewEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositEvents,/,
   );
-  assert.match(
+  assert.doesNotMatch(
     app,
-    /PropertyDeskDepositDetails\.create\(\{[\s\S]*?depositLedger,/,
+    /PropertyDesk(?:TransactionMaintenance|DepositMaintenance|AccountDetailActions)Workflow\.create/,
   );
-  assert.match(
-    app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule,[\s\S]*?depositSectionHTML,/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
-  assert.match(
-    app,
-    /attachCreateActionEvents,\s*attachPropertyFormEvents,\s*attachAccountFormEvents,\s*attachLedgerEntryFormEvents,/,
-  );
-  assert.doesNotMatch(app, /function attachTransactionEvents\(/);
-  assert.doesNotMatch(app, /function attachAccountDetailsEvents\(/);
 
-  for (const script of workflows) {
+  for (const script of requiredModules) {
     assert.ok(
       html.indexOf(script) >= 0 &&
         html.indexOf(script) < html.indexOf("app.js"),
       `${script} loads before app.js`,
     );
-    const workerPath = script.replaceAll("/", "\\/");
-    assert.match(worker, new RegExp(`'\\./${workerPath}'`));
+    assert.ok(worker.includes(`'./${script}'`), `${script} is precached`);
   }
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:Transaction|AccountDetails)Workflow\.create\(/,
-  );
-  assert.doesNotMatch(
-    html,
-    /features\/(?:transaction|account-details)-workflow\.js/,
-  );
-  assert.doesNotMatch(
-    worker,
-    /features\/(?:transaction|account-details)-workflow\.js/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskFinancialWorkspaceWorkflow/);
-  assert.doesNotMatch(html, /financial-workspace-workflow\.js/);
-  assert.doesNotMatch(worker, /financial-workspace-workflow\.js/);
-  assert.doesNotMatch(html, /features\/entry-workflow\.js/);
-  assert.doesNotMatch(worker, /features\/entry-workflow\.js/);
+  for (const retiredWorkflow of [
+    "features/transaction-maintenance-workflow.js",
+    "features/deposit-maintenance-workflow.js",
+    "features/account-detail-actions-workflow.js",
+  ]) {
+    assert.equal(fs.existsSync(path.join(root, retiredWorkflow)), false);
+    assert.equal(html.includes(retiredWorkflow), false);
+    assert.equal(worker.includes(retiredWorkflow), false);
+  }
 });

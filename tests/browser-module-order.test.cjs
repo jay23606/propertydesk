@@ -64,19 +64,14 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/domain-options.js", "account-import-validation.js"],
     ["workspace-table-catalog.js", "backup-utils.js"],
     ["features/transaction-options.js", "expense-import-validation.js"],
-    [
-      "features/account-close-entry.js",
-      "features/account-close-maintenance.js",
-    ],
     ["features/account-repository.js", "features/account-close-maintenance.js"],
     [
       "features/repository-write-feedback.js",
       "features/account-close-maintenance.js",
     ],
-    [
-      "features/account-close-maintenance.js",
-      "features/account-detail-actions-workflow.js",
-    ],
+    ["features/account-close-entry.js", "app.js"],
+    ["features/account-close-maintenance.js", "app.js"],
+    ["features/account-detail-events.js", "app.js"],
     ["features/account-details.js", "features/account-detail-events.js"],
     [
       "features/account-loan-schedule-view.js",
@@ -126,14 +121,9 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/deposit-details.js", "features/deposit-detail-events.js"],
     ["features/deposit-details-model.js", "features/deposit-details.js"],
     ["features/deposit-details-view.js", "features/deposit-details.js"],
-    [
-      "features/deposit-adjustment-entry.js",
-      "features/deposit-maintenance-workflow.js",
-    ],
-    [
-      "features/deposit-maintenance.js",
-      "features/deposit-maintenance-workflow.js",
-    ],
+    ["features/deposit-adjustment-entry.js", "app.js"],
+    ["features/deposit-maintenance.js", "app.js"],
+    ["features/deposit-detail-events.js", "app.js"],
     ["features/deposit-repository.js", "features/deposit-maintenance.js"],
     [
       "features/repository-write-feedback.js",
@@ -323,22 +313,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-inserts.js",
     ],
     ["features/transaction-repository.js", "features/transaction-inserts.js"],
-    [
-      "features/transaction-correction-form.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
-    [
-      "features/transaction-maintenance.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
-    [
-      "features/transaction-view-events.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
-    [
-      "features/transaction-void-entry.js",
-      "features/transaction-maintenance-workflow.js",
-    ],
+    ["features/transaction-correction-form.js", "app.js"],
+    ["features/transaction-maintenance.js", "app.js"],
+    ["features/transaction-view-events.js", "app.js"],
+    ["features/transaction-void-entry.js", "app.js"],
     [
       "features/repository-write-feedback.js",
       "features/transaction-maintenance.js",

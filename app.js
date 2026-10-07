@@ -197,19 +197,33 @@
       navigate,
       documentRef: document,
     });
-  const { attachTransactionActionEvents } =
-    window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      $,
+  const { saveVoidTransaction } =
+    window.PropertyDeskTransactionMaintenance.create({
       state,
       toast,
       fetchAll,
+    });
+  const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
+    toast,
+    saveVoidTransaction,
+  });
+  const { correctTransaction } =
+    window.PropertyDeskTransactionCorrectionForm.create({
+      $,
+      state,
+      toast,
       prettyType,
       openPayment,
       openExpense,
       updatePaymentGuidance,
       EventClass: Event,
       OptionClass: Option,
+    });
+  const { attachEvents: attachTransactionActionEvents } =
+    window.PropertyDeskTransactionViewEvents.create({
       documentRef: document,
+      correctTransaction,
+      voidTransaction,
     });
   const { depositSectionHTML } = window.PropertyDeskDepositDetails.create({
     state,
@@ -237,25 +251,45 @@
       propertyAddress,
       depositSectionHTML,
     });
-  const { attachEvents: attachDepositEvents } =
-    window.PropertyDeskDepositMaintenanceWorkflow.create({
-      $,
+  const { saveDepositAdjustment } =
+    window.PropertyDeskDepositMaintenance.create({
       state,
-      moneyInput,
       todayIso,
       toast,
       fetchAll,
-      depositSectionHTML,
     });
-  const { attachEvents: attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountDetailActionsWorkflow.create({
+  const { recordDepositAdjustment } =
+    window.PropertyDeskDepositAdjustmentEntry.create({
+      state,
+      moneyInput,
+      toast,
+      saveDepositAdjustment,
+    });
+  const { attachEvents: attachDepositEvents } =
+    window.PropertyDeskDepositDetailEvents.create({
       $,
+      state,
+      depositSectionHTML,
+      recordDepositAdjustment,
+    });
+  const { saveCloseAccount } =
+    window.PropertyDeskAccountCloseMaintenance.create({
       state,
       toast,
       fetchAll,
+      closeAccountDetails: () => closeModal($("detail-modal")),
+    });
+  const { closeAccount } = window.PropertyDeskAccountCloseEntry.create({
+    saveCloseAccount,
+  });
+  const { attachEvents: attachAccountDetailActionEvents } =
+    window.PropertyDeskAccountDetailEvents.create({
+      $,
+      state,
       closeModal,
       editAccount,
       openPayment,
+      closeAccount,
     });
   const { openPropertyDetails } =
     window.PropertyDeskPropertyDetailContentWorkflow.create({
