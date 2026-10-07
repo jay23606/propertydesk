@@ -77,14 +77,15 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create/);
-  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
-  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
   assert.match(app, /attachPropertyHolderEvents/);
   assert.match(app, /attachPropertyDetailEvents/);
   assert.match(app, /attachPropertyQuickActionEvents/);
-  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
@@ -112,8 +113,12 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create/);
 });
 
-test("app root composes independent property screens and shares detail actions", () => {
+test("property workspace composes screens and shares detail actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const workflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    "utf8",
+  );
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -123,20 +128,20 @@ test("app root composes independent property screens and shares detail actions",
     "PropertyDeskPropertyScreenWorkflow.create(",
     "PropertyDeskOverviewWorkflow.create(",
     "PropertyDeskPropertyPortfolioWorkflow.create(",
-  ].map((marker) => app.indexOf(marker));
+  ].map((marker) => workflow.indexOf(marker));
 
   assert.ok(creationOrder.every((position) => position >= 0));
   assert.ok(creationOrder[0] < creationOrder[1]);
   assert.ok(creationOrder[1] < creationOrder[2]);
-  assert.match(app, /openPropertyDetails,\s*openPropertyPayment,/);
   assert.match(
-    app,
-    /openPayment,\s*openPropertyDetails,\s*openAccountForProperty,/,
+    workflow,
+    /openPropertyDetails: propertyDetails\.openPropertyDetails/,
   );
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",
     "features/property-screen-workflow.js",
+    "features/property-workspace-workflow.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview.js",
@@ -157,12 +162,15 @@ test("app root composes independent property screens and shares detail actions",
     );
     assert.match(worker, new RegExp(`'\\./${script.replaceAll("/", "\\/")}'`));
   }
-  assert.doesNotMatch(app, /PropertyDeskPropertyWorkspaceWorkflow/);
-  assert.doesNotMatch(html, /property-workspace-workflow\.js/);
-  assert.doesNotMatch(worker, /property-workspace-workflow\.js/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.ok(
+    html.indexOf("features/property-workspace-workflow.js") <
+      html.indexOf("app.js"),
+  );
+  assert.match(worker, /\.\/features\/property-workspace-workflow\.js/);
   assert.ok(
     app.indexOf("PropertyDeskAccountScreenWorkflow.create(") <
-      app.indexOf("PropertyDeskPropertyScreenWorkflow.create("),
+      app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
   );
 });
 

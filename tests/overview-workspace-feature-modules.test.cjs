@@ -162,7 +162,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
     order,
     [...order].sort((left, right) => left - right),
   );
-  assert.match(app, /PropertyDeskOverviewWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Model|Events)?\.create\(/);
   assert.match(
     workflow,

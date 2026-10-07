@@ -86,7 +86,7 @@ test("app connects private document actions to their detail event router", () =>
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDeskPropertyDetailManagementWorkflow\.create\(/,

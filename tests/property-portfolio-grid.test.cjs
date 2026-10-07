@@ -29,7 +29,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
     order,
     [...order].sort((left, right) => left - right),
   );
-  assert.match(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
     /(?:PropertyDeskPropertyPortfolio(?:Table|Model)|PropertyDeskProperty(?:QuickNote|ViewEvents))\.create\(/,

@@ -210,7 +210,7 @@ test("property detail events own editing and quick-action bindings", () => {
 
 test("app composes property detail content, actions, and document routes", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskPropertyScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDeskPropertyDetail(?:Content|Management)Workflow\.create\(/,
@@ -222,6 +222,14 @@ test("app composes property detail content, actions, and document routes", () =>
   assert.match(
     screenWorkflow,
     /PropertyDetailContentWorkflow\.create\([\s\S]*?PropertyDetailManagementWorkflow\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
+  );
+  const workspaceWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    workspaceWorkflow,
+    /PropertyDeskPropertyScreenWorkflow\.create\(detail\)/,
   );
   const workflow = fs.readFileSync(
     path.join(

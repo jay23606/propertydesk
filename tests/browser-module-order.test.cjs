@@ -258,6 +258,19 @@ test("browser feature scripts load after their dependencies", () => {
       "features/property-screen-workflow.js",
     ],
     [
+      "features/property-screen-workflow.js",
+      "features/property-workspace-workflow.js",
+    ],
+    [
+      "features/overview-workflow.js",
+      "features/property-workspace-workflow.js",
+    ],
+    [
+      "features/property-portfolio-workflow.js",
+      "features/property-workspace-workflow.js",
+    ],
+    ["features/property-workspace-workflow.js", "app.js"],
+    [
       "features/reminder-activity-model.js",
       "features/workspace-reminder-workflow.js",
     ],
