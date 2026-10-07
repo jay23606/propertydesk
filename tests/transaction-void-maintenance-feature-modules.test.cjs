@@ -129,8 +129,8 @@ test("app composes transaction history and maintenance without a broad wrapper",
   assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
-  assert.match(app, /PropertyDeskTransactionHistoryWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionHistoryWorkflow/);
   assert.match(app, /renderPayments,/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(

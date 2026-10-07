@@ -160,8 +160,8 @@
     attachLedgerEntryFormEvents,
     resetPropertyForm,
   } = recordEntry;
-  const { renderPayments, attachTransactionViewEvents } =
-    window.PropertyDeskTransactionHistoryWorkflow.create({
+  const { renderPayments, attachEvents: attachTransactionViewEvents } =
+    window.PropertyDeskTransactionViews.create({
       $,
       state,
       dateOnly,

@@ -15,7 +15,7 @@ test("app root wires record entry forms and create actions directly", () => {
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
@@ -58,7 +58,10 @@ test("app root wires record entry forms and create actions directly", () => {
     app,
     /PropertyDeskRecordEntryWorkflow\.create\(\{[\s\S]*?saveCorrection,/,
   );
-  assert.match(app, /PropertyDeskTransactionHistoryWorkflow\.create\(/);
+  assert.match(
+    app,
+    /attachEvents: attachTransactionViewEvents[\s\S]*?PropertyDeskTransactionViews\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 
@@ -96,7 +99,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskTransactionCorrections\.create\(/);
   assert.match(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
@@ -220,7 +223,7 @@ test("app coordinator delegates shared setup to the app services workflow", () =
     app,
     /PropertyDesk(?:WorkspaceData|BackendClient|AppState|WorkspaceRefresh)\.create/,
   );
-  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionsWorkflow\.create\(/);
