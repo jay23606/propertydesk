@@ -89,9 +89,6 @@
 
     return {
       updatePaymentGuidance: paymentView.updatePaymentGuidance,
-      readValues: paymentView.readValues,
-      resetAfterSave: paymentView.resetAfterSave,
-      prepareNextPayment: paymentView.prepareNextPayment,
       openPayment: paymentView.openPayment,
       openPropertyPayment,
       attachEvents,

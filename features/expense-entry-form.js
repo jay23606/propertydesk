@@ -96,9 +96,6 @@
 
     return {
       openExpense: expenseView.openExpense,
-      prepareNextExpense: expenseView.prepareNextExpense,
-      readValues: expenseView.readValues,
-      resetAfterSave: expenseView.resetAfterSave,
       attachEvents,
     };
   }

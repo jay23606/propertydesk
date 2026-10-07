@@ -391,17 +391,11 @@ test("payment and expense form workflows publish explicit view operations", () =
     "attachEvents",
     "openPayment",
     "openPropertyPayment",
-    "prepareNextPayment",
-    "readValues",
-    "resetAfterSave",
     "updatePaymentGuidance",
   ]);
   assert.deepEqual(Object.keys(expense).sort(), [
     "attachEvents",
     "openExpense",
-    "prepareNextExpense",
-    "readValues",
-    "resetAfterSave",
   ]);
 });
 
