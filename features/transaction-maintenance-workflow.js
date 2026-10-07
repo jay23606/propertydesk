@@ -30,10 +30,16 @@
         toast,
         fetchAll,
         repository: window.PropertyDeskTransactionRepository,
+        resolveVoidTarget:
+          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+        buildVoidPayload:
+          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
       });
     const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
       toast,
       saveVoidTransaction,
+      resolveVoidTarget:
+        window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
     });
 
     function createActionHandlers({

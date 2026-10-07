@@ -8,8 +8,7 @@
     confirmAction = (message) => window.confirm(message),
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
-    resolveVoidTarget = window.PropertyDeskTransactionVoidModel
-      .resolveVoidTarget,
+    resolveVoidTarget,
   }) {
     async function voidTransaction(kind, id) {
       const target = resolveVoidTarget(kind);

@@ -14,6 +14,8 @@ function loadWorkflow(context, filename) {
 test("transaction maintenance coordinator joins correction and void actions", () => {
   const passed = {};
   const transactionRepository = { voidPosted() {}, correct() {} };
+  const resolveVoidTarget = () => ({ table: "pd_payments" });
+  const buildVoidPayload = () => ({ status: "voided" });
   const saveCorrection = () => {};
   const saveVoidTransaction = () => {};
   const voidTransaction = () => {};
@@ -25,6 +27,10 @@ test("transaction maintenance coordinator joins correction and void actions", ()
     document: {},
     window: {
       PropertyDeskTransactionRepository: transactionRepository,
+      PropertyDeskTransactionVoidModel: {
+        resolveVoidTarget,
+        buildVoidPayload,
+      },
       PropertyDeskTransactionCorrections: {
         create: (options) => {
           passed.corrections = options;
@@ -88,6 +94,9 @@ test("transaction maintenance coordinator joins correction and void actions", ()
   assert.equal(passed.corrections.repository, transactionRepository);
   assert.equal(passed.maintenance.fetchAll, dependencies.fetchAll);
   assert.equal(passed.maintenance.repository, transactionRepository);
+  assert.equal(passed.maintenance.resolveVoidTarget, resolveVoidTarget);
+  assert.equal(passed.maintenance.buildVoidPayload, buildVoidPayload);
+  assert.equal(passed.voidEntry.resolveVoidTarget, resolveVoidTarget);
   assert.equal(passed.voidEntry.saveVoidTransaction, saveVoidTransaction);
   assert.equal(passed.correctionForm.openPayment, openPayment);
   assert.equal(passed.correctionForm.openExpense, openExpense);
@@ -105,6 +114,8 @@ test("account and deposit coordinator wires entry actions to workspace details",
   const passed = {};
   const repository = { close() {} };
   const depositRepository = { insert() {} };
+  const prepareAdjustment = () => ({ status: "ready", payload: {} });
+  const validateAdjustment = () => ({ status: "ready" });
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
   const attachDepositEvents = () => {};
@@ -121,6 +132,10 @@ test("account and deposit coordinator wires entry actions to workspace details",
     window: {
       PropertyDeskAccountRepository: repository,
       PropertyDeskDepositRepository: depositRepository,
+      PropertyDeskDepositAdjustmentModel: {
+        prepare: prepareAdjustment,
+        validate: validateAdjustment,
+      },
       PropertyDeskDepositMaintenance: {
         create: (options) => {
           passed.depositMaintenance = options;
@@ -180,11 +195,13 @@ test("account and deposit coordinator wires entry actions to workspace details",
 
   assert.equal(passed.depositMaintenance.state, dependencies.state);
   assert.equal(passed.depositMaintenance.repository, depositRepository);
+  assert.equal(passed.depositMaintenance.prepareAdjustment, prepareAdjustment);
   assert.equal(
     passed.depositEntry.saveDepositAdjustment,
     saveDepositAdjustment,
   );
   assert.equal(passed.depositEntry.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.depositEntry.validateAdjustment, validateAdjustment);
   assert.equal(
     passed.depositEvents.recordDepositAdjustment,
     recordDepositAdjustment,

@@ -9,7 +9,7 @@
     saveDepositAdjustment,
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
-    validateAdjustment = window.PropertyDeskDepositAdjustmentModel.validate,
+    validateAdjustment,
   }) {
     async function recordDepositAdjustment(accountId, type) {
       const account = state.accounts.find((row) => row.id === accountId);

@@ -28,6 +28,24 @@ function loadTransactionRepository(context) {
   );
 }
 
+function transactionVoidModelOptions(context) {
+  if (!context.window.PropertyDeskTransactionVoidModel) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", "transaction-void-model.js"),
+        "utf8",
+      ),
+      context,
+    );
+  }
+  return {
+    resolveVoidTarget:
+      context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+    buildVoidPayload:
+      context.window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+  };
+}
+
 test("transaction void model maps supported kinds and preserves audit defaults", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -74,6 +92,7 @@ test("transaction void entry confirms, collects a reason, then delegates persist
   const calls = [];
   const entry = context.window.PropertyDeskTransactionVoidEntry.create({
     toast: (message) => calls.push(["toast", message]),
+    ...transactionVoidModelOptions(context),
     confirmAction: (message) => {
       calls.push(["confirm", message]);
       return true;
@@ -113,6 +132,7 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
   const calls = [];
   const entry = context.window.PropertyDeskTransactionVoidEntry.create({
     toast: (message) => calls.push(["toast", message]),
+    ...transactionVoidModelOptions(context),
     confirmAction: () => assert.fail("unsupported kinds must not prompt"),
     saveVoidTransaction: () => assert.fail("unsupported kinds must not write"),
   });
@@ -200,6 +220,7 @@ test("transaction maintenance voids a posted row with an audit reason", async ()
   const feature = context.window.PropertyDeskTransactionMaintenance.create({
     state,
     repository: context.window.PropertyDeskTransactionRepository,
+    ...transactionVoidModelOptions(context),
     timestamp: () => "2026-10-04T12:00:00.000Z",
     fetchAll: async () => {
       refreshes += 1;
@@ -241,6 +262,7 @@ test("transaction maintenance rejects unsupported kinds before prompting or writ
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
     repository: context.window.PropertyDeskTransactionRepository,
+    ...transactionVoidModelOptions(context),
   });
 
   await feature.saveVoidTransaction("unexpected", "transaction-1", "reason");
@@ -290,6 +312,7 @@ test("transaction maintenance reports rejected void requests without refreshing"
     fetchAll: async () => assert.fail("failed void request must not refresh"),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskTransactionRepository,
+    ...transactionVoidModelOptions(context),
   });
 
   await assert.doesNotReject(
@@ -321,6 +344,7 @@ test("transaction maintenance reports returned database errors without refreshin
         error: { message: "Permission denied" },
       }),
     },
+    ...transactionVoidModelOptions(context),
     fetchAll: async () => assert.fail("database errors must not refresh"),
     toast: (message) => messages.push(message),
   });
@@ -348,6 +372,7 @@ test("transaction maintenance reports an already-changed row without refreshing"
     repository: {
       voidPosted: async () => ({ data: null, error: null }),
     },
+    ...transactionVoidModelOptions(context),
     fetchAll: async () => assert.fail("a missing row must not refresh"),
     toast: (message) => messages.push(message),
   });

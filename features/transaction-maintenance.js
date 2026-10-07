@@ -7,9 +7,8 @@
     toast,
     fetchAll,
     timestamp = () => new Date().toISOString(),
-    resolveVoidTarget = window.PropertyDeskTransactionVoidModel
-      .resolveVoidTarget,
-    buildVoidPayload = window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+    resolveVoidTarget,
+    buildVoidPayload,
     repository,
   }) {
     async function saveVoidTransaction(kind, id, reason) {

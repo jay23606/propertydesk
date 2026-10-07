@@ -123,12 +123,16 @@ test("deposit maintenance retains adjustment audit details", async () => {
       refreshes += 1;
     },
     repository: context.window.PropertyDeskDepositRepository,
+    prepareAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.prepare,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
+    validateAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.validate,
     promptAction: () => prompts.shift(),
   });
 
@@ -272,12 +276,16 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
     repository: context.window.PropertyDeskDepositRepository,
+    prepareAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.prepare,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
+    validateAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.validate,
     promptAction: () => prompts.shift(),
   });
 
@@ -317,6 +325,8 @@ test("deposit adjustment entry validates the amount before asking for an audit r
     toast: (message) => messages.push(message),
     saveDepositAdjustment: () =>
       assert.fail("invalid amount should not reach persistence"),
+    validateAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.validate,
     promptAction: (message) => {
       messages.push(message);
       return prompts.shift();

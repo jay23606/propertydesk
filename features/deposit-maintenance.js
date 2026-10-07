@@ -15,7 +15,7 @@
     todayIso,
     toast,
     fetchAll,
-    prepareAdjustment = window.PropertyDeskDepositAdjustmentModel.prepare,
+    prepareAdjustment,
     repository,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {

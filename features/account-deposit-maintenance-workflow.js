@@ -21,6 +21,7 @@
         toast,
         fetchAll,
         repository: window.PropertyDeskDepositRepository,
+        prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
       });
     const { recordDepositAdjustment } =
       window.PropertyDeskDepositAdjustmentEntry.create({
@@ -28,6 +29,7 @@
         moneyInput,
         toast,
         saveDepositAdjustment,
+        validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
       });
     const { attachEvents: attachDepositEvents } =
       window.PropertyDeskDepositDetailEvents.create({
