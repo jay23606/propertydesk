@@ -12,7 +12,7 @@
     startWorkspace,
     resetWorkspaceState,
   }) {
-    function handleSignedOut() {
+    function finishSignOut() {
       resetWorkspaceState(state);
       showAuth();
       setAuthMode(false);
@@ -36,7 +36,7 @@
     }
 
     function handleAuthStateChange(event, session) {
-      if (event === "SIGNED_OUT") return handleSignedOut();
+      if (event === "SIGNED_OUT") return finishSignOut();
       if (event === "PASSWORD_RECOVERY" && handlePasswordRecovery(session))
         return;
       handleAuthenticatedSession(event, session);
@@ -79,9 +79,7 @@
         );
         return;
       }
-      resetWorkspaceState(state);
-      showAuth();
-      setAuthMode(false);
+      finishSignOut();
     }
 
     return { handleAuthStateChange, restoreAuthSession, signOut };
