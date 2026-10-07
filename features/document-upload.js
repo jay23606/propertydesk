@@ -9,6 +9,7 @@
     openPropertyDetails,
     makeId = () => crypto.randomUUID(),
     repository,
+    describeUpload,
   }) {
     async function uploadFile(path, file, contentType) {
       let error;
@@ -71,7 +72,7 @@
       input.value = "";
       if (!file || !propertyId) return;
 
-      const upload = window.PropertyDeskDocumentUploadPolicy.describe(file);
+      const upload = describeUpload(file);
       if (!upload) {
         toast("Choose a PDF, DOCX, or JPEG agreement under 15 MB");
         return;

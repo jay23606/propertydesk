@@ -21,6 +21,7 @@
         openPropertyDetails,
         makeId,
         repository,
+        describeUpload: window.PropertyDeskDocumentUploadPolicy.describe,
       },
     );
 
