@@ -24,7 +24,14 @@
 
       $("detail-title").textContent = account.name;
       $("detail-content").innerHTML = renderAccountDetails({
-        ...accountData,
+        account,
+        propertyName: accountData.propertyName,
+        propertyAddressText: accountData.propertyAddressText,
+        postedPaymentTotal: accountData.postedPaymentTotal,
+        estimatedLoanBalance: accountData.estimatedLoanBalance,
+        unpaidDue: accountData.unpaidDue,
+        schedule: accountData.schedule,
+        payments,
         unpaidSinceLabel: fmtDate(unpaidStart, {
           month: "short",
           day: "numeric",

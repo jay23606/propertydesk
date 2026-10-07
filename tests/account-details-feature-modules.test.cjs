@@ -137,6 +137,16 @@ test("account details render action targets without owning action listeners", as
     amortizationSchedule: () => [],
     propertyAddress: (property) => property.name,
   });
+  let renderedViewModel;
+  const accountDetailsView =
+    context.window.PropertyDeskAccountDetailsView.create({
+      money: (value) => "$" + value,
+      fmtDate: () => "today",
+      esc: String,
+      prettyType: (type) => type,
+      paymentFrequencyLabel: () => "Monthly",
+      accountLoanScheduleHTML: () => "",
+    });
   const feature = context.window.PropertyDeskAccountDetails.create({
     $,
     state,
@@ -145,17 +155,26 @@ test("account details render action targets without owning action listeners", as
     openModal() {},
     depositSectionHTML: () => "<p>Held deposit</p>",
     renderAccountHistory: async () => "",
-    renderAccountDetails: context.window.PropertyDeskAccountDetailsView.create({
-      money: (value) => `$${value}`,
-      fmtDate: () => "today",
-      esc: String,
-      prettyType: (type) => type,
-      paymentFrequencyLabel: () => "Monthly",
-      accountLoanScheduleHTML: () => "",
-    }).renderAccountDetails,
+    renderAccountDetails: (data) => {
+      renderedViewModel = data;
+      return accountDetailsView.renderAccountDetails(data);
+    },
   });
 
   await feature.openAccountDetails(account.id);
+  assert.deepEqual(Object.keys(renderedViewModel).sort(), [
+    "account",
+    "estimatedLoanBalance",
+    "historyHTML",
+    "payments",
+    "postedPaymentTotal",
+    "propertyAddressText",
+    "propertyName",
+    "schedule",
+    "unpaidDue",
+    "unpaidSinceLabel",
+  ]);
+  assert.equal("unpaidStart" in renderedViewModel, false);
   assert.match(elements.get("detail-content").innerHTML, /\$20/);
   assert.doesNotMatch(elements.get("detail-content").innerHTML, /\$520/);
   assert.match(
