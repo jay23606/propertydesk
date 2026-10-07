@@ -230,7 +230,7 @@
   });
   const {
     openAccountDetails,
-    attachDepositEvents,
+    attachDepositAdjustmentEvents,
     attachAccountDetailActionEvents,
   } = window.PropertyDeskAccountScreenWorkflow.create({
     content: {
@@ -426,7 +426,7 @@
       attachTransactionViewEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,
-      attachDepositEvents,
+      attachDepositAdjustmentEvents,
       attachCreateActionEvents,
       attachPropertyFormEvents,
       attachAccountFormEvents,

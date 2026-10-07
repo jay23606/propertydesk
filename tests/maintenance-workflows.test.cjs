@@ -206,7 +206,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   const validateAdjustment = () => ({ status: "ready" });
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
-  const attachDepositEvents = () => {};
+  const attachDepositAdjustmentEvents = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskDepositMaintenance: {
@@ -224,7 +224,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
       PropertyDeskDepositDetailEvents: {
         create: (options) => {
           passed.events = options;
-          return { attachEvents: attachDepositEvents };
+          return { attachEvents: attachDepositAdjustmentEvents };
         },
       },
     },
@@ -254,8 +254,11 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
     passed.events.depositSectionHTML,
     dependencies.depositSectionHTML,
   );
-  assert.equal(workflow.attachDepositEvents, attachDepositEvents);
-  assert.deepEqual(Object.keys(workflow), ["attachDepositEvents"]);
+  assert.equal(
+    workflow.attachDepositAdjustmentEvents,
+    attachDepositAdjustmentEvents,
+  );
+  assert.deepEqual(Object.keys(workflow), ["attachDepositAdjustmentEvents"]);
 });
 
 test("account detail action workflow wires only account close concerns", () => {

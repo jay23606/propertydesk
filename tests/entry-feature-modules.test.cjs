@@ -40,7 +40,10 @@ test("record entry forms and global create actions use separate workflows", () =
   assert.match(app, /openAccountForProperty,/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /entryWorkflow\./);
-  assert.match(app, /attachAccountDetailActionEvents,\s*attachDepositEvents,/);
+  assert.match(
+    app,
+    /attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
+  );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "record-entry-workflow.js"),

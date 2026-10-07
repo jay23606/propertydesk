@@ -14,7 +14,8 @@
 
     return {
       openAccountDetails: details.openAccountDetails,
-      attachDepositEvents: depositActions.attachDepositEvents,
+      attachDepositAdjustmentEvents:
+        depositActions.attachDepositAdjustmentEvents,
       attachAccountDetailActionEvents:
         accountDetailActions.attachAccountDetailActionEvents,
     };

@@ -81,7 +81,7 @@ test("app delegates account actions and deposit adjustments to separate workflow
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
@@ -106,7 +106,7 @@ test("account screen workflow composes isolated detail actions and deposits", ()
       PropertyDeskDepositAdjustmentWorkflow: {
         create(deposit) {
           calls.push(["deposit", deposit]);
-          return { attachDepositEvents() {} };
+          return { attachDepositAdjustmentEvents() {} };
         },
       },
     },
@@ -155,7 +155,7 @@ test("account screen workflow composes isolated detail actions and deposits", ()
   assert.equal(calls[2][1].depositSectionHTML, depositSectionHTML);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",
-    "attachDepositEvents",
+    "attachDepositAdjustmentEvents",
     "openAccountDetails",
   ]);
 });

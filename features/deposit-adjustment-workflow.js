@@ -31,7 +31,7 @@
         saveDepositAdjustment,
         validateAdjustment,
       });
-    const { attachEvents: attachDepositEvents } =
+    const { attachEvents: attachDepositAdjustmentEvents } =
       window.PropertyDeskDepositDetailEvents.create({
         $,
         state,
@@ -39,7 +39,7 @@
         recordDepositAdjustment,
       });
 
-    return { attachDepositEvents };
+    return { attachDepositAdjustmentEvents };
   }
 
   window.PropertyDeskDepositAdjustmentWorkflow = Object.freeze({
