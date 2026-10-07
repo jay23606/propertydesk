@@ -537,6 +537,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/import-validation-api.js",
     ],
     [
+      "features/payment-import-allocation.js",
+      "features/payment-import-validation.js",
+    ],
+    [
       "features/payment-import-validation.js",
       "features/import-validation-api.js",
     ],

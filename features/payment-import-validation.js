@@ -5,6 +5,7 @@
   const { createImportLookup, markPossibleDuplicates, validateImportRows } =
     globalThis.PropertyDeskImportRows;
   const { csvMoney, validIsoDate } = globalThis.PropertyDeskCsvValueUtils;
+  const { paymentAllocation } = globalThis.PropertyDeskPaymentImportAllocation;
   const {
     incomeCategories,
     paymentMethods,
@@ -15,14 +16,6 @@
     rental: new Set(incomeCategories.rental.map(({ value }) => value)),
     loan: new Set(incomeCategories.loan.map(({ value }) => value)),
   };
-  const allocationColumns = [
-    "principal_amount",
-    "interest_amount",
-    "fee_amount",
-    "escrow_amount",
-    "unapplied_amount",
-  ];
-
   function paymentKey(accountId, date, amount, memo) {
     return JSON.stringify([
       accountId,
@@ -82,90 +75,11 @@
     return { amount, paymentDate, incomeCategory, method };
   }
 
-  function hasLegacyPaymentAllocation(row) {
-    return allocationColumns.some(
-      (column) => String(row[column] ?? "").trim() !== "",
-    );
-  }
-
-  function paymentAllocation(row, account, amount, hasLegacyAllocation) {
-    if (account.account_type === "rental")
-      return { principal: 0, interest: 0, fee: 0, escrow: 0, unapplied: 0 };
-    if (!hasLegacyAllocation)
-      return {
-        principal: 0,
-        interest: 0,
-        fee: 0,
-        escrow: 0,
-        unapplied: amount,
-      };
-    return {
-      principal: csvMoney(
-        row.principal_amount,
-        `${account.name} principal allocation`,
-        { optional: true },
-      ),
-      interest: csvMoney(
-        row.interest_amount,
-        `${account.name} interest allocation`,
-        { optional: true },
-      ),
-      fee: csvMoney(row.fee_amount, `${account.name} fee allocation`, {
-        optional: true,
-      }),
-      escrow: csvMoney(row.escrow_amount, `${account.name} escrow allocation`, {
-        optional: true,
-      }),
-      unapplied: csvMoney(
-        row.unapplied_amount,
-        `${account.name} unapplied allocation`,
-        { optional: true },
-      ),
-    };
-  }
-
-  function validatePaymentAllocation(
-    account,
-    hasLegacyAllocation,
-    allocation,
-    amount,
-    paymentDate,
-  ) {
-    if (
-      account.account_type !== "rental" &&
-      hasLegacyAllocation &&
-      Math.round(
-        (allocation.principal +
-          allocation.interest +
-          allocation.fee +
-          allocation.escrow +
-          allocation.unapplied) *
-          100,
-      ) !== Math.round(amount * 100)
-    )
-      throw new Error(
-        `Payment allocations for ${account.name} on ${paymentDate} must add up to ${new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(amount)}.`,
-      );
-  }
-
   function normalizePaymentRow(row, lookup) {
     const { property, account } = paymentAccount(row, lookup);
     const { amount, paymentDate, incomeCategory, method } =
       paymentReceiptDetails(row, account);
-    const hasLegacyAllocation = hasLegacyPaymentAllocation(row);
-    const allocation = paymentAllocation(
-      row,
-      account,
-      amount,
-      hasLegacyAllocation,
-    );
-    validatePaymentAllocation(
-      account,
-      hasLegacyAllocation,
-      allocation,
-      amount,
-      paymentDate,
-    );
+    const allocation = paymentAllocation(row, account, amount, paymentDate);
     return {
       property_name: property.name,
       property_address: property.address,
