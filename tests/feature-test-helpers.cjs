@@ -49,6 +49,7 @@ function loadWorkspaceFeatures(context) {
     "workspace-members-view.js",
     "workspace-member-repository.js",
     "workspace-members.js",
+    "workspace-members-workflow.js",
     "workspace.js",
   ]) {
     vm.runInContext(

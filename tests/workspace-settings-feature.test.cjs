@@ -254,8 +254,13 @@ test("workspace member feature loads before settings and is precached", () => {
   assert.match(worker, /'\.\/features\/workspace-member-repository\.js'/);
   assert.ok(
     html.indexOf("features/workspace-members.js") <
-      html.indexOf("features/workspace.js"),
+      html.indexOf("features/workspace-members-workflow.js"),
     "workspace members should load before the settings coordinator",
+  );
+  assert.ok(
+    html.indexOf("features/workspace-members-workflow.js") <
+      html.indexOf("features/workspace.js"),
+    "workspace member actions should load before Workspace settings",
   );
   assert.ok(
     html.indexOf("features/profile-settings-view.js") <
@@ -274,5 +279,6 @@ test("workspace member feature loads before settings and is precached", () => {
   );
   assert.match(worker, /'\.\/features\/profile-settings-view\.js'/);
   assert.match(worker, /'\.\/features\/workspace-profile-workflow\.js'/);
+  assert.match(worker, /'\.\/features\/workspace-members-workflow\.js'/);
   assert.match(worker, /'\.\/features\/workspace-members\.js'/);
 });

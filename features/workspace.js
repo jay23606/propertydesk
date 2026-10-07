@@ -1,4 +1,4 @@
-/* Compose Workspace member settings and the settings-page renderer. */
+/* Compose profile and member workflows with the Workspace page renderer. */
 (() => {
   "use strict";
 
@@ -19,15 +19,9 @@
       authClient,
       toast,
     });
-    const memberView = window.PropertyDeskWorkspaceMembersView.create({
-      $,
-      state,
-      esc,
-    });
-
     function renderWorkspaceSettings() {
       profileWorkflow.renderProfileSettings();
-      memberView.renderWorkspaceMembers();
+      members.renderWorkspaceMembers();
     }
 
     function renderWorkspacePage() {
@@ -35,25 +29,22 @@
       renderReminderActivity();
     }
 
-    const members = window.PropertyDeskWorkspaceMembers.create({
+    const members = window.PropertyDeskWorkspaceMembersWorkflow.create({
+      $,
       state,
+      esc,
       toast,
       fetchAll,
-      view: memberView,
       refreshWorkspaceSettings: renderWorkspaceSettings,
       repository: memberRepository,
       confirmAction,
     });
 
-    function attachWorkspaceMemberEvents() {
-      members.attachEvents();
-    }
-
     return {
       updateGreeting: profileWorkflow.updateGreeting,
       renderWorkspaceSettings: renderWorkspacePage,
       attachProfileEvents: profileWorkflow.attachProfileEvents,
-      attachWorkspaceMemberEvents,
+      attachWorkspaceMemberEvents: members.attachWorkspaceMemberEvents,
     };
   }
 

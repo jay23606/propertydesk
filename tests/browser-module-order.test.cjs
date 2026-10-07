@@ -561,7 +561,12 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/profile-settings.js", "features/workspace-profile-workflow.js"],
     ["features/workspace-profile-workflow.js", "features/workspace.js"],
-    ["features/workspace-members.js", "features/workspace.js"],
+    [
+      "features/workspace-members-view.js",
+      "features/workspace-members-workflow.js",
+    ],
+    ["features/workspace-members.js", "features/workspace-members-workflow.js"],
+    ["features/workspace-members-workflow.js", "features/workspace.js"],
     ["features/csv-value-utils.js", "features/import-validation-api.js"],
     [
       "features/account-import-validation.js",
