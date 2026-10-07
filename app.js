@@ -21,9 +21,12 @@
     sumPosted,
     unpaidDueAccrualStart,
   } = window.PropertyDeskLedgerUtils;
-  const { createBackup } = window.PropertyDeskBackupUtils;
+  const backupUtils = window.PropertyDeskBackupUtils.create({
+    workspaceTables: window.PropertyDeskWorkspaceTables,
+  });
+  const { createBackup } = backupUtils;
   const backupRecords = window.PropertyDeskBackupRecords.create({
-    tables: window.PropertyDeskBackupUtils.tables,
+    tables: backupUtils.tables,
     loadAllPages: window.PropertyDeskWorkspaceQuery.loadAllPages,
   });
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
