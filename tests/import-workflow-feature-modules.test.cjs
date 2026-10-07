@@ -156,6 +156,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     todayIso() {},
     fetchAll() {},
     toast() {},
+    repository: { kind: "injected-import-repository" },
     unrelatedDependency() {},
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
@@ -166,8 +167,8 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachPaymentEvents",
     "attachExpenseEvents",
   ]);
-  assert.equal(passed.commit.repository.kind, "import-repository");
-  assert.equal(passed.importRepository.getClient(), dependencies.state.client);
+  assert.equal(passed.commit.repository, dependencies.repository);
+  assert.equal(passed.importRepository, undefined);
   assert.deepEqual(
     Object.keys(passed.account).sort(),
     [
@@ -420,6 +421,9 @@ test("payment and expense CSV importers save their own validated transaction pay
       return element;
     },
     state,
+    repository: context.window.PropertyDeskImportRepository.create({
+      getClient: () => state.client,
+    }),
     fetchAll: async () => {},
     toast() {},
   });
@@ -601,6 +605,9 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
   const feature = context.window.PropertyDeskImportFeature.create({
     $: element,
     state,
+    repository: context.window.PropertyDeskImportRepository.create({
+      getClient: () => state.client,
+    }),
     esc: (value) => String(value ?? ""),
     todayIso: () => "2026-10-04",
     openModal() {},

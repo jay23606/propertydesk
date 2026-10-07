@@ -3,8 +3,17 @@
   "use strict";
 
   function createImportWorkflows(context) {
-    const { $, state, esc, openModal, closeModal, todayIso, fetchAll, toast } =
-      context;
+    const {
+      $,
+      state,
+      esc,
+      openModal,
+      closeModal,
+      todayIso,
+      fetchAll,
+      toast,
+      repository,
+    } = context;
     const { selectImportRows, parseCSV, createImportLookup } =
       window.PropertyDeskImportUtils;
     const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
@@ -32,9 +41,7 @@
         fetchAll,
         status: $("import-status"),
         toast,
-        repository: window.PropertyDeskImportRepository.create({
-          getClient: () => state.client,
-        }),
+        repository,
       });
     const importReview = window.PropertyDeskImportReview.create({
       stageImport: importPreview.stageImport,

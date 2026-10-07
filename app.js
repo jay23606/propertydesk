@@ -346,6 +346,9 @@
     todayIso,
     fetchAll,
     toast,
+    repository: window.PropertyDeskImportRepository.create({
+      getClient: () => state.client,
+    }),
   });
   const { attachEvents: attachExportEvents } =
     window.PropertyDeskBackupExport.create({
