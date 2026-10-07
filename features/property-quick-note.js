@@ -11,7 +11,11 @@
       window.prompt(message, initialValue),
   }) {
     const { savePropertyQuickNote } =
-      window.PropertyDeskPropertyMaintenance.create({ state, toast });
+      window.PropertyDeskPropertyMaintenance.create({
+        state,
+        toast,
+        repository: window.PropertyDeskPropertyRepository,
+      });
 
     async function editPropertyQuickNote(id) {
       const property = state.properties.find((item) => item.id === id);

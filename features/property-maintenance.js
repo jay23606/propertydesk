@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    repository = window.PropertyDeskPropertyRepository,
-  }) {
+  function create({ state, toast, repository }) {
     function updateProperty(propertyId, ownerId, values, failureMessage) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () =>

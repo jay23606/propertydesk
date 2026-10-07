@@ -5,7 +5,11 @@
   function createPropertyForm({ $, state, toast, closeModal, fetchAll }) {
     const formView = window.PropertyDeskPropertyFormView.create({ $ });
     const { saveProperty: persistProperty } =
-      window.PropertyDeskPropertyMaintenance.create({ state, toast });
+      window.PropertyDeskPropertyMaintenance.create({
+        state,
+        toast,
+        repository: window.PropertyDeskPropertyRepository,
+      });
 
     async function saveProperty(event) {
       event.preventDefault();

@@ -4,7 +4,11 @@
 
   function create({ state, toast, fetchAll, todayIso, openPropertyDetails }) {
     const { savePropertyArchive } =
-      window.PropertyDeskPropertyMaintenance.create({ state, toast });
+      window.PropertyDeskPropertyMaintenance.create({
+        state,
+        toast,
+        repository: window.PropertyDeskPropertyRepository,
+      });
 
     async function toggleArchiveProperty() {
       const id = state.selectedPropertyId;

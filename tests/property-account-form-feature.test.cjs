@@ -90,6 +90,7 @@ test("property and account maintenance save inserts and updates to their own tab
   const property = context.window.PropertyDeskPropertyMaintenance.create({
     state,
     toast: (message) => messages.push(message),
+    repository: context.window.PropertyDeskPropertyRepository,
   });
   const account = context.window.PropertyDeskAccountMaintenance.create({
     state,
