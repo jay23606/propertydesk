@@ -9,6 +9,7 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   const passed = {};
   const updateGreeting = () => {};
   const renderWorkspaceMembers = () => {};
+  let reminderActivityRenders = 0;
   const eventCalls = [];
   const attachProfileEvents = () => eventCalls.push("profile");
   const attachMemberEvents = () => eventCalls.push("members");
@@ -63,6 +64,7 @@ test("workspace workflow owns profile display alongside profile settings", () =>
     esc() {},
     toast() {},
     fetchAll() {},
+    renderReminderActivity: () => reminderActivityRenders++,
   });
 
   assert.equal(passed.profileDisplay.state, state);
@@ -72,6 +74,9 @@ test("workspace workflow owns profile display alongside profile settings", () =>
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspaceSettings();
   assert.equal(passed.displayName, "Owner");
+  assert.equal(reminderActivityRenders, 1);
+  passed.members.refreshWorkspaceSettings();
+  assert.equal(reminderActivityRenders, 1);
   workflow.attachProfileEvents();
   workflow.attachWorkspaceMemberEvents();
   assert.equal(

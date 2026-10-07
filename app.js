@@ -136,15 +136,12 @@
     esc,
     toast,
     fetchAll,
+    renderReminderActivity,
   });
-  function renderWorkspaceSettings() {
-    workspace.renderWorkspaceSettings();
-    renderReminderActivity();
-  }
   const navigation = window.PropertyDeskNavigation.create({
     $,
     state,
-    renderWorkspaceSettings,
+    renderWorkspaceSettings: workspace.renderWorkspaceSettings,
   });
   const { updateGreeting, attachProfileEvents, attachWorkspaceMemberEvents } =
     workspace;

@@ -21,7 +21,7 @@ test("app composes the reminder activity model into its display view", () => {
   );
   assert.match(
     app,
-    /function renderWorkspaceSettings\(\)\s*\{\s*workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.doesNotMatch(app, /PropertyDeskReminderActivityWorkflow/);
   assert.doesNotMatch(html, /features\/reminder-activity-workflow\.js/);

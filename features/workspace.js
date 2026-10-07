@@ -8,6 +8,7 @@
     esc,
     toast,
     fetchAll,
+    renderReminderActivity = () => {},
     confirmAction = (message) => window.confirm(message),
   }) {
     const profileDisplay = window.PropertyDeskProfileDisplay.create({
@@ -32,6 +33,11 @@
       memberView.renderWorkspaceMembers();
     }
 
+    function renderWorkspacePage() {
+      renderWorkspaceSettings();
+      renderReminderActivity();
+    }
+
     const members = window.PropertyDeskWorkspaceMembers.create({
       state,
       toast,
@@ -51,7 +57,7 @@
 
     return {
       updateGreeting,
-      renderWorkspaceSettings,
+      renderWorkspaceSettings: renderWorkspacePage,
       attachProfileEvents,
       attachWorkspaceMemberEvents,
     };

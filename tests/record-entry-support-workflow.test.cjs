@@ -28,7 +28,7 @@ test("app composes reminder activity separately from modal and form options", ()
   assert.match(app, /attachEvents: attachModalEvents/);
   assert.match(
     app,
-    /function renderWorkspaceSettings\(\)\s*\{\s*workspace\.renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(app, /previewReminderEmail,/);
   assert.match(
