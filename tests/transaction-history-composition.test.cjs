@@ -12,7 +12,11 @@ test("transaction screen workflow composes history views with maintenance action
     path.join(root, "features", "transaction-screen-workflow.js"),
     "utf8",
   );
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  const workspaceWorkflow = fs.readFileSync(
+    path.join(root, "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(workflow, /PropertyDeskTransactionViews\.create\(/);
   assert.match(workflow, /transactionMaintenance\.createActionHandlers\(/);
   assert.match(workflow, /attachTransactionViewEvents: views\.attachEvents/);
@@ -20,12 +24,17 @@ test("transaction screen workflow composes history views with maintenance action
     workflow,
     /attachTransactionActionEvents: actions\.attachEvents/,
   );
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(workspaceWorkflow, /TransactionMaintenanceWorkflow\.create\(/);
   assert.ok(
     html.indexOf("features/transaction-screen-workflow.js") <
       html.indexOf("app.js"),
   );
+  assert.ok(
+    html.indexOf("features/transaction-workspace-workflow.js") <
+      html.indexOf("app.js"),
+  );
   assert.ok(worker.includes("'./features/transaction-screen-workflow.js'"));
+  assert.ok(worker.includes("'./features/transaction-workspace-workflow.js'"));
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
 });

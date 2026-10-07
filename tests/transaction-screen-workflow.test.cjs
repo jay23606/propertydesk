@@ -74,14 +74,16 @@ test("app delegates the Transactions screen and precaches its coordinator", () =
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const workflow = "features/transaction-screen-workflow.js";
+  const workflow = "features/transaction-workspace-workflow.js";
 
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.ok(html.indexOf(workflow) < html.indexOf("app.js"));
   assert.ok(
-    html.indexOf("features/record-entry-workflow.js") < html.indexOf(workflow),
+    html.indexOf("features/transaction-screen-workflow.js") <
+      html.indexOf(workflow),
   );
   assert.ok(worker.includes("'./" + workflow + "'"));
 });

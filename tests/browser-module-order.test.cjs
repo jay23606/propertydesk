@@ -284,6 +284,18 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/backend-client.js", "features/workspace-runtime.js"],
     ["features/workspace-refresh.js", "features/workspace-runtime.js"],
     ["workspace-data.js", "features/workspace-runtime.js"],
+    [
+      "features/transaction-maintenance-workflow.js",
+      "features/transaction-workspace-workflow.js",
+    ],
+    [
+      "features/record-entry-workflow.js",
+      "features/transaction-workspace-workflow.js",
+    ],
+    [
+      "features/transaction-screen-workflow.js",
+      "features/transaction-workspace-workflow.js",
+    ],
     ["features/auth.js", "features/app-startup-workflow.js"],
     ["features/app-lifecycle.js", "features/app-startup-workflow.js"],
     [
