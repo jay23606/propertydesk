@@ -23,7 +23,7 @@ function loadRepository() {
   return context.window.PropertyDeskTransactionRepository;
 }
 
-test("transaction repository inserts ledger rows through the selected table", async () => {
+test("transaction repository pins payment and expense inserts to their ledgers", async () => {
   const calls = [];
   const result = { error: null };
   const client = {
@@ -38,8 +38,12 @@ test("transaction repository inserts ledger rows through the selected table", as
   };
 
   const repository = loadRepository().create({ getClient: () => client });
-  assert.equal(await repository.insert("pd_payments", { amount: 250 }), result);
-  assert.deepEqual(calls, [["pd_payments", { amount: 250 }]]);
+  assert.equal(await repository.insertPayment({ amount: 250 }), result);
+  assert.equal(await repository.insertExpense({ amount: 125 }), result);
+  assert.deepEqual(calls, [
+    ["pd_payments", { amount: 250 }],
+    ["pd_expenses", { amount: 125 }],
+  ]);
 });
 
 test("transaction repository forwards audited correction arguments", async () => {

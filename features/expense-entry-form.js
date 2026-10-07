@@ -9,7 +9,7 @@
       toast,
       saveCorrection,
       finishSuccessfulEntry,
-      insertTransaction,
+      insertExpense,
       buildExpensePayload,
       buildExpenseCorrection,
       moneyInput,
@@ -70,8 +70,7 @@
         return;
       }
 
-      const saved = await insertTransaction({
-        table: "pd_expenses",
+      const saved = await insertExpense({
         payload,
         failureMessage:
           "Expense couldn't be saved right now. Check your connection and try again.",

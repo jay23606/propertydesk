@@ -42,7 +42,7 @@ function loadTransactionInserts(client, messages = []) {
   });
 }
 
-test("transaction inserts write a posted ledger row to the requested table", async () => {
+test("transaction entry actions write to their dedicated ledgers", async () => {
   const calls = [];
   const inserts = loadTransactionInserts({
     from(table) {
@@ -56,14 +56,23 @@ test("transaction inserts write a posted ledger row to the requested table", asy
   });
 
   assert.equal(
-    await inserts.insertTransaction({
-      table: "pd_payments",
+    await inserts.insertPayment({
       payload: { amount: 500 },
       failureMessage: "Payment unavailable",
     }),
     true,
   );
-  assert.deepEqual(calls, [["pd_payments", { amount: 500 }]]);
+  assert.equal(
+    await inserts.insertExpense({
+      payload: { amount: 100 },
+      failureMessage: "Expense unavailable",
+    }),
+    true,
+  );
+  assert.deepEqual(calls, [
+    ["pd_payments", { amount: 500 }],
+    ["pd_expenses", { amount: 100 }],
+  ]);
 });
 
 test("transaction inserts report backend and connection errors without success", async () => {
@@ -84,20 +93,18 @@ test("transaction inserts report backend and connection errors without success",
   );
 
   assert.equal(
-    await backendError.insertTransaction({
-      table: "pd_expenses",
+    await backendError.insertExpense({
       payload: { amount: 100 },
       failureMessage: "Expense unavailable",
     }),
     false,
   );
   assert.equal(
-    await connectionError.insertTransaction({
-      table: "pd_expenses",
+    await connectionError.insertPayment({
       payload: { amount: 100 },
-      failureMessage: "Expense unavailable",
+      failureMessage: "Payment unavailable",
     }),
     false,
   );
-  assert.deepEqual(messages, ["Denied", "Expense unavailable"]);
+  assert.deepEqual(messages, ["Denied", "Payment unavailable"]);
 });

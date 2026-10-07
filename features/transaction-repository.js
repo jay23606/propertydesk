@@ -5,8 +5,12 @@
   const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
 
   function create({ getClient }) {
-    function insert(table, payload) {
-      return insertRecord(getClient(), table, payload);
+    function insertPayment(payload) {
+      return insertRecord(getClient(), "pd_payments", payload);
+    }
+
+    function insertExpense(payload) {
+      return insertRecord(getClient(), "pd_expenses", payload);
     }
 
     function correct({ kind, transactionId, correction, reason }) {
@@ -28,7 +32,12 @@
         .maybeSingle();
     }
 
-    return Object.freeze({ insert, correct, voidPosted });
+    return Object.freeze({
+      insertPayment,
+      insertExpense,
+      correct,
+      voidPosted,
+    });
   }
 
   window.PropertyDeskTransactionRepository = Object.freeze({ create });

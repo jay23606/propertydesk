@@ -25,11 +25,11 @@
       buildPaymentCorrection,
       buildExpenseCorrection,
     } = transactionPayloads;
-    const { insertTransaction } = window.PropertyDeskTransactionInserts.create({
-      state,
-      toast,
-      repository: transactionRepository,
-    });
+    const { insertPayment, insertExpense } =
+      window.PropertyDeskTransactionInserts.create({
+        toast,
+        repository: transactionRepository,
+      });
     const { finishSuccessfulEntry } =
       window.PropertyDeskLedgerEntrySaveWorkflow.create({
         $,
@@ -49,7 +49,7 @@
       openModal,
       saveCorrection,
       finishSuccessfulEntry,
-      insertTransaction,
+      insertPayment,
       buildPaymentPayload: buildPayment,
       buildPaymentCorrection,
     });
@@ -65,7 +65,7 @@
       openModal,
       saveCorrection,
       finishSuccessfulEntry,
-      insertTransaction,
+      insertExpense,
       buildExpensePayload: buildExpense,
       buildExpenseCorrection,
     });

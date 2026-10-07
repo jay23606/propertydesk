@@ -3,15 +3,23 @@
   "use strict";
 
   function create({ toast, repository }) {
-    function insertTransaction({ table, payload, failureMessage }) {
+    function insertPayment({ payload, failureMessage }) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () => repository.insert(table, payload),
+        operation: () => repository.insertPayment(payload),
         toast,
         failureMessage,
       });
     }
 
-    return { insertTransaction };
+    function insertExpense({ payload, failureMessage }) {
+      return window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: () => repository.insertExpense(payload),
+        toast,
+        failureMessage,
+      });
+    }
+
+    return { insertPayment, insertExpense };
   }
 
   window.PropertyDeskTransactionInserts = Object.freeze({ create });
