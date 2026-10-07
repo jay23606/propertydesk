@@ -33,16 +33,17 @@
       sumIncome,
       sumOperatingExpenses,
     });
-    const actions = transactionMaintenance.createActionHandlers({
-      openPayment,
-      openExpense,
-      updatePaymentGuidance,
-    });
+    const { attachTransactionActionEvents } =
+      transactionMaintenance.createActionHandlers({
+        openPayment,
+        openExpense,
+        updatePaymentGuidance,
+      });
 
     return {
       renderPayments: views.renderPayments,
       attachTransactionViewEvents: views.attachEvents,
-      attachTransactionActionEvents: actions.attachEvents,
+      attachTransactionActionEvents,
     };
   }
 

@@ -19,12 +19,13 @@
         openExpense,
         updatePaymentGuidance,
       });
-      const { attachEvents } = window.PropertyDeskTransactionViewEvents.create({
-        documentRef: context.events.documentRef,
-        correctTransaction,
-        voidTransaction,
-      });
-      return { attachEvents };
+      const { attachEvents: attachTransactionActionEvents } =
+        window.PropertyDeskTransactionViewEvents.create({
+          documentRef: context.events.documentRef,
+          correctTransaction,
+          voidTransaction,
+        });
+      return { attachTransactionActionEvents };
     }
 
     return { saveCorrection: correction.saveCorrection, createActionHandlers };

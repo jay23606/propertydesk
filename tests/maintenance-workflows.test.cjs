@@ -97,7 +97,8 @@ test("transaction maintenance coordinator joins isolated correction and void act
   );
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
-  assert.equal(handlers.attachEvents, attachEvents);
+  assert.deepEqual(Object.keys(handlers), ["attachTransactionActionEvents"]);
+  assert.equal(handlers.attachTransactionActionEvents, attachEvents);
 });
 
 test("transaction correction workflow owns correction persistence and forms", () => {
