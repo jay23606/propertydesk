@@ -47,15 +47,23 @@ test("property document workflow connects private file actions to detail events"
     toast() {},
     fetchAll() {},
     openPropertyDetails() {},
-    makeId() {},
-    repository: { kind: "document-repository" },
+    documentRepository: { kind: "document-repository" },
   };
   const workflow =
     context.window.PropertyDeskPropertyDocumentManagementWorkflow.create(
       dependencies,
     );
 
-  assert.equal(passed.documents, dependencies);
+  assert.equal(passed.documents.state, dependencies.state);
+  assert.equal(passed.documents.toast, dependencies.toast);
+  assert.equal(passed.documents.fetchAll, dependencies.fetchAll);
+  assert.equal(
+    passed.documents.openPropertyDetails,
+    dependencies.openPropertyDetails,
+  );
+  assert.equal(passed.documents.repository, dependencies.documentRepository);
+  assert.equal("documentRepository" in passed.documents, false);
+  assert.equal("$" in passed.documents, false);
   assert.equal(typeof passed.events.uploadPropertyDocument, "function");
   assert.equal(typeof passed.events.deletePropertyDocument, "function");
   assert.equal(typeof passed.events.openPropertyDocument, "function");

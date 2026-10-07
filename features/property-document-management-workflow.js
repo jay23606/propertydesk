@@ -3,7 +3,13 @@
   "use strict";
 
   function createPropertyDocumentManagementWorkflow(context) {
-    const propertyDocuments = window.PropertyDeskDocuments.create(context);
+    const propertyDocuments = window.PropertyDeskDocuments.create({
+      state: context.state,
+      toast: context.toast,
+      fetchAll: context.fetchAll,
+      openPropertyDetails: context.openPropertyDetails,
+      repository: context.documentRepository,
+    });
     const { attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDetailDocumentEvents.create({
         $: context.$,

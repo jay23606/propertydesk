@@ -264,7 +264,10 @@ test("app composes property detail content, actions, and document routes", () =>
     ),
     "utf8",
   );
-  assert.match(documentWorkflow, /PropertyDeskDocuments\.create\(context\)/);
+  assert.match(
+    documentWorkflow,
+    /PropertyDeskDocuments\.create\([\s\S]*?repository: context\.documentRepository/,
+  );
   assert.match(
     documentWorkflow,
     /PropertyDeskPropertyDetailDocumentEvents\.create\(/,

@@ -95,7 +95,7 @@ test("app connects private document actions to their detail event router", () =>
     path.join(root, "features", "property-document-management-workflow.js"),
     "utf8",
   );
-  assert.match(workflow, /PropertyDeskDocuments\.create\(context\)/);
+  assert.match(workflow, /repository: context\.documentRepository/);
   assert.match(
     app,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
