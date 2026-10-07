@@ -9,6 +9,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function overrideImportStage(context, stageImport) {
+  const preview = context.window.PropertyDeskImportPreview;
+  context.window.PropertyDeskImportPreview = {
+    ...preview,
+    create(options) {
+      return { ...preview.create(options), stageImport };
+    },
+  };
+}
+
 test("CSV import feature loads as an isolated browser module", () => {
   const validators = Object.freeze({ validateAccountRows() {} });
   const context = vm.createContext({
@@ -20,11 +30,9 @@ test("CSV import feature loads as an isolated browser module", () => {
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
     },
   });
-  loadImportPreview(context);
   loadImportFeatures(context);
 
   assert.equal(context.window.PropertyDeskImportWorkflows, validators);
-  const preview = context.window.PropertyDeskImportPreview.create({});
   const previewEvents = context.window.PropertyDeskImportPreviewEvents.create(
     {},
   );
@@ -34,7 +42,6 @@ test("CSV import feature loads as an isolated browser module", () => {
       addEventListener: (event, handler) =>
         handlers.set(`${id}:${event}`, handler),
     }),
-    stageImport: preview.stageImport,
     createImportLookup() {},
   });
   assert.deepEqual(Object.keys(feature), [
@@ -81,11 +88,15 @@ test("import workflow keeps file import handlers inside its event bindings", () 
         validateExpenseRows() {},
       },
       PropertyDeskImportPreview: {
-        create: () => ({
-          stageImport() {},
-          renderImportPreview() {},
-          updateImportCommitButton() {},
-        }),
+        create: () => {
+          const stageImport = () => {};
+          passed.stageImport = stageImport;
+          return {
+            stageImport,
+            renderImportPreview() {},
+            updateImportCommitButton() {},
+          };
+        },
       },
       PropertyDeskImportPreviewEvents: {
         create: () => ({ attachEvents() {} }),
@@ -132,7 +143,6 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   const dependencies = {
     $() {},
     state: {},
-    stageImport() {},
     todayIso() {},
     fetchAll() {},
     toast() {},
@@ -205,6 +215,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   assert.deepEqual(Object.keys(passed.importReviewDependencies), [
     "stageImport",
   ]);
+  assert.equal(passed.importReviewDependencies.stageImport, passed.stageImport);
   imports.attachAccountEvents();
   imports.attachPaymentEvents();
   imports.attachExpenseEvents();
@@ -382,6 +393,9 @@ test("payment and expense CSV importers save their own validated transaction pay
   const fileHandlers = new Map();
   const elements = formElements();
   let lookupBuilds = 0;
+  overrideImportStage(context, (title, rows, commit, note, report) =>
+    staged.push({ title, rows, commit, note, report }),
+  );
   const feature = context.window.PropertyDeskImportFeature.create({
     $: (id) => {
       const element = elements(id);
@@ -390,8 +404,6 @@ test("payment and expense CSV importers save their own validated transaction pay
       return element;
     },
     state,
-    stageImport: (title, rows, commit, note, report) =>
-      staged.push({ title, rows, commit, note, report }),
     fetchAll: async () => {},
     toast() {},
   });
@@ -567,12 +579,12 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     validateExpenseRows() {},
     validatePaymentRows() {},
   };
+  overrideImportStage(context, (title, rows, commit, note, report) => {
+    state.pendingImport = { title, rows, commit, note, ...report };
+  });
   const feature = context.window.PropertyDeskImportFeature.create({
     $: element,
     state,
-    stageImport(title, rows, commit, note, report) {
-      state.pendingImport = { title, rows, commit, note, ...report };
-    },
     esc: (value) => String(value ?? ""),
     todayIso: () => "2026-10-04",
     openModal() {},

@@ -26,7 +26,6 @@
         closeModal,
         toast,
       });
-    const stageImport = context.stageImport || importPreview.stageImport;
     const { commitAccounts, commitTransactions } =
       window.PropertyDeskImportCommit.create({
         state,
@@ -35,7 +34,7 @@
         toast,
       });
     const importReview = window.PropertyDeskImportReview.create({
-      stageImport,
+      stageImport: importPreview.stageImport,
     });
     const accounts = window.PropertyDeskAccountImport.create({
       $,

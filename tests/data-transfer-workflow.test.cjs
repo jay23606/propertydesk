@@ -21,7 +21,7 @@ test("app wires CSV import and private backup export independently", () => {
   assert.match(imports, /PropertyDeskImportPreviewEvents\.create\(/);
   assert.match(imports, /window\.PropertyDeskImportUtils/);
   assert.match(imports, /window\.PropertyDeskImportWorkflows/);
-  assert.match(imports, /context\.stageImport \|\| importPreview\.stageImport/);
+  assert.match(imports, /stageImport: importPreview\.stageImport/);
   assert.doesNotMatch(
     app,
     /PropertyDeskImportUtils|PropertyDeskImportWorkflows/,
