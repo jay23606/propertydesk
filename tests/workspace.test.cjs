@@ -39,6 +39,12 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
           return { renderWorkspaceMembers };
         },
       },
+      PropertyDeskWorkspaceMemberMaintenance: {
+        create(options) {
+          passed.memberMaintenance = options;
+          return { addWorkspaceMember() {}, removeWorkspaceMember() {} };
+        },
+      },
       PropertyDeskWorkspaceMembers: {
         create(options) {
           passed.memberActions = options;
@@ -76,6 +82,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     workflows: {
       profile: context.window.PropertyDeskWorkspaceProfileWorkflow,
       memberView: context.window.PropertyDeskWorkspaceMembersView,
+      memberMaintenance: context.window.PropertyDeskWorkspaceMemberMaintenance,
       members: context.window.PropertyDeskWorkspaceMembers,
       profileModules: {},
     },
@@ -86,7 +93,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   );
   assert.doesNotMatch(
     workspaceSource,
-    /window\.PropertyDeskWorkspace(?:ProfileWorkflow|MembersView|Members)\.create/,
+    /window\.PropertyDeskWorkspace(?:ProfileWorkflow|MembersView|Members|MemberMaintenance)\.create/,
   );
 
   assert.equal(passed.profileWorkflow.state, state);
@@ -104,6 +111,10 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     assert.equal(passed.reminderWorkflow[key], reminder[key]);
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
   assert.equal(passed.memberActions.repository, memberRepository);
+  assert.equal(
+    passed.memberActions.maintenanceWorkflow,
+    context.window.PropertyDeskWorkspaceMemberMaintenance,
+  );
   assert.equal(
     passed.memberActions.view.renderWorkspaceMembers,
     renderWorkspaceMembers,

@@ -50,6 +50,7 @@
       toast,
       fetchAll,
       view: memberView,
+      maintenanceWorkflow: workflows.memberMaintenance,
       refreshWorkspaceSettings: renderWorkspaceSettings,
       repository: memberRepository,
       confirmAction,

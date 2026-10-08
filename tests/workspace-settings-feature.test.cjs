@@ -75,6 +75,7 @@ test("adding a workspace member clears the address only after successful refresh
   };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
+    maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state,
@@ -125,6 +126,7 @@ test("adding a workspace member keeps the address when refresh fails", async () 
   };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
+    maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state: {
@@ -256,6 +258,7 @@ test("workspace member actions reconcile lost responses against refreshed member
   const state = { workspaceMembers: [], properties: [] };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
+    maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       calls.push("refresh");

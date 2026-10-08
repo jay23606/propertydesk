@@ -178,6 +178,7 @@
     workspaceWorkflows: {
       profile: window.PropertyDeskWorkspaceProfileWorkflow,
       memberView: window.PropertyDeskWorkspaceMembersView,
+      memberMaintenance: window.PropertyDeskWorkspaceMemberMaintenance,
       members: window.PropertyDeskWorkspaceMembers,
       profileModules: {
         display: window.PropertyDeskProfileDisplay,

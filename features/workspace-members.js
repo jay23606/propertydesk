@@ -7,11 +7,12 @@
     toast,
     fetchAll,
     view,
+    maintenanceWorkflow,
     refreshWorkspaceSettings,
     repository,
     confirmAction,
   }) {
-    const maintenance = window.PropertyDeskWorkspaceMemberMaintenance.create({
+    const maintenance = maintenanceWorkflow.create({
       state,
       toast,
       fetchAll,
