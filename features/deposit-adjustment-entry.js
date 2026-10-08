@@ -18,7 +18,9 @@
         type === "retained"
           ? "retained from the deposit"
           : "restored to the held balance";
-      const amount = moneyInput(promptAction(`Amount ${action}?`, "0.00"));
+      const enteredAmount = promptAction(`Amount ${action}?`, "0.00");
+      if (enteredAmount === null) return false;
+      const amount = moneyInput(enteredAmount);
       const validation = validateAdjustment({ account, amount });
       if (validation.status === "invalid-amount") {
         toast("Enter an amount greater than zero");

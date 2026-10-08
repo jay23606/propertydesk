@@ -472,3 +472,40 @@ test("deposit adjustment entry validates the amount before asking for an audit r
     "Enter an amount greater than zero",
   ]);
 });
+
+test("deposit adjustment entry treats amount prompt cancellation as a no-op", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-adjustment-entry.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
+    state: {
+      accounts: [{ id: "rental-1", account_type: "rental" }],
+    },
+    moneyInput: Number,
+    toast: (message) => messages.push(message),
+    saveDepositAdjustment: () =>
+      assert.fail("cancelled amount should not reach persistence"),
+    validateAdjustment:
+      context.window.PropertyDeskDepositAdjustmentModel.validate,
+    promptAction: () => null,
+  });
+
+  assert.equal(
+    await entry.recordDepositAdjustment("rental-1", "retained"),
+    false,
+  );
+  assert.deepEqual(messages, []);
+});
