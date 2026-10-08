@@ -15,6 +15,7 @@
             .saveAndRefreshWorkspaceRecord
         : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
       return save({
+        ...completion,
         operation,
         state,
         collection,
@@ -25,7 +26,6 @@
         refreshFailureMessage: failureMessage,
         retryMessage:
           "Ledger was refreshed. Check it before recording this entry again.",
-        ...completion,
       });
     }
 

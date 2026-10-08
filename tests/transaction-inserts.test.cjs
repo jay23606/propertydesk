@@ -215,6 +215,59 @@ test("transaction entry completion reuses its readback refresh after a lost resp
   ]);
 });
 
+test("transaction completion cannot replace repository write inputs", async () => {
+  const state = { payments: [], expenses: [] };
+  const payload = { id: "payment-1", amount: 550 };
+  const writes = [];
+  const messages = [];
+  let overriddenOperationCalled = false;
+  let overriddenRefreshCalled = false;
+  const inserts = loadTransactionInserts(
+    {
+      from(table) {
+        return {
+          async insert(receivedPayload) {
+            writes.push([table, receivedPayload]);
+            throw new Error("connection lost");
+          },
+        };
+      },
+    },
+    messages,
+    {
+      state,
+      fetchAll: async () => {
+        state.payments.push(payload);
+      },
+    },
+  );
+
+  assert.equal(
+    await inserts.insertPayment({
+      payload,
+      failureMessage: "Payment could not be confirmed",
+      completion: {
+        operation: async () => {
+          overriddenOperationCalled = true;
+          return { error: null };
+        },
+        state: { payments: [], expenses: [] },
+        collection: "expenses",
+        payload: { id: "wrong-payment", amount: 1 },
+        fetchAll: async () => {
+          overriddenRefreshCalled = true;
+        },
+        toast: () => {},
+      },
+    }),
+    true,
+  );
+  assert.deepEqual(writes, [["pd_payments", payload]]);
+  assert.equal(overriddenOperationCalled, false);
+  assert.equal(overriddenRefreshCalled, false);
+  assert.deepEqual(messages, []);
+});
+
 test("transaction inserts ask the user to inspect refreshed rows before retrying", async () => {
   const messages = [];
   const inserts = loadTransactionInserts(
