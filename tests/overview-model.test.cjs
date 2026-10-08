@@ -121,6 +121,8 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
   const model = context.window.PropertyDeskOverviewModel.create({
     state,
     propertySummaryModel,
+    groupAccountsByProperty:
+      context.window.PropertyDeskPropertyAccountIndex.groupByProperty,
     activityModel: context.window.PropertyDeskOverviewActivityModel.create({
       isPosted: (payment) => payment.status !== "voided",
     }),

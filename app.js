@@ -329,6 +329,8 @@
     attachPropertyGridEvents,
     attachPropertyActionEvents,
   } = window.PropertyDeskPropertyWorkspaceWorkflow.create({
+    groupAccountsByProperty:
+      window.PropertyDeskPropertyAccountIndex.groupByProperty,
     detail: {
       content: {
         $,

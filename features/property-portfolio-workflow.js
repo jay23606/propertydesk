@@ -5,6 +5,7 @@
   function create({
     $,
     state,
+    groupAccountsByProperty,
     esc,
     money,
     paymentFrequencyLabel,
@@ -58,8 +59,7 @@
     const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
       state,
       accountRowModel,
-      groupAccountsByProperty:
-        window.PropertyDeskPropertyAccountIndex.groupByProperty,
+      groupAccountsByProperty,
       streetAddress,
       filterModel,
     });

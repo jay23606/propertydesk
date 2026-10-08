@@ -5,6 +5,7 @@
   function create({
     $,
     state,
+    groupAccountsByProperty,
     monthlyScheduledEstimate,
     summarizeAccount,
     collectedSince,
@@ -30,6 +31,7 @@
     const overviewModel = window.PropertyDeskOverviewModel.create({
       state,
       propertySummaryModel,
+      groupAccountsByProperty,
       activityModel: window.PropertyDeskOverviewActivityModel.create({
         isPosted,
       }),

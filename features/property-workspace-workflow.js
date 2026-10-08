@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  function createPropertyWorkspaceWorkflow({ detail, overview, portfolio }) {
+  function createPropertyWorkspaceWorkflow({
+    detail,
+    overview,
+    portfolio,
+    groupAccountsByProperty,
+  }) {
     const propertyDetails = window.PropertyDeskPropertyScreenWorkflow.create({
       content: detail.content,
       management: detail.management,
@@ -12,6 +17,7 @@
     const propertyOverview = window.PropertyDeskOverviewWorkflow.create({
       $: overview.$,
       state: overview.state,
+      groupAccountsByProperty,
       monthlyScheduledEstimate: overview.monthlyScheduledEstimate,
       summarizeAccount: overview.summarizeAccount,
       collectedSince: overview.collectedSince,
@@ -31,6 +37,7 @@
     const properties = window.PropertyDeskPropertyPortfolioWorkflow.create({
       $: portfolio.$,
       state: portfolio.state,
+      groupAccountsByProperty,
       esc: portfolio.esc,
       money: portfolio.money,
       paymentFrequencyLabel: portfolio.paymentFrequencyLabel,

@@ -7,6 +7,7 @@
   function createOverviewModel({
     state,
     propertySummaryModel,
+    groupAccountsByProperty,
     collectedSince,
     scheduledMonthlyRunRate,
     monthStart,
@@ -21,8 +22,7 @@
       const propertyById = new Map(
         state.properties.map((property) => [property.id, property]),
       );
-      const accountsByProperty =
-        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
+      const accountsByProperty = groupAccountsByProperty(state.accounts);
       const accountById = new Map(
         state.accounts.map((account) => [account.id, account]),
       );

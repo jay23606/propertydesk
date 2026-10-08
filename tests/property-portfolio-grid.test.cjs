@@ -32,6 +32,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
+    /PropertyDeskPropertyWorkspaceWorkflow\.create\(\{\s*groupAccountsByProperty:\s*window\.PropertyDeskPropertyAccountIndex\.groupByProperty,/,
+  );
+  assert.match(
+    app,
     /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
   );
   assert.doesNotMatch(
@@ -111,7 +115,6 @@ test("Properties workflow returns explicit view and action operations", () => {
           return { attachEvents() {} };
         },
       },
-      PropertyDeskPropertyAccountIndex: { groupByProperty: action },
     },
   });
   vm.runInContext(
@@ -125,6 +128,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
     $: action,
     state,
+    groupAccountsByProperty: action,
     toast: action,
     fetchAll: action,
     streetAddress: action,
