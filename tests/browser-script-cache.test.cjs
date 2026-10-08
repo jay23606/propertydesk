@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("every feature module loads before app.js and every local script is precached", () => {
+test("every feature module loads before app.js and local scripts and styles are precached", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -12,6 +12,11 @@ test("every feature module loads before app.js and every local script is precach
   const localScripts = [...html.matchAll(/<script\b([^>]*)>/gi)]
     .filter(([, attributes]) => /\bdefer\b/i.test(attributes))
     .map(([, attributes]) => attributes.match(/\bsrc=["']([^"']+)["']/i)?.[1])
+    .filter((source) => source && !/^https?:\/\//i.test(source))
+    .map((source) => source.split("?")[0].replace(/^\.\//, ""));
+  const localStylesheets = [...html.matchAll(/<link\b([^>]*)>/gi)]
+    .filter(([, attributes]) => /\brel=["']stylesheet["']/i.test(attributes))
+    .map(([, attributes]) => attributes.match(/\bhref=["']([^"']+)["']/i)?.[1])
     .filter((source) => source && !/^https?:\/\//i.test(source))
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const shellMatch = worker.match(/const SHELL_FILES\s*=\s*\[([\s\S]*?)\];/);
@@ -39,6 +44,12 @@ test("every feature module loads before app.js and every local script is precach
     );
   }
   for (const source of localScripts) {
+    assert.ok(
+      shellFiles.has(source),
+      `${source} is cached by the service worker`,
+    );
+  }
+  for (const source of localStylesheets) {
     assert.ok(
       shellFiles.has(source),
       `${source} is cached by the service worker`,
