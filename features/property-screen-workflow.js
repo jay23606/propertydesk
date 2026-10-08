@@ -51,19 +51,14 @@
         $: holders.$,
         savePropertyHolders,
       });
-    const propertyDocuments = window.PropertyDeskDocuments.create({
-      state: documents.state,
-      toast: documents.toast,
-      fetchAll: documents.fetchAll,
-      openPropertyDetails: details.openPropertyDetails,
-      repository: documents.documentRepository,
-    });
     const { attachPropertyDocumentEvents } =
-      window.PropertyDeskPropertyDetailDocumentEvents.create({
+      window.PropertyDeskPropertyDocumentWorkflow.create({
         $: documents.$,
-        uploadPropertyDocument: propertyDocuments.uploadPropertyDocument,
-        deletePropertyDocument: propertyDocuments.deletePropertyDocument,
-        openPropertyDocument: propertyDocuments.openPropertyDocument,
+        state: documents.state,
+        toast: documents.toast,
+        fetchAll: documents.fetchAll,
+        openPropertyDetails: details.openPropertyDetails,
+        repository: documents.documentRepository,
       });
 
     return Object.freeze({

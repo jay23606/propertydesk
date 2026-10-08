@@ -47,9 +47,6 @@ test("property screen workflow passes detail actions to management and returns b
   const attachPropertyDocumentEvents = () => {};
   const attachPropertyHolderEvents = () => {};
   const savePropertyHolders = () => {};
-  const uploadPropertyDocument = () => {};
-  const deletePropertyDocument = () => {};
-  const openPropertyDocument = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskPropertyDetailContentWorkflow: {
@@ -67,19 +64,9 @@ test("property screen workflow passes detail actions to management and returns b
           };
         },
       },
-      PropertyDeskDocuments: {
+      PropertyDeskPropertyDocumentWorkflow: {
         create(options) {
-          calls.push(["documents", options]);
-          return {
-            uploadPropertyDocument,
-            deletePropertyDocument,
-            openPropertyDocument,
-          };
-        },
-      },
-      PropertyDeskPropertyDetailDocumentEvents: {
-        create(options) {
-          calls.push(["documentEvents", options]);
+          calls.push(["propertyDocuments", options]);
           return { attachPropertyDocumentEvents };
         },
       },
@@ -147,16 +134,13 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[3][0], "holderEvents");
   assert.equal(calls[3][1].$, holders.$);
   assert.equal(calls[3][1].savePropertyHolders, savePropertyHolders);
-  assert.equal(calls[4][0], "documents");
+  assert.equal(calls[4][0], "propertyDocuments");
   assert.equal(calls[4][1].repository, documents.documentRepository);
   assert.equal(calls[4][1].openPropertyDetails, openPropertyDetails);
-  assert.equal("documentRepository" in calls[4][1], false);
-  assert.equal("$" in calls[4][1], false);
-  assert.equal(calls[5][0], "documentEvents");
-  assert.equal(calls[5][1].$, documents.$);
-  assert.equal(calls[5][1].uploadPropertyDocument, uploadPropertyDocument);
-  assert.equal(calls[5][1].deletePropertyDocument, deletePropertyDocument);
-  assert.equal(calls[5][1].openPropertyDocument, openPropertyDocument);
+  assert.equal(calls[4][1].$, documents.$);
+  assert.equal(calls[4][1].state, documents.state);
+  assert.equal(calls[4][1].toast, documents.toast);
+  assert.equal(calls[4][1].fetchAll, documents.fetchAll);
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",

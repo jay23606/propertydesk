@@ -80,7 +80,7 @@ test("property detail document events route private document actions to document
   ]);
 });
 
-test("app connects private document actions to their detail event router", () => {
+test("property document workflow connects private actions and detail events", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -92,10 +92,14 @@ test("app connects private document actions to their detail event router", () =>
     /PropertyDeskPropertyDetailManagementWorkflow\.create\(/,
   );
   const workflow = fs.readFileSync(
+    path.join(root, "features", "property-document-workflow.js"),
+    "utf8",
+  );
+  const screenWorkflow = fs.readFileSync(
     path.join(root, "features", "property-screen-workflow.js"),
     "utf8",
   );
-  assert.match(workflow, /repository: documents\.documentRepository/);
+  assert.match(screenWorkflow, /repository: documents\.documentRepository/);
   assert.match(
     app,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
@@ -111,16 +115,87 @@ test("app connects private document actions to their detail event router", () =>
   );
   assert.match(
     workflow,
-    /PropertyDeskPropertyDetailDocumentEvents\.create\([\s\S]*?uploadPropertyDocument: propertyDocuments\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: propertyDocuments\.deletePropertyDocument,[\s\S]*?openPropertyDocument: propertyDocuments\.openPropertyDocument,/,
+    /PropertyDeskPropertyDetailDocumentEvents\.create\([\s\S]*?uploadPropertyDocument: documents\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: documents\.deletePropertyDocument,[\s\S]*?openPropertyDocument: documents\.openPropertyDocument,/,
   );
   assert.match(app, /attachPropertyDocumentEvents/);
-  assert.equal(
-    fs.existsSync(path.join(root, "features", "property-document-workflow.js")),
-    false,
+  assert.ok(html.includes("features/property-document-workflow.js"));
+  assert.ok(worker.includes("'./features/property-document-workflow.js'"));
+  assert.ok(
+    html.indexOf("features/documents.js") <
+      html.indexOf("features/property-document-workflow.js") &&
+      html.indexOf("features/property-document-workflow.js") <
+        html.indexOf("features/property-screen-workflow.js"),
   );
-  assert.equal(html.includes("features/property-document-workflow.js"), false);
-  assert.equal(
-    worker.includes("features/property-document-workflow.js"),
-    false,
+});
+
+test("property document workflow routes actions through one explicit binder", () => {
+  const root = path.join(__dirname, "..");
+  const calls = [];
+  const actions = {
+    uploadPropertyDocument() {},
+    deletePropertyDocument() {},
+    openPropertyDocument() {},
+  };
+  const attachPropertyDocumentEvents = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDocuments: {
+        create(options) {
+          calls.push(["documents", options]);
+          return actions;
+        },
+      },
+      PropertyDeskPropertyDetailDocumentEvents: {
+        create(options) {
+          calls.push(["events", options]);
+          return { attachPropertyDocumentEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(root, "features", "property-document-workflow.js"),
+      "utf8",
+    ),
+    context,
   );
+
+  const dependencies = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    openPropertyDetails() {},
+    repository: {},
+  };
+  const workflow =
+    context.window.PropertyDeskPropertyDocumentWorkflow.create(dependencies);
+
+  assert.equal(calls[0][0], "documents");
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "fetchAll",
+    "openPropertyDetails",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  assert.equal(calls[0][1].repository, dependencies.repository);
+  assert.equal(calls[1][0], "events");
+  assert.equal(calls[1][1].$, dependencies.$);
+  assert.equal(
+    calls[1][1].uploadPropertyDocument,
+    actions.uploadPropertyDocument,
+  );
+  assert.equal(
+    calls[1][1].deletePropertyDocument,
+    actions.deletePropertyDocument,
+  );
+  assert.equal(calls[1][1].openPropertyDocument, actions.openPropertyDocument);
+  assert.deepEqual(Object.keys(workflow), ["attachPropertyDocumentEvents"]);
+  assert.equal(
+    workflow.attachPropertyDocumentEvents,
+    attachPropertyDocumentEvents,
+  );
+  assert.equal(Object.isFrozen(workflow), true);
 });
