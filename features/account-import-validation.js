@@ -157,11 +157,7 @@
 
   function normalizedAccountRow(
     row,
-    type,
-    financial,
-    schedule,
-    lateFee,
-    contact,
+    { type, financial, schedule, lateFee, contact },
   ) {
     return {
       property_name: row.property_name,
@@ -197,14 +193,13 @@
     });
     const contact = accountContactFields(row);
     context.identity.seenAccounts.add(key);
-    return normalizedAccountRow(
-      row,
+    return normalizedAccountRow(row, {
       type,
       financial,
       schedule,
       lateFee,
       contact,
-    );
+    });
   }
 
   function validateAccountRows(rows, properties, accounts, today) {
