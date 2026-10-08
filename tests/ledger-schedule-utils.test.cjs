@@ -266,6 +266,37 @@ test("monthly due dates stay anchored at month end", () => {
   );
 });
 
+test("unpaid due follows each supported payment frequency across the current month", () => {
+  const schedules = [
+    ["weekly", "2026-10-01", 5],
+    ["biweekly", "2026-10-01", 3],
+    ["monthly", "2026-10-01", 1],
+    ["quarterly", "2026-10-01", 1],
+    ["annual", "2026-10-01", 1],
+  ];
+
+  for (const [payment_frequency, start_date, installmentCount] of schedules) {
+    assert.equal(
+      amountDueSince(
+        [
+          {
+            id: payment_frequency,
+            start_date,
+            next_due_date: "2026-10-01",
+            payment_amount: 80,
+            payment_frequency,
+          },
+        ],
+        [],
+        "2026-10-01",
+        "2026-10-01",
+      ),
+      installmentCount * 80,
+      `${payment_frequency} schedule accrues installments through October even on October 1`,
+    );
+  }
+});
+
 test("unpaid charges backfill from the current next-due date through the 2026 accrual window", () => {
   const account = {
     id: "advanced-due",
