@@ -117,26 +117,6 @@ html[data-theme="dark"] .config-banner {
   border-color: #61512b;
   color: #f1d995;
 }
-html[data-theme="dark"] .property-art {
-  background: linear-gradient(130deg, #35443a, #293a30);
-}
-html[data-theme="dark"] .property-art:before {
-  background: #2c3e32;
-}
-html[data-theme="dark"] .property-art:after {
-  background: #26382d;
-}
-html[data-theme="dark"] .property-building {
-  background: #3b4a40;
-  border-color: #5a6a5e;
-}
-html[data-theme="dark"] .property-building:after {
-  background: #61796a;
-}
-html[data-theme="dark"] .property-type {
-  background: #202923e8;
-  color: #c8d7cd;
-}
 html[data-theme="dark"] .list-row,
 html[data-theme="dark"] .profile-row,
 html[data-theme="dark"] .modal-heading,
@@ -161,54 +141,6 @@ html[data-theme="dark"] .table-wrap td strong {
 }
 html[data-theme="dark"] .table-wrap tbody tr:hover {
   background: #27332c;
-}
-html[data-theme="dark"] .portfolio-table th:nth-child(1),
-html[data-theme="dark"] .portfolio-table th:nth-child(2) {
-  background: #252f29;
-}
-html[data-theme="dark"] .portfolio-table td:nth-child(1),
-html[data-theme="dark"] .portfolio-table td:nth-child(2) {
-  background: #202923;
-}
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(2) {
-  background: #27332c;
-}
-html[data-theme="dark"] .portfolio-table tbody td.payment-received-this-month {
-  background: #294b36;
-}
-html[data-theme="dark"]
-  .portfolio-table
-  tbody
-  tr:hover
-  td.payment-received-this-month {
-  background: #315a40;
-}
-html[data-theme="dark"]
-  .portfolio-table
-  tbody
-  td.payment-paid-in-full-this-month {
-  background: #346b48;
-}
-html[data-theme="dark"]
-  .portfolio-table
-  tbody
-  tr:hover
-  td.payment-paid-in-full-this-month {
-  background: #3c7952;
-}
-html[data-theme="dark"]
-  .portfolio-table
-  tbody
-  td.payment-not-received-this-month {
-  background: #4c2d30;
-}
-html[data-theme="dark"]
-  .portfolio-table
-  tbody
-  tr:hover
-  td.payment-not-received-this-month {
-  background: #5b3538;
 }
 html[data-theme="dark"] .status-pill {
   background: #294735;
@@ -262,7 +194,6 @@ html[data-theme="dark"] .payment-guidance {
   background: #26312a;
   color: #c3d0c7;
 }
-html[data-theme="dark"] .property-row-note,
 html[data-theme="dark"] .table-subtext {
   color: #a7b3aa;
 }
@@ -281,9 +212,6 @@ html[data-theme="dark"] .privacy-note {
 }
 html[data-theme="dark"] .text-button {
   color: #78c99d;
-}
-html[data-theme="dark"] .portfolio-table td.portfolio-due {
-  color: #b8f0cd !important;
 }
 html[data-theme="dark"] .reminder-toggle-row,
 html[data-theme="dark"] .reminder-preview-meta,

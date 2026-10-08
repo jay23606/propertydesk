@@ -132,6 +132,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+html[data-theme="dark"] .property-art {
+  background: linear-gradient(130deg, #35443a, #293a30);
+}
+html[data-theme="dark"] .property-art:before {
+  background: #2c3e32;
+}
+html[data-theme="dark"] .property-art:after {
+  background: #26382d;
+}
+html[data-theme="dark"] .property-building {
+  background: #3b4a40;
+  border-color: #5a6a5e;
+}
+html[data-theme="dark"] .property-building:after {
+  background: #61796a;
+}
+html[data-theme="dark"] .property-type {
+  background: #202923e8;
+  color: #c8d7cd;
+}
 @media (max-width: 760px) {
   .property-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

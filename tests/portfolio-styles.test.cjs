@@ -9,6 +9,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const portfolio = fs.readFileSync(path.join(root, "portfolio.css"), "utf8");
+  const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
   const stylesheetOrder = [
     ...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g),
   ]
@@ -26,6 +27,8 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /\.portfolio-panel/);
   assert.match(portfolio, /\.portfolio-table/);
   assert.match(portfolio, /\.property-row-note/);
+  assert.match(portfolio, /html\[data-theme="dark"\] \.portfolio-table/);
   assert.doesNotMatch(styles, /\.portfolio-(?:panel|table|due)/);
   assert.doesNotMatch(shared, /\.portfolio-|\.property-row-note/);
+  assert.doesNotMatch(theme, /\.portfolio-table|\.property-row-note/);
 });
