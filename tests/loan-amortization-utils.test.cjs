@@ -48,12 +48,10 @@ test("financial calculation modules keep focused APIs and load before the app", 
   assert.deepEqual(
     Object.keys(ledgerUtils).sort(),
     [
-      "hasPostedPaymentInMonth",
       "isDueReducingPayment",
       "isPosted",
       "paymentStatusInMonth",
       "postedOnOrAfter",
-      "postedPaymentTotalInMonth",
       "sumIncome",
       "sumOperatingExpenses",
       "sumPosted",

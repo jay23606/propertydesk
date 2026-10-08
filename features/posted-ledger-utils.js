@@ -30,14 +30,6 @@
     );
   }
 
-  function hasPostedPaymentInMonth(payments, accountId, month) {
-    const yearMonth = String(month || "").slice(0, 7);
-    if (!/^\d{4}-\d{2}$/.test(yearMonth)) return false;
-    return payments.some((payment) =>
-      isDueReducingPaymentInMonth(payment, accountId, yearMonth),
-    );
-  }
-
   function postedPaymentTotalInMonth(payments, accountId, month) {
     const yearMonth = String(month || "").slice(0, 7);
     if (!/^\d{4}-\d{2}$/.test(yearMonth)) return 0;
@@ -89,12 +81,10 @@
       "PropertyDeskCurrencyUtils must load before PropertyDeskPostedLedgerUtils.",
     );
   const helpers = Object.freeze({
-    hasPostedPaymentInMonth,
     isDueReducingPayment,
     isPosted,
     paymentStatusInMonth,
     postedOnOrAfter,
-    postedPaymentTotalInMonth,
     sumIncome,
     sumOperatingExpenses,
     sumPosted,
