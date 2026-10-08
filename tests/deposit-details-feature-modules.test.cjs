@@ -5,11 +5,17 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 test("deposit details render rental-only ledger rows and preserve voided markers", () => {
-  const context = vm.createContext({ window: {} });
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositAdjustmentWorkflow: {
+        create: () => ({ attachDepositAdjustmentEvents() {} }),
+      },
+    },
+  });
   for (const filename of [
     "deposit-details-model.js",
     "deposit-details-view.js",
-    "deposit-details-workflow.js",
+    "deposit-workspace-workflow.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -22,39 +28,52 @@ test("deposit details render rental-only ledger rows and preserve voided markers
     expenses: [],
   };
   const { depositSectionHTML } =
-    context.window.PropertyDeskDepositDetailsWorkflow.create({
-      state,
-      money: (value) => `$${value.toFixed(2)}`,
-      fmtDate: (value) => value,
-      esc: (value) => String(value).replaceAll("<", "&lt;"),
-      depositLedger: () => {
-        ledgerReads += 1;
-        return {
-          entries: [
-            {
-              id: "entry-1",
-              entry_type: "received",
-              movement_date: "2026-10-01",
-              amount: 500,
-              source_payment_id: "payment-1",
+    context.window.PropertyDeskDepositWorkspaceWorkflow.create({
+      details: {
+        state,
+        money: (value) => `$${value.toFixed(2)}`,
+        fmtDate: (value) => value,
+        esc: (value) => String(value).replaceAll("<", "&lt;"),
+        depositLedger: () => {
+          ledgerReads += 1;
+          return {
+            entries: [
+              {
+                id: "entry-1",
+                entry_type: "received",
+                movement_date: "2026-10-01",
+                amount: 500,
+                source_payment_id: "payment-1",
+              },
+              {
+                id: "entry-2",
+                entry_type: "retained",
+                movement_date: "2026-10-02",
+                amount: 100,
+                reason: "Repair",
+              },
+            ],
+            active: [{ id: "entry-1" }],
+            totals: {
+              held: 400,
+              received: 500,
+              refunded: 0,
+              retained: 100,
+              restored: 0,
             },
-            {
-              id: "entry-2",
-              entry_type: "retained",
-              movement_date: "2026-10-02",
-              amount: 100,
-              reason: "Repair",
-            },
-          ],
-          active: [{ id: "entry-1" }],
-          totals: {
-            held: 400,
-            received: 500,
-            refunded: 0,
-            retained: 100,
-            restored: 0,
-          },
-        };
+          };
+        },
+      },
+      adjustments: {
+        $() {},
+        state,
+        todayIso() {},
+        toast() {},
+        fetchAll() {},
+        moneyInput() {},
+        repository: {},
+        prepareAdjustment() {},
+        validateAdjustment() {},
       },
     });
 

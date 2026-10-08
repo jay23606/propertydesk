@@ -44,8 +44,13 @@ test("app composes account details apart from account and deposit maintenance", 
   );
   assert.match(
     depositWorkspaceWorkflow,
-    /DepositDetailsWorkflow\.create\([\s\S]*?depositLedger: details\.depositLedger/,
+    /PropertyDeskDepositDetailsModel\.create\(/,
   );
+  assert.match(
+    depositWorkspaceWorkflow,
+    /PropertyDeskDepositDetailsView\.create\(/,
+  );
+  assert.match(depositWorkspaceWorkflow, /buildDepositDetails\(account\)/);
   assert.match(
     depositWorkspaceWorkflow,
     /DepositAdjustmentWorkflow\.create\([\s\S]*?depositSectionHTML,/,
@@ -111,14 +116,24 @@ test("app composes account details apart from account and deposit maintenance", 
 
 test("deposit workspace connects held-balance details to adjustment actions", () => {
   const calls = [];
-  const depositSectionHTML = () => "deposit";
+  const buildDepositDetails = (account) => ({ account });
+  const renderDepositDetails = (details) => {
+    calls.push(["render", details]);
+    return "deposit";
+  };
   const attachDepositAdjustmentEvents = () => {};
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositDetailsWorkflow: {
+      PropertyDeskDepositDetailsModel: {
         create(options) {
-          calls.push(["details", options]);
-          return { depositSectionHTML };
+          calls.push(["detailsModel", options]);
+          return { buildDepositDetails };
+        },
+      },
+      PropertyDeskDepositDetailsView: {
+        create(options) {
+          calls.push(["detailsView", options]);
+          return { depositSectionHTML: renderDepositDetails };
         },
       },
       PropertyDeskDepositAdjustmentWorkflow: {
@@ -161,22 +176,23 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
     adjustments,
   });
 
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
-    "depositLedger",
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), ["depositLedger", "state"]);
+  assert.equal(calls[0][1].depositLedger, details.depositLedger);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
     "esc",
     "fmtDate",
     "money",
-    "state",
   ]);
-  assert.equal(calls[0][1].depositLedger, details.depositLedger);
-  assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
-  assert.equal(calls[1][1].repository, adjustments.repository);
-  assert.equal("unused" in calls[1][1], false);
+  assert.equal(calls[1][1].money, details.money);
+  assert.equal(calls[2][1].depositSectionHTML, workflow.depositSectionHTML);
+  assert.equal(calls[2][1].repository, adjustments.repository);
+  assert.equal("unused" in calls[2][1], false);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachDepositAdjustmentEvents",
     "depositSectionHTML",
   ]);
-  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.equal(workflow.depositSectionHTML({ id: "rental-1" }), "deposit");
+  assert.deepEqual(calls[3], ["render", { account: { id: "rental-1" } }]);
   assert.equal(
     workflow.attachDepositAdjustmentEvents,
     attachDepositAdjustmentEvents,

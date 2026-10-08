@@ -30,7 +30,6 @@ test("app delegates account, deposit, and transaction maintenance", () => {
 
   for (const feature of [
     "account-detail-action-workflow",
-    "deposit-details-workflow",
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
     "transaction-maintenance-workflow",
