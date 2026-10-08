@@ -118,7 +118,6 @@
     return Object.freeze({
       saveWorkspaceRecord,
       saveAndRefreshWorkspaceRecord,
-      selectRecordWriteCompletion,
     });
   }
 

@@ -84,6 +84,15 @@ test("record-write completion selects only supported lifecycle options", () => {
     context,
   );
   const recordWrites = context.window.PropertyDeskWorkspaceRecordWriteWorkflow;
+  const recordWriter = recordWrites.create({
+    run() {},
+    reconcileWorkspaceChange() {},
+    finishWorkspaceWrite() {},
+  });
+  assert.deepEqual(Object.keys(recordWriter).sort(), [
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
+  ]);
   const onSaved = () => {};
   const onRefreshed = () => {};
   const afterRefresh = () => {};
