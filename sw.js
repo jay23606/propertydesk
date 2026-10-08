@@ -117,6 +117,7 @@ const SHELL_FILES = [
   './features/transaction-import-feature.js',
   './features/import-repository.js',
   './features/import-batch-reconciliation.js',
+  './features/import-commit-reporting.js',
   './features/import-commit.js',
   './features/imports.js',
   './features/property-activity-details.js',
