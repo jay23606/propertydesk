@@ -6,6 +6,8 @@ PropertyDesk is a plain HTML, CSS, and JavaScript app with no build step. Browse
 
 `app.js` is the composition root. It creates shared runtime services, supplies explicit dependencies to feature workflows, and connects their renderers and event binders. Keep it focused on wiring rather than moving domain rules or UI behavior into it.
 
+Workflow coordinators pass only the dependencies each child needs instead of forwarding a whole app context. Those explicit mappings keep feature boundaries visible and make accidental coupling easier to spot.
+
 `features/app-startup-workflow.js` joins authentication and `features/app-lifecycle.js`. The lifecycle attaches events, registers the service worker, initializes the backend, restores the auth session, and calls the renderers when workspace data changes.
 
 ## Workspace data and access
