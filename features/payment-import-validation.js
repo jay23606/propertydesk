@@ -8,6 +8,7 @@
     duplicateKeyAmount,
     duplicateKeyText,
     markPossibleDuplicates,
+    resolveImportProperty,
     validateImportRows,
   } = globalThis.PropertyDeskImportRows;
   const { csvMoney, validIsoDate } = globalThis.PropertyDeskCsvValueUtils;
@@ -42,14 +43,12 @@
       throw new Error(
         "Each payment row needs property_name, property_address, account_name, received_date, and amount.",
       );
-    const property = lookup.findProperty(
-      row.property_name,
-      row.property_address,
+    const property = resolveImportProperty(
+      row,
+      lookup,
+      ({ property_name, property_address }) =>
+        `Property not found: ${property_name} at ${property_address}. Import properties and accounts first.`,
     );
-    if (!property)
-      throw new Error(
-        `Property not found: ${row.property_name} at ${row.property_address}. Import properties and accounts first.`,
-      );
     const account = lookup.findAccount(property.id, row.account_name);
     if (!account)
       throw new Error(

@@ -53,6 +53,15 @@
     });
   }
 
+  function resolveImportProperty(row, lookup, missingMessage) {
+    const property = lookup.findProperty(
+      row.property_name,
+      row.property_address,
+    );
+    if (!property) throw new Error(missingMessage(row));
+    return property;
+  }
+
   function markPossibleDuplicates(rows, existingKeys, keyForRow) {
     const seen = new Set(existingKeys);
     return rows.map((row) => {
@@ -107,6 +116,7 @@
     duplicateKeyAmount,
     duplicateKeyText,
     markPossibleDuplicates,
+    resolveImportProperty,
     selectImportRows,
     validateImportRows,
   });

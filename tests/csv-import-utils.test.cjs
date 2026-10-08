@@ -13,6 +13,7 @@ const {
   duplicateKeyAmount,
   duplicateKeyText,
   markPossibleDuplicates,
+  resolveImportProperty,
   selectImportRows,
   validateImportRows,
 } = require("../features/import-row-utils.js");
@@ -136,6 +137,25 @@ test("indexed CSV lookup preserves normalized and exact first-match behavior", (
   );
   assert.equal(lookup.findAccount("p1", "OAK RENTAL"), firstAccount);
   assert.equal(lookup.findExactAccount("p1", "OAK RENTAL"), secondAccount);
+});
+
+test("shared property resolution keeps caller-specific missing-property messages", () => {
+  const lookup = createImportLookup([], []);
+  const row = { property_name: "Oak House", property_address: "10 Oak St" };
+
+  assert.throws(
+    () => resolveImportProperty(row, lookup, () => "Import properties first."),
+    { message: "Import properties first." },
+  );
+  const property = { id: "p1", name: "Oak House", address: "10 Oak St" };
+  assert.equal(
+    resolveImportProperty(
+      row,
+      createImportLookup([property], []),
+      () => "missing",
+    ),
+    property,
+  );
 });
 
 test("re-imported and repeated rows are flagged and excluded unless explicitly included", () => {
