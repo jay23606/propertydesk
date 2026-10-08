@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("workspace composes reminder activity and shares preview with account forms", () => {
+test("app shell shares workspace reminder preview with account forms", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -18,7 +18,10 @@ test("workspace composes reminder activity and shares preview with account forms
     workspace,
     /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
   );
-  assert.match(app, /const \{ previewReminderEmail \} = workspace/);
+  assert.match(
+    app,
+    /const \{[\s\S]*?previewReminderEmail,[\s\S]*?\} = appShell/,
+  );
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,

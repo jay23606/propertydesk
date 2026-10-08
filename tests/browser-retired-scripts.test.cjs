@@ -21,8 +21,6 @@ test("retired workflows stay out of the browser shell and app root", () => {
     ["features/reports-workflow.js", worker],
     ["features/deposit-details.js", html],
     ["features/deposit-details.js", worker],
-    ["features/app-shell-workflow.js", html],
-    ["features/app-shell-workflow.js", worker],
     ["record-maintenance.js", worker],
     ["features/reminder-workflow.js", worker],
     ["workspace-settings-workflow.js", worker],

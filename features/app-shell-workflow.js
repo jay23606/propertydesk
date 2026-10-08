@@ -1,0 +1,26 @@
+/* Compose workspace settings and page navigation for the app shell. */
+(() => {
+  "use strict";
+
+  function createAppShellWorkflow({ workspace, navigation }) {
+    const workspacePage = window.PropertyDeskWorkspace.create(workspace);
+    const pageNavigation = window.PropertyDeskNavigation.create({
+      ...navigation,
+      renderWorkspacePage: workspacePage.renderWorkspacePage,
+    });
+
+    return Object.freeze({
+      updateGreeting: workspacePage.updateGreeting,
+      renderWorkspacePage: workspacePage.renderWorkspacePage,
+      previewReminderEmail: workspacePage.previewReminderEmail,
+      attachProfileEvents: workspacePage.attachProfileEvents,
+      attachWorkspaceMemberEvents: workspacePage.attachWorkspaceMemberEvents,
+      navigate: pageNavigation.navigate,
+      attachNavigationEvents: pageNavigation.attachEvents,
+    });
+  }
+
+  window.PropertyDeskAppShellWorkflow = Object.freeze({
+    create: createAppShellWorkflow,
+  });
+})();

@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app composes workspace settings and page navigation directly", () => {
+test("app shell composes workspace settings and page navigation", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -12,14 +12,18 @@ test("app composes workspace settings and page navigation directly", () => {
     path.join(root, "features", "workspace.js"),
     "utf8",
   );
+  const appShell = fs.readFileSync(
+    path.join(root, "features", "app-shell-workflow.js"),
+    "utf8",
+  );
 
   assert.match(
     app,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?reminder: \{[\s\S]*?openModal: modal\.openModal,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
+    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?workspace: \{[\s\S]*?reminder: \{[\s\S]*?openModal: modal\.openModal,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
-    app,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
+    appShell,
+    /PropertyDeskWorkspace\.create\(workspace\)[\s\S]*?PropertyDeskNavigation\.create\([\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
   );
   assert.match(
     workspace,
@@ -36,6 +40,7 @@ test("app composes workspace settings and page navigation directly", () => {
   for (const script of [
     "features/workspace.js",
     "features/navigation.js",
+    "features/app-shell-workflow.js",
     "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));

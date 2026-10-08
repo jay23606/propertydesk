@@ -99,43 +99,48 @@
       propertyAddress,
       prettyType,
     });
-  const workspace = window.PropertyDeskWorkspace.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    reminder: {
+  const appShell = window.PropertyDeskAppShellWorkflow.create({
+    workspace: {
       $,
       state,
       esc,
-      fmtDate,
-      money,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      monthEnd,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      todayIso,
-      moneyInput,
       toast,
-      openModal: modal.openModal,
+      fetchAll,
+      reminder: {
+        $,
+        state,
+        esc,
+        fmtDate,
+        money,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        monthEnd,
+        dateOnly,
+        monthStart,
+        propertyAddress,
+        todayIso,
+        moneyInput,
+        toast,
+        openModal: modal.openModal,
+      },
+      memberRepository: repositories.workspaceMembers,
+      authClient,
     },
-    memberRepository: repositories.workspaceMembers,
-    authClient,
+    navigation: {
+      $,
+      state,
+      documentRef: document,
+      windowRef: window,
+    },
   });
-  const navigation = window.PropertyDeskNavigation.create({
-    $,
-    state,
-    renderWorkspacePage: workspace.renderWorkspacePage,
-    documentRef: document,
-    windowRef: window,
-  });
-  const { previewReminderEmail } = workspace;
-  const { updateGreeting, attachProfileEvents, attachWorkspaceMemberEvents } =
-    workspace;
-  const { navigate, attachEvents: attachNavigationEvents } = navigation;
+  const {
+    previewReminderEmail,
+    updateGreeting,
+    attachProfileEvents,
+    attachWorkspaceMemberEvents,
+    navigate,
+    attachNavigationEvents,
+  } = appShell;
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const propertyForm = window.PropertyDeskPropertyForm.create({

@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("workspace reminder activity and preview stay independent of navigation", () => {
+test("workspace reminder activity stays under the app shell and independent of navigation", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -13,7 +13,14 @@ test("workspace reminder activity and preview stay independent of navigation", (
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskWorkspace\.create\(/);
+  assert.match(app, /PropertyDeskAppShellWorkflow\.create\(/);
+  assert.match(
+    fs.readFileSync(
+      path.join(root, "features", "app-shell-workflow.js"),
+      "utf8",
+    ),
+    /PropertyDeskWorkspace\.create\(workspace\)[\s\S]*?PropertyDeskNavigation\.create\(/,
+  );
   assert.match(
     fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),
     /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
