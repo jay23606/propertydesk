@@ -56,7 +56,7 @@
       };
     }
 
-    return { buildAccountRow };
+    return Object.freeze({ buildAccountRow });
   }
 
   window.PropertyDeskPropertyPortfolioAccountRowModel = Object.freeze({

@@ -52,7 +52,7 @@
       });
     }
 
-    return { buildRows };
+    return Object.freeze({ buildRows });
   }
 
   window.PropertyDeskReminderActivityModel = Object.freeze({

@@ -38,7 +38,7 @@
       };
     }
 
-    return { summarizeProperty };
+    return Object.freeze({ summarizeProperty });
   }
 
   window.PropertyDeskOverviewPropertySummaryModel = Object.freeze({

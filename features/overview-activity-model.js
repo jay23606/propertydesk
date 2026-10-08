@@ -32,7 +32,7 @@
         });
     }
 
-    return { upcomingPayments, recentPayments };
+    return Object.freeze({ upcomingPayments, recentPayments });
   }
 
   window.PropertyDeskOverviewActivityModel = Object.freeze({

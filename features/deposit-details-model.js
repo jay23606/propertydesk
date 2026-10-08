@@ -40,7 +40,7 @@
       };
     }
 
-    return { buildDepositDetails };
+    return Object.freeze({ buildDepositDetails });
   }
 
   window.PropertyDeskDepositDetailsModel = Object.freeze({

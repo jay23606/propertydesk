@@ -48,11 +48,13 @@ test("database queries stay inside repository adapters", () => {
   }
 });
 
-test("view factories return frozen API bundles", () => {
+test("view, form, and model factories return frozen API bundles", () => {
   const featureDirectory = path.join(__dirname, "..", "features");
   const viewFiles = fs
     .readdirSync(featureDirectory)
-    .filter((file) => /-views?(?:-rendering)?\.js$/u.test(file));
+    .filter((file) =>
+      /(?:-views?(?:-rendering)?|-forms?|-models?)\.js$/u.test(file),
+    );
   let inspectedFactories = 0;
   let inspectedObjects = 0;
 

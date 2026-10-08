@@ -83,7 +83,7 @@
       return filterModel.filterRows(rows, filters).map(toDisplayRow);
     }
 
-    return { buildTransactionList };
+    return Object.freeze({ buildTransactionList });
   }
 
   window.PropertyDeskTransactionListModel = Object.freeze({

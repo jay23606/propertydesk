@@ -33,7 +33,7 @@
       return { reminderHref, recipientHint };
     }
 
-    return { buildReminderDetails };
+    return Object.freeze({ buildReminderDetails });
   }
 
   window.PropertyDeskPropertyPortfolioReminderModel = Object.freeze({

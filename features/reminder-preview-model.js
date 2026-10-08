@@ -49,7 +49,7 @@
       };
     }
 
-    return { build };
+    return Object.freeze({ build });
   }
 
   window.PropertyDeskReminderPreviewModel = Object.freeze({ create });

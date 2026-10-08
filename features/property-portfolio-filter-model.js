@@ -74,14 +74,14 @@
       );
     }
 
-    return {
+    return Object.freeze({
       holdersByProperty,
       accountMatches,
       propertyIsVisible,
       activeAccountsForProperty,
       shouldShowEmptyProperty,
       compareRows,
-    };
+    });
   }
 
   window.PropertyDeskPropertyPortfolioFilterModel = Object.freeze({

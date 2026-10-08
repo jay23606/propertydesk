@@ -45,7 +45,7 @@
       };
     }
 
-    return { buildReportModel };
+    return Object.freeze({ buildReportModel });
   }
 
   window.PropertyDeskReportModel = Object.freeze({ create: createReportModel });

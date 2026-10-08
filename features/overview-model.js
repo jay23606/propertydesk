@@ -64,7 +64,7 @@
       };
     }
 
-    return { buildOverview };
+    return Object.freeze({ buildOverview });
   }
 
   window.PropertyDeskOverviewModel = Object.freeze({

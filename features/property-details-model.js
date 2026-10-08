@@ -23,7 +23,7 @@
       };
     }
 
-    return { buildPropertyDetailData };
+    return Object.freeze({ buildPropertyDetailData });
   }
 
   window.PropertyDeskPropertyDetailsModel = Object.freeze({

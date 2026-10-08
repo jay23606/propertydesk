@@ -83,7 +83,7 @@
       );
     }
 
-    return { buildRows, totalsFor };
+    return Object.freeze({ buildRows, totalsFor });
   }
 
   window.PropertyDeskPropertyPortfolioModel = Object.freeze({

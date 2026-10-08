@@ -50,7 +50,7 @@
       state.pendingCorrection = { kind: "expense", id, reason: auditReason };
     }
 
-    return { correctTransaction };
+    return Object.freeze({ correctTransaction });
   }
 
   window.PropertyDeskTransactionCorrectionForm = Object.freeze({ create });

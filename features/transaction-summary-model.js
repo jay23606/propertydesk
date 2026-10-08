@@ -27,7 +27,7 @@
       return { collected, expenses, netCashFlow: collected - expenses };
     }
 
-    return { currentMonthTotals };
+    return Object.freeze({ currentMonthTotals });
   }
 
   window.PropertyDeskTransactionSummaryModel = Object.freeze({

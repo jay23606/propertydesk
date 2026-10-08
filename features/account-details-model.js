@@ -44,7 +44,7 @@
       };
     }
 
-    return { buildAccountDetailData };
+    return Object.freeze({ buildAccountDetailData });
   }
 
   window.PropertyDeskAccountDetailsModel = Object.freeze({

@@ -34,7 +34,7 @@
         );
     }
 
-    return { filterRows };
+    return Object.freeze({ filterRows });
   }
 
   window.PropertyDeskTransactionListFilterModel = Object.freeze({

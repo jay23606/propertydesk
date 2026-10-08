@@ -40,7 +40,7 @@
       return { accountVersions, auditEvents, auditError };
     }
 
-    return { loadAccountHistory };
+    return Object.freeze({ loadAccountHistory });
   }
 
   window.PropertyDeskAccountHistoryModel = Object.freeze({

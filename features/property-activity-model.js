@@ -70,7 +70,7 @@
       };
     }
 
-    return { buildPropertyActivity };
+    return Object.freeze({ buildPropertyActivity });
   }
 
   window.PropertyDeskPropertyActivityModel = Object.freeze({
