@@ -67,12 +67,12 @@ function loadLedgerEntryForms(context) {
     "repository-write-feedback.js",
     "transaction-repository.js",
     "transaction-inserts.js",
+    "ledger-entry-save-workflow.js",
     "payment-entry-view.js",
     "property-payment-action.js",
     "payment-entry-form.js",
     "expense-entry-view.js",
     "expense-entry-form.js",
-    "ledger-entry-save-workflow.js",
     "ledger-entry-forms.js",
   ]) {
     vm.runInContext(

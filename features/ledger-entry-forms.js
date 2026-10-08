@@ -30,9 +30,11 @@
         toast,
         repository: transactionRepository,
       });
-    const { finishSuccessfulEntry } =
+    const { saveTransactionEntry } =
       window.PropertyDeskLedgerEntrySaveWorkflow.create({
         $,
+        state,
+        saveCorrection,
         closeModal,
         fetchAll,
         toast,
@@ -47,8 +49,7 @@
       populateFormOptions,
       prettyType,
       openModal,
-      saveCorrection,
-      finishSuccessfulEntry,
+      saveTransactionEntry,
       insertPayment,
       buildPaymentPayload: buildPayment,
       buildPaymentCorrection,
@@ -63,8 +64,7 @@
       populateFormOptions,
       prettyType,
       openModal,
-      saveCorrection,
-      finishSuccessfulEntry,
+      saveTransactionEntry,
       insertExpense,
       buildExpensePayload: buildExpense,
       buildExpenseCorrection,

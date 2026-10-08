@@ -7,8 +7,7 @@
       $,
       state,
       toast,
-      saveCorrection,
-      finishSuccessfulEntry,
+      saveTransactionEntry,
       insertPayment,
       buildPaymentPayload,
       buildPaymentCorrection,
@@ -38,7 +37,6 @@
 
     async function savePayment(event) {
       event.preventDefault();
-      const addAnother = event.submitter?.id === "payment-save-next";
       const {
         accountId,
         amount,
@@ -60,20 +58,15 @@
         memo,
       });
 
-      if (state.pendingCorrection?.kind === "payment") {
-        await saveCorrection("payment", buildPaymentCorrection(payload));
-        return;
-      }
-
-      const saved = await insertPayment({
+      await saveTransactionEntry({
+        kind: "payment",
+        event,
         payload,
+        buildCorrection: buildPaymentCorrection,
+        insert: insertPayment,
         failureMessage:
           "Payment couldn't be saved right now. Check your connection and try again.",
-      });
-      if (!saved) return;
-      await finishSuccessfulEntry({
         label: "Payment",
-        addAnother,
         modalId: "payment-modal",
         resetAfterSave: paymentView.resetAfterSave,
         resetArguments: [account.id],

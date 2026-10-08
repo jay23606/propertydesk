@@ -65,7 +65,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       PropertyDeskLedgerEntrySaveWorkflow: {
         create: (options) => {
           passed.saveWorkflowOptions = options;
-          return { finishSuccessfulEntry: () => "finished" };
+          return { saveTransactionEntry: () => "saved" };
         },
       },
       PropertyDeskPaymentEntryForm: {
@@ -131,14 +131,13 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "$",
       "buildPaymentPayload",
       "buildPaymentCorrection",
-      "finishSuccessfulEntry",
       "fillSelect",
       "insertPayment",
       "moneyInput",
       "openModal",
       "populateFormOptions",
       "prettyType",
-      "saveCorrection",
+      "saveTransactionEntry",
       "state",
       "todayIso",
       "toast",
@@ -150,21 +149,22 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "$",
       "buildExpensePayload",
       "buildExpenseCorrection",
-      "finishSuccessfulEntry",
       "fillSelect",
       "insertExpense",
       "moneyInput",
       "openModal",
       "populateFormOptions",
       "prettyType",
-      "saveCorrection",
+      "saveTransactionEntry",
       "state",
       "todayIso",
       "toast",
     ].sort(),
   );
-  assert.equal(passed.payment.saveCorrection, dependencies.saveCorrection);
-  assert.equal(passed.expense.saveCorrection, dependencies.saveCorrection);
+  assert.equal(
+    passed.payment.saveTransactionEntry,
+    passed.expense.saveTransactionEntry,
+  );
   assert.equal(passed.payment.buildPaymentPayload, buildPaymentPayload);
   assert.equal(passed.expense.buildExpensePayload, buildExpensePayload);
   assert.equal(passed.payment.buildPaymentCorrection, buildPaymentCorrection);
@@ -175,35 +175,21 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   assert.equal(passed.persistenceOptions.repository, transactionRepository);
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
   assert.equal(passed.saveWorkflowOptions.fetchAll, dependencies.fetchAll);
-  assert.equal(passed.payment.finishSuccessfulEntry(), "finished");
+  assert.equal(passed.saveWorkflowOptions.state, dependencies.state);
   assert.equal(
-    passed.expense.finishSuccessfulEntry,
-    passed.payment.finishSuccessfulEntry,
+    passed.saveWorkflowOptions.saveCorrection,
+    dependencies.saveCorrection,
   );
   forms.attachLedgerEntryFormEvents();
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
 test("shared ledger completion resets, refreshes, then continues or closes", async () => {
-  const passed = {};
   const calls = [];
   let failRefresh = false;
   const context = vm.createContext({
     window: {
-      PropertyDeskTransactionPayloads: {},
-      PropertyDeskTransactionInserts: { create: () => ({}) },
-      PropertyDeskPaymentEntryForm: {
-        create: (options) => {
-          passed.payment = options;
-          return {};
-        },
-      },
-      PropertyDeskExpenseEntryForm: {
-        create: (options) => {
-          passed.expense = options;
-          return {};
-        },
-      },
+      PropertyDeskRepositoryWriteFeedback: {},
     },
   });
   vm.runInContext(
@@ -220,33 +206,26 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
     ),
     context,
   );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
-      "utf8",
-    ),
-    context,
-  );
-  context.window.PropertyDeskLedgerEntryForms.create({
+  const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
     $: (id) => id,
+    state: { pendingCorrection: null },
+    saveCorrection() {},
     closeModal: (id) => calls.push(`close:${id}`),
     fetchAll: async () => {
       calls.push("refresh");
       if (failRefresh) throw new Error("refresh failed");
     },
     toast: (message) => calls.push(`toast:${message}`),
-    transactionPayloads: context.window.PropertyDeskTransactionPayloads,
-    transactionRepository: {},
   });
 
-  await passed.payment.finishSuccessfulEntry({
+  await workflow.finishSuccessfulEntry({
     label: "Payment",
     addAnother: false,
     modalId: "payment-modal",
     resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
     resetArguments: ["account-1"],
   });
-  await passed.expense.finishSuccessfulEntry({
+  await workflow.finishSuccessfulEntry({
     label: "Expense",
     addAnother: true,
     modalId: "expense-modal",
@@ -266,7 +245,7 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
     "toast:Expense recorded. Ready for the next entry",
   ]);
   failRefresh = true;
-  await passed.payment.finishSuccessfulEntry({
+  await workflow.finishSuccessfulEntry({
     label: "Payment",
     addAnother: false,
     modalId: "payment-modal",

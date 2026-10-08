@@ -163,6 +163,10 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/document-repository.js", "features/documents.js"],
     ["features/document-upload.js", "features/documents.js"],
     ["features/transaction-inserts.js", "features/expense-entry-form.js"],
+    [
+      "features/repository-write-feedback.js",
+      "features/ledger-entry-save-workflow.js",
+    ],
     ["features/import-review.js", "features/expense-import.js"],
     ["features/domain-options.js", "features/form-options.js"],
     ["features/transaction-options.js", "features/form-options.js"],
@@ -314,6 +318,14 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/expense-import.js", "features/transaction-import-feature.js"],
     ["features/transaction-import-feature.js", "features/imports.js"],
     ["features/expense-entry-form.js", "features/ledger-entry-forms.js"],
+    [
+      "features/ledger-entry-save-workflow.js",
+      "features/expense-entry-form.js",
+    ],
+    [
+      "features/ledger-entry-save-workflow.js",
+      "features/payment-entry-form.js",
+    ],
     [
       "features/ledger-entry-save-workflow.js",
       "features/ledger-entry-forms.js",

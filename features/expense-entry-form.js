@@ -7,8 +7,7 @@
       $,
       state,
       toast,
-      saveCorrection,
-      finishSuccessfulEntry,
+      saveTransactionEntry,
       insertExpense,
       buildExpensePayload,
       buildExpenseCorrection,
@@ -32,7 +31,6 @@
 
     async function saveExpense(event) {
       event.preventDefault();
-      const addAnother = event.submitter?.id === "expense-save-next";
       const {
         propertyId,
         accountId,
@@ -65,20 +63,15 @@
         paymentMethod,
         memo,
       });
-      if (state.pendingCorrection?.kind === "expense") {
-        await saveCorrection("expense", buildExpenseCorrection(payload));
-        return;
-      }
-
-      const saved = await insertExpense({
+      await saveTransactionEntry({
+        kind: "expense",
+        event,
         payload,
+        buildCorrection: buildExpenseCorrection,
+        insert: insertExpense,
         failureMessage:
           "Expense couldn't be saved right now. Check your connection and try again.",
-      });
-      if (!saved) return;
-      await finishSuccessfulEntry({
         label: "Expense",
-        addAnother,
         modalId: "expense-modal",
         resetAfterSave: expenseView.resetAfterSave,
         prepareNext: expenseView.prepareNextExpense,
