@@ -92,6 +92,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     openPayment() {},
     openExpense() {},
     updatePaymentGuidance() {},
+    unusedAction: true,
   };
   const handlers = workflow.createTransactionActionHandlers(actions);
 
@@ -183,6 +184,11 @@ test("transaction maintenance coordinator joins isolated correction and void act
     passed.correctionActions.updatePaymentGuidance,
     actions.updatePaymentGuidance,
   );
+  assert.deepEqual(Object.keys(passed.correctionActions).sort(), [
+    "openExpense",
+    "openPayment",
+    "updatePaymentGuidance",
+  ]);
   assert.equal(passed.events.correctTransaction, correctTransaction);
   assert.equal(passed.events.voidTransaction, voidTransaction);
   assert.deepEqual(Object.keys(handlers), ["attachTransactionActionEvents"]);

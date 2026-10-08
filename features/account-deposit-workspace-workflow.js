@@ -3,8 +3,28 @@
   "use strict";
 
   function createAccountDepositWorkspaceWorkflow({ deposits, accountDetails }) {
-    const depositWorkspace =
-      window.PropertyDeskDepositWorkspaceWorkflow.create(deposits);
+    const depositWorkspace = window.PropertyDeskDepositWorkspaceWorkflow.create(
+      {
+        details: {
+          state: deposits.details.state,
+          depositLedger: deposits.details.depositLedger,
+          money: deposits.details.money,
+          fmtDate: deposits.details.fmtDate,
+          esc: deposits.details.esc,
+        },
+        adjustments: {
+          $: deposits.adjustments.$,
+          state: deposits.adjustments.state,
+          todayIso: deposits.adjustments.todayIso,
+          toast: deposits.adjustments.toast,
+          fetchAll: deposits.adjustments.fetchAll,
+          moneyInput: deposits.adjustments.moneyInput,
+          repository: deposits.adjustments.repository,
+          prepareAdjustment: deposits.adjustments.prepareAdjustment,
+          validateAdjustment: deposits.adjustments.validateAdjustment,
+        },
+      },
+    );
     const accountDetailWorkspace =
       window.PropertyDeskAccountDetailWorkspaceWorkflow.create({
         content: {
@@ -24,7 +44,16 @@
             accountDetails.content.accountHistoryRepository,
           depositSectionHTML: depositWorkspace.depositSectionHTML,
         },
-        actions: accountDetails.actions,
+        actions: {
+          $: accountDetails.actions.$,
+          state: accountDetails.actions.state,
+          toast: accountDetails.actions.toast,
+          fetchAll: accountDetails.actions.fetchAll,
+          closeModal: accountDetails.actions.closeModal,
+          editAccount: accountDetails.actions.editAccount,
+          openPayment: accountDetails.actions.openPayment,
+          repository: accountDetails.actions.repository,
+        },
       });
 
     return Object.freeze({

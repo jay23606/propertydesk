@@ -15,7 +15,7 @@ test("transaction workspace composes history and maintenance actions", () => {
   );
   assert.match(
     workspaceWorkflow,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)[\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,[\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(/,
   );
   const transactionWorkflow = fs.readFileSync(
     path.join(root, "features", "transaction-records-workflow.js"),

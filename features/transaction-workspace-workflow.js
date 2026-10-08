@@ -4,7 +4,11 @@
 
   function createTransactionWorkspaceWorkflow({ maintenance, entries, views }) {
     const transactionMaintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create(maintenance);
+      window.PropertyDeskTransactionMaintenanceWorkflow.create({
+        correction: maintenance.correction,
+        voiding: maintenance.voiding,
+        events: maintenance.events,
+      });
     return window.PropertyDeskTransactionRecordsWorkflow.create({
       maintenance: transactionMaintenance,
       entries,

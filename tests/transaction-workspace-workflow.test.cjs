@@ -11,7 +11,12 @@ test("transaction workspace connects maintenance to the records workflow", () =>
     createTransactionActionHandlers() {},
   };
   const recordsApi = { openPayment() {}, renderPayments() {} };
-  const maintenance = { correction: {}, voiding: {}, events: {} };
+  const maintenance = {
+    correction: {},
+    voiding: {},
+    events: {},
+    unusedContext: true,
+  };
   const entries = { transactionRepository: {} };
   const views = { money() {} };
   const context = vm.createContext({
@@ -50,7 +55,14 @@ test("transaction workspace connects maintenance to the records workflow", () =>
       views,
     });
 
-  assert.equal(passed.maintenance, maintenance);
+  assert.deepEqual(Object.keys(passed.maintenance).sort(), [
+    "correction",
+    "events",
+    "voiding",
+  ]);
+  assert.equal(passed.maintenance.correction, maintenance.correction);
+  assert.equal(passed.maintenance.voiding, maintenance.voiding);
+  assert.equal(passed.maintenance.events, maintenance.events);
   assert.equal(passed.records.maintenance, maintenanceApi);
   assert.equal(passed.records.entries, entries);
   assert.equal(passed.records.views, views);
@@ -70,7 +82,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     transactionWorkspace,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,/,
   );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),

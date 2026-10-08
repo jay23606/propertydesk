@@ -46,7 +46,29 @@ test("account and deposit workspace exposes only its supported operations", () =
     ),
     context,
   );
-  const deposits = { detailOptions: {} };
+  const deposits = {
+    details: {
+      state: {},
+      depositLedger: {},
+      money: () => {},
+      fmtDate: () => {},
+      esc: () => {},
+      unusedDetailValue: true,
+    },
+    adjustments: {
+      $: () => {},
+      state: {},
+      todayIso: () => {},
+      toast: () => {},
+      fetchAll: () => {},
+      moneyInput: () => {},
+      repository: {},
+      prepareAdjustment: () => {},
+      validateAdjustment: () => {},
+      unusedAdjustmentValue: true,
+    },
+    unusedDepositValue: true,
+  };
   const content = {
     $: () => {},
     state: {},
@@ -63,7 +85,18 @@ test("account and deposit workspace exposes only its supported operations", () =
     accountHistoryRepository: {},
     unusedContentValue: true,
   };
-  const accountDetails = { content, actions: {} };
+  const actions = {
+    $: () => {},
+    state: {},
+    toast: () => {},
+    fetchAll: () => {},
+    closeModal: () => {},
+    editAccount: () => {},
+    openPayment: () => {},
+    repository: {},
+    unusedActionValue: true,
+  };
+  const accountDetails = { content, actions };
   const workspace =
     context.window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
       deposits,
@@ -76,7 +109,31 @@ test("account and deposit workspace exposes only its supported operations", () =
     "attachDepositAdjustmentEvents",
     "openAccountDetails",
   ]);
-  assert.equal(passed.deposits, deposits);
+  assert.deepEqual(Object.keys(passed.deposits.details).sort(), [
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+    "state",
+  ]);
+  assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
+    "$",
+    "fetchAll",
+    "moneyInput",
+    "prepareAdjustment",
+    "repository",
+    "state",
+    "toast",
+    "todayIso",
+    "validateAdjustment",
+  ]);
+  for (const key of Object.keys(passed.deposits.details))
+    assert.equal(passed.deposits.details[key], deposits.details[key]);
+  for (const key of Object.keys(passed.deposits.adjustments))
+    assert.equal(passed.deposits.adjustments[key], deposits.adjustments[key]);
+  assert.equal("unusedDetailValue" in passed.deposits.details, false);
+  assert.equal("unusedAdjustmentValue" in passed.deposits.adjustments, false);
+  assert.equal("unusedDepositValue" in passed.deposits, false);
   assert.deepEqual(Object.keys(passed.accountDetails.content).sort(), [
     "$",
     "accountHistoryRepository",
@@ -102,7 +159,19 @@ test("account and deposit workspace exposes only its supported operations", () =
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
   );
-  assert.equal(passed.accountDetails.actions, accountDetails.actions);
+  assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
+    "$",
+    "closeModal",
+    "editAccount",
+    "fetchAll",
+    "openPayment",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  for (const key of Object.keys(passed.accountDetails.actions))
+    assert.equal(passed.accountDetails.actions[key], actions[key]);
+  assert.equal("unusedActionValue" in passed.accountDetails.actions, false);
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,
@@ -171,7 +240,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /PropertyDeskDepositWorkspaceWorkflow\.create\(deposits\)[\s\S]*?PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /PropertyDeskDepositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?validateAdjustment: deposits\.adjustments\.validateAdjustment,[\s\S]*?PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   const depositWorkspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),

@@ -10,9 +10,41 @@ test("account and deposit workspace share detail rendering and events", () => {
   const attachDepositAdjustmentEvents = () => {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
-  const deposits = { adjustments: {} };
+  const deposits = {
+    details: {
+      state: {},
+      depositLedger: {},
+      money() {},
+      fmtDate() {},
+      esc() {},
+      ignored: true,
+    },
+    adjustments: {
+      $() {},
+      state: {},
+      todayIso() {},
+      toast() {},
+      fetchAll() {},
+      moneyInput() {},
+      repository: {},
+      prepareAdjustment() {},
+      validateAdjustment() {},
+      ignored: true,
+    },
+    ignored: true,
+  };
   const content = { accountHistoryRepository: {} };
-  const actions = { repository: {} };
+  const actions = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+    repository: {},
+    ignored: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskDepositWorkspaceWorkflow: {
@@ -48,7 +80,25 @@ test("account and deposit workspace share detail rendering and events", () => {
       accountDetails: { content, actions },
     });
 
-  assert.equal(passed.deposits, deposits);
+  assert.deepEqual(Object.keys(passed.deposits.details).sort(), [
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+    "state",
+  ]);
+  assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
+    "$",
+    "fetchAll",
+    "moneyInput",
+    "prepareAdjustment",
+    "repository",
+    "state",
+    "toast",
+    "todayIso",
+    "validateAdjustment",
+  ]);
+  assert.equal("ignored" in passed.deposits, false);
   assert.equal(
     passed.accountDetails.content.accountHistoryRepository,
     content.accountHistoryRepository,
@@ -57,7 +107,17 @@ test("account and deposit workspace share detail rendering and events", () => {
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
   );
-  assert.equal(passed.accountDetails.actions, actions);
+  assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
+    "$",
+    "closeModal",
+    "editAccount",
+    "fetchAll",
+    "openPayment",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  assert.equal("ignored" in passed.accountDetails.actions, false);
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,

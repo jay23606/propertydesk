@@ -35,15 +35,11 @@
       resolveVoidTarget: voidingContext.resolveVoidTarget,
     });
 
-    function createTransactionActionHandlers({
-      openPayment,
-      openExpense,
-      updatePaymentGuidance,
-    }) {
+    function createTransactionActionHandlers(actions) {
       const { correctTransaction } = correction.createCorrectionActionHandlers({
-        openPayment,
-        openExpense,
-        updatePaymentGuidance,
+        openPayment: actions.openPayment,
+        openExpense: actions.openExpense,
+        updatePaymentGuidance: actions.updatePaymentGuidance,
       });
       const { attachTransactionActionEvents } =
         window.PropertyDeskTransactionMaintenanceEvents.create({
