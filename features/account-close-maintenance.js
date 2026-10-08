@@ -8,7 +8,7 @@
         operation: () => repository.close(account.id),
         toast,
         failureMessage:
-          "Account couldn't be closed right now. Please try again.",
+          "Account close result couldn't be confirmed. Reload the account before trying again.",
       });
       if (!saved) return;
       closeAccountDetails();

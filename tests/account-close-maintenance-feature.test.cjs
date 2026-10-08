@@ -115,7 +115,7 @@ test("account close maintenance reports rejected requests without closing detail
   );
   assert.deepEqual(calls, []);
   assert.deepEqual(messages, [
-    "Account couldn't be closed right now. Please try again.",
+    "Account close result couldn't be confirmed. Reload the account before trying again.",
   ]);
 });
 

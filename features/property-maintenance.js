@@ -16,7 +16,7 @@
         operation: () => repository.save(payload, propertyId),
         toast,
         failureMessage:
-          "Property couldn't be saved right now. Check your connection and try again.",
+          "Property save result couldn't be confirmed. Reload Properties before trying again.",
       });
     }
 

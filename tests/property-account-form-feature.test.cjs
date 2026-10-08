@@ -359,7 +359,7 @@ test("property and account forms report rejected saves without running success a
     handlers.get("account-form:submit")({ preventDefault() {} }),
   );
   assert.deepEqual(messages, [
-    "Property couldn't be saved right now. Check your connection and try again.",
-    "Account couldn't be saved right now. Check your connection and try again.",
+    "Property save result couldn't be confirmed. Reload Properties before trying again.",
+    "Account save result couldn't be confirmed. Reload Properties before trying again.",
   ]);
 });

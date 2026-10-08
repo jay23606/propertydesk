@@ -17,7 +17,7 @@
         operation: () => repository.addMember(email),
         toast,
         failureMessage:
-          "Workspace member couldn't be added right now. Check your connection and try again.",
+          "Workspace member addition result couldn't be confirmed. Reload workspace settings before trying again.",
       });
       if (!saved) return;
       if (
@@ -48,7 +48,7 @@
         operation: () => repository.removeMember(memberId),
         toast,
         failureMessage:
-          "Workspace member couldn't be removed right now. Check your connection and try again.",
+          "Workspace member removal result couldn't be confirmed. Reload workspace settings before trying again.",
       });
       if (!removed) return;
       await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({

@@ -8,7 +8,7 @@
         operation: () => repository.save(payload, accountId),
         toast,
         failureMessage:
-          "Account couldn't be saved right now. Check your connection and try again.",
+          "Account save result couldn't be confirmed. Reload Properties before trying again.",
       });
     }
 
