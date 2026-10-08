@@ -171,16 +171,38 @@
         onReconciled?.(...args);
       },
     });
-    if (!saved || reconciled) return saved;
-
-    onSaved?.();
-    return refreshWorkspace({
+    return finishWorkspaceWrite({
+      saved,
+      reconciled,
+      onSaved,
       fetchAll: saveOptions.fetchAll,
       afterRefresh,
       toast: saveOptions.toast,
       successMessage,
       refreshFailureMessage:
         savedRefreshFailureMessage || saveOptions.refreshFailureMessage,
+    });
+  }
+
+  function finishWorkspaceWrite({
+    saved,
+    reconciled,
+    onSaved,
+    fetchAll,
+    afterRefresh,
+    toast,
+    successMessage,
+    refreshFailureMessage,
+  }) {
+    if (!saved || reconciled) return saved;
+
+    onSaved?.();
+    return refreshWorkspace({
+      fetchAll,
+      afterRefresh,
+      toast,
+      successMessage,
+      refreshFailureMessage,
     });
   }
 
@@ -221,10 +243,10 @@
           },
         }),
     });
-    if (!saved || reconciled) return saved;
-
-    onSaved?.();
-    return refreshWorkspace({
+    return finishWorkspaceWrite({
+      saved,
+      reconciled,
+      onSaved,
       fetchAll,
       afterRefresh,
       toast,
