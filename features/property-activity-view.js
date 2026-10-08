@@ -37,7 +37,7 @@
         }</div>`;
     }
 
-    return { renderRecentActivity };
+    return Object.freeze({ renderRecentActivity });
   }
 
   window.PropertyDeskPropertyActivityView = Object.freeze({

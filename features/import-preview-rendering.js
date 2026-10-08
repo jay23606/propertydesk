@@ -115,7 +115,7 @@
         count === 0 || Boolean(pending?.commitUnconfirmed);
     }
 
-    return { renderImportPreview, updateImportCommitButton };
+    return Object.freeze({ renderImportPreview, updateImportCommitButton });
   }
 
   window.PropertyDeskImportPreviewRendering = Object.freeze({

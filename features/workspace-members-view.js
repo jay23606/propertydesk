@@ -37,7 +37,7 @@
       });
     }
 
-    return { attachEvents, renderWorkspaceMembers };
+    return Object.freeze({ attachEvents, renderWorkspaceMembers });
   }
 
   window.PropertyDeskWorkspaceMembersView = Object.freeze({ create });

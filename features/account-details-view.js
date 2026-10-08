@@ -82,7 +82,7 @@
         </div>`;
     }
 
-    return { renderAccountDetails };
+    return Object.freeze({ renderAccountDetails });
   }
 
   window.PropertyDeskAccountDetailsView = Object.freeze({

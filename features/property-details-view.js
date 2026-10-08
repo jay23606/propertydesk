@@ -53,7 +53,7 @@
         ${activityHTML}`;
     }
 
-    return { propertyDetailsHTML };
+    return Object.freeze({ propertyDetailsHTML });
   }
 
   window.PropertyDeskPropertyDetailsView = Object.freeze({

@@ -88,13 +88,13 @@
       });
     }
 
-    return {
+    return Object.freeze({
       attachEvents,
       openExpense,
       prepareNextExpense,
       readValues,
       resetAfterSave,
-    };
+    });
   }
 
   window.PropertyDeskExpenseEntryView = Object.freeze({

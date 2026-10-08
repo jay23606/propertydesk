@@ -41,7 +41,7 @@
       return versionsHTML + auditHTML;
     }
 
-    return { accountHistoryHTML };
+    return Object.freeze({ accountHistoryHTML });
   }
 
   window.PropertyDeskAccountHistoryView = Object.freeze({

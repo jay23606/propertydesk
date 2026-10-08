@@ -21,7 +21,7 @@
         : '<tr><td colspan="6" class="muted">Reminder attempts will appear here. Reminders are off until you enable them in an account.</td></tr>';
     }
 
-    return { renderReminderActivity };
+    return Object.freeze({ renderReminderActivity });
   }
 
   window.PropertyDeskReminderActivityView = Object.freeze({

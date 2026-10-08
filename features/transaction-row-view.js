@@ -23,7 +23,7 @@
       </tr>`;
     }
 
-    return { transactionRowHTML };
+    return Object.freeze({ transactionRowHTML });
   }
 
   window.PropertyDeskTransactionRowView = Object.freeze({

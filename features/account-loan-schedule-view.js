@@ -37,7 +37,7 @@
         </div>`;
     }
 
-    return { accountLoanScheduleHTML };
+    return Object.freeze({ accountLoanScheduleHTML });
   }
 
   window.PropertyDeskAccountLoanScheduleView = Object.freeze({ create });

@@ -64,7 +64,7 @@
       $("net-cash-flow").textContent = money(totals.netCashFlow);
     }
 
-    return { renderPayments, attachTransactionFilterEvents };
+    return Object.freeze({ renderPayments, attachTransactionFilterEvents });
   }
 
   window.PropertyDeskTransactionViews = Object.freeze({

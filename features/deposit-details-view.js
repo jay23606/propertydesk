@@ -58,7 +58,7 @@
         }</div>`;
     }
 
-    return { depositSectionHTML };
+    return Object.freeze({ depositSectionHTML });
   }
 
   window.PropertyDeskDepositDetailsView = Object.freeze({

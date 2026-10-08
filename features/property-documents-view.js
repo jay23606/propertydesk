@@ -28,7 +28,7 @@
         </div>`;
     }
 
-    return { propertyDocumentsHTML };
+    return Object.freeze({ propertyDocumentsHTML });
   }
 
   window.PropertyDeskPropertyDocumentsView = Object.freeze({ create });

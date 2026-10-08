@@ -69,10 +69,10 @@
           "No matching active properties. Use “Show inactive / archived” to include inactive records.";
     }
 
-    return {
+    return Object.freeze({
       renderProperties,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskPropertyViews = Object.freeze({

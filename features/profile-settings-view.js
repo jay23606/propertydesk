@@ -14,7 +14,7 @@
       });
     }
 
-    return { attachEvents, setDisplayName };
+    return Object.freeze({ attachEvents, setDisplayName });
   }
 
   window.PropertyDeskProfileSettingsView = Object.freeze({

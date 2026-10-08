@@ -38,7 +38,7 @@
         : '<tr><td colspan="5" class="muted">Completed imports will appear here.</td></tr>';
     }
 
-    return { renderReports };
+    return Object.freeze({ renderReports });
   }
 
   window.PropertyDeskReportViews = Object.freeze({ create: createReportViews });

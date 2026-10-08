@@ -54,7 +54,7 @@
       $("expense-save-next").classList.add("hidden");
     }
 
-    return { populatePayment, populateExpense };
+    return Object.freeze({ populatePayment, populateExpense });
   }
 
   window.PropertyDeskTransactionCorrectionView = Object.freeze({ create });

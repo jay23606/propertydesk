@@ -111,14 +111,14 @@
       $("payment-date").addEventListener("change", updatePaymentGuidance);
     }
 
-    return {
+    return Object.freeze({
       updatePaymentGuidance,
       readValues,
       resetAfterSave,
       prepareNextPayment,
       openPayment,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskPaymentEntryView = Object.freeze({

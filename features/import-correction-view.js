@@ -42,7 +42,7 @@
       );
     }
 
-    return { renderImportCorrections };
+    return Object.freeze({ renderImportCorrections });
   }
 
   window.PropertyDeskImportCorrectionView = Object.freeze({
