@@ -99,6 +99,10 @@ test("transaction maintenance coordinator joins isolated correction and void act
     events: eventsContext,
     workflows: {
       correction: context.window.PropertyDeskTransactionCorrectionWorkflow,
+      correctionModules: {
+        maintenance: {},
+        form: {},
+      },
       voidMaintenance: context.window.PropertyDeskTransactionVoidMaintenance,
       voidEntry: context.window.PropertyDeskTransactionVoidEntry,
       events: context.window.PropertyDeskTransactionMaintenanceEvents,
@@ -139,6 +143,10 @@ test("transaction maintenance coordinator joins isolated correction and void act
     passed.correctionWorkflow.findCorrectionTarget,
     correctionContext.findCorrectionTarget,
   );
+  assert.equal(
+    passed.correctionWorkflow.workflows,
+    dependencies.workflows.correctionModules,
+  );
   assert.equal("unusedCorrectionValue" in passed.correctionWorkflow, false);
   assert.deepEqual(Object.keys(passed.correctionWorkflow).sort(), [
     "$",
@@ -151,6 +159,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "repository",
     "state",
     "toast",
+    "workflows",
   ]);
   assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
   assert.equal(passed.voidMaintenance.state, voidingContext.state);

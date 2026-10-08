@@ -13,23 +13,23 @@
     OptionClass = Option,
     repository,
     findCorrectionTarget,
+    workflows,
   }) {
-    const { saveCorrection } =
-      window.PropertyDeskTransactionCorrectionMaintenance.create({
-        $,
-        state,
-        toast,
-        fetchAll,
-        closeModal,
-        repository,
-      });
+    const { saveCorrection } = workflows.maintenance.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+      repository,
+    });
 
     function createCorrectionActionHandlers({
       openPayment,
       openExpense,
       updatePaymentGuidance,
     }) {
-      return window.PropertyDeskTransactionCorrectionForm.create({
+      return workflows.form.create({
         $,
         state,
         toast,

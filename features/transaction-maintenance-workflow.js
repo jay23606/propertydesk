@@ -8,6 +8,7 @@
     events: eventsContext,
     workflows: {
       correction: correctionWorkflow,
+      correctionModules,
       voidMaintenance: voidMaintenanceWorkflow,
       voidEntry: voidEntryWorkflow,
       events: maintenanceEventsWorkflow,
@@ -24,6 +25,7 @@
       OptionClass: correctionContext.OptionClass,
       repository: correctionContext.repository,
       findCorrectionTarget: correctionContext.findCorrectionTarget,
+      workflows: correctionModules,
     });
     const { saveVoidTransaction } = voidMaintenanceWorkflow.create({
       state: voidingContext.state,

@@ -250,6 +250,10 @@
       },
       maintenanceWorkflows: {
         correction: window.PropertyDeskTransactionCorrectionWorkflow,
+        correctionModules: {
+          maintenance: window.PropertyDeskTransactionCorrectionMaintenance,
+          form: window.PropertyDeskTransactionCorrectionForm,
+        },
         voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
         voidEntry: window.PropertyDeskTransactionVoidEntry,
         events: window.PropertyDeskTransactionMaintenanceEvents,

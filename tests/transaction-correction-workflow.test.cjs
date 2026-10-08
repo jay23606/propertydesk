@@ -11,14 +11,15 @@ test("transaction correction workflow owns correction persistence and forms", ()
   const context = vm.createContext({
     Event: class MockEvent {},
     Option: class MockOption {},
-    window: {
-      PropertyDeskTransactionCorrectionMaintenance: {
+    window: {},
+    correctionModules: {
+      maintenance: {
         create: (options) => {
           passed.corrections = options;
           return { saveCorrection };
         },
       },
-      PropertyDeskTransactionCorrectionForm: {
+      form: {
         create: (options) => {
           passed.form = options;
           return { correctTransaction };
@@ -47,11 +48,24 @@ test("transaction correction workflow owns correction persistence and forms", ()
     prettyType() {},
     repository: {},
     findCorrectionTarget() {},
+    workflows: context.correctionModules,
   };
   const workflow =
     context.window.PropertyDeskTransactionCorrectionWorkflow.create(
       correctionContext,
     );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-correction-workflow.js",
+      ),
+      "utf8",
+    ),
+    /window\.PropertyDeskTransactionCorrection(?:Maintenance|Form)\.create/,
+  );
   const actions = {
     openPayment() {},
     openExpense() {},
