@@ -3,6 +3,9 @@
   "use strict";
 
   const { csvMoney } = globalThis.PropertyDeskCsvValueUtils;
+  const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+  if (!roundCurrency)
+    throw new Error("The shared currency helper is not loaded.");
   const money = globalThis.PropertyDeskDisplayUtils?.money;
   if (!money) throw new Error("The PropertyDesk display helper is not loaded.");
   const allocationColumns = [
@@ -59,7 +62,7 @@
       (sum, value) => sum + value,
       0,
     );
-    if (Math.round(allocated * 100) !== Math.round(amount * 100))
+    if (roundCurrency(allocated) !== roundCurrency(amount))
       throw new Error(
         `Payment allocations for ${account.name} on ${paymentDate} must add up to ${money(amount)}.`,
       );
