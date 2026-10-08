@@ -246,12 +246,18 @@ test("app composes property detail content, actions, and document routes", () =>
     "PropertyDeskPropertyDetailQuickActions",
   ])
     assert.match(workflow, new RegExp(`${feature}\\.create\\(`));
-  const holderWorkflow = screenWorkflow;
+  const holderWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-holder-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    screenWorkflow,
+    /PropertyDeskPropertyHolderWorkflow\.create\([\s\S]*?repository: holders\.repository/,
+  );
   assert.match(
     holderWorkflow,
-    /PropertyDeskPropertyHolderManagement\.create\([\s\S]*?repository: holders\.repository/,
+    /PropertyDeskPropertyHolderManagement\.create\([\s\S]*?PropertyDeskPropertyHolderEvents\.create\(/,
   );
-  assert.match(holderWorkflow, /PropertyDeskPropertyHolderEvents\.create\(/);
   const documentWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "property-document-workflow.js"),
     "utf8",

@@ -38,18 +38,14 @@
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
     });
-    const { savePropertyHolders } =
-      window.PropertyDeskPropertyHolderManagement.create({
+    const { attachPropertyHolderEvents } =
+      window.PropertyDeskPropertyHolderWorkflow.create({
+        $: holders.$,
         state: holders.state,
         toast: holders.toast,
         fetchAll: holders.fetchAll,
         repository: holders.repository,
         openPropertyDetails: details.openPropertyDetails,
-      });
-    const { attachPropertyHolderEvents } =
-      window.PropertyDeskPropertyHolderEvents.create({
-        $: holders.$,
-        savePropertyHolders,
       });
     const { attachPropertyDocumentEvents } =
       window.PropertyDeskPropertyDocumentWorkflow.create({
