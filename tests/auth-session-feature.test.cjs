@@ -114,8 +114,6 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
     importBatches: [{ id: "import-batch-1" }],
     pendingImport: { id: "pending-import" },
     pendingCorrection: { id: "pending-correction" },
-    editingProperty: { id: "editing-property" },
-    editingAccount: { id: "editing-account" },
     selectedPropertyId: "property-1",
     auditRequestId: 3,
     passwordRecoveryInProgress: true,
@@ -168,8 +166,6 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   assert.equal(state.workspaceOwnerId, null);
   assert.equal(state.pendingImport, null);
   assert.equal(state.pendingCorrection, null);
-  assert.equal(state.editingProperty, null);
-  assert.equal(state.editingAccount, null);
   assert.equal(state.selectedPropertyId, null);
   assert.equal(state.auditRequestId, 4);
   assert.equal(state.passwordRecoveryInProgress, false);

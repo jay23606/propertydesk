@@ -20,8 +20,6 @@
       importBatches: [],
       pendingImport: null,
       pendingCorrection: null,
-      editingProperty: null,
-      editingAccount: null,
       selectedPropertyId: null,
       auditRequestId: 0,
       passwordRecoveryInProgress: false,
