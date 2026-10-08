@@ -12,6 +12,8 @@
   }) {
     const { savePropertyArchive } =
       window.PropertyDeskPropertyMaintenance.create({
+        state,
+        fetchAll,
         toast,
         repository,
       });
@@ -27,9 +29,11 @@
         id,
         state.workspaceOwnerId,
         archived_at,
-        async () => {
-          reconciled = await refreshUncertainPropertyStatus(id, archived_at);
-          return reconciled;
+        ({ recordWasSaved }) => {
+          openPropertyDetails(id);
+          if (!recordWasSaved) return;
+          reconciled = true;
+          toast(archiveSuccessMessage(archived_at));
         },
       );
       if (!saved || reconciled) return;
@@ -37,37 +41,15 @@
         fetchAll,
         afterRefresh: () => openPropertyDetails(id),
         toast,
-        successMessage: archived_at ? "Property archived" : "Property restored",
+        successMessage: archiveSuccessMessage(archived_at),
         refreshFailureMessage: archived_at
           ? "Property was archived, but the workspace could not refresh. Reload to verify its status."
           : "Property was restored, but the workspace could not refresh. Reload to verify its status.",
       });
     }
 
-    async function refreshUncertainPropertyStatus(id, archivedAt) {
-      let statusMatches = false;
-      const refreshed =
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          afterRefresh: () => {
-            const property = state.properties.find((item) => item.id === id);
-            statusMatches =
-              Boolean(property?.archived_at) === Boolean(archivedAt);
-            openPropertyDetails(id);
-          },
-          toast,
-          refreshFailureMessage:
-            "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
-        });
-      if (!refreshed) return false;
-      toast(
-        statusMatches
-          ? archivedAt
-            ? "Property archived"
-            : "Property restored"
-          : "Property status is shown in refreshed details. Check it before retrying.",
-      );
-      return statusMatches;
+    function archiveSuccessMessage(archivedAt) {
+      return archivedAt ? "Property archived" : "Property restored";
     }
 
     return Object.freeze({ toggleArchiveProperty });

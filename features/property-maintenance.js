@@ -3,21 +3,6 @@
   "use strict";
 
   function create({ state, fetchAll, toast, repository }) {
-    function updateProperty(
-      propertyId,
-      ownerId,
-      values,
-      failureMessage,
-      onUnconfirmed,
-    ) {
-      return window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () => repository.updateOwned(propertyId, ownerId, values),
-        toast,
-        failureMessage,
-        onUnconfirmed,
-      });
-    }
-
     function saveProperty(payload, propertyId) {
       return window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
         operation: () => repository.save(payload, propertyId),
@@ -56,19 +41,26 @@
       });
     }
 
-    function savePropertyArchive(
-      propertyId,
-      ownerId,
-      archivedAt,
-      onUnconfirmed,
-    ) {
-      return updateProperty(
-        propertyId,
-        ownerId,
-        { archived_at: archivedAt },
-        "Property status result couldn't be confirmed. Reload Properties before retrying.",
-        onUnconfirmed,
-      );
+    function savePropertyArchive(propertyId, ownerId, archivedAt, onRefreshed) {
+      return window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
+        operation: () =>
+          repository.updateOwned(propertyId, ownerId, {
+            archived_at: archivedAt,
+          }),
+        state,
+        collection: "properties",
+        payload: { archived_at: archivedAt },
+        recordId: propertyId,
+        fetchAll,
+        toast,
+        failureMessage:
+          "Property status result couldn't be confirmed. Reload Properties before retrying.",
+        refreshFailureMessage:
+          "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+        retryMessage:
+          "Property status is shown in refreshed details. Check it before retrying.",
+        onRefreshed,
+      });
     }
 
     return Object.freeze({

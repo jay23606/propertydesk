@@ -80,6 +80,7 @@
     errorMessage,
     refreshFailureMessage,
     retryMessage,
+    onRefreshed,
     onReconciled,
   }) {
     const initialRecords = state?.[collection];
@@ -106,6 +107,7 @@
                   : records.filter((record) =>
                       payloadMatchesRecord(record, payload),
                     ).length > previousCount;
+                onRefreshed?.({ recordWasSaved });
               },
               toast,
               refreshFailureMessage,
