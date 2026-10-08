@@ -3,54 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function loadTransactionRepository(context) {
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-query-utils.js"),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-write-reconciliation.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-record-write-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-repository.js"),
-      "utf8",
-    ),
-    context,
-  );
-}
+const { loadTransactionRepository } = require("./transaction-test-helpers.cjs");
 
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });

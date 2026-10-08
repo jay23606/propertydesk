@@ -3,24 +3,9 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function transactionVoidModelOptions(context) {
-  if (!context.window.PropertyDeskTransactionVoidModel) {
-    vm.runInContext(
-      fs.readFileSync(
-        path.join(__dirname, "..", "features", "transaction-void-model.js"),
-        "utf8",
-      ),
-      context,
-    );
-  }
-  return {
-    resolveVoidTarget:
-      context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-    buildVoidPayload:
-      context.window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-  };
-}
+const {
+  transactionVoidModelOptions,
+} = require("./transaction-test-helpers.cjs");
 
 test("transaction void model maps supported kinds and preserves audit defaults", () => {
   const context = vm.createContext({ window: {} });

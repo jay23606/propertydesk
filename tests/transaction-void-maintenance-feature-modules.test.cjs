@@ -3,72 +3,10 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-
-function loadTransactionRepository(context) {
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-query-utils.js"),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-write-reconciliation.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-record-write-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-repository.js"),
-      "utf8",
-    ),
-    context,
-  );
-}
-
-function transactionVoidModelOptions(context) {
-  if (!context.window.PropertyDeskTransactionVoidModel) {
-    vm.runInContext(
-      fs.readFileSync(
-        path.join(__dirname, "..", "features", "transaction-void-model.js"),
-        "utf8",
-      ),
-      context,
-    );
-  }
-  return {
-    resolveVoidTarget:
-      context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-    buildVoidPayload:
-      context.window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-  };
-}
+const {
+  loadTransactionRepository,
+  transactionVoidModelOptions,
+} = require("./transaction-test-helpers.cjs");
 
 test("transaction void maintenance voids a posted row with an audit reason", async () => {
   const context = vm.createContext({
