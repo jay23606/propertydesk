@@ -26,6 +26,22 @@ test("property workspace shares detail actions across overview and grid", () => 
   const lateReminderMailto = () => "reminder";
   const lateReminderSms = () => "sms";
   const portfolioWorkflows = {};
+  const overviewWorkflow = {
+    create(options) {
+      calls.push(["overview", options]);
+      return { renderOverview() {}, attachOverviewEvents() {} };
+    },
+  };
+  const portfolioWorkflow = {
+    create(options) {
+      calls.push(["portfolio", options]);
+      return {
+        renderProperties() {},
+        attachPropertyGridEvents() {},
+        attachPropertyActionEvents() {},
+      };
+    },
+  };
   const overview = {
     state,
     propertyAddress,
@@ -56,22 +72,6 @@ test("property workspace shares detail actions across overview and grid", () => 
           };
         },
       },
-      PropertyDeskOverviewWorkflow: {
-        create(options) {
-          calls.push(["overview", options]);
-          return { renderOverview() {}, attachOverviewEvents() {} };
-        },
-      },
-      PropertyDeskPropertyPortfolioWorkflow: {
-        create(options) {
-          calls.push(["portfolio", options]);
-          return {
-            renderProperties() {},
-            attachPropertyGridEvents() {},
-            attachPropertyActionEvents() {},
-          };
-        },
-      },
     },
   });
   detail.workflows.screen = context.window.PropertyDeskPropertyScreenWorkflow;
@@ -84,7 +84,17 @@ test("property workspace shares detail actions across overview and grid", () => 
   );
 
   const workspace = context.window.PropertyDeskPropertyWorkspaceWorkflow.create(
-    { detail, overview, portfolio, groupAccountsByProperty, isActiveAccount },
+    {
+      detail,
+      overview,
+      portfolio,
+      groupAccountsByProperty,
+      isActiveAccount,
+      workflows: {
+        overview: overviewWorkflow,
+        portfolio: portfolioWorkflow,
+      },
+    },
   );
 
   assert.deepEqual(

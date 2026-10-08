@@ -8,6 +8,7 @@
     portfolio,
     groupAccountsByProperty,
     isActiveAccount,
+    workflows,
   }) {
     const propertyDetails = detail.workflows.screen.create({
       content: detail.content,
@@ -16,7 +17,7 @@
       documents: detail.documents,
       workflows: detail.workflows,
     });
-    const propertyOverview = window.PropertyDeskOverviewWorkflow.create({
+    const propertyOverview = workflows.overview.create({
       $: overview.$,
       state: overview.state,
       groupAccountsByProperty,
@@ -38,7 +39,7 @@
       openPropertyPayment: overview.openPropertyPayment,
       workflows: overview.workflows,
     });
-    const properties = window.PropertyDeskPropertyPortfolioWorkflow.create({
+    const properties = workflows.portfolio.create({
       $: portfolio.$,
       state: portfolio.state,
       groupAccountsByProperty,

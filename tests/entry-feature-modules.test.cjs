@@ -222,8 +222,8 @@ test("property workspace composes screens and shares detail actions", () => {
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
     "detail.workflows.screen.create(",
-    "PropertyDeskOverviewWorkflow.create(",
-    "PropertyDeskPropertyPortfolioWorkflow.create(",
+    "workflows.overview.create(",
+    "workflows.portfolio.create(",
   ].map((marker) => workflow.indexOf(marker));
 
   assert.ok(creationOrder.every((position) => position >= 0));

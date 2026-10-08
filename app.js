@@ -415,6 +415,10 @@
     groupAccountsByProperty:
       window.PropertyDeskPropertyAccountIndex.groupByProperty,
     isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
+    workflows: {
+      overview: window.PropertyDeskOverviewWorkflow,
+      portfolio: window.PropertyDeskPropertyPortfolioWorkflow,
+    },
     detail: {
       content: {
         $,
