@@ -8,6 +8,7 @@
     authClient,
     fetchAll,
     toast,
+    paymentNotifications = { start() {}, stop() {} },
     windowRef = window,
     documentRef = document,
   }) {
@@ -43,6 +44,7 @@
       showApp();
       try {
         await fetchAll();
+        paymentNotifications.start();
       } catch {
         // fetchAll already reports the failure.
       }
@@ -59,6 +61,7 @@
         isPasswordRecoverySession,
         startWorkspace,
         resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+        stopWorkspaceNotifications: paymentNotifications.stop,
       });
 
     function attachEvents() {

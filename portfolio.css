@@ -37,9 +37,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 106px;
-    min-width: 106px;
-    max-width: 106px;
+    width: 92px;
+    min-width: 92px;
+    max-width: 92px;
     z-index: 2;
     background: #fff;
   }
@@ -63,8 +63,8 @@
     background: #fbfcfa;
   }
   .portfolio-table td:nth-child(1) .button {
-    width: 96px;
-    padding: 7px 2px;
+    width: max-content;
+    padding: 4px 6px;
     font-size: 9px;
   }
   .portfolio-mobile-due {
@@ -89,10 +89,10 @@
   }
   .portfolio-table td:nth-child(3) {
     position: sticky;
-    left: 106px;
-    width: 94px;
-    min-width: 94px;
-    max-width: 94px;
+    left: 92px;
+    width: 116px;
+    min-width: 116px;
+    max-width: 116px;
     z-index: 2;
     background: #fff;
     overflow: hidden;
@@ -100,16 +100,16 @@
   }
   .portfolio-table th:nth-child(3) {
     position: sticky;
-    left: 106px;
-    width: 94px;
-    min-width: 94px;
-    max-width: 94px;
+    left: 92px;
+    width: 116px;
+    min-width: 116px;
+    max-width: 116px;
     z-index: 4;
     background: #fafbf9;
   }
   .portfolio-table td:nth-child(3) .table-action {
     display: block;
-    max-width: 88px;
+    max-width: 110px;
     overflow-wrap: anywhere;
     white-space: normal;
     vertical-align: middle;
@@ -130,11 +130,11 @@
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4) {
-    left: 200px;
+    left: 208px;
   }
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    left: 242px;
+    left: 250px;
     box-shadow: 3px 0 6px #1c30200d;
   }
   .portfolio-table th:nth-child(4),
@@ -278,21 +278,21 @@ html[data-theme="dark"] .portfolio-table th:nth-child(2),
 html[data-theme="dark"] .portfolio-table th:nth-child(3),
 html[data-theme="dark"] .portfolio-table th:nth-child(4),
 html[data-theme="dark"] .portfolio-table th:nth-child(5) {
-  background: #252f29;
+  background: #2c4033;
 }
 html[data-theme="dark"] .portfolio-table td:nth-child(1),
 html[data-theme="dark"] .portfolio-table td:nth-child(2),
 html[data-theme="dark"] .portfolio-table td:nth-child(3),
 html[data-theme="dark"] .portfolio-table td:nth-child(4),
 html[data-theme="dark"] .portfolio-table td:nth-child(5) {
-  background: #202923;
+  background: #24352b;
 }
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1),
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(2),
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(3),
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(4),
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(5) {
-  background: #27332c;
+  background: #304838;
 }
 @media (max-width: 760px) {
   .portfolio-table th:nth-child(1),
@@ -305,78 +305,82 @@ html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(5) {
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    left: 106px;
+    left: 92px;
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4) {
-    left: 200px;
+    left: 208px;
   }
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    left: 242px;
+    left: 250px;
   }
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
-    width: 106px;
+    width: 92px;
   }
   .portfolio-table tfoot td:nth-child(2) {
     display: none;
   }
   .portfolio-table tfoot td:nth-child(3) {
     position: sticky;
-    left: 106px;
-    width: 94px;
+    left: 92px;
+    width: 116px;
     background: var(--canvas);
   }
   .portfolio-table tfoot td:nth-child(4) {
     position: sticky;
-    left: 200px;
+    left: 208px;
     width: 42px;
     background: var(--canvas);
   }
   .portfolio-table tfoot td:nth-child(5) {
     position: sticky;
-    left: 242px;
+    left: 250px;
     width: 42px;
     background: var(--canvas);
     box-shadow: 3px 0 6px #1c30200d;
   }
 }
 html[data-theme="dark"] .portfolio-table tbody td.payment-received-this-month {
-  background: #294b36;
+  background: #315f40;
 }
 html[data-theme="dark"]
   .portfolio-table
   tbody
   tr:hover
   td.payment-received-this-month {
-  background: #315a40;
+  background: #3b704c;
 }
 html[data-theme="dark"]
   .portfolio-table
   tbody
   td.payment-paid-in-full-this-month {
-  background: #346b48;
+  background: #428b5a;
 }
 html[data-theme="dark"]
   .portfolio-table
   tbody
   tr:hover
   td.payment-paid-in-full-this-month {
-  background: #3c7952;
+  background: #4b9a65;
 }
 html[data-theme="dark"]
   .portfolio-table
   tbody
   td.payment-not-received-this-month {
-  background: #4c2d30;
+  background: #74434c;
 }
 html[data-theme="dark"]
   .portfolio-table
   tbody
   tr:hover
   td.payment-not-received-this-month {
-  background: #5b3538;
+  background: #86505b;
+}
+html[data-theme="dark"] .portfolio-table .table-action,
+html[data-theme="dark"] .portfolio-table .property-party-name {
+  color: #83e2a8;
 }
 html[data-theme="dark"] .property-row-note {
   color: #a7b3aa;

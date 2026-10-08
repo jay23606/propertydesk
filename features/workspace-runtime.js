@@ -52,6 +52,7 @@
       authClient,
       repositories: repositoryAdapters,
       initializeClient,
+      getClient,
       isClientReady: () => Boolean(client),
     });
   }

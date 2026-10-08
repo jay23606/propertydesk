@@ -21,6 +21,7 @@
       authClient,
       fetchAll: authContext.fetchAll,
       toast: authContext.toast,
+      paymentNotifications: authContext.paymentNotifications,
     });
     const lifecycle = workflows.lifecycle.create({
       $,

@@ -89,6 +89,7 @@ create table if not exists public.pd_documents (
 create table if not exists public.pd_payments (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  recorded_by uuid default auth.uid() references auth.users(id) on delete set null,
   account_id uuid not null references public.pd_accounts(id) on delete cascade,
   amount numeric(14,2) not null check (amount > 0),
   received_date date not null,
@@ -109,6 +110,18 @@ create table if not exists public.pd_payments (
 );
 
 alter table public.pd_payments add column if not exists status text not null default 'posted' check (status in ('posted','voided'));
+alter table public.pd_payments add column if not exists recorded_by uuid references auth.users(id) on delete set null;
+alter table public.pd_payments alter column recorded_by set default auth.uid();
+
+create or replace function public.pd_set_payment_recorder()
+returns trigger language plpgsql security invoker set search_path = '' as $$
+begin
+  new.recorded_by := auth.uid();
+  return new;
+end $$;
+drop trigger if exists pd_payments_set_recorder on public.pd_payments;
+create trigger pd_payments_set_recorder before insert on public.pd_payments
+for each row execute function public.pd_set_payment_recorder();
 alter table public.pd_payments add column if not exists escrow_amount numeric(14,2) not null default 0 check (escrow_amount >= 0);
 alter table public.pd_payments add column if not exists voided_at timestamptz;
 alter table public.pd_payments add column if not exists void_reason text;
@@ -504,6 +517,14 @@ $$;
 
 drop trigger if exists pd_payments_allocation_guard on public.pd_payments;
 create trigger pd_payments_allocation_guard before insert or update on public.pd_payments for each row execute function public.pd_validate_payment_allocation();
+
+do $$
+begin
+  alter publication supabase_realtime add table public.pd_payments;
+exception
+  when duplicate_object then null;
+end;
+$$;
 
 -- Account and transaction imports are atomic and keep a private source receipt.
 drop function if exists public.pd_import_propertydesk_accounts(jsonb);

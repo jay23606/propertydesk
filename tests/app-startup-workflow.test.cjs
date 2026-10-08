@@ -14,10 +14,12 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.equal(authContext.authClient, authClient);
         assert.equal(authContext.fetchAll, fetchAll);
         assert.equal(authContext.toast, toast);
+        assert.equal(authContext.paymentNotifications, paymentNotifications);
         assert.deepEqual(Object.keys(authContext).sort(), [
           "$",
           "authClient",
           "fetchAll",
+          "paymentNotifications",
           "state",
           "toast",
         ]);
@@ -64,12 +66,14 @@ test("app startup composes auth and lifecycle at the original event position", (
   const selector = () => {};
   const fetchAll = async () => {};
   const toast = () => {};
+  const paymentNotifications = { start() {}, stop() {} };
   const startupContext = {
     authContext: {
       $: selector,
       state: { name: "shared-state" },
       fetchAll,
       toast,
+      paymentNotifications,
       unusedStartupValue: true,
     },
     backendConfigured: true,

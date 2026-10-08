@@ -30,6 +30,7 @@
     repositories,
     authClient,
     initializeClient,
+    getClient,
     isClientReady,
   } = window.PropertyDeskWorkspaceRuntime.create({
     config: window.PROPERTYDESK_CONFIG || {},
@@ -58,6 +59,14 @@
       data: window.PropertyDeskWorkspaceData,
       refresh: window.PropertyDeskWorkspaceRefresh,
     },
+  });
+  const paymentNotifications = window.PropertyDeskPaymentNotifications.create({
+    state,
+    getClient,
+    toast,
+    money,
+    propertyAddress,
+    refresh: fetchAll,
   });
   const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
@@ -628,7 +637,7 @@
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
     authClient,
-    authContext: { $, state, fetchAll, toast },
+    authContext: { $, state, fetchAll, toast, paymentNotifications },
     renderers: [
       updateGreeting,
       renderOverview,

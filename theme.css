@@ -21,14 +21,14 @@
 }
 html[data-theme="dark"] {
   color-scheme: dark;
-  --ink: #e5ece7;
-  --muted: #a0aca4;
-  --line: #344039;
-  --surface: #202923;
-  --canvas: #151b17;
-  --green: #49a77b;
-  --green-dark: #68c997;
-  --green-soft: #263c30;
+  --ink: #edf5ef;
+  --muted: #b0beb4;
+  --line: #405347;
+  --surface: #24352b;
+  --canvas: #17231b;
+  --green: #55bd80;
+  --green-dark: #73d99a;
+  --green-soft: #2d4a37;
   --gold: #403724;
   --blue: #263943;
   --violet: #362f43;
@@ -85,12 +85,12 @@ html[data-theme="dark"] .button:not(.primary):hover {
   border-color: #5a6d60;
 }
 html[data-theme="dark"] .button.primary {
-  background: #24765a;
-  border-color: #338767;
+  background: #27865b;
+  border-color: #45a66f;
   color: #fff;
 }
 html[data-theme="dark"] .button.primary:hover {
-  background: #2e8a67;
+  background: #32a06a;
 }
 html[data-theme="dark"] .avatar {
   background: #304537;

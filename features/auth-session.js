@@ -12,8 +12,10 @@
     isPasswordRecoverySession,
     startWorkspace,
     resetWorkspaceState,
+    stopWorkspaceNotifications = () => {},
   }) {
     function finishSignOut() {
+      stopWorkspaceNotifications();
       resetWorkspaceState(state);
       showAuth();
       setAuthMode(false);
@@ -34,6 +36,7 @@
       const passwordRecoveryInProgress =
         state.passwordRecoveryInProgress === true;
       if (signedIntoNewUser) {
+        stopWorkspaceNotifications();
         resetWorkspaceState(state);
         state.passwordRecoveryInProgress = passwordRecoveryInProgress;
       }

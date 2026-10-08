@@ -120,6 +120,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[2][1].getClient(), client);
   assert.equal(calls[3][1].getClient(), client);
   assert.equal(runtime.isClientReady(), true);
+  assert.equal(runtime.getClient(), client);
   assert.equal(runtime.backendConfigured, true);
   assert.equal(runtime.state, state);
   assert.equal(runtime.fetchAll, fetchAll);
@@ -130,6 +131,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     "authClient",
     "backendConfigured",
     "fetchAll",
+    "getClient",
     "initializeClient",
     "isClientReady",
     "loadAllWorkspacePages",
