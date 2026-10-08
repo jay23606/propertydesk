@@ -222,7 +222,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   assert.match(
     app,
-    /depositWorkflows: \{[\s\S]*?PropertyDeskDepositAdjustmentWorkflow/,
+    /depositWorkflows: \{[\s\S]*?adjustmentModules: \{\s*maintenance: window\.PropertyDeskDepositMaintenance,[\s\S]*?events: window\.PropertyDeskDepositDetailEvents/,
   );
   const accountDetailWorkflow = fs.readFileSync(
     path.join(
@@ -300,11 +300,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     "utf8",
   );
   for (const feature of [
-    "PropertyDeskDepositMaintenance",
-    "PropertyDeskDepositAdjustmentEntry",
-    "PropertyDeskDepositDetailEvents",
+    "workflows.maintenance",
+    "workflows.entry",
+    "workflows.events",
   ])
     assert.match(depositWorkflow, new RegExp(`${feature}\\.create\\(`));
+  assert.doesNotMatch(
+    depositWorkflow,
+    /window\.PropertyDeskDeposit(?:Maintenance|AdjustmentEntry|DetailEvents)\.create/,
+  );
   assert.match(depositWorkflow, /repository,/);
   assert.match(app, /repository: repositories\.transactions/);
   assert.match(

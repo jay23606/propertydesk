@@ -14,33 +14,31 @@
     prepareAdjustment,
     validateAdjustment,
     resolveAdjustmentType,
+    workflows,
   }) {
-    const { saveDepositAdjustment } =
-      window.PropertyDeskDepositMaintenance.create({
-        state,
-        todayIso,
-        toast,
-        fetchAll,
-        repository,
-        prepareAdjustment,
-        resolveAdjustmentType,
-      });
-    const { recordDepositAdjustment } =
-      window.PropertyDeskDepositAdjustmentEntry.create({
-        state,
-        moneyInput,
-        toast,
-        saveDepositAdjustment,
-        validateAdjustment,
-        resolveAdjustmentType,
-      });
-    const { attachDepositAdjustmentEvents } =
-      window.PropertyDeskDepositDetailEvents.create({
-        $,
-        state,
-        depositSectionHTML,
-        recordDepositAdjustment,
-      });
+    const { saveDepositAdjustment } = workflows.maintenance.create({
+      state,
+      todayIso,
+      toast,
+      fetchAll,
+      repository,
+      prepareAdjustment,
+      resolveAdjustmentType,
+    });
+    const { recordDepositAdjustment } = workflows.entry.create({
+      state,
+      moneyInput,
+      toast,
+      saveDepositAdjustment,
+      validateAdjustment,
+      resolveAdjustmentType,
+    });
+    const { attachDepositAdjustmentEvents } = workflows.events.create({
+      $,
+      state,
+      depositSectionHTML,
+      recordDepositAdjustment,
+    });
 
     return Object.freeze({ attachDepositAdjustmentEvents });
   }

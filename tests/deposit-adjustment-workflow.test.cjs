@@ -55,9 +55,22 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
     prepareAdjustment,
     validateAdjustment,
     resolveAdjustmentType,
+    workflows: {
+      maintenance: context.window.PropertyDeskDepositMaintenance,
+      entry: context.window.PropertyDeskDepositAdjustmentEntry,
+      events: context.window.PropertyDeskDepositDetailEvents,
+    },
   };
   const workflow =
     context.window.PropertyDeskDepositAdjustmentWorkflow.create(dependencies);
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "deposit-adjustment-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskDeposit(?:Maintenance|AdjustmentEntry|DetailEvents)\.create/,
+  );
 
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance.repository, repository);

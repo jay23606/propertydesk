@@ -319,6 +319,11 @@
       detailsModel: window.PropertyDeskDepositDetailsModel,
       detailsView: window.PropertyDeskDepositDetailsView,
       adjustmentWorkflow: window.PropertyDeskDepositAdjustmentWorkflow,
+      adjustmentModules: {
+        maintenance: window.PropertyDeskDepositMaintenance,
+        entry: window.PropertyDeskDepositAdjustmentEntry,
+        events: window.PropertyDeskDepositDetailEvents,
+      },
     },
     accountDetailWorkspaceWorkflow:
       window.PropertyDeskAccountDetailWorkspaceWorkflow,

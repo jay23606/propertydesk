@@ -30,6 +30,7 @@
         prepareAdjustment: adjustments.prepareAdjustment,
         validateAdjustment: adjustments.validateAdjustment,
         resolveAdjustmentType: adjustments.resolveAdjustmentType,
+        workflows: workflows.adjustmentModules,
       });
 
     return Object.freeze({ depositSectionHTML, attachDepositAdjustmentEvents });

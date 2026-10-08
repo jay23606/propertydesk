@@ -14,6 +14,11 @@ test("account and deposit workspace share detail rendering and events", () => {
     detailsModel: {},
     detailsView: {},
     adjustmentWorkflow: {},
+    adjustmentModules: {
+      maintenance: {},
+      entry: {},
+      events: {},
+    },
   };
   const deposits = {
     details: {
@@ -123,6 +128,7 @@ test("account and deposit workspace share detail rendering and events", () => {
   ]);
   assert.equal("ignored" in passed.deposits, false);
   assert.deepEqual(Object.keys(passed.deposits.workflows).sort(), [
+    "adjustmentModules",
     "adjustmentWorkflow",
     "detailsModel",
     "detailsView",
