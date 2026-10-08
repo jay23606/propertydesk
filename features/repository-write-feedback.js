@@ -71,6 +71,17 @@
     finishWorkspaceWrite: reconciliation.finishWorkspaceWrite,
   });
 
+  function selectRecordWriteCompletion(options = {}) {
+    return {
+      onSaved: options.onSaved,
+      onRefreshed: options.onRefreshed,
+      onReconciled: options.onReconciled,
+      afterRefresh: options.afterRefresh,
+      successMessage: options.successMessage,
+      savedRefreshFailureMessage: options.savedRefreshFailureMessage,
+    };
+  }
+
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
@@ -78,5 +89,6 @@
     runAndRefreshWorkspaceChange: reconciliation.runAndRefreshWorkspaceChange,
     saveWorkspaceRecord: recordWrites.saveWorkspaceRecord,
     saveAndRefreshWorkspaceRecord: recordWrites.saveAndRefreshWorkspaceRecord,
+    selectRecordWriteCompletion,
   });
 })();

@@ -65,8 +65,47 @@ test("repository write feedback exposes only its supported API", () => {
     "runAndRefreshWorkspaceChange",
     "saveAndRefreshWorkspaceRecord",
     "saveWorkspaceRecord",
+    "selectRecordWriteCompletion",
   ]);
   assert.equal(Object.isFrozen(feedback), true);
+});
+
+test("record-write completion selects only supported lifecycle options", () => {
+  const feedback = createFeedback();
+  const onSaved = () => {};
+  const onRefreshed = () => {};
+  const afterRefresh = () => {};
+  const selected = feedback.selectRecordWriteCompletion({
+    onSaved,
+    onRefreshed,
+    afterRefresh,
+    operation() {},
+    state: {},
+    payload: {},
+    toast() {},
+    unrecognized: true,
+  });
+
+  assert.equal(selected.onSaved, onSaved);
+  assert.equal(selected.onRefreshed, onRefreshed);
+  assert.equal(selected.afterRefresh, afterRefresh);
+  assert.deepEqual(Object.keys(selected).sort(), [
+    "afterRefresh",
+    "onReconciled",
+    "onRefreshed",
+    "onSaved",
+    "savedRefreshFailureMessage",
+    "successMessage",
+  ]);
+  assert.equal("operation" in selected, false);
+  assert.equal("state" in selected, false);
+  assert.equal("payload" in selected, false);
+  assert.equal("toast" in selected, false);
+  assert.equal("unrecognized" in selected, false);
+  assert.deepEqual(
+    Object.keys(feedback.selectRecordWriteCompletion()).sort(),
+    Object.keys(selected).sort(),
+  );
 });
 
 test("repository write feedback shows returned database errors", async () => {

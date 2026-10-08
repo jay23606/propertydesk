@@ -15,7 +15,9 @@
             .saveAndRefreshWorkspaceRecord
         : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
       return save({
-        ...completion,
+        ...window.PropertyDeskRepositoryWriteFeedback.selectRecordWriteCompletion(
+          completion,
+        ),
         operation,
         state,
         collection,
