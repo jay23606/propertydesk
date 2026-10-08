@@ -11,6 +11,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
   for (const source of [
     "repository-query-utils.js",
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-holder-repository.js",
     "property-holder-management.js",
@@ -92,6 +93,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
   const context = vm.createContext({ window: {} });
   for (const source of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-maintenance.js",
     "property-archive.js",
@@ -138,6 +140,7 @@ test("archive and restore writes share property maintenance and reopen updated d
   for (const source of [
     "repository-query-utils.js",
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
@@ -219,6 +222,7 @@ test("property holder save persists the member IDs supplied by the event layer",
   for (const source of [
     "repository-query-utils.js",
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-holder-repository.js",
     "property-holder-management.js",
@@ -298,6 +302,7 @@ test("property holder refreshes displayed labels after a partial save failure", 
   const context = vm.createContext({ window: {} });
   for (const source of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-holder-management.js",
   ]) {
@@ -339,6 +344,7 @@ test("property holder reports when a partial save cannot refresh the displayed l
   const context = vm.createContext({ window: {} });
   for (const source of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-holder-management.js",
   ]) {
@@ -382,6 +388,7 @@ test("property holder reloads after a rejected label write with an unknown resul
     const context = vm.createContext({ window: {} });
     for (const source of [
       "workspace-write-reconciliation.js",
+      "workspace-record-write-workflow.js",
       "repository-write-feedback.js",
       "property-holder-management.js",
     ]) {

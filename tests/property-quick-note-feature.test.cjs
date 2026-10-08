@@ -8,6 +8,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
   for (const source of [
     "repository-query-utils.js",
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
@@ -78,6 +79,7 @@ test("property quick notes enforce the character limit before writing", async ()
   for (const source of [
     "repository-query-utils.js",
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
     "property-maintenance.js",
@@ -112,6 +114,7 @@ test("quick note reconciles a lost response against refreshed property state", a
   const context = vm.createContext({ window: {} });
   for (const source of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-maintenance.js",
     "property-quick-note.js",

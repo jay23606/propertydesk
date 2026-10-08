@@ -18,20 +18,41 @@ function createReconciliation() {
     ),
     context,
   );
-  return context.window.PropertyDeskWorkspaceWriteReconciliation.create({
-    run: async ({ operation, onUnconfirmed }) => {
-      try {
-        return await operation();
-      } catch (error) {
-        return onUnconfirmed(error);
-      }
-    },
-    refreshWorkspace: async ({ fetchAll, afterRefresh }) => {
-      await fetchAll();
-      afterRefresh?.();
-      return true;
-    },
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-record-write-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const run = async ({ operation, onUnconfirmed }) => {
+    try {
+      return await operation();
+    } catch (error) {
+      return onUnconfirmed(error);
+    }
+  };
+  const refreshWorkspace = async ({ fetchAll, afterRefresh }) => {
+    await fetchAll();
+    afterRefresh?.();
+    return true;
+  };
+  const core = context.window.PropertyDeskWorkspaceWriteReconciliation.create({
+    run,
+    refreshWorkspace,
   });
+  const records =
+    context.window.PropertyDeskWorkspaceRecordWriteWorkflow.create({
+      run,
+      reconcileWorkspaceChange: core.reconcileWorkspaceChange,
+      finishWorkspaceWrite: core.finishWorkspaceWrite,
+    });
+  return Object.freeze({ ...core, ...records });
 }
 
 test("workspace write reconciliation confirms a saved record after readback", async () => {

@@ -65,10 +65,17 @@
       refreshWorkspace,
     },
   );
+  const recordWrites = window.PropertyDeskWorkspaceRecordWriteWorkflow.create({
+    run,
+    reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
+    finishWorkspaceWrite: reconciliation.finishWorkspaceWrite,
+  });
 
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
-    ...reconciliation,
+    reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
+    runAndRefreshWorkspaceChange: reconciliation.runAndRefreshWorkspaceChange,
+    ...recordWrites,
   });
 })();

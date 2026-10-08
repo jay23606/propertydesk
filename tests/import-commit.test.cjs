@@ -8,6 +8,7 @@ function loadCommitFeature() {
   const context = vm.createContext({ window: {} });
   for (const source of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "import-repository.js",
     "import-batch-reconciliation.js",

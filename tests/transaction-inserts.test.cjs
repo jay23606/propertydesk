@@ -27,6 +27,18 @@ function loadTransactionInserts(client, messages = [], options = {}) {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-record-write-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),

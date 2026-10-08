@@ -7,6 +7,7 @@ const vm = require("node:vm");
 function loadDocumentModules(context) {
   for (const filename of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "document-repository.js",
     "document-upload-policy.js",

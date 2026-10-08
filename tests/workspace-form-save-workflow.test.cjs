@@ -8,6 +8,7 @@ function loadWorkflow() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
     "property-maintenance.js",
@@ -102,6 +103,7 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
     "property-maintenance.js",
