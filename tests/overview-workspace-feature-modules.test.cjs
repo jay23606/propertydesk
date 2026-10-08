@@ -163,12 +163,12 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const order = [
-    "PropertyDeskOverviewPropertySummaryModel.create(",
-    "PropertyDeskOverviewModel.create(",
-    "PropertyDeskOverviewActivityModel.create(",
-    "PropertyDeskOverview.create(",
-    "PropertyDeskOverviewView.create(",
-    "PropertyDeskOverviewEvents.create(",
+    "workflows.propertySummaryModel.create(",
+    "workflows.overviewModel.create(",
+    "workflows.activityModel.create(",
+    "workflows.overview.create(",
+    "workflows.view.create(",
+    "workflows.events.create(",
   ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -179,7 +179,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Model|Events)?\.create\(/);
   assert.match(
     workflow,
-    /PropertyDeskOverviewModel.create\(\{\s*state,\s*isActiveAccount,\s*propertySummaryModel,\s*groupAccountsByProperty,[\s\S]*?postedOnOrAfter,/,
+    /workflows\.overviewModel\.create\(\{\s*state,\s*isActiveAccount,\s*propertySummaryModel,\s*groupAccountsByProperty,[\s\S]*?postedOnOrAfter,/,
   );
   assert.match(app, /renderers:[\s\S]*?renderOverview/);
   assert.match(app, /eventBindersBeforeAuth:[\s\S]*?attachOverviewEvents/);
@@ -265,6 +265,15 @@ test("overview workflow exposes its renderer and event binder directly", () => {
     isActiveAccount,
     isPosted,
     summarizeAccount,
+    workflows: {
+      propertySummaryModel:
+        context.window.PropertyDeskOverviewPropertySummaryModel,
+      overviewModel: context.window.PropertyDeskOverviewModel,
+      activityModel: context.window.PropertyDeskOverviewActivityModel,
+      overview: context.window.PropertyDeskOverview,
+      view: context.window.PropertyDeskOverviewView,
+      events: context.window.PropertyDeskOverviewEvents,
+    },
   });
 
   assert.deepEqual(calls, [

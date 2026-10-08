@@ -35,6 +35,7 @@
       fmtDate: overview.fmtDate,
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openPropertyPayment: overview.openPropertyPayment,
+      workflows: overview.workflows,
     });
     const properties = window.PropertyDeskPropertyPortfolioWorkflow.create({
       $: portfolio.$,

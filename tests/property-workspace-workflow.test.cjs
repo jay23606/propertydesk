@@ -18,6 +18,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   const openPropertyPayment = () => "overview-payment";
   const openPayment = () => "grid-payment";
   const state = {};
+  const workflows = {};
   const propertyAddress = () => "address";
   const groupAccountsByProperty = () => new Map();
   const isActiveAccount = () => true;
@@ -26,6 +27,7 @@ test("property workspace shares detail actions across overview and grid", () => 
     state,
     propertyAddress,
     openPropertyPayment,
+    workflows,
     unusedDependency: true,
   };
   const portfolio = {
@@ -100,6 +102,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[1][1].propertyAddress, propertyAddress);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
+  assert.equal(calls[1][1].workflows, workflows);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[2][1].state, state);
   assert.equal(calls[2][1].groupAccountsByProperty, groupAccountsByProperty);

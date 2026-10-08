@@ -447,6 +447,14 @@
       prettyType,
       fmtDate,
       openPropertyPayment,
+      workflows: {
+        propertySummaryModel: window.PropertyDeskOverviewPropertySummaryModel,
+        overviewModel: window.PropertyDeskOverviewModel,
+        activityModel: window.PropertyDeskOverviewActivityModel,
+        overview: window.PropertyDeskOverview,
+        view: window.PropertyDeskOverviewView,
+        events: window.PropertyDeskOverviewEvents,
+      },
     },
     portfolio: {
       $,

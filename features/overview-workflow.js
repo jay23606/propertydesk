@@ -22,20 +22,20 @@
     fmtDate,
     openPropertyDetails,
     openPropertyPayment,
+    workflows,
   }) {
-    const propertySummaryModel =
-      window.PropertyDeskOverviewPropertySummaryModel.create({
-        state,
-        isActiveAccount,
-        monthlyScheduledEstimate,
-        summarizeAccount,
-      });
-    const overviewModel = window.PropertyDeskOverviewModel.create({
+    const propertySummaryModel = workflows.propertySummaryModel.create({
+      state,
+      isActiveAccount,
+      monthlyScheduledEstimate,
+      summarizeAccount,
+    });
+    const overviewModel = workflows.overviewModel.create({
       state,
       isActiveAccount,
       propertySummaryModel,
       groupAccountsByProperty,
-      activityModel: window.PropertyDeskOverviewActivityModel.create({
+      activityModel: workflows.activityModel.create({
         isPosted,
       }),
       collectedSince,
@@ -43,11 +43,11 @@
       monthStart,
       postedOnOrAfter,
     });
-    const overview = window.PropertyDeskOverview.create({
+    const overview = workflows.overview.create({
       $,
       money,
       overviewModel,
-      overviewView: window.PropertyDeskOverviewView.create({
+      overviewView: workflows.view.create({
         esc,
         prettyKind,
         money,
@@ -56,7 +56,7 @@
         fmtDate,
       }),
     });
-    const overviewEvents = window.PropertyDeskOverviewEvents.create({
+    const overviewEvents = workflows.events.create({
       $,
       openPropertyDetails,
       openPropertyPayment,
