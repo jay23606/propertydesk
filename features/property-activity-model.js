@@ -7,10 +7,8 @@
     isPosted,
     sumIncome,
     sumOperatingExpenses,
+    buildRecentTransactions,
   }) {
-    const { buildRecentTransactions } =
-      window.PropertyDeskPropertyActivityTransactions.create();
-
     function buildPropertyActivity(propertyId, accounts) {
       const accountIds = new Set(accounts.map((account) => account.id));
       const accountById = new Map(

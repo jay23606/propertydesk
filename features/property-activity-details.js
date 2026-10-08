@@ -11,12 +11,15 @@
     fmtDate,
     esc,
   }) {
+    const { buildRecentTransactions } =
+      window.PropertyDeskPropertyActivityTransactions.create();
     const { buildPropertyActivity } =
       window.PropertyDeskPropertyActivityModel.create({
         state,
         isPosted,
         sumIncome,
         sumOperatingExpenses,
+        buildRecentTransactions,
       });
     const { renderRecentActivity } =
       window.PropertyDeskPropertyActivityView.create({

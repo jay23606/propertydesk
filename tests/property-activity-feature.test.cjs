@@ -89,6 +89,9 @@ test("property activity model aggregates posted cash flow and sorts eight recent
     ),
     context,
   );
+  const { buildRecentTransactions } =
+    context.window.PropertyDeskPropertyActivityTransactions.create();
+  delete context.window.PropertyDeskPropertyActivityTransactions;
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-activity-model.js"),
@@ -122,6 +125,7 @@ test("property activity model aggregates posted cash flow and sorts eight recent
   const statusChecks = [];
   const model = context.window.PropertyDeskPropertyActivityModel.create({
     state,
+    buildRecentTransactions,
     isPosted: (record) => {
       statusChecks.push(record);
       return record.status === "posted";
