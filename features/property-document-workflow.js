@@ -9,6 +9,7 @@
     fetchAll,
     openPropertyDetails,
     repository,
+    writeFeedback,
     documentsWorkflow,
     documentEventsWorkflow,
   }) {
@@ -18,6 +19,7 @@
       fetchAll,
       openPropertyDetails,
       repository,
+      writeFeedback,
     });
     const { attachPropertyDocumentEvents } = documentEventsWorkflow.create({
       $,

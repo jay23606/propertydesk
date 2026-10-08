@@ -32,6 +32,7 @@ function createDocuments(context, options) {
       context.window.PropertyDeskDocumentRepository.create({
         getClient: () => options.state.client,
       }),
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
   });
 }
 

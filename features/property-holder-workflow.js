@@ -8,6 +8,7 @@
     toast,
     fetchAll,
     repository,
+    writeFeedback,
     openPropertyDetails,
     workflows,
   }) {
@@ -16,6 +17,7 @@
       toast,
       fetchAll,
       repository,
+      writeFeedback,
       openPropertyDetails,
     });
     const { attachPropertyHolderEvents } = workflows.events.create({

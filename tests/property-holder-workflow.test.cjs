@@ -39,6 +39,7 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     toast() {},
     fetchAll() {},
     repository: {},
+    writeFeedback: { kind: "write-feedback" },
     openPropertyDetails() {},
     workflows: {
       management: context.window.PropertyDeskPropertyHolderManagement,
@@ -50,6 +51,7 @@ test("property-holder workflow connects saving to one explicit event binder", ()
 
   assert.equal(calls[0][0], "management");
   assert.equal(calls[0][1].repository, dependencies.repository);
+  assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
   assert.equal(calls[0][1].state, dependencies.state);
   assert.equal(
     calls[0][1].openPropertyDetails,

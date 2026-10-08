@@ -9,6 +9,7 @@
     openPropertyDetails,
     confirm = (message) => window.confirm(message),
     repository,
+    writeFeedback,
   }) {
     const { removePropertyDocument } =
       window.PropertyDeskDocumentDeleteMaintenance.create({
@@ -17,6 +18,7 @@
         fetchAll,
         openPropertyDetails,
         repository,
+        writeFeedback,
       });
 
     function documentForDeletion(id, propertyId) {

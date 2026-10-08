@@ -62,6 +62,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
       fetchAll: async () => {
         throw new Error("offline");
       },
+      writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
       openPropertyDetails: () =>
         assert.fail("a rejected write must not reopen details"),
       repository: context.window.PropertyDeskPropertyHolderRepository.create({
@@ -272,6 +273,7 @@ test("property holder save persists the member IDs supplied by the event layer",
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
     repository: context.window.PropertyDeskPropertyHolderRepository.create({
       getClient: () => state.client,
@@ -326,6 +328,7 @@ test("property holder refreshes displayed labels after a partial save failure", 
     },
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => events.push(["refresh"]),
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     openPropertyDetails: (id) => events.push(["open", id]),
     repository: {
       clearPropertyHolders: async () => ({ error: null }),
@@ -370,6 +373,7 @@ test("property holder reports when a partial save cannot refresh the displayed l
       events.push(["refresh"]);
       throw new Error("offline");
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     openPropertyDetails: () => events.push(["open"]),
     repository: {
       clearPropertyHolders: async () => ({ error: null }),
@@ -423,6 +427,7 @@ test("property holder reloads after a rejected label write with an unknown resul
           ];
           events.push(["refresh"]);
         },
+        writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
         openPropertyDetails: (id) => events.push(["open", id]),
         repository: {
           clearPropertyHolders: async () => {

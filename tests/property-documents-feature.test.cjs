@@ -100,6 +100,7 @@ test("property document workflow connects private actions and detail events", ()
     "utf8",
   );
   assert.match(screenWorkflow, /repository: documents\.documentRepository/);
+  assert.match(screenWorkflow, /writeFeedback: documents\.writeFeedback/);
   assert.match(
     app,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
@@ -168,6 +169,7 @@ test("property document workflow routes actions through one explicit binder", ()
     fetchAll() {},
     openPropertyDetails() {},
     repository: {},
+    writeFeedback: { kind: "write-feedback" },
     documentsWorkflow: context.window.PropertyDeskDocuments,
     documentEventsWorkflow:
       context.window.PropertyDeskPropertyDetailDocumentEvents,
@@ -182,8 +184,10 @@ test("property document workflow routes actions through one explicit binder", ()
     "repository",
     "state",
     "toast",
+    "writeFeedback",
   ]);
   assert.equal(calls[0][1].repository, dependencies.repository);
+  assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
   assert.equal(calls[1][0], "events");
   assert.equal(calls[1][1].$, dependencies.$);
   assert.equal(

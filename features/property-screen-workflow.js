@@ -48,6 +48,7 @@
       toast: holders.toast,
       fetchAll: holders.fetchAll,
       repository: holders.repository,
+      writeFeedback: holders.writeFeedback,
       openPropertyDetails: details.openPropertyDetails,
       workflows: workflows.holderModules,
     });
@@ -58,6 +59,7 @@
       fetchAll: documents.fetchAll,
       openPropertyDetails: details.openPropertyDetails,
       repository: documents.documentRepository,
+      writeFeedback: documents.writeFeedback,
       documentsWorkflow: documents.documentsWorkflow,
       documentEventsWorkflow: documents.documentEventsWorkflow,
     });

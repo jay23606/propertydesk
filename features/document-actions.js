@@ -10,6 +10,7 @@
     confirm,
     openWindow,
     repository,
+    writeFeedback,
   }) {
     const { deletePropertyDocument } = window.PropertyDeskDocumentDelete.create(
       {
@@ -19,6 +20,7 @@
         openPropertyDetails,
         confirm,
         repository,
+        writeFeedback,
       },
     );
     const { openPropertyDocument } = window.PropertyDeskDocumentOpen.create({

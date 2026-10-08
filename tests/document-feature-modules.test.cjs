@@ -25,6 +25,23 @@ test("private document module exposes upload, delete, and open workflows", () =>
   }
 });
 
+test("document maintenance receives write feedback through explicit dependencies", () => {
+  const root = path.join(__dirname, "..");
+  for (const filename of [
+    "document-upload.js",
+    "document-upload-maintenance.js",
+    "document-delete.js",
+    "document-delete-maintenance.js",
+  ]) {
+    const source = fs.readFileSync(
+      path.join(root, "features", filename),
+      "utf8",
+    );
+    assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+    assert.match(source, /writeFeedback/);
+  }
+});
+
 test("document actions separate deletion and signed-link dependencies", () => {
   const passed = {};
   const deleteAction = () => "deleted";
@@ -60,6 +77,7 @@ test("document actions separate deletion and signed-link dependencies", () => {
     confirm() {},
     openWindow() {},
     repository: {},
+    writeFeedback: { kind: "write-feedback" },
   };
 
   const actions =
@@ -69,6 +87,7 @@ test("document actions separate deletion and signed-link dependencies", () => {
   assert.equal(passed.deletion.fetchAll, dependencies.fetchAll);
   assert.equal(passed.deletion.confirm, dependencies.confirm);
   assert.equal(passed.deletion.repository, dependencies.repository);
+  assert.equal(passed.deletion.writeFeedback, dependencies.writeFeedback);
   assert.equal(passed.deletion.openWindow, undefined);
   assert.equal(passed.open.state, dependencies.state);
   assert.equal(passed.open.openWindow, dependencies.openWindow);

@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    repository,
+    writeFeedback,
+  }) {
     async function removePropertyDocument(doc, propertyId) {
       if (!(await removeStoredAgreement(doc, propertyId))) return false;
       if (!(await deleteDocumentRecord(doc, propertyId))) return false;
@@ -30,14 +37,13 @@
       propertyId,
       requestError,
     ) {
-      const refreshed =
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          afterRefresh: () => openPropertyDetails(propertyId),
-          toast,
-          refreshFailureMessage:
-            "Agreement file removal result couldn't be confirmed. Reload property details and check the agreement before retrying.",
-        });
+      const refreshed = await writeFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => openPropertyDetails(propertyId),
+        toast,
+        refreshFailureMessage:
+          "Agreement file removal result couldn't be confirmed. Reload property details and check the agreement before retrying.",
+      });
       if (!refreshed) return false;
       toast(
         `Agreement file removal result couldn't be confirmed. The agreement record for ${doc.file_name} was kept; verify the file before retrying. ${requestError.message || ""}`,
@@ -72,17 +78,16 @@
 
     async function refreshAfterDocumentRecordFailure(doc, propertyId) {
       let recordRemains = false;
-      const refreshed =
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          afterRefresh: () => {
-            recordRemains = state.documents.some((row) => row.id === doc.id);
-            openPropertyDetails(propertyId);
-          },
-          toast,
-          refreshFailureMessage:
-            "Agreement file was deleted, but its document record could not be refreshed. Reload property details before retrying.",
-        });
+      const refreshed = await writeFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => {
+          recordRemains = state.documents.some((row) => row.id === doc.id);
+          openPropertyDetails(propertyId);
+        },
+        toast,
+        refreshFailureMessage:
+          "Agreement file was deleted, but its document record could not be refreshed. Reload property details before retrying.",
+      });
       if (!refreshed) return false;
       toast(
         recordRemains
@@ -93,7 +98,7 @@
     }
 
     async function refreshDeletedProperty(propertyId) {
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+      await writeFeedback.refreshWorkspace({
         fetchAll,
         beforeRefresh: () => toast("Agreement deleted"),
         afterRefresh: () => openPropertyDetails(propertyId),

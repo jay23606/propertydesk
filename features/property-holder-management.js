@@ -2,40 +2,45 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    repository,
+    writeFeedback,
+  }) {
     async function refreshUncertainLabels(
       id,
       expectedMemberIds,
       refreshFailureMessage,
     ) {
-      return window.PropertyDeskRepositoryWriteFeedback.reconcileWorkspaceChange(
-        {
-          fetchAll,
-          isConfirmed: () => {
-            const actualMemberIds = (state.propertyHolders || [])
-              .filter(
-                (row) =>
-                  row.user_id === state.workspaceOwnerId &&
-                  row.property_id === id,
-              )
-              .map((row) => row.member_user_id)
-              .sort();
-            const expected = expectedMemberIds.slice().sort();
-            return (
-              actualMemberIds.length === expected.length &&
-              actualMemberIds.every(
-                (memberId, index) => memberId === expected[index],
-              )
-            );
-          },
-          afterRefresh: () => openPropertyDetails(id),
-          toast,
-          refreshFailureMessage,
-          retryMessage:
-            "Current account-holder labels were refreshed. Check them before retrying.",
-          onConfirmed: () => toast("Account-holder labels saved"),
+      return writeFeedback.reconcileWorkspaceChange({
+        fetchAll,
+        isConfirmed: () => {
+          const actualMemberIds = (state.propertyHolders || [])
+            .filter(
+              (row) =>
+                row.user_id === state.workspaceOwnerId &&
+                row.property_id === id,
+            )
+            .map((row) => row.member_user_id)
+            .sort();
+          const expected = expectedMemberIds.slice().sort();
+          return (
+            actualMemberIds.length === expected.length &&
+            actualMemberIds.every(
+              (memberId, index) => memberId === expected[index],
+            )
+          );
         },
-      );
+        afterRefresh: () => openPropertyDetails(id),
+        toast,
+        refreshFailureMessage,
+        retryMessage:
+          "Current account-holder labels were refreshed. Check them before retrying.",
+        onConfirmed: () => toast("Account-holder labels saved"),
+      });
     }
 
     async function savePropertyHolders(selectedMemberIds = []) {
@@ -84,7 +89,7 @@
           return;
         }
       }
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+      await writeFeedback.refreshWorkspace({
         fetchAll,
         afterRefresh: () => openPropertyDetails(id),
         toast,

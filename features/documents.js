@@ -11,6 +11,7 @@
     confirm = (message) => window.confirm(message),
     openWindow = (...args) => window.open(...args),
     repository,
+    writeFeedback,
   }) {
     const { uploadPropertyDocument } = window.PropertyDeskDocumentUpload.create(
       {
@@ -20,6 +21,7 @@
         openPropertyDetails,
         makeId,
         repository,
+        writeFeedback,
         describeUpload: window.PropertyDeskDocumentUploadPolicy.describe,
       },
     );
@@ -33,6 +35,7 @@
         confirm,
         openWindow,
         repository,
+        writeFeedback,
       });
 
     return Object.freeze({

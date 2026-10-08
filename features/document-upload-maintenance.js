@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    repository,
+    writeFeedback,
+  }) {
     async function uploadFile(path, file, contentType) {
       let error;
       try {
@@ -51,22 +58,21 @@
 
     async function reconcileUnconfirmedMetadata(propertyId, metadata, error) {
       let recordWasSaved = false;
-      const refreshed =
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          afterRefresh: () => {
-            recordWasSaved = state.documents.some(
-              (document) =>
-                document.user_id === metadata.user_id &&
-                document.property_id === propertyId &&
-                document.storage_path === metadata.storage_path,
-            );
-            if (recordWasSaved) openPropertyDetails(propertyId);
-          },
-          toast,
-          refreshFailureMessage:
-            "Agreement record result couldn't be confirmed, and Properties could not refresh. The private file was kept; reload property details before retrying.",
-        });
+      const refreshed = await writeFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => {
+          recordWasSaved = state.documents.some(
+            (document) =>
+              document.user_id === metadata.user_id &&
+              document.property_id === propertyId &&
+              document.storage_path === metadata.storage_path,
+          );
+          if (recordWasSaved) openPropertyDetails(propertyId);
+        },
+        toast,
+        refreshFailureMessage:
+          "Agreement record result couldn't be confirmed, and Properties could not refresh. The private file was kept; reload property details before retrying.",
+      });
       if (!refreshed) return false;
       if (recordWasSaved) {
         toast("Agreement uploaded privately");

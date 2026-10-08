@@ -10,6 +10,7 @@
     makeId = () => crypto.randomUUID(),
     repository,
     describeUpload,
+    writeFeedback,
   }) {
     const { uploadFile, saveDocumentMetadata } =
       window.PropertyDeskDocumentUploadMaintenance.create({
@@ -18,10 +19,11 @@
         fetchAll,
         openPropertyDetails,
         repository,
+        writeFeedback,
       });
 
     async function reopenPropertyDetails(propertyId) {
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+      await writeFeedback.refreshWorkspace({
         fetchAll,
         beforeRefresh: () => toast("Agreement uploaded privately"),
         afterRefresh: () => openPropertyDetails(propertyId),

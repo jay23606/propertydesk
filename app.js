@@ -522,6 +522,7 @@
         toast,
         fetchAll,
         repository: repositories.propertyHolders,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
       },
       documents: {
         workflow: window.PropertyDeskPropertyDocumentWorkflow,
@@ -532,6 +533,7 @@
         toast,
         fetchAll,
         documentRepository: repositories.documents,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
       },
       workflows: {
         screen: window.PropertyDeskPropertyScreenWorkflow,
