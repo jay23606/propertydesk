@@ -8,6 +8,18 @@ function createFeedback() {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),

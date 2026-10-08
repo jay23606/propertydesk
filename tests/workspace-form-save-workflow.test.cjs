@@ -7,6 +7,7 @@ const vm = require("node:vm");
 function loadWorkflow() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
     "property-maintenance.js",
@@ -100,6 +101,7 @@ test("failed workspace form persistence leaves the form open and unchanged", asy
 test("a form save confirmed by readback reuses its refresh before closing", async () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
     "property-maintenance.js",

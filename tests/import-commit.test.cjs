@@ -7,6 +7,7 @@ const vm = require("node:vm");
 function loadCommitFeature() {
   const context = vm.createContext({ window: {} });
   for (const source of [
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "import-repository.js",
     "import-commit.js",

@@ -5,6 +5,18 @@ const vm = require("node:vm");
 function loadRepositoryWriteFeedback(context) {
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),
@@ -51,6 +63,7 @@ function loadWorkspaceFeatures(context) {
     "profile-settings-view.js",
     "profile-settings.js",
     "workspace-profile-workflow.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "workspace-members-view.js",
     "workspace-member-repository.js",
@@ -70,6 +83,7 @@ function loadLedgerEntryForms(context) {
     "expense-account-policy.js",
     "transaction-payloads.js",
     "repository-query-utils.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "transaction-repository.js",
     "transaction-inserts.js",
@@ -117,6 +131,7 @@ function propertyFormDependencies(context, state = {}) {
 function loadPropertyAndAccountForms(context) {
   for (const filename of [
     "repository-query-utils.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "property-form-view.js",
     "property-repository.js",

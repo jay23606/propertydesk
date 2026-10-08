@@ -360,6 +360,18 @@ test("profile settings save the display label and refresh the shared shell", asy
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),
@@ -432,6 +444,18 @@ test("profile settings confirm a lost update response from the authenticated use
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),
@@ -477,6 +501,18 @@ test("profile settings confirm a lost update response from the authenticated use
 
 test("profile settings show refreshed server state when an uncertain update did not apply", async () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),

@@ -7,6 +7,7 @@ const vm = require("node:vm");
 function loadSaveWorkflow() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "ledger-entry-save-workflow.js",
   ]) {

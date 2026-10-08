@@ -14,6 +14,18 @@ function loadTransactionRepository(context) {
   );
   vm.runInContext(
     fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-write-reconciliation.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "repository-write-feedback.js"),
       "utf8",
     ),
@@ -257,6 +269,7 @@ test("transaction void maintenance rejects unsupported kinds before prompting or
   for (const filename of [
     "transaction-void-model.js",
     "repository-query-utils.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "transaction-repository.js",
     "transaction-void-maintenance.js",
@@ -343,6 +356,7 @@ test("transaction void confirms a lost response from the refreshed audit fields"
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "transaction-void-maintenance.js",
   ]) {
@@ -395,6 +409,7 @@ test("transaction void maintenance reports database errors without refreshing", 
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "transaction-void-maintenance.js",
   ]) {
@@ -425,6 +440,7 @@ test("transaction void maintenance reports an already-changed row without refres
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-void-model.js",
+    "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "transaction-void-maintenance.js",
   ]) {
