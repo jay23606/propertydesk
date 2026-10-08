@@ -352,6 +352,13 @@ test("payment and expense CSV importers save their own validated transaction pay
   assert.equal(calls[1].args.p_rows[0].received_date, "2026-10-05");
   assert.equal(calls[1].args.p_source_name, "payments.csv");
   assert.equal(lookupBuilds, 2);
+
+  state.accounts = [];
+  await assert.rejects(
+    staged[1].commit(staged[1].rows, { total: 1 }),
+    /account is no longer available/i,
+  );
+  assert.equal(calls.length, 2);
 });
 
 test("an unconfirmed import disables retry and directs the owner to verify the receipt", async () => {
