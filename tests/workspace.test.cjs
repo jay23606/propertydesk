@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("workspace workflow composes profile settings with member settings", () => {
+test("workspace workflow composes profile, member, and reminder settings", () => {
   const root = path.join(__dirname, "..");
   const passed = {};
   const updateGreeting = () => {};
@@ -37,6 +37,15 @@ test("workspace workflow composes profile settings with member settings", () => 
           return { attachWorkspaceMemberEvents: attachMemberEvents };
         },
       },
+      PropertyDeskWorkspaceReminderWorkflow: {
+        create(options) {
+          passed.reminderWorkflow = options;
+          return {
+            renderReminderActivity: () => reminderActivityRenders++,
+            previewReminderEmail: () => "preview",
+          };
+        },
+      },
     },
   });
   vm.runInContext(
@@ -53,10 +62,11 @@ test("workspace workflow composes profile settings with member settings", () => 
     toast() {},
     fetchAll() {},
     memberRepository,
-    renderReminderActivity: () => reminderActivityRenders++,
+    reminder: { state },
   });
 
   assert.equal(passed.profileWorkflow.state, state);
+  assert.equal(passed.reminderWorkflow.state, state);
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
   assert.equal(passed.memberActions.repository, memberRepository);
   assert.equal(
@@ -68,6 +78,7 @@ test("workspace workflow composes profile settings with member settings", () => 
     "function",
   );
   assert.equal(workflow.updateGreeting, updateGreeting);
+  assert.equal(typeof workflow.previewReminderEmail, "function");
   workflow.renderWorkspacePage();
   assert.equal(passed.displayName, "Owner");
   assert.equal(reminderActivityRenders, 1);

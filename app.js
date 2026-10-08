@@ -122,8 +122,13 @@
       propertyAddress,
       prettyType,
     });
-  const workspaceReminder = window.PropertyDeskWorkspaceReminderWorkflow.create(
-    {
+  const workspace = window.PropertyDeskWorkspace.create({
+    $,
+    state,
+    esc,
+    toast,
+    fetchAll,
+    reminder: {
       $,
       state,
       esc,
@@ -140,14 +145,6 @@
       toast,
       openModal: modal.openModal,
     },
-  );
-  const workspace = window.PropertyDeskWorkspace.create({
-    $,
-    state,
-    esc,
-    toast,
-    fetchAll,
-    renderReminderActivity: workspaceReminder.renderReminderActivity,
     memberRepository: repositories.workspaceMembers,
     authClient,
   });
@@ -158,7 +155,7 @@
     documentRef: document,
     windowRef: window,
   });
-  const { previewReminderEmail } = workspaceReminder;
+  const { previewReminderEmail } = workspace;
   const { updateGreeting, attachProfileEvents, attachWorkspaceMemberEvents } =
     workspace;
   const { navigate, attachEvents: attachNavigationEvents } = navigation;

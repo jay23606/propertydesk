@@ -15,7 +15,7 @@ test("app composes workspace settings and page navigation directly", () => {
 
   assert.match(
     app,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity: workspaceReminder\.renderReminderActivity,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?reminder: \{[\s\S]*?openModal: modal\.openModal,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
     app,
@@ -23,7 +23,11 @@ test("app composes workspace settings and page navigation directly", () => {
   );
   assert.match(
     workspace,
-    /function renderWorkspacePage\(\)\s*\{\s*renderWorkspaceSettings\(\);\s*renderReminderActivity\(\);/,
+    /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
+  );
+  assert.match(
+    workspace,
+    /function renderWorkspacePage\(\)\s*\{\s*renderWorkspaceSettings\(\);\s*reminderWorkflow\.renderReminderActivity\(\);/,
   );
   assert.match(
     app,

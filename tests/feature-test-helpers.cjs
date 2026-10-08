@@ -39,6 +39,12 @@ function createAuthClient(context, state) {
 }
 
 function loadWorkspaceFeatures(context) {
+  context.window.PropertyDeskWorkspaceReminderWorkflow ||= {
+    create: () => ({
+      renderReminderActivity() {},
+      previewReminderEmail() {},
+    }),
+  };
   for (const filename of [
     "auth-client.js",
     "profile-display.js",

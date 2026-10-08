@@ -1,4 +1,4 @@
-/* Compose profile and member workflows with the Workspace page renderer. */
+/* Compose Workspace settings, member access, and reminder activity. */
 (() => {
   "use strict";
 
@@ -8,11 +8,13 @@
     esc,
     toast,
     fetchAll,
-    renderReminderActivity = () => {},
+    reminder,
     memberRepository,
     authClient,
     confirmAction = (message) => window.confirm(message),
   }) {
+    const reminderWorkflow =
+      window.PropertyDeskWorkspaceReminderWorkflow.create(reminder);
     const profileWorkflow = window.PropertyDeskWorkspaceProfileWorkflow.create({
       $,
       state,
@@ -31,7 +33,7 @@
 
     function renderWorkspacePage() {
       renderWorkspaceSettings();
-      renderReminderActivity();
+      reminderWorkflow.renderReminderActivity();
     }
 
     const members = window.PropertyDeskWorkspaceMembers.create({
@@ -47,6 +49,7 @@
     return {
       updateGreeting: profileWorkflow.updateGreeting,
       renderWorkspacePage,
+      previewReminderEmail: reminderWorkflow.previewReminderEmail,
       attachProfileEvents: profileWorkflow.attachProfileEvents,
       attachWorkspaceMemberEvents: members.attachWorkspaceMemberEvents,
     };

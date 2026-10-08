@@ -3,14 +3,23 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app connects account reminder preview through the reminder workflow", () => {
+test("workspace composes reminder activity and shares preview with account forms", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /const \{ previewReminderEmail \} = workspaceReminder/);
-  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
+  const workspace = fs.readFileSync(
+    path.join(root, "features", "workspace.js"),
+    "utf8",
+  );
+
+  assert.match(
+    workspace,
+    /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
+  );
+  assert.match(app, /const \{ previewReminderEmail \} = workspace/);
+  assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskAccountForm\.create\(\{[\s\S]*?previewReminderEmail,/,

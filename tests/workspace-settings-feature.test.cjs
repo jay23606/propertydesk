@@ -27,6 +27,7 @@ test("workspace feature owns profile and member form bindings", () => {
   assert.deepEqual(Object.keys(feature).sort(), [
     "attachProfileEvents",
     "attachWorkspaceMemberEvents",
+    "previewReminderEmail",
     "renderWorkspacePage",
     "updateGreeting",
   ]);

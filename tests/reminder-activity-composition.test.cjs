@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("reminder activity and preview are composed independently of navigation", () => {
+test("workspace reminder activity and preview stay independent of navigation", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -13,7 +13,11 @@ test("reminder activity and preview are composed independently of navigation", (
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskWorkspace\.create\(/);
+  assert.match(
+    fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),
+    /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
+  );
   assert.match(
     reminderWorkflow,
     /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\(/,

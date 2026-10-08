@@ -243,13 +243,13 @@ test("property workspace composes screens and shares detail actions", () => {
   );
 });
 
-test("app wires reminder preview and activity independently from workspace settings", () => {
+test("app passes reminder services into the workspace coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /WorkspaceReminderWorkflow\.create\([\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?reminder: \{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
   );
-  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
   assert.match(app, /memberRepository: repositories\.workspaceMembers/);
 });
