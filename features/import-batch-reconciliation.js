@@ -3,20 +3,34 @@
   "use strict";
 
   function createImportBatchReconciliation({ state, fetchAll, toast }) {
-    function matchesCommittedBatch(batch, sourceName, total, collection) {
-      const normalizedName =
+    function normalizedSourceName(sourceName) {
+      return (
         String(sourceName || "")
           .trim()
-          .slice(0, 255) || "CSV import";
+          .slice(0, 255) || "CSV import"
+      );
+    }
+
+    function batchMatchesSource(batch, sourceName) {
+      return (
+        batch.source_type === "csv" &&
+        batch.source_name === normalizedSourceName(sourceName)
+      );
+    }
+
+    function batchHasImportedRows(batch, collection) {
+      return (state[collection] || []).some(
+        (row) => row.import_batch_id === batch.id,
+      );
+    }
+
+    function matchesCommittedBatch(batch, sourceName, total, collection) {
       return (
         batch.user_id === state.workspaceOwnerId &&
-        batch.source_type === "csv" &&
-        batch.source_name === normalizedName &&
+        batchMatchesSource(batch, sourceName) &&
         batch.status === "committed" &&
         Number(batch.rows_total) === Number(total) &&
-        (state[collection] || []).some(
-          (row) => row.import_batch_id === batch.id,
-        )
+        batchHasImportedRows(batch, collection)
       );
     }
 

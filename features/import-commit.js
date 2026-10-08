@@ -19,6 +19,20 @@
       return refreshError;
     }
 
+    function importSummary(data, fallbackCount, total, label) {
+      const imported = Number(data?.rows_accepted ?? fallbackCount);
+      const rejected = total - imported;
+      const importedLabel = `${label}${imported === 1 ? "" : "s"}`;
+      const rejectedLabel = `row${rejected === 1 ? " was" : "s were"}`;
+      return `Imported ${imported} ${importedLabel}; ${rejected} ${rejectedLabel} skipped or need correction. Source saved to import history.`;
+    }
+
+    function importSuccessMessage(label, message) {
+      return (
+        message || `${label[0].toUpperCase()}${label.slice(1)} import complete`
+      );
+    }
+
     async function finish({
       data,
       fallbackCount,
@@ -27,9 +41,7 @@
       toastMessage,
       alreadyRefreshed = false,
     }) {
-      const imported = Number(data?.rows_accepted ?? fallbackCount);
-      const rejected = total - imported;
-      status.textContent = `Imported ${imported} ${label}${imported === 1 ? "" : "s"}; ${rejected} row${rejected === 1 ? " was" : "s were"} skipped or need correction. Source saved to import history.`;
+      status.textContent = importSummary(data, fallbackCount, total, label);
       status.classList.add("success");
       if (!alreadyRefreshed) {
         try {
@@ -38,10 +50,7 @@
           throw importRefreshError(error);
         }
       }
-      toast(
-        toastMessage ||
-          `${label[0].toUpperCase()}${label.slice(1)} import complete`,
-      );
+      toast(importSuccessMessage(label, toastMessage));
     }
 
     async function commitWithReconciliation({
