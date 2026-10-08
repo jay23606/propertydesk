@@ -57,8 +57,11 @@
           closeModal("import-preview-modal");
         } catch (error) {
           pending.commitUnconfirmed = true;
+          const summary = error.importPersisted
+            ? "Import was saved, but the workspace couldn't be refreshed. Reload the workspace before continuing. "
+            : "Import status couldn't be confirmed. Reload the workspace and check Reports import history before retrying. ";
           $("import-preview-summary").textContent =
-            `Import status couldn't be confirmed. Reload the workspace and check Reports import history before retrying. ${error.message}`;
+            `${summary}${error.message}`;
           updateImportCommitButton();
         } finally {
           updateImportCommitButton();

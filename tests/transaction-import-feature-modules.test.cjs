@@ -419,6 +419,68 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
   assert.deepEqual(closed, []);
 });
 
+test("a saved import with refresh failure explains the save and still blocks retry", async () => {
+  const context = vm.createContext({ window: {} });
+  loadImportPreview(context);
+  const elements = new Map();
+  const handlers = new Map();
+  const $ = (id) => {
+    if (!elements.has(id)) {
+      elements.set(id, {
+        checked: false,
+        disabled: false,
+        textContent: "",
+        innerHTML: "",
+        classList: { toggle() {} },
+        addEventListener(event, handler) {
+          handlers.set(`${id}:${event}`, handler);
+        },
+      });
+    }
+    return elements.get(id);
+  };
+  const state = { pendingImport: null };
+  const preview = context.window.PropertyDeskImportPreview.create({
+    $,
+    state,
+    selectImportRows: (rows) => rows,
+    esc: String,
+    openModal() {},
+    closeModal() {},
+  });
+  const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
+    $,
+    state,
+    selectImportRows: (rows) => rows,
+    renderImportPreview: preview.renderImportPreview,
+    updateImportCommitButton: preview.updateImportCommitButton,
+    closeModal() {},
+  });
+  preview.stageImport(
+    "Review payment import",
+    [{ id: "row-1" }],
+    async () => {
+      const error = new Error("Workspace refresh failed after save.");
+      error.importPersisted = true;
+      throw error;
+    },
+    "",
+    { total: 1 },
+  );
+  previewEvents.attachEvents();
+
+  await assert.doesNotReject(handlers.get("import-commit:click")());
+
+  assert.match($("import-preview-summary").textContent, /Import was saved/i);
+  assert.match(
+    $("import-preview-summary").textContent,
+    /reload the workspace/i,
+  );
+  assert.equal($("import-commit").disabled, true);
+  assert.equal($("import-commit").textContent, "Reload to check status");
+  assert.equal(state.pendingImport.commitUnconfirmed, true);
+});
+
 test("CSV imports report a real zero accepted by the server as zero", async () => {
   const context = vm.createContext({ window: {} });
   loadImportFeatures(context);

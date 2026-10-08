@@ -108,3 +108,42 @@ test("failed import commits do not refresh or report success", async () => {
   assert.equal(refreshCount, 0);
   assert.deepEqual(messages, []);
 });
+
+test("a confirmed import distinguishes refresh failure from save failure", async () => {
+  const messages = [];
+  const status = {
+    textContent: "",
+    classList: { add() {} },
+  };
+  const client = {
+    async rpc() {
+      return { data: { rows_accepted: 1 }, error: null };
+    },
+  };
+  const { commit: feature, repository } = loadCommitFeature();
+  const commit = feature.create({
+    repository: repository.create({ getClient: () => client }),
+    fetchAll: async () => {
+      throw new Error("workspace refresh failed");
+    },
+    status,
+    toast: (message) => messages.push(message),
+  });
+
+  await assert.rejects(
+    commit.commitTransactions({
+      kind: "payments",
+      rows: [{ amount: 550 }],
+      sourceName: "payments.csv",
+      total: 1,
+      label: "payment",
+    }),
+    (error) => {
+      assert.equal(error.importPersisted, true);
+      assert.match(error.message, /workspace refresh failed/i);
+      return true;
+    },
+  );
+  assert.match(status.textContent, /Imported 1 payment/);
+  assert.deepEqual(messages, []);
+});

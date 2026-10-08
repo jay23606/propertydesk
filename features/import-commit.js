@@ -3,12 +3,25 @@
   "use strict";
 
   function createImportCommit({ fetchAll, status, toast, repository }) {
+    function importRefreshError(error) {
+      const refreshError = new Error(
+        error?.message ||
+          "Workspace refresh failed after the import was saved.",
+      );
+      refreshError.importPersisted = true;
+      return refreshError;
+    }
+
     async function finish({ data, fallbackCount, total, label, toastMessage }) {
-      await fetchAll();
       const imported = Number(data?.rows_accepted ?? fallbackCount);
       const rejected = total - imported;
       status.textContent = `Imported ${imported} ${label}${imported === 1 ? "" : "s"}; ${rejected} row${rejected === 1 ? " was" : "s were"} skipped or need correction. Source saved to import history.`;
       status.classList.add("success");
+      try {
+        await fetchAll();
+      } catch (error) {
+        throw importRefreshError(error);
+      }
       toast(
         toastMessage ||
           `${label[0].toUpperCase()}${label.slice(1)} import complete`,
