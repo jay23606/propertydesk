@@ -96,13 +96,17 @@ test("property and account maintenance save inserts and updates to their own tab
   };
   const messages = [];
   const property = context.window.PropertyDeskPropertyMaintenance.create({
-    state,
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
   });
   assert.equal(Object.isFrozen(property), true);
+  assert.deepEqual(Object.keys(property), [
+    "saveProperty",
+    "savePropertyQuickNote",
+    "savePropertyArchive",
+  ]);
   const account = context.window.PropertyDeskAccountFormMaintenance.create({
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({

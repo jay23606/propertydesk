@@ -13,7 +13,6 @@
   }) {
     const { savePropertyQuickNote } =
       window.PropertyDeskPropertyMaintenance.create({
-        state,
         toast,
         repository,
       });

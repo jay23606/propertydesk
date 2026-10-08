@@ -20,7 +20,6 @@
       });
     const { saveProperty: persistProperty } =
       window.PropertyDeskPropertyMaintenance.create({
-        state,
         toast,
         repository,
       });

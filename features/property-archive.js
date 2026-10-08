@@ -12,7 +12,6 @@
   }) {
     const { savePropertyArchive } =
       window.PropertyDeskPropertyMaintenance.create({
-        state,
         toast,
         repository,
       });
