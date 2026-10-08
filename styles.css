@@ -586,15 +586,6 @@ button {
   grid-template-columns: repeat(3, 1fr);
   max-width: 900px;
 }
-.report-panel {
-  margin-bottom: 16px;
-}
-.empty-state {
-  padding: 45px 16px;
-  text-align: center;
-  color: #98a39a;
-  font-size: 12px;
-}
 .modal {
   position: fixed;
   inset: 0;
