@@ -6,6 +6,7 @@ const test = require("node:test");
 test("Overview property summary styles stay in their feature stylesheet", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const overview = fs.readFileSync(path.join(root, "overview.css"), "utf8");
   const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
@@ -26,6 +27,8 @@ test("Overview property summary styles stay in their feature stylesheet", () => 
   assert.match(overview, /\.property-summary-grid/);
   assert.match(overview, /\.property-quick-payment/);
   assert.match(overview, /\.property-party/);
+  assert.match(overview, /\.overview-grid/);
+  assert.doesNotMatch(styles, /\.overview-grid/);
   assert.match(overview, /html\[data-theme="dark"\] \.property-art/);
   assert.doesNotMatch(
     shared,

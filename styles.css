@@ -334,12 +334,6 @@ button {
   font-size: 11px;
   margin-top: 2px;
 }
-.overview-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
 .panel {
   overflow: hidden;
 }
@@ -695,9 +689,6 @@ button {
   }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .overview-grid {
-    grid-template-columns: 1fr;
   }
   .toolbar {
     flex-wrap: wrap;

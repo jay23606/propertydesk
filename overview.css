@@ -1,3 +1,9 @@
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
 .property-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -153,6 +159,9 @@ html[data-theme="dark"] .property-type {
   color: #c8d7cd;
 }
 @media (max-width: 760px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
   .property-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 13px 14px;
