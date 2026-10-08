@@ -89,6 +89,15 @@
   border-top: 2px solid var(--line);
   background: var(--canvas);
 }
+.portfolio-party-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.portfolio-text-reminder {
+  white-space: nowrap;
+}
 .portfolio-table tfoot td {
   font-weight: 700;
   white-space: nowrap;

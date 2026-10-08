@@ -44,17 +44,17 @@ test("account detail workspace joins content rendering and action binding", () =
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskAccountDetailContentWorkflow: {
-        create(options) {
-          passed.content = options;
-          return { openAccountDetails };
-        },
-      },
       PropertyDeskAccountDetailActionWorkflow: {
         create(options) {
           passed.actions = options;
           return { attachAccountDetailActionEvents };
         },
+      },
+    },
+    contentWorkflow: {
+      create(options) {
+        passed.content = options;
+        return { openAccountDetails };
       },
     },
   });
@@ -75,6 +75,7 @@ test("account detail workspace joins content rendering and action binding", () =
     context.window.PropertyDeskAccountDetailWorkspaceWorkflow.create({
       content,
       actions,
+      contentWorkflow: context.contentWorkflow,
       actionWorkflow: context.window.PropertyDeskAccountDetailActionWorkflow,
       actionWorkflows,
     });
@@ -120,4 +121,16 @@ test("account detail workspace joins content rendering and action binding", () =
     attachAccountDetailActionEvents,
   );
   assert.equal(Object.isFrozen(workflow), true);
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "account-detail-workspace-workflow.js",
+      ),
+      "utf8",
+    ),
+    /window\.PropertyDeskAccountDetailContentWorkflow\.create/,
+  );
 });

@@ -257,6 +257,7 @@ test("Properties account-row model derives balances and reminder details", () =>
         reminderOptions = options;
         return `mailto:${options.email || ""}`;
       },
+      lateReminderSms: (options) => `sms:${options.phone || ""}`,
       money: (amount) => `$${amount.toFixed(2)}`,
     });
   const model =
@@ -289,6 +290,7 @@ test("Properties account-row model derives balances and reminder details", () =>
     name: "Contract",
     party_name: "Buyer",
     party_email: "buyer@example.com",
+    party_phone: "+1 (555) 010-2020",
     account_type: "land_contract",
     payment_amount: 250,
     payment_frequency: "monthly",
@@ -303,6 +305,7 @@ test("Properties account-row model derives balances and reminder details", () =>
   assert.equal(row.hasLoanBalance, true);
   assert.equal(row.paymentStatus, "partial");
   assert.equal(row.reminderHref, "mailto:buyer@example.com");
+  assert.equal(row.textReminderHref, "sms:+1 (555) 010-2020");
   assert.equal(row.recipientHint, "Draft late reminder email");
   assert.deepEqual(scheduledAccountKeys, [
     "id",
@@ -329,6 +332,7 @@ test("Properties account-row model derives balances and reminder details", () =>
     rental.recipientHint,
     "No email saved; opens an unaddressed late reminder draft",
   );
+  assert.equal(rental.textReminderHref, "sms:");
 });
 
 test("Properties reminder model builds the manual reminder details", () => {
@@ -353,6 +357,7 @@ test("Properties reminder model builds the manual reminder details", () => {
     context,
   );
   const options = [];
+  const smsOptions = [];
   const model =
     context.window.PropertyDeskPropertyPortfolioReminderModel.create({
       state: { user: { user_metadata: { display_name: " Owner " } } },
@@ -364,6 +369,10 @@ test("Properties reminder model builds the manual reminder details", () => {
         options.push(value);
         return "mailto:buyer@example.test";
       },
+      lateReminderSms: (value) => {
+        smsOptions.push(value);
+        return "sms:+15550102020";
+      },
       money: (value) => `$${value.toFixed(2)}`,
     });
 
@@ -371,13 +380,16 @@ test("Properties reminder model builds the manual reminder details", () => {
   const account = {
     party_name: "Buyer",
     party_email: "buyer@example.test",
+    party_phone: "+1 (555) 010-2020",
   };
   const reminder = model.buildReminderDetails(property, account, 35);
 
   assert.equal(reminder.reminderHref, "mailto:buyer@example.test");
+  assert.equal(reminder.textReminderHref, "sms:+15550102020");
   assert.equal(reminder.recipientHint, "Draft late reminder email");
   assert.deepEqual(JSON.parse(JSON.stringify(options[0])), {
     email: "buyer@example.test",
+    phone: "+1 (555) 010-2020",
     address: "1 Oak St",
     subjectAddress: "1 Oak St",
     unpaidDue: "$35.00",
@@ -385,6 +397,9 @@ test("Properties reminder model builds the manual reminder details", () => {
     recipientName: "Buyer",
     month: "October 2026",
     asOf: "2026-10-31",
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(smsOptions[0])), {
+    ...JSON.parse(JSON.stringify(options[0])),
   });
 });
 
@@ -526,6 +541,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     dateOnly: (value) => new Date(`${value}T12:00:00`),
     monthEnd: () => "2026-10-31",
     lateReminderMailto: () => "mailto:buyer@example.com",
+    lateReminderSms: () => "sms:+15550102020",
     paymentStatusInMonth: () => "none",
     money,
   };
@@ -559,6 +575,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
           dateOnly: dependencies.dateOnly,
           monthEnd: dependencies.monthEnd,
           lateReminderMailto: dependencies.lateReminderMailto,
+          lateReminderSms: dependencies.lateReminderSms,
           money,
         }),
     });

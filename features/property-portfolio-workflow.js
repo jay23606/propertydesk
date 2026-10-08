@@ -19,6 +19,7 @@
     dateOnly,
     monthEnd,
     lateReminderMailto,
+    lateReminderSms,
     paymentStatusInMonth,
     toast,
     fetchAll,
@@ -40,6 +41,7 @@
       dateOnly,
       monthEnd,
       lateReminderMailto,
+      lateReminderSms,
       money,
     });
     const accountRowModel = workflows.accountRowModel.create({

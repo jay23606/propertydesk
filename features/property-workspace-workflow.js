@@ -55,6 +55,7 @@
       dateOnly: portfolio.dateOnly,
       monthEnd: portfolio.monthEnd,
       lateReminderMailto: portfolio.lateReminderMailto,
+      lateReminderSms: portfolio.lateReminderSms,
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
       toast: portfolio.toast,
       fetchAll: portfolio.fetchAll,

@@ -31,7 +31,7 @@
       const scheduleAccount = scheduledAccount(account);
       const scheduledPayment = monthlyScheduledEstimate([scheduleAccount]);
       const partyName = account.party_name || account.name;
-      const { reminderHref, recipientHint } =
+      const { reminderHref, textReminderHref, recipientHint } =
         reminderModel.buildReminderDetails(property, account, unpaidDue);
       const scheduledThisMonth =
         amountDueSince([scheduleAccount], [], monthStart(), monthEnd()) ||
@@ -58,6 +58,7 @@
         partyName,
         paymentStatus,
         reminderHref,
+        textReminderHref,
         recipientHint,
       };
     }

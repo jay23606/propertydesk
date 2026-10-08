@@ -7,7 +7,7 @@
   function render() {
     appLifecycle.render();
   }
-  const { lateReminderMailto } = window.PropertyDeskEmailUtils;
+  const { lateReminderMailto, lateReminderSms } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
   const { dateOnly, fmtDate, todayIso, monthStart, monthEnd } =
@@ -335,6 +335,8 @@
     },
     accountDetailWorkspaceWorkflow:
       window.PropertyDeskAccountDetailWorkspaceWorkflow,
+    accountDetailContentWorkflow:
+      window.PropertyDeskAccountDetailContentWorkflow,
     accountDetailActionWorkflow: window.PropertyDeskAccountDetailActionWorkflow,
     accountDetailActionWorkflows: {
       closeMaintenance: window.PropertyDeskAccountCloseMaintenance,
@@ -525,6 +527,7 @@
       dateOnly,
       monthEnd,
       lateReminderMailto,
+      lateReminderSms,
       paymentStatusInMonth,
       toast,
       fetchAll,

@@ -2,7 +2,10 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/email-address-utils.js");
 require("../supabase/functions/_shared/reminder-copy.js");
-const { lateReminderMailto } = require("../features/email-utils.js");
+const {
+  lateReminderMailto,
+  lateReminderSms,
+} = require("../features/email-utils.js");
 
 function parts(href) {
   const url = new URL(href);
@@ -76,6 +79,27 @@ test("shared reminder copy falls back to a generic greeting for a blank name", (
   assert.match(parts(message).body, /^Hello there,/);
 });
 
+test("late reminder text link opens the phone composer with the same reminder body", () => {
+  const href = lateReminderSms({
+    phone: "+1 (555) 010-2020",
+    address: "1 Sample Street",
+    unpaidDue: "$550.00",
+    senderName: "Property Manager",
+    recipientName: "Test Buyer",
+    month: "October 2026",
+    asOf: "2026-10-31",
+  });
+  const url = new URL(href);
+
+  assert.equal(url.protocol, "sms:");
+  assert.equal(url.pathname, "+15550102020");
+  assert.equal(
+    url.searchParams.get("body"),
+    "Hello Test Buyer,\n\nOur records show no rent or installment payment recorded for October 2026.\n\nUnpaid due as of 2026-10-31: $550.00\nProperty: 1 Sample Street\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nProperty Manager",
+  );
+  assert.equal(lateReminderSms({ phone: "   " }), "");
+});
+
 test("the app renders the account holder as a mailto link instead of an account-details button", () => {
   const fs = require("node:fs");
   const path = require("node:path");
@@ -90,6 +114,8 @@ test("the app renders the account holder as a mailto link instead of an account-
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
 
   assert.match(views, /href="\$\{esc\(reminderHref\)\}"/);
+  assert.match(views, /href="\$\{esc\(textReminderHref\)\}"/);
+  assert.match(views, /Draft text reminder for \$\{partyName\}/);
   assert.doesNotMatch(
     views,
     /class="table-action" data-detail="\$\{esc\(account\.id\)\}">${esc\(account\.party_name/,

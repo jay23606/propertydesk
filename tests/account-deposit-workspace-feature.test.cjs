@@ -253,7 +253,11 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountWorkspaceWorkflow,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?workflows: content\.workflows,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
+    /contentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?workflows: content\.workflows,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
+  );
+  assert.doesNotMatch(
+    accountWorkspaceWorkflow,
+    /window\.PropertyDeskAccountDetailContentWorkflow\.create/,
   );
   const accountDepositWorkspaceWorkflow = fs.readFileSync(
     path.join(
@@ -266,7 +270,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /depositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /depositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?contentWorkflow: accountDetailContentWorkflow,[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,
@@ -328,6 +332,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.match(
     app,
     /accountDetailActionWorkflow:\s*window\.PropertyDeskAccountDetailActionWorkflow/,
+  );
+  assert.match(
+    app,
+    /accountDetailContentWorkflow:\s*window\.PropertyDeskAccountDetailContentWorkflow/,
   );
   assert.match(
     app,

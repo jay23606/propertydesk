@@ -33,6 +33,7 @@
       partyName,
       paymentStatus,
       reminderHref,
+      textReminderHref,
       recipientHint,
     }) {
       const paymentAmount =
@@ -52,7 +53,10 @@
         <td class="portfolio-due">${money(due)}</td>
         ${propertyAddressCell(property, street)}
         <td>
+        <div class="portfolio-party-actions">
         <a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a>
+        ${textReminderHref ? `<a class="table-action portfolio-text-reminder" href="${esc(textReminderHref)}" title="Open a text reminder draft" aria-label="${esc(`Draft text reminder for ${partyName}`)}">Text</a>` : ""}
+        </div>
         <small class="table-subtext">${esc(account.name)}${inactiveHint}</small>
         </td>
         <td>${paymentAmount}<small class="table-subtext">${frequencyHint}</small>

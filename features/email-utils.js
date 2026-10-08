@@ -34,7 +34,20 @@
     return `mailto:${recipients}?subject=${encodeURIComponent(message.subject)}&body=${encodeURIComponent(message.body)}`;
   }
 
-  const helpers = Object.freeze({ paymentReminderMessage, lateReminderMailto });
+  function lateReminderSms({ phone, ...messageOptions }) {
+    const rawPhone = String(phone || "").trim();
+    const digits = rawPhone.replace(/\D/g, "");
+    if (!digits) return "";
+    const internationalPrefix = rawPhone.startsWith("+") ? "+" : "";
+    const message = paymentReminderMessage(messageOptions);
+    return `sms:${internationalPrefix}${digits}?body=${encodeURIComponent(message.body)}`;
+  }
+
+  const helpers = Object.freeze({
+    paymentReminderMessage,
+    lateReminderMailto,
+    lateReminderSms,
+  });
   globalThis.PropertyDeskEmailUtils = helpers;
   if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();

@@ -9,12 +9,14 @@
     dateOnly,
     monthEnd,
     lateReminderMailto,
+    lateReminderSms,
     money,
   }) {
     function buildReminderDetails(property, account, unpaidDue) {
       const partyName = account.party_name || account.name;
-      const reminderHref = lateReminderMailto({
+      const reminderDetails = {
         email: account.party_email,
+        phone: account.party_phone,
         address: propertyAddress(property),
         subjectAddress: property.address,
         unpaidDue: money(unpaidDue),
@@ -26,12 +28,14 @@
           year: "numeric",
         }),
         asOf: monthEnd(),
-      });
+      };
+      const reminderHref = lateReminderMailto(reminderDetails);
+      const textReminderHref = lateReminderSms(reminderDetails);
       const recipientHint = account.party_email
         ? "Draft late reminder email"
         : "No email saved; opens an unaddressed late reminder draft";
 
-      return { reminderHref, recipientHint };
+      return { reminderHref, textReminderHref, recipientHint };
     }
 
     return Object.freeze({ buildReminderDetails });
