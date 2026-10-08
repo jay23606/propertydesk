@@ -10,7 +10,11 @@ test("app wires account forms and transaction entry through separate workflows",
   assert.match(app, /PropertyDeskPropertyForm\.create\(/);
   assert.match(app, /PropertyDeskAccountForm\.create\(/);
   assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(
+    app,
+    /transactionMaintenance\.createTransactionActionHandlers\(/,
+  );
   assert.match(
     app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyForm\.resetPropertyForm,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
@@ -26,6 +30,6 @@ test("app wires account forms and transaction entry through separate workflows",
 
   assert.match(
     app,
-    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance,[\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\([\s\S]*?const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
 });

@@ -19,7 +19,11 @@ test("account records and ledger entries use separate workspace workflows", () =
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
   );
   assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(
+    app,
+    /transactionMaintenance\.createTransactionActionHandlers\(/,
+  );
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
@@ -71,7 +75,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(
     app,
-    /PropertyDeskTransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance,[\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+    /PropertyDeskTransactionViews\.create\([\s\S]*?const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
@@ -103,10 +107,10 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
   assert.match(app, /window\.PropertyDeskAccountScreenWorkflow\.create\(/);
@@ -120,7 +124,7 @@ test("app coordinator passes the amortization helper into account details", () =
   }
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create/);
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create/);
+  assert.match(app, /PropertyDeskTransactionViews\.create/);
 });
 
 test("property workspace composes screens and shares detail actions", () => {
@@ -209,7 +213,7 @@ test("app root composes shared state and workspace services directly", () => {
   assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountFinancialSummary\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Ledger|Deposit)Context\.create\(/);
-  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.doesNotMatch(

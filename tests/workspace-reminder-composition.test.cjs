@@ -27,7 +27,6 @@ test("app connects account reminder preview through the workspace shell", () => 
     "features/property-form.js",
     "features/account-form.js",
     "features/ledger-entry-forms.js",
-    "features/transaction-screen-workflow.js",
   ]) {
     assert.ok(
       html.indexOf(feature) >= 0 &&

@@ -216,11 +216,7 @@
     transactionPayloads: window.PropertyDeskTransactionPayloads,
     saveCorrection: transactionMaintenance.saveCorrection,
   });
-  const {
-    renderPayments,
-    attachTransactionFilterEvents,
-    attachTransactionActionEvents,
-  } = window.PropertyDeskTransactionScreenWorkflow.create({
+  const transactionViews = window.PropertyDeskTransactionViews.create({
     $,
     state,
     dateOnly,
@@ -232,11 +228,14 @@
     monthStart,
     sumIncome,
     sumOperatingExpenses,
-    transactionMaintenance,
-    openPayment: ledgerEntryForms.openPayment,
-    openExpense: ledgerEntryForms.openExpense,
-    updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
   });
+  const { attachTransactionActionEvents } =
+    transactionMaintenance.createTransactionActionHandlers({
+      openPayment: ledgerEntryForms.openPayment,
+      openExpense: ledgerEntryForms.openExpense,
+      updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
+    });
+  const { renderPayments, attachTransactionFilterEvents } = transactionViews;
   const {
     openPayment,
     openPropertyPayment,
