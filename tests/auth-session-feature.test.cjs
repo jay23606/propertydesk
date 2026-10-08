@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
+  authFeatureModules,
   createAuthClient,
   loadAuthFeatures,
 } = require("./feature-test-helpers.cjs");
@@ -47,6 +48,7 @@ test("auth feature delegates session restoration and state changes to its sessio
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {
       calls.push("fetch-workspace");
@@ -148,6 +150,7 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {},
     toast() {},
@@ -226,6 +229,7 @@ test("auth feature restores login controls when the auth request rejects", async
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {},
     toast() {},
@@ -346,6 +350,7 @@ test("auth session restore and sign-out report rejected requests without clearin
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
+    modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => assert.fail("session failure must not load records"),
     toast: (message) => messages.push(message),

@@ -11,12 +11,15 @@
     paymentNotifications = { start() {}, stop() {} },
     windowRef = window,
     documentRef = document,
+    modules,
   }) {
-    const { showAuth, showApp, showConfigError } =
-      window.PropertyDeskAuthScreens.create({ $, documentRef });
+    const { showAuth, showApp, showConfigError } = modules.screens.create({
+      $,
+      documentRef,
+    });
 
     const { setAuthMode, attachEvents: attachAuthFormEvents } =
-      window.PropertyDeskAuthForm.create({
+      modules.form.create({
         $,
         state,
         authClient,
@@ -28,7 +31,7 @@
       showPasswordReset,
       isPasswordRecoverySession,
       attachEvents: attachRecoveryEvents,
-    } = window.PropertyDeskAuthRecovery.create({
+    } = modules.recovery.create({
       $,
       state,
       authClient,
@@ -51,7 +54,7 @@
     }
 
     const { handleAuthStateChange, restoreAuthSession, signOut } =
-      window.PropertyDeskAuthSession.create({
+      modules.session.create({
         state,
         authClient,
         toast,
@@ -60,7 +63,7 @@
         showPasswordReset,
         isPasswordRecoverySession,
         startWorkspace,
-        resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+        resetWorkspaceState: modules.resetWorkspaceState,
         stopWorkspaceNotifications: paymentNotifications.stop,
       });
 

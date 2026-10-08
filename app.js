@@ -737,7 +737,16 @@
       attachReportExportEvents,
     ],
     workflows: {
-      auth: window.PropertyDeskAuth,
+      auth: {
+        create: window.PropertyDeskAuth.create,
+        modules: {
+          screens: window.PropertyDeskAuthScreens,
+          form: window.PropertyDeskAuthForm,
+          recovery: window.PropertyDeskAuthRecovery,
+          session: window.PropertyDeskAuthSession,
+          resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+        },
+      },
       lifecycle: window.PropertyDeskAppLifecycle,
     },
   });

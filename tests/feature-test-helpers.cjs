@@ -56,6 +56,17 @@ function loadAuthFeatures(context) {
   }
 }
 
+function authFeatureModules(context) {
+  const { window } = context;
+  return {
+    screens: window.PropertyDeskAuthScreens,
+    form: window.PropertyDeskAuthForm,
+    recovery: window.PropertyDeskAuthRecovery,
+    session: window.PropertyDeskAuthSession,
+    resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+  };
+}
+
 function createAuthClient(context, state) {
   return context.window.PropertyDeskAuthClient.create({
     getClient: () => state.client,
@@ -317,6 +328,7 @@ function formElements(values = {}) {
 module.exports = {
   loadRepositoryWriteFeedback,
   loadAuthFeatures,
+  authFeatureModules,
   createAuthClient,
   loadWorkspaceFeatures,
   loadLedgerEntryForms,

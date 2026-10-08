@@ -8,6 +8,7 @@ test("app startup composes auth and lifecycle at the original event position", (
   const context = vm.createContext({ window: {} });
   const startupWorkflows = {
     auth: {
+      modules: { screens: "auth-screens" },
       create(authContext) {
         assert.equal(authContext.state.name, "shared-state");
         assert.equal(authContext.$, selector);
@@ -15,10 +16,12 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.equal(authContext.fetchAll, fetchAll);
         assert.equal(authContext.toast, toast);
         assert.equal(authContext.paymentNotifications, paymentNotifications);
+        assert.deepEqual(authContext.modules, { screens: "auth-screens" });
         assert.deepEqual(Object.keys(authContext).sort(), [
           "$",
           "authClient",
           "fetchAll",
+          "modules",
           "paymentNotifications",
           "state",
           "toast",
@@ -106,12 +109,17 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
   assert.match(app, /PropertyDeskAppStartupWorkflow\.create\(/);
   assert.match(
     app,
-    /workflows: \{\s*auth: window\.PropertyDeskAuth,\s*lifecycle: window\.PropertyDeskAppLifecycle,/,
+    /workflows: \{\s*auth: \{\s*create: window\.PropertyDeskAuth\.create,\s*modules: \{[\s\S]*?resetWorkspaceState:\s*window\.PropertyDeskAppState\.resetWorkspaceState,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAuth\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAppLifecycle\.create\(/);
   assert.doesNotMatch(
     fs.readFileSync(path.join(root, workflow), "utf8"),
     /window\.PropertyDesk(?:Auth|AppLifecycle)\.create\(/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(root, "features", "auth.js"), "utf8"),
+    /window\.PropertyDesk(?!Auth)/,
+    "auth child workflows are explicit dependencies",
   );
 });
