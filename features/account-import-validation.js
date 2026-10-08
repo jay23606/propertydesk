@@ -73,15 +73,15 @@
     };
   }
 
-  function normalizeAccountRow(row, context) {
-    const { type, key } = validateIdentity(row, context.identity);
+  function normalizeAccountRow(row, { identity, today }) {
+    const { type, key } = validateIdentity(row, identity);
     const financial = financialFields(row, type);
-    const schedule = scheduleFields(row, context.today);
+    const schedule = scheduleFields(row, today);
     const lateFee = csvMoney(row.late_fee, `${row.account_name} late fee`, {
       optional: true,
     });
     const contact = accountContactFields(row);
-    context.identity.seenAccounts.add(key);
+    identity.seenAccounts.add(key);
     return normalizedAccountRow(row, {
       type,
       financial,
