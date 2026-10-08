@@ -79,6 +79,7 @@
     failureMessage,
     refreshFailureMessage,
     retryMessage,
+    onReconciled,
   }) {
     const initialRecords = state?.[collection];
     const previousCount =
@@ -109,7 +110,8 @@
               refreshFailureMessage,
             });
             if (!refreshed) return false;
-            if (!recordWasSaved) toast(retryMessage);
+            if (recordWasSaved) onReconciled?.();
+            else toast(retryMessage);
             return recordWasSaved;
           }
         : undefined;
