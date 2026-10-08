@@ -10,6 +10,7 @@ function loadCommitFeature() {
     "workspace-write-reconciliation.js",
     "repository-write-feedback.js",
     "import-repository.js",
+    "import-batch-reconciliation.js",
     "import-commit.js",
   ]) {
     vm.runInContext(
@@ -200,6 +201,57 @@ test("an import with a lost response reconciles from the new committed batch", a
   assert.match(status.textContent, /Imported 2 accounts; 0 rows were skipped/);
   assert.deepEqual(refreshes, ["workspace", "success"]);
   assert.deepEqual(messages, ["Import complete"]);
+});
+
+test("an import with a lost response ignores older batches with the same source", async () => {
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    importBatches: [
+      {
+        id: "older-batch",
+        user_id: "workspace-1",
+        source_type: "csv",
+        source_name: "accounts.csv",
+        status: "committed",
+        rows_total: 2,
+        rows_accepted: 0,
+      },
+    ],
+    accounts: [{ import_batch_id: "older-batch" }],
+  };
+  const status = { textContent: "", classList: { add() {} } };
+  const { commit: feature } = loadCommitFeature();
+  const commit = feature.create({
+    state,
+    repository: {
+      commitAccounts: async () => {
+        throw new Error("connection lost");
+      },
+      commitTransactions: async () => assert.fail("wrong import method"),
+    },
+    fetchAll: async () => {
+      state.importBatches.push({
+        id: "new-batch",
+        user_id: "workspace-1",
+        source_type: "csv",
+        source_name: "accounts.csv",
+        status: "committed",
+        rows_total: 2,
+        rows_accepted: 1,
+      });
+      state.accounts.push({ import_batch_id: "new-batch" });
+    },
+    status,
+    toast() {},
+  });
+
+  await commit.commitAccounts({
+    rows: [{ account_name: "Buyer" }, { account_name: "Tenant" }],
+    sourceName: "accounts.csv",
+    total: 2,
+  });
+
+  assert.match(status.textContent, /Imported 1 account; 1 row was skipped/);
 });
 
 test("an unconfirmed import stays unresolved when refreshed history has no batch", async () => {

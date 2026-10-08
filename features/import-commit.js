@@ -3,6 +3,13 @@
   "use strict";
 
   function createImportCommit({ state, fetchAll, status, toast, repository }) {
+    const batchReconciliation =
+      window.PropertyDeskImportBatchReconciliation.create({
+        state,
+        fetchAll,
+        toast,
+      });
+
     function importRefreshError(error) {
       const refreshError = new Error(
         error?.message ||
@@ -37,29 +44,6 @@
       );
     }
 
-    function committedBatchMatches(batch, sourceName, total, collection) {
-      const normalizedName =
-        String(sourceName || "")
-          .trim()
-          .slice(0, 255) || "CSV import";
-      return (
-        batch.user_id === state.workspaceOwnerId &&
-        batch.source_type === "csv" &&
-        batch.source_name === normalizedName &&
-        batch.status === "committed" &&
-        Number(batch.rows_total) === Number(total) &&
-        (state[collection] || []).some(
-          (row) => row.import_batch_id === batch.id,
-        )
-      );
-    }
-
-    function committedBatchCount(sourceName, total, collection) {
-      return (state?.importBatches || []).filter((batch) =>
-        committedBatchMatches(batch, sourceName, total, collection),
-      ).length;
-    }
-
     async function commitWithReconciliation({
       operation,
       sourceName,
@@ -69,43 +53,22 @@
       toastMessage,
       collection,
     }) {
-      const previousCount = Array.isArray(state?.importBatches)
-        ? committedBatchCount(sourceName, total, collection)
-        : null;
+      const baselineBatchIds = batchReconciliation.captureBaselineBatchIds(
+        sourceName,
+        total,
+        collection,
+      );
       let data;
       try {
         data = await operation();
       } catch (error) {
-        if (previousCount === null || !fetchAll || error?.code) throw error;
-        let committedBatch;
-        const refreshed =
-          await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-            fetchAll,
-            afterRefresh: () => {
-              if (
-                committedBatchCount(sourceName, total, collection) <=
-                previousCount
-              )
-                return;
-              committedBatch = state.importBatches.find((batch) =>
-                committedBatchMatches(batch, sourceName, total, collection),
-              );
-            },
-            toast,
-            refreshFailureMessage:
-              "Import result couldn't be confirmed, and import history could not refresh. Reload before retrying.",
-          });
-        if (!refreshed) {
-          throw new Error(
-            "Import result couldn't be confirmed. Import history could not refresh.",
-          );
-        }
-        if (!committedBatch) {
-          throw new Error(
-            "Import history was refreshed, but no matching completed batch appeared. Check Reports before trying again.",
-          );
-        }
-        data = committedBatch;
+        data = await batchReconciliation.recoverCommit({
+          error,
+          baselineBatchIds,
+          sourceName,
+          total,
+          collection,
+        });
         await finish({
           data,
           fallbackCount: rows.length,
