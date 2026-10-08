@@ -7,20 +7,21 @@ test("app wires account forms and transaction entry through separate workflows",
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 
-  assert.match(app, /PropertyDeskPropertyAccountEntryWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
+  assert.match(app, /PropertyDeskAccountForm\.create\(/);
   assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountEntry\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountEntry\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
+    /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyForm\.resetPropertyForm,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
   );
   assert.match(
     app,
-    /editAccount: propertyAccountEntry\.editAccount,[\s\S]*?openAccountForProperty: propertyAccountEntry\.openAccountForProperty/,
+    /editAccount: accountForm\.editAccount,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty/,
   );
   assert.match(
     app,
-    /propertyAccountEntry\.attachPropertyFormEvents,[\s\S]*?propertyAccountEntry\.attachAccountFormEvents,[\s\S]*?attachLedgerEntryFormEvents/,
+    /propertyForm\.attachEvents,[\s\S]*?accountForm\.attachEvents,[\s\S]*?attachLedgerEntryFormEvents/,
   );
 
   assert.match(

@@ -35,7 +35,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /attachCreateActionEvents/);
   assert.match(
     app,
-    /openAccountForProperty: propertyAccountEntry\.openAccountForProperty/,
+    /openAccountForProperty: accountForm\.openAccountForProperty/,
   );
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /entryWorkflow\./);
@@ -44,42 +44,24 @@ test("account records and ledger entries use separate workspace workflows", () =
     /attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
-  const propertyAccountEntry = fs.readFileSync(
-    path.join(
-      __dirname,
-      "..",
-      "features",
-      "property-account-entry-workflow.js",
-    ),
-    "utf8",
-  );
   const ledgerEntryForms = fs.readFileSync(
     path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
     "utf8",
   );
-  assert.match(propertyAccountEntry, /PropertyDeskPropertyForm\.create\(/);
-  assert.match(propertyAccountEntry, /PropertyDeskAccountForm\.create\(/);
+  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
+  assert.match(app, /PropertyDeskAccountForm\.create\(/);
   assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
-  assert.match(propertyAccountEntry, /repository: context\.accountRepository/);
-  assert.match(propertyAccountEntry, /repository: context\.propertyRepository/);
+  assert.match(app, /repository: repositories\.accounts/);
+  assert.match(app, /repository: repositories\.properties/);
   assert.match(
-    propertyAccountEntry,
-    /buildAccountPayload: context\.accountPayload/,
+    app,
+    /buildAccountPayload: window\.PropertyDeskAccountPayload\.build/,
   );
-  assert.match(propertyAccountEntry, /formModel: context\.accountFormModel/);
+  assert.match(app, /formModel: window\.PropertyDeskAccountFormModel/);
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
     app,
     /transactionPayloads: window\.PropertyDeskTransactionPayloads/,
-  );
-  assert.match(
-    app,
-    /propertyRepository: repositories\.properties,[\s\S]*?accountRepository: repositories\.accounts,/,
-  );
-  assert.match(app, /accountRepository: repositories\.accounts/);
-  assert.match(
-    app,
-    /accountPayload: window\.PropertyDeskAccountPayload\.build,[\s\S]*?accountFormModel: window\.PropertyDeskAccountFormModel,/,
   );
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);

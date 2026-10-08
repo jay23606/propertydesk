@@ -16,7 +16,7 @@ test("app connects account reminder preview through the workspace shell", () => 
   assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskPropertyAccountEntryWorkflow\.create\(\{[\s\S]*?previewReminderEmail,/,
+    /PropertyDeskAccountForm\.create\(\{[\s\S]*?previewReminderEmail,/,
   );
   for (const feature of [
     "features/reminder-activity-model.js",
@@ -24,7 +24,8 @@ test("app connects account reminder preview through the workspace shell", () => 
     "features/reminder-preview.js",
     "features/reminder-preview-model.js",
     "features/workspace-shell-workflow.js",
-    "features/property-account-entry-workflow.js",
+    "features/property-form.js",
+    "features/account-form.js",
     "features/ledger-entry-forms.js",
     "features/transaction-screen-workflow.js",
   ]) {
