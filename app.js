@@ -262,6 +262,10 @@
         entryForms: window.PropertyDeskLedgerEntryForms,
         views: window.PropertyDeskTransactionViews,
       },
+      workflows: {
+        maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,
+        records: window.PropertyDeskTransactionRecordsWorkflow,
+      },
       entries: {
         $,
         state,

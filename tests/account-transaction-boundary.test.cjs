@@ -46,6 +46,6 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     transactionWorkspace,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows: maintenanceWorkflows,[\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+    /workflows\.maintenance\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows: maintenanceWorkflows,[\s\S]*?workflows\.records\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
 });

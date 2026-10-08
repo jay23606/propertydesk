@@ -8,15 +8,15 @@
     views,
     maintenanceWorkflows,
     recordWorkflows,
+    workflows,
   }) {
-    const transactionMaintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create({
-        correction: maintenance.correction,
-        voiding: maintenance.voiding,
-        events: maintenance.events,
-        workflows: maintenanceWorkflows,
-      });
-    return window.PropertyDeskTransactionRecordsWorkflow.create({
+    const transactionMaintenance = workflows.maintenance.create({
+      correction: maintenance.correction,
+      voiding: maintenance.voiding,
+      events: maintenance.events,
+      workflows: maintenanceWorkflows,
+    });
+    return workflows.records.create({
       maintenance: transactionMaintenance,
       entries,
       views,
