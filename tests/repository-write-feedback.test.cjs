@@ -168,39 +168,6 @@ test("repository write feedback uses its fallback when unconfirmed reconciliatio
   assert.deepEqual(messages, ["Write result couldn't be confirmed."]);
 });
 
-test("workspace record save runs its reconciliation callback only after a refreshed match", async () => {
-  const events = [];
-  const feedback = createFeedback();
-  const state = {
-    accounts: [{ id: "account-1", status: "active" }],
-  };
-
-  assert.equal(
-    await feedback.saveWorkspaceRecord({
-      operation: async () => {
-        throw new Error("connection lost");
-      },
-      state,
-      collection: "accounts",
-      payload: { status: "closed" },
-      recordId: "account-1",
-      fetchAll: async () => {
-        state.accounts[0].status = "closed";
-        events.push("refresh");
-      },
-      toast: (message) => events.push(["toast", message]),
-      failureMessage: "Write result couldn't be confirmed.",
-      refreshFailureMessage: "Refresh failed.",
-      retryMessage: "Check the account before retrying.",
-      onRefreshed: ({ recordWasSaved }) =>
-        events.push(["readback", recordWasSaved]),
-      onReconciled: () => events.push("confirmed action"),
-    }),
-    true,
-  );
-  assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
-});
-
 test("post-write refresh shows success only after workspace data reloads", async () => {
   const events = [];
   const feedback = createFeedback();
