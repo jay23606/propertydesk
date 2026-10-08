@@ -7,29 +7,6 @@
   function render() {
     appLifecycle.render();
   }
-  const {
-    isPosted,
-    paymentStatusInMonth,
-    postedOnOrAfter,
-    sumIncome,
-    sumOperatingExpenses,
-    sumPosted,
-  } = window.PropertyDeskPostedLedgerUtils;
-  const schedule = window.PropertyDeskScheduleUtils.create({
-    isDueReducingPayment:
-      window.PropertyDeskPostedLedgerUtils.isDueReducingPayment,
-    isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
-  });
-  const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create({
-    sumPosted,
-  });
-  const depositCalculations = window.PropertyDeskDepositLedgerUtils.create({
-    isPosted,
-  });
-  const { amountDueSince, monthlyScheduledEstimate, unpaidDueAccrualStart } =
-    schedule;
-  const { amortizationSchedule, scheduledLoanBalance } = loanSchedule;
-  const { securityDepositBalance } = depositCalculations;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -71,28 +48,28 @@
     toast,
     render,
   });
-  const financialContext =
-    window.PropertyDeskWorkspaceAccountFinancialContext.create({
-      state,
-      ledger: {
-        todayIso,
-        scheduledLoanBalance,
-        monthlyScheduledEstimate,
-        postedOnOrAfter,
-        sumPosted,
-      },
-      amountDueSince,
-      unpaidDueAccrualStart,
-    });
-  const { depositLedger } = window.PropertyDeskDepositContext.create({
+  const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
-    securityDepositBalance,
+    todayIso,
+    postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
+    isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
   });
   const {
+    isPosted,
+    paymentStatusInMonth,
+    postedOnOrAfter,
+    sumIncome,
+    sumOperatingExpenses,
+    sumPosted,
+    amountDueSince,
+    monthlyScheduledEstimate,
+    unpaidDueAccrualStart,
+    amortizationSchedule,
     accountBalance,
     scheduledMonthlyRunRate,
     collectedSince,
     summarizeAccount,
+    depositLedger,
   } = financialContext;
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =
