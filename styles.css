@@ -489,97 +489,6 @@ button {
   color: #99a39b;
   font-size: 12px;
 }
-.property-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  padding: 0 20px 20px;
-}
-.property-card {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: 0.15s;
-  cursor: pointer;
-}
-.property-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-.property-art {
-  height: 106px;
-  background: linear-gradient(130deg, #e9eee7, #dbe6dc);
-  position: relative;
-  overflow: hidden;
-}
-.property-art:before,
-.property-art:after {
-  content: "";
-  position: absolute;
-  bottom: -26px;
-  width: 180px;
-  height: 100px;
-  border-radius: 50%;
-  background: #d4e1d5;
-}
-.property-art:before {
-  left: -30px;
-}
-.property-art:after {
-  right: -55px;
-  bottom: -40px;
-  background: #c8d9cc;
-}
-.property-building {
-  position: absolute;
-  z-index: 1;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 103px;
-  height: 63px;
-  background: #f9faf7;
-  border: 2px solid #d1dcd1;
-  border-bottom: 0;
-  clip-path: polygon(50% 0, 100% 34%, 100% 100%, 0 100%, 0 34%);
-}
-.property-building:after {
-  content: "";
-  position: absolute;
-  left: 43px;
-  bottom: 0;
-  width: 19px;
-  height: 30px;
-  background: #b5c8b9;
-}
-.property-type {
-  position: absolute;
-  z-index: 2;
-  right: 11px;
-  top: 11px;
-  padding: 5px 8px;
-  background: #ffffffd9;
-  border-radius: 5px;
-  color: #5f7164;
-  font-size: 9px;
-  font-weight: 700;
-}
-.property-info {
-  padding: 13px 14px 14px;
-}
-.property-info h3 {
-  font-size: 13px;
-  margin: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.property-address {
-  font-size: 11px;
-  color: #98a19a;
-  margin-top: 5px;
-}
 .toolbar {
   display: flex;
   align-items: center;
@@ -1056,10 +965,6 @@ button {
   .overview-grid {
     grid-template-columns: 1fr;
   }
-  .property-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0 13px 14px;
-  }
   .toolbar {
     flex-wrap: wrap;
   }
@@ -1102,9 +1007,6 @@ button {
   }
   .nav-link:not(.active) .nav-icon {
     font-size: 17px;
-  }
-  .property-grid {
-    grid-template-columns: 1fr;
   }
   .page-heading {
     gap: 9px;
