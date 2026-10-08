@@ -75,7 +75,8 @@ test("record loading failures show feedback, rethrow, and skip rendering", async
   const failure = new Error("Records unavailable");
   const calls = [];
   const state = {
-    client: { rpc: async () => ({ data: "workspace-1", error: null }) },
+    workspaceOwnerId: "previous-workspace",
+    properties: [{ id: "previous-property" }],
   };
   const refresh = createRefresh({
     state,
@@ -93,7 +94,8 @@ test("record loading failures show feedback, rethrow, and skip rendering", async
     () => refresh.fetchAll(),
     (error) => error === failure,
   );
-  assert.equal(state.workspaceOwnerId, "workspace-1");
+  assert.equal(state.workspaceOwnerId, "previous-workspace");
+  assert.equal(state.properties[0].id, "previous-property");
   assert.deepEqual(calls, [["toast", "Records unavailable"]]);
 });
 

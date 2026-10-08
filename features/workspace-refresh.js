@@ -15,12 +15,10 @@
     }
 
     async function hydrateWorkspace(workspaceId) {
-      state.workspaceOwnerId = workspaceId;
       try {
-        Object.assign(
-          state,
-          await workspaceData.loadWorkspaceRecords(workspaceId),
-        );
+        const records = await workspaceData.loadWorkspaceRecords(workspaceId);
+        Object.assign(state, records);
+        state.workspaceOwnerId = workspaceId;
       } catch (error) {
         toast(error?.message || "Could not load this workspace");
         throw error;
