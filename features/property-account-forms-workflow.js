@@ -3,8 +3,29 @@
   "use strict";
 
   function createPropertyAccountFormsWorkflow({ property, account }) {
-    const propertyForm = window.PropertyDeskPropertyForm.create(property);
-    const accountForm = window.PropertyDeskAccountForm.create(account);
+    const propertyForm = window.PropertyDeskPropertyForm.create({
+      $: property.$,
+      state: property.state,
+      toast: property.toast,
+      closeModal: property.closeModal,
+      fetchAll: property.fetchAll,
+      repository: property.repository,
+    });
+    const accountForm = window.PropertyDeskAccountForm.create({
+      $: account.$,
+      state: account.state,
+      moneyInput: account.moneyInput,
+      toast: account.toast,
+      closeModal: account.closeModal,
+      fetchAll: account.fetchAll,
+      todayIso: account.todayIso,
+      populateFormOptions: account.populateFormOptions,
+      openModal: account.openModal,
+      buildAccountPayload: account.buildAccountPayload,
+      formModel: account.formModel,
+      previewReminderEmail: account.previewReminderEmail,
+      repository: account.repository,
+    });
 
     return Object.freeze({
       resetPropertyForm: propertyForm.resetPropertyForm,

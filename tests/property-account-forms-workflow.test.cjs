@@ -40,15 +40,65 @@ test("property and account forms keep separate dependencies and expose explicit 
     context,
   );
 
-  const property = { repository: { kind: "properties" } };
-  const account = { repository: { kind: "accounts" } };
+  const property = {
+    $: () => {},
+    state: {},
+    toast: () => {},
+    closeModal: () => {},
+    fetchAll: () => {},
+    repository: { kind: "properties" },
+    unusedDependency: true,
+  };
+  const account = {
+    $: () => {},
+    state: {},
+    moneyInput: () => {},
+    toast: () => {},
+    closeModal: () => {},
+    fetchAll: () => {},
+    todayIso: () => {},
+    populateFormOptions: () => {},
+    openModal: () => {},
+    buildAccountPayload: () => {},
+    formModel: {},
+    previewReminderEmail: () => {},
+    repository: { kind: "accounts" },
+    unusedDependency: true,
+  };
   const forms = context.window.PropertyDeskPropertyAccountFormsWorkflow.create({
     property,
     account,
   });
 
-  assert.equal(passed.property, property);
-  assert.equal(passed.account, account);
+  assert.deepEqual(Object.keys(passed.property).sort(), [
+    "$",
+    "closeModal",
+    "fetchAll",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  assert.deepEqual(Object.keys(passed.account).sort(), [
+    "$",
+    "buildAccountPayload",
+    "closeModal",
+    "fetchAll",
+    "formModel",
+    "moneyInput",
+    "openModal",
+    "populateFormOptions",
+    "previewReminderEmail",
+    "repository",
+    "state",
+    "toast",
+    "todayIso",
+  ]);
+  for (const key of Object.keys(passed.property))
+    assert.equal(passed.property[key], property[key]);
+  for (const key of Object.keys(passed.account))
+    assert.equal(passed.account[key], account[key]);
+  assert.equal("unusedDependency" in passed.property, false);
+  assert.equal("unusedDependency" in passed.account, false);
   assert.deepEqual(Object.keys(forms).sort(), [
     "attachAccountFormEvents",
     "attachPropertyFormEvents",
