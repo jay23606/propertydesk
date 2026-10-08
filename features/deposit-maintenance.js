@@ -31,9 +31,12 @@
         movementDate: reason.trim() ? todayIso() : null,
       });
       if (!adjustmentIsReady(prepared, toast)) return false;
-      let reconciled = false;
-      const saved =
-        await window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
+      const message =
+        type === "retained"
+          ? "Deposit retention recorded"
+          : "Deposit retention reversed";
+      return window.PropertyDeskRepositoryWriteFeedback.saveAndRefreshWorkspaceRecord(
+        {
           operation: () => repository.insert(prepared.payload),
           state,
           collection: "depositEntries",
@@ -49,26 +52,13 @@
           retryMessage:
             "Deposit ledger was refreshed. Check it before recording the adjustment again.",
           onReconciled: () => {
-            reconciled = true;
-            toast(
-              type === "retained"
-                ? "Deposit retention recorded"
-                : "Deposit retention reversed",
-            );
+            toast(message);
           },
-        });
-      if (!saved) return false;
-      if (reconciled) return true;
-      return window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        toast,
-        successMessage:
-          type === "retained"
-            ? "Deposit retention recorded"
-            : "Deposit retention reversed",
-        refreshFailureMessage:
-          "Deposit adjustment was saved, but the workspace could not refresh. Reload before recording another adjustment.",
-      });
+          successMessage: message,
+          savedRefreshFailureMessage:
+            "Deposit adjustment was saved, but the workspace could not refresh. Reload before recording another adjustment.",
+        },
+      );
     }
 
     return Object.freeze({ saveDepositAdjustment });

@@ -155,10 +155,40 @@
     });
   }
 
+  async function saveAndRefreshWorkspaceRecord({
+    onSaved,
+    afterRefresh,
+    successMessage,
+    savedRefreshFailureMessage,
+    ...saveOptions
+  }) {
+    let reconciled = false;
+    const onReconciled = saveOptions.onReconciled;
+    const saved = await saveWorkspaceRecord({
+      ...saveOptions,
+      onReconciled: (...args) => {
+        reconciled = true;
+        onReconciled?.(...args);
+      },
+    });
+    if (!saved || reconciled) return saved;
+
+    onSaved?.();
+    return refreshWorkspace({
+      fetchAll: saveOptions.fetchAll,
+      afterRefresh,
+      toast: saveOptions.toast,
+      successMessage,
+      refreshFailureMessage:
+        savedRefreshFailureMessage || saveOptions.refreshFailureMessage,
+    });
+  }
+
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
     reconcileWorkspaceChange,
     saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
   });
 })();
