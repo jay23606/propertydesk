@@ -166,6 +166,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     "state",
     "sumPosted",
     "summarizeAccount",
+    "workflows",
   ]);
   assert.equal("unusedContentValue" in passed.accountDetails.content, false);
   for (const key of Object.keys(content)) {
@@ -227,7 +228,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     ),
     "utf8",
   );
-  assert.match(accountDetailWorkflow, /AccountHistoryModel\.create\(/);
+  assert.match(
+    accountDetailWorkflow,
+    /workflows\.accountHistoryModel\.create\(/,
+  );
   assert.match(
     accountDetailWorkflow,
     /depositSectionHTML,\s*renderAccountHistory,/,
@@ -244,7 +248,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountWorkspaceWorkflow,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?workflows: content\.workflows,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
   );
   const accountDepositWorkspaceWorkflow = fs.readFileSync(
     path.join(

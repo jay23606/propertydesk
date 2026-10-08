@@ -24,6 +24,7 @@
         propertyAddress: content.propertyAddress,
         depositSectionHTML: content.depositSectionHTML,
         accountHistoryRepository: content.accountHistoryRepository,
+        workflows: content.workflows,
       });
     const { attachAccountDetailActionEvents } = actionWorkflow.create({
       $: actions.$,

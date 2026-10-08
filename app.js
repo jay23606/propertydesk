@@ -326,6 +326,14 @@
         openModal,
         propertyAddress,
         accountHistoryRepository: repositories.accountHistory,
+        workflows: {
+          accountHistoryModel: window.PropertyDeskAccountHistoryModel,
+          accountHistoryView: window.PropertyDeskAccountHistoryView,
+          accountLoanScheduleView: window.PropertyDeskAccountLoanScheduleView,
+          accountDetailsView: window.PropertyDeskAccountDetailsView,
+          accountDetailsModel: window.PropertyDeskAccountDetailsModel,
+          accountDetails: window.PropertyDeskAccountDetails,
+        },
       },
       actions: {
         $,

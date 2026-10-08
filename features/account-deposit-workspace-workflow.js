@@ -49,6 +49,7 @@
         propertyAddress: accountDetails.content.propertyAddress,
         accountHistoryRepository:
           accountDetails.content.accountHistoryRepository,
+        workflows: accountDetails.content.workflows,
         depositSectionHTML: depositWorkspace.depositSectionHTML,
       },
       actions: {

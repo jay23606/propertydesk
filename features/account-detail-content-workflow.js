@@ -17,42 +17,38 @@
     propertyAddress,
     depositSectionHTML,
     accountHistoryRepository,
+    workflows,
   }) {
-    const { loadAccountHistory } =
-      window.PropertyDeskAccountHistoryModel.create({
-        state,
-        repository: accountHistoryRepository,
-      });
-    const { accountHistoryHTML } = window.PropertyDeskAccountHistoryView.create(
-      {
-        esc,
-        money,
-        fmtDate,
-      },
-    );
+    const { loadAccountHistory } = workflows.accountHistoryModel.create({
+      state,
+      repository: accountHistoryRepository,
+    });
+    const { accountHistoryHTML } = workflows.accountHistoryView.create({
+      esc,
+      money,
+      fmtDate,
+    });
     async function renderAccountHistory(account, payments) {
       return accountHistoryHTML(await loadAccountHistory(account, payments));
     }
     const { accountLoanScheduleHTML } =
-      window.PropertyDeskAccountLoanScheduleView.create({ money, fmtDate });
-    const { renderAccountDetails } =
-      window.PropertyDeskAccountDetailsView.create({
-        money,
-        fmtDate,
-        esc,
-        prettyType,
-        paymentFrequencyLabel,
-        accountLoanScheduleHTML,
-      });
-    const { buildAccountDetailData } =
-      window.PropertyDeskAccountDetailsModel.create({
-        state,
-        sumPosted,
-        summarizeAccount,
-        amortizationSchedule,
-        propertyAddress,
-      });
-    const { openAccountDetails } = window.PropertyDeskAccountDetails.create({
+      workflows.accountLoanScheduleView.create({ money, fmtDate });
+    const { renderAccountDetails } = workflows.accountDetailsView.create({
+      money,
+      fmtDate,
+      esc,
+      prettyType,
+      paymentFrequencyLabel,
+      accountLoanScheduleHTML,
+    });
+    const { buildAccountDetailData } = workflows.accountDetailsModel.create({
+      state,
+      sumPosted,
+      summarizeAccount,
+      amortizationSchedule,
+      propertyAddress,
+    });
+    const { openAccountDetails } = workflows.accountDetails.create({
       $,
       state,
       buildAccountDetailData,

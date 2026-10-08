@@ -28,6 +28,7 @@ test("account detail workspace joins content rendering and action binding", () =
     propertyAddress() {},
     depositSectionHTML() {},
     accountHistoryRepository: {},
+    workflows: {},
     unusedDependency: true,
   };
   const actions = {
@@ -93,6 +94,7 @@ test("account detail workspace joins content rendering and action binding", () =
     "state",
     "sumPosted",
     "summarizeAccount",
+    "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.actions).sort(), [
     "$",

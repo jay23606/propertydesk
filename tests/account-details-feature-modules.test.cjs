@@ -452,6 +452,14 @@ test("account detail content workflow composes schedule, history, and account", 
   const accountHistory = { auditError: false };
   const depositSectionHTML = () => "deposit";
   const openAccountDetails = () => "opened";
+  const workflows = {
+    accountLoanScheduleView: null,
+    accountDetailsView: null,
+    accountDetailsModel: null,
+    accountDetails: null,
+    accountHistoryModel: null,
+    accountHistoryView: null,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskAccountLoanScheduleView: {
@@ -492,6 +500,15 @@ test("account detail content workflow composes schedule, history, and account", 
       },
     },
   });
+  for (const [key, name] of [
+    ["accountLoanScheduleView", "PropertyDeskAccountLoanScheduleView"],
+    ["accountDetailsView", "PropertyDeskAccountDetailsView"],
+    ["accountDetailsModel", "PropertyDeskAccountDetailsModel"],
+    ["accountDetails", "PropertyDeskAccountDetails"],
+    ["accountHistoryModel", "PropertyDeskAccountHistoryModel"],
+    ["accountHistoryView", "PropertyDeskAccountHistoryView"],
+  ])
+    workflows[key] = context.window[name];
   vm.runInContext(
     fs.readFileSync(
       path.join(
@@ -519,6 +536,7 @@ test("account detail content workflow composes schedule, history, and account", 
     propertyAddress() {},
     depositSectionHTML,
     accountHistoryRepository: { loadAccountAuditEvents() {} },
+    workflows,
   };
   const workflow =
     context.window.PropertyDeskAccountDetailContentWorkflow.create(
