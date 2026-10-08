@@ -16,8 +16,11 @@
       try {
         ({ error } = await repository.upload(path, file, contentType));
       } catch (requestError) {
+        const cleaned = await removeUploadedFile(path);
         toast(
-          `Agreement upload failed: ${requestError.message || "Check your connection and try again."}`,
+          cleaned
+            ? `Agreement upload result couldn't be confirmed. Any uploaded private file was removed. ${requestError.message || "You can retry the upload."}`
+            : `Agreement upload result couldn't be confirmed, and private file cleanup couldn't be verified. Check storage before retrying. ${requestError.message || ""}`,
         );
         return false;
       }

@@ -347,6 +347,53 @@ test("document upload reports a saved file when the workspace refresh fails", as
   ]);
 });
 
+test("document upload removes a possible orphan when the storage response is lost", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const calls = [];
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from: () => ({
+          upload: async () => {
+            calls.push(["upload"]);
+            throw new Error("connection lost");
+          },
+          remove: async (paths) => {
+            calls.push(["remove", paths]);
+            return { error: null };
+          },
+        }),
+      },
+      from: () => assert.fail("uncertain upload must not write metadata"),
+    },
+  };
+  const messages = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => assert.fail("uncertain upload must not refresh"),
+    openPropertyDetails: () => assert.fail("uncertain upload must not reopen"),
+    makeId: () => "file-id",
+  });
+  const input = {
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  };
+
+  await feature.uploadPropertyDocument(input);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ["upload"],
+    ["remove", ["workspace-1/property-1/file-id-Agreement.pdf"]],
+  ]);
+  assert.equal(input.value, "");
+  assert.match(messages[0], /Any uploaded private file was removed/);
+});
+
 test("document deletion reports a deleted file when the workspace refresh fails", async () => {
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);
@@ -455,7 +502,7 @@ test("private document workflows handle rejected storage requests without leakin
   assert.equal(input.value, "");
   assert.equal(viewer.closed, true);
   assert.deepEqual(messages, [
-    "Agreement upload failed: upload offline",
+    "Agreement upload result couldn't be confirmed, and private file cleanup couldn't be verified. Check storage before retrying. upload offline",
     "Agreement removal failed: storage offline",
     "Agreement link failed: signing offline",
   ]);
