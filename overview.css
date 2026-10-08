@@ -1,0 +1,51 @@
+.property-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 8px;
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid #eef0ec;
+  align-items: end;
+}
+.property-summary-grid > div {
+  min-width: 0;
+}
+.property-summary-grid small,
+.property-summary-grid strong {
+  display: block;
+}
+.property-summary-grid small {
+  font-size: 9px;
+  line-height: 1.35;
+  color: #8a968d;
+  min-height: 24px;
+}
+.property-summary-grid strong {
+  font-size: 12px;
+  color: #3c4e42;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.property-quick-payment {
+  grid-column: 1/-1;
+  width: 100%;
+  padding: 9px 12px;
+}
+.property-party {
+  font-size: 11px;
+  color: #647168;
+  margin-top: 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .property-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .property-summary-grid small {
+    min-height: 0;
+  }
+}

@@ -35,6 +35,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
     )
       .map((item) => item.href)
       .find((href) => new URL(href).pathname.endsWith("/portfolio.css"));
+    const overviewStylesheet = Array.from(
+      document.querySelectorAll("link[href]"),
+    )
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/overview.css"));
     const workspaceStylesheet = Array.from(
       document.querySelectorAll("link[href]"),
     )
@@ -60,6 +65,8 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
       throw new Error("The theme stylesheet is missing from the page.");
     if (!portfolioStylesheet)
       throw new Error("The portfolio stylesheet is missing from the page.");
+    if (!overviewStylesheet)
+      throw new Error("The Overview stylesheet is missing from the page.");
     if (!workspaceStylesheet)
       throw new Error("The workspace stylesheet is missing from the page.");
     if (!propertyDetailsStylesheet)
@@ -85,6 +92,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
         label: "portfolio stylesheet",
         url: portfolioStylesheet,
         expected: ".portfolio-table table",
+      },
+      {
+        label: "Overview stylesheet",
+        url: overviewStylesheet,
+        expected: ".property-summary-grid",
       },
       {
         label: "workspace settings stylesheet",
