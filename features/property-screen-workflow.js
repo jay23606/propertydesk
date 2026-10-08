@@ -38,31 +38,40 @@
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
     });
-    const propertyHolders = window.PropertyDeskPropertyHolderWorkflow.create({
-      $: holders.$,
-      state: holders.state,
-      toast: holders.toast,
-      fetchAll: holders.fetchAll,
-      repository: holders.repository,
-      openPropertyDetails: details.openPropertyDetails,
-    });
-    const propertyDocuments =
-      window.PropertyDeskPropertyDocumentManagementWorkflow.create({
-        $: documents.$,
-        state: documents.state,
-        toast: documents.toast,
-        fetchAll: documents.fetchAll,
-        documentRepository: documents.documentRepository,
+    const { savePropertyHolders } =
+      window.PropertyDeskPropertyHolderManagement.create({
+        state: holders.state,
+        toast: holders.toast,
+        fetchAll: holders.fetchAll,
+        repository: holders.repository,
         openPropertyDetails: details.openPropertyDetails,
+      });
+    const { attachPropertyHolderEvents } =
+      window.PropertyDeskPropertyHolderEvents.create({
+        $: holders.$,
+        savePropertyHolders,
+      });
+    const propertyDocuments = window.PropertyDeskDocuments.create({
+      state: documents.state,
+      toast: documents.toast,
+      fetchAll: documents.fetchAll,
+      openPropertyDetails: details.openPropertyDetails,
+      repository: documents.documentRepository,
+    });
+    const { attachPropertyDocumentEvents } =
+      window.PropertyDeskPropertyDetailDocumentEvents.create({
+        $: documents.$,
+        uploadPropertyDocument: propertyDocuments.uploadPropertyDocument,
+        deletePropertyDocument: propertyDocuments.deletePropertyDocument,
+        openPropertyDocument: propertyDocuments.openPropertyDocument,
       });
 
     return {
       openPropertyDetails: details.openPropertyDetails,
       attachPropertyDetailEvents: actions.attachPropertyDetailEvents,
       attachPropertyQuickActionEvents: actions.attachPropertyQuickActionEvents,
-      attachPropertyHolderEvents: propertyHolders.attachPropertyHolderEvents,
-      attachPropertyDocumentEvents:
-        propertyDocuments.attachPropertyDocumentEvents,
+      attachPropertyHolderEvents,
+      attachPropertyDocumentEvents,
     };
   }
 

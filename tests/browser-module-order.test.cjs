@@ -281,23 +281,17 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/property-holder-management.js",
-      "features/property-holder-workflow.js",
+      "features/property-screen-workflow.js",
     ],
     [
       "features/property-holder-events.js",
-      "features/property-holder-workflow.js",
+      "features/property-screen-workflow.js",
     ],
-    [
-      "features/documents.js",
-      "features/property-document-management-workflow.js",
-    ],
-    [
-      "features/document-repository.js",
-      "features/property-document-management-workflow.js",
-    ],
+    ["features/documents.js", "features/property-screen-workflow.js"],
+    ["features/document-repository.js", "features/property-screen-workflow.js"],
     [
       "features/property-detail-document-events.js",
-      "features/property-document-management-workflow.js",
+      "features/property-screen-workflow.js",
     ],
     [
       "features/property-detail-content-workflow.js",
@@ -305,14 +299,6 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/property-detail-management-workflow.js",
-      "features/property-screen-workflow.js",
-    ],
-    [
-      "features/property-holder-workflow.js",
-      "features/property-screen-workflow.js",
-    ],
-    [
-      "features/property-document-management-workflow.js",
       "features/property-screen-workflow.js",
     ],
     [

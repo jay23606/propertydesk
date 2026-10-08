@@ -92,10 +92,10 @@ test("app connects private document actions to their detail event router", () =>
     /PropertyDeskPropertyDetailManagementWorkflow\.create\(/,
   );
   const workflow = fs.readFileSync(
-    path.join(root, "features", "property-document-management-workflow.js"),
+    path.join(root, "features", "property-screen-workflow.js"),
     "utf8",
   );
-  assert.match(workflow, /repository: context\.documentRepository/);
+  assert.match(workflow, /repository: documents\.documentRepository/);
   assert.match(
     app,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
