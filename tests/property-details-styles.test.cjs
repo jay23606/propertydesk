@@ -7,6 +7,7 @@ test("property detail styles stay in their feature stylesheet", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
+  const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
   const details = fs.readFileSync(
     path.join(root, "property-details.css"),
     "utf8",
@@ -27,10 +28,12 @@ test("property detail styles stay in their feature stylesheet", () => {
   );
   assert.match(details, /\.property-detail-actions/);
   assert.match(details, /\.property-detail-table/);
+  assert.match(details, /\.property-account-table table/);
   assert.match(details, /\.document-list/);
   assert.match(details, /\.holder-choices/);
   assert.doesNotMatch(
     shared,
     /\.property-detail-(?:actions|kpis|table)|\.document-list|\.document-row|\.document-name-link|\.holder-choices/,
   );
+  assert.doesNotMatch(theme, /\.property-account-table/);
 });

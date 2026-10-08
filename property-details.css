@@ -95,6 +95,28 @@
   gap: 6px;
   color: var(--ink);
 }
+.property-account-table table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+.property-account-table th,
+.property-account-table td {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.property-account-table th:last-child,
+.property-account-table td:last-child {
+  position: sticky;
+  right: 0;
+  width: 58px;
+  min-width: 58px;
+  max-width: 58px;
+  text-align: center;
+  z-index: 2;
+  background: var(--surface);
+  white-space: nowrap;
+}
 @media (max-width: 760px) {
   .property-detail-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
