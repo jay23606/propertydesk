@@ -2,6 +2,21 @@
   grid-template-columns: repeat(3, 1fr);
   max-width: 900px;
 }
+.payment-guidance {
+  border-radius: 7px;
+  background: #f4f7f4;
+  padding: 11px 12px;
+  font-size: 11px;
+  color: #6b786e;
+}
+.payment-guidance:empty {
+  display: none;
+}
+.payment-guidance-note {
+  font-size: 10px;
+  color: #9aa49c;
+  margin-top: 6px;
+}
 .expense-pill {
   display: inline-block;
   border-radius: 20px;
