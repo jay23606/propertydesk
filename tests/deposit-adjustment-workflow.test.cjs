@@ -57,6 +57,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   const workflow =
     context.window.PropertyDeskDepositAdjustmentWorkflow.create(dependencies);
 
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance.repository, repository);
   assert.equal(passed.maintenance.prepareAdjustment, prepareAdjustment);
   assert.equal(passed.entry.moneyInput, dependencies.moneyInput);

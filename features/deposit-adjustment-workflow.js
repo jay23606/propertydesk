@@ -39,7 +39,7 @@
         recordDepositAdjustment,
       });
 
-    return { attachDepositAdjustmentEvents };
+    return Object.freeze({ attachDepositAdjustmentEvents });
   }
 
   window.PropertyDeskDepositAdjustmentWorkflow = Object.freeze({

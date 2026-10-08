@@ -32,7 +32,7 @@
         closeAccount,
       });
 
-    return { attachAccountDetailActionEvents };
+    return Object.freeze({ attachAccountDetailActionEvents });
   }
 
   window.PropertyDeskAccountDetailActionWorkflow = Object.freeze({

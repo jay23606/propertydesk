@@ -64,7 +64,7 @@
       openModal,
     });
 
-    return { openAccountDetails };
+    return Object.freeze({ openAccountDetails });
   }
 
   window.PropertyDeskAccountDetailContentWorkflow = Object.freeze({ create });

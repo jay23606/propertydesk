@@ -33,7 +33,7 @@
         validateAdjustment: adjustments.validateAdjustment,
       });
 
-    return { depositSectionHTML, attachDepositAdjustmentEvents };
+    return Object.freeze({ depositSectionHTML, attachDepositAdjustmentEvents });
   }
 
   window.PropertyDeskDepositWorkspaceWorkflow = Object.freeze({

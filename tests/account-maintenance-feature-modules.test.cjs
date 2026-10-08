@@ -194,6 +194,7 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
     adjustments,
   });
 
+  assert.equal(Object.isFrozen(workflow), true);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), ["depositLedger", "state"]);
   assert.equal(calls[0][1].depositLedger, details.depositLedger);
   assert.deepEqual(Object.keys(calls[1][1]).sort(), [
@@ -298,6 +299,7 @@ test("account detail content workflow composes schedule, history, and account", 
       dependencies,
     );
 
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
   assert.equal(passed.historyModel.state, dependencies.state);
   assert.equal(

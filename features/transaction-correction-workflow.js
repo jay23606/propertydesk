@@ -44,7 +44,7 @@
       });
     }
 
-    return { saveCorrection, createCorrectionActionHandlers };
+    return Object.freeze({ saveCorrection, createCorrectionActionHandlers });
   }
 
   window.PropertyDeskTransactionCorrectionWorkflow = Object.freeze({

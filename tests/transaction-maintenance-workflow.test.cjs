@@ -231,6 +231,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
   };
   const handlers = workflow.createCorrectionActionHandlers(actions);
 
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.corrections.state, correctionContext.state);
   assert.equal(passed.corrections.repository, correctionContext.repository);
   assert.equal(
