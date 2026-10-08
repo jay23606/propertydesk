@@ -19,10 +19,11 @@ test("account records and ledger entries use separate workspace workflows", () =
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
   );
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:TransactionMaintenance|RecordEntry|TransactionScreen)Workflow\.create\(/,
+    /PropertyDesk(?:RecordEntry|TransactionScreen)Workflow\.create\(/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.match(app, /accountHistoryRepository: repositories\.accountHistory/);
@@ -83,13 +84,18 @@ test("account records and ledger entries use separate workspace workflows", () =
     /accountPayload: window\.PropertyDeskAccountPayload\.build,[\s\S]*?accountFormModel: window\.PropertyDeskAccountFormModel,/,
   );
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
   assert.match(
     transactionWorkflow,
-    /TransactionMaintenanceWorkflow\.create\([\s\S]*?LedgerEntryForms\.create\(\{[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
+    /LedgerEntryForms\.create\(\{[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
+  );
+  assert.doesNotMatch(
+    transactionWorkflow,
+    /TransactionMaintenanceWorkflow\.create\(/,
   );
   assert.match(
     transactionWorkflow,
@@ -127,9 +133,10 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:TransactionMaintenance|RecordEntry|TransactionScreen)Workflow\.create\(/,
+    /PropertyDesk(?:RecordEntry|TransactionScreen)Workflow\.create\(/,
   );
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);

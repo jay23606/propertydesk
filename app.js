@@ -168,16 +168,8 @@
       accountPayload: window.PropertyDeskAccountPayload.build,
       accountFormModel: window.PropertyDeskAccountFormModel,
     });
-  const {
-    renderPayments,
-    attachTransactionFilterEvents,
-    attachTransactionActionEvents,
-    openPayment,
-    openPropertyPayment,
-    openExpense,
-    attachLedgerEntryFormEvents,
-  } = window.PropertyDeskTransactionWorkspaceWorkflow.create({
-    maintenance: {
+  const transactionMaintenance =
+    window.PropertyDeskTransactionMaintenanceWorkflow.create({
       correction: {
         $,
         state,
@@ -201,7 +193,17 @@
           window.PropertyDeskTransactionVoidModel.buildVoidPayload,
       },
       events: { documentRef: document },
-    },
+    });
+  const {
+    renderPayments,
+    attachTransactionFilterEvents,
+    attachTransactionActionEvents,
+    openPayment,
+    openPropertyPayment,
+    openExpense,
+    attachLedgerEntryFormEvents,
+  } = window.PropertyDeskTransactionWorkspaceWorkflow.create({
+    maintenance: transactionMaintenance,
     entry: {
       $,
       state,

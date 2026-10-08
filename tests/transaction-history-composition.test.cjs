@@ -17,6 +17,7 @@ test("transaction screen workflow composes history views with maintenance action
     "utf8",
   );
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(workflow, /PropertyDeskTransactionViews\.create\(/);
   assert.match(
     workflow,
@@ -30,7 +31,11 @@ test("transaction screen workflow composes history views with maintenance action
     workflow,
     /const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\(/,
   );
-  assert.match(workspaceWorkflow, /TransactionMaintenanceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    workspaceWorkflow,
+    /TransactionMaintenanceWorkflow\.create\(/,
+  );
+  assert.match(workspaceWorkflow, /maintenance\.saveCorrection/);
   assert.ok(
     html.indexOf("features/transaction-screen-workflow.js") <
       html.indexOf("app.js"),

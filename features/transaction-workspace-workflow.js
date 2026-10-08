@@ -1,18 +1,12 @@
-/* Connect correction persistence, payment entry, and transaction history. */
+/* Connect ledger entry forms with the transaction history screen. */
 (() => {
   "use strict";
 
   function createTransactionWorkspaceWorkflow({
-    maintenance: maintenanceContext,
+    maintenance,
     entry: entryContext,
     screen: screenContext,
   }) {
-    const maintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create({
-        correction: maintenanceContext.correction,
-        voiding: maintenanceContext.voiding,
-        events: maintenanceContext.events,
-      });
     const entry = window.PropertyDeskLedgerEntryForms.create({
       $: entryContext.$,
       state: entryContext.state,

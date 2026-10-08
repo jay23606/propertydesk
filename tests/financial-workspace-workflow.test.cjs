@@ -10,7 +10,12 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /TransactionWorkspaceWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+  );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.match(
     app,

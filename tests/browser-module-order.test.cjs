@@ -370,10 +370,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["workspace-data.js", "features/workspace-runtime.js"],
     ["features/ledger-context.js", "features/workspace-financial-context.js"],
     ["features/deposit-context.js", "features/workspace-financial-context.js"],
-    [
-      "features/transaction-maintenance-workflow.js",
-      "features/transaction-workspace-workflow.js",
-    ],
+    ["features/transaction-maintenance-workflow.js", "app.js"],
     [
       "features/ledger-entry-forms.js",
       "features/transaction-workspace-workflow.js",

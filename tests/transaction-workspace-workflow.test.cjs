@@ -11,9 +11,11 @@ test("transaction workspace owns only ledger entry and transaction workflows", (
   const openExpense = () => "expense";
   const updatePaymentGuidance = () => "guidance";
   const maintenance = {
-    correction: { name: "correction" },
-    voiding: { name: "voiding" },
-    events: { name: "events" },
+    saveCorrection,
+    createTransactionActionHandlers(options) {
+      calls.push(["maintenanceActions", options]);
+      return { attachTransactionActionEvents() {} };
+    },
   };
   const entry = {
     $() {},
@@ -33,12 +35,6 @@ test("transaction workspace owns only ledger entry and transaction workflows", (
   const screen = { state: {} };
   const context = vm.createContext({
     window: {
-      PropertyDeskTransactionMaintenanceWorkflow: {
-        create(options) {
-          calls.push(["maintenance", options]);
-          return { saveCorrection };
-        },
-      },
       PropertyDeskLedgerEntryForms: {
         create(options) {
           calls.push(["entry", options]);
@@ -83,30 +79,25 @@ test("transaction workspace owns only ledger entry and transaction workflows", (
       screen,
     });
 
-  assert.equal(calls[0][0], "maintenance");
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
-    "correction",
-    "events",
-    "voiding",
-  ]);
-  assert.equal(calls[1][0], "entry");
-  assert.equal(calls[1][1].transactionRepository, entry.transactionRepository);
-  assert.equal(calls[1][1].transactionPayloads, entry.transactionPayloads);
-  assert.equal(calls[1][1].saveCorrection, saveCorrection);
-  assert.equal("propertyRepository" in calls[1][1], false);
-  assert.equal("accountRepository" in calls[1][1], false);
-  assert.equal("accountPayload" in calls[1][1], false);
-  assert.equal("accountFormModel" in calls[1][1], false);
-  assert.equal("previewReminderEmail" in calls[1][1], false);
-  assert.equal(calls[2][0], "screen");
-  assert.equal(calls[2][1].state, screen.state);
+  assert.equal(calls[0][0], "entry");
+  assert.equal(calls[0][1].transactionRepository, entry.transactionRepository);
+  assert.equal(calls[0][1].transactionPayloads, entry.transactionPayloads);
+  assert.equal(calls[0][1].saveCorrection, saveCorrection);
+  assert.equal("propertyRepository" in calls[0][1], false);
+  assert.equal("accountRepository" in calls[0][1], false);
+  assert.equal("accountPayload" in calls[0][1], false);
+  assert.equal("accountFormModel" in calls[0][1], false);
+  assert.equal("previewReminderEmail" in calls[0][1], false);
+  assert.equal(calls[1][0], "screen");
+  assert.equal(calls[1][1].state, screen.state);
+  assert.equal(calls[1][1].transactionMaintenance, maintenance);
   assert.equal(
-    calls[2][1].transactionMaintenance.saveCorrection,
+    calls[1][1].transactionMaintenance.saveCorrection,
     saveCorrection,
   );
-  assert.equal(calls[2][1].openPayment, openPayment);
-  assert.equal(calls[2][1].openExpense, openExpense);
-  assert.equal(calls[2][1].updatePaymentGuidance, updatePaymentGuidance);
+  assert.equal(calls[1][1].openPayment, openPayment);
+  assert.equal(calls[1][1].openExpense, openExpense);
+  assert.equal(calls[1][1].updatePaymentGuidance, updatePaymentGuidance);
   assert.equal(workflow.openPayment, openPayment);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachLedgerEntryFormEvents",
