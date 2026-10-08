@@ -97,3 +97,36 @@ test("repository write feedback reports rejected requests with domain fallback",
   );
   assert.deepEqual(messages, ["Property couldn't be saved right now."]);
 });
+
+test("post-write refresh shows success only after workspace data reloads", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      fetchAll: async () => events.push("refresh"),
+      toast: (message) => events.push(["toast", message]),
+      successMessage: "Payment corrected",
+    }),
+    true,
+  );
+  assert.deepEqual(events, ["refresh", ["toast", "Payment corrected"]]);
+});
+
+test("post-write refresh suppresses success feedback when reload fails", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      fetchAll: async () => {
+        events.push("refresh");
+        throw new Error("offline");
+      },
+      toast: (message) => events.push(["toast", message]),
+      successMessage: "Payment corrected",
+    }),
+    false,
+  );
+  assert.deepEqual(events, ["refresh"]);
+});

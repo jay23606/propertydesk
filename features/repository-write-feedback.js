@@ -1,4 +1,4 @@
-/* Share save-result handling while leaving fallback messages with each domain. */
+/* Share write feedback and post-write refresh handling across the workspace. */
 (() => {
   "use strict";
 
@@ -30,5 +30,18 @@
     return true;
   }
 
-  window.PropertyDeskRepositoryWriteFeedback = Object.freeze({ run });
+  async function refreshWorkspace({ fetchAll, toast, successMessage }) {
+    try {
+      await fetchAll();
+    } catch {
+      return false;
+    }
+    toast(successMessage);
+    return true;
+  }
+
+  window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
+    run,
+    refreshWorkspace,
+  });
 })();

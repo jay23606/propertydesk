@@ -32,13 +32,14 @@
             : "This transaction was already voided or is no longer available.",
       });
       if (!saved) return;
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast("Transaction voided; original entry preserved");
-      return true;
+      if (
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          toast,
+          successMessage: "Transaction voided; original entry preserved",
+        })
+      )
+        return true;
     }
 
     return { saveVoidTransaction };

@@ -81,12 +81,11 @@
       if (!(await persistAccount(payload, form.id))) return;
       closeModal($("account-modal"));
       resetAccountForm();
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast(form.id ? "Account updated" : "Account added");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage: form.id ? "Account updated" : "Account added",
+      });
     }
 
     function attachEvents() {

@@ -25,15 +25,11 @@
       });
       if (!saved) return false;
       closeModal($(kind === "payment" ? "payment-modal" : "expense-modal"));
-      try {
-        await fetchAll();
-      } catch {
-        return false;
-      }
-      toast(
-        `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
-      );
-      return true;
+      return window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage: `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
+      });
     }
 
     return { saveCorrection };

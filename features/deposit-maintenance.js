@@ -39,17 +39,14 @@
         errorMessage: (error) => `Deposit adjustment failed: ${error.message}`,
       });
       if (!saved) return false;
-      try {
-        await fetchAll();
-      } catch {
-        return false;
-      }
-      toast(
-        type === "retained"
-          ? "Deposit retention recorded"
-          : "Deposit retention reversed",
-      );
-      return true;
+      return window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage:
+          type === "retained"
+            ? "Deposit retention recorded"
+            : "Deposit retention reversed",
+      });
     }
 
     return { saveDepositAdjustment };

@@ -12,12 +12,11 @@
       });
       if (!saved) return;
       closeAccountDetails();
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast("Account closed");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage: "Account closed",
+      });
     }
 
     return { saveCloseAccount };
