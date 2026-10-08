@@ -1,3 +1,4 @@
+const assert = require("node:assert/strict");
 const {
   assertNoBrowserErrors,
   assertNoUnhandledRejections,
@@ -57,6 +58,51 @@ async function smokeSignedInWorkflows(browser, url) {
       `Synthetic Properties row did not appear. Page text: ${body.slice(-2500)}. ${error.message}`,
     );
   }
+  await signedInPage.setViewportSize({ width: 390, height: 844 });
+  const mobileGrid = await signedInPage.evaluate(() => {
+    const table = document.querySelector(".portfolio-table");
+    const row = document.querySelector("#properties-table tr");
+    const cells = row ? [...row.cells] : [];
+    return {
+      wrapperWidth: table?.clientWidth ?? 0,
+      paymentWidth: cells[0]?.getBoundingClientRect().width ?? 0,
+      addressWidth: cells[2]?.getBoundingClientRect().width ?? 0,
+      emailWidth: cells[3]?.getBoundingClientRect().width ?? 0,
+      smsWidth: cells[4]?.getBoundingClientRect().width ?? 0,
+      firstFiveRight: cells[5]?.getBoundingClientRect().right ?? 0,
+      wrapperRight: table?.getBoundingClientRect().right ?? 0,
+      hiddenDue: cells[1]
+        ? getComputedStyle(cells[1]).display === "none"
+        : false,
+      nameWidth: cells[5]?.getBoundingClientRect().width ?? 0,
+    };
+  });
+  assert.equal(
+    mobileGrid.hiddenDue,
+    true,
+    "mobile combines the separate due column with the payment action",
+  );
+  assert.ok(
+    mobileGrid.paymentWidth <= 56,
+    `mobile payment column should be at most 56px; got ${mobileGrid.paymentWidth}px`,
+  );
+  assert.ok(
+    mobileGrid.addressWidth <= 90,
+    `mobile address column should be at most 90px; got ${mobileGrid.addressWidth}px`,
+  );
+  assert.ok(
+    mobileGrid.emailWidth <= 40 && mobileGrid.smsWidth <= 40,
+    `mobile Email and SMS columns should each be at most 40px: ${JSON.stringify(mobileGrid)}`,
+  );
+  assert.ok(
+    mobileGrid.nameWidth <= 80,
+    `mobile tenant/buyer name column should be at most 80px; got ${mobileGrid.nameWidth}px`,
+  );
+  assert.ok(
+    mobileGrid.firstFiveRight <= mobileGrid.wrapperRight,
+    `the payment/due, address, Email, SMS, and name columns should fit at 390px: ${JSON.stringify(mobileGrid)}`,
+  );
+  await signedInPage.setViewportSize({ width: 1280, height: 720 });
   await smokePropertyWorkflows(
     signedInPage,
     signedInPageErrors,

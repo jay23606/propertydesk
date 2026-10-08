@@ -41,7 +41,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 62px;\s*min-width: 62px;/,
+    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 56px;\s*min-width: 56px;/,
   );
   assert.match(
     portfolio,
@@ -49,11 +49,22 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
+    /\.portfolio-table td\.portfolio-contact-action\s*\{\s*width: 40px;\s*min-width: 40px;\s*max-width: 40px;/,
+    "mobile keeps the Email and SMS action columns compact",
+  );
+  assert.match(
+    portfolio,
     /\.portfolio-table \.portfolio-payment-action\s*\{\s*margin-inline: auto;/,
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 110px;\s*min-width: 110px;\s*max-width: 125px;/,
+    /\.portfolio-table th:nth-child\(3\),\s*\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 90px;\s*min-width: 90px;\s*max-width: 90px;/,
+    "mobile keeps the address column narrow and allows its text to wrap",
+  );
+  assert.match(
+    portfolio,
+    /\.portfolio-table th:nth-child\(6\),\s*\.portfolio-table td:nth-child\(6\)\s*\{\s*width: 80px;\s*min-width: 80px;\s*max-width: 80px;/,
+    "mobile keeps the name column compact and allows names to wrap",
   );
   assert.match(
     portfolio,

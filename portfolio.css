@@ -40,12 +40,14 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 62px;
-    min-width: 62px;
-    max-width: 62px;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
     z-index: 2;
     background: #fff;
     text-align: center;
+    padding-right: 0;
+    padding-left: 0;
   }
   .portfolio-table th:nth-child(1) {
     z-index: 4;
@@ -87,11 +89,20 @@
     padding-right: 3px;
     padding-left: 3px;
   }
+  .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 110px;
-    min-width: 110px;
-    max-width: 125px;
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
     overflow-wrap: anywhere;
+  }
+  .portfolio-table th:nth-child(6),
+  .portfolio-table td:nth-child(6) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
   .portfolio-table td:nth-child(3) .table-action {
     display: block;
@@ -104,9 +115,11 @@
     display: none;
   }
   .portfolio-table td.portfolio-contact-action {
-    padding-right: 2px;
-    padding-left: 2px;
-    min-width: 42px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    padding-right: 0;
+    padding-left: 0;
   }
   .portfolio-table .portfolio-icon-action {
     width: 30px;
@@ -264,7 +277,7 @@ html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1) {
 @media (max-width: 760px) {
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
-    width: 62px;
+    width: 56px;
   }
   .portfolio-table tfoot td:nth-child(2) {
     display: none;
