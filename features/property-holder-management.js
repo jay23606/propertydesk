@@ -39,14 +39,13 @@
         }
         if (error) {
           toast(error.message);
-          try {
-            await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-              fetchAll,
-              afterRefresh: () => openPropertyDetails(id),
-            });
-          } catch {
-            return;
-          }
+          await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+            fetchAll,
+            afterRefresh: () => openPropertyDetails(id),
+            toast,
+            refreshFailureMessage:
+              "Account-holder labels could not be fully saved, and the workspace could not refresh. Reload to verify the current labels.",
+          });
           return;
         }
       }

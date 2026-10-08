@@ -276,3 +276,44 @@ test("property holder refreshes displayed labels after a partial save failure", 
     ["open", "property-1"],
   ]);
 });
+
+test("property holder reports when a partial save cannot refresh the displayed labels", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const source of [
+    "repository-write-feedback.js",
+    "property-holder-management.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
+    state: {
+      workspaceOwnerId: "workspace-1",
+      selectedPropertyId: "property-1",
+    },
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      events.push(["refresh"]);
+      throw new Error("offline");
+    },
+    openPropertyDetails: () => events.push(["open"]),
+    repository: {
+      clearPropertyHolders: async () => ({ error: null }),
+      addPropertyHolders: async () => ({ error: new Error("Insert failed") }),
+    },
+  });
+
+  await workflow.savePropertyHolders(["member-1"]);
+
+  assert.deepEqual(events, [
+    ["toast", "Insert failed"],
+    ["refresh"],
+    [
+      "toast",
+      "Account-holder labels could not be fully saved, and the workspace could not refresh. Reload to verify the current labels.",
+    ],
+  ]);
+});
