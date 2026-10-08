@@ -47,7 +47,6 @@
       monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
       unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
       amortizationSchedule: loanSchedule.amortizationSchedule,
-      scheduledLoanBalance: loanSchedule.scheduledLoanBalance,
       accountBalance: financial.accountBalance,
       scheduledMonthlyRunRate: financial.scheduledMonthlyRunRate,
       collectedSince: financial.collectedSince,

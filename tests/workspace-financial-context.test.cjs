@@ -117,7 +117,6 @@ test("workspace financial context composes ledger, account, loan, and deposit se
   assert.equal(calls[4][1].state, state);
   assert.equal(calls[4][1].securityDepositBalance, securityDepositBalance);
   assert.equal(financial.amortizationSchedule, amortizationSchedule);
-  assert.equal(financial.scheduledLoanBalance, scheduledLoanBalance);
   assert.equal(financial.amountDueSince, amountDueSince);
   assert.equal(financial.accountBalance, accountBalance);
   assert.equal(financial.scheduledMonthlyRunRate, scheduledMonthlyRunRate);
@@ -126,4 +125,21 @@ test("workspace financial context composes ledger, account, loan, and deposit se
   assert.equal(financial.depositLedger, depositLedger);
   assert.equal(financial.isPosted, isPosted);
   assert.equal(financial.sumPosted, sumPosted);
+  assert.deepEqual(Object.keys(financial).sort(), [
+    "accountBalance",
+    "amortizationSchedule",
+    "amountDueSince",
+    "collectedSince",
+    "depositLedger",
+    "isPosted",
+    "monthlyScheduledEstimate",
+    "paymentStatusInMonth",
+    "postedOnOrAfter",
+    "scheduledMonthlyRunRate",
+    "sumIncome",
+    "sumOperatingExpenses",
+    "sumPosted",
+    "summarizeAccount",
+    "unpaidDueAccrualStart",
+  ]);
 });
