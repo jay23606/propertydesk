@@ -11,15 +11,13 @@ test("app composes account details apart from account and deposit maintenance", 
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.match(
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(/,
   );
-  assert.match(
-    app,
-    /PropertyDeskAccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: repositories\.accounts/,
-  );
+  assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   const accountDetailWorkflow = fs.readFileSync(
@@ -106,7 +104,28 @@ test("app composes account details apart from account and deposit maintenance", 
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
+  );
+  const accountDepositWorkspaceWorkflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-deposit-workspace-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.match(
+    accountDepositWorkspaceWorkflow,
+    /PropertyDeskDepositWorkspaceWorkflow\.create\(deposit\)/,
+  );
+  assert.match(
+    accountDepositWorkspaceWorkflow,
+    /PropertyDeskAccountDetailContentWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+  );
+  assert.match(
+    accountDepositWorkspaceWorkflow,
+    /PropertyDeskAccountDetailActionWorkflow\.create\(accountActions\)/,
   );
   assert.doesNotMatch(html, /account-screen-workflow/);
   assert.doesNotMatch(worker, /account-screen-workflow/);

@@ -8,24 +8,22 @@ test("app composes transaction history separately from maintenance actions", () 
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(
-    app,
-    /transactionMaintenance\.createTransactionActionHandlers\(/,
+  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
+  const transactionWorkflow = fs.readFileSync(
+    path.join(root, "features", "transaction-records-workflow.js"),
+    "utf8",
   );
   assert.match(
-    app,
-    /const \{ renderPayments, attachTransactionFilterEvents \} = transactionViews;/,
+    transactionWorkflow,
+    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection: transactionMaintenance\.saveCorrection/,
   );
   assert.match(
-    app,
-    /const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\(/,
+    transactionWorkflow,
+    /PropertyDeskTransactionViews\.create\(views\)/,
   );
   assert.match(
-    app,
-    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\([\s\S]*?transactionMaintenance\.createTransactionActionHandlers\(/,
+    transactionWorkflow,
+    /createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
   assert.doesNotMatch(app, /PropertyDeskTransactionScreenWorkflow/);
   assert.doesNotMatch(html, /transaction-screen-workflow/);

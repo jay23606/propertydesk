@@ -9,12 +9,7 @@ test("app wires account forms and transaction entry through separate workflows",
 
   assert.match(app, /PropertyDeskPropertyForm\.create\(/);
   assert.match(app, /PropertyDeskAccountForm\.create\(/);
-  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(
-    app,
-    /transactionMaintenance\.createTransactionActionHandlers\(/,
-  );
+  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyForm\.resetPropertyForm,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
@@ -28,8 +23,12 @@ test("app wires account forms and transaction entry through separate workflows",
     /propertyForm\.attachEvents,[\s\S]*?accountForm\.attachEvents,[\s\S]*?attachLedgerEntryFormEvents/,
   );
 
+  const transactionWorkflow = fs.readFileSync(
+    path.join(root, "features", "transaction-records-workflow.js"),
+    "utf8",
+  );
   assert.match(
-    app,
-    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\([\s\S]*?const \{ attachTransactionActionEvents \} =\s+transactionMaintenance\.createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+    transactionWorkflow,
+    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\(views\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
 });

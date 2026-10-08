@@ -187,74 +187,71 @@
     formModel: window.PropertyDeskAccountFormModel,
     repository: repositories.accounts,
   });
-  const transactionMaintenance =
-    window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      correction: {
+  const transactionRecords =
+    window.PropertyDeskTransactionRecordsWorkflow.create({
+      maintenance: {
+        correction: {
+          $,
+          state,
+          toast,
+          fetchAll,
+          closeModal,
+          prettyType,
+          EventClass: Event,
+          OptionClass: Option,
+          repository: repositories.transactions,
+          findCorrectionTarget:
+            window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+        },
+        voiding: {
+          toast,
+          fetchAll,
+          repository: repositories.transactions,
+          resolveVoidTarget:
+            window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+          buildVoidPayload:
+            window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+        },
+        events: { documentRef: document },
+      },
+      entries: {
         $,
         state,
+        moneyInput,
+        todayIso,
         toast,
-        fetchAll,
         closeModal,
-        prettyType,
-        EventClass: Event,
-        OptionClass: Option,
-        repository: repositories.transactions,
-        findCorrectionTarget:
-          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
-      },
-      voiding: {
-        toast,
         fetchAll,
-        repository: repositories.transactions,
-        resolveVoidTarget:
-          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-        buildVoidPayload:
-          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+        populateFormOptions,
+        fillSelect,
+        prettyType,
+        openModal,
+        transactionRepository: repositories.transactions,
+        transactionPayloads: window.PropertyDeskTransactionPayloads,
       },
-      events: { documentRef: document },
+      views: {
+        $,
+        state,
+        dateOnly,
+        fmtDate,
+        esc,
+        expenseCategoryLabel,
+        money,
+        postedOnOrAfter,
+        monthStart,
+        sumIncome,
+        sumOperatingExpenses,
+      },
     });
-  const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
-    populateFormOptions,
-    fillSelect,
-    prettyType,
-    openModal,
-    transactionRepository: repositories.transactions,
-    transactionPayloads: window.PropertyDeskTransactionPayloads,
-    saveCorrection: transactionMaintenance.saveCorrection,
-  });
-  const transactionViews = window.PropertyDeskTransactionViews.create({
-    $,
-    state,
-    dateOnly,
-    fmtDate,
-    esc,
-    expenseCategoryLabel,
-    money,
-    postedOnOrAfter,
-    monthStart,
-    sumIncome,
-    sumOperatingExpenses,
-  });
-  const { attachTransactionActionEvents } =
-    transactionMaintenance.createTransactionActionHandlers({
-      openPayment: ledgerEntryForms.openPayment,
-      openExpense: ledgerEntryForms.openExpense,
-      updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
-    });
-  const { renderPayments, attachTransactionFilterEvents } = transactionViews;
   const {
+    attachLedgerEntryFormEvents,
+    attachTransactionActionEvents,
+    attachTransactionFilterEvents,
+    openExpense,
     openPayment,
     openPropertyPayment,
-    openExpense,
-    attachLedgerEntryFormEvents,
-  } = ledgerEntryForms;
+    renderPayments,
+  } = transactionRecords;
   const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
     $,
     state,
@@ -267,54 +264,60 @@
     navigate,
     documentRef: document,
   });
-  const depositWorkspace = window.PropertyDeskDepositWorkspaceWorkflow.create({
-    details: {
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
-    },
-    adjustments: {
-      $,
-      state,
-      todayIso,
-      toast,
-      fetchAll,
-      moneyInput,
-      repository: repositories.deposits,
-      prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
-      validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
-    },
-  });
-  const { openAccountDetails } =
-    window.PropertyDeskAccountDetailContentWorkflow.create({
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      sumPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      summarizeAccount,
-      amortizationSchedule,
-      openModal,
-      propertyAddress,
-      depositSectionHTML: depositWorkspace.depositSectionHTML,
-      accountHistoryRepository: repositories.accountHistory,
+  const accountDepositWorkspace =
+    window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
+      deposit: {
+        details: {
+          state,
+          depositLedger,
+          money,
+          fmtDate,
+          esc,
+        },
+        adjustments: {
+          $,
+          state,
+          todayIso,
+          toast,
+          fetchAll,
+          moneyInput,
+          repository: repositories.deposits,
+          prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
+          validateAdjustment:
+            window.PropertyDeskDepositAdjustmentModel.validate,
+        },
+      },
+      accountDetails: {
+        $,
+        state,
+        money,
+        fmtDate,
+        esc,
+        sumPosted,
+        prettyType,
+        paymentFrequencyLabel,
+        summarizeAccount,
+        amortizationSchedule,
+        openModal,
+        propertyAddress,
+        accountHistoryRepository: repositories.accountHistory,
+      },
+      accountActions: {
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        editAccount: accountForm.editAccount,
+        openPayment,
+        repository: repositories.accounts,
+      },
     });
-  const { attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountDetailActionWorkflow.create({
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      editAccount: accountForm.editAccount,
-      openPayment,
-      repository: repositories.accounts,
-    });
+  const {
+    attachAccountDetailActionEvents,
+    attachDepositAdjustmentEvents,
+    openAccountDetails,
+  } = accountDepositWorkspace;
   const {
     attachPropertyDetailEvents,
     attachPropertyQuickActionEvents,
@@ -470,7 +473,7 @@
       attachTransactionFilterEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,
-      depositWorkspace.attachDepositAdjustmentEvents,
+      attachDepositAdjustmentEvents,
       attachCreateActionEvents,
       propertyForm.attachEvents,
       accountForm.attachEvents,

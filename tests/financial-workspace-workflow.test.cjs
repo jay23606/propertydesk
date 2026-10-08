@@ -9,23 +9,23 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.match(
+  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
+  assert.doesNotMatch(
     app,
-    /transactionMaintenance\.createTransactionActionHandlers\(/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
-  assert.match(
+  assert.doesNotMatch(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
     app,
-    /AccountDetailContentWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(/,
   );
+  assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
   );
 
   for (const feature of [
@@ -33,6 +33,8 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
     "transaction-maintenance-workflow",
+    "transaction-records-workflow",
+    "account-deposit-workspace-workflow",
   ]) {
     const script = `features/${feature}.js`;
     assert.ok(
