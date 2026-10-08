@@ -3,17 +3,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("Workspace navigation coordinates settings rendering and page routing", () => {
+test("workspace shell connects settings rendering and page routing", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const workspace = fs.readFileSync(
     path.join(root, "features", "workspace.js"),
-    "utf8",
-  );
-  const workflow = fs.readFileSync(
-    path.join(root, "features", "workspace-navigation-workflow.js"),
     "utf8",
   );
   const shell = fs.readFileSync(
@@ -31,11 +27,7 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
   );
   assert.match(
     shell,
-    /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
-  );
-  assert.match(
-    workflow,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,[\s\S]*?PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
   );
   assert.match(
     workspace,
@@ -48,7 +40,6 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
   for (const script of [
     "features/workspace.js",
     "features/navigation.js",
-    "features/workspace-navigation-workflow.js",
     "features/workspace-shell-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));

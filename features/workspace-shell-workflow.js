@@ -1,4 +1,4 @@
-/* Connect reminder tools with workspace settings and navigation. */
+/* Compose reminder tools, workspace settings, and page navigation. */
 (() => {
   "use strict";
 
@@ -33,18 +33,23 @@
       model: previewModel,
       openModal: reminder.openModal,
     });
-    const workspace = window.PropertyDeskWorkspaceNavigationWorkflow.create({
+    const workspace = window.PropertyDeskWorkspace.create({
       $: navigation.$,
       state: navigation.state,
       esc: navigation.esc,
       toast: navigation.toast,
       fetchAll: navigation.fetchAll,
       renderReminderActivity,
-      documentRef: navigation.documentRef,
-      windowRef: navigation.windowRef,
       memberRepository: navigation.memberRepository,
       authClient: navigation.authClient,
       confirmAction: navigation.confirmAction,
+    });
+    const pageNavigation = window.PropertyDeskNavigation.create({
+      $: navigation.$,
+      state: navigation.state,
+      renderWorkspacePage: workspace.renderWorkspacePage,
+      documentRef: navigation.documentRef,
+      windowRef: navigation.windowRef,
     });
 
     return {
@@ -52,8 +57,8 @@
       updateGreeting: workspace.updateGreeting,
       attachProfileEvents: workspace.attachProfileEvents,
       attachWorkspaceMemberEvents: workspace.attachWorkspaceMemberEvents,
-      navigate: workspace.navigate,
-      attachNavigationEvents: workspace.attachNavigationEvents,
+      navigate: pageNavigation.navigate,
+      attachNavigationEvents: pageNavigation.attachEvents,
     };
   }
 

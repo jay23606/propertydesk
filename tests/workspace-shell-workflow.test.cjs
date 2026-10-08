@@ -60,13 +60,21 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
           return { previewReminderEmail };
         },
       },
-      PropertyDeskWorkspaceNavigationWorkflow: {
+      PropertyDeskWorkspace: {
         create(options) {
-          calls.push(["navigation", options]);
+          calls.push(["workspace", options]);
           return {
             updateGreeting() {},
             attachProfileEvents() {},
             attachWorkspaceMemberEvents() {},
+            renderWorkspacePage() {},
+          };
+        },
+      },
+      PropertyDeskNavigation: {
+        create(options) {
+          calls.push(["navigation", options]);
+          return {
             navigate() {},
             attachNavigationEvents() {},
           };
@@ -98,12 +106,14 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
   assert.equal(calls[3][0], "preview");
   assert.equal(calls[3][1].model, previewModel);
   assert.equal(calls[3][1].openModal, reminder.openModal);
-  assert.equal(calls[4][0], "navigation");
-  assert.equal(calls[4][1].documentRef, navigation.documentRef);
-  assert.equal(calls[4][1].windowRef, navigation.windowRef);
+  assert.equal(calls[4][0], "workspace");
   assert.equal(calls[4][1].memberRepository, navigation.memberRepository);
   assert.equal("unusedDependency" in calls[4][1], false);
   assert.equal(calls[4][1].renderReminderActivity, renderReminderActivity);
+  assert.equal(calls[5][0], "navigation");
+  assert.equal(calls[5][1].documentRef, navigation.documentRef);
+  assert.equal(calls[5][1].windowRef, navigation.windowRef);
+  assert.equal(typeof calls[5][1].renderWorkspacePage, "function");
   assert.equal(workflow.previewReminderEmail, previewReminderEmail);
   assert.equal("renderReminderActivity" in workflow, false);
   assert.deepEqual(Object.keys(calls[3][1]).sort(), [
@@ -136,14 +146,12 @@ test("workspace shell connects reminder activity to workspace navigation", () =>
     "$",
     "authClient",
     "confirmAction",
-    "documentRef",
     "esc",
     "fetchAll",
     "memberRepository",
     "renderReminderActivity",
     "state",
     "toast",
-    "windowRef",
   ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachNavigationEvents",
