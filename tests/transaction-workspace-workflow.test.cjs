@@ -56,3 +56,44 @@ test("transaction workspace connects maintenance to the records workflow", () =>
   assert.equal(passed.records.views, views);
   assert.equal(workflow, recordsApi);
 });
+
+test("transaction workspace connects maintenance and records at the app root", () => {
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+  );
+  const transactionWorkspace = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    transactionWorkspace,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)/,
+  );
+  const transactionWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    transactionWorkflow,
+    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+  );
+  assert.match(transactionWorkflow, /createTransactionActionHandlers\(/);
+  assert.match(
+    transactionWorkflow,
+    /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;/,
+  );
+  assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /renderPayments,/);
+  assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
+  assert.match(
+    app,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,/,
+  );
+  assert.doesNotMatch(app, /function attachTransactionEvents\(/);
+  assert.doesNotMatch(app, /PropertyDeskTransactionWorkflow\.create\(/);
+});
