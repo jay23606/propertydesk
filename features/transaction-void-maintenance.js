@@ -42,7 +42,7 @@
         return true;
     }
 
-    return { saveVoidTransaction };
+    return Object.freeze({ saveVoidTransaction });
   }
 
   window.PropertyDeskTransactionVoidMaintenance = Object.freeze({ create });

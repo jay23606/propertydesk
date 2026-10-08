@@ -107,6 +107,7 @@ test("transaction void entry confirms, collects a reason, then delegates persist
     },
   });
 
+  assert.equal(Object.isFrozen(entry), true);
   assert.equal(await entry.voidTransaction("income", "payment-1"), true);
   assert.deepEqual(calls, [
     [
@@ -242,6 +243,7 @@ test("transaction void maintenance voids a posted row with an audit reason", asy
     toast: (message) => messages.push(message),
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   await feature.saveVoidTransaction("income", "payment-1", "Entered in error");
 
   assert.equal(updates[0][0], "pd_payments");

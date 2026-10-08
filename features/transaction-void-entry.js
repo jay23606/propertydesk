@@ -30,7 +30,7 @@
       return saveVoidTransaction(kind, id, reason);
     }
 
-    return { voidTransaction };
+    return Object.freeze({ voidTransaction });
   }
 
   window.PropertyDeskTransactionVoidEntry = Object.freeze({ create });

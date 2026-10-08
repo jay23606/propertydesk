@@ -70,6 +70,7 @@ test("transaction corrections save payment and expense changes with their audit 
       }),
     });
 
+  assert.equal(Object.isFrozen(feature), true);
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), true);
   state.pendingCorrection = {
     kind: "expense",

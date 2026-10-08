@@ -32,7 +32,7 @@
       });
     }
 
-    return { saveCorrection };
+    return Object.freeze({ saveCorrection });
   }
 
   window.PropertyDeskTransactionCorrectionMaintenance = Object.freeze({
