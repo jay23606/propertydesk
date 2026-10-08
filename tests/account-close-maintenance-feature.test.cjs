@@ -49,7 +49,6 @@ test("account close maintenance preserves the account history", async () => {
     },
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    state,
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,
     }),
@@ -94,17 +93,6 @@ test("account close maintenance reports rejected requests without closing detail
   const calls = [];
   const messages = [];
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    state: {
-      client: {
-        from: () => ({
-          update: () => ({
-            eq: async () => {
-              throw new Error("offline");
-            },
-          }),
-        }),
-      },
-    },
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => ({
         from: () => ({
@@ -143,7 +131,6 @@ test("account close maintenance reports database errors before closing details",
   const calls = [];
   const messages = [];
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    state: { client: {} },
     repository: {
       close: async (id) => {
         calls.push(["close", id]);

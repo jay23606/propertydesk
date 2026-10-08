@@ -14,7 +14,6 @@
   }) {
     const { saveCloseAccount } =
       window.PropertyDeskAccountCloseMaintenance.create({
-        state,
         toast,
         fetchAll,
         closeAccountDetails: () => closeModal($("detail-modal")),

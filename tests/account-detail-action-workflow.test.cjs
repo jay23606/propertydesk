@@ -60,6 +60,7 @@ test("account detail action workflow wires only account close concerns", () => {
     context.window.PropertyDeskAccountDetailActionWorkflow.create(dependencies);
 
   assert.equal(passed.maintenance.repository, repository);
+  assert.equal("state" in passed.maintenance, false);
   assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
   assert.equal(passed.entry.saveCloseAccount, saveCloseAccount);
   assert.equal(passed.events.closeAccount, closeAccount);
