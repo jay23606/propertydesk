@@ -3,7 +3,7 @@
   "use strict";
 
   function createWorkspaceReadCatalog(tables) {
-    return Object.freeze([
+    const reads = [
       {
         key: "properties",
         table: tables.properties,
@@ -61,7 +61,21 @@
         order: [["attempted_at", false]],
         limit: 300,
       },
-    ]);
+    ];
+    return Object.freeze(
+      reads.map((read) =>
+        Object.freeze({
+          ...read,
+          ...(read.order
+            ? {
+                order: Object.freeze(
+                  read.order.map((entry) => Object.freeze(entry)),
+                ),
+              }
+            : {}),
+        }),
+      ),
+    );
   }
 
   window.PropertyDeskWorkspaceReadCatalog = Object.freeze({

@@ -34,4 +34,7 @@ test("workspace read catalog lists each hydrated record source once", () => {
   );
   assert.equal(reads.find((read) => read.key === "reminderLogs").limit, 300);
   assert.equal(Object.isFrozen(reads), true);
+  assert.equal(Object.isFrozen(reads[0]), true);
+  assert.equal(Object.isFrozen(reads[0].order), true);
+  assert.equal(Object.isFrozen(reads[0].order[0]), true);
 });
