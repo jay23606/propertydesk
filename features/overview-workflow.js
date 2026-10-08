@@ -59,10 +59,10 @@
       openPropertyPayment,
     });
 
-    return {
+    return Object.freeze({
       renderOverview: overview.renderOverview,
       attachOverviewEvents: overviewEvents.attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskOverviewWorkflow = Object.freeze({ create });

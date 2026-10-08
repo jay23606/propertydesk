@@ -15,7 +15,7 @@
       return true;
     }
 
-    return { save };
+    return Object.freeze({ save });
   }
 
   window.PropertyDeskWorkspaceFormSaveWorkflow = Object.freeze({ create });

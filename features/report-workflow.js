@@ -39,7 +39,7 @@
         downloadBlob,
       });
 
-    return { renderReports, attachReportExportEvents };
+    return Object.freeze({ renderReports, attachReportExportEvents });
   }
 
   window.PropertyDeskReportWorkflow = Object.freeze({ create });

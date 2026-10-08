@@ -87,11 +87,11 @@
         openAccountForProperty,
       });
 
-    return {
+    return Object.freeze({
       renderProperties: propertyViews.renderProperties,
       attachPropertyGridEvents: propertyViews.attachEvents,
       attachPropertyActionEvents,
-    };
+    });
   }
 
   window.PropertyDeskPropertyPortfolioWorkflow = Object.freeze({ create });

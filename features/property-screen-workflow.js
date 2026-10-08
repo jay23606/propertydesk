@@ -66,13 +66,13 @@
         openPropertyDocument: propertyDocuments.openPropertyDocument,
       });
 
-    return {
+    return Object.freeze({
       openPropertyDetails: details.openPropertyDetails,
       attachPropertyDetailEvents: actions.attachPropertyDetailEvents,
       attachPropertyQuickActionEvents: actions.attachPropertyQuickActionEvents,
       attachPropertyHolderEvents,
       attachPropertyDocumentEvents,
-    };
+    });
   }
 
   window.PropertyDeskPropertyScreenWorkflow = Object.freeze({

@@ -34,7 +34,9 @@
       documentRepository,
     });
 
-    return { attachBackupExportEvents: exporter.attachBackupExportEvents };
+    return Object.freeze({
+      attachBackupExportEvents: exporter.attachBackupExportEvents,
+    });
   }
 
   window.PropertyDeskBackupWorkspaceWorkflow = Object.freeze({

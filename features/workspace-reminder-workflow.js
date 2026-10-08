@@ -50,7 +50,7 @@
       openModal,
     });
 
-    return { renderReminderActivity, previewReminderEmail };
+    return Object.freeze({ renderReminderActivity, previewReminderEmail });
   }
 
   window.PropertyDeskWorkspaceReminderWorkflow = Object.freeze({

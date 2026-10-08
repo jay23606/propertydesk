@@ -39,6 +39,7 @@ function createImportFile(options = {}) {
       options.handleRows ||
       ((file, rows) => calls.push(["rows", file.name, rows])),
   });
+  assert.equal(Object.isFrozen(workflow), true);
   return { calls, input, status, workflow };
 }
 

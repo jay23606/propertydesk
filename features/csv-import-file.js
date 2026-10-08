@@ -29,7 +29,7 @@
       });
     }
 
-    return { attachEvents };
+    return Object.freeze({ attachEvents });
   }
 
   window.PropertyDeskCsvImportFile = Object.freeze({ create });

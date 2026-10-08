@@ -65,7 +65,7 @@
       propertyDetailsHTML,
     });
 
-    return { openPropertyDetails };
+    return Object.freeze({ openPropertyDetails });
   }
 
   window.PropertyDeskPropertyDetailContentWorkflow = Object.freeze({ create });

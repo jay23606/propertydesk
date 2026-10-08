@@ -46,10 +46,10 @@
         openAccountForProperty,
         toggleArchiveProperty,
       });
-    return {
+    return Object.freeze({
       attachPropertyDetailEvents,
       attachPropertyQuickActionEvents,
-    };
+    });
   }
 
   window.PropertyDeskPropertyDetailManagementWorkflow = Object.freeze({
