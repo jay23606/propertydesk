@@ -45,6 +45,7 @@ test("transaction list model filters rows and resolves their display association
     payments: [
       {
         id: "payment-1",
+        user_id: "private-owner-id",
         account_id: "rental",
         amount: 500,
         received_date: "2026-10-05",
@@ -139,6 +140,14 @@ test("transaction list model filters rows and resolves their display association
 
   assert.equal(rows.length, 5);
   assert.equal(rows[0].item.id, "payment-1");
+  assert.deepEqual(Object.keys(rows[0].item).sort(), [
+    "id",
+    "memo",
+    "status",
+    "void_reason",
+  ]);
+  assert.equal(Object.hasOwn(rows[0].item, "user_id"), false);
+  assert.equal(Object.hasOwn(rows[0].item, "account_id"), false);
   assert.equal(rows[0].propertyName, "Oak House");
   assert.equal(rows[0].partyName, "Tenant A");
   assert.equal(rows[0].transactionType, "Income");

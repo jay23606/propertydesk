@@ -73,7 +73,12 @@
         kind: row.kind,
         date: row.date,
         amount: row.amount,
-        item,
+        item: {
+          id: item.id,
+          status: item.status,
+          memo: item.memo,
+          void_reason: item.void_reason,
+        },
         propertyName: property?.name || "—",
         partyName: account?.party_name || account?.name || "Property",
         ...displayFields(row),
