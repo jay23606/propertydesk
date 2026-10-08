@@ -11,6 +11,7 @@
     editAccount,
     openPayment,
     repository,
+    writeFeedback,
     workflows: {
       closeMaintenance: closeMaintenanceWorkflow,
       closeEntry: closeEntryWorkflow,
@@ -23,6 +24,7 @@
       fetchAll,
       closeAccountDetails: () => closeModal($("detail-modal")),
       repository,
+      writeFeedback,
     });
     const { closeAccount } = closeEntryWorkflow.create({
       saveCloseAccount,

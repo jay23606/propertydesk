@@ -10,6 +10,7 @@ test("account and deposit workspace share detail rendering and events", () => {
   const attachDepositAdjustmentEvents = () => {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
+  const writeFeedback = {};
   const depositWorkflows = {
     detailsModel: {},
     detailsView: {},
@@ -40,6 +41,7 @@ test("account and deposit workspace share detail rendering and events", () => {
       prepareAdjustment() {},
       validateAdjustment() {},
       resolveAdjustmentType() {},
+      writeFeedback,
       ignored: true,
     },
     ignored: true,
@@ -54,6 +56,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     editAccount() {},
     openPayment() {},
     repository: {},
+    writeFeedback,
     ignored: true,
   };
   const context = vm.createContext({
@@ -130,6 +133,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     "toast",
     "todayIso",
     "validateAdjustment",
+    "writeFeedback",
   ]);
   assert.equal("ignored" in passed.deposits, false);
   assert.deepEqual(Object.keys(passed.deposits.workflows).sort(), [
@@ -157,8 +161,10 @@ test("account and deposit workspace share detail rendering and events", () => {
     "repository",
     "state",
     "toast",
+    "writeFeedback",
   ]);
   assert.equal("ignored" in passed.accountDetails.actions, false);
+  assert.equal(passed.accountDetails.actions.writeFeedback, writeFeedback);
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,

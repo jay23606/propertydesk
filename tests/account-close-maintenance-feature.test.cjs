@@ -4,6 +4,15 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
+
+test("account close maintenance uses injected write feedback", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-close-maintenance.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+});
+
 test("account close maintenance preserves the account history", async () => {
   const context = vm.createContext({ window: {} });
   loadRepositoryWriteFeedback(context);
@@ -50,6 +59,7 @@ test("account close maintenance preserves the account history", async () => {
     },
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,
     }),
@@ -97,6 +107,7 @@ test("account close maintenance reports rejected requests without closing detail
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => ({
         from: () => ({
@@ -137,6 +148,7 @@ test("account close confirms a lost response from refreshed account status", asy
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     repository: {
       close: async () => {
         throw new Error("connection lost");
@@ -171,6 +183,7 @@ test("account close maintenance reports database errors before closing details",
   const calls = [];
   const messages = [];
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     repository: {
       close: async (id) => {
         calls.push(["close", id]);

@@ -40,6 +40,7 @@ test("account detail workspace joins content rendering and action binding", () =
     editAccount() {},
     openPayment() {},
     repository: {},
+    writeFeedback: {},
     unusedDependency: true,
   };
   const context = vm.createContext({
@@ -107,6 +108,7 @@ test("account detail workspace joins content rendering and action binding", () =
     "state",
     "toast",
     "workflows",
+    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.content))
     assert.equal(passed.content[key], content[key]);

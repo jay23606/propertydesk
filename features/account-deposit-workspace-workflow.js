@@ -31,6 +31,7 @@
         prepareAdjustment: deposits.adjustments.prepareAdjustment,
         validateAdjustment: deposits.adjustments.validateAdjustment,
         resolveAdjustmentType: deposits.adjustments.resolveAdjustmentType,
+        writeFeedback: deposits.adjustments.writeFeedback,
       },
       workflows: depositWorkflows,
     });
@@ -65,6 +66,7 @@
         editAccount: accountDetails.actions.editAccount,
         openPayment: accountDetails.actions.openPayment,
         repository: accountDetails.actions.repository,
+        writeFeedback: accountDetails.actions.writeFeedback,
       },
     });
 

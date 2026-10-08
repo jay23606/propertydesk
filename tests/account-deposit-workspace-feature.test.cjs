@@ -10,6 +10,7 @@ test("account and deposit workspace exposes only its supported operations", () =
   const attachAccountDetailActionEvents = () => {};
   const attachDepositAdjustmentEvents = () => {};
   const depositSectionHTML = () => "deposit";
+  const writeFeedback = {};
   const context = vm.createContext({
     window: {
       PropertyDeskDepositWorkspaceWorkflow: {
@@ -70,6 +71,7 @@ test("account and deposit workspace exposes only its supported operations", () =
       prepareAdjustment: () => {},
       validateAdjustment: () => {},
       resolveAdjustmentType: () => {},
+      writeFeedback,
       unusedAdjustmentValue: true,
     },
     unusedDepositValue: true,
@@ -99,6 +101,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     editAccount: () => {},
     openPayment: () => {},
     repository: {},
+    writeFeedback,
     unusedActionValue: true,
   };
   const accountDetails = { content, actions };
@@ -144,6 +147,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     "toast",
     "todayIso",
     "validateAdjustment",
+    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.deposits.details))
     assert.equal(passed.deposits.details[key], deposits.details[key]);
@@ -187,10 +191,12 @@ test("account and deposit workspace exposes only its supported operations", () =
     "repository",
     "state",
     "toast",
+    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.accountDetails.actions))
     assert.equal(passed.accountDetails.actions[key], actions[key]);
   assert.equal("unusedActionValue" in passed.accountDetails.actions, false);
+  assert.equal(passed.accountDetails.actions.writeFeedback, writeFeedback);
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,
@@ -299,6 +305,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
   );
   assert.match(accountWorkflow, /repository,/);
+  assert.match(accountWorkflow, /writeFeedback,/);
   const depositWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-adjustment-workflow.js"),
     "utf8",
@@ -314,6 +321,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /window\.PropertyDeskDeposit(?:Maintenance|AdjustmentEntry|DetailEvents)\.create/,
   );
   assert.match(depositWorkflow, /repository,/);
+  assert.match(depositWorkflow, /writeFeedback,/);
+  assert.match(
+    app,
+    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback/,
+  );
+  assert.match(
+    app,
+    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback/,
+  );
   assert.match(app, /repository: repositories\.transactions/);
   assert.match(
     app,

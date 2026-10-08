@@ -5,6 +5,14 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
+test("deposit maintenance uses injected write feedback", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "deposit-maintenance.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+});
+
 function loadAdjustmentModel(context) {
   if (!context.window.PropertyDeskDepositAdjustmentModel) {
     vm.runInContext(
@@ -143,6 +151,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => {
@@ -205,6 +214,7 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
   const messages = [];
   let inserts = 0;
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -283,6 +293,7 @@ test("deposit maintenance reconciles an adjustment after a lost response", async
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-08",
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => {
@@ -345,6 +356,7 @@ test("deposit maintenance asks to check the refreshed ledger before retrying", a
   );
   const events = [];
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -444,6 +456,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),

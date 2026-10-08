@@ -14,6 +14,7 @@
     prepareAdjustment,
     validateAdjustment,
     resolveAdjustmentType,
+    writeFeedback,
     workflows,
   }) {
     const { saveDepositAdjustment } = workflows.maintenance.create({
@@ -24,6 +25,7 @@
       repository,
       prepareAdjustment,
       resolveAdjustmentType,
+      writeFeedback,
     });
     const { recordDepositAdjustment } = workflows.entry.create({
       state,

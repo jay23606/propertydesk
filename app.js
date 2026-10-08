@@ -410,6 +410,7 @@
         fetchAll,
         moneyInput,
         repository: repositories.deposits,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
         prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
         resolveAdjustmentType:
@@ -449,6 +450,7 @@
         editAccount: propertyAccountForms.editAccount,
         openPayment,
         repository: repositories.accounts,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
       },
     },
   });

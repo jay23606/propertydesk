@@ -30,6 +30,7 @@
         prepareAdjustment: adjustments.prepareAdjustment,
         validateAdjustment: adjustments.validateAdjustment,
         resolveAdjustmentType: adjustments.resolveAdjustmentType,
+        writeFeedback: adjustments.writeFeedback,
         workflows: workflows.adjustmentModules,
       });
 
