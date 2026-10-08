@@ -49,17 +49,41 @@
         ));
       } catch (requestError) {
         toast(
-          `File deleted, but its document record could not be removed: ${requestError.message || "Check your connection and try again."}`,
+          `File was deleted, but its document record result couldn't be confirmed. ${requestError.message || "Reloading property details to check."}`,
         );
+        await refreshAfterDocumentRecordFailure(doc, propertyId);
         return false;
       }
       if (error) {
         toast(
           `File deleted, but its document record could not be removed: ${error.message}`,
         );
+        await refreshAfterDocumentRecordFailure(doc, propertyId);
         return false;
       }
       return true;
+    }
+
+    async function refreshAfterDocumentRecordFailure(doc, propertyId) {
+      let recordRemains = false;
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            recordRemains = state.documents.some((row) => row.id === doc.id);
+            openPropertyDetails(propertyId);
+          },
+          toast,
+          refreshFailureMessage:
+            "Agreement file was deleted, but its document record could not be refreshed. Reload property details before retrying.",
+        });
+      if (!refreshed) return false;
+      toast(
+        recordRemains
+          ? "Agreement file was deleted, but its document record remains. Retry deletion to clear the stale entry."
+          : "Agreement deleted",
+      );
+      return !recordRemains;
     }
 
     async function refreshDeletedProperty(propertyId) {
