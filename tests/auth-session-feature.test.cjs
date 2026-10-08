@@ -43,11 +43,18 @@ test("auth feature delegates session restoration and state changes to its sessio
     },
   };
   const calls = [];
+  const workspaceSnapshots = [];
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
     state,
     authClient: createAuthClient(context, state),
-    fetchAll: async () => calls.push("fetch-workspace"),
+    fetchAll: async () => {
+      calls.push("fetch-workspace");
+      workspaceSnapshots.push({
+        ownerId: state.workspaceOwnerId,
+        propertyCount: state.properties.length,
+      });
+    },
     toast() {},
     windowRef: {
       location: { hash: "#type=recovery&access_token=reset-token" },
@@ -77,6 +84,18 @@ test("auth feature delegates session restoration and state changes to its sessio
   });
   assert.equal(state.user.refreshed, true);
   assert.deepEqual(calls, ["fetch-workspace"]);
+
+  state.workspaceOwnerId = "owner-2";
+  state.properties = [{ id: "owner-2-property" }];
+  feature.handleAuthStateChange("SIGNED_IN", { user: { id: "owner-3" } });
+  assert.equal(state.user.id, "owner-3");
+  assert.equal(state.workspaceOwnerId, null);
+  assert.equal(state.properties.length, 0);
+  assert.deepEqual(calls, ["fetch-workspace", "fetch-workspace"]);
+  assert.deepEqual(workspaceSnapshots, [
+    { ownerId: null, propertyCount: 0 },
+    { ownerId: null, propertyCount: 0 },
+  ]);
 });
 
 test("auth feature owns login controls and clears workspace data on sign-out", async () => {

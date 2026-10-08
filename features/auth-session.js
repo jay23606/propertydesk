@@ -29,9 +29,15 @@
     function handleAuthenticatedSession(event, session) {
       if (!session?.user) return;
       const previousUserId = state.user?.id;
-      state.user = session.user;
       const signedIntoNewUser =
         event === "SIGNED_IN" && previousUserId !== session.user.id;
+      const passwordRecoveryInProgress =
+        state.passwordRecoveryInProgress === true;
+      if (signedIntoNewUser) {
+        resetWorkspaceState(state);
+        state.passwordRecoveryInProgress = passwordRecoveryInProgress;
+      }
+      state.user = session.user;
       if (signedIntoNewUser && !state.passwordRecoveryInProgress)
         startWorkspace();
     }
