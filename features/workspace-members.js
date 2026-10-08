@@ -29,28 +29,21 @@
         toast,
         failureMessage:
           "Workspace member addition result couldn't be confirmed. Reload workspace settings before trying again.",
-        onUnconfirmed: async () => {
-          let added = false;
-          const refreshed =
-            await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-              fetchAll,
-              afterRefresh: () => {
-                refreshWorkspaceSettings();
-                added = memberWithEmailExists(email);
-              },
-              toast,
-              refreshFailureMessage:
-                "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
-            });
-          if (!refreshed) return false;
-          reconciled = added;
-          toast(
-            added
-              ? "Workspace member added"
-              : "Workspace member addition wasn't confirmed. Check settings before retrying.",
-          );
-          return added;
-        },
+        onUnconfirmed: () =>
+          window.PropertyDeskRepositoryWriteFeedback.reconcileWorkspaceChange({
+            fetchAll,
+            afterRefresh: refreshWorkspaceSettings,
+            isConfirmed: () => memberWithEmailExists(email),
+            toast,
+            refreshFailureMessage:
+              "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+            retryMessage:
+              "Workspace member addition wasn't confirmed. Check settings before retrying.",
+            onConfirmed: () => {
+              reconciled = true;
+              toast("Workspace member added");
+            },
+          }),
       });
       if (!saved) return;
       if (reconciled) return true;
@@ -84,30 +77,24 @@
         toast,
         failureMessage:
           "Workspace member removal result couldn't be confirmed. Reload workspace settings before trying again.",
-        onUnconfirmed: async () => {
-          let memberRemains = true;
-          const refreshed =
-            await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-              fetchAll,
-              afterRefresh: () => {
-                refreshWorkspaceSettings();
-                memberRemains = state.workspaceMembers.some(
-                  (item) => item.member_user_id === memberId,
-                );
-              },
-              toast,
-              refreshFailureMessage:
-                "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
-            });
-          if (!refreshed) return false;
-          reconciled = !memberRemains;
-          toast(
-            reconciled
-              ? "Workspace access removed"
-              : "Workspace member still appears in settings. Check access before retrying.",
-          );
-          return reconciled;
-        },
+        onUnconfirmed: () =>
+          window.PropertyDeskRepositoryWriteFeedback.reconcileWorkspaceChange({
+            fetchAll,
+            afterRefresh: refreshWorkspaceSettings,
+            isConfirmed: () =>
+              !state.workspaceMembers.some(
+                (item) => item.member_user_id === memberId,
+              ),
+            toast,
+            refreshFailureMessage:
+              "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+            retryMessage:
+              "Workspace member still appears in settings. Check access before retrying.",
+            onConfirmed: () => {
+              reconciled = true;
+              toast("Workspace access removed");
+            },
+          }),
       });
       if (!removed) return;
       if (reconciled) return;

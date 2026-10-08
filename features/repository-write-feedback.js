@@ -59,6 +59,34 @@
     return true;
   }
 
+  async function reconcileWorkspaceChange({
+    fetchAll,
+    isConfirmed,
+    afterRefresh,
+    toast,
+    refreshFailureMessage,
+    retryMessage,
+    onConfirmed,
+  }) {
+    let confirmed = false;
+    const refreshed = await refreshWorkspace({
+      fetchAll,
+      afterRefresh: () => {
+        afterRefresh?.();
+        confirmed = isConfirmed();
+      },
+      toast,
+      refreshFailureMessage,
+    });
+    if (!refreshed) return false;
+    if (!confirmed) {
+      toast(retryMessage);
+      return false;
+    }
+    onConfirmed?.();
+    return true;
+  }
+
   function payloadMatchesRecord(record, payload) {
     return Object.entries(payload).every(([key, value]) => {
       const actual = record[key];
@@ -131,6 +159,7 @@
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
+    reconcileWorkspaceChange,
     saveWorkspaceRecord,
   });
 })();
