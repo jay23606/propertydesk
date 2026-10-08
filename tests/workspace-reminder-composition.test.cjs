@@ -23,7 +23,6 @@ test("app connects account reminder preview through the workspace shell", () => 
     "features/reminder-activity-view.js",
     "features/reminder-preview.js",
     "features/reminder-preview-model.js",
-    "features/workspace-reminder-workflow.js",
     "features/workspace-navigation-workflow.js",
     "features/workspace-shell-workflow.js",
     "features/property-account-entry-workflow.js",

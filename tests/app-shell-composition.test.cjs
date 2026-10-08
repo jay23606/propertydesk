@@ -27,11 +27,11 @@ test("Workspace navigation coordinates settings rendering and page routing", () 
   );
   assert.match(
     shell,
-    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?state: reminder\.state,[\s\S]*?openModal: reminder\.openModal/,
+    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\([\s\S]*?openModal: reminder\.openModal/,
   );
   assert.match(
     shell,
-    /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
+    /WorkspaceNavigationWorkflow\.create\(\{[\s\S]*?renderReminderActivity,/,
   );
   assert.match(
     workflow,

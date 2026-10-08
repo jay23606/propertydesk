@@ -8,10 +8,6 @@ test("reminder activity flows through reminder and workspace navigation workflow
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const reminderWorkflow = fs.readFileSync(
-    path.join(root, "features", "workspace-reminder-workflow.js"),
-    "utf8",
-  );
   const navigationWorkflow = fs.readFileSync(
     path.join(root, "features", "workspace-navigation-workflow.js"),
     "utf8",
@@ -24,14 +20,14 @@ test("reminder activity flows through reminder and workspace navigation workflow
   assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
   assert.match(
     shellWorkflow,
-    /WorkspaceReminderWorkflow\.create\(\{[\s\S]*?state: reminder\.state,[\s\S]*?openModal: reminder\.openModal,\s*\}\);[\s\S]*?WorkspaceNavigationWorkflow\.create\([\s\S]*?renderReminderActivity: reminders\.renderReminderActivity/,
+    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\([\s\S]*?WorkspaceNavigationWorkflow\.create\([\s\S]*?renderReminderActivity,/,
   );
   assert.match(
-    reminderWorkflow,
-    /PropertyDeskReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
+    shellWorkflow,
+    /ReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
   );
   assert.match(
-    reminderWorkflow,
+    shellWorkflow,
     /PropertyDeskReminderPreview\.create\(\{[\s\S]*?model: previewModel/,
   );
   assert.match(
@@ -43,7 +39,10 @@ test("reminder activity flows through reminder and workspace navigation workflow
     /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
   );
   for (const feature of [
-    "features/workspace-reminder-workflow.js",
+    "features/reminder-activity-model.js",
+    "features/reminder-activity-view.js",
+    "features/reminder-preview-model.js",
+    "features/reminder-preview.js",
     "features/workspace-navigation-workflow.js",
     "features/workspace-shell-workflow.js",
   ]) {
