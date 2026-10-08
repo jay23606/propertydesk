@@ -3,24 +3,24 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app wires account forms and transaction entry through separate workflows", () => {
+test("app composes independent property and account forms before action routing", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 
-  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
-  assert.match(app, /PropertyDeskAccountForm\.create\(/);
+  assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
   assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyForm\.resetPropertyForm,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
+    /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountForms\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
   );
   assert.match(
     app,
-    /editAccount: accountForm\.editAccount,[\s\S]*?openAccountForProperty: accountForm\.openAccountForProperty/,
+    /editAccount: propertyAccountForms\.editAccount,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty/,
   );
   assert.match(
     app,
-    /propertyForm\.attachEvents,[\s\S]*?accountForm\.attachEvents,[\s\S]*?attachLedgerEntryFormEvents/,
+    /propertyAccountForms\.attachPropertyFormEvents,[\s\S]*?propertyAccountForms\.attachAccountFormEvents,[\s\S]*?attachLedgerEntryFormEvents/,
   );
 
   const transactionWorkflow = fs.readFileSync(

@@ -143,29 +143,32 @@
   } = appShell;
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
-  const propertyForm = window.PropertyDeskPropertyForm.create({
-    $,
-    state,
-    toast,
-    closeModal,
-    fetchAll,
-    repository: repositories.properties,
-  });
-  const accountForm = window.PropertyDeskAccountForm.create({
-    $,
-    state,
-    moneyInput,
-    todayIso,
-    toast,
-    closeModal,
-    fetchAll,
-    populateFormOptions,
-    openModal,
-    previewReminderEmail,
-    buildAccountPayload: window.PropertyDeskAccountPayload.build,
-    formModel: window.PropertyDeskAccountFormModel,
-    repository: repositories.accounts,
-  });
+  const propertyAccountForms =
+    window.PropertyDeskPropertyAccountFormsWorkflow.create({
+      property: {
+        $,
+        state,
+        toast,
+        closeModal,
+        fetchAll,
+        repository: repositories.properties,
+      },
+      account: {
+        $,
+        state,
+        moneyInput,
+        todayIso,
+        toast,
+        closeModal,
+        fetchAll,
+        populateFormOptions,
+        openModal,
+        previewReminderEmail,
+        buildAccountPayload: window.PropertyDeskAccountPayload.build,
+        formModel: window.PropertyDeskAccountFormModel,
+        repository: repositories.accounts,
+      },
+    });
   const transactionRecords =
     window.PropertyDeskTransactionRecordsWorkflow.create({
       maintenance: {
@@ -235,9 +238,9 @@
     $,
     state,
     toast,
-    resetPropertyForm: propertyForm.resetPropertyForm,
+    resetPropertyForm: propertyAccountForms.resetPropertyForm,
     openModal,
-    openAccountForProperty: accountForm.openAccountForProperty,
+    openAccountForProperty: propertyAccountForms.openAccountForProperty,
     openPayment,
     openExpense,
     navigate,
@@ -287,7 +290,7 @@
         toast,
         fetchAll,
         closeModal,
-        editAccount: accountForm.editAccount,
+        editAccount: propertyAccountForms.editAccount,
         openPayment,
         repository: repositories.accounts,
       },
@@ -332,11 +335,11 @@
         todayIso,
         propertyRepository: repositories.properties,
         closeModal,
-        editAccount: accountForm.editAccount,
+        editAccount: propertyAccountForms.editAccount,
         openAccountDetails,
         openPayment,
         openExpense,
-        openAccountForProperty: accountForm.openAccountForProperty,
+        openAccountForProperty: propertyAccountForms.openAccountForProperty,
       },
       holders: {
         $,
@@ -391,7 +394,7 @@
       fetchAll,
       openPayment,
       propertyRepository: repositories.properties,
-      openAccountForProperty: accountForm.openAccountForProperty,
+      openAccountForProperty: propertyAccountForms.openAccountForProperty,
     },
   });
   const {
@@ -454,8 +457,8 @@
       attachAccountDetailActionEvents,
       attachDepositAdjustmentEvents,
       attachCreateActionEvents,
-      propertyForm.attachEvents,
-      accountForm.attachEvents,
+      propertyAccountForms.attachPropertyFormEvents,
+      propertyAccountForms.attachAccountFormEvents,
       attachLedgerEntryFormEvents,
       attachPropertyDetailEvents,
       attachPropertyHolderEvents,

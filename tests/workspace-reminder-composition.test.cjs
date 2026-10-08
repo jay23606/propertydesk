@@ -25,7 +25,7 @@ test("app shell shares workspace reminder preview with account forms", () => {
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskAccountForm\.create\(\{[\s\S]*?previewReminderEmail,/,
+    /PropertyDeskPropertyAccountFormsWorkflow\.create\(\{[\s\S]*?account: \{[\s\S]*?previewReminderEmail,/,
   );
   for (const feature of [
     "features/reminder-activity-model.js",

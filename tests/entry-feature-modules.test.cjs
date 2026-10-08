@@ -44,7 +44,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /attachCreateActionEvents/);
   assert.match(
     app,
-    /openAccountForProperty: accountForm\.openAccountForProperty/,
+    /openAccountForProperty: propertyAccountForms\.openAccountForProperty/,
   );
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /entryWorkflow\./);
@@ -60,8 +60,24 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
     "utf8",
   );
-  assert.match(app, /PropertyDeskPropertyForm\.create\(/);
-  assert.match(app, /PropertyDeskAccountForm\.create\(/);
+  assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
+  const propertyAccountForms = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-account-forms-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.match(
+    propertyAccountForms,
+    /PropertyDeskPropertyForm\.create\(property\)/,
+  );
+  assert.match(
+    propertyAccountForms,
+    /PropertyDeskAccountForm\.create\(account\)/,
+  );
   assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
   assert.match(app, /repository: repositories\.accounts/);
   assert.match(app, /repository: repositories\.properties/);
