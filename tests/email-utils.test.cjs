@@ -16,7 +16,7 @@ function parts(href) {
   };
 }
 
-test("late reminder link addresses the saved party and fills the requested subject and body", () => {
+test("late reminder email uses the requested concise payment reminder copy", () => {
   const href = lateReminderMailto({
     email: "buyer@example.test",
     address: "1 Sample Street",
@@ -30,7 +30,7 @@ test("late reminder link addresses the saved party and fills the requested subje
   assert.deepEqual(parts(href), {
     recipients: "buyer@example.test",
     subject: "Payment reminder for 1 Sample Street · October 2026",
-    body: "Hello Test Buyer,\n\nOur records show no rent or installment payment recorded for October 2026.\n\nUnpaid due as of 2026-10-31: $550.00\nProperty: 1 Sample Street\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nProperty Manager",
+    body: "Hello Test Buyer, our records show $550.00 unpaid for October 2026 at 1 Sample Street. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
   });
 });
 
@@ -55,15 +55,10 @@ test("late reminder link supports multiple validated recipients and leaves missi
   );
   assert.equal(noEmail.recipients, "");
   assert.match(noEmail.subject, /^Payment reminder for 10 Oak St · /);
-  assert.match(
+  assert.equal(
     noEmail.body,
-    /^Hello there,\n\nOur records show no rent or installment payment recorded for /,
+    "Hello there, our records show $75.00 unpaid for October 2026 at 10 Oak St. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
   );
-  assert.match(
-    noEmail.body,
-    /Unpaid due as of \d{4}-\d{2}-\d{2}: \$75\.00\nProperty: 10 Oak St/,
-  );
-  assert.ok(noEmail.body.endsWith("\n\nThank you,\nOwner"));
 });
 
 test("shared reminder copy falls back to a generic greeting for a blank name", () => {
@@ -76,7 +71,7 @@ test("shared reminder copy falls back to a generic greeting for a blank name", (
     asOf: "2026-10-31",
   });
 
-  assert.match(parts(message).body, /^Hello there,/);
+  assert.match(parts(message).body, /^Hello there, our records show/);
 });
 
 test("late reminder text link opens the phone composer with the same reminder body", () => {
@@ -95,7 +90,7 @@ test("late reminder text link opens the phone composer with the same reminder bo
   assert.equal(url.pathname, "+15550102020");
   assert.equal(
     url.searchParams.get("body"),
-    "Hello Test Buyer,\n\nOur records show no rent or installment payment recorded for October 2026.\n\nUnpaid due as of 2026-10-31: $550.00\nProperty: 1 Sample Street\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\nProperty Manager",
+    "Hello Test Buyer, our records show $550.00 unpaid for October 2026 at 1 Sample Street. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
   );
   assert.equal(lateReminderSms({ phone: "   " }), "");
 });

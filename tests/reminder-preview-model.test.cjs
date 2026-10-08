@@ -77,18 +77,6 @@ test("reminder preview model derives the due and email content from current term
     label: "October 2026",
     schedule:
       "Last day of October 2026, only when no rent or installment payment is recorded that month",
-    body: [
-      "Hello Buyer,",
-      "",
-      "Our records show no rent or installment payment recorded for October 2026.",
-      "",
-      "Unpaid due as of 2026-10-31: USD 550.00",
-      "Property: 10 Main St",
-      "",
-      "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
-      "",
-      "Thank you,",
-      "PropertyDesk",
-    ].join("\n"),
+    body: "Hello Buyer, our records show USD 550.00 unpaid for October 2026 at 10 Main St. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
   });
 });

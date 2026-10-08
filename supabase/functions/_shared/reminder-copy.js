@@ -7,9 +7,7 @@
     subjectAddress = address,
     unpaidDue,
     recipientName,
-    senderName,
     month,
-    asOf,
   }) {
     const period =
       month ||
@@ -17,22 +15,9 @@
         month: "long",
         year: "numeric",
       }).format(new Date());
-    const amountDate = asOf || new Date().toISOString().slice(0, 10);
     const subject = `Payment reminder for ${subjectAddress} · ${period}`;
     const name = String(recipientName || "").trim() || "there";
-    const body = [
-      `Hello ${name},`,
-      "",
-      `Our records show no rent or installment payment recorded for ${period}.`,
-      "",
-      `Unpaid due as of ${amountDate}: ${unpaidDue}`,
-      `Property: ${address}`,
-      "",
-      "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
-      "",
-      "Thank you,",
-      senderName || "PropertyDesk",
-    ].join("\n");
+    const body = `Hello ${name}, our records show ${unpaidDue} unpaid for ${period} at ${address}. Please arrange payment promptly, or contact me if you believe our records are incorrect.`;
 
     return { subject, body };
   }

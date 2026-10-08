@@ -33,16 +33,16 @@ export function reminderMessage(
     .filter(Boolean)
     .join(", ");
   const name = account.party_name?.trim() || "there";
-  const sender = "PropertyDesk";
   const { subject, body: text } = buildReminderCopy({
     subjectAddress: property.address,
     address,
     unpaidDue: `$${amountDue.toFixed(2)}`,
     recipientName: name,
-    senderName: sender,
     month: label,
-    asOf: monthEnd,
   });
-  const html = `<p>Hello ${escapeHtml(name)},</p><p>Our records show no rent or installment payment recorded for ${escapeHtml(label)}.</p><p><strong>Unpaid due as of ${escapeHtml(monthEnd)}:</strong> $${amountDue.toFixed(2)}<br><strong>Property:</strong> ${escapeHtml(address)}</p><p>If you have already paid or believe this is incorrect, please contact your landlord or seller.</p><p>Thank you,<br>${sender}</p>`;
+  const html = text
+    .split("\n")
+    .map((line) => escapeHtml(line))
+    .join("<br>");
   return { subject, text, html };
 }

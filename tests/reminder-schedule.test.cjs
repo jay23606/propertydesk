@@ -9,7 +9,7 @@ const utilsPromise =
 const messagePromise =
   import("../supabase/functions/_shared/reminder-message.mjs");
 
-test("reminder messages keep plain text readable and escape HTML fields", async () => {
+test("reminder email uses the requested wording and safely escapes its HTML version", async () => {
   const { reminderMessage } = await messagePromise;
   const message = reminderMessage(
     { party_name: "Ana & <Sam>" },
@@ -28,12 +28,14 @@ test("reminder messages keep plain text readable and escape HTML fields", async 
     message.subject,
     "Payment reminder for 12 <Main> & 2nd · October 2026",
   );
-  assert.match(message.text, /Hello Ana & <Sam>,/);
-  assert.match(message.text, /Unpaid due as of 2026-10-31: \$550\.00/);
-  assert.match(message.text, /Property: 12 <Main> & 2nd, Town, PA, 17000/);
-  assert.match(message.html, /Hello Ana &amp; &lt;Sam&gt;/);
-  assert.match(message.html, /12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000/);
-  assert.match(message.html, /October 2026/);
+  assert.equal(
+    message.text,
+    "Hello Ana & <Sam>, our records show $550.00 unpaid for October 2026 at 12 <Main> & 2nd, Town, PA, 17000. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
+  );
+  assert.equal(
+    message.html,
+    "Hello Ana &amp; &lt;Sam&gt;, our records show $550.00 unpaid for October 2026 at 12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
+  );
 });
 
 test("automated reminders and manual drafts share the same plain-text message", async () => {
@@ -76,8 +78,8 @@ test("reminder message greets the recipient generically when no name is set", as
     100,
   );
 
-  assert.match(message.text, /^Hello there,/);
-  assert.match(message.html, /<p>Hello there,<\/p>/);
+  assert.match(message.text, /^Hello there, our records show/);
+  assert.match(message.html, /^Hello there, our records show/);
 });
 
 test("month-end detection uses New York calendar time, including daylight-saving boundaries", async () => {

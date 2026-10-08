@@ -34,9 +34,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 96px;
-    min-width: 96px;
-    max-width: 96px;
+    width: 76px;
+    min-width: 76px;
+    max-width: 76px;
     z-index: 2;
     background: #fff;
   }
@@ -47,41 +47,100 @@
   .portfolio-table th:nth-child(2),
   .portfolio-table td:nth-child(2) {
     position: sticky;
-    left: 96px;
-    width: 100px;
-    min-width: 100px;
-    max-width: 100px;
+    left: 76px;
+    width: 68px;
+    min-width: 68px;
+    max-width: 68px;
     z-index: 2;
     background: #fff;
-    box-shadow: 3px 0 6px #1c30200d;
   }
   .portfolio-table th:nth-child(2) {
     z-index: 4;
     background: #fafbf9;
   }
   .portfolio-table tbody tr:hover td:nth-child(1),
-  .portfolio-table tbody tr:hover td:nth-child(2) {
+  .portfolio-table tbody tr:hover td:nth-child(2),
+  .portfolio-table tbody tr:hover td:nth-child(3),
+  .portfolio-table tbody tr:hover td:nth-child(4),
+  .portfolio-table tbody tr:hover td:nth-child(5) {
     background: #fbfcfa;
   }
   .portfolio-table td:nth-child(1) .button {
-    width: 86px;
-    padding: 7px 5px;
+    width: 68px;
+    padding: 7px 2px;
     font-size: 9px;
   }
   .portfolio-table .table-subtext {
     display: none;
   }
+  .portfolio-table th,
+  .portfolio-table td {
+    padding-right: 3px;
+    padding-left: 3px;
+  }
   .portfolio-table td:nth-child(3) {
-    min-width: 165px;
-    max-width: 190px;
+    position: sticky;
+    left: 144px;
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    z-index: 2;
+    background: #fff;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .portfolio-table th:nth-child(3) {
+    position: sticky;
+    left: 144px;
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    z-index: 4;
+    background: #fafbf9;
+  }
   .portfolio-table td:nth-child(3) .table-action {
-    max-width: 175px;
+    display: block;
+    max-width: 84px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
     vertical-align: middle;
+  }
+  .portfolio-table .property-row-note {
+    display: none;
+  }
+  .portfolio-table th:nth-child(4),
+  .portfolio-table td:nth-child(4),
+  .portfolio-table th:nth-child(5),
+  .portfolio-table td:nth-child(5) {
+    position: sticky;
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    z-index: 2;
+    background: #fff;
+  }
+  .portfolio-table th:nth-child(4),
+  .portfolio-table td:nth-child(4) {
+    left: 234px;
+  }
+  .portfolio-table th:nth-child(5),
+  .portfolio-table td:nth-child(5) {
+    left: 276px;
+    box-shadow: 3px 0 6px #1c30200d;
+  }
+  .portfolio-table th:nth-child(4),
+  .portfolio-table th:nth-child(5) {
+    z-index: 4;
+    background: #fafbf9;
+  }
+  .portfolio-table td.portfolio-contact-action {
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+  .portfolio-table .portfolio-icon-action {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -207,16 +266,74 @@
   text-decoration: underline;
 }
 html[data-theme="dark"] .portfolio-table th:nth-child(1),
-html[data-theme="dark"] .portfolio-table th:nth-child(2) {
+html[data-theme="dark"] .portfolio-table th:nth-child(2),
+html[data-theme="dark"] .portfolio-table th:nth-child(3),
+html[data-theme="dark"] .portfolio-table th:nth-child(4),
+html[data-theme="dark"] .portfolio-table th:nth-child(5) {
   background: #252f29;
 }
 html[data-theme="dark"] .portfolio-table td:nth-child(1),
-html[data-theme="dark"] .portfolio-table td:nth-child(2) {
+html[data-theme="dark"] .portfolio-table td:nth-child(2),
+html[data-theme="dark"] .portfolio-table td:nth-child(3),
+html[data-theme="dark"] .portfolio-table td:nth-child(4),
+html[data-theme="dark"] .portfolio-table td:nth-child(5) {
   background: #202923;
 }
 html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(2) {
+html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(2),
+html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(3),
+html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(4),
+html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(5) {
   background: #27332c;
+}
+@media (max-width: 760px) {
+  .portfolio-table th:nth-child(1),
+  .portfolio-table td:nth-child(1) {
+    left: 0;
+  }
+  .portfolio-table th:nth-child(2),
+  .portfolio-table td:nth-child(2) {
+    left: 76px;
+  }
+  .portfolio-table th:nth-child(3),
+  .portfolio-table td:nth-child(3) {
+    left: 144px;
+  }
+  .portfolio-table th:nth-child(4),
+  .portfolio-table td:nth-child(4) {
+    left: 234px;
+  }
+  .portfolio-table th:nth-child(5),
+  .portfolio-table td:nth-child(5) {
+    left: 276px;
+  }
+  .portfolio-table tfoot td:nth-child(1) {
+    left: 0;
+    width: 76px;
+  }
+  .portfolio-table tfoot td:nth-child(2) {
+    left: 76px;
+    width: 68px;
+  }
+  .portfolio-table tfoot td:nth-child(3) {
+    position: sticky;
+    left: 144px;
+    width: 90px;
+    background: var(--canvas);
+  }
+  .portfolio-table tfoot td:nth-child(4) {
+    position: sticky;
+    left: 234px;
+    width: 42px;
+    background: var(--canvas);
+  }
+  .portfolio-table tfoot td:nth-child(5) {
+    position: sticky;
+    left: 276px;
+    width: 42px;
+    background: var(--canvas);
+    box-shadow: 3px 0 6px #1c30200d;
+  }
 }
 html[data-theme="dark"] .portfolio-table tbody td.payment-received-this-month {
   background: #294b36;
