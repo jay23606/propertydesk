@@ -115,6 +115,7 @@ test("account and deposit workspace exposes only its supported operations", () =
         closeEntry: context.window.PropertyDeskAccountCloseEntry,
         detailEvents: context.window.PropertyDeskAccountDetailEvents,
       },
+      depositWorkflows: {},
       deposits,
       accountDetails,
     });
@@ -219,6 +220,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
+  assert.match(
+    app,
+    /depositWorkflows: \{[\s\S]*?PropertyDeskDepositAdjustmentWorkflow/,
+  );
   const accountDetailWorkflow = fs.readFileSync(
     path.join(
       __dirname,
@@ -261,7 +266,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /depositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /depositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,
@@ -271,18 +276,12 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
     "utf8",
   );
-  assert.match(
-    depositWorkspaceWorkflow,
-    /PropertyDeskDepositDetailsModel\.create\(/,
-  );
-  assert.match(
-    depositWorkspaceWorkflow,
-    /PropertyDeskDepositDetailsView\.create\(/,
-  );
+  assert.match(depositWorkspaceWorkflow, /workflows\.detailsModel\.create\(/);
+  assert.match(depositWorkspaceWorkflow, /workflows\.detailsView\.create\(/);
   assert.match(depositWorkspaceWorkflow, /buildDepositDetails\(account\)/);
   assert.match(
     depositWorkspaceWorkflow,
-    /DepositAdjustmentWorkflow\.create\([\s\S]*?depositSectionHTML,/,
+    /workflows\.adjustmentWorkflow\.create\([\s\S]*?depositSectionHTML,/,
   );
   const accountWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "account-detail-action-workflow.js"),
@@ -416,6 +415,11 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
   const workflow = context.window.PropertyDeskDepositWorkspaceWorkflow.create({
     details,
     adjustments,
+    workflows: {
+      detailsModel: context.window.PropertyDeskDepositDetailsModel,
+      detailsView: context.window.PropertyDeskDepositDetailsView,
+      adjustmentWorkflow: context.window.PropertyDeskDepositAdjustmentWorkflow,
+    },
   });
 
   assert.equal(Object.isFrozen(workflow), true);

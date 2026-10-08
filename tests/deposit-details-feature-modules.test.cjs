@@ -78,6 +78,12 @@ test("deposit details render rental-only ledger rows and preserve voided markers
         validateAdjustment() {},
         resolveAdjustmentType() {},
       },
+      workflows: {
+        detailsModel: context.window.PropertyDeskDepositDetailsModel,
+        detailsView: context.window.PropertyDeskDepositDetailsView,
+        adjustmentWorkflow:
+          context.window.PropertyDeskDepositAdjustmentWorkflow,
+      },
     });
 
   assert.equal(depositSectionHTML({ id: "note-1", account_type: "note" }), "");

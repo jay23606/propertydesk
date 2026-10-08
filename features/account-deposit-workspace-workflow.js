@@ -4,6 +4,7 @@
 
   function createAccountDepositWorkspaceWorkflow({
     deposits,
+    depositWorkflows,
     accountDetails,
     depositWorkspaceWorkflow,
     accountDetailWorkspaceWorkflow,
@@ -30,6 +31,7 @@
         validateAdjustment: deposits.adjustments.validateAdjustment,
         resolveAdjustmentType: deposits.adjustments.resolveAdjustmentType,
       },
+      workflows: depositWorkflows,
     });
     const accountDetailWorkspace = accountDetailWorkspaceWorkflow.create({
       actionWorkflow: accountDetailActionWorkflow,

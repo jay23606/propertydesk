@@ -2,13 +2,12 @@
 (() => {
   "use strict";
 
-  function createDepositWorkspaceWorkflow({ details, adjustments }) {
-    const { buildDepositDetails } =
-      window.PropertyDeskDepositDetailsModel.create({
-        depositLedger: details.depositLedger,
-      });
+  function createDepositWorkspaceWorkflow({ details, adjustments, workflows }) {
+    const { buildDepositDetails } = workflows.detailsModel.create({
+      depositLedger: details.depositLedger,
+    });
     const { depositSectionHTML: renderDepositDetails } =
-      window.PropertyDeskDepositDetailsView.create({
+      workflows.detailsView.create({
         money: details.money,
         fmtDate: details.fmtDate,
         esc: details.esc,
@@ -19,7 +18,7 @@
     }
 
     const { attachDepositAdjustmentEvents } =
-      window.PropertyDeskDepositAdjustmentWorkflow.create({
+      workflows.adjustmentWorkflow.create({
         $: adjustments.$,
         state: adjustments.state,
         todayIso: adjustments.todayIso,

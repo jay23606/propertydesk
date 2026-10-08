@@ -10,6 +10,11 @@ test("account and deposit workspace share detail rendering and events", () => {
   const attachDepositAdjustmentEvents = () => {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
+  const depositWorkflows = {
+    detailsModel: {},
+    detailsView: {},
+    adjustmentWorkflow: {},
+  };
   const deposits = {
     details: {
       state: {},
@@ -92,6 +97,7 @@ test("account and deposit workspace share detail rendering and events", () => {
         closeEntry: context.window.PropertyDeskAccountCloseEntry,
         detailEvents: context.window.PropertyDeskAccountDetailEvents,
       },
+      depositWorkflows,
       deposits,
       accountDetails: { content, actions },
     });
@@ -116,6 +122,13 @@ test("account and deposit workspace share detail rendering and events", () => {
     "validateAdjustment",
   ]);
   assert.equal("ignored" in passed.deposits, false);
+  assert.deepEqual(Object.keys(passed.deposits.workflows).sort(), [
+    "adjustmentWorkflow",
+    "detailsModel",
+    "detailsView",
+  ]);
+  for (const key of Object.keys(depositWorkflows))
+    assert.equal(passed.deposits.workflows[key], depositWorkflows[key]);
   assert.equal(
     passed.accountDetails.content.accountHistoryRepository,
     content.accountHistoryRepository,
