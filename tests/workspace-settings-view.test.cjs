@@ -73,7 +73,14 @@ test("workspace settings render member labels and escape untrusted text", () => 
       ),
     toast() {},
     fetchAll: async () => {},
-    reminder: { $() {}, state, esc() {}, fmtDate() {}, money() {} },
+    reminder: {
+      $() {},
+      state,
+      esc() {},
+      fmtDate() {},
+      money() {},
+      workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
+    },
     memberRepository: { addMember() {}, removeMember() {} },
     confirmAction: () => true,
   });

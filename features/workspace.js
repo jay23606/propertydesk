@@ -13,14 +13,15 @@
     authClient,
     confirmAction = (message) => window.confirm(message),
   }) {
-    const reminderWorkflow =
-      window.PropertyDeskWorkspaceReminderWorkflow.create({
-        $: reminder.$,
-        state: reminder.state,
-        esc: reminder.esc,
-        fmtDate: reminder.fmtDate,
-        money: reminder.money,
-      });
+    const reminderWorkflow = reminder.workflow.create({
+      $: reminder.$,
+      state: reminder.state,
+      esc: reminder.esc,
+      fmtDate: reminder.fmtDate,
+      money: reminder.money,
+      activityModelWorkflow: reminder.activityModelWorkflow,
+      activityViewWorkflow: reminder.activityViewWorkflow,
+    });
     const profileWorkflow = window.PropertyDeskWorkspaceProfileWorkflow.create({
       $,
       state,

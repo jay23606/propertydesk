@@ -14,7 +14,14 @@ test("workspace feature owns profile and member form bindings", () => {
   const handlers = new Map();
   const feature = context.window.PropertyDeskWorkspace.create({
     memberRepository: { addMember() {}, removeMember() {} },
-    reminder: { $() {}, state: {}, esc() {}, fmtDate() {}, money() {} },
+    reminder: {
+      $() {},
+      state: {},
+      esc() {},
+      fmtDate() {},
+      money() {},
+      workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
+    },
     $: (id) => ({
       addEventListener(event, handler) {
         handlers.set(`${id}:${event}`, handler);
@@ -196,7 +203,14 @@ test("workspace setting writes report rejected requests and retain entered value
     fetchAll: async () => {
       throw new Error("offline");
     },
-    reminder: { $() {}, state, esc() {}, fmtDate() {}, money() {} },
+    reminder: {
+      $() {},
+      state,
+      esc() {},
+      fmtDate() {},
+      money() {},
+      workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
+    },
     memberRepository:
       context.window.PropertyDeskWorkspaceMemberRepository.create({
         getClient: () => state.client,

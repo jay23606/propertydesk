@@ -60,6 +60,9 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     esc() {},
     fmtDate() {},
     money() {},
+    workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
+    activityModelWorkflow: {},
+    activityViewWorkflow: {},
     unusedDependency: true,
   };
   const workflow = context.window.PropertyDeskWorkspace.create({
@@ -76,6 +79,8 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   assert.equal(passed.reminderWorkflow.state, state);
   assert.deepEqual(Object.keys(passed.reminderWorkflow).sort(), [
     "$",
+    "activityModelWorkflow",
+    "activityViewWorkflow",
     "esc",
     "fmtDate",
     "money",

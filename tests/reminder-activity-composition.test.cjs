@@ -23,17 +23,21 @@ test("workspace reminder activity stays independent of account email preview", (
   );
   assert.match(
     fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),
-    /PropertyDeskWorkspaceReminderWorkflow\.create\(\{\s*\$: reminder\.\$,\s*state: reminder\.state,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*money: reminder\.money,/,
+    /reminder\.workflow\.create\(\{\s*\$: reminder\.\$,\s*state: reminder\.state,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*money: reminder\.money,\s*activityModelWorkflow: reminder\.activityModelWorkflow,\s*activityViewWorkflow: reminder\.activityViewWorkflow,/,
   );
   assert.match(
     reminderWorkflow,
-    /function createWorkspaceReminderWorkflow\(\{[\s\S]*?state,[\s\S]*?\}\) \{[\s\S]*?ReminderActivityModel\.create\(\{\s*state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,/,
+    /function createWorkspaceReminderWorkflow\(\{[\s\S]*?activityModelWorkflow,[\s\S]*?activityViewWorkflow,[\s\S]*?\}\) \{[\s\S]*?activityModelWorkflow\.create\(\{\s*state,[\s\S]*?activityViewWorkflow\.create\([\s\S]*?model: activityModel,/,
   );
   assert.match(
     reminderWorkflow,
-    /ReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
+    /activityViewWorkflow\.create\(\{[\s\S]*?model: activityModel,/,
   );
   assert.doesNotMatch(reminderWorkflow, /ReminderPreview/);
+  assert.match(
+    app,
+    /workflow: window\.PropertyDeskWorkspaceReminderWorkflow,[\s\S]*?activityModelWorkflow: window\.PropertyDeskReminderActivityModel,[\s\S]*?activityViewWorkflow: window\.PropertyDeskReminderActivityView/,
+  );
   for (const feature of [
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",

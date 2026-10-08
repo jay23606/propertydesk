@@ -39,6 +39,10 @@ test("workspace reminder workflow composes only its activity view", () => {
     ),
     context,
   );
+  reminder.activityModelWorkflow =
+    context.window.PropertyDeskReminderActivityModel;
+  reminder.activityViewWorkflow =
+    context.window.PropertyDeskReminderActivityView;
 
   const workflow =
     context.window.PropertyDeskWorkspaceReminderWorkflow.create(reminder);

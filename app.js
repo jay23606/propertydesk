@@ -140,6 +140,9 @@
       toast,
       fetchAll,
       reminder: {
+        workflow: window.PropertyDeskWorkspaceReminderWorkflow,
+        activityModelWorkflow: window.PropertyDeskReminderActivityModel,
+        activityViewWorkflow: window.PropertyDeskReminderActivityView,
         $,
         state,
         esc,

@@ -2,18 +2,25 @@
 (() => {
   "use strict";
 
-  function createWorkspaceReminderWorkflow({ $, state, esc, fmtDate, money }) {
-    const activityModel = window.PropertyDeskReminderActivityModel.create({
+  function createWorkspaceReminderWorkflow({
+    $,
+    state,
+    esc,
+    fmtDate,
+    money,
+    activityModelWorkflow,
+    activityViewWorkflow,
+  }) {
+    const activityModel = activityModelWorkflow.create({
       state,
     });
-    const { renderReminderActivity } =
-      window.PropertyDeskReminderActivityView.create({
-        $,
-        esc,
-        fmtDate,
-        money,
-        model: activityModel,
-      });
+    const { renderReminderActivity } = activityViewWorkflow.create({
+      $,
+      esc,
+      fmtDate,
+      money,
+      model: activityModel,
+    });
     return Object.freeze({ renderReminderActivity });
   }
 
