@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+require("../features/email-address-utils.js");
+const { paymentReminderMessage } = require("../features/email-utils.js");
 
 const utilsPromise =
   import("../supabase/functions/_shared/reminder-schedule.mjs");
@@ -31,6 +33,36 @@ test("reminder messages keep plain text readable and escape HTML fields", async 
   assert.match(message.html, /Hello Ana &amp; &lt;Sam&gt;/);
   assert.match(message.html, /12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000/);
   assert.match(message.html, /October 2026/);
+});
+
+test("automated reminders and manual drafts share the same plain-text message", async () => {
+  const { reminderMessage } = await messagePromise;
+  const account = { party_name: "  Ana & Sam  " };
+  const property = {
+    address: "12 Main St",
+    city: "Town",
+    state: "PA",
+    postal_code: "17000",
+  };
+  const automated = reminderMessage(
+    account,
+    property,
+    "2026-10-01",
+    "2026-10-31",
+    550,
+  );
+  const manual = paymentReminderMessage({
+    subjectAddress: property.address,
+    address: "12 Main St, Town, PA, 17000",
+    unpaidDue: "$550.00",
+    recipientName: account.party_name,
+    senderName: "PropertyDesk",
+    month: "October 2026",
+    asOf: "2026-10-31",
+  });
+
+  assert.equal(manual.subject, automated.subject);
+  assert.equal(manual.body, automated.text);
 });
 
 test("reminder message greets the recipient generically when no name is set", async () => {
