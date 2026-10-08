@@ -498,10 +498,6 @@ button {
   gap: 14px;
   padding: 0 20px 20px;
 }
-.property-grid.large {
-  padding: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
 .property-card {
   background: #fff;
   border: 1px solid var(--line);
@@ -1035,9 +1031,6 @@ button {
   .topbar {
     padding: 0 25px;
   }
-  .property-grid.large {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .stats-grid {
     gap: 10px;
   }
@@ -1112,13 +1105,9 @@ button {
   .overview-grid {
     grid-template-columns: 1fr;
   }
-  .property-grid,
-  .property-grid.large {
+  .property-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 13px 14px;
-  }
-  .property-grid.large {
-    padding: 0;
   }
   .toolbar {
     flex-wrap: wrap;
@@ -1166,8 +1155,7 @@ button {
   .nav-link:not(.active) .nav-icon {
     font-size: 17px;
   }
-  .property-grid,
-  .property-grid.large {
+  .property-grid {
     grid-template-columns: 1fr;
   }
   .page-heading {
