@@ -36,7 +36,10 @@
       );
       const property = findTransactionProperty(row, account);
       return {
-        ...row,
+        kind: row.kind,
+        date: row.date,
+        amount: row.amount,
+        item: row.item,
         account,
         property,
         searchText: transactionSearchText(row, account, property),
