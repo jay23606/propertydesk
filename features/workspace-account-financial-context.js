@@ -1,11 +1,10 @@
-/* Compose workspace-wide ledger summaries and deposit calculations. */
+/* Compose workspace account-balance and due summaries. */
 (() => {
   "use strict";
 
-  function createWorkspaceFinancialContext({
+  function createWorkspaceAccountFinancialContext({
     state,
     ledger,
-    deposit,
     amountDueSince,
     unpaidDueAccrualStart,
   }) {
@@ -17,11 +16,6 @@
       postedOnOrAfter: ledger.postedOnOrAfter,
       sumPosted: ledger.sumPosted,
     });
-    const depositContext = window.PropertyDeskDepositContext.create({
-      state,
-      securityDepositBalance: deposit.securityDepositBalance,
-    });
-
     const accountSummary = window.PropertyDeskAccountFinancialSummary.create({
       accountBalance: ledgerContext.accountBalance,
       amountDueSince,
@@ -33,12 +27,11 @@
       accountBalance: ledgerContext.accountBalance,
       scheduledMonthlyRunRate: ledgerContext.scheduledMonthlyRunRate,
       collectedSince: ledgerContext.collectedSince,
-      depositLedger: depositContext.depositLedger,
       summarizeAccount: accountSummary.summarizeAccount,
     };
   }
 
-  window.PropertyDeskWorkspaceFinancialContext = Object.freeze({
-    create: createWorkspaceFinancialContext,
+  window.PropertyDeskWorkspaceAccountFinancialContext = Object.freeze({
+    create: createWorkspaceAccountFinancialContext,
   });
 })();

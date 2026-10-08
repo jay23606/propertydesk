@@ -97,7 +97,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create/);
   assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create/);
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
+  assert.match(app, /PropertyDeskWorkspaceAccountFinancialContext\.create\(/);
   assert.match(app, /summarizeAccount,\s*\} = financialContext;/);
   assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
@@ -216,9 +216,10 @@ test("app root composes shared state and workspace services directly", () => {
     /PropertyDesk(?:BackendClient|AppState|WorkspaceData|WorkspaceRefresh)\.create\(/,
   );
   assert.doesNotMatch(app, /PropertyDeskAppServices/);
-  assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
+  assert.match(app, /PropertyDeskWorkspaceAccountFinancialContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountFinancialSummary\.create\(/);
-  assert.doesNotMatch(app, /PropertyDesk(?:Ledger|Deposit)Context\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskLedgerContext\.create\(/);
+  assert.match(app, /PropertyDeskDepositContext\.create\(/);
   assert.match(app, /PropertyDeskTransactionViews\.create\(/);
   assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);

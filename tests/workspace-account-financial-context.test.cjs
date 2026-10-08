@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("workspace financial context shares state with ledger and deposit models", () => {
+test("workspace account financial context shares state with ledger summaries", () => {
   const calls = [];
   const state = { accounts: [] };
   const todayIso = () => "2026-10-07";
@@ -16,12 +16,7 @@ test("workspace financial context shares state with ledger and deposit models", 
     sumPosted() {},
     unusedLedgerValue: true,
   };
-  const depositOptions = {
-    securityDepositBalance() {},
-    unusedDepositValue: true,
-  };
   const accountBalance = () => 42;
-  const depositLedger = () => ({ active: [] });
   const summarizeAccount = () => ({ unpaidDue: 5 });
   const accountSummaryOptions = {
     amountDueSince() {},
@@ -36,12 +31,6 @@ test("workspace financial context shares state with ledger and deposit models", 
           return { accountBalance };
         },
       },
-      PropertyDeskDepositContext: {
-        create(options) {
-          calls.push(["deposit", options]);
-          return { depositLedger };
-        },
-      },
       PropertyDeskAccountFinancialSummary: {
         create(options) {
           capturedAccountSummaryOptions = options;
@@ -52,18 +41,23 @@ test("workspace financial context shares state with ledger and deposit models", 
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "workspace-financial-context.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-account-financial-context.js",
+      ),
       "utf8",
     ),
     context,
   );
 
-  const workflow = context.window.PropertyDeskWorkspaceFinancialContext.create({
-    state,
-    ledger: ledgerOptions,
-    deposit: depositOptions,
-    ...accountSummaryOptions,
-  });
+  const workflow =
+    context.window.PropertyDeskWorkspaceAccountFinancialContext.create({
+      state,
+      ledger: ledgerOptions,
+      ...accountSummaryOptions,
+    });
 
   assert.equal(calls[0][0], "ledger");
   assert.equal(calls[0][1].state, state);
@@ -87,19 +81,7 @@ test("workspace financial context shares state with ledger and deposit models", 
     "sumPosted",
     "todayIso",
   ]);
-  assert.equal(calls[1][0], "deposit");
-  assert.equal(calls[1][1].state, state);
-  assert.equal(
-    calls[1][1].securityDepositBalance,
-    depositOptions.securityDepositBalance,
-  );
-  assert.equal("unusedDepositValue" in calls[1][1], false);
-  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
-    "securityDepositBalance",
-    "state",
-  ]);
   assert.equal(workflow.accountBalance, accountBalance);
-  assert.equal(workflow.depositLedger, depositLedger);
   assert.equal(capturedAccountSummaryOptions.accountBalance, accountBalance);
   assert.equal(
     capturedAccountSummaryOptions.amountDueSince,
@@ -114,7 +96,6 @@ test("workspace financial context shares state with ledger and deposit models", 
   assert.deepEqual(Object.keys(workflow).sort(), [
     "accountBalance",
     "collectedSince",
-    "depositLedger",
     "scheduledMonthlyRunRate",
     "summarizeAccount",
   ]);
