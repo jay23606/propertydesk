@@ -22,9 +22,10 @@
     }
 
     async function initialize() {
+      const today = todayIso();
       attachEvents();
-      $("payment-date").value = todayIso();
-      $("account-start").value = todayIso();
+      $("payment-date").value = today;
+      $("account-start").value = today;
       auth.setAuthMode(false);
       registerShell();
 

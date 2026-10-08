@@ -15,6 +15,7 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
   );
   const calls = [];
   const elements = new Map();
+  let todayReads = 0;
   const $ = (id) => {
     if (!elements.has(id)) elements.set(id, { value: "" });
     return elements.get(id);
@@ -38,7 +39,10 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
       calls.push("create-client");
       return { auth: {} };
     },
-    todayIso: () => "2026-10-05",
+    todayIso: () => {
+      todayReads += 1;
+      return "2026-10-05";
+    },
     registerShell: () => calls.push("register-shell"),
     auth,
     renderers: [() => calls.push("greeting"), () => calls.push("properties")],
@@ -62,6 +66,7 @@ test("app lifecycle preserves render, event-binding, and startup order", async (
   ]);
   assert.equal($("payment-date").value, "2026-10-05");
   assert.equal($("account-start").value, "2026-10-05");
+  assert.equal(todayReads, 1);
 });
 
 test("app lifecycle shows the configuration error before creating a client", async () => {
