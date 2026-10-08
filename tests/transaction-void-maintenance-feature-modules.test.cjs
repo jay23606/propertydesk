@@ -220,7 +220,6 @@ test("transaction void maintenance voids a posted row with an audit reason", asy
     },
   };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state,
     repository: context.window.PropertyDeskTransactionRepository.create({
       getClient: () => state.client,
     }),
@@ -258,11 +257,6 @@ test("transaction void maintenance rejects unsupported kinds before prompting or
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state: {
-      client: {
-        from: () => assert.fail("unsupported kind must not write"),
-      },
-    },
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
     repository: context.window.PropertyDeskTransactionRepository.create({
@@ -300,23 +294,6 @@ test("transaction void maintenance reports rejected requests without refreshing"
   );
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state: {
-      client: {
-        from: () => ({
-          update: () => ({
-            eq: () => ({
-              eq: () => ({
-                select: () => ({
-                  maybeSingle: async () => {
-                    throw new Error("offline");
-                  },
-                }),
-              }),
-            }),
-          }),
-        }),
-      },
-    },
     fetchAll: async () => assert.fail("failed void request must not refresh"),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskTransactionRepository.create({
@@ -361,7 +338,6 @@ test("transaction void maintenance reports database errors without refreshing", 
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state: { client: {} },
     repository: {
       voidPosted: async () => ({
         data: null,
@@ -392,7 +368,6 @@ test("transaction void maintenance reports an already-changed row without refres
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state: { client: {} },
     repository: {
       voidPosted: async () => ({ data: null, error: null }),
     },
