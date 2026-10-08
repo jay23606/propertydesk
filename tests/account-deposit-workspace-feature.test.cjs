@@ -4,6 +4,80 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("account and deposit workspace exposes only its supported operations", () => {
+  const passed = {};
+  const openAccountDetails = () => {};
+  const attachAccountDetailActionEvents = () => {};
+  const attachDepositAdjustmentEvents = () => {};
+  const depositSectionHTML = () => "deposit";
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositWorkspaceWorkflow: {
+        create: (options) => {
+          passed.deposits = options;
+          return {
+            depositSectionHTML,
+            attachDepositAdjustmentEvents,
+            internalOperation: () => {},
+          };
+        },
+      },
+      PropertyDeskAccountDetailWorkspaceWorkflow: {
+        create: (options) => {
+          passed.accountDetails = options;
+          return {
+            openAccountDetails,
+            attachAccountDetailActionEvents,
+            internalOperation: () => {},
+          };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "account-deposit-workspace-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const deposits = { detailOptions: {} };
+  const accountDetails = { content: { contentOption: true }, actions: {} };
+  const workspace =
+    context.window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
+      deposits,
+      accountDetails,
+    });
+
+  assert.equal(Object.isFrozen(workspace), true);
+  assert.deepEqual(Object.keys(workspace).sort(), [
+    "attachAccountDetailActionEvents",
+    "attachDepositAdjustmentEvents",
+    "openAccountDetails",
+  ]);
+  assert.equal(passed.deposits, deposits);
+  assert.equal(passed.accountDetails.content.contentOption, true);
+  assert.equal(
+    passed.accountDetails.content.depositSectionHTML,
+    depositSectionHTML,
+  );
+  assert.equal(passed.accountDetails.actions, accountDetails.actions);
+  assert.equal(workspace.openAccountDetails, openAccountDetails);
+  assert.equal(
+    workspace.attachAccountDetailActionEvents,
+    attachAccountDetailActionEvents,
+  );
+  assert.equal(
+    workspace.attachDepositAdjustmentEvents,
+    attachDepositAdjustmentEvents,
+  );
+});
+
 test("account and deposit workspaces connect at one feature boundary", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const html = fs.readFileSync(

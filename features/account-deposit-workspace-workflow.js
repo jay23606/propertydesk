@@ -15,7 +15,9 @@
       });
 
     return Object.freeze({
-      ...accountDetailWorkspace,
+      openAccountDetails: accountDetailWorkspace.openAccountDetails,
+      attachAccountDetailActionEvents:
+        accountDetailWorkspace.attachAccountDetailActionEvents,
       attachDepositAdjustmentEvents:
         depositWorkspace.attachDepositAdjustmentEvents,
     });
