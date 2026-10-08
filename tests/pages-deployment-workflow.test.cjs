@@ -22,4 +22,7 @@ test("Pages deployment uses a unique artifact for each workflow attempt", () => 
   assert.ok(upload >= 0 && upload < wait && wait < deploy);
   assert.ok(workflow.includes('GITHUB_RUN_ID}/artifacts"'));
   assert.ok(workflow.includes("sleep 5"));
+  assert.ok(workflow.includes("visible_attempts=0"));
+  assert.ok(workflow.includes('"$visible_attempts" -ge 3'));
+  assert.ok(workflow.includes("three consecutive checks"));
 });

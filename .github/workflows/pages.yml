@@ -91,17 +91,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_PAGES_ARTIFACT: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
+          visible_attempts=0
           for attempt in $(seq 1 12); do
             if artifact_count=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" --jq '.artifacts | map(select(.name == env.GITHUB_PAGES_ARTIFACT and .expired == false)) | length' 2>/dev/null); then
               if [ "$artifact_count" -gt 0 ]; then
-                echo "Pages artifact ${GITHUB_PAGES_ARTIFACT} is visible."
-                exit 0
+                visible_attempts=$((visible_attempts + 1))
+                if [ "$visible_attempts" -ge 3 ]; then
+                  echo "Pages artifact ${GITHUB_PAGES_ARTIFACT} is visible in three consecutive checks."
+                  sleep 5
+                  exit 0
+                fi
+              else
+                visible_attempts=0
               fi
+            else
+              visible_attempts=0
             fi
-            echo "Pages artifact is not visible yet (attempt $attempt/12)."
+            echo "Pages artifact is not stably visible yet (attempt $attempt/12)."
             sleep 5
           done
-          echo "Pages artifact ${GITHUB_PAGES_ARTIFACT} did not become visible within 60 seconds." >&2
+          echo "Pages artifact ${GITHUB_PAGES_ARTIFACT} did not stay visible for three consecutive checks within 60 seconds." >&2
           exit 1
       - id: deployment
         uses: actions/deploy-pages@v5
