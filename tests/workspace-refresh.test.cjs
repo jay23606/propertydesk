@@ -21,6 +21,14 @@ function createRefresh({ state, workspaceData, toast, render }) {
   });
 }
 
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
 test("workspace refresh resolves workspace, hydrates state, and rerenders", async () => {
   const state = { properties: [] };
   const calls = [];
@@ -97,6 +105,81 @@ test("record loading failures show feedback, rethrow, and skip rendering", async
   assert.equal(state.workspaceOwnerId, "previous-workspace");
   assert.equal(state.properties[0].id, "previous-property");
   assert.deepEqual(calls, [["toast", "Records unavailable"]]);
+});
+
+test("workspace data finishing after sign-out cannot restore cleared records", async () => {
+  const records = deferred();
+  const recordsStarted = deferred();
+  const calls = [];
+  const state = {
+    user: { id: "user-1" },
+    workspaceOwnerId: "workspace-1",
+    properties: [{ id: "private-property" }],
+  };
+  const refresh = createRefresh({
+    state,
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
+      loadWorkspaceRecords: () => {
+        recordsStarted.resolve();
+        return records.promise;
+      },
+    },
+    toast: (message) => calls.push(["toast", message]),
+    render: () => calls.push("render"),
+  });
+
+  const pendingRefresh = refresh.fetchAll();
+  await recordsStarted.promise;
+  state.user = null;
+  state.workspaceOwnerId = null;
+  state.properties = [];
+  records.resolve({ properties: [{ id: "private-property" }] });
+  await pendingRefresh;
+
+  assert.equal(state.workspaceOwnerId, null);
+  assert.deepEqual(state.properties, []);
+  assert.deepEqual(calls, []);
+});
+
+test("an older overlapping refresh cannot replace newer workspace data", async () => {
+  const firstRecords = deferred();
+  const secondRecords = deferred();
+  const firstStarted = deferred();
+  const secondStarted = deferred();
+  const calls = [];
+  const state = { user: { id: "user-1" }, properties: [] };
+  let readCount = 0;
+  const refresh = createRefresh({
+    state,
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
+      loadWorkspaceRecords: () => {
+        readCount += 1;
+        if (readCount === 1) {
+          firstStarted.resolve();
+          return firstRecords.promise;
+        }
+        secondStarted.resolve();
+        return secondRecords.promise;
+      },
+    },
+    toast: (message) => calls.push(["toast", message]),
+    render: () => calls.push("render"),
+  });
+
+  const olderRefresh = refresh.fetchAll();
+  await firstStarted.promise;
+  const newerRefresh = refresh.fetchAll();
+  await secondStarted.promise;
+  secondRecords.resolve({ properties: [{ id: "newer-property" }] });
+  await newerRefresh;
+  firstRecords.resolve({ properties: [{ id: "older-property" }] });
+  await olderRefresh;
+
+  assert.equal(state.workspaceOwnerId, "workspace-1");
+  assert.deepEqual(state.properties, [{ id: "newer-property" }]);
+  assert.deepEqual(calls, ["render"]);
 });
 
 test("workspace render failures are logged, shown to the user, and rethrown", async () => {
