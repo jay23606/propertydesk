@@ -223,6 +223,128 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
   ]);
 });
 
+test("deposit maintenance reconciles an adjustment after a lost response", async () => {
+  const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const events = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+    depositEntries: [],
+  };
+  const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    state,
+    todayIso: () => "2026-10-08",
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      state.depositEntries = [
+        {
+          user_id: "workspace-1",
+          account_id: "rental-1",
+          entry_type: "retained",
+          amount: 25,
+          movement_date: "2026-10-08",
+          reason: "Retention correction",
+        },
+      ];
+      events.push(["refresh"]);
+    },
+    prepareAdjustment: () => ({
+      status: "ready",
+      payload: {
+        user_id: "workspace-1",
+        account_id: "rental-1",
+        entry_type: "retained",
+        amount: 25,
+        movement_date: "2026-10-08",
+        reason: "Retention correction",
+      },
+    }),
+    repository: {
+      insert: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "retained",
+      25,
+      "Retention correction",
+    ),
+    true,
+  );
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["toast", "Deposit retention recorded"],
+  ]);
+});
+
+test("deposit maintenance asks to check the refreshed ledger before retrying", async () => {
+  const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const events = [];
+  const maintenance = context.window.PropertyDeskDepositMaintenance.create({
+    state: {
+      workspaceOwnerId: "workspace-1",
+      accounts: [{ id: "rental-1", account_type: "rental" }],
+      depositEntries: [],
+    },
+    todayIso: () => "2026-10-08",
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => events.push(["refresh"]),
+    prepareAdjustment: () => ({
+      status: "ready",
+      payload: {
+        user_id: "workspace-1",
+        account_id: "rental-1",
+        entry_type: "retained",
+        amount: 25,
+        movement_date: "2026-10-08",
+        reason: "Retention correction",
+      },
+    }),
+    repository: {
+      insert: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "retained",
+      25,
+      "Retention correction",
+    ),
+    false,
+  );
+  assert.deepEqual(events, [
+    ["refresh"],
+    [
+      "toast",
+      "Deposit ledger was refreshed. Check it before recording the adjustment again.",
+    ],
+  ]);
+});
+
 test("deposit maintenance reports a rejected save without refreshing as if it succeeded", async () => {
   const context = vm.createContext({ window: {} });
   loadRepositoryWriteFeedback(context);
