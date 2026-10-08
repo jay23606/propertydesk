@@ -42,6 +42,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
       .find((href) =>
         new URL(href).pathname.endsWith("/workspace-settings.css"),
       );
+    const propertyDetailsStylesheet = Array.from(
+      document.querySelectorAll("link[href]"),
+    )
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/property-details.css"));
     if (!appScript) throw new Error("The app script is missing from the page.");
     if (!themeStylesheet)
       throw new Error("The theme stylesheet is missing from the page.");
@@ -49,6 +54,10 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
       throw new Error("The portfolio stylesheet is missing from the page.");
     if (!workspaceStylesheet)
       throw new Error("The workspace stylesheet is missing from the page.");
+    if (!propertyDetailsStylesheet)
+      throw new Error(
+        "The property details stylesheet is missing from the page.",
+      );
     return [
       {
         label: "app script",
@@ -69,6 +78,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
         label: "workspace settings stylesheet",
         url: workspaceStylesheet,
         expected: ".member-form",
+      },
+      {
+        label: "property details stylesheet",
+        url: propertyDetailsStylesheet,
+        expected: ".property-detail-table",
       },
     ].map((asset) => {
       const url = new URL(asset.url);
