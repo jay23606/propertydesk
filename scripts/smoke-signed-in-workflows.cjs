@@ -65,6 +65,7 @@ async function smokeSignedInWorkflows(browser, url) {
     const cells = row ? [...row.cells] : [];
     return {
       wrapperWidth: table?.clientWidth ?? 0,
+      wrapperLeft: table?.getBoundingClientRect().left ?? 0,
       paymentWidth: cells[0]?.getBoundingClientRect().width ?? 0,
       addressWidth: cells[2]?.getBoundingClientRect().width ?? 0,
       emailWidth: cells[3]?.getBoundingClientRect().width ?? 0,
@@ -75,6 +76,7 @@ async function smokeSignedInWorkflows(browser, url) {
         ? getComputedStyle(cells[1]).display === "none"
         : false,
       nameWidth: cells[5]?.getBoundingClientRect().width ?? 0,
+      monthlyPaymentLeft: cells[6]?.getBoundingClientRect().left ?? 0,
     };
   });
   assert.equal(
@@ -87,20 +89,42 @@ async function smokeSignedInWorkflows(browser, url) {
     `mobile payment column should be at most 56px; got ${mobileGrid.paymentWidth}px`,
   );
   assert.ok(
-    mobileGrid.addressWidth <= 90,
-    `mobile address column should be at most 90px; got ${mobileGrid.addressWidth}px`,
+    mobileGrid.addressWidth >= 100,
+    `mobile address column should have room for wrapped addresses: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.emailWidth <= 40 && mobileGrid.smsWidth <= 40,
+    mobileGrid.emailWidth <= 36 && mobileGrid.smsWidth <= 36,
     `mobile Email and SMS columns should each be at most 40px: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.nameWidth <= 80,
-    `mobile tenant/buyer name column should be at most 80px; got ${mobileGrid.nameWidth}px`,
+    mobileGrid.nameWidth >= 145,
+    `mobile tenant/buyer name column should have room for wrapped names: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.firstFiveRight <= mobileGrid.wrapperRight,
+    mobileGrid.wrapperLeft <= 1,
+    `the mobile Properties grid should reach the screen edges: ${JSON.stringify(mobileGrid)}`,
+  );
+  assert.ok(
+    mobileGrid.monthlyPaymentLeft >= mobileGrid.wrapperRight - 1,
+    `the sixth Monthly Payment column should start beyond the phone viewport: ${JSON.stringify(mobileGrid)}`,
+  );
+  assert.ok(
+    mobileGrid.firstFiveRight <= mobileGrid.wrapperRight + 1,
     `the payment/due, address, Email, SMS, and name columns should fit at 390px: ${JSON.stringify(mobileGrid)}`,
+  );
+  await signedInPage.setViewportSize({ width: 430, height: 844 });
+  const widerMobileGrid = await signedInPage.evaluate(() => {
+    const table = document.querySelector(".portfolio-table");
+    const row = document.querySelector("#properties-table tr");
+    const monthlyPayment = row?.cells[6];
+    return {
+      wrapperRight: table?.getBoundingClientRect().right ?? 0,
+      monthlyPaymentLeft: monthlyPayment?.getBoundingClientRect().left ?? 0,
+    };
+  });
+  assert.ok(
+    widerMobileGrid.monthlyPaymentLeft >= widerMobileGrid.wrapperRight - 1,
+    `the sixth column should remain off-screen at 430px: ${JSON.stringify(widerMobileGrid)}`,
   );
   await signedInPage.setViewportSize({ width: 1280, height: 720 });
   await smokePropertyWorkflows(

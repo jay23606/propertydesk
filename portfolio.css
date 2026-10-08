@@ -23,7 +23,9 @@
 }
 @media (max-width: 760px) {
   .portfolio-table {
-    border-radius: 8px;
+    width: calc(100% + 30px);
+    margin-inline: -15px;
+    border-radius: 0;
   }
   .portfolio-table th,
   .portfolio-table td {
@@ -40,9 +42,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 56px;
-    min-width: 56px;
-    max-width: 56px;
+    width: 14vw;
+    min-width: 14vw;
+    max-width: 14vw;
     z-index: 2;
     background: #fff;
     text-align: center;
@@ -91,16 +93,16 @@
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
+    width: 28vw;
+    min-width: 28vw;
+    max-width: 28vw;
     overflow-wrap: anywhere;
   }
   .portfolio-table th:nth-child(6),
   .portfolio-table td:nth-child(6) {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
+    width: 40vw;
+    min-width: 40vw;
+    max-width: 40vw;
     overflow-wrap: anywhere;
     white-space: normal;
   }
@@ -115,9 +117,9 @@
     display: none;
   }
   .portfolio-table td.portfolio-contact-action {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
+    width: 9vw;
+    min-width: 9vw;
+    max-width: 9vw;
     padding-right: 0;
     padding-left: 0;
   }
@@ -277,7 +279,7 @@ html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1) {
 @media (max-width: 760px) {
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
-    width: 56px;
+    width: 14vw;
   }
   .portfolio-table tfoot td:nth-child(2) {
     display: none;
