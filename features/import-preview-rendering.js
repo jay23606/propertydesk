@@ -2,6 +2,19 @@
 (() => {
   "use strict";
 
+  function commitButtonState(pending, count) {
+    let textContent;
+    if (pending?.commitUnconfirmed) textContent = "Reload to check status";
+    else if (count)
+      textContent = `Import ${count} row${count === 1 ? "" : "s"}`;
+    else textContent = "No valid rows to import";
+
+    return {
+      textContent,
+      disabled: count === 0 || Boolean(pending?.commitUnconfirmed),
+    };
+  }
+
   function createImportPreviewRendering({
     $,
     state,
@@ -105,14 +118,9 @@
         pending?.rows || [],
         $("import-include-duplicates").checked,
       );
-      const count = selected.length;
-      $("import-commit").textContent = pending?.commitUnconfirmed
-        ? "Reload to check status"
-        : count
-          ? `Import ${count} row${count === 1 ? "" : "s"}`
-          : "No valid rows to import";
-      $("import-commit").disabled =
-        count === 0 || Boolean(pending?.commitUnconfirmed);
+      const buttonState = commitButtonState(pending, selected.length);
+      $("import-commit").textContent = buttonState.textContent;
+      $("import-commit").disabled = buttonState.disabled;
     }
 
     return Object.freeze({ renderImportPreview, updateImportCommitButton });

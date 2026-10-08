@@ -174,6 +174,13 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   );
   assert.equal(getElement("import-commit").textContent, "Import 1 row");
   assert.equal(getElement("import-commit").disabled, false);
+  state.pendingImport.commitUnconfirmed = true;
+  preview.updateImportCommitButton();
+  assert.equal(
+    getElement("import-commit").textContent,
+    "Reload to check status",
+  );
+  assert.equal(getElement("import-commit").disabled, true);
   assert.deepEqual(opened, ["import-preview-modal"]);
 });
 
