@@ -4,14 +4,40 @@
 
   function createAccountDepositWorkspaceWorkflow({
     deposit,
-    accountDetails,
+    accountDetails: {
+      $,
+      state,
+      money,
+      fmtDate,
+      esc,
+      sumPosted,
+      prettyType,
+      paymentFrequencyLabel,
+      summarizeAccount,
+      amortizationSchedule,
+      openModal,
+      propertyAddress,
+      accountHistoryRepository,
+    },
     accountActions,
   }) {
     const depositWorkspace =
       window.PropertyDeskDepositWorkspaceWorkflow.create(deposit);
     const { openAccountDetails } =
       window.PropertyDeskAccountDetailContentWorkflow.create({
-        ...accountDetails,
+        $,
+        state,
+        money,
+        fmtDate,
+        esc,
+        sumPosted,
+        prettyType,
+        paymentFrequencyLabel,
+        summarizeAccount,
+        amortizationSchedule,
+        openModal,
+        propertyAddress,
+        accountHistoryRepository,
         depositSectionHTML: depositWorkspace.depositSectionHTML,
       });
     const { attachAccountDetailActionEvents } =

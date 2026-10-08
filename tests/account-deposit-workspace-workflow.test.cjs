@@ -11,7 +11,22 @@ test("account and deposit workspace share deposit details without mixing actions
   const attachAccountDetailActionEvents = () => {};
   const attachDepositAdjustmentEvents = () => {};
   const deposit = { marker: "deposit" };
-  const accountDetails = { marker: "account-details" };
+  const accountDetails = {
+    $: () => {},
+    state: {},
+    money: () => {},
+    fmtDate: () => {},
+    esc: () => {},
+    sumPosted: () => {},
+    prettyType: () => {},
+    paymentFrequencyLabel: () => {},
+    summarizeAccount: () => {},
+    amortizationSchedule: () => {},
+    openModal: () => {},
+    propertyAddress: () => {},
+    accountHistoryRepository: {},
+    unusedAccountDetailDependency: true,
+  };
   const accountActions = { marker: "account-actions" };
   const context = vm.createContext({
     window: {
@@ -56,11 +71,27 @@ test("account and deposit workspace share deposit details without mixing actions
     });
 
   assert.equal(passed.deposit, deposit);
-  assert.equal(passed.accountDetails.marker, "account-details");
+  for (const [key, value] of Object.entries(accountDetails)) {
+    if (key === "unusedAccountDetailDependency") continue;
+    assert.equal(passed.accountDetails[key], value);
+  }
   assert.equal(passed.accountDetails.depositSectionHTML, depositSectionHTML);
+  assert.equal("unusedAccountDetailDependency" in passed.accountDetails, false);
   assert.deepEqual(Object.keys(passed.accountDetails).sort(), [
+    "$",
+    "accountHistoryRepository",
+    "amortizationSchedule",
     "depositSectionHTML",
-    "marker",
+    "esc",
+    "fmtDate",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "state",
+    "sumPosted",
+    "summarizeAccount",
   ]);
   assert.equal(passed.accountActions, accountActions);
   assert.deepEqual(Object.keys(workflow).sort(), [
