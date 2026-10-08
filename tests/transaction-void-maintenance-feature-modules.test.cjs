@@ -153,7 +153,7 @@ test("app composes transaction history and maintenance actions independently", (
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskTransactionViews\.create\(views\)/,
+    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
   assert.match(
     transactionWorkflow,

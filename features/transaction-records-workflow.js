@@ -2,14 +2,68 @@
 (() => {
   "use strict";
 
-  function createTransactionRecordsWorkflow({ maintenance, entries, views }) {
+  function createTransactionRecordsWorkflow({
+    maintenance,
+    entries: {
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      transactionRepository,
+      transactionPayloads,
+    },
+    views: {
+      $: viewQuery,
+      state: viewState,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    },
+  }) {
     const transactionMaintenance =
       window.PropertyDeskTransactionMaintenanceWorkflow.create(maintenance);
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
-      ...entries,
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      fillSelect,
+      populateFormOptions,
+      prettyType,
+      openModal,
+      transactionRepository,
+      transactionPayloads,
       saveCorrection: transactionMaintenance.saveCorrection,
     });
-    const transactionViews = window.PropertyDeskTransactionViews.create(views);
+    const transactionViews = window.PropertyDeskTransactionViews.create({
+      $: viewQuery,
+      state: viewState,
+      dateOnly,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    });
     const { attachTransactionActionEvents } =
       transactionMaintenance.createTransactionActionHandlers({
         openPayment: ledgerEntryForms.openPayment,

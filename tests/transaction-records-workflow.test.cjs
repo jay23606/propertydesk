@@ -17,8 +17,36 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   const maintenance = {
     marker: "maintenance",
   };
-  const entries = { marker: "entries" };
-  const views = { marker: "views" };
+  const entries = {
+    $: () => {},
+    state: {},
+    moneyInput: () => {},
+    todayIso: () => {},
+    toast: () => {},
+    closeModal: () => {},
+    fetchAll: () => {},
+    fillSelect: () => {},
+    populateFormOptions: () => {},
+    prettyType: () => {},
+    openModal: () => {},
+    transactionRepository: {},
+    transactionPayloads: {},
+    unusedEntryDependency: true,
+  };
+  const views = {
+    $: () => {},
+    state: {},
+    dateOnly: () => {},
+    fmtDate: () => {},
+    esc: () => {},
+    expenseCategoryLabel: () => {},
+    money: () => {},
+    postedOnOrAfter: () => {},
+    monthStart: () => {},
+    sumIncome: () => {},
+    sumOperatingExpenses: () => {},
+    unusedViewDependency: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionMaintenanceWorkflow: {
@@ -70,13 +98,49 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   );
 
   assert.equal(passed.maintenance, maintenance);
-  assert.equal(passed.entries.marker, "entries");
+  for (const [key, value] of Object.entries(entries)) {
+    if (key === "unusedEntryDependency") continue;
+    assert.equal(passed.entries[key], value);
+  }
   assert.equal(passed.entries.saveCorrection, saveCorrection);
+  assert.equal("unusedEntryDependency" in passed.entries, false);
   assert.deepEqual(Object.keys(passed.entries).sort(), [
-    "marker",
+    "$",
+    "closeModal",
+    "fetchAll",
+    "fillSelect",
+    "moneyInput",
+    "openModal",
+    "populateFormOptions",
+    "prettyType",
     "saveCorrection",
+    "state",
+    "toast",
+    "todayIso",
+    "transactionPayloads",
+    "transactionRepository",
   ]);
-  assert.equal(passed.views, views);
+  for (const [key, value] of Object.entries(views)) {
+    if (key === "unusedViewDependency") continue;
+    assert.equal(passed.views[key], value);
+  }
+  assert.equal("unusedViewDependency" in passed.views, false);
+  assert.deepEqual(
+    Object.keys(passed.views).sort(),
+    [
+      "$",
+      "dateOnly",
+      "esc",
+      "expenseCategoryLabel",
+      "fmtDate",
+      "money",
+      "monthStart",
+      "postedOnOrAfter",
+      "state",
+      "sumIncome",
+      "sumOperatingExpenses",
+    ].sort(),
+  );
   assert.equal(passed.actions.openPayment, openPayment);
   assert.equal(passed.actions.openExpense, openExpense);
   assert.equal(passed.actions.updatePaymentGuidance, updatePaymentGuidance);
