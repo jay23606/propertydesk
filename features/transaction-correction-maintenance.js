@@ -32,32 +32,25 @@
           "Correction result couldn't be confirmed. Reload transaction history before trying again.",
         errorMessage: (error) =>
           `Correction failed; original entry is unchanged. ${error.message}`,
-        onUnconfirmed: async () => {
-          let correctionFound = false;
-          const refreshed =
-            await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-              fetchAll,
-              afterRefresh: () => {
-                correctionFound = correctionWasApplied(kind, pending.id);
-              },
-              toast,
-              refreshFailureMessage:
-                "Correction result couldn't be confirmed, and transaction history could not refresh. Reload before trying again.",
-            });
-          if (!refreshed) return false;
-          if (!correctionFound) {
-            toast(
+        onUnconfirmed: () =>
+          window.PropertyDeskRepositoryWriteFeedback.reconcileWorkspaceChange({
+            fetchAll,
+            isConfirmed: () => correctionWasApplied(kind, pending.id),
+            toast,
+            refreshFailureMessage:
+              "Correction result couldn't be confirmed, and transaction history could not refresh. Reload before trying again.",
+            retryMessage:
               "Transaction history was refreshed. Check it before trying the correction again.",
-            );
-            return false;
-          }
-          reconciled = true;
-          closeModal($(kind === "payment" ? "payment-modal" : "expense-modal"));
-          toast(
-            `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
-          );
-          return true;
-        },
+            onConfirmed: () => {
+              reconciled = true;
+              closeModal(
+                $(kind === "payment" ? "payment-modal" : "expense-modal"),
+              );
+              toast(
+                `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
+              );
+            },
+          }),
       });
       if (!saved) return false;
       if (reconciled) return true;
