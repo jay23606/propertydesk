@@ -2,18 +2,18 @@
 (() => {
   "use strict";
 
-  function createTransactionWorkspaceWorkflow({ maintenance, entries, views }) {
+  function createTransactionWorkspaceWorkflow({
+    maintenance,
+    entries,
+    views,
+    maintenanceWorkflows,
+  }) {
     const transactionMaintenance =
       window.PropertyDeskTransactionMaintenanceWorkflow.create({
         correction: maintenance.correction,
         voiding: maintenance.voiding,
         events: maintenance.events,
-        workflows: {
-          correction: window.PropertyDeskTransactionCorrectionWorkflow,
-          voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
-          voidEntry: window.PropertyDeskTransactionVoidEntry,
-          events: window.PropertyDeskTransactionMaintenanceEvents,
-        },
+        workflows: maintenanceWorkflows,
       });
     return window.PropertyDeskTransactionRecordsWorkflow.create({
       maintenance: transactionMaintenance,

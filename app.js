@@ -224,6 +224,12 @@
         },
         events: { documentRef: document },
       },
+      maintenanceWorkflows: {
+        correction: window.PropertyDeskTransactionCorrectionWorkflow,
+        voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
+        voidEntry: window.PropertyDeskTransactionVoidEntry,
+        events: window.PropertyDeskTransactionMaintenanceEvents,
+      },
       entries: {
         $,
         state,

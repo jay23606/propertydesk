@@ -19,6 +19,12 @@ test("transaction workspace connects maintenance to the records workflow", () =>
   };
   const entries = { transactionRepository: {} };
   const views = { money() {} };
+  const maintenanceWorkflows = {
+    correction: { create() {} },
+    voidMaintenance: { create() {} },
+    voidEntry: { create() {} },
+    events: { create() {} },
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionMaintenanceWorkflow: {
@@ -57,6 +63,7 @@ test("transaction workspace connects maintenance to the records workflow", () =>
       maintenance,
       entries,
       views,
+      maintenanceWorkflows,
     });
 
   assert.deepEqual(Object.keys(passed.maintenance).sort(), [
@@ -70,19 +77,19 @@ test("transaction workspace connects maintenance to the records workflow", () =>
   assert.equal(passed.maintenance.events, maintenance.events);
   assert.equal(
     passed.maintenance.workflows.correction,
-    context.window.PropertyDeskTransactionCorrectionWorkflow,
+    maintenanceWorkflows.correction,
   );
   assert.equal(
     passed.maintenance.workflows.voidMaintenance,
-    context.window.PropertyDeskTransactionVoidMaintenance,
+    maintenanceWorkflows.voidMaintenance,
   );
   assert.equal(
     passed.maintenance.workflows.voidEntry,
-    context.window.PropertyDeskTransactionVoidEntry,
+    maintenanceWorkflows.voidEntry,
   );
   assert.equal(
     passed.maintenance.workflows.events,
-    context.window.PropertyDeskTransactionMaintenanceEvents,
+    maintenanceWorkflows.events,
   );
   assert.equal(passed.records.maintenance, maintenanceApi);
   assert.equal(passed.records.entries, entries);
@@ -103,7 +110,19 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     transactionWorkspace,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows:/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows: maintenanceWorkflows,/,
+  );
+  assert.match(
+    transactionWorkspace,
+    /PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+  );
+  assert.match(
+    app,
+    /maintenanceWorkflows: \{[\s\S]*?PropertyDeskTransactionMaintenanceEvents/,
+  );
+  assert.doesNotMatch(
+    transactionWorkspace,
+    /window\.PropertyDeskTransaction(?:Correction|Void|MaintenanceEvents)/,
   );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
