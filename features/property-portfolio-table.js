@@ -3,6 +3,16 @@
   "use strict";
 
   const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
+  const PAYMENT_STATUS_CLASS = Object.freeze({
+    none: "payment-not-received-this-month",
+    partial: "payment-received-this-month",
+    full: "payment-paid-in-full-this-month",
+  });
+  const PAYMENT_STATUS_TITLE = Object.freeze({
+    none: "No payment received this month",
+    partial: "Partial payment received this month",
+    full: "Full scheduled amount received this month",
+  });
 
   function create({ esc, money, paymentFrequencyLabel }) {
     function propertyAddressCell(property, street) {
@@ -25,16 +35,6 @@
       reminderHref,
       recipientHint,
     }) {
-      const paymentClasses = {
-        none: "payment-not-received-this-month",
-        partial: "payment-received-this-month",
-        full: "payment-paid-in-full-this-month",
-      };
-      const paymentTitles = {
-        none: "No payment received this month",
-        partial: "Partial payment received this month",
-        full: "Full scheduled amount received this month",
-      };
       const paymentAmount =
         account.payment_frequency === "monthly"
           ? money(account.payment_amount)
@@ -46,7 +46,7 @@
       const inactiveHint = isActiveAccount(account) ? "" : " · Inactive";
 
       return `<tr>
-        <td class="${paymentClasses[paymentStatus]}" title="${paymentTitles[paymentStatus]}">
+        <td class="${PAYMENT_STATUS_CLASS[paymentStatus]}" title="${PAYMENT_STATUS_TITLE[paymentStatus]}">
         <button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button>
         </td>
         <td class="portfolio-due">${money(due)}</td>
