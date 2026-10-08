@@ -184,7 +184,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   assert.deepEqual(calls, ["payment events", "expense events"]);
 });
 
-test("shared ledger completion resets, refreshes, then continues or closes", async () => {
+test("shared ledger save resets, refreshes, then continues or closes", async () => {
   const calls = [];
   let failRefresh = false;
   const context = vm.createContext({
@@ -217,17 +217,28 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
     },
     toast: (message) => calls.push(`toast:${message}`),
   });
+  assert.deepEqual(Object.keys(workflow), ["saveTransactionEntry"]);
 
-  await workflow.finishSuccessfulEntry({
+  await workflow.saveTransactionEntry({
+    kind: "payment",
+    event: { submitter: { id: "payment-save-button" } },
+    payload: {},
+    buildCorrection: () => ({}),
+    insert: async () => true,
+    failureMessage: "Payment unavailable",
     label: "Payment",
-    addAnother: false,
     modalId: "payment-modal",
     resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
     resetArguments: ["account-1"],
   });
-  await workflow.finishSuccessfulEntry({
+  await workflow.saveTransactionEntry({
+    kind: "expense",
+    event: { submitter: { id: "expense-save-next" } },
+    payload: {},
+    buildCorrection: () => ({}),
+    insert: async () => true,
+    failureMessage: "Expense unavailable",
     label: "Expense",
-    addAnother: true,
     modalId: "expense-modal",
     resetAfterSave: () => calls.push("reset-expense"),
     prepareNext: (values) => calls.push(`next-expense:${values.propertyId}`),
@@ -245,9 +256,14 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
     "toast:Expense recorded. Ready for the next entry",
   ]);
   failRefresh = true;
-  await workflow.finishSuccessfulEntry({
+  await workflow.saveTransactionEntry({
+    kind: "payment",
+    event: { submitter: { id: "payment-save-button" } },
+    payload: {},
+    buildCorrection: () => ({}),
+    insert: async () => true,
+    failureMessage: "Payment unavailable",
     label: "Payment",
-    addAnother: false,
     modalId: "payment-modal",
     resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
     resetArguments: ["account-2"],

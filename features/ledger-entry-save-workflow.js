@@ -59,7 +59,7 @@
       });
     }
 
-    return { finishSuccessfulEntry, saveTransactionEntry };
+    return { saveTransactionEntry };
   }
 
   window.PropertyDeskLedgerEntrySaveWorkflow = Object.freeze({ create });
