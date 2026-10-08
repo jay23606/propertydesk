@@ -12,7 +12,7 @@ PropertyDesk is a plain HTML, CSS, and JavaScript app with no build step. Browse
 
 The root-level workspace modules and `features/workspace-runtime.js` create the authenticated backend, shared state, repositories, scoped queries, and refresh pipeline. Repositories resolve the active authenticated client when an operation runs. Feature workflows receive repositories and callbacks; they do not pass Supabase clients through the UI.
 
-`workspace-table-catalog.js` is the shared inventory for workspace reads and backups. `workspace-data.js` hydrates app state, `workspace-query.js` scopes and pages reads, and `workspace-refresh.js` coordinates loading and rendering. Row-level security and database grants remain the access boundary.
+`workspace-table-catalog.js` is the shared table inventory for workspace operations, and `workspace-read-catalog.js` explicitly lists the records hydrated into the client. `workspace-data.js` runs that read catalog to hydrate app state, `workspace-query.js` scopes and pages reads, and `workspace-refresh.js` coordinates loading and rendering. Row-level security and database grants remain the access boundary.
 
 ## Feature workflows
 

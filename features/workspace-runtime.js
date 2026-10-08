@@ -30,8 +30,11 @@
     const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
       getClient,
     });
+    const workspaceReads = window.PropertyDeskWorkspaceReadCatalog.create(
+      window.PropertyDeskWorkspaceTables,
+    );
     const workspaceData = window.PropertyDeskWorkspaceData.create({
-      tables: window.PropertyDeskWorkspaceTables,
+      reads: workspaceReads,
       workspaceQuery,
     });
     const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({

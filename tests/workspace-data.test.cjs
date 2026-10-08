@@ -14,6 +14,13 @@ function loadModule(getClient = () => null) {
     context,
   );
   vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "workspace-read-catalog.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(path.join(__dirname, "..", "workspace-query.js"), "utf8"),
     context,
   );
@@ -24,8 +31,11 @@ function loadModule(getClient = () => null) {
   const workspaceQuery = context.window.PropertyDeskWorkspaceQuery.create({
     getClient,
   });
+  const reads = context.window.PropertyDeskWorkspaceReadCatalog.create(
+    context.window.PropertyDeskWorkspaceTables,
+  );
   return context.window.PropertyDeskWorkspaceData.create({
-    tables: context.window.PropertyDeskWorkspaceTables,
+    reads,
     workspaceQuery,
   });
 }
@@ -205,11 +215,20 @@ test("workspace data modules load before app root and are precached", () => {
       html.indexOf("workspace-data.js"),
   );
   assert.ok(
+    html.indexOf("workspace-read-catalog.js") <
+      html.indexOf("workspace-data.js"),
+  );
+  assert.ok(
     html.indexOf("workspace-query.js") < html.indexOf("workspace-data.js"),
   );
   assert.match(worker, /'\.\/workspace-table-catalog\.js'/);
   assert.ok(
     worker.indexOf("./workspace-table-catalog.js") <
+      worker.indexOf("./workspace-data.js"),
+  );
+  assert.match(worker, /'\.\/workspace-read-catalog\.js'/);
+  assert.ok(
+    worker.indexOf("./workspace-read-catalog.js") <
       worker.indexOf("./workspace-data.js"),
   );
   assert.match(worker, /'\.\/workspace-query\.js'/);
