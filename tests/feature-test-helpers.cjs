@@ -135,6 +135,11 @@ function ledgerEntryDependencies(context, state = {}) {
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
     expenseAccountPolicy: context.window.PropertyDeskExpenseAccountPolicy,
+    workflows: {
+      paymentView: context.window.PropertyDeskPaymentEntryView,
+      expenseView: context.window.PropertyDeskExpenseEntryView,
+      propertyPaymentAction: context.window.PropertyDeskPropertyPaymentAction,
+    },
   };
 }
 

@@ -146,6 +146,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "state",
       "todayIso",
       "toast",
+      "workflows",
     ].sort(),
   );
   assert.deepEqual(
@@ -165,6 +166,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "state",
       "todayIso",
       "toast",
+      "workflows",
     ].sort(),
   );
   assert.equal(
@@ -177,6 +179,18 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   assert.equal(passed.expense.buildExpenseCorrection, buildExpenseCorrection);
   assert.equal(passed.payment.insertPayment, insertPayment);
   assert.equal(passed.expense.insertExpense, insertExpense);
+  assert.equal(
+    passed.payment.workflows.view,
+    dependencies.workflows.paymentView,
+  );
+  assert.equal(
+    passed.payment.workflows.propertyPaymentAction,
+    dependencies.workflows.propertyPaymentAction,
+  );
+  assert.equal(
+    passed.expense.workflows.view,
+    dependencies.workflows.expenseView,
+  );
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
   assert.equal(passed.persistenceOptions.repository, transactionRepository);
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
@@ -428,14 +442,26 @@ test("payment and expense form workflows publish explicit view operations", () =
       requiresRentalAccount: () => false,
       accountMatchesCategory: () => true,
     },
+    workflows: {
+      paymentView: context.window.PropertyDeskPaymentEntryView,
+      expenseView: context.window.PropertyDeskExpenseEntryView,
+      propertyPaymentAction: context.window.PropertyDeskPropertyPaymentAction,
+    },
     saveCorrection() {},
     buildPaymentPayload() {},
     buildExpensePayload() {},
   };
-  const payment =
-    context.window.PropertyDeskPaymentEntryForm.create(dependencies);
-  const expense =
-    context.window.PropertyDeskExpenseEntryForm.create(dependencies);
+  const payment = context.window.PropertyDeskPaymentEntryForm.create({
+    ...dependencies,
+    workflows: {
+      view: context.window.PropertyDeskPaymentEntryView,
+      propertyPaymentAction: context.window.PropertyDeskPropertyPaymentAction,
+    },
+  });
+  const expense = context.window.PropertyDeskExpenseEntryForm.create({
+    ...dependencies,
+    workflows: { view: context.window.PropertyDeskExpenseEntryView },
+  });
 
   assert.equal(Object.isFrozen(payment), true);
   assert.equal(Object.isFrozen(expense), true);
@@ -553,9 +579,16 @@ test("payment and expense callbacks retain values at their form boundary", async
       requiresRentalAccount: () => false,
       accountMatchesCategory: () => true,
     },
+    workflows: {
+      view: context.window.PropertyDeskPaymentEntryView,
+      propertyPaymentAction: context.window.PropertyDeskPropertyPaymentAction,
+    },
   };
   const payment = context.window.PropertyDeskPaymentEntryForm.create(common);
-  const expense = context.window.PropertyDeskExpenseEntryForm.create(common);
+  const expense = context.window.PropertyDeskExpenseEntryForm.create({
+    ...common,
+    workflows: { view: context.window.PropertyDeskExpenseEntryView },
+  });
   payment.attachEvents();
   expense.attachEvents();
 

@@ -17,8 +17,9 @@
     prettyType,
     openModal,
     expenseAccountPolicy,
+    workflows,
   }) {
-    const expenseView = window.PropertyDeskExpenseEntryView.create({
+    const expenseView = workflows.view.create({
       $,
       state,
       moneyInput,

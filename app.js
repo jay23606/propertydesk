@@ -325,6 +325,11 @@
         transactionRepository: repositories.transactions,
         transactionPayloads: window.PropertyDeskTransactionPayloads,
         expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
+        workflows: {
+          paymentView: window.PropertyDeskPaymentEntryView,
+          expenseView: window.PropertyDeskExpenseEntryView,
+          propertyPaymentAction: window.PropertyDeskPropertyPaymentAction,
+        },
       },
       views: {
         $,

@@ -16,8 +16,9 @@
     populateFormOptions,
     prettyType,
     openModal,
+    workflows,
   }) {
-    const paymentView = window.PropertyDeskPaymentEntryView.create({
+    const paymentView = workflows.view.create({
       $,
       state,
       moneyInput,
@@ -27,12 +28,11 @@
       prettyType,
       openModal,
     });
-    const { openPropertyPayment } =
-      window.PropertyDeskPropertyPaymentAction.create({
-        state,
-        toast,
-        openPayment: paymentView.openPayment,
-      });
+    const { openPropertyPayment } = workflows.propertyPaymentAction.create({
+      state,
+      toast,
+      openPayment: paymentView.openPayment,
+    });
 
     async function savePayment(event) {
       event.preventDefault();

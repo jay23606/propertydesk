@@ -18,6 +18,7 @@
     transactionPayloads,
     transactionRepository,
     expenseAccountPolicy,
+    workflows,
   }) {
     const {
       buildPayment,
@@ -50,6 +51,10 @@
       populateFormOptions,
       prettyType,
       openModal,
+      workflows: {
+        view: workflows.paymentView,
+        propertyPaymentAction: workflows.propertyPaymentAction,
+      },
       saveTransactionEntry,
       insertPayment,
       buildPaymentPayload: buildPayment,
@@ -68,6 +73,7 @@
       saveTransactionEntry,
       insertExpense,
       expenseAccountPolicy,
+      workflows: { view: workflows.expenseView },
       buildExpensePayload: buildExpense,
       buildExpenseCorrection,
     });
