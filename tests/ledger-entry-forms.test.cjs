@@ -174,7 +174,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
   assert.equal(passed.persistenceOptions.repository, transactionRepository);
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
-  assert.equal(passed.saveWorkflowOptions.fetchAll, dependencies.fetchAll);
+  assert.equal(passed.saveWorkflowOptions.fetchAll, undefined);
   assert.equal(passed.saveWorkflowOptions.state, dependencies.state);
   assert.equal(
     passed.saveWorkflowOptions.saveCorrection,

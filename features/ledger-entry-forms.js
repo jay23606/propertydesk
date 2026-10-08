@@ -38,7 +38,6 @@
         state,
         saveCorrection,
         closeModal,
-        fetchAll,
         toast,
       });
     const payments = window.PropertyDeskPaymentEntryForm.create({

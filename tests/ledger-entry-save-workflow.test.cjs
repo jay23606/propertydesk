@@ -27,7 +27,6 @@ test("shared transaction save routes corrections and completes successful entrie
     state,
     saveCorrection: (...args) => calls.push(["correct", ...args]),
     closeModal: (id) => calls.push(["close", id]),
-    fetchAll: async () => calls.push(["refresh"]),
     toast: (message) => calls.push(["toast", message]),
   });
 
@@ -86,7 +85,6 @@ test("failed transaction insert skips successful-entry completion", async () => 
     state: { pendingCorrection: null },
     saveCorrection() {},
     closeModal() {},
-    fetchAll: async () => calls.push("refresh"),
     toast: (message) => calls.push(message),
   });
 
@@ -113,10 +111,6 @@ test("saved transaction explains refresh failure to prevent duplicate entry", as
     state: { pendingCorrection: null },
     saveCorrection() {},
     closeModal: (id) => calls.push(["close", id]),
-    fetchAll: async () => {
-      calls.push(["refresh"]);
-      throw new Error("offline");
-    },
     toast: (message) => calls.push(["toast", message]),
   });
 
