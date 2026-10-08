@@ -10,23 +10,30 @@
       }
 
       let data;
-      let error;
-      try {
-        ({ data, error } = await authClient.updateUser({
-          data: { display_name: displayName },
-        }));
-      } catch {
-        await reconcileUnconfirmedProfile(displayName);
-        return;
-      }
-      if (error) {
-        toast(error.message);
-        return;
-      }
+      let reconciled = false;
+      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+        operation: async () => {
+          const result = await authClient.updateUser({
+            data: { display_name: displayName },
+          });
+          data = result.data;
+          return result;
+        },
+        toast,
+        failureMessage:
+          "Display name result couldn't be confirmed. Reload your profile before trying again.",
+        onUnconfirmed: async () => {
+          reconciled = await reconcileUnconfirmedProfile(displayName);
+          return reconciled;
+        },
+      });
+      if (!saved) return false;
+      if (reconciled) return true;
 
-      state.user = data.user || state.user;
+      state.user = data?.user || state.user;
       updateGreeting();
       toast("Display name saved");
+      return true;
     }
 
     async function reconcileUnconfirmedProfile(displayName) {
