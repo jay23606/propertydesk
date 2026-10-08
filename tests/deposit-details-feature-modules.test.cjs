@@ -54,6 +54,8 @@ test("deposit details render rental-only ledger rows and preserve voided markers
               },
             ],
             active: [{ id: "entry-1" }],
+            paymentById: new Map(state.payments.map((row) => [row.id, row])),
+            expenseById: new Map(state.expenses.map((row) => [row.id, row])),
             totals: {
               held: 400,
               received: 500,

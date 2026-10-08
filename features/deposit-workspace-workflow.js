@@ -5,7 +5,6 @@
   function createDepositWorkspaceWorkflow({ details, adjustments }) {
     const { buildDepositDetails } =
       window.PropertyDeskDepositDetailsModel.create({
-        state: details.state,
         depositLedger: details.depositLedger,
       });
     const { depositSectionHTML: renderDepositDetails } =

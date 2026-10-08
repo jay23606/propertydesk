@@ -211,6 +211,8 @@ test("security deposit held balance reconciles posted receipts, refunds, retenti
     result.active.map((entry) => entry.id),
     ["r1", "f1", "t1", "t2"],
   );
+  assert.equal(result.paymentById.get("p1").status, "posted");
+  assert.equal(result.expenseById.get("e1").status, "posted");
 });
 
 test("monthly scheduled totals normalize payment cadence and exclude inactive accounts", () => {

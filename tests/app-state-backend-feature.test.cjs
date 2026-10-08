@@ -213,6 +213,8 @@ test("deposit context scopes held-balance calculations to the selected account",
       return {
         active: entries,
         totals: { held: entries.reduce((sum, row) => sum + row.amount, 0) },
+        paymentById: new Map(passedPayments.map((row) => [row.id, row])),
+        expenseById: new Map(passedExpenses.map((row) => [row.id, row])),
       };
     },
   });
@@ -223,7 +225,7 @@ test("deposit context scopes held-balance calculations to the selected account",
   assert.equal(deposit.entries[0], depositEntries[0]);
   assert.deepEqual(
     Object.keys(deposit).sort(),
-    ["active", "entries", "totals"].sort(),
+    ["active", "entries", "expenseById", "paymentById", "totals"].sort(),
   );
   assert.equal(deposit.active.length, 1);
   assert.equal(deposit.totals.held, 40);

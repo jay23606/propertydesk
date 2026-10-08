@@ -395,7 +395,7 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
   });
 
   assert.equal(Object.isFrozen(workflow), true);
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), ["depositLedger", "state"]);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), ["depositLedger"]);
   assert.equal(calls[0][1].depositLedger, details.depositLedger);
   assert.deepEqual(Object.keys(calls[1][1]).sort(), [
     "esc",

@@ -12,7 +12,13 @@
         state.payments,
         state.expenses,
       );
-      return { active: result.active, totals: result.totals, entries };
+      return {
+        active: result.active,
+        totals: result.totals,
+        entries,
+        paymentById: result.paymentById,
+        expenseById: result.expenseById,
+      };
     }
 
     return Object.freeze({ depositLedger });

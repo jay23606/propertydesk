@@ -20,7 +20,7 @@
         totals[entry.entry_type] += Number(entry.amount || 0);
       totals.held =
         totals.received - totals.refunded - totals.retained + totals.restored;
-      return { active, totals };
+      return { active, totals, paymentById, expenseById };
     }
 
     return Object.freeze({ securityDepositBalance });
