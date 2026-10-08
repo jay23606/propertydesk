@@ -105,6 +105,7 @@ const SHELL_FILES = [
   './features/ledger-entry-forms.js',
   './features/create-actions.js',
   './features/import-correction-view.js',
+  './features/import-preview-table.js',
   './features/import-preview-rendering.js',
   './features/import-preview.js',
   './features/import-preview-events.js',
