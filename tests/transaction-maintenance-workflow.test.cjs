@@ -94,7 +94,6 @@ test("transaction maintenance coordinator joins isolated correction and void act
     openExpense() {},
     updatePaymentGuidance() {},
     unusedAction: true,
-    unusedAction: true,
   };
   const handlers = workflow.createTransactionActionHandlers(actions);
 
@@ -238,6 +237,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     openPayment() {},
     openExpense() {},
     updatePaymentGuidance() {},
+    unusedAction: true,
   };
   const handlers = workflow.createCorrectionActionHandlers(actions);
 

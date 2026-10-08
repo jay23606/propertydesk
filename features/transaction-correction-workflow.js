@@ -24,15 +24,19 @@
         repository,
       });
 
-    function createCorrectionActionHandlers(actions) {
+    function createCorrectionActionHandlers({
+      openPayment,
+      openExpense,
+      updatePaymentGuidance,
+    }) {
       return window.PropertyDeskTransactionCorrectionForm.create({
         $,
         state,
         toast,
         prettyType,
-        openPayment: actions.openPayment,
-        openExpense: actions.openExpense,
-        updatePaymentGuidance: actions.updatePaymentGuidance,
+        openPayment,
+        openExpense,
+        updatePaymentGuidance,
         findCorrectionTarget,
         EventClass,
         OptionClass,
