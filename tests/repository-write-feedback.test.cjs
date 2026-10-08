@@ -55,6 +55,20 @@ test("repository write feedback returns success without notifying", async () => 
   assert.deepEqual(messages, []);
 });
 
+test("repository write feedback exposes only its supported API", () => {
+  const feedback = createFeedback();
+
+  assert.deepEqual(Object.keys(feedback).sort(), [
+    "reconcileWorkspaceChange",
+    "refreshWorkspace",
+    "run",
+    "runAndRefreshWorkspaceChange",
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
+  ]);
+  assert.equal(Object.isFrozen(feedback), true);
+});
+
 test("repository write feedback shows returned database errors", async () => {
   const messages = [];
   const feedback = createFeedback();
