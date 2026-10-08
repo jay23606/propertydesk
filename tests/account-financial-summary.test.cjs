@@ -35,7 +35,6 @@ test("shared account financial summary keeps due and loan rules consistent", () 
     {
       unpaidDue: 550,
       unpaidStart: "2026-10-01",
-      unpaidAsOf: "2026-10-06",
       loanBalance: 12000,
       hasLoanBalance: true,
     },
@@ -45,7 +44,6 @@ test("shared account financial summary keeps due and loan rules consistent", () 
     {
       unpaidDue: 550,
       unpaidStart: "2026-10-01",
-      unpaidAsOf: "2026-10-06",
       loanBalance: 0,
       hasLoanBalance: false,
     },

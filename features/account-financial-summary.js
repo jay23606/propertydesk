@@ -15,7 +15,6 @@
       return {
         unpaidDue: amountDueSince([account], payments, unpaidStart, asOf),
         unpaidStart,
-        unpaidAsOf: asOf,
         loanBalance: hasLoanBalance ? accountBalance(account) : 0,
         hasLoanBalance,
       };
