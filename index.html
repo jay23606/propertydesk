@@ -675,7 +675,11 @@
                 </p>
               </form>
             </section>
-            <section class="panel report-panel">
+            <section
+              id="reminder-activity-panel"
+              class="panel report-panel"
+              hidden
+            >
               <div class="panel-heading">
                 <div>
                   <h2>Email reminder activity</h2>
@@ -1061,8 +1065,8 @@
                 inputmode="email"
                 placeholder="name@example.com, co-buyer@example.com"
               /><span class="field-hint"
-                >Stored for your records. Reminders stay off until you enable
-                them.</span
+                >Stored for your records. Use the Email or SMS action in
+                Properties to draft a reminder.</span
               ></label
             ><label
               >Tenant / buyer phone<input
@@ -1077,7 +1081,7 @@
               ></label
             >
           </div>
-          <div class="reminder-toggle-row">
+          <div class="reminder-toggle-row" hidden>
             <label class="reminder-toggle"
               ><input id="account-reminder-enabled" type="checkbox" /> Enable
               automatic month-end email reminder</label

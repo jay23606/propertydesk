@@ -281,6 +281,8 @@ test("reminder controls remain off by default and the preview stylesheet is in t
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(html, /id="account-reminder-enabled" type="checkbox"/);
+  assert.match(html, /class="reminder-toggle-row" hidden/);
+  assert.match(html, /id="reminder-activity-panel"[\s\S]*?hidden/);
   assert.doesNotMatch(
     html.match(/id="account-reminder-enabled"[^>]*>/)?.[0] || "",
     /checked/,
