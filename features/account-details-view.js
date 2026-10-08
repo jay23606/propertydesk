@@ -2,15 +2,8 @@
 (() => {
   "use strict";
 
-  function createAccountDetailsView({
-    money,
-    fmtDate,
-    esc,
-    prettyType,
-    paymentFrequencyLabel,
-    accountLoanScheduleHTML,
-  }) {
-    function renderAccountDetails({
+  function accountSummaryHTML(details, helpers) {
+    const {
       account,
       propertyName,
       propertyAddressText,
@@ -18,14 +11,11 @@
       estimatedLoanBalance,
       unpaidDue,
       unpaidSinceLabel,
-      schedule,
-      historyHTML,
-      payments,
-    }) {
-      const scheduleHTML = accountLoanScheduleHTML(schedule);
-      const isRental = account.account_type === "rental";
+    } = details;
+    const { money, fmtDate, esc, prettyType, paymentFrequencyLabel } = helpers;
+    const isRental = account.account_type === "rental";
 
-      return `<div class="detail-kpis">
+    return `<div class="detail-kpis">
         <div class="detail-kpi">
         <small>Property</small>
         <strong>${esc(propertyName)}</strong>
@@ -49,10 +39,24 @@
         <button type="button" data-account-detail-edit="${esc(account.id)}" class="button secondary compact">Edit</button>
         <button type="button" data-account-detail-payment="${esc(account.id)}" class="button primary compact">Record payment</button>
         </div>
-        </div><div id="detail-deposit-section"></div>${scheduleHTML}${historyHTML}<div class="detail-section">
-        <h3>Payment history (${payments.length})</h3>${
-          payments.length
-            ? `<div class="schedule-table">
+        </div>`;
+  }
+
+  function paymentHistoryHTML(payments, { money, fmtDate, esc }) {
+    const paymentRows = payments
+      .map(
+        (
+          payment,
+        ) => `<tr class="${payment.status === "voided" ? "transaction-voided" : ""}">
+        <td>${fmtDate(payment.received_date)}</td>
+        <td>${money(payment.amount)}</td>
+        <td>${payment.status === "voided" ? "Voided" : "Posted"}</td>
+        <td>${esc(payment.memo || "—")}</td>
+        </tr>`,
+      )
+      .join("");
+    const content = paymentRows
+      ? `<div class="schedule-table">
         <table>
         <thead>
         <tr>
@@ -62,24 +66,30 @@
         <th>Memo</th>
         </tr>
         </thead>
-        <tbody>${payments
-          .map(
-            (
-              payment,
-            ) => `<tr class="${payment.status === "voided" ? "transaction-voided" : ""}">
-        <td>${fmtDate(payment.received_date)}</td>
-        <td>${money(payment.amount)}</td>
-        <td>${payment.status === "voided" ? "Voided" : "Posted"}</td>
-        <td>${esc(payment.memo || "—")}</td>
-        </tr>`,
-          )
-          .join("")}</tbody>
+        <tbody>${paymentRows}</tbody>
         </table>
         </div>`
-            : '<div class="list-empty">No payments recorded for this account.</div>'
-        }</div><div class="detail-section">
-        <button type="button" data-account-detail-close="${esc(account.id)}" class="text-button">Close account and preserve its history</button>
+      : '<div class="list-empty">No payments recorded for this account.</div>';
+
+    return `<div class="detail-section">
+        <h3>Payment history (${payments.length})</h3>${content}
         </div>`;
+  }
+
+  function closeAccountHTML(accountId, esc) {
+    return `<div class="detail-section">
+        <button type="button" data-account-detail-close="${esc(accountId)}" class="text-button">Close account and preserve its history</button>
+        </div>`;
+  }
+
+  function createAccountDetailsView(helpers) {
+    function renderAccountDetails(details) {
+      return `${accountSummaryHTML(details, helpers)}
+        <div id="detail-deposit-section"></div>
+        ${helpers.accountLoanScheduleHTML(details.schedule)}
+        ${details.historyHTML}
+        ${paymentHistoryHTML(details.payments, helpers)}
+        ${closeAccountHTML(details.account.id, helpers.esc)}`;
     }
 
     return Object.freeze({ renderAccountDetails });
