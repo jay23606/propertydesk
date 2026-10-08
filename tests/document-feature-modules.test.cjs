@@ -13,6 +13,7 @@ function loadDocumentModules(context) {
     "document-upload-maintenance.js",
     "document-upload-policy.js",
     "document-upload.js",
+    "document-delete-maintenance.js",
     "document-delete.js",
     "document-open.js",
     "document-actions.js",
