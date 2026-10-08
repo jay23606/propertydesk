@@ -35,6 +35,17 @@
     ]);
   }
 
+  function expenseAccountFor(row, property, lookup) {
+    if (!row.account_name) return null;
+
+    const account = lookup.findAccount(property.id, row.account_name);
+    if (!account)
+      throw new Error(
+        `Account not found for ${row.property_name}: ${row.account_name}.`,
+      );
+    return account;
+  }
+
   function expensePropertyAndAccount(row, lookup) {
     if (
       !row.property_name ||
@@ -53,13 +64,7 @@
       throw new Error(
         `Property not found: ${row.property_name} at ${row.property_address}. Add or import the property first.`,
       );
-    const account = row.account_name
-      ? lookup.findAccount(property.id, row.account_name)
-      : null;
-    if (row.account_name && !account)
-      throw new Error(
-        `Account not found for ${row.property_name}: ${row.account_name}.`,
-      );
+    const account = expenseAccountFor(row, property, lookup);
     return { property, account };
   }
 
