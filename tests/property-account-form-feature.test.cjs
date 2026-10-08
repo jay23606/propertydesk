@@ -167,6 +167,37 @@ test("property and account maintenance save inserts and updates to their own tab
   assert.deepEqual(messages, []);
 });
 
+test("account form confirms a lost save response from refreshed account data", async () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
+  const payload = {
+    user_id: "workspace-1",
+    name: "Rental",
+    payment_amount: 825,
+    account_type: "rental",
+  };
+  const state = { accounts: [] };
+  let refreshes = 0;
+  const messages = [];
+  const maintenance = context.window.PropertyDeskAccountFormMaintenance.create({
+    state,
+    fetchAll: async () => {
+      state.accounts.push({ ...payload, id: "account-1" });
+      refreshes += 1;
+    },
+    toast: (message) => messages.push(message),
+    repository: {
+      save: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+
+  assert.equal(await maintenance.saveAccount(payload), true);
+  assert.equal(refreshes, 1);
+  assert.deepEqual(messages, []);
+});
+
 test("property form view reads normalized values, resets the form, and binds submit", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
@@ -332,7 +363,9 @@ test("property and account forms report rejected saves without running success a
     state,
     toast: (message) => messages.push(message),
     closeModal: () => assert.fail("rejected save must keep its form open"),
-    fetchAll: async () => assert.fail("rejected save must not refresh"),
+    fetchAll: async () => {
+      throw new Error("offline");
+    },
   };
   const property = context.window.PropertyDeskPropertyForm.create({
     ...dependencies,
@@ -360,6 +393,6 @@ test("property and account forms report rejected saves without running success a
   );
   assert.deepEqual(messages, [
     "Property save result couldn't be confirmed. Reload Properties before trying again.",
-    "Account save result couldn't be confirmed. Reload Properties before trying again.",
+    "Account save result couldn't be confirmed, and Properties could not refresh. Reload before trying again.",
   ]);
 });

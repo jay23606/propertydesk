@@ -33,6 +33,8 @@
       });
     const { saveAccount: persistAccount } =
       window.PropertyDeskAccountFormMaintenance.create({
+        state,
+        fetchAll,
         toast,
         repository,
       });
