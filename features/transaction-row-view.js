@@ -2,14 +2,26 @@
 (() => {
   "use strict";
 
+  function transactionActionHTML(record, item, isVoided, esc) {
+    if (isVoided) return '<span class="muted">Voided</span>';
+    return `<button type="button" class="text-button" data-correct-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Correct</button> <button type="button" class="text-button" data-void-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Void</button>`;
+  }
+
+  function transactionMemoHTML(record, item, esc) {
+    const voidReason = item.void_reason
+      ? `<small class='table-subtext'>${esc(item.void_reason)}</small>`
+      : "";
+    const correctionNote = record.correctionOf
+      ? '<small class="table-subtext">Corrected replacement</small>'
+      : "";
+    return `${esc(item.memo || "—")}${voidReason}${correctionNote}`;
+  }
+
   function createTransactionRowView({ esc, money, fmtDate }) {
     function transactionRowHTML(record) {
       const item = record.item;
       const isExpense = record.kind === "expense";
       const isVoided = item.status === "voided";
-      const actionButtons = isVoided
-        ? '<span class="muted">Voided</span>'
-        : `<button type="button" class="text-button" data-correct-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Correct</button> <button type="button" class="text-button" data-void-transaction data-kind="${record.kind}" data-id="${esc(item.id)}">Void</button>`;
 
       return `<tr class='${isVoided ? "transaction-voided" : ""}'>
         <td>${fmtDate(record.date)}</td>
@@ -18,8 +30,8 @@
         <td>${esc(record.detailsType)}</td>
         <td><strong>${isExpense ? "−" : ""}${money(record.amount)}</strong></td>
         <td>${esc(record.paymentMethod)}</td>
-        <td>${esc(item.memo || "—")}${item.void_reason ? `<small class='table-subtext'>${esc(item.void_reason)}</small>` : ""}${record.correctionOf ? '<small class="table-subtext">Corrected replacement</small>' : ""}</td>
-        <td>${actionButtons}</td>
+        <td>${transactionMemoHTML(record, item, esc)}</td>
+        <td>${transactionActionHTML(record, item, isVoided, esc)}</td>
       </tr>`;
     }
 
