@@ -38,7 +38,6 @@
       });
     const { commitAccounts, commitTransactions } =
       window.PropertyDeskImportCommit.create({
-        state,
         fetchAll,
         status: $("import-status"),
         toast,

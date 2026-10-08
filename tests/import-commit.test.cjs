@@ -34,7 +34,6 @@ test("account and transaction imports share the commit refresh and result report
   };
   const { commit: feature, repository } = loadCommitFeature();
   const commit = feature.create({
-    state: { client },
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshes.push("workspace refreshed"),
     status,
@@ -94,7 +93,6 @@ test("failed import commits do not refresh or report success", async () => {
   };
   const { commit: feature, repository } = loadCommitFeature();
   const commit = feature.create({
-    state: { client },
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshCount++,
     status: { textContent: "", classList: { add() {} } },
