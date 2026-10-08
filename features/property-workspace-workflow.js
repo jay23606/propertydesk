@@ -9,11 +9,12 @@
     groupAccountsByProperty,
     isActiveAccount,
   }) {
-    const propertyDetails = window.PropertyDeskPropertyScreenWorkflow.create({
+    const propertyDetails = detail.workflows.screen.create({
       content: detail.content,
       management: detail.management,
       holders: detail.holders,
       documents: detail.documents,
+      workflows: detail.workflows,
     });
     const propertyOverview = window.PropertyDeskOverviewWorkflow.create({
       $: overview.$,

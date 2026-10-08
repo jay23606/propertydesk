@@ -93,6 +93,11 @@ test("property screen workflow passes detail actions to management and returns b
     management,
     holders,
     documents,
+    workflows: {
+      content: context.window.PropertyDeskPropertyDetailContentWorkflow,
+      management: context.window.PropertyDeskPropertyDetailManagementWorkflow,
+      holders: context.window.PropertyDeskPropertyHolderWorkflow,
+    },
   });
 
   assert.equal(calls[0][0], "content");

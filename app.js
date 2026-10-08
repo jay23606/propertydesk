@@ -429,6 +429,12 @@
         fetchAll,
         documentRepository: repositories.documents,
       },
+      workflows: {
+        screen: window.PropertyDeskPropertyScreenWorkflow,
+        content: window.PropertyDeskPropertyDetailContentWorkflow,
+        management: window.PropertyDeskPropertyDetailManagementWorkflow,
+        holders: window.PropertyDeskPropertyHolderWorkflow,
+      },
     },
     overview: {
       $,

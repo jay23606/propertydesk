@@ -13,6 +13,7 @@ test("property workspace shares detail actions across overview and grid", () => 
     management: {},
     holders: {},
     documents: {},
+    workflows: {},
     unusedDetailValue: true,
   };
   const openPropertyPayment = () => "overview-payment";
@@ -71,6 +72,7 @@ test("property workspace shares detail actions across overview and grid", () => 
       },
     },
   });
+  detail.workflows.screen = context.window.PropertyDeskPropertyScreenWorkflow;
   vm.runInContext(
     fs.readFileSync(
       path.join(root, "features", "property-workspace-workflow.js"),
@@ -97,6 +99,7 @@ test("property workspace shares detail actions across overview and grid", () => 
     "documents",
     "holders",
     "management",
+    "workflows",
   ]);
   assert.equal(calls[1][1].state, state);
   assert.equal(calls[1][1].groupAccountsByProperty, groupAccountsByProperty);

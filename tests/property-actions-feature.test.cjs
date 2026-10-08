@@ -221,7 +221,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     screenWorkflow,
-    /PropertyDetailContentWorkflow\.create\([\s\S]*?PropertyDetailManagementWorkflow\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
+    /workflows\.content\.create\([\s\S]*?workflows\.management\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
   );
   const workspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
@@ -229,7 +229,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     workspaceWorkflow,
-    /PropertyDeskPropertyScreenWorkflow\.create\(\{[\s\S]*?content: detail\.content,[\s\S]*?documents: detail\.documents/,
+    /detail\.workflows\.screen\.create\(\{[\s\S]*?content: detail\.content,[\s\S]*?documents: detail\.documents,[\s\S]*?workflows: detail\.workflows/,
   );
   const workflow = fs.readFileSync(
     path.join(
@@ -252,7 +252,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     screenWorkflow,
-    /PropertyDeskPropertyHolderWorkflow\.create\([\s\S]*?repository: holders\.repository/,
+    /workflows\.holders\.create\([\s\S]*?repository: holders\.repository/,
   );
   assert.match(
     holderWorkflow,

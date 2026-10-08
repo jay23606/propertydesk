@@ -7,8 +7,9 @@
     management,
     holders,
     documents,
+    workflows,
   }) {
-    const details = window.PropertyDeskPropertyDetailContentWorkflow.create({
+    const details = workflows.content.create({
       $: content.$,
       state: content.state,
       isPosted: content.isPosted,
@@ -23,7 +24,7 @@
       openModal: content.openModal,
       propertyAddress: content.propertyAddress,
     });
-    const actions = window.PropertyDeskPropertyDetailManagementWorkflow.create({
+    const actions = workflows.management.create({
       $: management.$,
       state: management.state,
       toast: management.toast,
@@ -38,15 +39,14 @@
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
     });
-    const { attachPropertyHolderEvents } =
-      window.PropertyDeskPropertyHolderWorkflow.create({
-        $: holders.$,
-        state: holders.state,
-        toast: holders.toast,
-        fetchAll: holders.fetchAll,
-        repository: holders.repository,
-        openPropertyDetails: details.openPropertyDetails,
-      });
+    const { attachPropertyHolderEvents } = workflows.holders.create({
+      $: holders.$,
+      state: holders.state,
+      toast: holders.toast,
+      fetchAll: holders.fetchAll,
+      repository: holders.repository,
+      openPropertyDetails: details.openPropertyDetails,
+    });
     const { attachPropertyDocumentEvents } = documents.workflow.create({
       $: documents.$,
       state: documents.state,
