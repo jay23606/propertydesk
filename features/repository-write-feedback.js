@@ -122,7 +122,7 @@
       Array.isArray(initialRecords) && fetchAll
         ? async () => {
             let recordWasSaved = false;
-            const refreshed = await refreshWorkspace({
+            return reconcileWorkspaceChange({
               fetchAll,
               afterRefresh: () => {
                 const records = state[collection] || [];
@@ -137,13 +137,12 @@
                     ).length > previousCount;
                 onRefreshed?.({ recordWasSaved });
               },
+              isConfirmed: () => recordWasSaved,
               toast,
               refreshFailureMessage,
+              retryMessage,
+              onConfirmed: onReconciled,
             });
-            if (!refreshed) return false;
-            if (recordWasSaved) onReconciled?.();
-            else toast(retryMessage);
-            return recordWasSaved;
           }
         : undefined;
 

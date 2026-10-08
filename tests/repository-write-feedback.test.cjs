@@ -180,11 +180,13 @@ test("workspace record save runs its reconciliation callback only after a refres
       failureMessage: "Write result couldn't be confirmed.",
       refreshFailureMessage: "Refresh failed.",
       retryMessage: "Check the account before retrying.",
+      onRefreshed: ({ recordWasSaved }) =>
+        events.push(["readback", recordWasSaved]),
       onReconciled: () => events.push("confirmed action"),
     }),
     true,
   );
-  assert.deepEqual(events, ["refresh", "confirmed action"]);
+  assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
 });
 
 test("post-write refresh shows success only after workspace data reloads", async () => {
