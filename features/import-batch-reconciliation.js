@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  function createImportBatchReconciliation({ state, fetchAll, toast }) {
+  function createImportBatchReconciliation({
+    state,
+    fetchAll,
+    toast,
+    writeFeedback,
+  }) {
     function normalizedSourceName(sourceName) {
       return (
         String(sourceName || "")
@@ -56,20 +61,19 @@
       if (baselineBatchIds === null || !fetchAll || error?.code) throw error;
 
       let committedBatch;
-      const refreshed =
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          afterRefresh: () => {
-            committedBatch = state.importBatches.find(
-              (batch) =>
-                !baselineBatchIds.has(batch.id) &&
-                matchesCommittedBatch(batch, sourceName, total, collection),
-            );
-          },
-          toast,
-          refreshFailureMessage:
-            "Import result couldn't be confirmed, and import history could not refresh. Reload before retrying.",
-        });
+      const refreshed = await writeFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => {
+          committedBatch = state.importBatches.find(
+            (batch) =>
+              !baselineBatchIds.has(batch.id) &&
+              matchesCommittedBatch(batch, sourceName, total, collection),
+          );
+        },
+        toast,
+        refreshFailureMessage:
+          "Import result couldn't be confirmed, and import history could not refresh. Reload before retrying.",
+      });
       if (!refreshed) {
         throw new Error(
           "Import result couldn't be confirmed. Import history could not refresh.",

@@ -637,6 +637,7 @@
     fetchAll,
     toast,
     repository: repositories.imports,
+    writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
   });
   const { attachBackupExportEvents } =
     window.PropertyDeskBackupWorkspaceWorkflow.create({

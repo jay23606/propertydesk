@@ -23,8 +23,17 @@ function loadCommitFeature() {
   return {
     commit: context.window.PropertyDeskImportCommit,
     repository: context.window.PropertyDeskImportRepository,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
   };
 }
+
+test("import batch reconciliation uses injected workspace feedback", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "import-batch-reconciliation.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+});
 
 test("account and transaction imports share the commit refresh and result reporting", async () => {
   const rpcCalls = [];
@@ -40,8 +49,9 @@ test("account and transaction imports share the commit refresh and result report
       return { data: { rows_accepted: 1 }, error: null };
     },
   };
-  const { commit: feature, repository } = loadCommitFeature();
+  const { commit: feature, repository, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshes.push("workspace refreshed"),
     status,
@@ -99,8 +109,9 @@ test("failed import commits do not refresh or report success", async () => {
       return { data: null, error: new Error("database offline") };
     },
   };
-  const { commit: feature, repository } = loadCommitFeature();
+  const { commit: feature, repository, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshCount++,
     status: { textContent: "", classList: { add() {} } },
@@ -126,8 +137,9 @@ test("a confirmed import distinguishes refresh failure from save failure", async
       return { data: { rows_accepted: 1 }, error: null };
     },
   };
-  const { commit: feature, repository } = loadCommitFeature();
+  const { commit: feature, repository, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => {
       throw new Error("workspace refresh failed");
@@ -166,8 +178,9 @@ test("an import with a lost response reconciles from the new committed batch", a
     textContent: "",
     classList: { add: (name) => refreshes.push(name) },
   };
-  const { commit: feature } = loadCommitFeature();
+  const { commit: feature, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     state,
     repository: {
       commitAccounts: async () => {
@@ -222,8 +235,9 @@ test("an import with a lost response ignores older batches with the same source"
     accounts: [{ import_batch_id: "older-batch" }],
   };
   const status = { textContent: "", classList: { add() {} } };
-  const { commit: feature } = loadCommitFeature();
+  const { commit: feature, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     state,
     repository: {
       commitAccounts: async () => {
@@ -262,8 +276,9 @@ test("an unconfirmed import stays unresolved when refreshed history has no batch
     workspaceOwnerId: "workspace-1",
     importBatches: [],
   };
-  const { commit: feature } = loadCommitFeature();
+  const { commit: feature, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     state,
     repository: {
       commitAccounts: async () => {
@@ -292,8 +307,9 @@ test("database import errors keep their specific message without reconciliation"
   const databaseError = Object.assign(new Error("Account row is invalid"), {
     code: "P0001",
   });
-  const { commit: feature } = loadCommitFeature();
+  const { commit: feature, writeFeedback } = loadCommitFeature();
   const commit = feature.create({
+    writeFeedback,
     state: { workspaceOwnerId: "workspace-1", importBatches: [] },
     repository: {
       commitAccounts: async () => {

@@ -2,12 +2,20 @@
 (() => {
   "use strict";
 
-  function createImportCommit({ state, fetchAll, status, toast, repository }) {
+  function createImportCommit({
+    state,
+    fetchAll,
+    status,
+    toast,
+    repository,
+    writeFeedback,
+  }) {
     const batchReconciliation =
       window.PropertyDeskImportBatchReconciliation.create({
         state,
         fetchAll,
         toast,
+        writeFeedback,
       });
     const { finish } = window.PropertyDeskImportCommitReporting.create({
       status,

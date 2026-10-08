@@ -12,6 +12,7 @@
     fetchAll,
     toast,
     repository,
+    writeFeedback,
   }) {
     const { selectImportRows, createImportLookup } =
       window.PropertyDeskImportRows;
@@ -42,6 +43,7 @@
         status: $("import-status"),
         toast,
         repository,
+        writeFeedback,
       });
     const importReview = window.PropertyDeskImportReview.create({
       stageImport: importPreview.stageImport,

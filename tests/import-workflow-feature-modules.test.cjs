@@ -101,6 +101,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
           return { kind: "import-repository" };
         },
       },
+      PropertyDeskRepositoryWriteFeedback: { kind: "write-feedback" },
       PropertyDeskTransactionImportWorkflow: { create() {} },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskImportReview: {
@@ -140,6 +141,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     fetchAll() {},
     toast() {},
     repository: { kind: "injected-import-repository" },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     unrelatedDependency() {},
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
@@ -152,6 +154,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachExpenseEvents",
   ]);
   assert.equal(passed.commit.repository, dependencies.repository);
+  assert.equal(passed.commit.writeFeedback, dependencies.writeFeedback);
   assert.equal(passed.commit.state, dependencies.state);
   assert.deepEqual(Object.keys(passed.commit).sort(), [
     "fetchAll",
@@ -159,6 +162,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "state",
     "status",
     "toast",
+    "writeFeedback",
   ]);
   assert.equal(passed.importRepository, undefined);
   assert.deepEqual(

@@ -11,7 +11,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   assert.match(
     app,
-    /PropertyDeskImportFeature\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports/,
+    /PropertyDeskImportFeature\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback/,
   );
   const imports = fs.readFileSync(
     path.join(root, "features", "imports.js"),
@@ -22,7 +22,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   assert.match(imports, /window\.PropertyDeskImportRows/);
   assert.match(imports, /window\.PropertyDeskImportWorkflows/);
   assert.match(imports, /stageImport: importPreview\.stageImport/);
-  assert.match(imports, /repository,\s*\n\s*\}\);/);
+  assert.match(imports, /repository,\s*\n\s*writeFeedback,\s*\n\s*\}\);/);
   assert.doesNotMatch(
     app,
     /PropertyDeskImportRows|PropertyDeskImportWorkflows/,
