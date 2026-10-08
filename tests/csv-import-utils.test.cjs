@@ -9,10 +9,21 @@ const {
 } = require("../features/csv-value-utils.js");
 const {
   createImportLookup,
+  duplicateKey,
+  duplicateKeyAmount,
+  duplicateKeyText,
   markPossibleDuplicates,
   selectImportRows,
   validateImportRows,
 } = require("../features/import-row-utils.js");
+
+test("import duplicate-key helpers normalize money and text without delimiter collisions", () => {
+  assert.equal(duplicateKeyAmount(12), "12.00");
+  assert.equal(duplicateKeyAmount("12.5"), "12.50");
+  assert.equal(duplicateKeyText("  Paid JANUARY "), "paid january");
+  assert.equal(duplicateKeyText(null), "");
+  assert.notEqual(duplicateKey(["a|b", "c"]), duplicateKey(["a", "b|c"]));
+});
 
 test("row validation keeps valid rows and reports every bad source row", () => {
   const rows = parseCSV(

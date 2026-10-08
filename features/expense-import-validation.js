@@ -2,8 +2,14 @@
 (() => {
   "use strict";
 
-  const { createImportLookup, markPossibleDuplicates, validateImportRows } =
-    globalThis.PropertyDeskImportRows;
+  const {
+    createImportLookup,
+    duplicateKey,
+    duplicateKeyAmount,
+    duplicateKeyText,
+    markPossibleDuplicates,
+    validateImportRows,
+  } = globalThis.PropertyDeskImportRows;
   const { csvMoney, validIsoDate } = globalThis.PropertyDeskCsvValueUtils;
   const {
     expenseCategories,
@@ -21,17 +27,13 @@
   );
 
   function expenseKey(propertyId, accountId, date, amount, payee, memo) {
-    return JSON.stringify([
+    return duplicateKey([
       propertyId,
       accountId || "",
       date,
-      Number(amount).toFixed(2),
-      String(payee || "")
-        .trim()
-        .toLowerCase(),
-      String(memo || "")
-        .trim()
-        .toLowerCase(),
+      duplicateKeyAmount(amount),
+      duplicateKeyText(payee),
+      duplicateKeyText(memo),
     ]);
   }
 

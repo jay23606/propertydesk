@@ -63,6 +63,20 @@
     });
   }
 
+  function duplicateKey(parts) {
+    return JSON.stringify(parts);
+  }
+
+  function duplicateKeyAmount(value) {
+    return Number(value).toFixed(2);
+  }
+
+  function duplicateKeyText(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
+  }
+
   function selectImportRows(rows, includePossibleDuplicates = false) {
     return rows.filter(
       (row) => includePossibleDuplicates || !row._possible_duplicate,
@@ -89,6 +103,9 @@
 
   const helpers = Object.freeze({
     createImportLookup,
+    duplicateKey,
+    duplicateKeyAmount,
+    duplicateKeyText,
     markPossibleDuplicates,
     selectImportRows,
     validateImportRows,
