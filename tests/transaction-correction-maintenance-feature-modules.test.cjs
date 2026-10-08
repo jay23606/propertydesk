@@ -134,11 +134,18 @@ test("transaction correction failures preserve the open form and pending correct
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
   assert.equal(await feature.saveCorrection("expense", { amount: 75 }), false);
-  assert.equal(state.pendingCorrection.id, "payment-1");
+  state.pendingCorrection = {
+    kind: "deposit",
+    id: "deposit-1",
+    reason: "Unsupported kind",
+  };
+  assert.equal(await feature.saveCorrection("deposit", { amount: 75 }), false);
+  assert.equal(state.pendingCorrection.id, "deposit-1");
   assert.equal(closes, 0);
   assert.equal(refreshes, 1);
   assert.deepEqual(messages, [
     "Transaction history was refreshed. Check it before trying the correction again.",
+    "This correction is no longer available.",
     "This correction is no longer available.",
   ]);
 });

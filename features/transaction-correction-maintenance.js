@@ -3,22 +3,30 @@
   "use strict";
 
   function create({ $, state, toast, fetchAll, closeModal, repository }) {
-    function correctionWasApplied(kind, transactionId) {
-      const rows = state[kind === "payment" ? "payments" : "expenses"] || [];
-      const correctionKey =
-        kind === "payment"
-          ? "correction_of_payment_id"
-          : "correction_of_expense_id";
-      return rows.some((row) => row[correctionKey] === transactionId);
-    }
+    const correctionTypes = Object.freeze({
+      payment: Object.freeze({
+        label: "Payment",
+        modalId: "payment-modal",
+        collection: "payments",
+        correctionKey: "correction_of_payment_id",
+      }),
+      expense: Object.freeze({
+        label: "Expense",
+        modalId: "expense-modal",
+        collection: "expenses",
+        correctionKey: "correction_of_expense_id",
+      }),
+    });
 
     async function saveCorrection(kind, correction) {
+      const type = correctionTypes[kind];
       const pending = state.pendingCorrection;
-      if (!pending || pending.kind !== kind) {
+      if (!type || !pending || pending.kind !== kind) {
         toast("This correction is no longer available.");
         return false;
       }
-      const successMessage = `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`;
+      const successMessage = `${type.label} corrected; original kept in history`;
+      const closeCorrectionForm = () => closeModal($(type.modalId));
       return window.PropertyDeskRepositoryWriteFeedback.runAndRefreshWorkspaceChange(
         {
           operation: () =>
@@ -29,7 +37,10 @@
               reason: pending.reason,
             }),
           fetchAll,
-          isConfirmed: () => correctionWasApplied(kind, pending.id),
+          isConfirmed: () =>
+            (state[type.collection] || []).some(
+              (row) => row[type.correctionKey] === pending.id,
+            ),
           toast,
           failureMessage:
             "Correction result couldn't be confirmed. Reload transaction history before trying again.",
@@ -39,14 +50,9 @@
             "Correction result couldn't be confirmed, and transaction history could not refresh. Reload before trying again.",
           retryMessage:
             "Transaction history was refreshed. Check it before trying the correction again.",
-          onSaved: () =>
-            closeModal(
-              $(kind === "payment" ? "payment-modal" : "expense-modal"),
-            ),
+          onSaved: closeCorrectionForm,
           onReconciled: () => {
-            closeModal(
-              $(kind === "payment" ? "payment-modal" : "expense-modal"),
-            );
+            closeCorrectionForm();
             toast(successMessage);
           },
           successMessage,
