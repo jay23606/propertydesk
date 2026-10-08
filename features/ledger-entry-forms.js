@@ -27,6 +27,8 @@
     } = transactionPayloads;
     const { insertPayment, insertExpense } =
       window.PropertyDeskTransactionInserts.create({
+        state,
+        fetchAll,
         toast,
         repository: transactionRepository,
       });
