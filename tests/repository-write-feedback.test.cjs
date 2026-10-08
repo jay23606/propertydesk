@@ -118,6 +118,24 @@ test("repository write feedback reconciles an unconfirmed write without misrepor
   assert.deepEqual(events, [["reconcile", "connection lost"]]);
 });
 
+test("repository write feedback accepts a write confirmed by readback", async () => {
+  const messages = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.run({
+      operation: async () => {
+        throw new Error("connection lost");
+      },
+      toast: (message) => messages.push(message),
+      failureMessage: "Write result couldn't be confirmed.",
+      onUnconfirmed: async () => true,
+    }),
+    true,
+  );
+  assert.deepEqual(messages, []);
+});
+
 test("repository write feedback uses its fallback when unconfirmed reconciliation fails", async () => {
   const messages = [];
   const feedback = createFeedback();

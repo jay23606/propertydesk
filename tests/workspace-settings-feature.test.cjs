@@ -193,7 +193,9 @@ test("workspace setting writes report rejected requests and retain entered value
     authClient: createAuthClient(context, state),
     esc: String,
     toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    fetchAll: async () => {
+      throw new Error("offline");
+    },
     memberRepository:
       context.window.PropertyDeskWorkspaceMemberRepository.create({
         getClient: () => state.client,
@@ -222,8 +224,54 @@ test("workspace setting writes report rejected requests and retain entered value
   assert.equal($("member-email").value, " spouse@example.test ");
   assert.deepEqual(messages, [
     "Display name couldn't be saved right now. Check your connection and try again.",
-    "Workspace member addition result couldn't be confirmed. Reload workspace settings before trying again.",
-    "Workspace member removal result couldn't be confirmed. Reload workspace settings before trying again.",
+    "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+    "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+  ]);
+});
+
+test("workspace member actions reconcile lost responses against refreshed membership", async () => {
+  const context = vm.createContext({ window: {} });
+  loadWorkspaceFeatures(context);
+  const calls = [];
+  const messages = [];
+  const handlers = {};
+  const member = { member_user_id: "member-1", email: "spouse@example.test" };
+  const state = { workspaceMembers: [], properties: [] };
+  const feature = context.window.PropertyDeskWorkspaceMembers.create({
+    state,
+    toast: (message) => messages.push(message),
+    fetchAll: async () => {
+      calls.push("refresh");
+      state.workspaceMembers = state.pendingMembers;
+    },
+    view: {
+      attachEvents: (actions) => Object.assign(handlers, actions),
+    },
+    refreshWorkspaceSettings: () => calls.push("render"),
+    repository: {
+      addMember: async () => {
+        throw new Error("add response lost");
+      },
+      removeMember: async () => {
+        throw new Error("remove response lost");
+      },
+    },
+    confirmAction: () => true,
+  });
+  feature.attachWorkspaceMemberEvents();
+
+  state.pendingMembers = [member];
+  assert.equal(
+    await handlers.addWorkspaceMember(" SPOUSE@example.test "),
+    true,
+  );
+  state.pendingMembers = [];
+  await handlers.removeWorkspaceMember("member-1");
+
+  assert.deepEqual(calls, ["refresh", "render", "refresh", "render"]);
+  assert.deepEqual(messages, [
+    "Workspace member added",
+    "Workspace access removed",
   ]);
 });
 

@@ -18,7 +18,7 @@
     } catch (error) {
       if (onUnconfirmed) {
         try {
-          await onUnconfirmed(error);
+          return (await onUnconfirmed(error)) === true;
         } catch {
           toast(failureMessage);
         }

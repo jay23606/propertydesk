@@ -22,15 +22,17 @@
       if (!property) return;
 
       const archived_at = property.archived_at ? null : todayIso();
-      if (
-        !(await savePropertyArchive(
-          id,
-          state.workspaceOwnerId,
-          archived_at,
-          () => refreshUncertainPropertyStatus(id, archived_at),
-        ))
-      )
-        return;
+      let reconciled = false;
+      const saved = await savePropertyArchive(
+        id,
+        state.workspaceOwnerId,
+        archived_at,
+        async () => {
+          reconciled = await refreshUncertainPropertyStatus(id, archived_at);
+          return reconciled;
+        },
+      );
+      if (!saved || reconciled) return;
       await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
         fetchAll,
         afterRefresh: () => openPropertyDetails(id),
@@ -65,7 +67,7 @@
             : "Property restored"
           : "Property status is shown in refreshed details. Check it before retrying.",
       );
-      return true;
+      return statusMatches;
     }
 
     return Object.freeze({ toggleArchiveProperty });
