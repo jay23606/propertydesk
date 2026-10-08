@@ -2,19 +2,18 @@
 (() => {
   "use strict";
 
-  function createTransactionCorrectionWorkflow(context) {
-    const {
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      prettyType,
-      EventClass = Event,
-      OptionClass = Option,
-      repository,
-      findCorrectionTarget,
-    } = context;
+  function createTransactionCorrectionWorkflow({
+    $,
+    state,
+    toast,
+    fetchAll,
+    closeModal,
+    prettyType,
+    EventClass = Event,
+    OptionClass = Option,
+    repository,
+    findCorrectionTarget,
+  }) {
     const { saveCorrection } =
       window.PropertyDeskTransactionCorrectionMaintenance.create({
         $,
@@ -25,19 +24,15 @@
         repository,
       });
 
-    function createCorrectionActionHandlers({
-      openPayment,
-      openExpense,
-      updatePaymentGuidance,
-    }) {
+    function createCorrectionActionHandlers(actions) {
       return window.PropertyDeskTransactionCorrectionForm.create({
         $,
         state,
         toast,
         prettyType,
-        openPayment,
-        openExpense,
-        updatePaymentGuidance,
+        openPayment: actions.openPayment,
+        openExpense: actions.openExpense,
+        updatePaymentGuidance: actions.updatePaymentGuidance,
         findCorrectionTarget,
         EventClass,
         OptionClass,

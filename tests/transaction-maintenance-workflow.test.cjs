@@ -64,6 +64,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     prettyType() {},
     repository: {},
     findCorrectionTarget() {},
+    unusedContext: true,
     unusedCorrectionValue: true,
   };
   const voidingContext = {
@@ -92,6 +93,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     openPayment() {},
     openExpense() {},
     updatePaymentGuidance() {},
+    unusedAction: true,
     unusedAction: true,
   };
   const handlers = workflow.createTransactionActionHandlers(actions);
@@ -248,6 +250,20 @@ test("transaction correction workflow owns correction persistence and forms", ()
   );
   assert.equal(passed.form.openPayment, actions.openPayment);
   assert.equal(passed.form.openExpense, actions.openExpense);
+  assert.equal("unusedContext" in passed.form, false);
+  assert.equal("unusedAction" in passed.form, false);
+  assert.deepEqual(Object.keys(passed.form).sort(), [
+    "$",
+    "EventClass",
+    "OptionClass",
+    "findCorrectionTarget",
+    "openExpense",
+    "openPayment",
+    "prettyType",
+    "state",
+    "toast",
+    "updatePaymentGuidance",
+  ]);
   assert.equal(handlers.correctTransaction, correctTransaction);
   assert.equal(workflow.saveCorrection, saveCorrection);
 });
