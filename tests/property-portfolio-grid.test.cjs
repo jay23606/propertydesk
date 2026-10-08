@@ -15,14 +15,14 @@ test("app composes the Properties grid and action operations explicitly", () => 
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   const order = [
-    "PropertyDeskPropertyPortfolioTable.create(",
-    "PropertyDeskPropertyPortfolioReminderModel.create(",
-    "PropertyDeskPropertyPortfolioAccountRowModel.create(",
-    "PropertyDeskPropertyPortfolioFilterModel.create(",
-    "PropertyDeskPropertyPortfolioModel.create(",
-    "PropertyDeskPropertyViews.create(",
-    "PropertyDeskPropertyQuickNote.create(",
-    "PropertyDeskPropertyViewEvents.create(",
+    "workflows.table.create(",
+    "workflows.reminderModel.create(",
+    "workflows.accountRowModel.create(",
+    "workflows.filterModel.create(",
+    "workflows.portfolioModel.create(",
+    "workflows.views.create(",
+    "workflows.quickNote.create(",
+    "workflows.events.create(",
   ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(
@@ -37,6 +37,14 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(
     app,
     /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
+  );
+  assert.match(
+    app,
+    /workflows: \{\s*table: window\.PropertyDeskPropertyPortfolioTable,[\s\S]*?events: window\.PropertyDeskPropertyViewEvents,/,
+  );
+  assert.doesNotMatch(
+    workflow,
+    /window\.PropertyDeskProperty(?:Portfolio(?:Table|ReminderModel|AccountRowModel|FilterModel|Model)|Views|QuickNote|ViewEvents)\.create/,
   );
   assert.doesNotMatch(
     app,
@@ -126,6 +134,17 @@ test("Properties workflow returns explicit view and action operations", () => {
     context,
   );
 
+  const workflows = {
+    table: context.window.PropertyDeskPropertyPortfolioTable,
+    reminderModel: context.window.PropertyDeskPropertyPortfolioReminderModel,
+    accountRowModel:
+      context.window.PropertyDeskPropertyPortfolioAccountRowModel,
+    filterModel: context.window.PropertyDeskPropertyPortfolioFilterModel,
+    portfolioModel: context.window.PropertyDeskPropertyPortfolioModel,
+    views: context.window.PropertyDeskPropertyViews,
+    quickNote: context.window.PropertyDeskPropertyQuickNote,
+    events: context.window.PropertyDeskPropertyViewEvents,
+  };
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
     $: action,
     state,
@@ -138,6 +157,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     propertyRepository,
     openPropertyDetails: action,
     openAccountForProperty: action,
+    workflows,
     unusedDependency: true,
   });
 

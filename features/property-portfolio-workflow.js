@@ -26,62 +26,60 @@
     openPropertyDetails,
     openAccountForProperty,
     propertyRepository,
+    workflows,
   }) {
-    const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
+    const portfolioTable = workflows.table.create({
       esc,
       money,
       paymentFrequencyLabel,
     });
-    const reminderModel =
-      window.PropertyDeskPropertyPortfolioReminderModel.create({
-        state,
-        propertyAddress,
-        monthStart,
-        dateOnly,
-        monthEnd,
-        lateReminderMailto,
-        money,
-      });
-    const accountRowModel =
-      window.PropertyDeskPropertyPortfolioAccountRowModel.create({
-        state,
-        monthlyScheduledEstimate,
-        summarizeAccount,
-        amountDueSince,
-        monthStart,
-        monthEnd,
-        paymentStatusInMonth,
-        reminderModel,
-      });
-    const filterModel = window.PropertyDeskPropertyPortfolioFilterModel.create({
+    const reminderModel = workflows.reminderModel.create({
+      state,
+      propertyAddress,
+      monthStart,
+      dateOnly,
+      monthEnd,
+      lateReminderMailto,
+      money,
+    });
+    const accountRowModel = workflows.accountRowModel.create({
+      state,
+      monthlyScheduledEstimate,
+      summarizeAccount,
+      amountDueSince,
+      monthStart,
+      monthEnd,
+      paymentStatusInMonth,
+      reminderModel,
+    });
+    const filterModel = workflows.filterModel.create({
       state,
       propertyAddress,
       isActiveAccount,
     });
-    const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
+    const portfolioModel = workflows.portfolioModel.create({
       state,
       accountRowModel,
       groupAccountsByProperty,
       streetAddress,
       filterModel,
     });
-    const propertyViews = window.PropertyDeskPropertyViews.create({
+    const propertyViews = workflows.views.create({
       $,
       state,
       esc,
       portfolioTable,
       portfolioModel,
     });
-    const { editPropertyQuickNote } =
-      window.PropertyDeskPropertyQuickNote.create({
-        state,
-        toast,
-        fetchAll,
-        streetAddress,
-        repository: propertyRepository,
-      });
+    const { editPropertyQuickNote } = workflows.quickNote.create({
+      state,
+      toast,
+      fetchAll,
+      streetAddress,
+      repository: propertyRepository,
+    });
     const { attachEvents: attachPropertyActionEvents } =
-      window.PropertyDeskPropertyViewEvents.create({
+      workflows.events.create({
         $,
         openPayment,
         editPropertyQuickNote,

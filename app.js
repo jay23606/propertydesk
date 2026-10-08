@@ -477,6 +477,16 @@
       openPayment,
       propertyRepository: repositories.properties,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,
+      workflows: {
+        table: window.PropertyDeskPropertyPortfolioTable,
+        reminderModel: window.PropertyDeskPropertyPortfolioReminderModel,
+        accountRowModel: window.PropertyDeskPropertyPortfolioAccountRowModel,
+        filterModel: window.PropertyDeskPropertyPortfolioFilterModel,
+        portfolioModel: window.PropertyDeskPropertyPortfolioModel,
+        views: window.PropertyDeskPropertyViews,
+        quickNote: window.PropertyDeskPropertyQuickNote,
+        events: window.PropertyDeskPropertyViewEvents,
+      },
     },
   });
   const {

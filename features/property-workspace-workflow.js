@@ -61,6 +61,7 @@
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
       propertyRepository: portfolio.propertyRepository,
+      workflows: portfolio.workflows,
     });
 
     return Object.freeze({
