@@ -6,6 +6,11 @@
       globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
     if (!monthDateWithAnchor)
       throw new Error("PropertyDeskDateUtils must load before schedule utils.");
+    const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+    if (!roundCurrency)
+      throw new Error(
+        "PropertyDeskCurrencyUtils must load before schedule utils.",
+      );
     const dueIntervals = {
       monthly: [1, 0],
       weekly: [0, 7],
@@ -13,8 +18,6 @@
       quarterly: [3, 0],
       annual: [12, 0],
     };
-    const cents = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
-
     function monthlyScheduledEstimate(accounts) {
       const multipliers = {
         monthly: 1,
@@ -32,7 +35,7 @@
               (multipliers[account.payment_frequency] || 1),
           0,
         );
-      return Math.round((estimate + Number.EPSILON) * 100) / 100;
+      return roundCurrency(estimate);
     }
 
     function dueRange(accrualStart, asOf) {
@@ -130,7 +133,7 @@
       if (!range) return 0;
       const scheduled = scheduledDues(accounts, range);
       const received = receivedPayments(accounts, payments, accrualStart, asOf);
-      return cents(Math.max(0, scheduled - received));
+      return roundCurrency(Math.max(0, scheduled - received));
     }
 
     function unpaidDueAccrualStart() {

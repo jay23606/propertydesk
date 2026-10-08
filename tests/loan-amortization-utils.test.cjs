@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 require("../features/date-utils.js");
+require("../features/currency-utils.js");
 const accountStatus = require("../features/account-status-utils.js");
 const scheduleFactory = require("../features/ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../features/loan-amortization-utils.js");

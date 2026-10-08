@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
-require("../features/money-input-utils.js");
+require("../features/currency-utils.js");
 require("../features/csv-value-utils.js");
 require("../features/email-address-utils.js");
 require("../features/domain-options.js");

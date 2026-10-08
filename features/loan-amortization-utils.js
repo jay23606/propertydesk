@@ -7,6 +7,9 @@
       globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
     if (!monthDateWithAnchor)
       throw new Error("PropertyDeskDateUtils must load before loan utils.");
+    const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+    if (!roundCurrency)
+      throw new Error("PropertyDeskCurrencyUtils must load before loan utils.");
 
     function validPrincipalAndTerm(originalPrincipal, termMonths) {
       const principal = Number(originalPrincipal || 0),
@@ -70,19 +73,18 @@
     }
 
     function rowsForTerms({ principal, months, rate, payment }, dueDate) {
-      const cents = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
-      let balance = cents(principal),
+      let balance = roundCurrency(principal),
         rows = [];
       for (let i = 1; i <= Math.min(months, 600) && balance > 0.005; i++) {
-        const interest = cents(balance * rate);
-        const principalPart = cents(
+        const interest = roundCurrency(balance * rate);
+        const principalPart = roundCurrency(
           Math.min(balance, Math.max(0, payment - interest)),
         );
-        balance = cents(Math.max(0, balance - principalPart));
+        balance = roundCurrency(Math.max(0, balance - principalPart));
         rows.push({
           i,
           date: dueDate(i - 1),
-          payment: cents(interest + principalPart),
+          payment: roundCurrency(interest + principalPart),
           principal: principalPart,
           interest,
           balance,
@@ -110,10 +112,7 @@
         : Number(account.original_principal || 0);
       return Math.max(
         0,
-        Math.round(
-          (base + Number(account.balance_adjustment || 0) + Number.EPSILON) *
-            100,
-        ) / 100,
+        roundCurrency(base + Number(account.balance_adjustment || 0)),
       );
     }
 

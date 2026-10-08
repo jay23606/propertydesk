@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
-require("../features/money-input-utils.js");
+require("../features/currency-utils.js");
 
 test("all provided CSV templates parse with their example row", () => {
   for (const filename of [

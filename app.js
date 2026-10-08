@@ -26,7 +26,7 @@
     window.PropertyDeskPropertyAddressUtils;
   const { dateOnly, fmtDate, todayIso, monthStart, monthEnd } =
     window.PropertyDeskDateUtils;
-  const { moneyInput } = window.PropertyDeskMoneyInputUtils;
+  const { moneyInput } = window.PropertyDeskCurrencyUtils;
   const {
     money,
     esc,

@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { parseCSV } = require("../features/csv-parser.js");
-require("../features/money-input-utils.js");
+require("../features/currency-utils.js");
 const {
   csvMoney,
   csvRate,

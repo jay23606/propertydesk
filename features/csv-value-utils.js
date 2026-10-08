@@ -2,9 +2,9 @@
 (() => {
   "use strict";
 
-  const moneyInput = globalThis.PropertyDeskMoneyInputUtils?.moneyInput;
+  const moneyInput = globalThis.PropertyDeskCurrencyUtils?.moneyInput;
   if (!moneyInput)
-    throw new Error("The PropertyDesk money input helper is not loaded.");
+    throw new Error("The PropertyDesk currency helper is not loaded.");
 
   function hasValidCsvMoneyFormat(raw) {
     const number = "(?:\\d+|\\d{1,3}(?:,\\d{3})+)(?:\\.\\d{1,2})?";

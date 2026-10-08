@@ -17,7 +17,7 @@ test("date, display, and money-input utilities preserve their shared contracts",
     "transaction-options.js",
     "date-utils.js",
     "display-utils.js",
-    "money-input-utils.js",
+    "currency-utils.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -26,13 +26,14 @@ test("date, display, and money-input utilities preserve their shared contracts",
   }
   const dates = context.window.PropertyDeskDateUtils;
   const display = context.window.PropertyDeskDisplayUtils;
-  const inputs = context.window.PropertyDeskMoneyInputUtils;
+  const currency = context.window.PropertyDeskCurrencyUtils;
 
   assert.match(display.money(12), /12\.00/);
   assert.equal(display.esc(`<a x="'">&`), "&lt;a x=&quot;&#39;&quot;&gt;&amp;");
-  assert.equal(inputs.moneyInput("$1,234.567"), 1234.57);
-  assert.equal(inputs.moneyInput("(15.50)"), -15.5);
-  assert.equal(inputs.moneyInput("not a number"), 0);
+  assert.equal(currency.moneyInput("$1,234.567"), 1234.57);
+  assert.equal(currency.moneyInput("(15.50)"), -15.5);
+  assert.equal(currency.moneyInput("not a number"), 0);
+  assert.equal(currency.roundCurrency(1.005), 1.01);
   assert.equal(display.prettyType("land_contract"), "Land contract");
   assert.equal(display.prettyKind("residential"), "Residential");
   assert.equal(display.paymentFrequencyLabel("biweekly"), "Every 2 weeks");

@@ -46,7 +46,7 @@
         isDueReducingPaymentInMonth(payment, accountId, yearMonth),
       )
       .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
-    return Math.round((total + Number.EPSILON) * 100) / 100;
+    return roundCurrency(total);
   }
 
   function paymentStatusInMonth(payments, accountId, month, scheduledAmount) {
@@ -83,6 +83,11 @@
     );
   }
 
+  const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+  if (!roundCurrency)
+    throw new Error(
+      "PropertyDeskCurrencyUtils must load before PropertyDeskLedgerUtils.",
+    );
   const scheduleFactory = globalThis.PropertyDeskScheduleUtils;
   if (!scheduleFactory)
     throw new Error(

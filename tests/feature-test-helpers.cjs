@@ -135,7 +135,7 @@ function loadPropertyAndAccountForms(context) {
 
 function loadImportFeatures(context) {
   loadImportPreview(context);
-  require("../features/money-input-utils.js");
+  require("../features/currency-utils.js");
   context.window.PropertyDeskCsvParser = require("../features/csv-parser.js");
   context.window.PropertyDeskCsvValueUtils = require("../features/csv-value-utils.js");
   context.window.PropertyDeskImportRows = require("../features/import-row-utils.js");

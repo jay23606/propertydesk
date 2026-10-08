@@ -29,7 +29,7 @@ test("every feature module loads before app.js and every local script is precach
     "app.js is the last local deferred script",
   );
   assert.ok(
-    localScripts.indexOf("features/money-input-utils.js") <
+    localScripts.indexOf("features/currency-utils.js") <
       localScripts.indexOf("features/csv-value-utils.js"),
   );
   const featureModules = fs
@@ -61,6 +61,10 @@ test("browser feature scripts load after their dependencies", () => {
     .filter(Boolean)
     .map((source) => source.split("?")[0].replace(/^\.\//, ""));
   const dependencies = [
+    ["features/currency-utils.js", "features/csv-value-utils.js"],
+    ["features/currency-utils.js", "features/ledger-schedule-utils.js"],
+    ["features/currency-utils.js", "features/loan-amortization-utils.js"],
+    ["features/currency-utils.js", "features/ledger-utils.js"],
     ["features/transaction-options.js", "features/display-utils.js"],
     ["features/display-utils.js", "features/payment-import-allocation.js"],
     ["features/account-status-utils.js", "features/ledger-schedule-utils.js"],
