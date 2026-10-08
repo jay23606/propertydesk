@@ -19,7 +19,13 @@ function createReconciliation() {
     context,
   );
   return context.window.PropertyDeskWorkspaceWriteReconciliation.create({
-    run: ({ onUnconfirmed }) => onUnconfirmed(new Error("connection lost")),
+    run: async ({ operation, onUnconfirmed }) => {
+      try {
+        return await operation();
+      } catch (error) {
+        return onUnconfirmed(error);
+      }
+    },
     refreshWorkspace: async ({ fetchAll, afterRefresh }) => {
       await fetchAll();
       afterRefresh?.();
@@ -38,6 +44,7 @@ test("workspace write reconciliation confirms a saved record after readback", as
   assert.equal(
     await reconciliation.saveWorkspaceRecord({
       operation: async () => {
+        events.push("write");
         throw new Error("connection lost");
       },
       state,
@@ -58,7 +65,12 @@ test("workspace write reconciliation confirms a saved record after readback", as
     }),
     true,
   );
-  assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
+  assert.deepEqual(events, [
+    "write",
+    "refresh",
+    ["readback", true],
+    "confirmed action",
+  ]);
 });
 
 test("workspace write reconciliation confirms a new matching record by count", async () => {
@@ -72,6 +84,7 @@ test("workspace write reconciliation confirms a new matching record by count", a
   assert.equal(
     await reconciliation.saveWorkspaceRecord({
       operation: async () => {
+        events.push("write");
         throw new Error("connection lost");
       },
       state,
@@ -91,7 +104,12 @@ test("workspace write reconciliation confirms a new matching record by count", a
     }),
     true,
   );
-  assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
+  assert.deepEqual(events, [
+    "write",
+    "refresh",
+    ["readback", true],
+    "confirmed action",
+  ]);
 });
 
 test("workspace write reconciliation does not confirm an unchanged matching count", async () => {
@@ -105,6 +123,7 @@ test("workspace write reconciliation does not confirm an unchanged matching coun
   assert.equal(
     await reconciliation.saveWorkspaceRecord({
       operation: async () => {
+        events.push("write");
         throw new Error("connection lost");
       },
       state,
@@ -122,6 +141,7 @@ test("workspace write reconciliation does not confirm an unchanged matching coun
     false,
   );
   assert.deepEqual(events, [
+    "write",
     "refresh",
     ["readback", false],
     ["toast", "Check the account before retrying."],
