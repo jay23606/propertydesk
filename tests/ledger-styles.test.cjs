@@ -24,9 +24,11 @@ test("transaction ledger styles stay in their feature stylesheet", () => {
       stylesheetOrder.indexOf("theme.css"),
   );
   assert.match(ledger, /\.expense-pill/);
+  assert.match(ledger, /html\[data-theme="dark"\] \.expense-pill/);
+  assert.match(ledger, /html\[data-theme="dark"\] \.payment-guidance/);
   assert.match(ledger, /\.negative-amount/);
   assert.match(ledger, /\.transaction-voided/);
-  assert.match(theme, /html\[data-theme="dark"\] \.expense-pill/);
+  assert.doesNotMatch(theme, /\.expense-pill|\.payment-guidance/);
   assert.doesNotMatch(
     shared,
     /\.expense-pill|\.negative-amount|\.transaction-voided/,

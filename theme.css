@@ -150,10 +150,6 @@ html[data-theme="dark"] .kind-pill {
   background: #2d3c43;
   color: #b1cbd5;
 }
-html[data-theme="dark"] .expense-pill {
-  background: #4b3730;
-  color: #e0a58a;
-}
 html[data-theme="dark"] .modal-backdrop {
   background: #050907c9;
 }
@@ -190,18 +186,8 @@ html[data-theme="dark"] .loan-fields,
 html[data-theme="dark"] .schedule-table {
   border-color: var(--line);
 }
-html[data-theme="dark"] .payment-guidance {
-  background: #26312a;
-  color: #c3d0c7;
-}
 html[data-theme="dark"] .table-subtext {
   color: #a7b3aa;
-}
-html[data-theme="dark"] .duplicate-import-row {
-  background: #3a3424;
-}
-html[data-theme="dark"] .duplicate-import-toggle {
-  color: #e5ce8a;
 }
 html[data-theme="dark"] .auth-view {
   background: radial-gradient(ellipse at 50% 20%, #26372c 0, #151b17 58%);

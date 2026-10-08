@@ -25,6 +25,12 @@
 .duplicate-import-row {
   background: #fffaf0;
 }
+html[data-theme="dark"] .duplicate-import-row {
+  background: #3a3424;
+}
+html[data-theme="dark"] .import-preview-table tr.duplicate-import-row:hover {
+  background: #3a3424;
+}
 .duplicate-import-row td:last-child {
   color: #8d6b2b;
   font-weight: 700;
@@ -37,6 +43,9 @@
   color: #715b2b;
   font-size: 12px;
   font-weight: 600;
+}
+html[data-theme="dark"] .duplicate-import-toggle {
+  color: #e5ce8a;
 }
 .duplicate-import-toggle input {
   accent-color: #9a762b;

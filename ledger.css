@@ -17,6 +17,10 @@
   color: #9aa49c;
   margin-top: 6px;
 }
+html[data-theme="dark"] .payment-guidance {
+  background: #26312a;
+  color: #c3d0c7;
+}
 .expense-pill {
   display: inline-block;
   border-radius: 20px;
@@ -25,6 +29,10 @@
   font-weight: 700;
   background: #fbefea;
   color: #a35f45;
+}
+html[data-theme="dark"] .expense-pill {
+  background: #4b3730;
+  color: #e0a58a;
 }
 .negative-amount {
   color: #a35f45 !important;
