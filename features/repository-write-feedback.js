@@ -211,6 +211,7 @@
         reconcileWorkspaceChange({
           fetchAll,
           isConfirmed,
+          afterRefresh,
           toast,
           refreshFailureMessage,
           retryMessage,
