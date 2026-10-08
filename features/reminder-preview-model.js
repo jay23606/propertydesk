@@ -3,8 +3,7 @@
   "use strict";
 
   function create({
-    paymentReminderMessage = window.PropertyDeskEmailUtils
-      .paymentReminderMessage,
+    paymentReminderMessage,
     amountDueSince,
     unpaidDueAccrualStart,
     monthEnd,

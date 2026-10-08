@@ -5,6 +5,7 @@
   function create({
     $,
     state,
+    paymentReminderMessage,
     amountDueSince,
     unpaidDueAccrualStart,
     monthEnd,
@@ -19,6 +20,7 @@
     openModal,
   }) {
     const model = window.PropertyDeskReminderPreviewModel.create({
+      paymentReminderMessage,
       amountDueSince,
       unpaidDueAccrualStart,
       monthEnd,

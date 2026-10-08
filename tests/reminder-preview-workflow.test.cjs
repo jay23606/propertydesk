@@ -35,6 +35,7 @@ test("reminder preview workflow composes the account editor preview directly", (
   const services = {
     $() {},
     state: {},
+    paymentReminderMessage() {},
     amountDueSince() {},
     unpaidDueAccrualStart() {},
     monthEnd() {},
@@ -61,6 +62,7 @@ test("reminder preview workflow composes the account editor preview directly", (
     "money",
     "monthEnd",
     "monthStart",
+    "paymentReminderMessage",
     "propertyAddress",
     "unpaidDueAccrualStart",
   ]);

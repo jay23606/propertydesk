@@ -28,6 +28,8 @@ test("reminder preview model derives the due and email content from current term
   );
   const calls = [];
   const model = context.window.PropertyDeskReminderPreviewModel.create({
+    paymentReminderMessage:
+      context.window.PropertyDeskEmailUtils.paymentReminderMessage,
     amountDueSince: (...args) => {
       calls.push(args);
       return 550;

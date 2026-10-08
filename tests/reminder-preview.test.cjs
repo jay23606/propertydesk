@@ -50,6 +50,7 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   };
   const calls = [];
   const model = context.window.PropertyDeskReminderPreviewModel.create({
+    paymentReminderMessage: emailUtils.paymentReminderMessage,
     amountDueSince: (accounts, payments, start, end) => {
       calls.push({ account: accounts[0], payments, start, end });
       return 550;

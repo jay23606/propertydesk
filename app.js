@@ -113,6 +113,8 @@
     window.PropertyDeskReminderPreviewWorkflow.create({
       $,
       state,
+      paymentReminderMessage:
+        window.PropertyDeskEmailUtils.paymentReminderMessage,
       amountDueSince,
       unpaidDueAccrualStart,
       monthEnd,
