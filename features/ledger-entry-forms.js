@@ -2,23 +2,22 @@
 (() => {
   "use strict";
 
-  function createLedgerEntryForms(context) {
-    const {
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      toast,
-      closeModal,
-      fetchAll,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
-      saveCorrection,
-      transactionPayloads,
-      transactionRepository,
-    } = context;
+  function createLedgerEntryForms({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    toast,
+    closeModal,
+    fetchAll,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+    saveCorrection,
+    transactionPayloads,
+    transactionRepository,
+  }) {
     const {
       buildPayment,
       buildExpense,

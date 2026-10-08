@@ -2,18 +2,16 @@
 (() => {
   "use strict";
 
-  function createExpenseEntryView(context) {
-    const {
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
-    } = context;
-
+  function createExpenseEntryView({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+  }) {
     function openExpense(propertyId) {
       state.pendingCorrection = null;
       populateFormOptions();

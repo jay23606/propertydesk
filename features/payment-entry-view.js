@@ -2,18 +2,16 @@
 (() => {
   "use strict";
 
-  function createPaymentEntryView(context) {
-    const {
-      $,
-      state,
-      moneyInput,
-      todayIso,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
-    } = context;
-
+  function createPaymentEntryView({
+    $,
+    state,
+    moneyInput,
+    todayIso,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+  }) {
     function updatePaymentGuidance() {
       const account = state.accounts.find(
         (item) => item.id === $("payment-account").value,

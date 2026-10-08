@@ -2,22 +2,21 @@
 (() => {
   "use strict";
 
-  function createPaymentEntryForm(context) {
-    const {
-      $,
-      state,
-      toast,
-      saveTransactionEntry,
-      insertPayment,
-      buildPaymentPayload,
-      buildPaymentCorrection,
-      moneyInput,
-      todayIso,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
-    } = context;
+  function createPaymentEntryForm({
+    $,
+    state,
+    toast,
+    saveTransactionEntry,
+    insertPayment,
+    buildPaymentPayload,
+    buildPaymentCorrection,
+    moneyInput,
+    todayIso,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+  }) {
     const paymentView = window.PropertyDeskPaymentEntryView.create({
       $,
       state,

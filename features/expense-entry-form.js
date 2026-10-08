@@ -2,22 +2,21 @@
 (() => {
   "use strict";
 
-  function createExpenseEntryForm(context) {
-    const {
-      $,
-      state,
-      toast,
-      saveTransactionEntry,
-      insertExpense,
-      buildExpensePayload,
-      buildExpenseCorrection,
-      moneyInput,
-      todayIso,
-      fillSelect,
-      populateFormOptions,
-      prettyType,
-      openModal,
-    } = context;
+  function createExpenseEntryForm({
+    $,
+    state,
+    toast,
+    saveTransactionEntry,
+    insertExpense,
+    buildExpensePayload,
+    buildExpenseCorrection,
+    moneyInput,
+    todayIso,
+    fillSelect,
+    populateFormOptions,
+    prettyType,
+    openModal,
+  }) {
     const expenseView = window.PropertyDeskExpenseEntryView.create({
       $,
       state,
