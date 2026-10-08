@@ -38,7 +38,11 @@
       );
     }
 
-    return { saveProperty, savePropertyQuickNote, savePropertyArchive };
+    return Object.freeze({
+      saveProperty,
+      savePropertyQuickNote,
+      savePropertyArchive,
+    });
   }
 
   window.PropertyDeskPropertyMaintenance = Object.freeze({ create });
