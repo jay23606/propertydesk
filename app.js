@@ -75,24 +75,26 @@
     postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
   });
   // Feature modules receive shared state and helpers; app.js connects workflows.
-  const { renderReports } = window.PropertyDeskReportWorkflow.create({
-    $,
-    state,
-    dateOnly,
-    sumIncome,
-    sumOperatingExpenses,
-    accountBalance,
-    esc,
-    money,
-  });
-  const { attachEvents: attachReportExportEvents } =
-    window.PropertyDeskReportExport.create({
-      $,
-      state,
-      todayIso,
-      prettyType,
-      accountBalance,
-      downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+  const { renderReports, attachReportExportEvents } =
+    window.PropertyDeskReportWorkspaceWorkflow.create({
+      rendering: {
+        $,
+        state,
+        dateOnly,
+        sumIncome,
+        sumOperatingExpenses,
+        accountBalance,
+        esc,
+        money,
+      },
+      exporting: {
+        $,
+        state,
+        todayIso,
+        prettyType,
+        accountBalance,
+        downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+      },
     });
   const modal = window.PropertyDeskModalController.create({
     $,

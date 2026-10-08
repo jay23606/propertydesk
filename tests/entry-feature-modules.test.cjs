@@ -34,9 +34,11 @@ test("account records and ledger entries use separate workspace workflows", () =
     /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
   );
   assert.match(app, /accountHistoryRepository: repositories\.accountHistory/);
-  assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskReport(?:Model|Views)\.create\(/);
-  assert.match(app, /PropertyDeskReportExport\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
+  );
   assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
   assert.doesNotMatch(app, /registerShell: \(\) =>/);
   assert.match(app, /attachCreateActionEvents/);

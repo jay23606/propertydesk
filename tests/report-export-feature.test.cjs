@@ -67,13 +67,63 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
-test("app composes Reports rendering and CSV export independently", () => {
+test("app delegates Reports rendering and CSV export to one coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskReportExport\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskReport(?:Workflow|Export)\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskReport(?:Model|Views)\.create\(/);
   assert.match(app, /renderers:[\s\S]*?renderReports/);
   assert.match(app, /eventBindersAfterAuth:[\s\S]*?attachReportExportEvents/);
+  const workspace = fs.readFileSync(
+    path.join(__dirname, "..", "features", "report-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    workspace,
+    /PropertyDeskReportWorkflow\.create\(rendering\)[\s\S]*?PropertyDeskReportExport\.create\(exporting\)/,
+  );
+});
+
+test("report workspace preserves rendering and export APIs", () => {
+  const renderReports = () => {};
+  const attachReportExportEvents = () => {};
+  const rendering = { state: {} };
+  const exporting = { downloadBlob() {} };
+  const passed = {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskReportWorkflow: {
+        create(options) {
+          passed.rendering = options;
+          return { renderReports };
+        },
+      },
+      PropertyDeskReportExport: {
+        create(options) {
+          passed.exporting = options;
+          return { attachEvents: attachReportExportEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "report-workspace-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+
+  const workspace = context.window.PropertyDeskReportWorkspaceWorkflow.create({
+    rendering,
+    exporting,
+  });
+
+  assert.equal(passed.rendering, rendering);
+  assert.equal(passed.exporting, exporting);
+  assert.equal(workspace.renderReports, renderReports);
+  assert.equal(workspace.attachReportExportEvents, attachReportExportEvents);
+  assert.equal(Object.isFrozen(workspace), true);
 });
 
 test("Reports workflow composes calculation and view modules only", () => {
