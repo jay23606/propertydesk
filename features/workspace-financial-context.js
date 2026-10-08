@@ -1,4 +1,4 @@
-/* Compose workspace payment, loan, and held-deposit calculation services. */
+/* Compose workspace payment and loan calculation services. */
 (() => {
   "use strict";
 
@@ -13,9 +13,6 @@
       isActiveAccount,
     });
     const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create();
-    const depositCalculations = window.PropertyDeskDepositLedgerUtils.create({
-      isPosted: postedLedgerUtils.isPosted,
-    });
     const financial =
       window.PropertyDeskWorkspaceAccountFinancialContext.create({
         state,
@@ -29,11 +26,6 @@
         amountDueSince: schedule.amountDueSince,
         unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
       });
-    const deposits = window.PropertyDeskDepositContext.create({
-      state,
-      securityDepositBalance: depositCalculations.securityDepositBalance,
-    });
-
     return Object.freeze({
       isPosted: postedLedgerUtils.isPosted,
       paymentStatusInMonth: postedLedgerUtils.paymentStatusInMonth,
@@ -49,7 +41,6 @@
       scheduledMonthlyRunRate: financial.scheduledMonthlyRunRate,
       collectedSince: financial.collectedSince,
       summarizeAccount: financial.summarizeAccount,
-      depositLedger: deposits.depositLedger,
     });
   }
 

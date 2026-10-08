@@ -125,7 +125,18 @@ test("app coordinator passes the amortization helper into account details", () =
     /PropertyDeskLoanAmortizationUtils\.create\(/,
   );
   assert.match(financialWorkflow, /PropertyDeskScheduleUtils\.create\(/);
-  assert.match(financialWorkflow, /PropertyDeskDepositLedgerUtils\.create\(/);
+  assert.doesNotMatch(
+    financialWorkflow,
+    /PropertyDeskDepositLedgerUtils\.create\(/,
+  );
+  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
+  assert.match(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace-deposit-context.js"),
+      "utf8",
+    ),
+    /PropertyDeskDepositLedgerUtils\.create\([\s\S]*?PropertyDeskDepositContext\.create\(/,
+  );
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create/);
   assert.match(
     app,
@@ -141,11 +152,11 @@ test("app coordinator passes the amortization helper into account details", () =
     financialWorkflow,
     /PropertyDeskWorkspaceAccountFinancialContext\.create\(/,
   );
-  assert.match(financialWorkflow, /PropertyDeskDepositContext\.create\(/);
-  assert.match(
-    app,
-    /summarizeAccount,\s*depositLedger,\s*\} = financialContext;/,
+  assert.doesNotMatch(
+    financialWorkflow,
+    /PropertyDeskDepositContext\.create\(/,
   );
+  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);

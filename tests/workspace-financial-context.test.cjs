@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("workspace financial context composes ledger, account, loan, and deposit services", () => {
+test("workspace financial context composes ledger, account, and loan services", () => {
   const calls = [];
   const state = {
     accounts: [],
@@ -22,12 +22,10 @@ test("workspace financial context composes ledger, account, loan, and deposit se
   const unpaidDueAccrualStart = () => "2026-10-01";
   const amortizationSchedule = () => [];
   const scheduledLoanBalance = () => 4;
-  const securityDepositBalance = () => ({ active: [], totals: {} });
   const accountBalance = () => 5;
   const scheduledMonthlyRunRate = () => 6;
   const collectedSince = () => 7;
   const summarizeAccount = () => ({});
-  const depositLedger = () => ({ active: [], totals: {} });
   const postedLedgerUtils = {
     isDueReducingPayment,
     isPosted,
@@ -55,12 +53,6 @@ test("workspace financial context composes ledger, account, loan, and deposit se
           return { amortizationSchedule, scheduledLoanBalance };
         },
       },
-      PropertyDeskDepositLedgerUtils: {
-        create(options) {
-          calls.push(["deposit-calculations", options]);
-          return { securityDepositBalance };
-        },
-      },
       PropertyDeskWorkspaceAccountFinancialContext: {
         create(options) {
           calls.push(["account-financials", options]);
@@ -70,12 +62,6 @@ test("workspace financial context composes ledger, account, loan, and deposit se
             collectedSince,
             summarizeAccount,
           };
-        },
-      },
-      PropertyDeskDepositContext: {
-        create(options) {
-          calls.push(["deposit-context", options]);
-          return { depositLedger };
         },
       },
     },
@@ -100,38 +86,28 @@ test("workspace financial context composes ledger, account, loan, and deposit se
 
   assert.deepEqual(
     calls.map(([name]) => name),
-    [
-      "schedule",
-      "loan",
-      "deposit-calculations",
-      "account-financials",
-      "deposit-context",
-    ],
+    ["schedule", "loan", "account-financials"],
   );
   assert.equal(calls[0][1].isDueReducingPayment, isDueReducingPayment);
   assert.equal(calls[0][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[1][1], undefined);
-  assert.equal(calls[2][1].isPosted, isPosted);
-  assert.equal(calls[3][1].state, state);
-  assert.equal(calls[3][1].ledger.todayIso, todayIso);
-  assert.equal(calls[3][1].ledger.scheduledLoanBalance, scheduledLoanBalance);
+  assert.equal(calls[2][1].state, state);
+  assert.equal(calls[2][1].ledger.todayIso, todayIso);
+  assert.equal(calls[2][1].ledger.scheduledLoanBalance, scheduledLoanBalance);
   assert.equal(
-    calls[3][1].ledger.monthlyScheduledEstimate,
+    calls[2][1].ledger.monthlyScheduledEstimate,
     monthlyScheduledEstimate,
   );
-  assert.equal(calls[3][1].ledger.postedOnOrAfter, postedOnOrAfter);
-  assert.equal(calls[3][1].ledger.sumPosted, sumPosted);
-  assert.equal(calls[3][1].amountDueSince, amountDueSince);
-  assert.equal(calls[3][1].unpaidDueAccrualStart, unpaidDueAccrualStart);
-  assert.equal(calls[4][1].state, state);
-  assert.equal(calls[4][1].securityDepositBalance, securityDepositBalance);
+  assert.equal(calls[2][1].ledger.postedOnOrAfter, postedOnOrAfter);
+  assert.equal(calls[2][1].ledger.sumPosted, sumPosted);
+  assert.equal(calls[2][1].amountDueSince, amountDueSince);
+  assert.equal(calls[2][1].unpaidDueAccrualStart, unpaidDueAccrualStart);
   assert.equal(financial.amortizationSchedule, amortizationSchedule);
   assert.equal(financial.amountDueSince, amountDueSince);
   assert.equal(financial.accountBalance, accountBalance);
   assert.equal(financial.scheduledMonthlyRunRate, scheduledMonthlyRunRate);
   assert.equal(financial.collectedSince, collectedSince);
   assert.equal(financial.summarizeAccount, summarizeAccount);
-  assert.equal(financial.depositLedger, depositLedger);
   assert.equal(financial.isPosted, isPosted);
   assert.equal(financial.sumPosted, sumPosted);
   assert.deepEqual(Object.keys(financial).sort(), [
@@ -139,7 +115,6 @@ test("workspace financial context composes ledger, account, loan, and deposit se
     "amortizationSchedule",
     "amountDueSince",
     "collectedSince",
-    "depositLedger",
     "isPosted",
     "monthlyScheduledEstimate",
     "paymentStatusInMonth",

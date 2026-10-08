@@ -11,6 +11,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
 
   assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
@@ -25,6 +26,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "account-detail-action-workflow",
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
+    "workspace-deposit-context",
     "transaction-maintenance-workflow",
     "transaction-records-workflow",
   ]) {

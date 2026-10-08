@@ -69,8 +69,11 @@
     scheduledMonthlyRunRate,
     collectedSince,
     summarizeAccount,
-    depositLedger,
   } = financialContext;
+  const { depositLedger } = window.PropertyDeskWorkspaceDepositContext.create({
+    state,
+    postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
+  });
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports } = window.PropertyDeskReportWorkflow.create({
     $,

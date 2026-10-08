@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v652';
+const CACHE_NAME = 'propertydesk-shell-v653';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -79,6 +79,7 @@ const SHELL_FILES = [
   './features/property-address-utils.js',
   './features/ledger-context.js',
   './features/deposit-context.js',
+  './features/workspace-deposit-context.js',
   './features/workspace-account-financial-context.js',
   './features/workspace-financial-context.js',
   './features/property-form-view.js',
