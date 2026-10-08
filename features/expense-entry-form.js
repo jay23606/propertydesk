@@ -73,10 +73,14 @@
         label: "Expense",
         modalId: "expense-modal",
         resetAfterSave: expenseView.resetAfterSave,
-        prepareNext: expenseView.prepareNextExpense,
-        nextArguments: [
-          { propertyId, accountId, category, payee, paymentMethod },
-        ],
+        prepareNext: () =>
+          expenseView.prepareNextExpense({
+            propertyId,
+            accountId,
+            category,
+            payee,
+            paymentMethod,
+          }),
       });
     }
 

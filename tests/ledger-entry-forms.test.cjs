@@ -263,8 +263,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     failureMessage: "Payment unavailable",
     label: "Payment",
     modalId: "payment-modal",
-    resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
-    resetArguments: ["account-1"],
+    resetAfterSave: () => calls.push("reset-payment:account-1"),
   });
   await workflow.saveTransactionEntry({
     kind: "expense",
@@ -276,8 +275,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     label: "Expense",
     modalId: "expense-modal",
     resetAfterSave: () => calls.push("reset-expense"),
-    prepareNext: (values) => calls.push(`next-expense:${values.propertyId}`),
-    nextArguments: [{ propertyId: "property-1" }],
+    prepareNext: () => calls.push("next-expense:property-1"),
   });
 
   assert.deepEqual(calls, [
@@ -300,8 +298,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     failureMessage: "Payment unavailable",
     label: "Payment",
     modalId: "payment-modal",
-    resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
-    resetArguments: ["account-2"],
+    resetAfterSave: () => calls.push("reset-payment:account-2"),
   });
   assert.deepEqual(calls.slice(-3), [
     "reset-payment:account-2",

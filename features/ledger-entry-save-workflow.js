@@ -8,23 +8,21 @@
       addAnother,
       modalId,
       resetAfterSave,
-      resetArguments = [],
       prepareNext,
-      nextArguments = [],
     }) {
       const successMessage = addAnother
         ? `${label} recorded. Ready for the next entry`
         : `${label} recorded`;
       function finishFormAction() {
-        if (addAnother) prepareNext(...nextArguments);
+        if (addAnother) prepareNext();
         else closeModal($(modalId));
       }
 
       return {
-        onSaved: () => resetAfterSave(...resetArguments),
+        onSaved: () => resetAfterSave(),
         onRefreshed: ({ recordWasSaved }) => {
           if (!recordWasSaved) return;
-          resetAfterSave(...resetArguments);
+          resetAfterSave();
           finishFormAction();
         },
         afterRefresh: finishFormAction,
@@ -44,9 +42,7 @@
       label,
       modalId,
       resetAfterSave,
-      resetArguments = [],
       prepareNext,
-      nextArguments = [],
     }) {
       if (state.pendingCorrection?.kind === kind) {
         await saveCorrection(kind, buildCorrection(payload));
@@ -58,9 +54,7 @@
         addAnother: event.submitter?.id === `${kind}-save-next`,
         modalId,
         resetAfterSave,
-        resetArguments,
         prepareNext,
-        nextArguments,
       });
       return insert({ payload, failureMessage, completion });
     }

@@ -67,8 +67,7 @@
           "Payment result couldn't be confirmed. Reload the Properties or Transactions list before recording it again.",
         label: "Payment",
         modalId: "payment-modal",
-        resetAfterSave: paymentView.resetAfterSave,
-        resetArguments: [account.id],
+        resetAfterSave: () => paymentView.resetAfterSave(account.id),
         prepareNext: paymentView.prepareNextPayment,
       });
     }

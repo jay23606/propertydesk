@@ -48,8 +48,7 @@ test("shared transaction save routes corrections and completes successful entrie
     failureMessage: "payment failed",
     label: "Payment",
     modalId: "payment-modal",
-    resetAfterSave: (accountId) => calls.push(["reset", accountId]),
-    resetArguments: ["account-1"],
+    resetAfterSave: () => calls.push(["reset", "account-1"]),
     prepareNext: () => calls.push(["prepare-next"]),
   });
 
