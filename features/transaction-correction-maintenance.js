@@ -35,5 +35,7 @@
     return { saveCorrection };
   }
 
-  window.PropertyDeskTransactionCorrections = Object.freeze({ create });
+  window.PropertyDeskTransactionCorrectionMaintenance = Object.freeze({
+    create,
+  });
 })();

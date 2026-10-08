@@ -193,7 +193,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     Event: class MockEvent {},
     Option: class MockOption {},
     window: {
-      PropertyDeskTransactionCorrections: {
+      PropertyDeskTransactionCorrectionMaintenance: {
         create: (options) => {
           passed.corrections = options;
           return { saveCorrection };

@@ -33,7 +33,12 @@ test("transaction corrections save payment and expense changes with their audit 
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-correction-maintenance.js",
+      ),
       "utf8",
     ),
     context,
@@ -53,16 +58,17 @@ test("transaction corrections save payment and expense changes with their audit 
       },
     },
   };
-  const feature = context.window.PropertyDeskTransactionCorrections.create({
-    $: (id) => ({ id }),
-    state,
-    closeModal: (modal) => events.push(["close", modal.id]),
-    fetchAll: async () => events.push("refresh"),
-    toast: (message) => events.push(["toast", message]),
-    repository: context.window.PropertyDeskTransactionRepository.create({
-      getClient: () => state.client,
-    }),
-  });
+  const feature =
+    context.window.PropertyDeskTransactionCorrectionMaintenance.create({
+      $: (id) => ({ id }),
+      state,
+      closeModal: (modal) => events.push(["close", modal.id]),
+      fetchAll: async () => events.push("refresh"),
+      toast: (message) => events.push(["toast", message]),
+      repository: context.window.PropertyDeskTransactionRepository.create({
+        getClient: () => state.client,
+      }),
+    });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), true);
   state.pendingCorrection = {
@@ -107,7 +113,12 @@ test("transaction correction failures preserve the open form and pending correct
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-correction-maintenance.js",
+      ),
       "utf8",
     ),
     context,
@@ -123,20 +134,21 @@ test("transaction correction failures preserve the open form and pending correct
       },
     },
   };
-  const feature = context.window.PropertyDeskTransactionCorrections.create({
-    $: (id) => ({ id }),
-    state,
-    closeModal: () => {
-      closes += 1;
-    },
-    fetchAll: async () => {
-      refreshes += 1;
-    },
-    toast: (message) => messages.push(message),
-    repository: context.window.PropertyDeskTransactionRepository.create({
-      getClient: () => state.client,
-    }),
-  });
+  const feature =
+    context.window.PropertyDeskTransactionCorrectionMaintenance.create({
+      $: (id) => ({ id }),
+      state,
+      closeModal: () => {
+        closes += 1;
+      },
+      fetchAll: async () => {
+        refreshes += 1;
+      },
+      toast: (message) => messages.push(message),
+      repository: context.window.PropertyDeskTransactionRepository.create({
+        getClient: () => state.client,
+      }),
+    });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
   assert.equal(await feature.saveCorrection("expense", { amount: 75 }), false);
@@ -154,7 +166,12 @@ test("transaction correction database errors keep the correction open", async ()
   loadTransactionRepository(context);
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-corrections.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-correction-maintenance.js",
+      ),
       "utf8",
     ),
     context,
@@ -162,27 +179,28 @@ test("transaction correction database errors keep the correction open", async ()
   const messages = [];
   let closes = 0;
   let refreshes = 0;
-  const feature = context.window.PropertyDeskTransactionCorrections.create({
-    $: () => ({}),
-    state: {
-      pendingCorrection: {
-        kind: "payment",
-        id: "payment-1",
-        reason: "Fix date",
+  const feature =
+    context.window.PropertyDeskTransactionCorrectionMaintenance.create({
+      $: () => ({}),
+      state: {
+        pendingCorrection: {
+          kind: "payment",
+          id: "payment-1",
+          reason: "Fix date",
+        },
+        client: {
+          rpc: async () => ({ error: { message: "permission denied" } }),
+        },
       },
-      client: {
-        rpc: async () => ({ error: { message: "permission denied" } }),
-      },
-    },
-    closeModal: () => closes++,
-    fetchAll: async () => refreshes++,
-    toast: (message) => messages.push(message),
-    repository: context.window.PropertyDeskTransactionRepository.create({
-      getClient: () => ({
-        rpc: async () => ({ error: { message: "permission denied" } }),
+      closeModal: () => closes++,
+      fetchAll: async () => refreshes++,
+      toast: (message) => messages.push(message),
+      repository: context.window.PropertyDeskTransactionRepository.create({
+        getClient: () => ({
+          rpc: async () => ({ error: { message: "permission denied" } }),
+        }),
       }),
-    }),
-  });
+    });
 
   assert.equal(await feature.saveCorrection("payment", { amount: 75 }), false);
   assert.equal(closes, 0);

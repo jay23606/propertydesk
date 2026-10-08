@@ -199,7 +199,7 @@ test("browser feature scripts load after their dependencies", () => {
       "features/deposit-adjustment-workflow.js",
     ],
     [
-      "features/transaction-corrections.js",
+      "features/transaction-correction-maintenance.js",
       "features/transaction-correction-workflow.js",
     ],
     [
@@ -344,7 +344,7 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/ledger-entry-forms.js", "app.js"],
     ["features/create-actions.js", "app.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
-    ["features/transaction-corrections.js", "app.js"],
+    ["features/transaction-correction-maintenance.js", "app.js"],
     ["features/transaction-views.js", "app.js"],
     [
       "features/overview-property-summary-model.js",
@@ -462,7 +462,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/transaction-repository.js",
-      "features/transaction-corrections.js",
+      "features/transaction-correction-maintenance.js",
     ],
     ["features/import-review.js", "features/transaction-import-workflow.js"],
     [

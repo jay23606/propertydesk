@@ -15,9 +15,15 @@
       repository,
       findCorrectionTarget,
     } = context;
-    const { saveCorrection } = window.PropertyDeskTransactionCorrections.create(
-      { $, state, toast, fetchAll, closeModal, repository },
-    );
+    const { saveCorrection } =
+      window.PropertyDeskTransactionCorrectionMaintenance.create({
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        repository,
+      });
 
     function createCorrectionActionHandlers({
       openPayment,
