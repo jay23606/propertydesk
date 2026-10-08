@@ -148,7 +148,6 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/repository-query-utils.js", "features/deposit-repository.js"],
     ["features/domain-options.js", "features/display-utils.js"],
-    ["features/transaction-options.js", "features/display-utils.js"],
     ["features/transaction-options.js", "features/expense-account-policy.js"],
     [
       "features/expense-account-policy.js",
@@ -323,8 +322,6 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/transaction-corrections.js", "app.js"],
     ["features/transaction-views.js", "app.js"],
-    ["features/transaction-views.js", "app.js"],
-    ["features/transaction-maintenance-workflow.js", "app.js"],
     [
       "features/overview-property-summary-model.js",
       "features/overview-model.js",
@@ -412,10 +409,6 @@ test("browser feature scripts load after their dependencies", () => {
     [
       "features/property-portfolio-table.js",
       "features/property-portfolio-model.js",
-    ],
-    [
-      "features/property-quick-note.js",
-      "features/property-portfolio-workflow.js",
     ],
     [
       "features/property-view-events.js",
@@ -512,7 +505,15 @@ test("browser feature scripts load after their dependencies", () => {
     ["workspace-table-catalog.js", "workspace-data.js"],
   ];
 
+  const dependencyEdges = new Set();
   for (const [dependency, dependent] of dependencies) {
+    const edge = `${dependency} -> ${dependent}`;
+    assert.equal(
+      dependencyEdges.has(edge),
+      false,
+      `Duplicate browser dependency edge: ${edge}`,
+    );
+    dependencyEdges.add(edge);
     const dependencyIndex = scriptSources.indexOf(dependency);
     const dependentIndex = scriptSources.indexOf(dependent);
     assert.notEqual(
