@@ -60,3 +60,70 @@ test("workspace write reconciliation confirms a saved record after readback", as
   );
   assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
 });
+
+test("workspace write reconciliation confirms a new matching record by count", async () => {
+  const events = [];
+  const reconciliation = createReconciliation();
+  const payload = { account_name: "Rental", payment_amount: 500 };
+  const state = {
+    accounts: [{ id: "existing", ...payload }],
+  };
+
+  assert.equal(
+    await reconciliation.saveWorkspaceRecord({
+      operation: async () => {
+        throw new Error("connection lost");
+      },
+      state,
+      collection: "accounts",
+      payload,
+      fetchAll: async () => {
+        state.accounts.push({ id: "saved", ...payload });
+        events.push("refresh");
+      },
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write result couldn't be confirmed.",
+      refreshFailureMessage: "Refresh failed.",
+      retryMessage: "Check the account before retrying.",
+      onRefreshed: ({ recordWasSaved }) =>
+        events.push(["readback", recordWasSaved]),
+      onReconciled: () => events.push("confirmed action"),
+    }),
+    true,
+  );
+  assert.deepEqual(events, ["refresh", ["readback", true], "confirmed action"]);
+});
+
+test("workspace write reconciliation does not confirm an unchanged matching count", async () => {
+  const events = [];
+  const reconciliation = createReconciliation();
+  const payload = { account_name: "Rental", payment_amount: 500 };
+  const state = {
+    accounts: [{ id: "existing", ...payload }],
+  };
+
+  assert.equal(
+    await reconciliation.saveWorkspaceRecord({
+      operation: async () => {
+        throw new Error("connection lost");
+      },
+      state,
+      collection: "accounts",
+      payload,
+      fetchAll: async () => events.push("refresh"),
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write result couldn't be confirmed.",
+      refreshFailureMessage: "Refresh failed.",
+      retryMessage: "Check the account before retrying.",
+      onRefreshed: ({ recordWasSaved }) =>
+        events.push(["readback", recordWasSaved]),
+      onReconciled: () => events.push("confirmed action"),
+    }),
+    false,
+  );
+  assert.deepEqual(events, [
+    "refresh",
+    ["readback", false],
+    ["toast", "Check the account before retrying."],
+  ]);
+});
