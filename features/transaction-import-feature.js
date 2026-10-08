@@ -26,10 +26,10 @@
       importReview: expense.importReview,
     });
 
-    return {
+    return Object.freeze({
       attachPaymentEvents: payments.attachEvents,
       attachExpenseEvents: expenses.attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskTransactionImportFeature = Object.freeze({

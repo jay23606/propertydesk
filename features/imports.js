@@ -82,12 +82,12 @@
       },
     });
 
-    return {
+    return Object.freeze({
       attachPreviewEvents,
       attachAccountEvents: accounts.attachEvents,
       attachPaymentEvents: transactions.attachPaymentEvents,
       attachExpenseEvents: transactions.attachExpenseEvents,
-    };
+    });
   }
 
   window.PropertyDeskImportFeature = Object.freeze({

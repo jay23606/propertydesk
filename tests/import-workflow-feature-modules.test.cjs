@@ -144,6 +144,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
+  assert.equal(Object.isFrozen(imports), true);
   assert.deepEqual(Object.keys(imports), [
     "attachPreviewEvents",
     "attachAccountEvents",

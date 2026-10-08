@@ -74,6 +74,7 @@ test("transaction import feature shares setup without mixing payment and expense
     expense,
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   assert.equal(passed.payment.$, shared.$);
   assert.equal(passed.expense.$, shared.$);
   assert.equal(passed.payment.state, payment.state);
