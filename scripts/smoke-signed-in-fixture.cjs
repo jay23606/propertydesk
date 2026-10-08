@@ -11,6 +11,7 @@ async function installSignedInWorkspaceFixture(signedInPage) {
   await signedInPage.addInitScript(() => {
     const property = {
       id: "smoke-property",
+      user_id: "smoke-workspace",
       name: "Browser smoke-test property",
       address: "10 Smoke Street",
       city: "Testville",
@@ -80,6 +81,11 @@ async function installSignedInWorkspaceFixture(signedInPage) {
       pd_reminder_logs: [],
       pd_audit_events: [],
     };
+    const smokeUser = {
+      id: "smoke-user",
+      email: "smoke@example.invalid",
+      user_metadata: { display_name: "Browser smoke test" },
+    };
     window.__smokeRows = rows;
     function queryFor(table) {
       const result = { data: rows[table] || [], error: null };
@@ -134,15 +140,19 @@ async function installSignedInWorkspaceFixture(signedInPage) {
             data: {
               session: {
                 access_token: "smoke-token",
-                user: {
-                  id: "smoke-user",
-                  email: "smoke@example.invalid",
-                  user_metadata: { display_name: "Browser smoke test" },
-                },
+                user: smokeUser,
               },
             },
             error: null,
           }),
+          getUser: async () => ({ data: { user: smokeUser }, error: null }),
+          updateUser: async ({ data }) => {
+            smokeUser.user_metadata = {
+              ...smokeUser.user_metadata,
+              ...data,
+            };
+            return { data: { user: smokeUser }, error: null };
+          },
         },
         rpc: async (name, args) => {
           window.__smokeRpcCalls.push({ name, args });

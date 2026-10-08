@@ -55,6 +55,36 @@ async function smokePropertyWorkflows(
     );
   }
   await signedInPage.setViewportSize({ width: 1280, height: 720 });
+  signedInPage.once("dialog", (dialog) => {
+    void dialog.accept("Smoke quick note");
+  });
+  await signedInPage
+    .locator('#properties-table [data-property-note="smoke-property"]')
+    .first()
+    .click();
+  try {
+    await signedInPage.waitForFunction(
+      () =>
+        document
+          .querySelector(
+            '#properties-table [data-property-note="smoke-property"] em',
+          )
+          ?.textContent?.trim() === "Smoke quick note",
+    );
+  } catch {
+    const details = await signedInPage.evaluate(() => ({
+      notes: window.__smokeRows.pd_properties[0].notes,
+      rowNotes: [
+        ...document.querySelectorAll(
+          '#properties-table [data-property-note="smoke-property"] em',
+        ),
+      ].map((element) => element.textContent.trim()),
+      toast: document.querySelector("#toast")?.textContent,
+    }));
+    throw new Error(
+      `The property quick note did not save: ${JSON.stringify(details)}`,
+    );
+  }
   await signedInPage
     .locator('#properties-table [data-property-open="smoke-property"]')
     .first()
@@ -161,6 +191,17 @@ async function smokePropertyWorkflows(
     .getByText("Smoke test retention")
     .waitFor({ state: "visible", timeout: 10000 });
   await signedInPage.locator("#detail-modal button[data-close]").click();
+  await signedInPage.locator('.nav-link[data-view="payments"]').click();
+  await signedInPage.locator('.nav-link[data-view="workspace"]').click();
+  await signedInPage.locator("#display-name").fill("Smoke Profile Saved");
+  await signedInPage
+    .locator('#display-name-form button[type="submit"]')
+    .click();
+  await signedInPage.waitForFunction(
+    () =>
+      document.getElementById("greeting-name")?.textContent ===
+      ", Smoke Profile Saved",
+  );
   await signedInPage.locator('.nav-link[data-view="payments"]').click();
 }
 
