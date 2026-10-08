@@ -18,10 +18,17 @@
     const filterModel = window.PropertyDeskTransactionListFilterModel.create({
       dateOnly,
     });
+    const associationModel =
+      window.PropertyDeskTransactionAssociationModel.create({ state });
+    const displayRowModel =
+      window.PropertyDeskTransactionDisplayRowModel.create({
+        expenseCategoryLabel,
+      });
     const { buildTransactionList } =
       window.PropertyDeskTransactionListModel.create({
         state,
-        expenseCategoryLabel,
+        associationModel,
+        displayRowModel,
         filterModel,
       });
     const { currentMonthTotals } =

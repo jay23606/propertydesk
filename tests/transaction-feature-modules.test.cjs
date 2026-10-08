@@ -229,9 +229,18 @@ test("transaction list model filters rows and resolves their display association
       },
     ],
   };
+  const associationModel =
+    context.window.PropertyDeskTransactionAssociationModel.create({ state });
+  const displayRowModel =
+    context.window.PropertyDeskTransactionDisplayRowModel.create({
+      expenseCategoryLabel: (value) => value,
+    });
+  delete context.window.PropertyDeskTransactionAssociationModel;
+  delete context.window.PropertyDeskTransactionDisplayRowModel;
   const model = context.window.PropertyDeskTransactionListModel.create({
     state,
-    expenseCategoryLabel: (value) => value,
+    associationModel,
+    displayRowModel,
     filterModel: context.window.PropertyDeskTransactionListFilterModel.create({
       dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
     }),

@@ -4,16 +4,10 @@
 
   function createTransactionListModel({
     state,
-    expenseCategoryLabel,
+    associationModel,
+    displayRowModel,
     filterModel,
   }) {
-    const displayRowModel =
-      window.PropertyDeskTransactionDisplayRowModel.create({
-        expenseCategoryLabel,
-      });
-    const associationModel =
-      window.PropertyDeskTransactionAssociationModel.create({ state });
-
     function buildTransactionList(filters) {
       const rows = [
         ...state.payments.map((item) => ({
