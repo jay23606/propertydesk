@@ -153,7 +153,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     app,
-    /recordWorkflows: \{\s*entryForms: window\.PropertyDeskLedgerEntryForms,\s*views: \{\s*create: window\.PropertyDeskTransactionViews\.create,\s*modules: \{[\s\S]*?rowView: window\.PropertyDeskTransactionRowView,/,
+    /recordWorkflows: \{\s*entryForms: \{\s*create: window\.PropertyDeskLedgerEntryForms\.create,\s*modules: \{[\s\S]*?paymentForm: window\.PropertyDeskPaymentEntryForm,[\s\S]*?\},\s*\},\s*views: \{\s*create: window\.PropertyDeskTransactionViews\.create,\s*modules: \{[\s\S]*?rowView: window\.PropertyDeskTransactionRowView,/,
   );
   const transactionRecords = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
@@ -164,6 +164,14 @@ test("transaction workspace connects maintenance and records at the app root", (
   assert.doesNotMatch(
     transactionRecords,
     /window\.PropertyDesk(?:LedgerEntryForms|TransactionViews)\.create/,
+  );
+  const entryForms = fs.readFileSync(
+    path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    entryForms,
+    /window\.PropertyDesk(?:TransactionInserts|LedgerEntrySaveWorkflow|PaymentEntryForm|ExpenseEntryForm)\.create/,
   );
   assert.doesNotMatch(
     transactionWorkspace,

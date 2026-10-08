@@ -318,7 +318,15 @@
         events: window.PropertyDeskTransactionMaintenanceEvents,
       },
       recordWorkflows: {
-        entryForms: window.PropertyDeskLedgerEntryForms,
+        entryForms: {
+          create: window.PropertyDeskLedgerEntryForms.create,
+          modules: {
+            transactionInserts: window.PropertyDeskTransactionInserts,
+            saveWorkflow: window.PropertyDeskLedgerEntrySaveWorkflow,
+            paymentForm: window.PropertyDeskPaymentEntryForm,
+            expenseForm: window.PropertyDeskExpenseEntryForm,
+          },
+        },
         views: {
           create: window.PropertyDeskTransactionViews.create,
           modules: {

@@ -151,6 +151,12 @@ function ledgerEntryDependencies(context, state = {}) {
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
     expenseAccountPolicy: context.window.PropertyDeskExpenseAccountPolicy,
+    modules: {
+      transactionInserts: context.window.PropertyDeskTransactionInserts,
+      saveWorkflow: context.window.PropertyDeskLedgerEntrySaveWorkflow,
+      paymentForm: context.window.PropertyDeskPaymentEntryForm,
+      expenseForm: context.window.PropertyDeskExpenseEntryForm,
+    },
     workflows: {
       paymentView: context.window.PropertyDeskPaymentEntryView,
       expenseView: context.window.PropertyDeskExpenseEntryView,

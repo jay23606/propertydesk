@@ -21,6 +21,7 @@
     selectRecordWriteCompletion,
     expenseAccountPolicy,
     workflows,
+    modules,
   }) {
     const {
       buildPayment,
@@ -28,24 +29,22 @@
       buildPaymentCorrection,
       buildExpenseCorrection,
     } = transactionPayloads;
-    const { insertPayment, insertExpense } =
-      window.PropertyDeskTransactionInserts.create({
-        state,
-        fetchAll,
-        toast,
-        repository: transactionRepository,
-        writeFeedback,
-        selectRecordWriteCompletion,
-      });
-    const { saveTransactionEntry } =
-      window.PropertyDeskLedgerEntrySaveWorkflow.create({
-        $,
-        state,
-        saveCorrection,
-        closeModal,
-        toast,
-      });
-    const payments = window.PropertyDeskPaymentEntryForm.create({
+    const { insertPayment, insertExpense } = modules.transactionInserts.create({
+      state,
+      fetchAll,
+      toast,
+      repository: transactionRepository,
+      writeFeedback,
+      selectRecordWriteCompletion,
+    });
+    const { saveTransactionEntry } = modules.saveWorkflow.create({
+      $,
+      state,
+      saveCorrection,
+      closeModal,
+      toast,
+    });
+    const payments = modules.paymentForm.create({
       $,
       state,
       moneyInput,
@@ -64,7 +63,7 @@
       buildPaymentPayload: buildPayment,
       buildPaymentCorrection,
     });
-    const expenses = window.PropertyDeskExpenseEntryForm.create({
+    const expenses = modules.expenseForm.create({
       $,
       state,
       moneyInput,

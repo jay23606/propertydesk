@@ -70,7 +70,9 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   const context = vm.createContext({
     window: {},
   });
+  const entryFormModules = { paymentForm: {}, expenseForm: {} };
   workflows.entryForms = {
+    modules: entryFormModules,
     create(options) {
       passed.entries = options;
       return {
@@ -112,6 +114,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     assert.equal(passed.entries[key], value);
   }
   assert.equal(passed.entries.saveCorrection, saveCorrection);
+  assert.equal(passed.entries.modules, entryFormModules);
   assert.equal("unusedEntryDependency" in passed.entries, false);
   assert.deepEqual(Object.keys(passed.entries).sort(), [
     "$",
@@ -119,6 +122,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     "expenseAccountPolicy",
     "fetchAll",
     "fillSelect",
+    "modules",
     "moneyInput",
     "openModal",
     "populateFormOptions",

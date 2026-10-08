@@ -57,6 +57,7 @@
       selectRecordWriteCompletion,
       expenseAccountPolicy,
       workflows: entryWorkflows,
+      modules: workflows.entryForms.modules,
       saveCorrection,
     });
     const transactionViews = workflows.views.create({
