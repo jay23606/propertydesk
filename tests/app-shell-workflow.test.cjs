@@ -41,7 +41,18 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     context,
   );
 
-  const workspace = { state: {}, reminder: { state: {} } };
+  const workspace = {
+    $: () => {},
+    state: {},
+    esc: () => {},
+    toast: () => {},
+    fetchAll: () => {},
+    reminder: { state: {} },
+    memberRepository: {},
+    authClient: {},
+    confirmAction: () => true,
+    unusedWorkspaceValue: true,
+  };
   const navigationSelector = () => {};
   const navigation = {
     $: navigationSelector,
@@ -55,7 +66,20 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     navigation,
   });
 
-  assert.equal(passed.workspace, workspace);
+  assert.deepEqual(Object.keys(passed.workspace).sort(), [
+    "$",
+    "authClient",
+    "confirmAction",
+    "esc",
+    "fetchAll",
+    "memberRepository",
+    "reminder",
+    "state",
+    "toast",
+  ]);
+  assert.equal("unusedWorkspaceValue" in passed.workspace, false);
+  for (const key of Object.keys(passed.workspace))
+    assert.equal(passed.workspace[key], workspace[key]);
   assert.deepEqual(Object.keys(passed.navigation).sort(), [
     "$",
     "documentRef",

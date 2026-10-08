@@ -3,7 +3,17 @@
   "use strict";
 
   function createAppShellWorkflow({ workspace, navigation }) {
-    const workspacePage = window.PropertyDeskWorkspace.create(workspace);
+    const workspacePage = window.PropertyDeskWorkspace.create({
+      $: workspace.$,
+      state: workspace.state,
+      esc: workspace.esc,
+      toast: workspace.toast,
+      fetchAll: workspace.fetchAll,
+      reminder: workspace.reminder,
+      memberRepository: workspace.memberRepository,
+      authClient: workspace.authClient,
+      confirmAction: workspace.confirmAction,
+    });
     const pageNavigation = window.PropertyDeskNavigation.create({
       $: navigation.$,
       state: navigation.state,
