@@ -1,21 +1,8 @@
-/* Compose account detail content with account and deposit actions. */
+/* Compose account details with their account-specific actions. */
 (() => {
   "use strict";
 
-  function createAccountScreenWorkflow({
-    content,
-    accountActions,
-    depositDetails: depositDetailsContext,
-    deposit,
-  }) {
-    const { depositSectionHTML } =
-      window.PropertyDeskDepositDetailsWorkflow.create({
-        state: depositDetailsContext.state,
-        depositLedger: depositDetailsContext.depositLedger,
-        money: depositDetailsContext.money,
-        fmtDate: depositDetailsContext.fmtDate,
-        esc: depositDetailsContext.esc,
-      });
+  function createAccountScreenWorkflow({ content, accountActions }) {
     const details = window.PropertyDeskAccountDetailContentWorkflow.create({
       $: content.$,
       state: content.state,
@@ -29,7 +16,7 @@
       amortizationSchedule: content.amortizationSchedule,
       openModal: content.openModal,
       propertyAddress: content.propertyAddress,
-      depositSectionHTML,
+      depositSectionHTML: content.depositSectionHTML,
       accountHistoryRepository: content.accountHistoryRepository,
     });
     const accountDetailActions =
@@ -43,23 +30,8 @@
         openPayment: accountActions.openPayment,
         repository: accountActions.repository,
       });
-    const depositActions = window.PropertyDeskDepositAdjustmentWorkflow.create({
-      $: deposit.$,
-      state: deposit.state,
-      todayIso: deposit.todayIso,
-      toast: deposit.toast,
-      fetchAll: deposit.fetchAll,
-      depositSectionHTML,
-      moneyInput: deposit.moneyInput,
-      repository: deposit.repository,
-      prepareAdjustment: deposit.prepareAdjustment,
-      validateAdjustment: deposit.validateAdjustment,
-    });
-
     return {
       openAccountDetails: details.openAccountDetails,
-      attachDepositAdjustmentEvents:
-        depositActions.attachDepositAdjustmentEvents,
       attachAccountDetailActionEvents:
         accountDetailActions.attachAccountDetailActionEvents,
     };

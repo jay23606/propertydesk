@@ -7,9 +7,10 @@ const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
 test("app delegates account actions and deposit adjustments to separate workflows", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositDetails: \{[\s\S]*?depositLedger,[\s\S]*?accountActions:[\s\S]*?deposit:/,
+    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountActions:/,
   );
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create/);
@@ -23,15 +24,27 @@ test("app delegates account actions and deposit adjustments to separate workflow
   );
   assert.match(
     accountScreenWorkflow,
-    /DepositDetailsWorkflow\.create\(\{[\s\S]*?depositLedger: depositDetailsContext\.depositLedger/,
+    /depositSectionHTML: content\.depositSectionHTML/,
+  );
+  assert.doesNotMatch(
+    accountScreenWorkflow,
+    /DepositDetailsWorkflow|DepositAdjustmentWorkflow/,
   );
   assert.match(
     accountScreenWorkflow,
     /AccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: accountActions\.repository/,
   );
+  const depositWorkspaceWorkflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
+    "utf8",
+  );
   assert.match(
-    accountScreenWorkflow,
-    /DepositAdjustmentWorkflow\.create\(\{[\s\S]*?depositSectionHTML,/,
+    depositWorkspaceWorkflow,
+    /DepositDetailsWorkflow\.create\([\s\S]*?depositLedger: details\.depositLedger/,
+  );
+  assert.match(
+    depositWorkspaceWorkflow,
+    /DepositAdjustmentWorkflow\.create\([\s\S]*?depositSectionHTML,/,
   );
   const accountWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "account-detail-action-workflow.js"),
@@ -85,22 +98,15 @@ test("app delegates account actions and deposit adjustments to separate workflow
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 
-test("account screen workflow composes isolated detail actions and deposits", () => {
+test("account screen workflow composes only account detail and close actions", () => {
   const calls = [];
-  const depositSectionHTML = () => "deposit";
   const context = vm.createContext({
     window: {
-      PropertyDeskDepositDetailsWorkflow: {
-        create(options) {
-          calls.push(["depositDetails", options]);
-          return { depositSectionHTML };
-        },
-      },
       PropertyDeskAccountDetailContentWorkflow: {
         create(content) {
           calls.push(["content", content]);
@@ -111,12 +117,6 @@ test("account screen workflow composes isolated detail actions and deposits", ()
         create(actions) {
           calls.push(["accountActions", actions]);
           return { attachAccountDetailActionEvents() {} };
-        },
-      },
-      PropertyDeskDepositAdjustmentWorkflow: {
-        create(deposit) {
-          calls.push(["deposit", deposit]);
-          return { attachDepositAdjustmentEvents() {} };
         },
       },
     },
@@ -141,16 +141,9 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     amortizationSchedule() {},
     openModal() {},
     propertyAddress() {},
+    depositSectionHTML() {},
     accountHistoryRepository: {},
     unusedContentValue: true,
-  };
-  const depositDetails = {
-    state: {},
-    depositLedger() {},
-    money() {},
-    fmtDate() {},
-    esc() {},
-    unusedDepositDetailsValue: true,
   };
   const accountActions = {
     $() {},
@@ -163,47 +156,20 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     repository: { close() {} },
     unusedDependency: true,
   };
-  const deposit = {
-    $() {},
-    state: {},
-    todayIso() {},
-    toast() {},
-    fetchAll() {},
-    moneyInput() {},
-    repository: { insert() {} },
-    prepareAdjustment() {},
-    validateAdjustment() {},
-    unusedDependency: true,
-  };
   const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
     content,
     accountActions,
-    depositDetails,
-    deposit,
   });
 
-  assert.equal(calls[0][0], "depositDetails");
-  assert.equal(calls[0][1].state, depositDetails.state);
-  assert.equal(calls[0][1].depositLedger, depositDetails.depositLedger);
-  assert.equal(calls[0][1].money, depositDetails.money);
-  assert.equal("unusedDepositDetailsValue" in calls[0][1], false);
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
-    "depositLedger",
-    "esc",
-    "fmtDate",
-    "money",
-    "state",
-  ]);
-
-  assert.equal(calls[1][0], "content");
-  assert.equal(calls[1][1].state, content.state);
+  assert.equal(calls[0][0], "content");
+  assert.equal(calls[0][1].state, content.state);
   assert.equal(
-    calls[1][1].accountHistoryRepository,
+    calls[0][1].accountHistoryRepository,
     content.accountHistoryRepository,
   );
-  assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
-  assert.equal("unusedContentValue" in calls[1][1], false);
-  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+  assert.equal(calls[0][1].depositSectionHTML, content.depositSectionHTML);
+  assert.equal("unusedContentValue" in calls[0][1], false);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "$",
     "accountHistoryRepository",
     "amortizationSchedule",
@@ -219,10 +185,10 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     "sumPosted",
     "summarizeAccount",
   ]);
-  assert.equal(calls[2][0], "accountActions");
-  assert.equal(calls[2][1].repository, accountActions.repository);
-  assert.equal("unusedDependency" in calls[2][1], false);
-  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
+  assert.equal(calls[1][0], "accountActions");
+  assert.equal(calls[1][1].repository, accountActions.repository);
+  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
     "$",
     "closeModal",
     "editAccount",
@@ -232,18 +198,84 @@ test("account screen workflow composes isolated detail actions and deposits", ()
     "state",
     "toast",
   ]);
-  assert.equal(calls[3][0], "deposit");
-  assert.equal(calls[3][1].repository, deposit.repository);
-  assert.equal(calls[3][1].prepareAdjustment, deposit.prepareAdjustment);
-  assert.equal(calls[3][1].validateAdjustment, deposit.validateAdjustment);
-  assert.equal(calls[3][1].depositSectionHTML, depositSectionHTML);
-  assert.equal("closeModal" in calls[3][1], false);
-  assert.equal("unusedDependency" in calls[3][1], false);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachAccountDetailActionEvents",
-    "attachDepositAdjustmentEvents",
     "openAccountDetails",
   ]);
+});
+
+test("deposit workspace connects held-balance details to adjustment actions", () => {
+  const calls = [];
+  const depositSectionHTML = () => "deposit";
+  const attachDepositAdjustmentEvents = () => {};
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDepositDetailsWorkflow: {
+        create(options) {
+          calls.push(["details", options]);
+          return { depositSectionHTML };
+        },
+      },
+      PropertyDeskDepositAdjustmentWorkflow: {
+        create(options) {
+          calls.push(["adjustments", options]);
+          return { attachDepositAdjustmentEvents };
+        },
+      },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const details = {
+    state: {},
+    depositLedger() {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    unused: true,
+  };
+  const adjustments = {
+    $() {},
+    state: {},
+    todayIso() {},
+    toast() {},
+    fetchAll() {},
+    moneyInput() {},
+    repository: {},
+    prepareAdjustment() {},
+    validateAdjustment() {},
+    unused: true,
+  };
+  const workflow = context.window.PropertyDeskDepositWorkspaceWorkflow.create({
+    details,
+    adjustments,
+  });
+
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+    "state",
+  ]);
+  assert.equal(calls[0][1].depositLedger, details.depositLedger);
+  assert.equal(calls[1][1].depositSectionHTML, depositSectionHTML);
+  assert.equal(calls[1][1].repository, adjustments.repository);
+  assert.equal("unused" in calls[1][1], false);
+  assert.deepEqual(Object.keys(workflow).sort(), [
+    "attachDepositAdjustmentEvents",
+    "depositSectionHTML",
+  ]);
+  assert.equal(workflow.depositSectionHTML, depositSectionHTML);
+  assert.equal(
+    workflow.attachDepositAdjustmentEvents,
+    attachDepositAdjustmentEvents,
+  );
 });
 
 test("account detail content workflow composes schedule, history, and account", async () => {

@@ -243,44 +243,15 @@
     navigate,
     documentRef: document,
   });
-  const {
-    openAccountDetails,
-    attachDepositAdjustmentEvents,
-    attachAccountDetailActionEvents,
-  } = window.PropertyDeskAccountScreenWorkflow.create({
-    content: {
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      sumPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      summarizeAccount,
-      amortizationSchedule,
-      openModal,
-      propertyAddress,
-      accountHistoryRepository: repositories.accountHistory,
-    },
-    depositDetails: {
+  const depositWorkspace = window.PropertyDeskDepositWorkspaceWorkflow.create({
+    details: {
       state,
       depositLedger,
       money,
       fmtDate,
       esc,
     },
-    accountActions: {
-      $,
-      state,
-      toast,
-      fetchAll,
-      closeModal,
-      editAccount: propertyAccountEntry.editAccount,
-      openPayment,
-      repository: repositories.accounts,
-    },
-    deposit: {
+    adjustments: {
       $,
       state,
       todayIso,
@@ -292,6 +263,35 @@
       validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
     },
   });
+  const { openAccountDetails, attachAccountDetailActionEvents } =
+    window.PropertyDeskAccountScreenWorkflow.create({
+      content: {
+        $,
+        state,
+        money,
+        fmtDate,
+        esc,
+        sumPosted,
+        prettyType,
+        paymentFrequencyLabel,
+        summarizeAccount,
+        amortizationSchedule,
+        openModal,
+        propertyAddress,
+        depositSectionHTML: depositWorkspace.depositSectionHTML,
+        accountHistoryRepository: repositories.accountHistory,
+      },
+      accountActions: {
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        editAccount: propertyAccountEntry.editAccount,
+        openPayment,
+        repository: repositories.accounts,
+      },
+    });
   const {
     attachPropertyDetailEvents,
     attachPropertyQuickActionEvents,
@@ -447,7 +447,7 @@
       attachTransactionFilterEvents,
       attachTransactionActionEvents,
       attachAccountDetailActionEvents,
-      attachDepositAdjustmentEvents,
+      depositWorkspace.attachDepositAdjustmentEvents,
       attachCreateActionEvents,
       propertyAccountEntry.attachPropertyFormEvents,
       propertyAccountEntry.attachAccountFormEvents,

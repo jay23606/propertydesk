@@ -10,20 +10,22 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.match(
     app,
-    /AccountScreenWorkflow\.create\(\{[\s\S]*?depositDetails: \{[\s\S]*?depositLedger,[\s\S]*?accountActions: \{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,[\s\S]*?deposit: \{[\s\S]*?moneyInput,/,
+    /AccountScreenWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountActions: \{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,/,
   );
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
   );
 
   for (const feature of [
     "account-detail-action-workflow",
     "deposit-details-workflow",
     "deposit-adjustment-workflow",
+    "deposit-workspace-workflow",
     "account-screen-workflow",
     "transaction-maintenance-workflow",
     "transaction-screen-workflow",

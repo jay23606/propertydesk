@@ -141,7 +141,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/deposit-details-workflow.js",
-      "features/account-screen-workflow.js",
+      "features/deposit-workspace-workflow.js",
     ],
     [
       "features/account-detail-content-workflow.js",
@@ -153,6 +153,10 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     [
       "features/deposit-adjustment-workflow.js",
+      "features/deposit-workspace-workflow.js",
+    ],
+    [
+      "features/deposit-workspace-workflow.js",
       "features/account-screen-workflow.js",
     ],
     ["features/report-model.js", "features/report-workflow.js"],

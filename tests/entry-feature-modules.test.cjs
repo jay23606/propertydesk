@@ -42,7 +42,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.doesNotMatch(app, /entryWorkflow\./);
   assert.match(
     app,
-    /attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
+    /attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
   );
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   const propertyAccountEntry = fs.readFileSync(
