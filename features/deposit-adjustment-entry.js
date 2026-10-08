@@ -10,15 +10,18 @@
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
     validateAdjustment,
+    resolveAdjustmentType,
   }) {
     async function recordDepositAdjustment(accountId, type) {
       const account = state.accounts.find((row) => row.id === accountId);
-      if (!account || account.account_type !== "rental") return false;
-      const action =
-        type === "retained"
-          ? "retained from the deposit"
-          : "restored to the held balance";
-      const enteredAmount = promptAction(`Amount ${action}?`, "0.00");
+      const adjustmentType = resolveAdjustmentType(type);
+      if (!account || account.account_type !== "rental" || !adjustmentType) {
+        return false;
+      }
+      const enteredAmount = promptAction(
+        `Amount ${adjustmentType.amountPromptAction}?`,
+        "0.00",
+      );
       if (enteredAmount === null) return false;
       const amount = moneyInput(enteredAmount);
       const validation = validateAdjustment({ account, amount });

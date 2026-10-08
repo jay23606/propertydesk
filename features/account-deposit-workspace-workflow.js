@@ -22,6 +22,7 @@
           repository: deposits.adjustments.repository,
           prepareAdjustment: deposits.adjustments.prepareAdjustment,
           validateAdjustment: deposits.adjustments.validateAdjustment,
+          resolveAdjustmentType: deposits.adjustments.resolveAdjustmentType,
         },
       },
     );

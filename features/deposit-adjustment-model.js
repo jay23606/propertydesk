@@ -2,6 +2,21 @@
 (() => {
   "use strict";
 
+  const adjustmentTypes = Object.freeze({
+    retained: Object.freeze({
+      amountPromptAction: "retained from the deposit",
+      successMessage: "Deposit retention recorded",
+    }),
+    restored: Object.freeze({
+      amountPromptAction: "restored to the held balance",
+      successMessage: "Deposit retention reversed",
+    }),
+  });
+
+  function resolveAdjustmentType(type) {
+    return adjustmentTypes[type] || null;
+  }
+
   function validateDepositAdjustment({ account, amount }) {
     if (!account || account.account_type !== "rental") {
       return { status: "unavailable" };
@@ -19,6 +34,7 @@
     reason,
     movementDate,
   }) {
+    if (!resolveAdjustmentType(type)) return { status: "unsupported-type" };
     const validation = validateDepositAdjustment({ account, amount });
     if (validation.status !== "ready") return validation;
     if (reason === null) return { status: "cancelled" };
@@ -39,6 +55,7 @@
   }
 
   window.PropertyDeskDepositAdjustmentModel = Object.freeze({
+    resolveType: resolveAdjustmentType,
     validate: validateDepositAdjustment,
     prepare: prepareDepositAdjustment,
   });

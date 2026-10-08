@@ -65,6 +65,7 @@ test("account and deposit workspace exposes only its supported operations", () =
       repository: {},
       prepareAdjustment: () => {},
       validateAdjustment: () => {},
+      resolveAdjustmentType: () => {},
       unusedAdjustmentValue: true,
     },
     unusedDepositValue: true,
@@ -122,6 +123,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     "moneyInput",
     "prepareAdjustment",
     "repository",
+    "resolveAdjustmentType",
     "state",
     "toast",
     "todayIso",
@@ -240,7 +242,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /PropertyDeskDepositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?validateAdjustment: deposits\.adjustments\.validateAdjustment,[\s\S]*?PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /PropertyDeskDepositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   const depositWorkspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
@@ -307,6 +309,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.match(
     app,
     /validateAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.validate/,
+  );
+  assert.match(
+    app,
+    /resolveAdjustmentType:\s*window\.PropertyDeskDepositAdjustmentModel\.resolveType/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
@@ -380,6 +386,7 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
     repository: {},
     prepareAdjustment() {},
     validateAdjustment() {},
+    resolveAdjustmentType() {},
     unused: true,
   };
   const workflow = context.window.PropertyDeskDepositWorkspaceWorkflow.create({
@@ -398,6 +405,10 @@ test("deposit workspace connects held-balance details to adjustment actions", ()
   assert.equal(calls[1][1].money, details.money);
   assert.equal(calls[2][1].depositSectionHTML, workflow.depositSectionHTML);
   assert.equal(calls[2][1].repository, adjustments.repository);
+  assert.equal(
+    calls[2][1].resolveAdjustmentType,
+    adjustments.resolveAdjustmentType,
+  );
   assert.equal("unused" in calls[2][1], false);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachDepositAdjustmentEvents",

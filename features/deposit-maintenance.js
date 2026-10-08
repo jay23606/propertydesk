@@ -17,10 +17,14 @@
     fetchAll,
     prepareAdjustment,
     repository,
+    resolveAdjustmentType,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {
       const account = state.accounts.find((row) => row.id === accountId);
-      if (!account || account.account_type !== "rental") return false;
+      const adjustmentType = resolveAdjustmentType(type);
+      if (!account || account.account_type !== "rental" || !adjustmentType) {
+        return false;
+      }
       const prepared = prepareAdjustment({
         account,
         userId: state.workspaceOwnerId,
@@ -31,10 +35,7 @@
         movementDate: reason.trim() ? todayIso() : null,
       });
       if (!adjustmentIsReady(prepared, toast)) return false;
-      const message =
-        type === "retained"
-          ? "Deposit retention recorded"
-          : "Deposit retention reversed";
+      const message = adjustmentType.successMessage;
       return window.PropertyDeskRepositoryWriteFeedback.saveAndRefreshWorkspaceRecord(
         {
           operation: () => repository.insert(prepared.payload),

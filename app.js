@@ -286,6 +286,8 @@
         repository: repositories.deposits,
         prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
+        resolveAdjustmentType:
+          window.PropertyDeskDepositAdjustmentModel.resolveType,
       },
     },
     accountDetails: {

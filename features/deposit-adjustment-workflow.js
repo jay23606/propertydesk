@@ -13,6 +13,7 @@
     repository,
     prepareAdjustment,
     validateAdjustment,
+    resolveAdjustmentType,
   }) {
     const { saveDepositAdjustment } =
       window.PropertyDeskDepositMaintenance.create({
@@ -22,6 +23,7 @@
         fetchAll,
         repository,
         prepareAdjustment,
+        resolveAdjustmentType,
       });
     const { recordDepositAdjustment } =
       window.PropertyDeskDepositAdjustmentEntry.create({
@@ -30,6 +32,7 @@
         toast,
         saveDepositAdjustment,
         validateAdjustment,
+        resolveAdjustmentType,
       });
     const { attachDepositAdjustmentEvents } =
       window.PropertyDeskDepositDetailEvents.create({

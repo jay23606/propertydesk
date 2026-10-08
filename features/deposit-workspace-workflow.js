@@ -31,6 +31,7 @@
         repository: adjustments.repository,
         prepareAdjustment: adjustments.prepareAdjustment,
         validateAdjustment: adjustments.validateAdjustment,
+        resolveAdjustmentType: adjustments.resolveAdjustmentType,
       });
 
     return Object.freeze({ depositSectionHTML, attachDepositAdjustmentEvents });

@@ -74,6 +74,7 @@ test("deposit details render rental-only ledger rows and preserve voided markers
         repository: {},
         prepareAdjustment() {},
         validateAdjustment() {},
+        resolveAdjustmentType() {},
       },
     });
 

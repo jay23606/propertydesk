@@ -5,6 +5,19 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
+function loadAdjustmentModel(context) {
+  if (!context.window.PropertyDeskDepositAdjustmentModel) {
+    vm.runInContext(
+      fs.readFileSync(
+        path.join(__dirname, "..", "features", "deposit-adjustment-model.js"),
+        "utf8",
+      ),
+      context,
+    );
+  }
+  return context.window.PropertyDeskDepositAdjustmentModel;
+}
+
 test("deposit adjustment model validates inputs and prepares audited payloads", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -34,6 +47,19 @@ test("deposit adjustment model validates inputs and prepares audited payloads", 
     "unavailable",
   );
   assert.equal(model.validate({ account, amount: 0 }).status, "invalid-amount");
+  assert.equal(
+    model.resolveType("retained").successMessage,
+    "Deposit retention recorded",
+  );
+  assert.equal(
+    model.resolveType("restored").successMessage,
+    "Deposit retention reversed",
+  );
+  assert.equal(model.resolveType("unknown"), null);
+  assert.equal(
+    model.prepare({ ...common, type: "unknown", reason: "Reason" }).status,
+    "unsupported-type",
+  );
   assert.equal(model.prepare({ ...common, reason: null }).status, "cancelled");
   assert.equal(
     model.prepare({ ...common, reason: "   " }).status,
@@ -127,6 +153,8 @@ test("deposit maintenance retains adjustment audit details", async () => {
     }),
     prepareAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.prepare,
+    resolveAdjustmentType:
+      context.window.PropertyDeskDepositAdjustmentModel.resolveType,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,
@@ -135,6 +163,8 @@ test("deposit maintenance retains adjustment audit details", async () => {
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
     validateAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.validate,
+    resolveAdjustmentType:
+      context.window.PropertyDeskDepositAdjustmentModel.resolveType,
     promptAction: () => prompts.shift(),
   });
 
@@ -158,6 +188,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
 
 test("deposit maintenance only proceeds with a ready audited adjustment", async () => {
   const context = vm.createContext({ window: {} });
+  const adjustmentModel = loadAdjustmentModel(context);
   loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
@@ -182,6 +213,7 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("rejected adjustments must not refresh"),
     prepareAdjustment: () => outcomes.shift(),
+    resolveAdjustmentType: adjustmentModel.resolveType,
     repository: {
       insert: async () => {
         inserts++;
@@ -217,6 +249,15 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
     ),
     false,
   );
+  assert.equal(
+    await maintenance.saveDepositAdjustment(
+      "rental-1",
+      "unknown",
+      25,
+      "Reason",
+    ),
+    false,
+  );
   assert.equal(inserts, 0);
   assert.deepEqual(messages, [
     "Enter a reason so this adjustment can be audited",
@@ -225,6 +266,7 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
 
 test("deposit maintenance reconciles an adjustment after a lost response", async () => {
   const context = vm.createContext({ window: {} });
+  const adjustmentModel = loadAdjustmentModel(context);
   loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
@@ -267,6 +309,7 @@ test("deposit maintenance reconciles an adjustment after a lost response", async
         reason: "Retention correction",
       },
     }),
+    resolveAdjustmentType: adjustmentModel.resolveType,
     repository: {
       insert: async () => {
         throw new Error("connection lost");
@@ -291,6 +334,7 @@ test("deposit maintenance reconciles an adjustment after a lost response", async
 
 test("deposit maintenance asks to check the refreshed ledger before retrying", async () => {
   const context = vm.createContext({ window: {} });
+  const adjustmentModel = loadAdjustmentModel(context);
   loadRepositoryWriteFeedback(context);
   vm.runInContext(
     fs.readFileSync(
@@ -320,6 +364,7 @@ test("deposit maintenance asks to check the refreshed ledger before retrying", a
         reason: "Retention correction",
       },
     }),
+    resolveAdjustmentType: adjustmentModel.resolveType,
     repository: {
       insert: async () => {
         throw new Error("connection lost");
@@ -355,6 +400,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     ),
     context,
   );
+  const adjustmentModel = loadAdjustmentModel(context);
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "deposit-repository.js"),
@@ -410,6 +456,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     }),
     prepareAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.prepare,
+    resolveAdjustmentType: adjustmentModel.resolveType,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state,
@@ -418,6 +465,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
     validateAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.validate,
+    resolveAdjustmentType: adjustmentModel.resolveType,
     promptAction: () => prompts.shift(),
   });
 
@@ -457,6 +505,8 @@ test("deposit adjustment entry validates the amount before asking for an audit r
       assert.fail("invalid amount should not reach persistence"),
     validateAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.validate,
+    resolveAdjustmentType:
+      context.window.PropertyDeskDepositAdjustmentModel.resolveType,
     promptAction: (message) => {
       messages.push(message);
       return prompts.shift();
@@ -490,6 +540,7 @@ test("deposit adjustment entry treats amount prompt cancellation as a no-op", as
     context,
   );
   const messages = [];
+  let promptCount = 0;
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
     state: {
       accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -500,12 +551,22 @@ test("deposit adjustment entry treats amount prompt cancellation as a no-op", as
       assert.fail("cancelled amount should not reach persistence"),
     validateAdjustment:
       context.window.PropertyDeskDepositAdjustmentModel.validate,
-    promptAction: () => null,
+    resolveAdjustmentType:
+      context.window.PropertyDeskDepositAdjustmentModel.resolveType,
+    promptAction: () => {
+      promptCount += 1;
+      return null;
+    },
   });
 
+  assert.equal(
+    await entry.recordDepositAdjustment("rental-1", "unknown"),
+    false,
+  );
   assert.equal(
     await entry.recordDepositAdjustment("rental-1", "retained"),
     false,
   );
+  assert.equal(promptCount, 1);
   assert.deepEqual(messages, []);
 });
