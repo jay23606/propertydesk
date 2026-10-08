@@ -70,7 +70,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/account-details-view.js", "features/account-details.js"],
     ["features/account-form-view.js", "features/account-form.js"],
-    ["features/account-maintenance.js", "features/account-form.js"],
+    ["features/account-form-maintenance.js", "features/account-form.js"],
     ["features/account-payload.js", "features/account-form.js"],
     [
       "features/account-history-model.js",
@@ -103,10 +103,10 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/report-views.js", "features/report-workflow.js"],
     ["features/report-export.js", "features/report-workflow.js"],
     ["features/import-review.js", "features/account-import.js"],
-    ["features/account-repository.js", "features/account-maintenance.js"],
+    ["features/account-repository.js", "features/account-form-maintenance.js"],
     [
       "features/repository-write-feedback.js",
-      "features/account-maintenance.js",
+      "features/account-form-maintenance.js",
     ],
     ["features/deposit-context.js", "app.js"],
     ["features/notifications.js", "app.js"],

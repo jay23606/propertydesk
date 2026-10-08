@@ -15,5 +15,5 @@
     return { saveAccount };
   }
 
-  window.PropertyDeskAccountMaintenance = Object.freeze({ create });
+  window.PropertyDeskAccountFormMaintenance = Object.freeze({ create });
 })();

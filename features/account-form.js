@@ -32,7 +32,7 @@
         toast,
       });
     const { saveAccount: persistAccount } =
-      window.PropertyDeskAccountMaintenance.create({
+      window.PropertyDeskAccountFormMaintenance.create({
         toast,
         repository,
       });

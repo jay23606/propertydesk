@@ -100,7 +100,7 @@ test("property and account maintenance save inserts and updates to their own tab
       getClient: () => state.client,
     }),
   });
-  const account = context.window.PropertyDeskAccountMaintenance.create({
+  const account = context.window.PropertyDeskAccountFormMaintenance.create({
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,

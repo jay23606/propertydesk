@@ -107,7 +107,9 @@ async function smokeTransactionMaintenance(signedInPage) {
         ?.status === "closed",
   );
   if (!accountClosed) {
-    throw new Error("Closing an account did not reach account maintenance.");
+    throw new Error(
+      "Closing an account did not reach account-close maintenance.",
+    );
   }
 }
 
