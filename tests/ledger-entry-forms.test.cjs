@@ -102,6 +102,10 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
     populateFormOptions() {},
     prettyType() {},
     openModal() {},
+    expenseAccountPolicy: {
+      requiresRentalAccount: () => false,
+      accountMatchesCategory: () => true,
+    },
     navigate: () => {},
     previewReminderEmail: () => {},
     saveCorrection() {},
@@ -151,6 +155,7 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "buildExpensePayload",
       "buildExpenseCorrection",
       "fillSelect",
+      "expenseAccountPolicy",
       "insertExpense",
       "moneyInput",
       "openModal",
@@ -419,6 +424,10 @@ test("payment and expense form workflows publish explicit view operations", () =
     populateFormOptions() {},
     prettyType: String,
     openModal() {},
+    expenseAccountPolicy: {
+      requiresRentalAccount: () => false,
+      accountMatchesCategory: () => true,
+    },
     saveCorrection() {},
     buildPaymentPayload() {},
     buildExpensePayload() {},
@@ -442,6 +451,7 @@ test("payment and expense form workflows publish explicit view operations", () =
   ]);
   assert.deepEqual(Object.keys(viewDependencies.expense).sort(), [
     "$",
+    "expenseAccountPolicy",
     "fillSelect",
     "moneyInput",
     "openModal",
@@ -539,6 +549,10 @@ test("payment and expense callbacks retain values at their form boundary", async
     populateFormOptions() {},
     prettyType: String,
     openModal() {},
+    expenseAccountPolicy: {
+      requiresRentalAccount: () => false,
+      accountMatchesCategory: () => true,
+    },
   };
   const payment = context.window.PropertyDeskPaymentEntryForm.create(common);
   const expense = context.window.PropertyDeskExpenseEntryForm.create(common);

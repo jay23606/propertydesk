@@ -123,6 +123,7 @@ function ledgerEntryDependencies(context, state = {}) {
       ? repositoryFactory.create({ getClient: () => state.client })
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
+    expenseAccountPolicy: context.window.PropertyDeskExpenseAccountPolicy,
   };
 }
 

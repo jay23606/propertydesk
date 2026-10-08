@@ -11,6 +11,7 @@
     populateFormOptions,
     prettyType,
     openModal,
+    expenseAccountPolicy,
   }) {
     function openExpense(propertyId) {
       state.pendingCorrection = null;
@@ -79,7 +80,7 @@
       $("expense-category").addEventListener("change", () => {
         $("deposit-refund-hint").classList.toggle(
           "hidden",
-          !window.PropertyDeskExpenseAccountPolicy.requiresRentalAccount(
+          !expenseAccountPolicy.requiresRentalAccount(
             $("expense-category").value,
           ),
         );

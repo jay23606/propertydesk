@@ -231,6 +231,7 @@
         openModal,
         transactionRepository: repositories.transactions,
         transactionPayloads: window.PropertyDeskTransactionPayloads,
+        expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
       },
       views: {
         $,

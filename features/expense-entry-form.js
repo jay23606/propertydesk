@@ -16,6 +16,7 @@
     populateFormOptions,
     prettyType,
     openModal,
+    expenseAccountPolicy,
   }) {
     const expenseView = window.PropertyDeskExpenseEntryView.create({
       $,
@@ -26,6 +27,7 @@
       populateFormOptions,
       prettyType,
       openModal,
+      expenseAccountPolicy,
     });
 
     async function saveExpense(event) {
@@ -41,12 +43,7 @@
         memo,
       } = expenseView.readValues();
       const account = state.accounts.find((item) => item.id === accountId);
-      if (
-        !window.PropertyDeskExpenseAccountPolicy.accountMatchesCategory(
-          category,
-          account,
-        )
-      ) {
+      if (!expenseAccountPolicy.accountMatchesCategory(category, account)) {
         toast("Choose a rental account for a security deposit refund");
         return;
       }

@@ -17,6 +17,7 @@
     saveCorrection,
     transactionPayloads,
     transactionRepository,
+    expenseAccountPolicy,
   }) {
     const {
       buildPayment,
@@ -66,6 +67,7 @@
       openModal,
       saveTransactionEntry,
       insertExpense,
+      expenseAccountPolicy,
       buildExpensePayload: buildExpense,
       buildExpenseCorrection,
     });

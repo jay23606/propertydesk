@@ -66,6 +66,7 @@ function createView() {
     populateFormOptions: () => calls.push("populate-options"),
     prettyType: (value) => value,
     openModal: (id) => calls.push(["open-modal", id]),
+    expenseAccountPolicy: context.window.PropertyDeskExpenseAccountPolicy,
   });
   return { calls, elements, listeners, state, view };
 }
