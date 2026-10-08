@@ -13,18 +13,17 @@
       nextArguments = [],
     }) {
       resetAfterSave(...resetArguments);
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      if (addAnother) {
-        prepareNext(...nextArguments);
-        toast(`${label} recorded. Ready for the next entry`);
-        return;
-      }
-      closeModal($(modalId));
-      toast(`${label} recorded`);
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => {
+          if (addAnother) prepareNext(...nextArguments);
+          else closeModal($(modalId));
+        },
+        toast,
+        successMessage: addAnother
+          ? `${label} recorded. Ready for the next entry`
+          : `${label} recorded`,
+      });
     }
 
     return { finishSuccessfulEntry };

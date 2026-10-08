@@ -208,6 +208,13 @@ test("shared ledger completion resets, refreshes, then continues or closes", asy
   });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "repository-write-feedback.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "ledger-entry-save-workflow.js"),
       "utf8",
     ),
