@@ -8,19 +8,28 @@
     appLifecycle.render();
   }
   const {
-    amortizationSchedule,
-    amountDueSince,
     isPosted,
-    monthlyScheduledEstimate,
     paymentStatusInMonth,
     postedOnOrAfter,
-    scheduledLoanBalance,
-    securityDepositBalance,
     sumIncome,
     sumOperatingExpenses,
     sumPosted,
-    unpaidDueAccrualStart,
-  } = window.PropertyDeskLedgerUtils;
+  } = window.PropertyDeskPostedLedgerUtils;
+  const schedule = window.PropertyDeskScheduleUtils.create({
+    isDueReducingPayment:
+      window.PropertyDeskPostedLedgerUtils.isDueReducingPayment,
+    isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
+  });
+  const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create({
+    sumPosted,
+  });
+  const depositCalculations = window.PropertyDeskDepositLedgerUtils.create({
+    isPosted,
+  });
+  const { amountDueSince, monthlyScheduledEstimate, unpaidDueAccrualStart } =
+    schedule;
+  const { amortizationSchedule, scheduledLoanBalance } = loanSchedule;
+  const { securityDepositBalance } = depositCalculations;
   const { lateReminderMailto } = window.PropertyDeskEmailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;

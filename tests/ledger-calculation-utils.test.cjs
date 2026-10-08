@@ -2,25 +2,28 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/date-utils.js");
 require("../features/currency-utils.js");
-require("../features/account-status-utils.js");
-require("../features/ledger-schedule-utils.js");
-require("../features/loan-amortization-utils.js");
-require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../features/ledger-utils.js");
+const accountStatus = require("../features/account-status-utils.js");
+const ledgerUtils = require("../features/posted-ledger-utils.js");
+const scheduleUtils = require("../features/ledger-schedule-utils.js").create({
+  isDueReducingPayment: ledgerUtils.isDueReducingPayment,
+  isActiveAccount: accountStatus.isActiveAccount,
+});
+const deposits = require("../features/deposit-ledger-utils.js").create({
+  isPosted: ledgerUtils.isPosted,
+});
 const {
   hasPostedPaymentInMonth,
   isDueReducingPayment,
   isPosted,
-  monthlyScheduledEstimate,
   paymentStatusInMonth,
   postedOnOrAfter,
   postedPaymentTotalInMonth,
-  principalBalance,
-  securityDepositBalance,
   sumIncome,
   sumOperatingExpenses,
   sumPosted,
 } = ledgerUtils;
+const { monthlyScheduledEstimate } = scheduleUtils;
+const { securityDepositBalance } = deposits;
 
 test("only posted non-deposit and non-late-fee payments reduce scheduled dues", () => {
   assert.equal(isDueReducingPayment({ income_category: "installment" }), true);
@@ -168,27 +171,6 @@ test("voided payments remain recorded but no longer affect collected income", ()
     "legacy rows without status remain posted",
   );
   assert.equal(isPosted(payments[2]), false);
-});
-
-test("voided principal allocations do not reduce the account balance", () => {
-  const payments = [
-    { principal_amount: "120.00", status: "posted" },
-    { principal_amount: "80.00", status: "voided" },
-    { principal_amount: "30.00" },
-  ];
-  assert.equal(principalBalance("500.00", payments), 350);
-  assert.equal(principalBalance(40, [{ principal_amount: 50 }]), 0);
-});
-
-test("ledger opening balance can differ from contract principal and ignores earlier payments", () => {
-  const payments = [
-    { principal_amount: 200, received_date: "2025-12-31" },
-    { principal_amount: 125, received_date: "2026-01-01" },
-    { principal_amount: 100, received_date: "2026-01-02" },
-    { principal_amount: 25, received_date: "2026-02-01", status: "voided" },
-  ];
-  assert.equal(principalBalance(1000, payments, 500, "2026-01-01"), 400);
-  assert.equal(principalBalance(1000, payments, 0, "2026-01-01"), 0);
 });
 
 test("voided expenses no longer count toward posted expenses", () => {

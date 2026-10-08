@@ -86,52 +86,19 @@
   const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
   if (!roundCurrency)
     throw new Error(
-      "PropertyDeskCurrencyUtils must load before PropertyDeskLedgerUtils.",
+      "PropertyDeskCurrencyUtils must load before PropertyDeskPostedLedgerUtils.",
     );
-  const scheduleFactory = globalThis.PropertyDeskScheduleUtils;
-  if (!scheduleFactory)
-    throw new Error(
-      "PropertyDeskScheduleUtils must load before PropertyDeskLedgerUtils.",
-    );
-  const loanFactory = globalThis.PropertyDeskLoanAmortizationUtils;
-  if (!loanFactory)
-    throw new Error(
-      "PropertyDeskLoanAmortizationUtils must load before PropertyDeskLedgerUtils.",
-    );
-  const accountStatus = globalThis.PropertyDeskAccountStatusUtils;
-  if (!accountStatus)
-    throw new Error(
-      "PropertyDeskAccountStatusUtils must load before PropertyDeskLedgerUtils.",
-    );
-  const schedule = scheduleFactory.create({
-    isDueReducingPayment,
-    isActiveAccount: accountStatus.isActiveAccount,
-  });
-  const loans = loanFactory.create({ sumPosted });
-  const depositFactory = globalThis.PropertyDeskDepositLedgerUtils;
-  if (!depositFactory)
-    throw new Error(
-      "PropertyDeskDepositLedgerUtils must load before PropertyDeskLedgerUtils.",
-    );
-  const deposits = depositFactory.create({ isPosted });
   const helpers = Object.freeze({
-    amountDueSince: schedule.amountDueSince,
-    amortizationSchedule: loans.amortizationSchedule,
     hasPostedPaymentInMonth,
     isDueReducingPayment,
     isPosted,
-    monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
     paymentStatusInMonth,
     postedOnOrAfter,
     postedPaymentTotalInMonth,
-    principalBalance: loans.principalBalance,
-    scheduledLoanBalance: loans.scheduledLoanBalance,
-    securityDepositBalance: deposits.securityDepositBalance,
     sumIncome,
     sumOperatingExpenses,
     sumPosted,
-    unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
   });
-  globalThis.PropertyDeskLedgerUtils = helpers;
+  globalThis.PropertyDeskPostedLedgerUtils = helpers;
   if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();

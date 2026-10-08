@@ -6,7 +6,12 @@ const {
 async function smokeAccountAmortization(page, runtimeErrors, consoleErrors) {
   console.log("Smoke: checking account amortization rendering.");
   const detailText = await page.evaluate(async () => {
-    const utilities = window.PropertyDeskLedgerUtils;
+    const utilities = window.PropertyDeskLoanAmortizationUtils?.create({
+      sumPosted: (rows) =>
+        rows
+          .filter((payment) => !payment.status || payment.status === "posted")
+          .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
+    });
     const details = window.PropertyDeskAccountDetails;
     if (!utilities || !details) {
       throw new Error("PropertyDesk account detail modules did not load.");

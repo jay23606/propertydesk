@@ -1,16 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const workspaceTables = require("../workspace-table-catalog.js");
-require("../features/date-utils.js");
 require("../features/currency-utils.js");
-require("../features/account-status-utils.js");
-require("../features/ledger-schedule-utils.js");
-require("../features/loan-amortization-utils.js");
-require("../features/deposit-ledger-utils.js");
 const { createBackup } = require("../features/backup-utils.js").create({
   workspaceTables,
 });
-const ledgerUtils = require("../features/ledger-utils.js");
+const ledgerUtils = require("../features/posted-ledger-utils.js");
 
 test("backup manifest generation stays separate from ledger calculations", () => {
   assert.equal(typeof createBackup, "function");

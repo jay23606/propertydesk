@@ -85,8 +85,11 @@ test("app coordinator passes the amortization helper into account details", () =
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /amortizationSchedule,[\s\S]*?\} = window\.PropertyDeskLedgerUtils;/,
+    /PropertyDeskLoanAmortizationUtils\.create\(\{\s*sumPosted,\s*\}\)/,
   );
+  assert.match(app, /PropertyDeskScheduleUtils\.create\(/);
+  assert.match(app, /PropertyDeskDepositLedgerUtils\.create\(/);
+  assert.match(app, /window\.PropertyDeskPostedLedgerUtils/);
   assert.match(
     app,
     /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?amortizationSchedule/,

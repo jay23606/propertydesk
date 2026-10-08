@@ -7,8 +7,8 @@ require("../features/currency-utils.js");
 const accountStatus = require("../features/account-status-utils.js");
 const scheduleFactory = require("../features/ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../features/loan-amortization-utils.js");
-require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../features/ledger-utils.js");
+const depositFactory = require("../features/deposit-ledger-utils.js");
+const ledgerUtils = require("../features/posted-ledger-utils.js");
 const scheduleUtils = scheduleFactory.create({
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
@@ -16,10 +16,11 @@ const scheduleUtils = scheduleFactory.create({
 const loanUtils = loanAmortizationFactory.create({
   sumPosted: ledgerUtils.sumPosted,
 });
-const { amountDueSince, amortizationSchedule, scheduledLoanBalance } =
-  ledgerUtils;
+const depositUtils = depositFactory.create({ isPosted: ledgerUtils.isPosted });
+const { amountDueSince } = scheduleUtils;
+const { amortizationSchedule, scheduledLoanBalance } = loanUtils;
 
-test("due schedule and loan amortization utilities load before the stable ledger API and are precached", () => {
+test("financial calculation modules keep focused APIs and load before the app", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -29,43 +30,31 @@ test("due schedule and loan amortization utilities load before the stable ledger
     html.indexOf("features/date-utils.js") <
       html.indexOf("features/ledger-schedule-utils.js"),
   );
-  assert.ok(
-    html.indexOf("features/ledger-schedule-utils.js") <
-      html.indexOf("features/ledger-utils.js"),
-  );
-  assert.ok(
-    html.indexOf("features/loan-amortization-utils.js") <
-      html.indexOf("features/ledger-utils.js"),
-  );
-  assert.ok(
-    html.indexOf("features/deposit-ledger-utils.js") <
-      html.indexOf("features/ledger-utils.js"),
-  );
-  assert.match(worker, /'\.\/features\/ledger-schedule-utils\.js'/);
-  assert.match(worker, /'\.\/features\/loan-amortization-utils\.js'/);
-  assert.match(worker, /'\.\/features\/deposit-ledger-utils\.js'/);
+  for (const moduleName of [
+    "features/posted-ledger-utils.js",
+    "features/ledger-schedule-utils.js",
+    "features/loan-amortization-utils.js",
+    "features/deposit-ledger-utils.js",
+  ]) {
+    assert.ok(html.indexOf(moduleName) < html.indexOf("app.js"));
+    assert.ok(worker.includes(`'./${moduleName}'`));
+  }
   assert.equal(typeof scheduleUtils.amountDueSince, "function");
   assert.equal(typeof loanUtils.amortizationSchedule, "function");
-  assert.equal(typeof ledgerUtils.amortizationSchedule, "function");
+  assert.equal(typeof loanUtils.principalBalance, "function");
+  assert.equal(typeof depositUtils.securityDepositBalance, "function");
   assert.deepEqual(
     Object.keys(ledgerUtils).sort(),
     [
-      "amountDueSince",
-      "amortizationSchedule",
       "hasPostedPaymentInMonth",
       "isDueReducingPayment",
       "isPosted",
-      "monthlyScheduledEstimate",
       "paymentStatusInMonth",
       "postedOnOrAfter",
       "postedPaymentTotalInMonth",
-      "principalBalance",
-      "scheduledLoanBalance",
-      "securityDepositBalance",
       "sumIncome",
       "sumOperatingExpenses",
       "sumPosted",
-      "unpaidDueAccrualStart",
     ].sort(),
   );
 });
@@ -90,6 +79,30 @@ test("scheduled loan balance follows amortization and accepts positive or negati
     ),
     125,
   );
+});
+
+test("voided principal allocations do not reduce the account balance", () => {
+  const payments = [
+    { principal_amount: "120.00", status: "posted" },
+    { principal_amount: "80.00", status: "voided" },
+    { principal_amount: "30.00" },
+  ];
+  assert.equal(loanUtils.principalBalance("500.00", payments), 350);
+  assert.equal(loanUtils.principalBalance(40, [{ principal_amount: 50 }]), 0);
+});
+
+test("ledger opening balance can differ from contract principal and ignores earlier payments", () => {
+  const payments = [
+    { principal_amount: 200, received_date: "2025-12-31" },
+    { principal_amount: 125, received_date: "2026-01-01" },
+    { principal_amount: 100, received_date: "2026-01-02" },
+    { principal_amount: 25, received_date: "2026-02-01", status: "voided" },
+  ];
+  assert.equal(
+    loanUtils.principalBalance(1000, payments, 500, "2026-01-01"),
+    400,
+  );
+  assert.equal(loanUtils.principalBalance(1000, payments, 0, "2026-01-01"), 0);
 });
 
 test("on-time land-contract schedule provides the hypothetical balance independently of payments received", () => {

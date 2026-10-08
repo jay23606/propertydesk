@@ -2,12 +2,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const dateUtils = require("../features/date-utils.js");
 require("../features/currency-utils.js");
-require("../features/account-status-utils.js");
-require("../features/ledger-schedule-utils.js");
-require("../features/loan-amortization-utils.js");
-require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../features/ledger-utils.js");
-const { amountDueSince, unpaidDueAccrualStart } = ledgerUtils;
+const accountStatus = require("../features/account-status-utils.js");
+const postedLedger = require("../features/posted-ledger-utils.js");
+const { amountDueSince, unpaidDueAccrualStart } =
+  require("../features/ledger-schedule-utils.js").create({
+    isDueReducingPayment: postedLedger.isDueReducingPayment,
+    isActiveAccount: accountStatus.isActiveAccount,
+  });
 
 test("shared month-anchor dates clamp at month end without mutating the anchor", () => {
   const jan31 = new Date("2026-01-31T12:00:00");
