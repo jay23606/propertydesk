@@ -60,9 +60,18 @@ test("browser feature scripts load after their dependencies", () => {
       "features/repository-write-feedback.js",
       "features/account-close-maintenance.js",
     ],
-    ["features/account-close-entry.js", "app.js"],
-    ["features/account-close-maintenance.js", "app.js"],
-    ["features/account-detail-events.js", "app.js"],
+    [
+      "features/account-close-entry.js",
+      "features/account-detail-action-workflow.js",
+    ],
+    [
+      "features/account-close-maintenance.js",
+      "features/account-detail-action-workflow.js",
+    ],
+    [
+      "features/account-detail-events.js",
+      "features/account-detail-action-workflow.js",
+    ],
     ["features/account-details.js", "features/account-detail-events.js"],
     [
       "features/account-loan-schedule-view.js",
@@ -96,9 +105,19 @@ test("browser feature scripts load after their dependencies", () => {
       "features/deposit-adjustment-workflow.js",
       "features/deposit-workspace-workflow.js",
     ],
-    ["features/account-detail-content-workflow.js", "app.js"],
-    ["features/account-detail-action-workflow.js", "app.js"],
-    ["features/deposit-workspace-workflow.js", "app.js"],
+    [
+      "features/account-detail-content-workflow.js",
+      "features/account-deposit-workspace-workflow.js",
+    ],
+    [
+      "features/account-detail-action-workflow.js",
+      "features/account-deposit-workspace-workflow.js",
+    ],
+    [
+      "features/deposit-workspace-workflow.js",
+      "features/account-deposit-workspace-workflow.js",
+    ],
+    ["features/account-deposit-workspace-workflow.js", "app.js"],
     ["features/report-model.js", "features/report-workflow.js"],
     ["features/report-views.js", "features/report-workflow.js"],
     ["features/report-export.js", "features/report-workflow.js"],
@@ -135,11 +154,6 @@ test("browser feature scripts load after their dependencies", () => {
       "features/deposit-adjustment-model.js",
       "features/deposit-adjustment-entry.js",
     ],
-    ["features/deposit-details-model.js", "app.js"],
-    ["features/deposit-details-view.js", "app.js"],
-    ["features/deposit-adjustment-entry.js", "app.js"],
-    ["features/deposit-maintenance.js", "app.js"],
-    ["features/deposit-detail-events.js", "app.js"],
     ["features/deposit-repository.js", "features/deposit-maintenance.js"],
     [
       "features/repository-write-feedback.js",
@@ -174,18 +188,6 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/import-preview.js", "features/import-preview-events.js"],
     ["features/import-preview.js", "features/imports.js"],
     ["features/import-preview-events.js", "features/imports.js"],
-    [
-      "features/account-detail-events.js",
-      "features/account-detail-action-workflow.js",
-    ],
-    [
-      "features/account-close-entry.js",
-      "features/account-detail-action-workflow.js",
-    ],
-    [
-      "features/account-close-maintenance.js",
-      "features/account-detail-action-workflow.js",
-    ],
     [
       "features/deposit-adjustment-entry.js",
       "features/deposit-adjustment-workflow.js",
@@ -298,7 +300,10 @@ test("browser feature scripts load after their dependencies", () => {
       "features/workspace-account-financial-context.js",
     ],
     ["features/workspace-account-financial-context.js", "app.js"],
-    ["features/transaction-maintenance-workflow.js", "app.js"],
+    [
+      "features/transaction-maintenance-workflow.js",
+      "features/transaction-records-workflow.js",
+    ],
     ["features/auth.js", "features/app-startup-workflow.js"],
     ["features/app-lifecycle.js", "features/app-startup-workflow.js"],
     [
@@ -341,11 +346,17 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/workspace-form-save-workflow.js", "features/property-form.js"],
     ["features/workspace-form-save-workflow.js", "features/account-form.js"],
     ["features/account-form.js", "app.js"],
-    ["features/ledger-entry-forms.js", "app.js"],
+    [
+      "features/ledger-entry-forms.js",
+      "features/transaction-records-workflow.js",
+    ],
     ["features/create-actions.js", "app.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
-    ["features/transaction-correction-maintenance.js", "app.js"],
-    ["features/transaction-views.js", "app.js"],
+    [
+      "features/transaction-views.js",
+      "features/transaction-records-workflow.js",
+    ],
+    ["features/transaction-records-workflow.js", "app.js"],
     [
       "features/overview-property-summary-model.js",
       "features/overview-model.js",
@@ -470,10 +481,6 @@ test("browser feature scripts load after their dependencies", () => {
       "features/transaction-inserts.js",
     ],
     ["features/transaction-repository.js", "features/transaction-inserts.js"],
-    ["features/transaction-correction-form.js", "app.js"],
-    ["features/transaction-void-maintenance.js", "app.js"],
-    ["features/transaction-view-events.js", "app.js"],
-    ["features/transaction-void-entry.js", "app.js"],
     [
       "features/repository-write-feedback.js",
       "features/transaction-void-maintenance.js",
