@@ -46,13 +46,13 @@
       confirmAction,
     });
 
-    return {
+    return Object.freeze({
       updateGreeting: profileWorkflow.updateGreeting,
       renderWorkspacePage,
       previewReminderEmail: reminderWorkflow.previewReminderEmail,
       attachProfileEvents: profileWorkflow.attachProfileEvents,
       attachWorkspaceMemberEvents: members.attachWorkspaceMemberEvents,
-    };
+    });
   }
 
   window.PropertyDeskWorkspace = Object.freeze({ create });

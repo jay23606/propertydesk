@@ -23,11 +23,11 @@
       profileView.attachEvents(profile.saveProfile);
     }
 
-    return {
+    return Object.freeze({
       updateGreeting: profileDisplay.updateGreeting,
       renderProfileSettings,
       attachProfileEvents,
-    };
+    });
   }
 
   window.PropertyDeskWorkspaceProfileWorkflow = Object.freeze({ create });

@@ -78,6 +78,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     "function",
   );
   assert.equal(workflow.updateGreeting, updateGreeting);
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(typeof workflow.previewReminderEmail, "function");
   workflow.renderWorkspacePage();
   assert.equal(passed.displayName, "Owner");

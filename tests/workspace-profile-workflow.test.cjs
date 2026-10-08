@@ -60,6 +60,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   assert.equal(passed.settings.authClient, dependencies.authClient);
   assert.equal(passed.settings.updateGreeting, updateGreeting);
   assert.equal(workflow.updateGreeting, updateGreeting);
+  assert.equal(Object.isFrozen(workflow), true);
   workflow.renderProfileSettings();
   assert.equal(passed.displayName, "Workspace");
   workflow.attachProfileEvents();
