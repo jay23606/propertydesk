@@ -7,6 +7,8 @@
     accountDetails,
     depositWorkspaceWorkflow,
     accountDetailWorkspaceWorkflow,
+    accountDetailActionWorkflow,
+    accountDetailActionWorkflows,
   }) {
     const depositWorkspace = depositWorkspaceWorkflow.create({
       details: {
@@ -30,6 +32,8 @@
       },
     });
     const accountDetailWorkspace = accountDetailWorkspaceWorkflow.create({
+      actionWorkflow: accountDetailActionWorkflow,
+      actionWorkflows: accountDetailActionWorkflows,
       content: {
         $: accountDetails.content.$,
         state: accountDetails.content.state,

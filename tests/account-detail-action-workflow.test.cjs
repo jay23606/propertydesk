@@ -12,6 +12,14 @@ function loadWorkflow(context, filename) {
 }
 
 test("account detail action workflow wires only account close concerns", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-detail-action-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskAccount(?:Close|DetailEvents)[^.]*\.create/,
+  );
   const passed = {};
   const repository = { close() {} };
   const saveCloseAccount = () => {};
@@ -55,12 +63,21 @@ test("account detail action workflow wires only account close concerns", () => {
     editAccount() {},
     openPayment() {},
     repository,
+    workflows: {
+      closeMaintenance: context.window.PropertyDeskAccountCloseMaintenance,
+      closeEntry: context.window.PropertyDeskAccountCloseEntry,
+      detailEvents: context.window.PropertyDeskAccountDetailEvents,
+    },
   };
   const workflow =
     context.window.PropertyDeskAccountDetailActionWorkflow.create(dependencies);
 
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance.state, dependencies.state);
+  assert.equal(
+    dependencies.workflows.closeMaintenance,
+    context.window.PropertyDeskAccountCloseMaintenance,
+  );
   assert.equal(passed.maintenance.repository, repository);
   assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
   assert.equal(passed.entry.saveCloseAccount, saveCloseAccount);

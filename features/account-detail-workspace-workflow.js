@@ -2,7 +2,12 @@
 (() => {
   "use strict";
 
-  function createAccountDetailWorkspaceWorkflow({ content, actions }) {
+  function createAccountDetailWorkspaceWorkflow({
+    content,
+    actions,
+    actionWorkflow,
+    actionWorkflows,
+  }) {
     const { openAccountDetails } =
       window.PropertyDeskAccountDetailContentWorkflow.create({
         $: content.$,
@@ -20,17 +25,17 @@
         depositSectionHTML: content.depositSectionHTML,
         accountHistoryRepository: content.accountHistoryRepository,
       });
-    const { attachAccountDetailActionEvents } =
-      window.PropertyDeskAccountDetailActionWorkflow.create({
-        $: actions.$,
-        state: actions.state,
-        toast: actions.toast,
-        fetchAll: actions.fetchAll,
-        closeModal: actions.closeModal,
-        editAccount: actions.editAccount,
-        openPayment: actions.openPayment,
-        repository: actions.repository,
-      });
+    const { attachAccountDetailActionEvents } = actionWorkflow.create({
+      $: actions.$,
+      state: actions.state,
+      toast: actions.toast,
+      fetchAll: actions.fetchAll,
+      closeModal: actions.closeModal,
+      editAccount: actions.editAccount,
+      openPayment: actions.openPayment,
+      repository: actions.repository,
+      workflows: actionWorkflows,
+    });
 
     return Object.freeze({
       openAccountDetails,

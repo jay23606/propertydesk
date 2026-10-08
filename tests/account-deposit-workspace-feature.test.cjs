@@ -32,6 +32,10 @@ test("account and deposit workspace exposes only its supported operations", () =
           };
         },
       },
+      PropertyDeskAccountDetailActionWorkflow: { create() {} },
+      PropertyDeskAccountCloseMaintenance: { create() {} },
+      PropertyDeskAccountCloseEntry: { create() {} },
+      PropertyDeskAccountDetailEvents: { create() {} },
     },
   });
   vm.runInContext(
@@ -104,6 +108,13 @@ test("account and deposit workspace exposes only its supported operations", () =
         context.window.PropertyDeskDepositWorkspaceWorkflow,
       accountDetailWorkspaceWorkflow:
         context.window.PropertyDeskAccountDetailWorkspaceWorkflow,
+      accountDetailActionWorkflow:
+        context.window.PropertyDeskAccountDetailActionWorkflow,
+      accountDetailActionWorkflows: {
+        closeMaintenance: context.window.PropertyDeskAccountCloseMaintenance,
+        closeEntry: context.window.PropertyDeskAccountCloseEntry,
+        detailEvents: context.window.PropertyDeskAccountDetailEvents,
+      },
       deposits,
       accountDetails,
     });
@@ -233,7 +244,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountWorkspaceWorkflow,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?PropertyDeskAccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
   );
   const accountDepositWorkspaceWorkflow = fs.readFileSync(
     path.join(
@@ -273,12 +284,9 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     path.join(__dirname, "..", "features", "account-detail-action-workflow.js"),
     "utf8",
   );
-  for (const feature of [
-    "PropertyDeskAccountCloseMaintenance",
-    "PropertyDeskAccountCloseEntry",
-    "PropertyDeskAccountDetailEvents",
-  ])
-    assert.match(accountWorkflow, new RegExp(`${feature}\\.create\\(`));
+  assert.match(accountWorkflow, /closeMaintenanceWorkflow\.create\(/);
+  assert.match(accountWorkflow, /closeEntryWorkflow\.create\(/);
+  assert.match(accountWorkflow, /detailEventsWorkflow\.create\(/);
   assert.match(
     accountWorkflow,
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
@@ -310,6 +318,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(app, /repository: repositories\.accounts/);
   assert.match(app, /repository: repositories\.deposits/);
+  assert.match(
+    app,
+    /accountDetailActionWorkflow:\s*window\.PropertyDeskAccountDetailActionWorkflow/,
+  );
   assert.match(
     app,
     /prepareAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.prepare/,

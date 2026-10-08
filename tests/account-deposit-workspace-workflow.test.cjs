@@ -60,6 +60,10 @@ test("account and deposit workspace share detail rendering and events", () => {
           return { openAccountDetails, attachAccountDetailActionEvents };
         },
       },
+      PropertyDeskAccountDetailActionWorkflow: { create() {} },
+      PropertyDeskAccountCloseMaintenance: { create() {} },
+      PropertyDeskAccountCloseEntry: { create() {} },
+      PropertyDeskAccountDetailEvents: { create() {} },
     },
   });
   vm.runInContext(
@@ -81,6 +85,13 @@ test("account and deposit workspace share detail rendering and events", () => {
         context.window.PropertyDeskDepositWorkspaceWorkflow,
       accountDetailWorkspaceWorkflow:
         context.window.PropertyDeskAccountDetailWorkspaceWorkflow,
+      accountDetailActionWorkflow:
+        context.window.PropertyDeskAccountDetailActionWorkflow,
+      accountDetailActionWorkflows: {
+        closeMaintenance: context.window.PropertyDeskAccountCloseMaintenance,
+        closeEntry: context.window.PropertyDeskAccountCloseEntry,
+        detailEvents: context.window.PropertyDeskAccountDetailEvents,
+      },
       deposits,
       accountDetails: { content, actions },
     });

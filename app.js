@@ -278,6 +278,12 @@
     depositWorkspaceWorkflow: window.PropertyDeskDepositWorkspaceWorkflow,
     accountDetailWorkspaceWorkflow:
       window.PropertyDeskAccountDetailWorkspaceWorkflow,
+    accountDetailActionWorkflow: window.PropertyDeskAccountDetailActionWorkflow,
+    accountDetailActionWorkflows: {
+      closeMaintenance: window.PropertyDeskAccountCloseMaintenance,
+      closeEntry: window.PropertyDeskAccountCloseEntry,
+      detailEvents: window.PropertyDeskAccountDetailEvents,
+    },
     deposits: {
       details: {
         state,

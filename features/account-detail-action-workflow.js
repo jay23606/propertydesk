@@ -11,27 +11,30 @@
     editAccount,
     openPayment,
     repository,
+    workflows: {
+      closeMaintenance: closeMaintenanceWorkflow,
+      closeEntry: closeEntryWorkflow,
+      detailEvents: detailEventsWorkflow,
+    },
   }) {
-    const { saveCloseAccount } =
-      window.PropertyDeskAccountCloseMaintenance.create({
-        state,
-        toast,
-        fetchAll,
-        closeAccountDetails: () => closeModal($("detail-modal")),
-        repository,
-      });
-    const { closeAccount } = window.PropertyDeskAccountCloseEntry.create({
+    const { saveCloseAccount } = closeMaintenanceWorkflow.create({
+      state,
+      toast,
+      fetchAll,
+      closeAccountDetails: () => closeModal($("detail-modal")),
+      repository,
+    });
+    const { closeAccount } = closeEntryWorkflow.create({
       saveCloseAccount,
     });
-    const { attachAccountDetailActionEvents } =
-      window.PropertyDeskAccountDetailEvents.create({
-        $,
-        state,
-        closeModal,
-        editAccount,
-        openPayment,
-        closeAccount,
-      });
+    const { attachAccountDetailActionEvents } = detailEventsWorkflow.create({
+      $,
+      state,
+      closeModal,
+      editAccount,
+      openPayment,
+      closeAccount,
+    });
 
     return Object.freeze({ attachAccountDetailActionEvents });
   }

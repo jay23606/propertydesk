@@ -8,6 +8,11 @@ test("account detail workspace joins content rendering and action binding", () =
   const passed = {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
+  const actionWorkflows = {
+    closeMaintenance: { create() {} },
+    closeEntry: { create() {} },
+    detailEvents: { create() {} },
+  };
   const content = {
     $() {},
     state: {},
@@ -69,6 +74,8 @@ test("account detail workspace joins content rendering and action binding", () =
     context.window.PropertyDeskAccountDetailWorkspaceWorkflow.create({
       content,
       actions,
+      actionWorkflow: context.window.PropertyDeskAccountDetailActionWorkflow,
+      actionWorkflows,
     });
 
   assert.deepEqual(Object.keys(passed.content).sort(), [
@@ -96,11 +103,13 @@ test("account detail workspace joins content rendering and action binding", () =
     "repository",
     "state",
     "toast",
+    "workflows",
   ]);
   for (const key of Object.keys(passed.content))
     assert.equal(passed.content[key], content[key]);
   for (const key of Object.keys(passed.actions))
-    assert.equal(passed.actions[key], actions[key]);
+    if (key === "workflows") assert.equal(passed.actions[key], actionWorkflows);
+    else assert.equal(passed.actions[key], actions[key]);
   assert.equal("unusedDependency" in passed.content, false);
   assert.equal("unusedDependency" in passed.actions, false);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
