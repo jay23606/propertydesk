@@ -61,6 +61,7 @@
         fetchAll,
         beforeRefresh: () => toast("Agreement uploaded privately"),
         afterRefresh: () => openPropertyDetails(propertyId),
+        toast,
         refreshFailureMessage:
           "Agreement was uploaded, but the workspace could not refresh. Reload before uploading it again.",
       });

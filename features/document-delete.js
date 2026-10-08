@@ -67,6 +67,7 @@
         fetchAll,
         beforeRefresh: () => toast("Agreement deleted"),
         afterRefresh: () => openPropertyDetails(propertyId),
+        toast,
         refreshFailureMessage:
           "Agreement was deleted, but the workspace could not refresh. Reload to verify its status before trying again.",
       });

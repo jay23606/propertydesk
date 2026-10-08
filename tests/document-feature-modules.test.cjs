@@ -306,6 +306,91 @@ test("agreement deletion removes only the selected workspace file before refresh
   assert.deepEqual(calls.at(-1), ["open", "property-1"]);
 });
 
+test("document upload reports a saved file when the workspace refresh fails", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from: () => ({ upload: async () => ({ error: null }) }),
+      },
+      from: () => ({ insert: async () => ({ error: null }) }),
+    },
+  };
+  const events = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      events.push(["refresh"]);
+      throw new Error("offline");
+    },
+    openPropertyDetails: () => assert.fail("details should not reopen"),
+    makeId: () => "file-id",
+  });
+
+  await feature.uploadPropertyDocument({
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  });
+
+  assert.deepEqual(events, [
+    ["toast", "Agreement uploaded privately"],
+    ["refresh"],
+    [
+      "toast",
+      "Agreement was uploaded, but the workspace could not refresh. Reload before uploading it again.",
+    ],
+  ]);
+});
+
+test("document deletion reports a deleted file when the workspace refresh fails", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [
+      {
+        id: "doc-1",
+        user_id: "workspace-1",
+        property_id: "property-1",
+        storage_path: "workspace-1/property-1/file.pdf",
+        file_name: "file.pdf",
+      },
+    ],
+  };
+  const events = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      events.push(["refresh"]);
+      throw new Error("offline");
+    },
+    openPropertyDetails: () => assert.fail("details should not reopen"),
+    confirm: () => true,
+    repository: {
+      remove: async () => ({ error: null }),
+      deleteMetadata: async () => ({ error: null }),
+    },
+  });
+
+  await feature.deletePropertyDocument("doc-1");
+
+  assert.deepEqual(events, [
+    ["toast", "Agreement deleted"],
+    ["refresh"],
+    [
+      "toast",
+      "Agreement was deleted, but the workspace could not refresh. Reload to verify its status before trying again.",
+    ],
+  ]);
+});
+
 test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);
