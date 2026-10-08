@@ -32,6 +32,7 @@ test("app startup composes auth and lifecycle at the original event position", (
       },
       PropertyDeskAppLifecycle: {
         create(options) {
+          assert.equal("unusedStartupValue" in options, false);
           assert.equal(options.backendConfigured, true);
           assert.equal(options.initializeClient, initializeClient);
           assert.equal(options.authClient, authClient);
@@ -78,6 +79,7 @@ test("app startup composes auth and lifecycle at the original event position", (
     renderers,
     eventBindersBeforeAuth: [firstBinder, secondBinder],
     eventBindersAfterAuth: [thirdBinder],
+    unusedStartupValue: true,
   };
   const lifecycle =
     context.window.PropertyDeskAppStartupWorkflow.create(startupContext);

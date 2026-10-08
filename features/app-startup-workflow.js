@@ -2,19 +2,18 @@
 (() => {
   "use strict";
 
-  function createAppStartupWorkflow(context) {
-    const {
-      $,
-      backendConfigured,
-      initializeClient,
-      authClient,
-      todayIso,
-      registerShell,
-      authContext,
-      renderers,
-      eventBindersBeforeAuth,
-      eventBindersAfterAuth,
-    } = context;
+  function createAppStartupWorkflow({
+    $,
+    backendConfigured,
+    initializeClient,
+    authClient,
+    todayIso,
+    registerShell,
+    authContext,
+    renderers,
+    eventBindersBeforeAuth,
+    eventBindersAfterAuth,
+  }) {
     const auth = window.PropertyDeskAuth.create({
       $: authContext.$,
       state: authContext.state,
