@@ -9,13 +9,23 @@
     );
   }
 
+  function safeArchiveSegment(value, fallback) {
+    const safeValue = String(value || fallback)
+      .normalize("NFKC")
+      .replace(/[^\w.-]/g, "_")
+      .slice(0, 100);
+    return safeValue && !/^\.+$/.test(safeValue) ? safeValue : fallback;
+  }
+
   function archivePathFor(doc) {
+    const propertyId = safeArchiveSegment(doc.property_id, "unassigned");
+    const documentId = safeArchiveSegment(doc.id, "document");
     const safeName =
       String(doc.file_name || "agreement")
         .normalize("NFKC")
         .replace(/[^\w.-]/g, "_")
         .slice(-100) || "agreement";
-    return `agreements/${doc.property_id || "unassigned"}/${doc.id}-${safeName}`;
+    return `agreements/${propertyId}/${documentId}-${safeName}`;
   }
 
   function archiveManifestRecord(doc, path, byteLength) {

@@ -69,3 +69,47 @@ test("backup agreement collector downloads only workspace-scoped files into the 
   assert.equal(collected.includedFiles[0].content_type, "application/pdf");
   assert.equal(collected.includedFiles[0].property_id, "property-1");
 });
+
+test("backup agreement archive paths cannot escape the agreements folder", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "backup-agreement-files.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const collected =
+    await context.window.PropertyDeskBackupAgreementFiles.collect({
+      documents: [
+        {
+          id: "../../outside",
+          property_id: "../../outside",
+          storage_path: "workspace-1/property-1/doc-1-file.pdf",
+          file_name: "file.pdf",
+        },
+      ],
+      workspaceOwnerId: "workspace-1",
+      repository: {
+        async download() {
+          return {
+            data: {
+              async arrayBuffer() {
+                return new Uint8Array([1]).buffer;
+              },
+            },
+            error: null,
+          };
+        },
+      },
+    });
+
+  assert.equal(
+    collected.entries[0].name,
+    "agreements/.._.._outside/.._.._outside-file.pdf",
+  );
+  assert.equal(
+    collected.entries[0].name.split("/").some((segment) => segment === ".."),
+    false,
+  );
+});
