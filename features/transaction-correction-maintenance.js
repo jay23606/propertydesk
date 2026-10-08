@@ -29,6 +29,7 @@
         fetchAll,
         toast,
         successMessage: `${kind === "payment" ? "Payment" : "Expense"} corrected; original kept in history`,
+        refreshFailureMessage: `${kind === "payment" ? "Payment" : "Expense"} correction was saved, but the workspace could not refresh. Reload before trying again.`,
       });
     }
 

@@ -37,6 +37,8 @@
           fetchAll,
           toast,
           successMessage: "Transaction voided; original entry preserved",
+          refreshFailureMessage:
+            "Transaction was voided, but the workspace could not refresh. Reload to verify its status before making another change.",
         })
       )
         return true;

@@ -188,3 +188,29 @@ test("post-write refresh suppresses success feedback when reload fails", async (
   );
   assert.deepEqual(events, ["refresh"]);
 });
+
+test("post-write refresh reports a saved change when reload fails", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      fetchAll: async () => {
+        events.push("refresh");
+        throw new Error("offline");
+      },
+      toast: (message) => events.push(["toast", message]),
+      successMessage: "Payment corrected",
+      refreshFailureMessage:
+        "Payment correction was saved, but the workspace could not refresh.",
+    }),
+    false,
+  );
+  assert.deepEqual(events, [
+    "refresh",
+    [
+      "toast",
+      "Payment correction was saved, but the workspace could not refresh.",
+    ],
+  ]);
+});

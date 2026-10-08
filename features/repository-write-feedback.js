@@ -36,11 +36,13 @@
     afterRefresh,
     toast,
     successMessage,
+    refreshFailureMessage,
   }) {
     beforeRefresh?.();
     try {
       await fetchAll();
     } catch {
+      if (refreshFailureMessage) toast(refreshFailureMessage);
       return false;
     }
     afterRefresh?.();
