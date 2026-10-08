@@ -301,9 +301,6 @@
 .portfolio-table {
   overflow: auto;
 }
-.portfolio-table table {
-  min-width: 1120px;
-}
 .portfolio-row-actions {
   display: flex;
   gap: 6px;

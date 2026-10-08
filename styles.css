@@ -1205,7 +1205,7 @@ button {
   overscroll-behavior-x: contain;
 }
 .portfolio-table table {
-  min-width: 1040px;
+  min-width: 1120px;
 }
 .portfolio-due {
   font-weight: 700;
@@ -1215,9 +1215,6 @@ button {
 @media (max-width: 760px) {
   .portfolio-table {
     border-radius: 8px;
-  }
-  .portfolio-table table {
-    min-width: 930px;
   }
   .portfolio-table th,
   .portfolio-table td {
