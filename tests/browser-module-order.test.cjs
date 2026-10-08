@@ -363,14 +363,6 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/ledger-context.js", "features/workspace-financial-context.js"],
     ["features/deposit-context.js", "features/workspace-financial-context.js"],
     ["features/transaction-maintenance-workflow.js", "app.js"],
-    [
-      "features/ledger-entry-forms.js",
-      "features/transaction-workspace-workflow.js",
-    ],
-    [
-      "features/transaction-screen-workflow.js",
-      "features/transaction-workspace-workflow.js",
-    ],
     ["features/auth.js", "features/app-startup-workflow.js"],
     ["features/app-lifecycle.js", "features/app-startup-workflow.js"],
     [
@@ -406,10 +398,7 @@ test("browser feature scripts load after their dependencies", () => {
     ],
     ["features/account-form.js", "features/property-account-entry-workflow.js"],
     ["features/property-account-entry-workflow.js", "app.js"],
-    [
-      "features/ledger-entry-forms.js",
-      "features/transaction-workspace-workflow.js",
-    ],
+    ["features/ledger-entry-forms.js", "app.js"],
     ["features/create-actions.js", "app.js"],
     ["features/transaction-payloads.js", "features/ledger-entry-forms.js"],
     ["features/transaction-corrections.js", "app.js"],

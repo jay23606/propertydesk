@@ -18,13 +18,11 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
   );
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:RecordEntry|TransactionScreen)Workflow\.create\(/,
-  );
+  assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.match(app, /accountHistoryRepository: repositories\.accountHistory/);
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
@@ -85,23 +83,14 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  const transactionWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
-    "utf8",
+  assert.match(
+    app,
+    /LedgerEntryForms\.create\(\{[\s\S]*?transactionRepository: repositories\.transactions,[\s\S]*?transactionPayloads: window\.PropertyDeskTransactionPayloads,[\s\S]*?saveCorrection: transactionMaintenance\.saveCorrection/,
   );
   assert.match(
-    transactionWorkflow,
-    /LedgerEntryForms\.create\(\{[\s\S]*?transactionRepository: entryContext\.transactionRepository,[\s\S]*?transactionPayloads: entryContext\.transactionPayloads,[\s\S]*?saveCorrection: maintenance\.saveCorrection/,
+    app,
+    /PropertyDeskTransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance,[\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
-  assert.doesNotMatch(
-    transactionWorkflow,
-    /TransactionMaintenanceWorkflow\.create\(/,
-  );
-  assert.match(
-    transactionWorkflow,
-    /TransactionScreenWorkflow\.create\([\s\S]*?transactionMaintenance: maintenance,[\s\S]*?openPayment: entry\.openPayment/,
-  );
-  assert.doesNotMatch(transactionWorkflow, /PropertyDeskCreateActions\.create/);
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });
 
@@ -132,12 +121,9 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDesk(?:RecordEntry|TransactionScreen)Workflow\.create\(/,
-  );
+  assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(app, /window\.PropertyDeskAccountMaintenance\.create\(/);
@@ -152,7 +138,7 @@ test("app coordinator passes the amortization helper into account details", () =
   }
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow\.create/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create/);
 });
 
 test("property workspace composes screens and shares detail actions", () => {
@@ -241,7 +227,8 @@ test("app root composes shared state and workspace services directly", () => {
   assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountFinancialSummary\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Ledger|Deposit)Context\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
