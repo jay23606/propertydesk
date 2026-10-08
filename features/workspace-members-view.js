@@ -37,11 +37,7 @@
       });
     }
 
-    return {
-      attachEvents,
-      clearMemberEmail,
-      renderWorkspaceMembers,
-    };
+    return { attachEvents, renderWorkspaceMembers };
   }
 
   window.PropertyDeskWorkspaceMembersView = Object.freeze({ create });

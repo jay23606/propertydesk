@@ -95,6 +95,21 @@ test("workspace settings render member labels and escape untrusted text", () => 
   assert.equal(element("display-name").value, "Owner");
 });
 
+test("workspace member view exposes only rendering and event binding", () => {
+  const context = vm.createContext({ window: {} });
+  loadWorkspaceFeatures(context);
+  const view = context.window.PropertyDeskWorkspaceMembersView.create({
+    $: () => ({}),
+    state: { workspaceMembers: [] },
+    esc: String,
+  });
+
+  assert.deepEqual(Object.keys(view).sort(), [
+    "attachEvents",
+    "renderWorkspaceMembers",
+  ]);
+});
+
 test("profile settings view reads a trimmed name and prevents a page submit", () => {
   const context = vm.createContext({ window: {} });
   loadWorkspaceFeatures(context);
