@@ -13,17 +13,22 @@
       nextArguments = [],
     }) {
       resetAfterSave(...resetArguments);
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        afterRefresh: () => {
-          if (addAnother) prepareNext(...nextArguments);
-          else closeModal($(modalId));
-        },
-        toast,
-        successMessage: addAnother
-          ? `${label} recorded. Ready for the next entry`
-          : `${label} recorded`,
-      });
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            if (addAnother) prepareNext(...nextArguments);
+            else closeModal($(modalId));
+          },
+          toast,
+          successMessage: addAnother
+            ? `${label} recorded. Ready for the next entry`
+            : `${label} recorded`,
+        });
+      if (!refreshed)
+        toast(
+          `${label} was saved, but the workspace could not refresh. Reload before recording it again.`,
+        );
     }
 
     async function saveTransactionEntry({

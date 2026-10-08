@@ -100,3 +100,40 @@ test("failed transaction insert skips successful-entry completion", async () => 
 
   assert.deepEqual(calls, []);
 });
+
+test("saved transaction explains refresh failure to prevent duplicate entry", async () => {
+  const context = loadSaveWorkflow();
+  const calls = [];
+  const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
+    $: (id) => id,
+    state: { pendingCorrection: null },
+    saveCorrection() {},
+    closeModal: (id) => calls.push(["close", id]),
+    fetchAll: async () => {
+      calls.push(["refresh"]);
+      throw new Error("offline");
+    },
+    toast: (message) => calls.push(["toast", message]),
+  });
+
+  await workflow.saveTransactionEntry({
+    kind: "payment",
+    event: { submitter: { id: "payment-save" } },
+    payload: { amount: 550 },
+    buildCorrection: (payload) => payload,
+    insert: async () => true,
+    failureMessage: "payment failed",
+    label: "Payment",
+    modalId: "payment-modal",
+    resetAfterSave: () => calls.push(["reset"]),
+  });
+
+  assert.deepEqual(calls, [
+    ["reset"],
+    ["refresh"],
+    [
+      "toast",
+      "Payment was saved, but the workspace could not refresh. Reload before recording it again.",
+    ],
+  ]);
+});

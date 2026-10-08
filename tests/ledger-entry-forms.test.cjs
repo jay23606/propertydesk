@@ -268,7 +268,11 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     resetAfterSave: (accountId) => calls.push(`reset-payment:${accountId}`),
     resetArguments: ["account-2"],
   });
-  assert.deepEqual(calls.slice(-2), ["reset-payment:account-2", "refresh"]);
+  assert.deepEqual(calls.slice(-3), [
+    "reset-payment:account-2",
+    "refresh",
+    "toast:Payment was saved, but the workspace could not refresh. Reload before recording it again.",
+  ]);
 });
 
 test("property/account forms and ledger-entry forms expose separate workflows", () => {
