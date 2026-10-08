@@ -67,7 +67,6 @@ test("reminder preview model derives the due and email content from current term
     subjectAddress: "10 Main St",
     unpaidDue: "USD 550.00",
     recipientName: "Buyer",
-    senderName: "PropertyDesk",
     month: "October 2026",
     asOf: "2026-10-31",
   });
@@ -77,6 +76,6 @@ test("reminder preview model derives the due and email content from current term
     label: "October 2026",
     schedule:
       "Last day of October 2026, only when no rent or installment payment is recorded that month",
-    body: "Hello Buyer, our records show USD 550.00 unpaid for October 2026 at 10 Main St. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
+    body: "Hi Buyer,\n\nOur records show USD 550.00 unpaid for 10 Main St (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   });
 });

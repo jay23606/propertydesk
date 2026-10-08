@@ -7,6 +7,7 @@
     subjectAddress = address,
     unpaidDue,
     recipientName,
+    senderName,
     month,
   }) {
     const period =
@@ -17,7 +18,17 @@
       }).format(new Date());
     const subject = `Payment reminder for ${subjectAddress} · ${period}`;
     const name = String(recipientName || "").trim() || "there";
-    const body = `Hello ${name}, our records show ${unpaidDue} unpaid for ${period} at ${address}. Please arrange payment promptly, or contact me if you believe our records are incorrect.`;
+    const sender = String(senderName || "").trim();
+    const body = [
+      `Hi ${name},`,
+      "",
+      `Our records show ${unpaidDue} unpaid for ${address} (tracked since October 2026; earlier balances may not be included).`,
+      "",
+      "Please arrange payment promptly or contact me with questions.",
+      "",
+      "Thanks!",
+      ...(sender ? [sender] : []),
+    ].join("\n");
 
     return { subject, body };
   }

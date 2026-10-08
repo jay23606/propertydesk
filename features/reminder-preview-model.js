@@ -30,7 +30,6 @@
         subjectAddress: property.address,
         unpaidDue: money(amount),
         recipientName: account.party_name,
-        senderName: "PropertyDesk",
         month: label,
         asOf: endDate,
       });

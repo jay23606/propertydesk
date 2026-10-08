@@ -30,11 +30,11 @@ test("reminder email uses the requested wording and safely escapes its HTML vers
   );
   assert.equal(
     message.text,
-    "Hello Ana & <Sam>, our records show $550.00 unpaid for October 2026 at 12 <Main> & 2nd, Town, PA, 17000. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
+    "Hi Ana & <Sam>,\n\nOur records show $550.00 unpaid for 12 <Main> & 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   );
   assert.equal(
     message.html,
-    "Hello Ana &amp; &lt;Sam&gt;, our records show $550.00 unpaid for October 2026 at 12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000. Please arrange payment promptly, or contact me if you believe our records are incorrect.",
+    "Hi Ana &amp; &lt;Sam&gt;,<br><br>Our records show $550.00 unpaid for 12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances may not be included).<br><br>Please arrange payment promptly or contact me with questions.<br><br>Thanks!",
   );
 });
 
@@ -59,7 +59,6 @@ test("automated reminders and manual drafts share the same plain-text message", 
     address: "12 Main St, Town, PA, 17000",
     unpaidDue: "$550.00",
     recipientName: account.party_name,
-    senderName: "PropertyDesk",
     month: "October 2026",
     asOf: "2026-10-31",
   });
@@ -78,8 +77,8 @@ test("reminder message greets the recipient generically when no name is set", as
     100,
   );
 
-  assert.match(message.text, /^Hello there, our records show/);
-  assert.match(message.html, /^Hello there, our records show/);
+  assert.match(message.text, /^Hi there,\n\nOur records show/);
+  assert.match(message.html, /^Hi there,<br><br>Our records show/);
 });
 
 test("month-end detection uses New York calendar time, including daylight-saving boundaries", async () => {
