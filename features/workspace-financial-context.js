@@ -36,7 +36,7 @@
       securityDepositBalance: depositCalculations.securityDepositBalance,
     });
 
-    return {
+    return Object.freeze({
       isPosted: postedLedgerUtils.isPosted,
       paymentStatusInMonth: postedLedgerUtils.paymentStatusInMonth,
       postedOnOrAfter: postedLedgerUtils.postedOnOrAfter,
@@ -52,7 +52,7 @@
       collectedSince: financial.collectedSince,
       summarizeAccount: financial.summarizeAccount,
       depositLedger: deposits.depositLedger,
-    };
+    });
   }
 
   window.PropertyDeskWorkspaceFinancialContext = Object.freeze({

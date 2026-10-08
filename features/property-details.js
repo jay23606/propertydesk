@@ -44,7 +44,7 @@
       openModal("property-detail-modal");
     }
 
-    return { openPropertyDetails };
+    return Object.freeze({ openPropertyDetails });
   }
 
   window.PropertyDeskPropertyDetails = Object.freeze({

@@ -18,7 +18,7 @@
       timer = setTimeoutFn(() => element.classList.remove("show"), delayMs);
     }
 
-    return { toast };
+    return Object.freeze({ toast });
   }
 
   window.PropertyDeskNotifications = Object.freeze({ create });

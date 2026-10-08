@@ -39,7 +39,7 @@
       await auth.restoreAuthSession();
     }
 
-    return { render, initialize };
+    return Object.freeze({ render, initialize });
   }
 
   window.PropertyDeskAppLifecycle = Object.freeze({ create });

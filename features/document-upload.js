@@ -93,7 +93,7 @@
       }
     }
 
-    return { uploadPropertyDocument };
+    return Object.freeze({ uploadPropertyDocument });
   }
 
   window.PropertyDeskDocumentUpload = Object.freeze({ create });

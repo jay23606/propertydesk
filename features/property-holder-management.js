@@ -58,7 +58,7 @@
       });
     }
 
-    return { savePropertyHolders };
+    return Object.freeze({ savePropertyHolders });
   }
 
   window.PropertyDeskPropertyHolderManagement = Object.freeze({ create });

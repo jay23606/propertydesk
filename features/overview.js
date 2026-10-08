@@ -22,7 +22,7 @@
         '<div class="list-empty">Add your first property to build your portfolio.</div>';
     }
 
-    return { renderOverview };
+    return Object.freeze({ renderOverview });
   }
 
   window.PropertyDeskOverview = Object.freeze({ create: createOverview });

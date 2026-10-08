@@ -30,7 +30,7 @@
       return { blob, recordCount, agreementCount: includedFiles.length };
     }
 
-    return { prepare };
+    return Object.freeze({ prepare });
   }
 
   window.PropertyDeskBackupArchive = Object.freeze({ create });

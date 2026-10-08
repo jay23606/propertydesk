@@ -69,7 +69,7 @@
     }
 
     populateSelectOptions();
-    return { fillSelect, populateFormOptions };
+    return Object.freeze({ fillSelect, populateFormOptions });
   }
 
   window.PropertyDeskFormOptions = Object.freeze({ create });

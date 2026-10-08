@@ -52,7 +52,7 @@
       openModal("reminder-preview-modal");
     }
 
-    return { previewReminderEmail };
+    return Object.freeze({ previewReminderEmail });
   }
 
   window.PropertyDeskReminderPreview = Object.freeze({ create });

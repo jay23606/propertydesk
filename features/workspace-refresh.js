@@ -60,7 +60,7 @@
       renderWorkspace(fetchId, userId);
     }
 
-    return { fetchAll };
+    return Object.freeze({ fetchAll });
   }
 
   window.PropertyDeskWorkspaceRefresh = Object.freeze({ create });

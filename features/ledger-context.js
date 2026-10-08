@@ -23,11 +23,11 @@
       return sumPosted(payments);
     }
 
-    return {
+    return Object.freeze({
       accountBalance,
       scheduledMonthlyRunRate,
       collectedSince,
-    };
+    });
   }
 
   window.PropertyDeskLedgerContext = Object.freeze({ create });

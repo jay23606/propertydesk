@@ -34,7 +34,7 @@
       };
     }
 
-    return { renderPropertyActivity };
+    return Object.freeze({ renderPropertyActivity });
   }
 
   window.PropertyDeskPropertyActivityDetails = Object.freeze({

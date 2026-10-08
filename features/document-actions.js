@@ -28,7 +28,7 @@
       repository,
     });
 
-    return { deletePropertyDocument, openPropertyDocument };
+    return Object.freeze({ deletePropertyDocument, openPropertyDocument });
   }
 
   window.PropertyDeskDocumentActions = Object.freeze({ create });

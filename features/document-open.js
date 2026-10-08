@@ -38,7 +38,7 @@
       viewer.location.href = data.signedUrl;
     }
 
-    return { openPropertyDocument };
+    return Object.freeze({ openPropertyDocument });
   }
 
   window.PropertyDeskDocumentOpen = Object.freeze({ create });

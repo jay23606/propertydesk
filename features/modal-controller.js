@@ -49,7 +49,7 @@
       });
     }
 
-    return { attachEvents, openModal, closeModal };
+    return Object.freeze({ attachEvents, openModal, closeModal });
   }
 
   window.PropertyDeskModalController = Object.freeze({ create });

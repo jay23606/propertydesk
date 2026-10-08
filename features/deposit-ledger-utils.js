@@ -23,7 +23,7 @@
       return { active, totals };
     }
 
-    return { securityDepositBalance };
+    return Object.freeze({ securityDepositBalance });
   }
 
   globalThis.PropertyDeskDepositLedgerUtils = Object.freeze({

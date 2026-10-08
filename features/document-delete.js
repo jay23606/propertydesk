@@ -85,7 +85,7 @@
       await refreshDeletedProperty(propertyId);
     }
 
-    return { deletePropertyDocument };
+    return Object.freeze({ deletePropertyDocument });
   }
 
   window.PropertyDeskDocumentDelete = Object.freeze({ create });

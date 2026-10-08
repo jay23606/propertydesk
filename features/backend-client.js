@@ -18,7 +18,7 @@
       });
     }
 
-    return { configured, createClient };
+    return Object.freeze({ configured, createClient });
   }
 
   window.PropertyDeskBackendClient = Object.freeze({

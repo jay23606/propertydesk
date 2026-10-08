@@ -41,7 +41,7 @@
       render,
     });
 
-    return {
+    return Object.freeze({
       backendConfigured: backend.configured,
       state,
       fetchAll,
@@ -50,7 +50,7 @@
       repositories: repositoryAdapters,
       initializeClient,
       isClientReady: () => Boolean(client),
-    };
+    });
   }
 
   window.PropertyDeskWorkspaceRuntime = Object.freeze({

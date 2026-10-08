@@ -31,7 +31,7 @@
       toast("Display name saved");
     }
 
-    return { saveProfile };
+    return Object.freeze({ saveProfile });
   }
 
   window.PropertyDeskProfileSettings = Object.freeze({

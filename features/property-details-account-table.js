@@ -48,7 +48,7 @@
         </div>`;
     }
 
-    return { propertyAccountsHTML };
+    return Object.freeze({ propertyAccountsHTML });
   }
 
   window.PropertyDeskPropertyDetailsAccountTable = Object.freeze({

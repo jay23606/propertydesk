@@ -40,7 +40,7 @@
       });
     }
 
-    return { editPropertyQuickNote };
+    return Object.freeze({ editPropertyQuickNote });
   }
 
   window.PropertyDeskPropertyQuickNote = Object.freeze({ create });

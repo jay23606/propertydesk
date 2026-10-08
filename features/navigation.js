@@ -38,7 +38,7 @@
       });
     }
 
-    return { navigate, attachEvents };
+    return Object.freeze({ navigate, attachEvents });
   }
 
   window.PropertyDeskNavigation = Object.freeze({ create });

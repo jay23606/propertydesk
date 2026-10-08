@@ -31,7 +31,7 @@
       );
     }
 
-    return { stage };
+    return Object.freeze({ stage });
   }
 
   window.PropertyDeskImportReview = Object.freeze({

@@ -67,7 +67,7 @@
         });
     }
 
-    return { attachCreateActionEvents };
+    return Object.freeze({ attachCreateActionEvents });
   }
 
   window.PropertyDeskCreateActions = Object.freeze({ create: createActions });

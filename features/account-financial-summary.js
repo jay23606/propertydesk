@@ -20,7 +20,7 @@
       };
     }
 
-    return { summarizeAccount };
+    return Object.freeze({ summarizeAccount });
   }
 
   window.PropertyDeskAccountFinancialSummary = Object.freeze({

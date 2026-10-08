@@ -19,7 +19,7 @@
       return runInsert(() => repository.insertExpense(payload), failureMessage);
     }
 
-    return { insertPayment, insertExpense };
+    return Object.freeze({ insertPayment, insertExpense });
   }
 
   window.PropertyDeskTransactionInserts = Object.freeze({ create });

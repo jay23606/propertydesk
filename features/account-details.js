@@ -46,7 +46,7 @@
       openModal("detail-modal");
     }
 
-    return { openAccountDetails };
+    return Object.freeze({ openAccountDetails });
   }
 
   window.PropertyDeskAccountDetails = Object.freeze({

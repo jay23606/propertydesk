@@ -42,7 +42,7 @@
       await finish({ data, fallbackCount: rows.length, total, label });
     }
 
-    return { commitAccounts, commitTransactions };
+    return Object.freeze({ commitAccounts, commitTransactions });
   }
 
   window.PropertyDeskImportCommit = Object.freeze({

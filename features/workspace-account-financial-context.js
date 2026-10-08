@@ -23,12 +23,12 @@
       todayIso: ledger.todayIso,
     });
 
-    return {
+    return Object.freeze({
       accountBalance: ledgerContext.accountBalance,
       scheduledMonthlyRunRate: ledgerContext.scheduledMonthlyRunRate,
       collectedSince: ledgerContext.collectedSince,
       summarizeAccount: accountSummary.summarizeAccount,
-    };
+    });
   }
 
   window.PropertyDeskWorkspaceAccountFinancialContext = Object.freeze({

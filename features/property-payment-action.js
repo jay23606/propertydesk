@@ -15,7 +15,7 @@
       openPayment(accounts.length === 1 ? accounts[0].id : null, propertyId);
     }
 
-    return { openPropertyPayment };
+    return Object.freeze({ openPropertyPayment });
   }
 
   window.PropertyDeskPropertyPaymentAction = Object.freeze({ create });

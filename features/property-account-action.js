@@ -10,7 +10,7 @@
       openModal("account-modal");
     }
 
-    return { openAccountForProperty };
+    return Object.freeze({ openAccountForProperty });
   }
 
   window.PropertyDeskPropertyAccountAction = Object.freeze({ create });

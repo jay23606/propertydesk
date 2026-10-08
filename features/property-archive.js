@@ -33,7 +33,7 @@
       });
     }
 
-    return { toggleArchiveProperty };
+    return Object.freeze({ toggleArchiveProperty });
   }
 
   window.PropertyDeskPropertyArchive = Object.freeze({ create });

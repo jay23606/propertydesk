@@ -4,30 +4,6 @@ const path = require("node:path");
 const test = require("node:test");
 const espree = require("espree");
 
-test("workflow coordinators do not return mutable interface objects", () => {
-  const featureDirectory = path.join(__dirname, "..", "features");
-  const workflowFiles = fs
-    .readdirSync(featureDirectory)
-    .filter((file) => file.endsWith("-workflow.js"));
-
-  for (const file of workflowFiles) {
-    const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
-    assert.doesNotMatch(source, /\breturn\s+\{/u, file);
-  }
-});
-
-test("event routers do not return mutable interface objects", () => {
-  const featureDirectory = path.join(__dirname, "..", "features");
-  const eventFiles = fs
-    .readdirSync(featureDirectory)
-    .filter((file) => file.endsWith("-events.js"));
-
-  for (const file of eventFiles) {
-    const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
-    assert.doesNotMatch(source, /\breturn\s+\{/u, file);
-  }
-});
-
 test("database queries stay inside repository adapters", () => {
   const featureDirectory = path.join(__dirname, "..", "features");
   const featureFiles = fs
@@ -48,21 +24,24 @@ test("database queries stay inside repository adapters", () => {
   }
 });
 
-test("view, form, and model factories return frozen API bundles", () => {
+test("feature factories freeze APIs and keep mutable data containers open", () => {
   const featureDirectory = path.join(__dirname, "..", "features");
-  const viewFiles = fs
+  const featureFiles = fs
     .readdirSync(featureDirectory)
-    .filter((file) =>
-      /(?:-views?(?:-rendering)?|-forms?|-models?)\.js$/u.test(file),
-    );
-  let inspectedFactories = 0;
-  let inspectedObjects = 0;
+    .filter((file) => file.endsWith(".js"));
+  const mutableDataFactories = new Set([
+    "account-import-identity.js:createContext",
+    "app-state.js:createAppState",
+  ]);
+  const inspectedDataFactories = new Set();
+  let inspectedApiBundles = 0;
 
-  for (const file of viewFiles) {
+  for (const file of featureFiles) {
     const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
     const ast = espree.parse(source, {
       ecmaVersion: "latest",
       sourceType: "script",
+      range: true,
     });
     const creators = ast.body
       .filter(
@@ -84,7 +63,6 @@ test("view, form, and model factories return frozen API bundles", () => {
       });
 
     for (const creator of creators) {
-      inspectedFactories += 1;
       const returnedObjects = [];
       function inspect(node, root = false) {
         if (!node || typeof node !== "object") return;
@@ -117,16 +95,22 @@ test("view, form, and model factories return frozen API bundles", () => {
         }
       }
       inspect(creator.body);
-      inspectedObjects += returnedObjects.length;
       for (const returned of returnedObjects) {
-        const methodNames = returned.value.properties
-          .map((property) => property.key.name || property.key.value)
-          .join(", ");
-        assert.equal(returned.frozen, true, `${file}: ${methodNames}`);
+        const factoryName = `${file}:${creator.id.name}`;
+        if (mutableDataFactories.has(factoryName)) {
+          inspectedDataFactories.add(factoryName);
+          assert.equal(returned.frozen, false, factoryName);
+          continue;
+        }
+        inspectedApiBundles += 1;
+        assert.equal(returned.frozen, true, factoryName);
       }
     }
   }
 
-  assert.ok(inspectedFactories > 0);
-  assert.ok(inspectedObjects > 0);
+  assert.ok(inspectedApiBundles > 0);
+  assert.deepEqual(
+    [...inspectedDataFactories].sort(),
+    [...mutableDataFactories].sort(),
+  );
 });

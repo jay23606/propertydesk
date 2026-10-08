@@ -50,7 +50,11 @@
       openModal("import-preview-modal");
     }
 
-    return { stageImport, renderImportPreview, updateImportCommitButton };
+    return Object.freeze({
+      stageImport,
+      renderImportPreview,
+      updateImportCommitButton,
+    });
   }
 
   window.PropertyDeskImportPreview = Object.freeze({

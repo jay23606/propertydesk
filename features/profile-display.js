@@ -28,7 +28,7 @@
       });
     }
 
-    return { updateGreeting };
+    return Object.freeze({ updateGreeting });
   }
 
   window.PropertyDeskProfileDisplay = Object.freeze({

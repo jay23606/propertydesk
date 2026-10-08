@@ -36,7 +36,7 @@
       );
     }
 
-    return { attachEvents };
+    return Object.freeze({ attachEvents });
   }
 
   window.PropertyDeskPropertyDetailQuickActions = Object.freeze({ create });

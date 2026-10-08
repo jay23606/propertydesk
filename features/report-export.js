@@ -57,7 +57,7 @@
       $("export-report").addEventListener("click", exportReport);
     }
 
-    return { attachEvents };
+    return Object.freeze({ attachEvents });
   }
 
   window.PropertyDeskReportExport = Object.freeze({
