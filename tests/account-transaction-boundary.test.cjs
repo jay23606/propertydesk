@@ -12,6 +12,11 @@ test("app composes independent property and account forms before action routing"
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
+    /const transactionWorkspace =\s*window\.PropertyDeskTransactionWorkspaceWorkflow\.create\(/,
+  );
+  assert.doesNotMatch(app, /const transactionRecords =/);
+  assert.match(
+    app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountForms\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
   );
   assert.match(

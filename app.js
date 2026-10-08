@@ -185,7 +185,7 @@
         repository: repositories.accounts,
       },
     });
-  const transactionRecords =
+  const transactionWorkspace =
     window.PropertyDeskTransactionWorkspaceWorkflow.create({
       maintenance: {
         correction: {
@@ -250,7 +250,7 @@
     openPayment,
     openPropertyPayment,
     renderPayments,
-  } = transactionRecords;
+  } = transactionWorkspace;
   const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
     $,
     state,
