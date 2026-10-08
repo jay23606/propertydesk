@@ -14,7 +14,13 @@
     confirmAction = (message) => window.confirm(message),
   }) {
     const reminderWorkflow =
-      window.PropertyDeskWorkspaceReminderWorkflow.create(reminder);
+      window.PropertyDeskWorkspaceReminderWorkflow.create({
+        $: reminder.$,
+        state: reminder.state,
+        esc: reminder.esc,
+        fmtDate: reminder.fmtDate,
+        money: reminder.money,
+      });
     const profileWorkflow = window.PropertyDeskWorkspaceProfileWorkflow.create({
       $,
       state,

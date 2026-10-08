@@ -73,6 +73,7 @@ test("workspace settings render member labels and escape untrusted text", () => 
       ),
     toast() {},
     fetchAll: async () => {},
+    reminder: { $() {}, state, esc() {}, fmtDate() {}, money() {} },
     memberRepository: { addMember() {}, removeMember() {} },
     confirmAction: () => true,
   });

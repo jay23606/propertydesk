@@ -54,6 +54,14 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
 
   const state = { user: { user_metadata: { display_name: "Owner" } } };
   const memberRepository = { addMember() {}, removeMember() {} };
+  const reminder = {
+    $() {},
+    state,
+    esc() {},
+    fmtDate() {},
+    money() {},
+    unusedDependency: true,
+  };
   const workflow = context.window.PropertyDeskWorkspace.create({
     $: () => ({ value: "" }),
     state,
@@ -61,11 +69,20 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     toast() {},
     fetchAll() {},
     memberRepository,
-    reminder: { state },
+    reminder,
   });
 
   assert.equal(passed.profileWorkflow.state, state);
   assert.equal(passed.reminderWorkflow.state, state);
+  assert.deepEqual(Object.keys(passed.reminderWorkflow).sort(), [
+    "$",
+    "esc",
+    "fmtDate",
+    "money",
+    "state",
+  ]);
+  for (const key of Object.keys(passed.reminderWorkflow))
+    assert.equal(passed.reminderWorkflow[key], reminder[key]);
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
   assert.equal(passed.memberActions.repository, memberRepository);
   assert.equal(
