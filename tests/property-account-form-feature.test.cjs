@@ -198,6 +198,39 @@ test("account form confirms a lost save response from refreshed account data", a
   assert.deepEqual(messages, []);
 });
 
+test("property form confirms a lost save response from refreshed property data", async () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
+  const payload = {
+    user_id: "workspace-1",
+    name: "Home",
+    address: "10 Main St",
+    city: "Altoona",
+    state: "PA",
+    zip: "16601",
+  };
+  const state = { properties: [] };
+  let refreshes = 0;
+  const messages = [];
+  const maintenance = context.window.PropertyDeskPropertyMaintenance.create({
+    state,
+    fetchAll: async () => {
+      state.properties.push({ ...payload, id: "property-1" });
+      refreshes += 1;
+    },
+    toast: (message) => messages.push(message),
+    repository: {
+      save: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+
+  assert.equal(await maintenance.saveProperty(payload), true);
+  assert.equal(refreshes, 1);
+  assert.deepEqual(messages, []);
+});
+
 test("property form view reads normalized values, resets the form, and binds submit", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
@@ -350,6 +383,7 @@ test("property and account forms report rejected saves without running success a
   };
   const state = {
     workspaceOwnerId: "workspace-1",
+    accounts: [],
     client: {
       from: () => ({
         insert: async () => {

@@ -20,6 +20,8 @@
       });
     const { saveProperty: persistProperty } =
       window.PropertyDeskPropertyMaintenance.create({
+        state,
+        fetchAll,
         toast,
         repository,
       });

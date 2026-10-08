@@ -59,8 +59,72 @@
     return true;
   }
 
+  function payloadMatchesRecord(record, payload) {
+    return Object.entries(payload).every(([key, value]) => {
+      const actual = record[key];
+      if (value == null) return actual == null;
+      if (typeof value === "number") return Number(actual) === value;
+      return actual === value;
+    });
+  }
+
+  async function saveWorkspaceRecord({
+    operation,
+    state,
+    collection,
+    payload,
+    recordId,
+    fetchAll,
+    toast,
+    failureMessage,
+    refreshFailureMessage,
+    retryMessage,
+  }) {
+    const initialRecords = state?.[collection];
+    const previousCount =
+      recordId || !Array.isArray(initialRecords)
+        ? null
+        : initialRecords.filter((record) =>
+            payloadMatchesRecord(record, payload),
+          ).length;
+    const onUnconfirmed =
+      Array.isArray(initialRecords) && fetchAll
+        ? async () => {
+            let recordWasSaved = false;
+            const refreshed = await refreshWorkspace({
+              fetchAll,
+              afterRefresh: () => {
+                const records = state[collection] || [];
+                recordWasSaved = recordId
+                  ? records.some(
+                      (record) =>
+                        record.id === recordId &&
+                        payloadMatchesRecord(record, payload),
+                    )
+                  : records.filter((record) =>
+                      payloadMatchesRecord(record, payload),
+                    ).length > previousCount;
+              },
+              toast,
+              refreshFailureMessage,
+            });
+            if (!refreshed) return false;
+            if (!recordWasSaved) toast(retryMessage);
+            return recordWasSaved;
+          }
+        : undefined;
+
+    return run({
+      operation,
+      toast,
+      failureMessage,
+      onUnconfirmed,
+    });
+  }
+
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
+    saveWorkspaceRecord,
   });
 })();
