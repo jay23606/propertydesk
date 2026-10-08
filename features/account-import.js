@@ -2,19 +2,17 @@
 (() => {
   "use strict";
 
-  function createAccountImport(context) {
-    const {
-      $,
-      state,
-      parseCSV,
-      validateAccountRows,
-      todayIso,
-      buildPayloads,
-      commitAccounts,
-      importReview,
-      createFileWorkflow,
-    } = context;
-
+  function createAccountImport({
+    $,
+    state,
+    parseCSV,
+    validateAccountRows,
+    todayIso,
+    buildPayloads,
+    commitAccounts,
+    importReview,
+    createFileWorkflow,
+  }) {
     const fileWorkflow = createFileWorkflow({
       input: $("import-file"),
       status: $("import-status"),

@@ -2,22 +2,21 @@
 (() => {
   "use strict";
 
-  function createAccountForm(context) {
-    const {
-      $,
-      state,
-      moneyInput,
-      toast,
-      closeModal,
-      fetchAll,
-      todayIso,
-      populateFormOptions,
-      openModal,
-      buildAccountPayload,
-      formModel,
-      previewReminderEmail,
-      repository,
-    } = context;
+  function createAccountForm({
+    $,
+    state,
+    moneyInput,
+    toast,
+    closeModal,
+    fetchAll,
+    todayIso,
+    populateFormOptions,
+    openModal,
+    buildAccountPayload,
+    formModel,
+    previewReminderEmail,
+    repository,
+  }) {
     const formView = window.PropertyDeskAccountFormView.create({
       $,
       todayIso,

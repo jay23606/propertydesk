@@ -2,18 +2,16 @@
 (() => {
   "use strict";
 
-  function createAccountDetails(context) {
-    const {
-      $,
-      state,
-      buildAccountDetailData,
-      openModal,
-      depositSectionHTML,
-      renderAccountHistory,
-      renderAccountDetails,
-      fmtDate,
-    } = context;
-
+  function createAccountDetails({
+    $,
+    state,
+    buildAccountDetailData,
+    openModal,
+    depositSectionHTML,
+    renderAccountHistory,
+    renderAccountDetails,
+    fmtDate,
+  }) {
     async function openAccountDetails(id) {
       const auditRequestId = ++state.auditRequestId;
       const accountData = buildAccountDetailData(id);

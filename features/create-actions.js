@@ -2,20 +2,18 @@
 (() => {
   "use strict";
 
-  function createActions(context) {
-    const {
-      $,
-      state,
-      toast,
-      resetPropertyForm,
-      openModal,
-      openAccountForProperty,
-      openPayment,
-      openExpense,
-      navigate,
-      documentRef,
-    } = context;
-
+  function createActions({
+    $,
+    state,
+    toast,
+    resetPropertyForm,
+    openModal,
+    openAccountForProperty,
+    openPayment,
+    openExpense,
+    navigate,
+    documentRef,
+  }) {
     function attachCreateActionEvents() {
       const browserDocument = documentRef || document;
       browserDocument

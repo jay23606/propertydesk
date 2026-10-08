@@ -2,16 +2,14 @@
 (() => {
   "use strict";
 
-  function createPropertyDetails(context) {
-    const {
-      $,
-      state,
-      openModal,
-      buildPropertyDetailData,
-      renderPropertyActivity,
-      propertyDetailsHTML,
-    } = context;
-
+  function createPropertyDetails({
+    $,
+    state,
+    openModal,
+    buildPropertyDetailData,
+    renderPropertyActivity,
+    propertyDetailsHTML,
+  }) {
     function openPropertyDetails(id) {
       state.auditRequestId++;
       const detailData = buildPropertyDetailData(id);
