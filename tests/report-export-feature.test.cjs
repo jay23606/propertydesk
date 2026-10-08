@@ -80,15 +80,33 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   );
   assert.match(
     workspace,
-    /PropertyDeskReportWorkflow\.create\(rendering\)[\s\S]*?PropertyDeskReportExport\.create\(exporting\)/,
+    /PropertyDeskReportWorkflow\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?PropertyDeskReportExport\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,
   );
 });
 
 test("report workspace preserves rendering and export APIs", () => {
   const renderReports = () => {};
   const attachReportExportEvents = () => {};
-  const rendering = { state: {} };
-  const exporting = { downloadBlob() {} };
+  const rendering = {
+    $() {},
+    state: {},
+    dateOnly() {},
+    sumIncome() {},
+    sumOperatingExpenses() {},
+    accountBalance() {},
+    esc() {},
+    money() {},
+    unusedRenderingValue: true,
+  };
+  const exporting = {
+    $() {},
+    state: {},
+    todayIso() {},
+    prettyType() {},
+    accountBalance() {},
+    downloadBlob() {},
+    unusedExportingValue: true,
+  };
   const passed = {};
   const context = vm.createContext({
     window: {
@@ -119,8 +137,28 @@ test("report workspace preserves rendering and export APIs", () => {
     exporting,
   });
 
-  assert.equal(passed.rendering, rendering);
-  assert.equal(passed.exporting, exporting);
+  assert.deepEqual(Object.keys(passed.rendering).sort(), [
+    "$",
+    "accountBalance",
+    "dateOnly",
+    "esc",
+    "money",
+    "state",
+    "sumIncome",
+    "sumOperatingExpenses",
+  ]);
+  assert.deepEqual(Object.keys(passed.exporting).sort(), [
+    "$",
+    "accountBalance",
+    "downloadBlob",
+    "prettyType",
+    "state",
+    "todayIso",
+  ]);
+  for (const key of Object.keys(passed.rendering))
+    assert.equal(passed.rendering[key], rendering[key]);
+  for (const key of Object.keys(passed.exporting))
+    assert.equal(passed.exporting[key], exporting[key]);
   assert.equal(workspace.renderReports, renderReports);
   assert.equal(workspace.attachReportExportEvents, attachReportExportEvents);
   assert.equal(Object.isFrozen(workspace), true);
