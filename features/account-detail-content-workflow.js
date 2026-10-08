@@ -2,23 +2,22 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      money,
-      fmtDate,
-      esc,
-      sumPosted,
-      prettyType,
-      paymentFrequencyLabel,
-      summarizeAccount,
-      amortizationSchedule,
-      openModal,
-      propertyAddress,
-      depositSectionHTML,
-      accountHistoryRepository,
-    } = context;
+  function create({
+    $,
+    state,
+    money,
+    fmtDate,
+    esc,
+    sumPosted,
+    prettyType,
+    paymentFrequencyLabel,
+    summarizeAccount,
+    amortizationSchedule,
+    openModal,
+    propertyAddress,
+    depositSectionHTML,
+    accountHistoryRepository,
+  }) {
     const { loadAccountHistory } =
       window.PropertyDeskAccountHistoryModel.create({
         state,

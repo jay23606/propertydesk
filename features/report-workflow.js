@@ -2,17 +2,16 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      dateOnly,
-      sumIncome,
-      sumOperatingExpenses,
-      accountBalance,
-      esc,
-      money,
-    } = context;
+  function create({
+    $,
+    state,
+    dateOnly,
+    sumIncome,
+    sumOperatingExpenses,
+    accountBalance,
+    esc,
+    money,
+  }) {
     const { buildReportModel } = window.PropertyDeskReportModel.create({
       state,
       dateOnly,

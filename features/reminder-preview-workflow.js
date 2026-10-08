@@ -2,23 +2,22 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      monthEnd,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      money,
-      todayIso,
-      moneyInput,
-      toast,
-      esc,
-      openModal,
-    } = context;
+  function create({
+    $,
+    state,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    monthEnd,
+    dateOnly,
+    monthStart,
+    propertyAddress,
+    money,
+    todayIso,
+    moneyInput,
+    toast,
+    esc,
+    openModal,
+  }) {
     const model = window.PropertyDeskReminderPreviewModel.create({
       amountDueSince,
       unpaidDueAccrualStart,

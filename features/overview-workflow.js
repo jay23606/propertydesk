@@ -2,27 +2,25 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      monthlyScheduledEstimate,
-      summarizeAccount,
-      collectedSince,
-      scheduledMonthlyRunRate,
-      monthStart,
-      isPosted,
-      postedOnOrAfter,
-      esc,
-      prettyKind,
-      money,
-      propertyAddress,
-      prettyType,
-      fmtDate,
-      openPropertyDetails,
-      openPropertyPayment,
-    } = context;
-
+  function create({
+    $,
+    state,
+    monthlyScheduledEstimate,
+    summarizeAccount,
+    collectedSince,
+    scheduledMonthlyRunRate,
+    monthStart,
+    isPosted,
+    postedOnOrAfter,
+    esc,
+    prettyKind,
+    money,
+    propertyAddress,
+    prettyType,
+    fmtDate,
+    openPropertyDetails,
+    openPropertyPayment,
+  }) {
     const propertySummaryModel =
       window.PropertyDeskOverviewPropertySummaryModel.create({
         state,

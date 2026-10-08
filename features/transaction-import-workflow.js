@@ -2,24 +2,22 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      parseCSV,
-      importReview,
-      createFileWorkflow,
-      inputId,
-      emptyMessage,
-      failurePrefix,
-      title,
-      validateRows,
-      correctionKeys,
-      mapRows,
-      commitTransactions,
-      kind,
-      label,
-    } = context;
-
+  function create({
+    $,
+    parseCSV,
+    importReview,
+    createFileWorkflow,
+    inputId,
+    emptyMessage,
+    failurePrefix,
+    title,
+    validateRows,
+    correctionKeys,
+    mapRows,
+    commitTransactions,
+    kind,
+    label,
+  }) {
     return createFileWorkflow({
       input: $(inputId),
       status: $("import-status"),
