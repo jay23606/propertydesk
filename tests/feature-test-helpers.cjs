@@ -115,6 +115,7 @@ function loadPropertyAndAccountForms(context) {
     "property-form-view.js",
     "property-repository.js",
     "property-maintenance.js",
+    "workspace-form-save-workflow.js",
     "property-form.js",
     "account-repository.js",
     "account-maintenance.js",

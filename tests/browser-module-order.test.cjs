@@ -334,6 +334,12 @@ test("browser feature scripts load after their dependencies", () => {
     ["features/property-payment-action.js", "features/payment-entry-form.js"],
     ["features/property-account-action.js", "app.js"],
     ["features/property-form.js", "app.js"],
+    [
+      "features/repository-write-feedback.js",
+      "features/workspace-form-save-workflow.js",
+    ],
+    ["features/workspace-form-save-workflow.js", "features/property-form.js"],
+    ["features/workspace-form-save-workflow.js", "features/account-form.js"],
     ["features/account-form.js", "app.js"],
     ["features/ledger-entry-forms.js", "app.js"],
     ["features/create-actions.js", "app.js"],

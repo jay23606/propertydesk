@@ -24,6 +24,13 @@
       populateFormOptions,
       openModal,
     });
+    const { save: saveWorkspaceForm } =
+      window.PropertyDeskWorkspaceFormSaveWorkflow.create({
+        $,
+        closeModal,
+        fetchAll,
+        toast,
+      });
     const { saveAccount: persistAccount } =
       window.PropertyDeskAccountMaintenance.create({
         toast,
@@ -78,13 +85,13 @@
         },
         moneyInput,
       );
-      if (!(await persistAccount(payload, form.id))) return;
-      closeModal($("account-modal"));
-      resetAccountForm();
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        toast,
-        successMessage: form.id ? "Account updated" : "Account added",
+      await saveWorkspaceForm({
+        persist: persistAccount,
+        payload,
+        id: form.id,
+        modalId: "account-modal",
+        resetForm: resetAccountForm,
+        label: "Account",
       });
     }
 

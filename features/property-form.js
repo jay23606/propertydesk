@@ -11,6 +11,13 @@
     repository,
   }) {
     const formView = window.PropertyDeskPropertyFormView.create({ $ });
+    const { save: saveWorkspaceForm } =
+      window.PropertyDeskWorkspaceFormSaveWorkflow.create({
+        $,
+        closeModal,
+        fetchAll,
+        toast,
+      });
     const { saveProperty: persistProperty } =
       window.PropertyDeskPropertyMaintenance.create({
         state,
@@ -25,13 +32,13 @@
         user_id: state.workspaceOwnerId,
         ...values,
       };
-      if (!(await persistProperty(payload, id))) return;
-      closeModal($("property-modal"));
-      formView.resetPropertyForm();
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        toast,
-        successMessage: id ? "Property updated" : "Property added",
+      await saveWorkspaceForm({
+        persist: persistProperty,
+        payload,
+        id,
+        modalId: "property-modal",
+        resetForm: formView.resetPropertyForm,
+        label: "Property",
       });
     }
 
