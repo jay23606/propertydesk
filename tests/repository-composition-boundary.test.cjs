@@ -51,6 +51,6 @@ test("feature workflows receive repository instances from the app composition ro
     path.join(featureDirectory, "workspace-runtime.js"),
     "utf8",
   );
-  assert.match(runtime, /PropertyDeskRepositoryRegistry\.create\(/);
+  assert.match(runtime, /workflows\.repositoryRegistry\.create\(/);
   assert.doesNotMatch(app, repositoryFactory);
 });

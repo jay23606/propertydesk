@@ -18,6 +18,17 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
   );
+  assert.match(
+    app,
+    /tables: window\.PropertyDeskWorkspaceTables,\s*workflows: \{\s*backendClient: window\.PropertyDeskBackendClient,[\s\S]*?refresh: window\.PropertyDeskWorkspaceRefresh,/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace-runtime.js"),
+      "utf8",
+    ),
+    /window\.PropertyDesk[A-Za-z]+\.create\(/,
+  );
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);

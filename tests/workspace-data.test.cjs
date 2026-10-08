@@ -246,11 +246,11 @@ test("workspace data modules load before app root and are precached", () => {
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
   assert.match(worker, /'\.\/features\/workspace-runtime\.js'/);
   assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
-  assert.match(runtime, /PropertyDeskWorkspaceQuery\.create\(\{/);
-  assert.match(runtime, /PropertyDeskWorkspaceData\.create\(\{/);
-  assert.match(runtime, /PropertyDeskWorkspaceRefresh\.create\(/);
+  assert.match(runtime, /workflows\.query\.create\(\{/);
+  assert.match(runtime, /workflows\.data\.create\(\{/);
+  assert.match(runtime, /workflows\.refresh\.create\(/);
   assert.match(
     runtime,
-    /PropertyDeskWorkspaceRefresh\.create\(\{\s*state,\s*workspaceData,/,
+    /workflows\.refresh\.create\(\{\s*state,\s*workspaceData,/,
   );
 });

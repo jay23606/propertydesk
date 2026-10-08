@@ -8,36 +8,36 @@
     repositories,
     toast,
     render,
+    tables,
+    workflows,
   }) {
-    const backend = window.PropertyDeskBackendClient.create({
+    const backend = workflows.backendClient.create({
       config,
       supabase,
     });
-    const state = window.PropertyDeskAppState.create();
+    const state = workflows.appState.create();
     let client = null;
     const getClient = () => client;
     const initializeClient = () => {
       client = backend.createClient();
       return client;
     };
-    const authClient = window.PropertyDeskAuthClient.create({
+    const authClient = workflows.authClient.create({
       getClient,
     });
-    const repositoryAdapters = window.PropertyDeskRepositoryRegistry.create({
+    const repositoryAdapters = workflows.repositoryRegistry.create({
       repositories,
       getClient,
     });
-    const workspaceQuery = window.PropertyDeskWorkspaceQuery.create({
+    const workspaceQuery = workflows.query.create({
       getClient,
     });
-    const workspaceReads = window.PropertyDeskWorkspaceReadCatalog.create(
-      window.PropertyDeskWorkspaceTables,
-    );
-    const workspaceData = window.PropertyDeskWorkspaceData.create({
+    const workspaceReads = workflows.readCatalog.create(tables);
+    const workspaceData = workflows.data.create({
       reads: workspaceReads,
       workspaceQuery,
     });
-    const { fetchAll } = window.PropertyDeskWorkspaceRefresh.create({
+    const { fetchAll } = workflows.refresh.create({
       state,
       workspaceData,
       toast,

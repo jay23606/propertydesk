@@ -27,60 +27,62 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     repositories,
     toast() {},
     render() {},
+    tables: { properties: "pd_properties" },
+    workflows: {},
   };
   const context = vm.createContext({
-    window: {
-      PropertyDeskBackendClient: {
-        create(received) {
-          calls.push(["backend", received]);
-          return backend;
-        },
-      },
-      PropertyDeskAppState: {
-        create() {
-          calls.push(["state"]);
-          return state;
-        },
-      },
-      PropertyDeskAuthClient: {
-        create(received) {
-          calls.push(["auth-client", received]);
-          return { id: "auth-client" };
-        },
-      },
-      PropertyDeskRepositoryRegistry: {
-        create(received) {
-          calls.push(["repositories", received]);
-          return repositoryAdapters;
-        },
-      },
-      PropertyDeskWorkspaceTables: { properties: "pd_properties" },
-      PropertyDeskWorkspaceQuery: {
-        create(received) {
-          calls.push(["query", received]);
-          return workspaceQuery;
-        },
-      },
-      PropertyDeskWorkspaceReadCatalog: {
-        create(received) {
-          calls.push(["read-catalog", received]);
-          return workspaceReads;
-        },
-      },
-      PropertyDeskWorkspaceData: {
-        create(received) {
-          calls.push(["data", received]);
-          return workspaceData;
-        },
-      },
-      PropertyDeskWorkspaceRefresh: {
-        create(received) {
-          calls.push(["refresh", received]);
-          return { fetchAll };
-        },
+    window: {},
+  });
+  options.workflows = {
+    backendClient: {
+      create(received) {
+        calls.push(["backend", received]);
+        return backend;
       },
     },
-  });
+    appState: {
+      create() {
+        calls.push(["state"]);
+        return state;
+      },
+    },
+    authClient: {
+      create(received) {
+        calls.push(["auth-client", received]);
+        return { id: "auth-client" };
+      },
+    },
+    repositoryRegistry: {
+      create(received) {
+        calls.push(["repositories", received]);
+        return repositoryAdapters;
+      },
+    },
+    query: {
+      create(received) {
+        calls.push(["query", received]);
+        return workspaceQuery;
+      },
+    },
+    readCatalog: {
+      create(received) {
+        calls.push(["read-catalog", received]);
+        return workspaceReads;
+      },
+    },
+    data: {
+      create(received) {
+        calls.push(["data", received]);
+        return workspaceData;
+      },
+    },
+    refresh: {
+      create(received) {
+        calls.push(["refresh", received]);
+        return { fetchAll };
+      },
+    },
+  };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-runtime.js"),
@@ -103,7 +105,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[4][0], "query");
   assert.equal(calls[4][1].getClient(), null);
   assert.equal(calls[5][0], "read-catalog");
-  assert.equal(calls[5][1], context.window.PropertyDeskWorkspaceTables);
+  assert.equal(calls[5][1], options.tables);
   assert.equal(calls[6][0], "data");
   assert.equal(calls[6][1].reads, workspaceReads);
   assert.equal(calls[6][1].workspaceQuery, workspaceQuery);

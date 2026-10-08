@@ -47,6 +47,17 @@
     },
     toast,
     render,
+    tables: window.PropertyDeskWorkspaceTables,
+    workflows: {
+      backendClient: window.PropertyDeskBackendClient,
+      appState: window.PropertyDeskAppState,
+      authClient: window.PropertyDeskAuthClient,
+      repositoryRegistry: window.PropertyDeskRepositoryRegistry,
+      query: window.PropertyDeskWorkspaceQuery,
+      readCatalog: window.PropertyDeskWorkspaceReadCatalog,
+      data: window.PropertyDeskWorkspaceData,
+      refresh: window.PropertyDeskWorkspaceRefresh,
+    },
   });
   const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
