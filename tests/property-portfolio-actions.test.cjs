@@ -90,6 +90,8 @@ test("property portfolio indexes accounts and holders once per grid build", () =
     });
   const model = context.window.PropertyDeskPropertyPortfolioModel.create({
     state,
+    groupAccountsByProperty:
+      context.window.PropertyDeskPropertyAccountIndex.groupByProperty,
     accountRowModel: {
       buildAccountRow: (property, account, street) => ({
         hasAccount: true,

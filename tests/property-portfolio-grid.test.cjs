@@ -78,8 +78,9 @@ test("Properties workflow returns explicit view and action operations", () => {
         },
       },
       PropertyDeskPropertyPortfolioModel: {
-        create: () => {
+        create: (options) => {
           calls.push("portfolio model");
+          passed.portfolioModel = options;
           return {};
         },
       },
@@ -110,6 +111,7 @@ test("Properties workflow returns explicit view and action operations", () => {
           return { attachEvents() {} };
         },
       },
+      PropertyDeskPropertyAccountIndex: { groupByProperty: action },
     },
   });
   vm.runInContext(
@@ -149,6 +151,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     "renderProperties",
   ]);
   assert.equal(passed.quickNote.state, state);
+  assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
   assert.equal(passed.quickNote.toast, action);
   assert.equal(passed.quickNote.fetchAll, action);
   assert.equal(passed.quickNote.streetAddress, action);
@@ -541,6 +544,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     context.window.PropertyDeskPropertyPortfolioModel.create({
       state,
       accountRowModel,
+      groupAccountsByProperty:
+        context.window.PropertyDeskPropertyAccountIndex.groupByProperty,
       streetAddress: dependencies.streetAddress,
       filterModel,
     });

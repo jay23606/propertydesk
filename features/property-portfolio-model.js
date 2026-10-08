@@ -5,6 +5,7 @@
   function createPropertyPortfolioModel({
     state,
     accountRowModel,
+    groupAccountsByProperty,
     streetAddress,
     filterModel,
   }) {
@@ -50,8 +51,7 @@
     }
 
     function buildRows({ query, type, holderId, showArchived }) {
-      const accountsByProperty =
-        window.PropertyDeskPropertyAccountIndex.groupByProperty(state.accounts);
+      const accountsByProperty = groupAccountsByProperty(state.accounts);
       const assignedHolders = filterModel.holdersByProperty();
       const rows = [];
 
