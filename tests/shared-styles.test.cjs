@@ -23,7 +23,7 @@ test("shared component styles load after the base and before feature styles", ()
       stylesheetOrder.indexOf("shared.css"),
   );
   assert.match(shared, /\.heading-actions/);
-  assert.match(shared, /\.audit-list/);
+  assert.doesNotMatch(shared, /\.audit-list|\.audit-row/);
   assert.match(shared, /\.table-subtext/);
   for (const selector of [
     ".status-pill",
