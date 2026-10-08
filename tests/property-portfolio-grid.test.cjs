@@ -623,7 +623,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.match(tableRows, /data-account-edit="account-1"/);
   assert.match(
     tableRows,
-    /data-account-payment="account-1"[^>]*title="Record payment"[^>]*aria-label="Record payment"><svg/s,
+    /class="portfolio-icon-action portfolio-payment-action"[^>]*data-account-payment="account-1"[^>]*title="Record payment"[^>]*aria-label="Record payment"><svg/s,
   );
   assert.match(tableRows, /class="portfolio-mobile-due">\$50\.00/);
   assert.match(tableRows, /class="portfolio-icon-action unavailable"/);

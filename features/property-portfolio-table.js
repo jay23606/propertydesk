@@ -58,7 +58,7 @@
       return `<tr>
         <td class="${PAYMENT_STATUS_CLASS[paymentStatus]}" title="${PAYMENT_STATUS_TITLE[paymentStatus]}">
         <strong class="portfolio-mobile-due">${money(due)}</strong>
-        <button type="button" class="button primary compact portfolio-payment-action" data-account-payment="${esc(account.id)}" title="Record payment" aria-label="Record payment">${PAYMENT_ICON}</button>
+        <button type="button" class="portfolio-icon-action portfolio-payment-action" data-account-payment="${esc(account.id)}" title="Record payment" aria-label="Record payment">${PAYMENT_ICON}</button>
         </td>
         <td class="portfolio-due">${money(due)}</td>
         ${propertyAddressCell(property, street)}

@@ -18,6 +18,9 @@
 .portfolio-mobile-due {
   display: none;
 }
+.portfolio-mobile-payment-heading {
+  display: none;
+}
 @media (max-width: 760px) {
   .portfolio-table {
     border-radius: 8px;
@@ -37,11 +40,12 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 92px;
-    min-width: 92px;
-    max-width: 92px;
+    width: 62px;
+    min-width: 62px;
+    max-width: 62px;
     z-index: 2;
     background: #fff;
+    text-align: center;
   }
   .portfolio-table th:nth-child(1) {
     z-index: 4;
@@ -51,27 +55,23 @@
   .portfolio-table td:nth-child(2) {
     display: none;
   }
-  .portfolio-table th:nth-child(2) {
-    z-index: 4;
-    background: #fafbf9;
-  }
   .portfolio-table tbody tr:hover td:nth-child(1) {
     background: #fbfcfa;
-  }
-  .portfolio-table td:nth-child(1) .button {
-    width: 30px;
-    min-width: 30px;
-    height: 30px;
-    padding: 0;
   }
   .portfolio-table .portfolio-payment-action {
     margin-inline: auto;
   }
+  .portfolio-mobile-payment-heading {
+    display: inline;
+  }
+  .portfolio-desktop-payment-heading {
+    display: none;
+  }
   .portfolio-mobile-due {
     display: block;
-    margin: 0 0 5px;
+    margin: 0 0 4px;
     color: var(--green);
-    font-size: 10px;
+    font-size: 9px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -88,8 +88,9 @@
     padding-left: 3px;
   }
   .portfolio-table td:nth-child(3) {
-    min-width: 145px;
-    max-width: 190px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 125px;
     overflow-wrap: anywhere;
   }
   .portfolio-table td:nth-child(3) .table-action {
@@ -153,6 +154,8 @@
   justify-content: center;
   margin-inline: auto;
   padding: 0;
+  background: transparent;
+  cursor: pointer;
 }
 .portfolio-payment-action svg {
   width: 17px;
@@ -261,7 +264,7 @@ html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1) {
 @media (max-width: 760px) {
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
-    width: 92px;
+    width: 62px;
   }
   .portfolio-table tfoot td:nth-child(2) {
     display: none;

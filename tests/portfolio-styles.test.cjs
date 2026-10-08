@@ -27,6 +27,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /\.portfolio-panel/);
   assert.match(portfolio, /\.portfolio-table/);
   assert.match(portfolio, /\.property-row-note/);
+  assert.match(html, /class="portfolio-mobile-payment-heading"\s*>DUE \/ PAY/);
   assert.match(portfolio, /html\[data-theme="dark"\] \.portfolio-table/);
   assert.match(
     portfolio,
@@ -40,7 +41,11 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td:nth-child\(1\) \.button\s*\{\s*width: 30px;\s*min-width: 30px;\s*height: 30px;\s*padding: 0;/,
+    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 62px;\s*min-width: 62px;/,
+  );
+  assert.match(
+    portfolio,
+    /\.portfolio-table \.portfolio-icon-action\s*\{\s*width: 30px;\s*height: 30px;/,
   );
   assert.match(
     portfolio,
@@ -48,7 +53,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td:nth-child\(3\)\s*\{\s*min-width: 145px;/,
+    /\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 110px;\s*min-width: 110px;\s*max-width: 125px;/,
   );
   assert.match(
     portfolio,
