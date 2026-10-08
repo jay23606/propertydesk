@@ -6,7 +6,11 @@ const vm = require("node:vm");
 
 function loadCommitFeature() {
   const context = vm.createContext({ window: {} });
-  for (const source of ["import-repository.js", "import-commit.js"]) {
+  for (const source of [
+    "repository-write-feedback.js",
+    "import-repository.js",
+    "import-commit.js",
+  ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
       context,
@@ -144,4 +148,116 @@ test("a confirmed import distinguishes refresh failure from save failure", async
   );
   assert.match(status.textContent, /Imported 1 payment/);
   assert.deepEqual(messages, []);
+});
+
+test("an import with a lost response reconciles from the new committed batch", async () => {
+  const messages = [];
+  const refreshes = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    importBatches: [],
+    accounts: [],
+  };
+  const status = {
+    textContent: "",
+    classList: { add: (name) => refreshes.push(name) },
+  };
+  const { commit: feature } = loadCommitFeature();
+  const commit = feature.create({
+    state,
+    repository: {
+      commitAccounts: async () => {
+        throw new Error("connection lost");
+      },
+      commitTransactions: async () => assert.fail("wrong import method"),
+    },
+    fetchAll: async () => {
+      state.importBatches = [
+        {
+          id: "batch-1",
+          user_id: "workspace-1",
+          source_type: "csv",
+          source_name: "accounts.csv",
+          status: "committed",
+          rows_total: 2,
+          rows_accepted: 2,
+        },
+      ];
+      state.accounts = [{ import_batch_id: "batch-1" }];
+      refreshes.push("workspace");
+    },
+    status,
+    toast: (message) => messages.push(message),
+  });
+
+  await commit.commitAccounts({
+    rows: [{ account_name: "Buyer" }, { account_name: "Tenant" }],
+    sourceName: "accounts.csv",
+    total: 2,
+  });
+
+  assert.match(status.textContent, /Imported 2 accounts; 0 rows were skipped/);
+  assert.deepEqual(refreshes, ["workspace", "success"]);
+  assert.deepEqual(messages, ["Import complete"]);
+});
+
+test("an unconfirmed import stays unresolved when refreshed history has no batch", async () => {
+  const messages = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    importBatches: [],
+  };
+  const { commit: feature } = loadCommitFeature();
+  const commit = feature.create({
+    state,
+    repository: {
+      commitAccounts: async () => {
+        throw new Error("connection lost");
+      },
+      commitTransactions: async () => assert.fail("wrong import method"),
+    },
+    fetchAll: async () => {},
+    status: { textContent: "", classList: { add() {} } },
+    toast: (message) => messages.push(message),
+  });
+
+  await assert.rejects(
+    commit.commitAccounts({
+      rows: [{ account_name: "Buyer" }],
+      sourceName: "accounts.csv",
+      total: 1,
+    }),
+    /no matching completed batch appeared/i,
+  );
+  assert.deepEqual(messages, []);
+});
+
+test("database import errors keep their specific message without reconciliation", async () => {
+  let refreshes = 0;
+  const databaseError = Object.assign(new Error("Account row is invalid"), {
+    code: "P0001",
+  });
+  const { commit: feature } = loadCommitFeature();
+  const commit = feature.create({
+    state: { workspaceOwnerId: "workspace-1", importBatches: [] },
+    repository: {
+      commitAccounts: async () => {
+        throw databaseError;
+      },
+      commitTransactions: async () => assert.fail("wrong import method"),
+    },
+    fetchAll: async () => refreshes++,
+    status: { textContent: "", classList: { add() {} } },
+    toast() {},
+  });
+
+  await assert.rejects(
+    commit.commitAccounts({
+      rows: [{ account_name: "Buyer" }],
+      sourceName: "accounts.csv",
+      total: 1,
+    }),
+    (error) => error === databaseError,
+  );
+  assert.equal(refreshes, 0);
 });

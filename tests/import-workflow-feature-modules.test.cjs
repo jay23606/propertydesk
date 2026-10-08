@@ -152,9 +152,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachExpenseEvents",
   ]);
   assert.equal(passed.commit.repository, dependencies.repository);
+  assert.equal(passed.commit.state, dependencies.state);
   assert.deepEqual(Object.keys(passed.commit).sort(), [
     "fetchAll",
     "repository",
+    "state",
     "status",
     "toast",
   ]);
