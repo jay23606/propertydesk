@@ -110,6 +110,19 @@
     return { valid, errors, total: rows.length };
   }
 
+  function validateAndMarkDuplicates(
+    rows,
+    existingKeys,
+    validateRow,
+    keyForRow,
+  ) {
+    const validation = validateImportRows(rows, validateRow);
+    return {
+      ...validation,
+      valid: markPossibleDuplicates(validation.valid, existingKeys, keyForRow),
+    };
+  }
+
   const helpers = Object.freeze({
     createImportLookup,
     duplicateKey,
@@ -118,6 +131,7 @@
     markPossibleDuplicates,
     resolveImportProperty,
     selectImportRows,
+    validateAndMarkDuplicates,
     validateImportRows,
   });
   globalThis.PropertyDeskImportRows = helpers;

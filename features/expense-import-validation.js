@@ -7,9 +7,8 @@
     duplicateKey,
     duplicateKeyAmount,
     duplicateKeyText,
-    markPossibleDuplicates,
     resolveImportProperty,
-    validateImportRows,
+    validateAndMarkDuplicates,
   } = globalThis.PropertyDeskImportRows;
   const { csvMoney, validIsoDate } = globalThis.PropertyDeskCsvValueUtils;
   const {
@@ -121,12 +120,10 @@
         x.memo,
       ),
     );
-    const validation = validateImportRows(rows, (row) =>
-      normalizeExpenseRow(row, lookup),
-    );
-    const valid = markPossibleDuplicates(
-      validation.valid,
+    return validateAndMarkDuplicates(
+      rows,
       existingKeys,
+      (row) => normalizeExpenseRow(row, lookup),
       (row) => {
         const property = lookup.findExactProperty(
           row.property_name,
@@ -145,7 +142,6 @@
         );
       },
     );
-    return { ...validation, valid };
   }
 
   const validation = Object.freeze({ validateExpenseRows });

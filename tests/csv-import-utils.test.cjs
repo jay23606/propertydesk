@@ -15,6 +15,7 @@ const {
   markPossibleDuplicates,
   resolveImportProperty,
   selectImportRows,
+  validateAndMarkDuplicates,
   validateImportRows,
 } = require("../features/import-row-utils.js");
 
@@ -176,4 +177,35 @@ test("re-imported and repeated rows are flagged and excluded unless explicitly i
     ["February"],
   );
   assert.equal(selectImportRows(flagged, true).length, 3);
+});
+
+test("shared import validation marks existing and staged duplicates after normalization", () => {
+  const result = validateAndMarkDuplicates(
+    [
+      { source: "existing" },
+      { source: "new" },
+      { source: "new" },
+      { source: "invalid" },
+    ],
+    ["existing"],
+    (row) => {
+      if (row.source === "invalid") throw new Error("Invalid row.");
+      return { receipt: row.source.toUpperCase() };
+    },
+    (row) => row.receipt.toLowerCase(),
+  );
+
+  assert.equal(result.total, 4);
+  assert.deepEqual(result.errors, [{ row: 5, message: "Invalid row." }]);
+  assert.deepEqual(
+    result.valid.map(({ receipt, _possible_duplicate }) => [
+      receipt,
+      _possible_duplicate,
+    ]),
+    [
+      ["EXISTING", true],
+      ["NEW", false],
+      ["NEW", true],
+    ],
+  );
 });
