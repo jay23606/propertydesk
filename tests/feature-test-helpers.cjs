@@ -147,6 +147,7 @@ function loadPropertyAndAccountForms(context) {
     "workspace-write-reconciliation.js",
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
+    "workspace-record-save-maintenance.js",
     "property-form-view.js",
     "property-repository.js",
     "property-save-maintenance.js",

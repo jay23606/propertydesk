@@ -11,6 +11,7 @@ function loadWorkflow() {
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
+    "workspace-record-save-maintenance.js",
     "property-save-maintenance.js",
   ]) {
     vm.runInContext(
@@ -106,6 +107,7 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
+    "workspace-record-save-maintenance.js",
     "property-save-maintenance.js",
   ]) {
     vm.runInContext(
