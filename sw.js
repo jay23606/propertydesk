@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v658';
+const CACHE_NAME = 'propertydesk-shell-v659';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -274,10 +274,10 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  const shellURL = new URL(url.href);
+  shellURL.search = '';
   // Cache only this static app shell. Never cache API, auth, user records, or config.js responses.
-  if (!SHELL_URLS.has(url.href.split('?')[0])) {
-    return;
-  }
+  if (!SHELL_URLS.has(shellURL.href)) return;
   if (request.mode === 'navigate') {
     event.respondWith(
       fetchAndCache(request, './index.html').catch(() =>
@@ -287,8 +287,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const network = fetchAndCache(request).catch(async (error) => {
-    const cachedResponse = await caches.match(request);
+  const network = fetchAndCache(request, shellURL.href).catch(async (error) => {
+    const cachedResponse = await caches.match(shellURL.href);
     if (cachedResponse) {
       return cachedResponse;
     }
@@ -297,5 +297,7 @@ self.addEventListener('fetch', (event) => {
   // Extend the fetch event from its synchronous handler; do not call waitUntil
   // from a later promise callback after the event dispatch has completed.
   event.waitUntil(network.then(() => undefined).catch(() => undefined));
-  event.respondWith(caches.match(request).then((cached) => cached || network));
+  event.respondWith(
+    caches.match(shellURL.href).then((cached) => cached || network),
+  );
 });
