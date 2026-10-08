@@ -887,42 +887,6 @@ button {
   opacity: 1;
   transform: translate(-50%, 0);
 }
-.auth-view {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 25px;
-  background: radial-gradient(ellipse at 50% 20%, #edf3ec 0, #f7f8f5 55%);
-}
-.auth-card {
-  width: min(100%, 405px);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 33px 35px 27px;
-  box-shadow: 0 15px 55px #273b2b0d;
-}
-.auth-card .brand {
-  padding: 0;
-  margin-bottom: 37px;
-}
-.auth-card h1 {
-  margin: 0;
-  font-size: 25px;
-  letter-spacing: -0.9px;
-}
-.auth-intro {
-  font-size: 12px;
-  color: #89948c;
-  margin: 7px 0 22px;
-}
-.form-stack {
-  display: grid;
-  gap: 15px;
-}
-.form-stack input {
-  padding: 11px;
-}
 .form-message {
   min-height: 17px;
   color: #ae603d;
@@ -939,16 +903,6 @@ button {
   font-weight: 700;
   margin: 0 auto;
   padding: 5px;
-}
-.privacy-note {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  border-top: 1px solid #eff1ed;
-  padding-top: 17px;
-  margin: 21px 0 0;
-  color: #8f9a91;
-  font-size: 10px;
 }
 .detail-kpis {
   display: grid;
@@ -1136,9 +1090,6 @@ button {
   }
   .detail-kpis {
     grid-template-columns: 1fr 1fr 1fr;
-  }
-  .auth-card {
-    padding: 27px 23px;
   }
 }
 @media (max-width: 430px) {
