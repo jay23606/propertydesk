@@ -28,7 +28,12 @@ test("Overview property summary styles stay in their feature stylesheet", () => 
   assert.match(overview, /\.property-quick-payment/);
   assert.match(overview, /\.property-party/);
   assert.match(overview, /\.overview-grid/);
+  assert.match(overview, /\.list-body/);
+  assert.match(overview, /\.round-icon/);
+  assert.match(overview, /\.row-right/);
+  assert.match(overview, /html\[data-theme="dark"\] \.round-icon/);
   assert.doesNotMatch(styles, /\.overview-grid/);
+  assert.doesNotMatch(styles, /\.list-body|\.round-icon|\.row-right/);
   assert.match(overview, /html\[data-theme="dark"\] \.property-art/);
   assert.doesNotMatch(
     shared,

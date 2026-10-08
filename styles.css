@@ -354,9 +354,6 @@ button {
   color: #929d94;
   margin: 5px 0 0;
 }
-.list-body {
-  padding: 0 20px 12px;
-}
 .list-row {
   display: flex;
   align-items: center;
@@ -366,17 +363,6 @@ button {
 }
 .list-row:first-child {
   border-top: 1px solid #f0f2ee;
-}
-.round-icon {
-  width: 33px;
-  height: 33px;
-  border-radius: 9px;
-  background: #f0f4f0;
-  color: #588069;
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  flex-shrink: 0;
 }
 .row-copy {
   min-width: 0;
@@ -395,20 +381,6 @@ button {
   font-size: 11px;
   color: #9aa39c;
   margin-top: 4px;
-}
-.row-right {
-  text-align: right;
-  white-space: nowrap;
-}
-.row-right strong {
-  font-size: 12px;
-  display: block;
-}
-.row-right small {
-  font-size: 10px;
-  color: #9aa39c;
-  display: block;
-  margin-top: 3px;
 }
 .list-empty {
   padding: 27px 10px;
