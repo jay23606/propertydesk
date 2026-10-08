@@ -9,6 +9,7 @@ function loadTransactionModules() {
   for (const filename of [
     "transaction-list-filter-model.js",
     "transaction-display-row-model.js",
+    "transaction-association-model.js",
     "transaction-list-model.js",
     "transaction-summary-model.js",
     "transaction-row-view.js",
@@ -20,6 +21,57 @@ function loadTransactionModules() {
   }
   return context;
 }
+
+test("transaction association model joins rows and builds searchable text", () => {
+  const context = loadTransactionModules();
+  const state = {
+    accounts: [
+      {
+        id: "account-1",
+        property_id: "property-1",
+        name: "Primary account",
+        party_name: "Tenant One",
+      },
+    ],
+    properties: [
+      { id: "property-1", name: "First Street" },
+      { id: "property-2", name: "Second Street" },
+    ],
+  };
+  const model = context.window.PropertyDeskTransactionAssociationModel.create({
+    state,
+  });
+  const income = model.associateTransaction({
+    kind: "income",
+    date: "2026-10-01",
+    amount: 700,
+    item: { account_id: "account-1", memo: "October rent" },
+  });
+  const expense = model.associateTransaction({
+    kind: "expense",
+    date: "2026-10-02",
+    amount: 80,
+    item: {
+      account_id: "account-1",
+      property_id: "property-2",
+      payee: "Roofing Co",
+      memo: "Roof repair",
+    },
+  });
+
+  assert.equal(income.account, state.accounts[0]);
+  assert.equal(income.property, state.properties[0]);
+  assert.equal(
+    income.searchText,
+    "primary account tenant one first street october rent ",
+  );
+  assert.equal(expense.account, state.accounts[0]);
+  assert.equal(expense.property, state.properties[1]);
+  assert.equal(
+    expense.searchText,
+    "primary account tenant one second street roof repair roofing co",
+  );
+});
 
 test("transaction display projection omits loaded records and search data", () => {
   const context = loadTransactionModules();
