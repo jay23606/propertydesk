@@ -158,7 +158,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountWorkspaceWorkflow,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(content\)[\s\S]*?PropertyDeskAccountDetailActionWorkflow\.create\(actions\)/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?PropertyDeskAccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
   );
   const accountDepositWorkspaceWorkflow = fs.readFileSync(
     path.join(

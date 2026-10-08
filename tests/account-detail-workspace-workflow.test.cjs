@@ -8,8 +8,34 @@ test("account detail workspace joins content rendering and action binding", () =
   const passed = {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
-  const content = { depositSectionHTML() {} };
-  const actions = { repository: {} };
+  const content = {
+    $() {},
+    state: {},
+    money() {},
+    fmtDate() {},
+    esc() {},
+    sumPosted() {},
+    prettyType() {},
+    paymentFrequencyLabel() {},
+    summarizeAccount() {},
+    amortizationSchedule() {},
+    openModal() {},
+    propertyAddress() {},
+    depositSectionHTML() {},
+    accountHistoryRepository: {},
+    unusedDependency: true,
+  };
+  const actions = {
+    $() {},
+    state: {},
+    toast() {},
+    fetchAll() {},
+    closeModal() {},
+    editAccount() {},
+    openPayment() {},
+    repository: {},
+    unusedDependency: true,
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskAccountDetailContentWorkflow: {
@@ -45,8 +71,38 @@ test("account detail workspace joins content rendering and action binding", () =
       actions,
     });
 
-  assert.equal(passed.content, content);
-  assert.equal(passed.actions, actions);
+  assert.deepEqual(Object.keys(passed.content).sort(), [
+    "$",
+    "accountHistoryRepository",
+    "amortizationSchedule",
+    "depositSectionHTML",
+    "esc",
+    "fmtDate",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "state",
+    "sumPosted",
+    "summarizeAccount",
+  ]);
+  assert.deepEqual(Object.keys(passed.actions).sort(), [
+    "$",
+    "closeModal",
+    "editAccount",
+    "fetchAll",
+    "openPayment",
+    "repository",
+    "state",
+    "toast",
+  ]);
+  for (const key of Object.keys(passed.content))
+    assert.equal(passed.content[key], content[key]);
+  for (const key of Object.keys(passed.actions))
+    assert.equal(passed.actions[key], actions[key]);
+  assert.equal("unusedDependency" in passed.content, false);
+  assert.equal("unusedDependency" in passed.actions, false);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
   assert.equal(
     workflow.attachAccountDetailActionEvents,
