@@ -27,15 +27,21 @@
 
     async function saveProperty(event) {
       event.preventDefault();
-      const { id, ...values } = formView.readValues();
+      const values = formView.readValues();
       const payload = {
         user_id: state.workspaceOwnerId,
-        ...values,
+        name: values.name,
+        address: values.address,
+        city: values.city,
+        state: values.state,
+        postal_code: values.postal_code,
+        property_kind: values.property_kind,
+        notes: values.notes,
       };
       await saveWorkspaceForm({
         persist: persistProperty,
         payload,
-        id,
+        id: values.id,
         modalId: "property-modal",
         resetForm: formView.resetPropertyForm,
         label: "Property",

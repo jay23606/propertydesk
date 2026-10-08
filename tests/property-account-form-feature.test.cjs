@@ -1,4 +1,6 @@
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const test = require("node:test");
 const {
   loadPropertyAndAccountForms,
@@ -62,6 +64,75 @@ test("property and account form modules expose separate APIs", () => {
     "editAccount",
     "openAccountForProperty",
   ]);
+});
+
+test("property form projects view values into a database-safe property payload", async () => {
+  const context = vm.createContext({
+    window: {
+      PropertyDeskPropertyFormView: {
+        create: () => ({
+          readValues: () => ({
+            id: "property-1",
+            name: "Oak House",
+            address: "10 Main St",
+            city: "Altoona",
+            state: "PA",
+            postal_code: "16601",
+            property_kind: "residential",
+            notes: "Corner lot",
+            displayOnly: "not stored",
+          }),
+          resetPropertyForm() {},
+          attachEvents(handler) {
+            submit = handler;
+          },
+        }),
+      },
+      PropertyDeskWorkspaceFormSaveWorkflow: {
+        create: () => ({
+          save: async (options) => {
+            saved = options;
+          },
+        }),
+      },
+      PropertyDeskPropertySaveMaintenance: {
+        create: () => ({ saveProperty: async () => true }),
+      },
+    },
+  });
+  let submit;
+  let saved;
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-form.js"),
+      "utf8",
+    ),
+    context,
+  );
+
+  const form = context.window.PropertyDeskPropertyForm.create({
+    $: () => ({}),
+    state: { workspaceOwnerId: "workspace-1" },
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    repository: {},
+  });
+  form.attachEvents();
+  await submit({ preventDefault() {} });
+
+  assert.deepEqual(JSON.parse(JSON.stringify(saved.payload)), {
+    user_id: "workspace-1",
+    name: "Oak House",
+    address: "10 Main St",
+    city: "Altoona",
+    state: "PA",
+    postal_code: "16601",
+    property_kind: "residential",
+    notes: "Corner lot",
+  });
+  assert.equal(saved.id, "property-1");
+  assert.equal("displayOnly" in saved.payload, false);
 });
 
 test("property and account maintenance save inserts and updates to their own tables", async () => {
