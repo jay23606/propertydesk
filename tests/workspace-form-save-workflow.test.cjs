@@ -11,7 +11,7 @@ function loadWorkflow() {
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
-    "property-maintenance.js",
+    "property-save-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -106,7 +106,7 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
-    "property-maintenance.js",
+    "property-save-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -119,19 +119,21 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
     workspaceOwnerId: "workspace-1",
     properties: [property],
   };
-  const maintenance = context.window.PropertyDeskPropertyMaintenance.create({
-    state,
-    fetchAll: async () => {
-      Object.assign(property, { address: "New address" });
-      events.push("refresh");
-    },
-    toast: (message) => events.push(`toast:${message}`),
-    repository: {
-      save: async () => {
-        throw new Error("connection lost");
+  const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
+    {
+      state,
+      fetchAll: async () => {
+        Object.assign(property, { address: "New address" });
+        events.push("refresh");
+      },
+      toast: (message) => events.push(`toast:${message}`),
+      repository: {
+        save: async () => {
+          throw new Error("connection lost");
+        },
       },
     },
-  });
+  );
   const workflow = context.window.PropertyDeskWorkspaceFormSaveWorkflow.create({
     $: (id) => id,
     closeModal: (id) => events.push(`close:${id}`),

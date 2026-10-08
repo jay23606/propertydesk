@@ -11,7 +11,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
-    "property-maintenance.js",
+    "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
     vm.runInContext(
@@ -82,7 +82,7 @@ test("property quick notes enforce the character limit before writing", async ()
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
-    "property-maintenance.js",
+    "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
     vm.runInContext(
@@ -116,7 +116,7 @@ test("quick note reconciles a lost response against refreshed property state", a
     "workspace-write-reconciliation.js",
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
-    "property-maintenance.js",
+    "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
     vm.runInContext(

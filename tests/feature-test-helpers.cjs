@@ -150,7 +150,7 @@ function loadPropertyAndAccountForms(context) {
     "repository-write-feedback.js",
     "property-form-view.js",
     "property-repository.js",
-    "property-maintenance.js",
+    "property-save-maintenance.js",
     "workspace-form-save-workflow.js",
     "property-form.js",
     "account-repository.js",

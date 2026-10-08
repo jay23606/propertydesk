@@ -12,7 +12,7 @@
       window.prompt(message, initialValue),
   }) {
     const { savePropertyQuickNote } =
-      window.PropertyDeskPropertyMaintenance.create({
+      window.PropertyDeskPropertyNoteMaintenance.create({
         state,
         fetchAll,
         toast,

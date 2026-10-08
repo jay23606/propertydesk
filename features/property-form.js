@@ -18,7 +18,7 @@
         toast,
       });
     const { saveProperty: persistProperty } =
-      window.PropertyDeskPropertyMaintenance.create({
+      window.PropertyDeskPropertySaveMaintenance.create({
         state,
         fetchAll,
         toast,

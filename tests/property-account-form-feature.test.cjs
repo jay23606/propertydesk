@@ -95,18 +95,14 @@ test("property and account maintenance save inserts and updates to their own tab
     },
   };
   const messages = [];
-  const property = context.window.PropertyDeskPropertyMaintenance.create({
+  const property = context.window.PropertyDeskPropertySaveMaintenance.create({
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
   });
   assert.equal(Object.isFrozen(property), true);
-  assert.deepEqual(Object.keys(property), [
-    "saveProperty",
-    "savePropertyQuickNote",
-    "savePropertyArchive",
-  ]);
+  assert.deepEqual(Object.keys(property), ["saveProperty"]);
   const account = context.window.PropertyDeskAccountFormMaintenance.create({
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
@@ -212,19 +208,21 @@ test("property form confirms a lost save response from refreshed property data",
   const state = { properties: [] };
   let refreshes = 0;
   const messages = [];
-  const maintenance = context.window.PropertyDeskPropertyMaintenance.create({
-    state,
-    fetchAll: async () => {
-      state.properties.push({ ...payload, id: "property-1" });
-      refreshes += 1;
-    },
-    toast: (message) => messages.push(message),
-    repository: {
-      save: async () => {
-        throw new Error("connection lost");
+  const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
+    {
+      state,
+      fetchAll: async () => {
+        state.properties.push({ ...payload, id: "property-1" });
+        refreshes += 1;
+      },
+      toast: (message) => messages.push(message),
+      repository: {
+        save: async () => {
+          throw new Error("connection lost");
+        },
       },
     },
-  });
+  );
 
   assert.equal(await maintenance.saveProperty(payload), true);
   assert.equal(refreshes, 1);

@@ -11,7 +11,7 @@
     repository,
   }) {
     const { savePropertyArchive } =
-      window.PropertyDeskPropertyMaintenance.create({
+      window.PropertyDeskPropertyStatusMaintenance.create({
         state,
         fetchAll,
         toast,
