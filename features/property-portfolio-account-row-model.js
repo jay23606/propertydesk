@@ -12,24 +12,30 @@
     paymentStatusInMonth,
     reminderModel,
   }) {
+    function scheduledAccount(account) {
+      return {
+        id: account.id,
+        status: "active",
+        payment_amount: account.payment_amount,
+        payment_frequency: account.payment_frequency,
+        start_date: account.start_date,
+        next_due_date: account.next_due_date,
+      };
+    }
+
     function buildAccountRow(property, account, street) {
       const { unpaidDue, loanBalance, hasLoanBalance } = summarizeAccount(
         account,
         state.payments,
       );
-      const scheduledPayment = monthlyScheduledEstimate([
-        { ...account, status: "active" },
-      ]);
+      const scheduleAccount = scheduledAccount(account);
+      const scheduledPayment = monthlyScheduledEstimate([scheduleAccount]);
       const partyName = account.party_name || account.name;
       const { reminderHref, recipientHint } =
         reminderModel.buildReminderDetails(property, account, unpaidDue);
       const scheduledThisMonth =
-        amountDueSince(
-          [{ ...account, status: "active" }],
-          [],
-          monthStart(),
-          monthEnd(),
-        ) || Number(account.payment_amount || 0);
+        amountDueSince([scheduleAccount], [], monthStart(), monthEnd()) ||
+        Number(account.payment_amount || 0);
       const paymentStatus = paymentStatusInMonth(
         state.payments,
         account.id,

@@ -214,6 +214,8 @@ test("Properties account-row model derives balances and reminder details", () =>
     user: { user_metadata: { display_name: "Owner" } },
   };
   let reminderOptions;
+  let scheduledAccountKeys;
+  let dueAccountKeys;
   const reminderModel =
     context.window.PropertyDeskPropertyPortfolioReminderModel.create({
       state,
@@ -230,7 +232,10 @@ test("Properties account-row model derives balances and reminder details", () =>
   const model =
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
       state,
-      monthlyScheduledEstimate: ([account]) => account.payment_amount,
+      monthlyScheduledEstimate: ([account]) => {
+        scheduledAccountKeys = Object.keys(account).sort();
+        return account.payment_amount;
+      },
       summarizeAccount:
         context.window.PropertyDeskAccountFinancialSummary.create({
           accountBalance: () => 5000,
@@ -238,7 +243,10 @@ test("Properties account-row model derives balances and reminder details", () =>
           unpaidDueAccrualStart: () => "2026-10-01",
           todayIso: () => "2026-10-05",
         }).summarizeAccount,
-      amountDueSince: (_accounts, payments) => (payments.length ? 35 : 100),
+      amountDueSince: (accounts, payments) => {
+        dueAccountKeys = Object.keys(accounts[0]).sort();
+        return payments.length ? 35 : 100;
+      },
       monthStart: () => "2026-10-01",
       monthEnd: () => "2026-10-31",
       paymentStatusInMonth: (_payments, _id, _monthStart, scheduled) =>
@@ -253,6 +261,9 @@ test("Properties account-row model derives balances and reminder details", () =>
     party_email: "buyer@example.com",
     account_type: "land_contract",
     payment_amount: 250,
+    payment_frequency: "monthly",
+    start_date: "2020-01-01",
+    next_due_date: "2026-10-01",
   };
   const row = model.buildAccountRow(property, landContract, "1 Oak St");
 
@@ -263,6 +274,15 @@ test("Properties account-row model derives balances and reminder details", () =>
   assert.equal(row.paymentStatus, "partial");
   assert.equal(row.reminderHref, "mailto:buyer@example.com");
   assert.equal(row.recipientHint, "Draft late reminder email");
+  assert.deepEqual(scheduledAccountKeys, [
+    "id",
+    "next_due_date",
+    "payment_amount",
+    "payment_frequency",
+    "start_date",
+    "status",
+  ]);
+  assert.deepEqual(dueAccountKeys, scheduledAccountKeys);
   assert.equal(reminderOptions.senderName, "Owner");
   assert.equal(reminderOptions.recipientName, "Buyer");
   assert.equal(reminderOptions.unpaidDue, "$35.00");
