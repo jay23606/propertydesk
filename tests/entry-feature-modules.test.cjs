@@ -71,11 +71,11 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(
     propertyAccountForms,
-    /PropertyDeskPropertyForm\.create\(\{[\s\S]*?repository: property\.repository,/,
+    /workflows\.propertyForm\.create\(\{[\s\S]*?repository: property\.repository,/,
   );
   assert.match(
     propertyAccountForms,
-    /PropertyDeskAccountForm\.create\(\{[\s\S]*?repository: account\.repository,/,
+    /workflows\.accountForm\.create\(\{[\s\S]*?repository: account\.repository,/,
   );
   assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
   assert.match(app, /repository: repositories\.accounts/);

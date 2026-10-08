@@ -49,6 +49,10 @@ test("property and account forms keep separate dependencies and expose explicit 
     repository: { kind: "properties" },
     unusedDependency: true,
   };
+  const workflows = {
+    propertyForm: context.window.PropertyDeskPropertyForm,
+    accountForm: context.window.PropertyDeskAccountForm,
+  };
   const account = {
     $: () => {},
     state: {},
@@ -68,7 +72,16 @@ test("property and account forms keep separate dependencies and expose explicit 
   const forms = context.window.PropertyDeskPropertyAccountFormsWorkflow.create({
     property,
     account,
+    workflows,
   });
+  const source = fs.readFileSync(
+    path.join(root, "features", "property-account-forms-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDesk(?:Property|Account)Form\.create/,
+  );
 
   assert.deepEqual(Object.keys(passed.property).sort(), [
     "$",

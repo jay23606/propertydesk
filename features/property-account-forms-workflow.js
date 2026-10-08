@@ -2,8 +2,12 @@
 (() => {
   "use strict";
 
-  function createPropertyAccountFormsWorkflow({ property, account }) {
-    const propertyForm = window.PropertyDeskPropertyForm.create({
+  function createPropertyAccountFormsWorkflow({
+    property,
+    account,
+    workflows,
+  }) {
+    const propertyForm = workflows.propertyForm.create({
       $: property.$,
       state: property.state,
       toast: property.toast,
@@ -11,7 +15,7 @@
       fetchAll: property.fetchAll,
       repository: property.repository,
     });
-    const accountForm = window.PropertyDeskAccountForm.create({
+    const accountForm = workflows.accountForm.create({
       $: account.$,
       state: account.state,
       moneyInput: account.moneyInput,

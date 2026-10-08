@@ -190,6 +190,10 @@
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const propertyAccountForms =
     window.PropertyDeskPropertyAccountFormsWorkflow.create({
+      workflows: {
+        propertyForm: window.PropertyDeskPropertyForm,
+        accountForm: window.PropertyDeskAccountForm,
+      },
       property: {
         $,
         state,
