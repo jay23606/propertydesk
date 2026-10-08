@@ -52,7 +52,7 @@
       propertyRepository: portfolio.propertyRepository,
     });
 
-    return {
+    return Object.freeze({
       openPropertyDetails: propertyDetails.openPropertyDetails,
       attachPropertyDetailEvents: propertyDetails.attachPropertyDetailEvents,
       attachPropertyQuickActionEvents:
@@ -65,7 +65,7 @@
       renderProperties: properties.renderProperties,
       attachPropertyGridEvents: properties.attachPropertyGridEvents,
       attachPropertyActionEvents: properties.attachPropertyActionEvents,
-    };
+    });
   }
 
   window.PropertyDeskPropertyWorkspaceWorkflow = Object.freeze({

@@ -104,6 +104,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[2][1].openPayment, openPayment);
   assert.equal("unusedDependency" in calls[2][1], false);
   assert.equal(workspace.openPropertyDetails, openPropertyDetails);
+  assert.equal(Object.isFrozen(workspace), true);
   assert.deepEqual(Object.keys(workspace).sort(), [
     "attachOverviewEvents",
     "attachPropertyActionEvents",
