@@ -8,6 +8,7 @@
     fetchAll,
     refreshWorkspaceSettings,
     repository,
+    writeFeedback,
     confirmAction = (message) => window.confirm(message),
   }) {
     function memberWithEmailExists(email) {
@@ -29,21 +30,19 @@
       successMessage,
       savedRefreshFailureMessage,
     }) {
-      return window.PropertyDeskRepositoryWriteFeedback.runAndRefreshWorkspaceChange(
-        {
-          operation,
-          fetchAll,
-          isConfirmed,
-          toast,
-          failureMessage,
-          refreshFailureMessage,
-          retryMessage,
-          afterRefresh: refreshWorkspaceSettings,
-          successMessage,
-          savedRefreshFailureMessage,
-          onReconciled: () => toast(successMessage),
-        },
-      );
+      return writeFeedback.runAndRefreshWorkspaceChange({
+        operation,
+        fetchAll,
+        isConfirmed,
+        toast,
+        failureMessage,
+        refreshFailureMessage,
+        retryMessage,
+        afterRefresh: refreshWorkspaceSettings,
+        successMessage,
+        savedRefreshFailureMessage,
+        onReconciled: () => toast(successMessage),
+      });
     }
 
     async function addWorkspaceMember(email) {

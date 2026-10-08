@@ -55,6 +55,7 @@
       maintenanceWorkflow: workflows.memberMaintenance,
       refreshWorkspaceSettings: renderWorkspaceSettings,
       repository: memberRepository,
+      writeFeedback,
       confirmAction,
     });
 

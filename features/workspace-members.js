@@ -10,6 +10,7 @@
     maintenanceWorkflow,
     refreshWorkspaceSettings,
     repository,
+    writeFeedback,
     confirmAction,
   }) {
     const maintenance = maintenanceWorkflow.create({
@@ -18,6 +19,7 @@
       fetchAll,
       refreshWorkspaceSettings,
       repository,
+      writeFeedback,
       confirmAction,
     });
 

@@ -8,6 +8,14 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+test("workspace member maintenance uses its injected write service", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-member-maintenance.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+});
+
 test("workspace feature owns profile and member form bindings", () => {
   const context = vm.createContext({ window: {} });
   const workflows = loadWorkspaceFeatures(context);
@@ -77,6 +85,7 @@ test("adding a workspace member clears the address only after successful refresh
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state,
@@ -128,6 +137,7 @@ test("adding a workspace member keeps the address when refresh fails", async () 
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state: {
@@ -261,6 +271,7 @@ test("workspace member actions reconcile lost responses against refreshed member
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       calls.push("refresh");

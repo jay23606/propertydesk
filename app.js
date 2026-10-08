@@ -203,8 +203,8 @@
         money,
       },
       memberRepository: repositories.workspaceMembers,
-      authClient,
       writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+      authClient,
     },
     navigation: {
       $,
