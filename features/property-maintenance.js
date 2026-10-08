@@ -3,11 +3,18 @@
   "use strict";
 
   function create({ toast, repository }) {
-    function updateProperty(propertyId, ownerId, values, failureMessage) {
+    function updateProperty(
+      propertyId,
+      ownerId,
+      values,
+      failureMessage,
+      onUnconfirmed,
+    ) {
       return window.PropertyDeskRepositoryWriteFeedback.run({
         operation: () => repository.updateOwned(propertyId, ownerId, values),
         toast,
         failureMessage,
+        onUnconfirmed,
       });
     }
 
@@ -20,21 +27,28 @@
       });
     }
 
-    function savePropertyQuickNote(propertyId, ownerId, note) {
+    function savePropertyQuickNote(propertyId, ownerId, note, onUnconfirmed) {
       return updateProperty(
         propertyId,
         ownerId,
         { notes: note || null },
-        "Property note couldn't be saved right now. Check your connection and try again.",
+        "Property note result couldn't be confirmed. Reload Properties before retrying.",
+        onUnconfirmed,
       );
     }
 
-    function savePropertyArchive(propertyId, ownerId, archivedAt) {
+    function savePropertyArchive(
+      propertyId,
+      ownerId,
+      archivedAt,
+      onUnconfirmed,
+    ) {
       return updateProperty(
         propertyId,
         ownerId,
         { archived_at: archivedAt },
-        "Property status couldn't be updated right now. Check your connection and try again.",
+        "Property status result couldn't be confirmed. Reload Properties before retrying.",
+        onUnconfirmed,
       );
     }
 

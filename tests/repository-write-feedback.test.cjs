@@ -98,6 +98,46 @@ test("repository write feedback reports rejected requests with domain fallback",
   assert.deepEqual(messages, ["Property couldn't be saved right now."]);
 });
 
+test("repository write feedback reconciles an unconfirmed write without misreporting success", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.run({
+      operation: async () => {
+        throw new Error("connection lost");
+      },
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write result couldn't be confirmed.",
+      onUnconfirmed: async (error) => {
+        events.push(["reconcile", error.message]);
+      },
+    }),
+    false,
+  );
+  assert.deepEqual(events, [["reconcile", "connection lost"]]);
+});
+
+test("repository write feedback uses its fallback when unconfirmed reconciliation fails", async () => {
+  const messages = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.run({
+      operation: async () => {
+        throw new Error("connection lost");
+      },
+      toast: (message) => messages.push(message),
+      failureMessage: "Write result couldn't be confirmed.",
+      onUnconfirmed: async () => {
+        throw new Error("refresh failed");
+      },
+    }),
+    false,
+  );
+  assert.deepEqual(messages, ["Write result couldn't be confirmed."]);
+});
+
 test("post-write refresh shows success only after workspace data reloads", async () => {
   const events = [];
   const feedback = createFeedback();

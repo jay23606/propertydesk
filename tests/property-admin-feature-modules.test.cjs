@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-test("property holder and archive workflows report rejected writes without running success actions", async () => {
+test("property holder and archive workflows reconcile rejected writes before retry", async () => {
   const context = vm.createContext({
     window: {},
     document: { querySelectorAll: () => [] },
@@ -56,7 +56,9 @@ test("property holder and archive workflows report rejected writes without runni
     context.window.PropertyDeskPropertyHolderManagement.create({
       state,
       toast: (message) => messages.push(message),
-      fetchAll: async () => assert.fail("a rejected write must not refresh"),
+      fetchAll: async () => {
+        throw new Error("offline");
+      },
       openPropertyDetails: () =>
         assert.fail("a rejected write must not reopen details"),
       repository: context.window.PropertyDeskPropertyHolderRepository.create({
@@ -66,7 +68,9 @@ test("property holder and archive workflows report rejected writes without runni
   const archive = context.window.PropertyDeskPropertyArchive.create({
     state,
     toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("a rejected write must not refresh"),
+    fetchAll: async () => {
+      throw new Error("offline");
+    },
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
@@ -80,7 +84,51 @@ test("property holder and archive workflows report rejected writes without runni
   assert.deepEqual(messages, [
     "Account-holder labels couldn't be saved right now. Check your connection and try again.",
     "Account-holder label update status couldn't be confirmed, and the workspace could not refresh. Reload to verify the current labels.",
-    "Property status couldn't be updated right now. Check your connection and try again.",
+    "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+  ]);
+});
+
+test("archive reconciles a lost response against refreshed property state", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const source of [
+    "repository-write-feedback.js",
+    "property-maintenance.js",
+    "property-archive.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const property = { id: "property-1", archived_at: null };
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    selectedPropertyId: property.id,
+    properties: [property],
+  };
+  const archive = context.window.PropertyDeskPropertyArchive.create({
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      property.archived_at = "2026-10-08";
+      events.push(["refresh"]);
+    },
+    todayIso: () => "2026-10-08",
+    openPropertyDetails: (id) => events.push(["open", id]),
+    repository: {
+      updateOwned: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+
+  await archive.toggleArchiveProperty();
+
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["open", "property-1"],
+    ["toast", "Property archived"],
   ]);
 });
 

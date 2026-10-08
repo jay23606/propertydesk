@@ -8,14 +8,23 @@
     failureMessage,
     errorMessage = (error) => error.message,
     resultFailureMessage = () => null,
+    onUnconfirmed,
   }) {
     let result;
     let error;
     try {
       result = await operation();
       ({ error } = result);
-    } catch {
-      toast(failureMessage);
+    } catch (error) {
+      if (onUnconfirmed) {
+        try {
+          await onUnconfirmed(error);
+        } catch {
+          toast(failureMessage);
+        }
+      } else {
+        toast(failureMessage);
+      }
       return false;
     }
     if (error) {

@@ -22,7 +22,14 @@
       if (!property) return;
 
       const archived_at = property.archived_at ? null : todayIso();
-      if (!(await savePropertyArchive(id, state.workspaceOwnerId, archived_at)))
+      if (
+        !(await savePropertyArchive(
+          id,
+          state.workspaceOwnerId,
+          archived_at,
+          () => refreshUncertainPropertyStatus(id, archived_at),
+        ))
+      )
         return;
       await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
         fetchAll,
@@ -33,6 +40,32 @@
           ? "Property was archived, but the workspace could not refresh. Reload to verify its status."
           : "Property was restored, but the workspace could not refresh. Reload to verify its status.",
       });
+    }
+
+    async function refreshUncertainPropertyStatus(id, archivedAt) {
+      let statusMatches = false;
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            const property = state.properties.find((item) => item.id === id);
+            statusMatches =
+              Boolean(property?.archived_at) === Boolean(archivedAt);
+            openPropertyDetails(id);
+          },
+          toast,
+          refreshFailureMessage:
+            "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+        });
+      if (!refreshed) return false;
+      toast(
+        statusMatches
+          ? archivedAt
+            ? "Property archived"
+            : "Property restored"
+          : "Property status is shown in refreshed details. Check it before retrying.",
+      );
+      return true;
     }
 
     return Object.freeze({ toggleArchiveProperty });

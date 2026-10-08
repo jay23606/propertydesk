@@ -30,7 +30,11 @@
         toast("Quick notes are limited to 140 characters.");
         return;
       }
-      if (!(await savePropertyQuickNote(id, state.workspaceOwnerId, note)))
+      if (
+        !(await savePropertyQuickNote(id, state.workspaceOwnerId, note, () =>
+          refreshUncertainPropertyNote(id, note),
+        ))
+      )
         return;
       await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
         fetchAll,
@@ -40,6 +44,30 @@
           ? "Property note was saved, but the workspace could not refresh. Reload to verify it."
           : "Property note was removed, but the workspace could not refresh. Reload to verify it.",
       });
+    }
+
+    async function refreshUncertainPropertyNote(id, note) {
+      let noteMatches = false;
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            const property = state.properties.find((item) => item.id === id);
+            noteMatches = (property?.notes || "") === note;
+          },
+          toast,
+          refreshFailureMessage:
+            "Property note result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+        });
+      if (!refreshed) return false;
+      toast(
+        noteMatches
+          ? note
+            ? "Property note saved"
+            : "Property note removed"
+          : "Property note result is shown in refreshed Properties. Check it before retrying.",
+      );
+      return true;
     }
 
     return Object.freeze({ editPropertyQuickNote });

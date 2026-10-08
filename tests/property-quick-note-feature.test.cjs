@@ -106,6 +106,45 @@ test("property quick notes enforce the character limit before writing", async ()
   assert.deepEqual(messages, ["Quick notes are limited to 140 characters."]);
 });
 
+test("quick note reconciles a lost response against refreshed property state", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const source of [
+    "repository-write-feedback.js",
+    "property-maintenance.js",
+    "property-quick-note.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const property = { id: "property-1", address: "10 Main St", notes: "Old" };
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    properties: [property],
+  };
+  const feature = context.window.PropertyDeskPropertyQuickNote.create({
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      property.notes = "Updated note";
+      events.push(["refresh"]);
+    },
+    streetAddress: (item) => item.address,
+    repository: {
+      updateOwned: async () => {
+        throw new Error("connection lost");
+      },
+    },
+    promptAction: () => "Updated note",
+  });
+
+  await feature.editPropertyQuickNote("property-1");
+
+  assert.deepEqual(events, [["refresh"], ["toast", "Property note saved"]]);
+});
+
 test("quick note and grid actions load before the Properties workflow", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
