@@ -51,6 +51,10 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionRepository: transactionRepository,
+      PropertyDeskRepositoryWriteFeedback: { saveWorkspaceRecord() {} },
+      PropertyDeskWorkspaceRecordWriteWorkflow: {
+        selectRecordWriteCompletion() {},
+      },
       PropertyDeskTransactionPayloads: {
         buildPayment: buildPaymentPayload,
         buildExpense: buildExpensePayload,
@@ -193,6 +197,14 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   );
   assert.equal(passed.persistenceOptions.toast, dependencies.toast);
   assert.equal(passed.persistenceOptions.repository, transactionRepository);
+  assert.equal(
+    passed.persistenceOptions.writeFeedback,
+    dependencies.writeFeedback,
+  );
+  assert.equal(
+    passed.persistenceOptions.selectRecordWriteCompletion,
+    dependencies.selectRecordWriteCompletion,
+  );
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
   assert.equal(passed.saveWorkflowOptions.fetchAll, undefined);
   assert.equal(passed.saveWorkflowOptions.state, dependencies.state);

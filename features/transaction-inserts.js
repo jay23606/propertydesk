@@ -2,7 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ state, fetchAll, toast, repository }) {
+  function create({
+    state,
+    fetchAll,
+    toast,
+    repository,
+    writeFeedback,
+    selectRecordWriteCompletion,
+  }) {
     function runInsert(
       operation,
       failureMessage,
@@ -11,13 +18,10 @@
       completion,
     ) {
       const save = completion
-        ? window.PropertyDeskRepositoryWriteFeedback
-            .saveAndRefreshWorkspaceRecord
-        : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
+        ? writeFeedback.saveAndRefreshWorkspaceRecord
+        : writeFeedback.saveWorkspaceRecord;
       return save({
-        ...window.PropertyDeskWorkspaceRecordWriteWorkflow.selectRecordWriteCompletion(
-          completion,
-        ),
+        ...selectRecordWriteCompletion(completion),
         operation,
         state,
         collection,

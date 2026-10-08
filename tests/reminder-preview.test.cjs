@@ -97,7 +97,7 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   assert.match(values["reminder-preview-content"].innerHTML, /&lt;St&gt;/);
   assert.match(
     values["reminder-preview-content"].innerHTML,
-    /Hi &lt;Renter&gt;,<br><br>Our records show USD 550\.00 unpaid for 10 Main &lt;St&gt; \(tracked since October 2026; earlier balances may not be included\)\.<br><br>Please arrange payment promptly or contact me with questions\.<br><br>Thanks!/,
+    /Hi &lt;Renter&gt;,<br><br>Our records show USD 550\.00 unpaid for 10 Main &lt;St&gt; \(tracked since October 2026; earlier balances or late fees may not be included\)\.<br><br>Please arrange payment promptly or contact me with questions\.<br><br>Thanks!/,
   );
   assert.equal(calls.at(-1), "reminder-preview-modal");
 });

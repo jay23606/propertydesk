@@ -17,6 +17,8 @@
     saveCorrection,
     transactionPayloads,
     transactionRepository,
+    writeFeedback,
+    selectRecordWriteCompletion,
     expenseAccountPolicy,
     workflows,
   }) {
@@ -32,6 +34,8 @@
         fetchAll,
         toast,
         repository: transactionRepository,
+        writeFeedback,
+        selectRecordWriteCompletion,
       });
     const { saveTransactionEntry } =
       window.PropertyDeskLedgerEntrySaveWorkflow.create({

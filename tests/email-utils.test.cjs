@@ -30,7 +30,7 @@ test("late reminder email uses the requested payment reminder copy", () => {
   assert.deepEqual(parts(href), {
     recipients: "buyer@example.test",
     subject: "Payment reminder for 1 Sample Street · October 2026",
-    body: "Hi Test Buyer,\n\nOur records show $550.00 unpaid for 1 Sample Street (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
+    body: "Hi Test Buyer,\n\nOur records show $550.00 unpaid for 1 Sample Street (tracked since October 2026; earlier balances or late fees may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   });
 });
 
@@ -57,7 +57,7 @@ test("late reminder link supports multiple validated recipients and leaves missi
   assert.match(noEmail.subject, /^Payment reminder for 10 Oak St · /);
   assert.equal(
     noEmail.body,
-    "Hi there,\n\nOur records show $75.00 unpaid for 10 Oak St (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
+    "Hi there,\n\nOur records show $75.00 unpaid for 10 Oak St (tracked since October 2026; earlier balances or late fees may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   );
 });
 
@@ -90,7 +90,7 @@ test("late reminder text link opens the phone composer with the same reminder bo
   assert.equal(url.pathname, "+15550102020");
   assert.equal(
     url.searchParams.get("body"),
-    "Hi Test Buyer,\n\nOur records show $550.00 unpaid for 1 Sample Street (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!\nProperty Manager",
+    "Hi Test Buyer,\n\nOur records show $550.00 unpaid for 1 Sample Street (tracked since October 2026; earlier balances or late fees may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!\nProperty Manager",
   );
   assert.equal(lateReminderSms({ phone: "   " }), "");
 });

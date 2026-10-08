@@ -134,6 +134,10 @@ function ledgerEntryDependencies(context, state = {}) {
       ? repositoryFactory.create({ getClient: () => state.client })
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    selectRecordWriteCompletion:
+      context.window.PropertyDeskWorkspaceRecordWriteWorkflow
+        ?.selectRecordWriteCompletion,
     expenseAccountPolicy: context.window.PropertyDeskExpenseAccountPolicy,
     workflows: {
       paymentView: context.window.PropertyDeskPaymentEntryView,

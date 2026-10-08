@@ -76,6 +76,6 @@ test("reminder preview model derives the due and email content from current term
     label: "October 2026",
     schedule:
       "Last day of October 2026, only when no rent or installment payment is recorded that month",
-    body: "Hi Buyer,\n\nOur records show USD 550.00 unpaid for 10 Main St (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
+    body: "Hi Buyer,\n\nOur records show USD 550.00 unpaid for 10 Main St (tracked since October 2026; earlier balances or late fees may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   });
 });

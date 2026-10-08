@@ -326,6 +326,10 @@
         openModal,
         transactionRepository: repositories.transactions,
         transactionPayloads: window.PropertyDeskTransactionPayloads,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        selectRecordWriteCompletion:
+          window.PropertyDeskWorkspaceRecordWriteWorkflow
+            .selectRecordWriteCompletion,
         expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
         workflows: {
           paymentView: window.PropertyDeskPaymentEntryView,

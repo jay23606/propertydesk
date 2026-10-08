@@ -62,11 +62,27 @@ function loadTransactionInserts(client, messages = [], options = {}) {
     state: options.state,
     fetchAll: options.fetchAll,
     toast: (message) => messages.push(message),
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    selectRecordWriteCompletion:
+      context.window.PropertyDeskWorkspaceRecordWriteWorkflow
+        .selectRecordWriteCompletion,
     repository: context.window.PropertyDeskTransactionRepository.create({
       getClient: () => client,
     }),
   });
 }
+
+test("transaction inserts receive write services instead of reading globals", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-inserts.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
+  );
+});
 
 test("transaction entry actions write to their dedicated ledgers", async () => {
   const calls = [];

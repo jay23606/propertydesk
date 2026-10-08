@@ -22,7 +22,7 @@
     const body = [
       `Hi ${name},`,
       "",
-      `Our records show ${unpaidDue} unpaid for ${address} (tracked since October 2026; earlier balances may not be included).`,
+      `Our records show ${unpaidDue} unpaid for ${address} (tracked since October 2026; earlier balances or late fees may not be included).`,
       "",
       "Please arrange payment promptly or contact me with questions.",
       "",

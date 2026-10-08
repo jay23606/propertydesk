@@ -15,6 +15,8 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   const attachTransactionFilterEvents = () => {};
   const attachTransactionActionEvents = () => {};
   const expenseAccountPolicy = {};
+  const writeFeedback = {};
+  const selectRecordWriteCompletion = () => {};
   const entryWorkflows = {
     paymentView: {},
     expenseView: {},
@@ -42,6 +44,8 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     transactionRepository: {},
     transactionPayloads: {},
     expenseAccountPolicy,
+    writeFeedback,
+    selectRecordWriteCompletion,
     workflows: entryWorkflows,
     unusedEntryDependency: true,
   };
@@ -119,12 +123,14 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     "populateFormOptions",
     "prettyType",
     "saveCorrection",
+    "selectRecordWriteCompletion",
     "state",
     "toast",
     "todayIso",
     "transactionPayloads",
     "transactionRepository",
     "workflows",
+    "writeFeedback",
   ]);
   assert.equal(passed.entries.expenseAccountPolicy, expenseAccountPolicy);
   assert.equal(passed.entries.workflows, entryWorkflows);

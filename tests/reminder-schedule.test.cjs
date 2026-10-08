@@ -30,11 +30,11 @@ test("reminder email uses the requested wording and safely escapes its HTML vers
   );
   assert.equal(
     message.text,
-    "Hi Ana & <Sam>,\n\nOur records show $550.00 unpaid for 12 <Main> & 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
+    "Hi Ana & <Sam>,\n\nOur records show $550.00 unpaid for 12 <Main> & 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances or late fees may not be included).\n\nPlease arrange payment promptly or contact me with questions.\n\nThanks!",
   );
   assert.equal(
     message.html,
-    "Hi Ana &amp; &lt;Sam&gt;,<br><br>Our records show $550.00 unpaid for 12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances may not be included).<br><br>Please arrange payment promptly or contact me with questions.<br><br>Thanks!",
+    "Hi Ana &amp; &lt;Sam&gt;,<br><br>Our records show $550.00 unpaid for 12 &lt;Main&gt; &amp; 2nd, Town, PA, 17000 (tracked since October 2026; earlier balances or late fees may not be included).<br><br>Please arrange payment promptly or contact me with questions.<br><br>Thanks!",
   );
 });
 
