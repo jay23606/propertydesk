@@ -21,6 +21,7 @@
     });
     const { saveVoidTransaction } =
       window.PropertyDeskTransactionVoidMaintenance.create({
+        state: voidingContext.state,
         toast: voidingContext.toast,
         fetchAll: voidingContext.fetchAll,
         timestamp: voidingContext.timestamp,

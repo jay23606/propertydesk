@@ -67,6 +67,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     unusedCorrectionValue: true,
   };
   const voidingContext = {
+    state: {},
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
     repository: correctionContext.repository,
@@ -131,6 +132,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "toast",
   ]);
   assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
+  assert.equal(passed.voidMaintenance.state, voidingContext.state);
   assert.equal(passed.voidMaintenance.fetchAll, voidingContext.fetchAll);
   assert.equal(
     passed.voidMaintenance.resolveVoidTarget,
@@ -142,12 +144,12 @@ test("transaction maintenance coordinator joins isolated correction and void act
   );
   assert.equal(passed.voidMaintenance.repository, voidingContext.repository);
   assert.equal("unusedVoidingValue" in passed.voidMaintenance, false);
-  assert.equal("state" in passed.voidMaintenance, false);
   assert.deepEqual(Object.keys(passed.voidMaintenance).sort(), [
     "buildVoidPayload",
     "fetchAll",
     "repository",
     "resolveVoidTarget",
+    "state",
     "timestamp",
     "toast",
   ]);

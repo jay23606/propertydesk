@@ -51,6 +51,8 @@ test("transaction corrections save payment and expense changes with their audit 
       id: "payment-1",
       reason: "Bank statement",
     },
+    payments: [],
+    expenses: [],
     client: {
       async rpc(name, args) {
         rpcCalls.push([name, args]);
@@ -129,6 +131,8 @@ test("transaction correction failures preserve the open form and pending correct
   let refreshes = 0;
   const state = {
     pendingCorrection: { kind: "payment", id: "payment-1", reason: "Fix date" },
+    payments: [],
+    expenses: [],
     client: {
       rpc: async () => {
         throw new Error("offline");
@@ -155,10 +159,61 @@ test("transaction correction failures preserve the open form and pending correct
   assert.equal(await feature.saveCorrection("expense", { amount: 75 }), false);
   assert.equal(state.pendingCorrection.id, "payment-1");
   assert.equal(closes, 0);
-  assert.equal(refreshes, 0);
+  assert.equal(refreshes, 1);
   assert.deepEqual(messages, [
-    "Correction result couldn't be confirmed. Reload transaction history before trying again.",
+    "Transaction history was refreshed. Check it before trying the correction again.",
     "This correction is no longer available.",
+  ]);
+});
+
+test("transaction correction confirms a lost response from the audit link", async () => {
+  const context = vm.createContext({ window: {} });
+  loadTransactionRepository(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-correction-maintenance.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const events = [];
+  const state = {
+    pendingCorrection: { kind: "payment", id: "payment-1", reason: "Fix date" },
+    payments: [],
+    expenses: [],
+  };
+  const feature =
+    context.window.PropertyDeskTransactionCorrectionMaintenance.create({
+      $: (id) => ({ id }),
+      state,
+      closeModal: (modal) => events.push(["close", modal.id]),
+      fetchAll: async () => {
+        state.payments = [
+          {
+            id: "replacement-1",
+            correction_of_payment_id: "payment-1",
+          },
+        ];
+        events.push(["refresh"]);
+      },
+      toast: (message) => events.push(["toast", message]),
+      repository: {
+        correct: async () => {
+          throw new Error("connection lost");
+        },
+      },
+    });
+
+  assert.equal(await feature.saveCorrection("payment", { amount: 75 }), true);
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["close", "payment-modal"],
+    ["toast", "Payment corrected; original kept in history"],
   ]);
 });
 

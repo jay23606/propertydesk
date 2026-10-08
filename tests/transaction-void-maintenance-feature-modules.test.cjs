@@ -306,8 +306,11 @@ test("transaction void maintenance reports rejected requests without refreshing"
     context,
   );
   const messages = [];
+  const refreshes = [];
+  const state = { payments: [], expenses: [] };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    fetchAll: async () => assert.fail("failed void request must not refresh"),
+    state,
+    fetchAll: async () => refreshes.push(true),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskTransactionRepository.create({
       getClient: () => ({
@@ -333,7 +336,60 @@ test("transaction void maintenance reports rejected requests without refreshing"
     feature.saveVoidTransaction("income", "payment-1", "Entered in error"),
   );
   assert.deepEqual(messages, [
-    "Transaction void result couldn't be confirmed. Reload transaction history before trying again.",
+    "Transaction history was refreshed. Check it before trying to void this entry again.",
+  ]);
+  assert.deepEqual(refreshes, [true]);
+});
+
+test("transaction void confirms a lost response from the refreshed audit fields", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "transaction-void-model.js",
+    "repository-write-feedback.js",
+    "transaction-void-maintenance.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const state = {
+    payments: [{ id: "payment-1", status: "posted" }],
+    expenses: [],
+  };
+  const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
+    state,
+    repository: {
+      voidPosted: async () => {
+        throw new Error("connection lost");
+      },
+    },
+    ...transactionVoidModelOptions(context),
+    timestamp: () => "2026-10-08T12:00:00.000Z",
+    fetchAll: async () => {
+      state.payments[0] = {
+        id: "payment-1",
+        status: "voided",
+        voided_at: "2026-10-08T12:00:00.000Z",
+        void_reason: "Entered in error",
+      };
+      events.push(["refresh"]);
+    },
+    toast: (message) => events.push(["toast", message]),
+  });
+
+  assert.equal(
+    await feature.saveVoidTransaction(
+      "income",
+      "payment-1",
+      "Entered in error",
+    ),
+    true,
+  );
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["toast", "Transaction voided; original entry preserved"],
   ]);
 });
 

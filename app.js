@@ -186,6 +186,7 @@
             window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
         },
         voiding: {
+          state,
           toast,
           fetchAll,
           repository: repositories.transactions,
