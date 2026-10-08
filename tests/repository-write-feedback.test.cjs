@@ -233,6 +233,104 @@ test("repository write feedback uses its fallback when unconfirmed reconciliatio
   assert.deepEqual(messages, ["Write result couldn't be confirmed."]);
 });
 
+test("workspace change refreshes and reports a confirmed write once", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.runAndRefreshWorkspaceChange({
+      operation: async () => {
+        events.push("write");
+        return { error: null };
+      },
+      fetchAll: async () => events.push("refresh"),
+      isConfirmed: () => true,
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write failed.",
+      refreshFailureMessage: "Refresh failed.",
+      retryMessage: "Check before retrying.",
+      onSaved: () => events.push("saved callback"),
+      afterRefresh: () => events.push("after refresh"),
+      successMessage: "Change saved",
+    }),
+    true,
+  );
+  assert.deepEqual(events, [
+    "write",
+    "saved callback",
+    "refresh",
+    "after refresh",
+    ["toast", "Change saved"],
+  ]);
+});
+
+test("workspace change does not repeat refresh after a lost response is confirmed", async () => {
+  const events = [];
+  const feedback = createFeedback();
+  const state = { persisted: false, refreshed: false };
+
+  assert.equal(
+    await feedback.runAndRefreshWorkspaceChange({
+      operation: async () => {
+        events.push("write");
+        state.persisted = true;
+        throw new Error("connection lost");
+      },
+      fetchAll: async () => {
+        events.push("refresh");
+        state.refreshed = true;
+      },
+      isConfirmed: () => state.persisted && state.refreshed,
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write result couldn't be confirmed.",
+      refreshFailureMessage: "Refresh failed.",
+      retryMessage: "Check before retrying.",
+      onSaved: () => events.push("saved callback"),
+      afterRefresh: () => events.push("after refresh"),
+      successMessage: "Change saved",
+      onReconciled: () => events.push(["toast", "Change saved"]),
+    }),
+    true,
+  );
+  assert.deepEqual(events, [
+    "write",
+    "refresh",
+    "after refresh",
+    ["toast", "Change saved"],
+  ]);
+});
+
+test("workspace change asks for verification when refreshed state lacks the write", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.runAndRefreshWorkspaceChange({
+      operation: async () => {
+        events.push("write");
+        throw new Error("connection lost");
+      },
+      fetchAll: async () => events.push("refresh"),
+      isConfirmed: () => false,
+      toast: (message) => events.push(["toast", message]),
+      failureMessage: "Write result couldn't be confirmed.",
+      refreshFailureMessage: "Refresh failed.",
+      retryMessage: "Check before retrying.",
+      onSaved: () => events.push("saved callback"),
+      afterRefresh: () => events.push("after refresh"),
+      successMessage: "Change saved",
+      onReconciled: () => events.push(["toast", "Change saved"]),
+    }),
+    false,
+  );
+  assert.deepEqual(events, [
+    "write",
+    "refresh",
+    "after refresh",
+    ["toast", "Check before retrying."],
+  ]);
+});
+
 test("post-write refresh shows success only after workspace data reloads", async () => {
   const events = [];
   const feedback = createFeedback();
