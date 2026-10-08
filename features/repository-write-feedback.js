@@ -77,6 +77,7 @@
     fetchAll,
     toast,
     failureMessage,
+    errorMessage,
     refreshFailureMessage,
     retryMessage,
     onReconciled,
@@ -120,6 +121,7 @@
       operation,
       toast,
       failureMessage,
+      errorMessage,
       onUnconfirmed,
     });
   }
