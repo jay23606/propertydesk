@@ -16,6 +16,7 @@
       const reminderHref = lateReminderMailto({
         email: account.party_email,
         address: propertyAddress(property),
+        subjectAddress: property.address,
         unpaidDue: money(unpaidDue),
         senderName:
           state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",

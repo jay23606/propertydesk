@@ -5,19 +5,15 @@
   const { splitEmailAddresses, isValidEmailAddress } =
     globalThis.PropertyDeskEmailAddressUtils;
 
-  function lateReminderMailto({
-    email,
+  function paymentReminderMessage({
     address,
+    subjectAddress = address,
     unpaidDue,
     senderName,
     recipientName,
     month,
     asOf,
   }) {
-    const recipients = splitEmailAddresses(email)
-      .filter(isValidEmailAddress)
-      .map((value) => encodeURIComponent(value).replace(/%40/gi, "@"))
-      .join(",");
     const period =
       month ||
       new Intl.DateTimeFormat(undefined, {
@@ -25,9 +21,9 @@
         year: "numeric",
       }).format(new Date());
     const amountDate = asOf || new Date().toISOString().slice(0, 10);
-    const subject = `Payment reminder for ${address} · ${period}`;
+    const subject = `Payment reminder for ${subjectAddress} · ${period}`;
     const body = [
-      `Hello ${recipientName || "there"},`,
+      `Hello ${String(recipientName || "").trim() || "there"},`,
       "",
       `Our records show no rent or installment payment recorded for ${period}.`,
       "",
@@ -39,10 +35,36 @@
       "Thank you,",
       senderName || "PropertyDesk",
     ].join("\n");
-    return `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return { subject, body };
   }
 
-  const helpers = Object.freeze({ lateReminderMailto });
+  function lateReminderMailto({
+    email,
+    address,
+    subjectAddress,
+    unpaidDue,
+    senderName,
+    recipientName,
+    month,
+    asOf,
+  }) {
+    const recipients = splitEmailAddresses(email)
+      .filter(isValidEmailAddress)
+      .map((value) => encodeURIComponent(value).replace(/%40/gi, "@"))
+      .join(",");
+    const message = paymentReminderMessage({
+      address,
+      subjectAddress,
+      unpaidDue,
+      senderName,
+      recipientName,
+      month,
+      asOf,
+    });
+    return `mailto:${recipients}?subject=${encodeURIComponent(message.subject)}&body=${encodeURIComponent(message.body)}`;
+  }
+
+  const helpers = Object.freeze({ paymentReminderMessage, lateReminderMailto });
   globalThis.PropertyDeskEmailUtils = helpers;
   if (typeof module !== "undefined" && module.exports) module.exports = helpers;
 })();

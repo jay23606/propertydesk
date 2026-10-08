@@ -318,6 +318,7 @@ test("Properties reminder model builds the manual reminder details", () => {
   assert.deepEqual(JSON.parse(JSON.stringify(options[0])), {
     email: "buyer@example.test",
     address: "1 Oak St",
+    subjectAddress: "1 Oak St",
     unpaidDue: "$35.00",
     senderName: "Owner",
     recipientName: "Buyer",

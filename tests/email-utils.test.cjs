@@ -62,6 +62,19 @@ test("late reminder link supports multiple validated recipients and leaves missi
   assert.ok(noEmail.body.endsWith("\n\nThank you,\nOwner"));
 });
 
+test("shared reminder copy falls back to a generic greeting for a blank name", () => {
+  const message = lateReminderMailto({
+    email: "buyer@example.test",
+    address: "10 Oak St",
+    unpaidDue: "$75.00",
+    recipientName: "   ",
+    month: "October 2026",
+    asOf: "2026-10-31",
+  });
+
+  assert.match(parts(message).body, /^Hello there,/);
+});
+
 test("the app renders the account holder as a mailto link instead of an account-details button", () => {
   const fs = require("node:fs");
   const path = require("node:path");

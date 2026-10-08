@@ -3,9 +3,21 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
+require("../features/email-address-utils.js");
+const { paymentReminderMessage } = require("../features/email-utils.js");
 
 test("reminder preview model derives the due and email content from current terms", () => {
-  const context = vm.createContext({ window: {} });
+  const messageCalls = [];
+  const context = vm.createContext({
+    window: {
+      PropertyDeskEmailUtils: {
+        paymentReminderMessage: (options) => {
+          messageCalls.push(options);
+          return paymentReminderMessage(options);
+        },
+      },
+    },
+  });
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "reminder-preview-model.js"),
@@ -47,6 +59,15 @@ test("reminder preview model derives the due and email content from current term
     "2026-10-01",
     "2026-10-31",
   ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(messageCalls[0])), {
+    address: "10 Main St",
+    subjectAddress: "10 Main St",
+    unpaidDue: "USD 550.00",
+    recipientName: "Buyer",
+    senderName: "PropertyDesk",
+    month: "October 2026",
+    asOf: "2026-10-31",
+  });
   assert.deepEqual(JSON.parse(JSON.stringify(preview)), {
     recipients: ["buyer@example.test"],
     subject: "Payment reminder for 10 Main St · October 2026",

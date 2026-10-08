@@ -3,6 +3,8 @@
   "use strict";
 
   function create({
+    paymentReminderMessage = window.PropertyDeskEmailUtils
+      .paymentReminderMessage,
     amountDueSince,
     unpaidDueAccrualStart,
     monthEnd,
@@ -24,21 +26,15 @@
         year: "numeric",
       });
       const address = propertyAddress(property);
-      const name = account.party_name || "there";
-      const subject = `Payment reminder for ${property.address} · ${label}`;
-      const body = [
-        `Hello ${name},`,
-        "",
-        `Our records show no rent or installment payment recorded for ${label}.`,
-        "",
-        `Unpaid due as of ${endDate}: ${money(amount)}`,
-        `Property: ${address}`,
-        "",
-        "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
-        "",
-        "Thank you,",
-        "PropertyDesk",
-      ].join("\n");
+      const { subject, body } = paymentReminderMessage({
+        address,
+        subjectAddress: property.address,
+        unpaidDue: money(amount),
+        recipientName: account.party_name,
+        senderName: "PropertyDesk",
+        month: label,
+        asOf: endDate,
+      });
 
       return {
         recipients,

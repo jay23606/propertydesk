@@ -3,8 +3,12 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+require("../features/email-address-utils.js");
+const emailUtils = require("../features/email-utils.js");
 test("reminder preview uses current form values and escapes recipient-facing text", () => {
-  const context = vm.createContext({ window: {} });
+  const context = vm.createContext({
+    window: { PropertyDeskEmailUtils: emailUtils },
+  });
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "email-address-utils.js"),
