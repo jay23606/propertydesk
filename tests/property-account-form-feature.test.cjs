@@ -7,6 +7,7 @@ const {
   accountFormDependencies,
   accountFormModel,
   propertyFormDependencies,
+  workspaceRecordWriteDependencies,
   formElements,
 } = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
@@ -173,6 +174,7 @@ test("property and account maintenance save inserts and updates to their own tab
   };
   const messages = [];
   const property = context.window.PropertyDeskPropertySaveMaintenance.create({
+    ...workspaceRecordWriteDependencies(context),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
@@ -181,6 +183,7 @@ test("property and account maintenance save inserts and updates to their own tab
   assert.equal(Object.isFrozen(property), true);
   assert.deepEqual(Object.keys(property), ["saveProperty"]);
   const account = context.window.PropertyDeskAccountFormMaintenance.create({
+    ...workspaceRecordWriteDependencies(context),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,
@@ -253,6 +256,7 @@ test("account form confirms a lost save response from refreshed account data", a
   let refreshes = 0;
   const messages = [];
   const maintenance = context.window.PropertyDeskAccountFormMaintenance.create({
+    ...workspaceRecordWriteDependencies(context),
     state,
     fetchAll: async () => {
       state.accounts.push({ ...payload, id: "account-1" });
@@ -287,6 +291,7 @@ test("property form confirms a lost save response from refreshed property data",
   const messages = [];
   const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
     {
+      ...workspaceRecordWriteDependencies(context),
       state,
       fetchAll: async () => {
         state.properties.push({ ...payload, id: "property-1" });

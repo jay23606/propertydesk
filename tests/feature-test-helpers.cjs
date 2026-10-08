@@ -147,8 +147,21 @@ function ledgerEntryDependencies(context, state = {}) {
   };
 }
 
+function workspaceRecordWriteDependencies(context) {
+  return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    selectRecordWriteCompletion:
+      context.window.PropertyDeskWorkspaceRecordWriteWorkflow
+        .selectRecordWriteCompletion,
+  };
+}
+
 function accountFormDependencies(context, state = {}) {
   return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    selectRecordWriteCompletion:
+      context.window.PropertyDeskWorkspaceRecordWriteWorkflow
+        ?.selectRecordWriteCompletion,
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,
     }),
@@ -169,6 +182,10 @@ function accountFormModel(context) {
 
 function propertyFormDependencies(context, state = {}) {
   return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    selectRecordWriteCompletion:
+      context.window.PropertyDeskWorkspaceRecordWriteWorkflow
+        ?.selectRecordWriteCompletion,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
@@ -279,6 +296,7 @@ module.exports = {
   loadWorkspaceFeatures,
   loadLedgerEntryForms,
   ledgerEntryDependencies,
+  workspaceRecordWriteDependencies,
   accountFormDependencies,
   accountFormModel,
   propertyFormDependencies,

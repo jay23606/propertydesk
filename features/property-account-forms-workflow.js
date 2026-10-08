@@ -14,6 +14,8 @@
       closeModal: property.closeModal,
       fetchAll: property.fetchAll,
       repository: property.repository,
+      writeFeedback: property.writeFeedback,
+      selectRecordWriteCompletion: property.selectRecordWriteCompletion,
       workflows: workflows.propertyFormModules,
     });
     const accountForm = workflows.accountForm.create({
@@ -30,6 +32,8 @@
       formModel: account.formModel,
       previewReminderEmail: account.previewReminderEmail,
       repository: account.repository,
+      writeFeedback: account.writeFeedback,
+      selectRecordWriteCompletion: account.selectRecordWriteCompletion,
       workflows: workflows.accountFormModules,
     });
 

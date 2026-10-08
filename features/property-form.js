@@ -9,6 +9,8 @@
     closeModal,
     fetchAll,
     repository,
+    writeFeedback,
+    selectRecordWriteCompletion,
     workflows,
   }) {
     const formView = workflows.view.create({ $ });
@@ -22,6 +24,8 @@
       fetchAll,
       toast,
       repository,
+      writeFeedback,
+      selectRecordWriteCompletion,
     });
 
     async function saveProperty(event) {

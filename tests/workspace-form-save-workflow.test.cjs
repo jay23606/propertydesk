@@ -3,6 +3,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
+const {
+  workspaceRecordWriteDependencies,
+} = require("./feature-test-helpers.cjs");
 
 function loadWorkflow() {
   const context = vm.createContext({ window: {} });
@@ -21,6 +24,23 @@ function loadWorkflow() {
   }
   return context.window.PropertyDeskWorkspaceFormSaveWorkflow;
 }
+
+test("workspace record saves use injected write services", () => {
+  const source = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "workspace-record-save-maintenance.js",
+    ),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
+  );
+});
 
 test("shared workspace form save closes, resets, refreshes, and labels add or edit", async () => {
   const events = [];
@@ -123,6 +143,7 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
   };
   const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
     {
+      ...workspaceRecordWriteDependencies(context),
       state,
       fetchAll: async () => {
         Object.assign(property, { address: "New address" });

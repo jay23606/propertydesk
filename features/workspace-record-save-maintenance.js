@@ -7,18 +7,17 @@
     fetchAll,
     toast,
     repository,
+    writeFeedback,
+    selectRecordWriteCompletion,
     collection,
     recordLabel,
   }) {
     function saveRecord(payload, recordId, completion) {
       const save = completion
-        ? window.PropertyDeskRepositoryWriteFeedback
-            .saveAndRefreshWorkspaceRecord
-        : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
+        ? writeFeedback.saveAndRefreshWorkspaceRecord
+        : writeFeedback.saveWorkspaceRecord;
       return save({
-        ...window.PropertyDeskWorkspaceRecordWriteWorkflow.selectRecordWriteCompletion(
-          completion,
-        ),
+        ...selectRecordWriteCompletion(completion),
         operation: () => repository.save(payload, recordId),
         state,
         collection,

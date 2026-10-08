@@ -2,13 +2,22 @@
 (() => {
   "use strict";
 
-  function create({ state, fetchAll, toast, repository }) {
+  function create({
+    state,
+    fetchAll,
+    toast,
+    repository,
+    writeFeedback,
+    selectRecordWriteCompletion,
+  }) {
     const { saveRecord } =
       window.PropertyDeskWorkspaceRecordSaveMaintenance.create({
         state,
         fetchAll,
         toast,
         repository,
+        writeFeedback,
+        selectRecordWriteCompletion,
         collection: "accounts",
         recordLabel: "Account",
       });

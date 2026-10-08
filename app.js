@@ -245,6 +245,10 @@
         closeModal,
         fetchAll,
         repository: repositories.properties,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        selectRecordWriteCompletion:
+          window.PropertyDeskWorkspaceRecordWriteWorkflow
+            .selectRecordWriteCompletion,
       },
       account: {
         $,
@@ -262,6 +266,10 @@
           window.PropertyDeskEmailAddressUtils,
         ),
         repository: repositories.accounts,
+        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        selectRecordWriteCompletion:
+          window.PropertyDeskWorkspaceRecordWriteWorkflow
+            .selectRecordWriteCompletion,
       },
     });
   const transactionWorkspace =

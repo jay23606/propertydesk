@@ -16,6 +16,8 @@
     formModel,
     previewReminderEmail,
     repository,
+    writeFeedback,
+    selectRecordWriteCompletion,
     workflows,
   }) {
     const formView = workflows.view.create({
@@ -34,6 +36,8 @@
       fetchAll,
       toast,
       repository,
+      writeFeedback,
+      selectRecordWriteCompletion,
     });
     const { resetAccountForm, readValues, editAccount } = formView;
     const { openAccountForProperty } = workflows.propertyAction.create({
