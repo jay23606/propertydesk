@@ -213,24 +213,3 @@ html[data-theme="dark"] .privacy-note {
 html[data-theme="dark"] .text-button {
   color: #78c99d;
 }
-html[data-theme="dark"] .reminder-toggle-row,
-html[data-theme="dark"] .reminder-preview-meta,
-html[data-theme="dark"] .reminder-preview-body {
-  background: #18211b;
-  border-color: #435248;
-}
-html[data-theme="dark"] .reminder-status {
-  color: #e4ece6;
-}
-html[data-theme="dark"] .reminder-accepted {
-  background: #183d2b;
-}
-html[data-theme="dark"] .reminder-failed {
-  background: #4b2926;
-}
-html[data-theme="dark"] .reminder-skipped {
-  background: #303a32;
-}
-html[data-theme="dark"] .reminder-sending {
-  background: #29354d;
-}

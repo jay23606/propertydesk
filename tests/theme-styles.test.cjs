@@ -20,8 +20,11 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
       stylesheetOrder.indexOf("reminders.css"),
   );
   assert.match(theme, /html\[data-theme="dark"\]/);
-  assert.match(theme, /\.reminder-status/);
+  assert.doesNotMatch(
+    theme,
+    /\.reminder-(?:toggle-row|preview|status|accepted|failed|skipped|sending)/,
+  );
   assert.doesNotMatch(styles, /html\[data-theme="dark"\]/);
   assert.doesNotMatch(shared, /html\[data-theme="dark"\]/);
-  assert.doesNotMatch(reminders, /html\[data-theme="dark"\]/);
+  assert.match(reminders, /html\[data-theme="dark"\] \.reminder-status/);
 });
