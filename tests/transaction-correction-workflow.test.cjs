@@ -47,6 +47,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     closeModal() {},
     prettyType() {},
     repository: {},
+    writeFeedback: {},
     findCorrectionTarget() {},
     workflows: context.correctionModules,
   };
@@ -77,6 +78,10 @@ test("transaction correction workflow owns correction persistence and forms", ()
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.corrections.state, correctionContext.state);
   assert.equal(passed.corrections.repository, correctionContext.repository);
+  assert.equal(
+    passed.corrections.writeFeedback,
+    correctionContext.writeFeedback,
+  );
   assert.equal(
     passed.form.findCorrectionTarget,
     correctionContext.findCorrectionTarget,

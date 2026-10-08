@@ -277,6 +277,7 @@
           EventClass: Event,
           OptionClass: Option,
           repository: repositories.transactions,
+          writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
           findCorrectionTarget:
             window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
         },
@@ -285,6 +286,7 @@
           toast,
           fetchAll,
           repository: repositories.transactions,
+          writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
           resolveVoidTarget:
             window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
           buildVoidPayload:

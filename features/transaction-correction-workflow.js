@@ -12,6 +12,7 @@
     EventClass = Event,
     OptionClass = Option,
     repository,
+    writeFeedback,
     findCorrectionTarget,
     workflows,
   }) {
@@ -22,6 +23,7 @@
       fetchAll,
       closeModal,
       repository,
+      writeFeedback,
     });
 
     function createCorrectionActionHandlers({

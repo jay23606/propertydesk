@@ -21,6 +21,15 @@ test("transaction maintenance coordinator joins isolated correction and void act
     ),
     "utf8",
   );
+  for (const filename of [
+    "transaction-correction-maintenance.js",
+    "transaction-void-maintenance.js",
+  ]) {
+    assert.doesNotMatch(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      /window\.PropertyDeskRepositoryWriteFeedback/,
+    );
+  }
   assert.doesNotMatch(
     source,
     /window\.PropertyDeskTransaction(?:Correction|Void|MaintenanceEvents)[^.]*\.create/,
@@ -30,6 +39,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
   const voidTransaction = () => {};
   const correctTransaction = () => {};
   const attachEvents = () => {};
+  const writeFeedback = {};
   const context = vm.createContext({
     document: {},
     window: {
@@ -76,6 +86,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     closeModal() {},
     prettyType() {},
     repository: {},
+    writeFeedback,
     findCorrectionTarget() {},
     unusedContext: true,
     unusedCorrectionValue: true,
@@ -85,6 +96,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
     repository: correctionContext.repository,
+    writeFeedback,
     resolveVoidTarget() {},
     buildVoidPayload() {},
     unusedVoidingValue: true,
@@ -139,6 +151,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     passed.correctionWorkflow.repository,
     correctionContext.repository,
   );
+  assert.equal(passed.correctionWorkflow.writeFeedback, writeFeedback);
   assert.equal(
     passed.correctionWorkflow.findCorrectionTarget,
     correctionContext.findCorrectionTarget,
@@ -160,6 +173,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "state",
     "toast",
     "workflows",
+    "writeFeedback",
   ]);
   assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
   assert.equal(passed.voidMaintenance.state, voidingContext.state);
@@ -173,6 +187,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     voidingContext.buildVoidPayload,
   );
   assert.equal(passed.voidMaintenance.repository, voidingContext.repository);
+  assert.equal(passed.voidMaintenance.writeFeedback, writeFeedback);
   assert.equal("unusedVoidingValue" in passed.voidMaintenance, false);
   assert.deepEqual(Object.keys(passed.voidMaintenance).sort(), [
     "buildVoidPayload",
@@ -182,6 +197,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "state",
     "timestamp",
     "toast",
+    "writeFeedback",
   ]);
   assert.equal(passed.voidEntry.toast, voidingContext.toast);
   assert.equal(

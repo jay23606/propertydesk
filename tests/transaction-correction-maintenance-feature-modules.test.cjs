@@ -3,7 +3,10 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { loadTransactionRepository } = require("./transaction-test-helpers.cjs");
+const {
+  loadTransactionRepository,
+  transactionWriteFeedbackOptions,
+} = require("./transaction-test-helpers.cjs");
 
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
@@ -40,6 +43,7 @@ test("transaction corrections save payment and expense changes with their audit 
   const feature =
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
+      ...transactionWriteFeedbackOptions(context),
       state,
       closeModal: (modal) => events.push(["close", modal.id]),
       fetchAll: async () => events.push("refresh"),
@@ -119,6 +123,7 @@ test("transaction correction failures preserve the open form and pending correct
   const feature =
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
+      ...transactionWriteFeedbackOptions(context),
       state,
       closeModal: () => {
         closes += 1;
@@ -174,6 +179,7 @@ test("transaction correction confirms a lost response from the audit link", asyn
   const feature =
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
+      ...transactionWriteFeedbackOptions(context),
       state,
       closeModal: (modal) => events.push(["close", modal.id]),
       fetchAll: async () => {
@@ -222,6 +228,7 @@ test("transaction correction database errors keep the correction open", async ()
   const feature =
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: () => ({}),
+      ...transactionWriteFeedbackOptions(context),
       state: {
         pendingCorrection: {
           kind: "payment",

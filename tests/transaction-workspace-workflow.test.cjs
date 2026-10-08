@@ -120,6 +120,14 @@ test("transaction workspace connects maintenance and records at the app root", (
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
+    /correction: \{[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback,/,
+  );
+  assert.match(
+    app,
+    /voiding: \{[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback,/,
+  );
+  assert.match(
+    app,
     /workflows: \{\s*maintenance: window\.PropertyDeskTransactionMaintenanceWorkflow,\s*records: window\.PropertyDeskTransactionRecordsWorkflow,/,
   );
   assert.doesNotMatch(

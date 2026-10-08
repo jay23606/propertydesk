@@ -28,6 +28,7 @@ function transactionVoidModelOptions(context) {
     );
   }
   return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     resolveVoidTarget:
       context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
     buildVoidPayload:
@@ -35,4 +36,14 @@ function transactionVoidModelOptions(context) {
   };
 }
 
-module.exports = { loadTransactionRepository, transactionVoidModelOptions };
+function transactionWriteFeedbackOptions(context) {
+  return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+  };
+}
+
+module.exports = {
+  loadTransactionRepository,
+  transactionVoidModelOptions,
+  transactionWriteFeedbackOptions,
+};
