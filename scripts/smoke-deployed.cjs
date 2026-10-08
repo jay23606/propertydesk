@@ -4,6 +4,7 @@ const {
   assertNoUnhandledRejections,
   captureUnhandledRejections,
   assertVersionedAppScriptAvailableOffline,
+  assertThemeToggleWorks,
   reloadThroughServiceWorker,
 } = require("./smoke-browser-support.cjs");
 const { smokeSignedInWorkflows } = require("./smoke-signed-in-workflows.cjs");
@@ -65,6 +66,9 @@ async function main() {
         `The sign-in screen did not appear. Browser errors: ${[...runtimeErrors, ...consoleErrors].join(" | ") || "none"}. Page state: ${JSON.stringify(pageState)}. ${error.message}`,
       );
     }
+    console.log("Smoke: checking light and dark theme switching.");
+    await assertThemeToggleWorks(page);
+    assertNoBrowserErrors(runtimeErrors, consoleErrors, "Theme toggle");
     console.log("Smoke: checking service-worker startup.");
     await reloadThroughServiceWorker(page);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");

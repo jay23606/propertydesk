@@ -48,6 +48,36 @@ async function assertVersionedAppScriptAvailableOffline(page, context) {
   }
 }
 
+async function assertThemeToggleWorks(page) {
+  const result = await page.evaluate(() => {
+    const root = document.documentElement;
+    const initialTheme = root.dataset.theme;
+    const button = document.querySelector("#auth-view [data-theme-toggle]");
+    if (!button) throw new Error("The sign-in theme toggle is missing.");
+    const initialColor = getComputedStyle(root).getPropertyValue("--canvas");
+    try {
+      button.click();
+      return {
+        themeChanged: root.dataset.theme !== initialTheme,
+        colorChanged:
+          getComputedStyle(root).getPropertyValue("--canvas") !== initialColor,
+        label: button.querySelector(".theme-label")?.textContent,
+      };
+    } finally {
+      if (root.dataset.theme !== initialTheme) button.click();
+    }
+  });
+  if (
+    !result.themeChanged ||
+    !result.colorChanged ||
+    result.label !== "Dark mode"
+  ) {
+    throw new Error(
+      "The sign-in theme toggle did not switch the page palette.",
+    );
+  }
+}
+
 function assertNoBrowserErrors(pageErrors, consoleErrors, label) {
   if (pageErrors.length || consoleErrors.length) {
     throw new Error(
@@ -83,6 +113,7 @@ function captureUnhandledRejections(page) {
 module.exports = {
   reloadThroughServiceWorker,
   assertVersionedAppScriptAvailableOffline,
+  assertThemeToggleWorks,
   assertNoBrowserErrors,
   assertNoUnhandledRejections,
   captureUnhandledRejections,
