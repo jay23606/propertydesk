@@ -585,22 +585,6 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 11px;
 }
-.form-row:has(#property-city) {
-  grid-template-columns: 2fr 1fr 1fr;
-}
-.loan-fields {
-  border: 1px solid #e5ebe5;
-  border-radius: 8px;
-  padding: 13px 12px 11px;
-  display: grid;
-  gap: 12px;
-}
-.loan-fields legend {
-  font-size: 11px;
-  font-weight: 700;
-  color: #526157;
-  padding: 0 5px;
-}
 .field-hint {
   font-size: 10px;
   line-height: 1.5;

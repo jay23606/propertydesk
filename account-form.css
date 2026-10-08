@@ -1,0 +1,13 @@
+.loan-fields {
+  border: 1px solid #e5ebe5;
+  border-radius: 8px;
+  padding: 13px 12px 11px;
+  display: grid;
+  gap: 12px;
+}
+.loan-fields legend {
+  font-size: 11px;
+  font-weight: 700;
+  color: #526157;
+  padding: 0 5px;
+}

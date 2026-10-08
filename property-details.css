@@ -1,3 +1,6 @@
+.form-row:has(#property-city) {
+  grid-template-columns: 2fr 1fr 1fr;
+}
 .property-detail-actions {
   display: flex;
   flex-wrap: wrap;
