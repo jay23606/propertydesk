@@ -71,7 +71,7 @@
         updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
       });
 
-    return {
+    return Object.freeze({
       attachLedgerEntryFormEvents: ledgerEntryForms.attachLedgerEntryFormEvents,
       attachTransactionActionEvents,
       attachTransactionFilterEvents:
@@ -80,7 +80,7 @@
       openPayment: ledgerEntryForms.openPayment,
       openPropertyPayment: ledgerEntryForms.openPropertyPayment,
       renderPayments: transactionViews.renderPayments,
-    };
+    });
   }
 
   window.PropertyDeskTransactionRecordsWorkflow = Object.freeze({

@@ -94,6 +94,8 @@ test("transaction maintenance coordinator joins isolated correction and void act
   };
   const handlers = workflow.createTransactionActionHandlers(actions);
 
+  assert.equal(Object.isFrozen(workflow), true);
+  assert.equal(Object.isFrozen(handlers), true);
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.correctionWorkflow.$, correctionContext.$);
   assert.equal(passed.correctionWorkflow.state, correctionContext.state);

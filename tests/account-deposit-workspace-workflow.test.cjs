@@ -100,6 +100,7 @@ test("account and deposit workspace share deposit details without mixing actions
     "openAccountDetails",
   ]);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(
     workflow.attachAccountDetailActionEvents,
     attachAccountDetailActionEvents,

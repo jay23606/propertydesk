@@ -50,13 +50,13 @@
           correctTransaction,
           voidTransaction,
         });
-      return { attachTransactionActionEvents };
+      return Object.freeze({ attachTransactionActionEvents });
     }
 
-    return {
+    return Object.freeze({
       saveCorrection: correction.saveCorrection,
       createTransactionActionHandlers,
-    };
+    });
   }
 
   window.PropertyDeskTransactionMaintenanceWorkflow = Object.freeze({

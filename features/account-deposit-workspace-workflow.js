@@ -43,12 +43,12 @@
     const { attachAccountDetailActionEvents } =
       window.PropertyDeskAccountDetailActionWorkflow.create(accountActions);
 
-    return {
+    return Object.freeze({
       attachAccountDetailActionEvents,
       attachDepositAdjustmentEvents:
         depositWorkspace.attachDepositAdjustmentEvents,
       openAccountDetails,
-    };
+    });
   }
 
   window.PropertyDeskAccountDepositWorkspaceWorkflow = Object.freeze({

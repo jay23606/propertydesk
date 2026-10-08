@@ -97,6 +97,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     },
   );
 
+  assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance, maintenance);
   for (const [key, value] of Object.entries(entries)) {
     if (key === "unusedEntryDependency") continue;
