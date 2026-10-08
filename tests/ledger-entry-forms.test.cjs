@@ -462,6 +462,156 @@ test("payment and expense form workflows publish explicit view operations", () =
   ]);
 });
 
+test("payment and expense callbacks retain values at their form boundary", async () => {
+  const context = vm.createContext({ window: {} });
+  loadLedgerEntryForms(context);
+  const calls = [];
+  const saveCalls = [];
+  const paymentValues = {
+    accountId: "rental-1",
+    amount: 500,
+    receivedDate: "2026-10-05",
+    paymentMethod: "check",
+    incomeCategory: "rent",
+    memo: "October",
+  };
+  const expenseValues = {
+    propertyId: "property-1",
+    accountId: "rental-1",
+    amount: 100,
+    expenseDate: "2026-10-06",
+    category: "repair",
+    payee: "Plumber",
+    paymentMethod: "check",
+    memo: "Leak repair",
+  };
+  context.window.PropertyDeskPaymentEntryView = {
+    create: () => ({
+      readValues: () => paymentValues,
+      resetAfterSave: (...args) => calls.push(["reset-payment", ...args]),
+      prepareNextPayment: (...args) => calls.push(["next-payment", ...args]),
+      openPayment() {},
+      openPropertyPayment() {},
+      updatePaymentGuidance() {},
+      attachEvents() {},
+    }),
+  };
+  context.window.PropertyDeskPropertyPaymentAction = {
+    create: () => ({ openPropertyPayment() {} }),
+  };
+  context.window.PropertyDeskExpenseEntryView = {
+    create: () => ({
+      readValues: () => expenseValues,
+      resetAfterSave: (...args) => calls.push(["reset-expense", ...args]),
+      prepareNextExpense: (...args) => calls.push(["next-expense", ...args]),
+      openExpense() {},
+      attachEvents() {},
+    }),
+  };
+  context.window.PropertyDeskTransactionPayloads = {
+    buildPayment: (values) => values,
+    buildExpense: (values) => values,
+    buildPaymentCorrection: (values) => values,
+    buildExpenseCorrection: (values) => values,
+  };
+  context.window.PropertyDeskTransactionInserts = {
+    create: () => ({ insertPayment() {}, insertExpense() {} }),
+  };
+  context.window.PropertyDeskLedgerEntrySaveWorkflow = {
+    create: () => ({
+      saveTransactionEntry: async (options) => {
+        saveCalls.push(options);
+        options.resetAfterSave();
+        options.prepareNext?.();
+      },
+    }),
+  };
+
+  const { $, handlers } = captureFormSubmissions(formElements(), [
+    "payment-form",
+    "expense-form",
+  ]);
+  const forms = context.window.PropertyDeskLedgerEntryForms.create({
+    $,
+    state: {
+      workspaceOwnerId: "workspace-1",
+      accounts: [
+        { id: "rental-1", property_id: "property-1", account_type: "rental" },
+      ],
+    },
+    toast() {},
+    closeModal() {},
+    fetchAll() {},
+    moneyInput: Number,
+    todayIso: () => "2026-10-08",
+    fillSelect() {},
+    populateFormOptions() {},
+    prettyType: String,
+    openModal() {},
+    saveCorrection() {},
+    transactionPayloads: context.window.PropertyDeskTransactionPayloads,
+    transactionRepository: {},
+  });
+  forms.attachLedgerEntryFormEvents();
+
+  const savedForm = async (formId, submitterId) => {
+    const handler = handlers.get(`${formId}:submit`);
+    await handler({
+      preventDefault() {},
+      submitter: { id: submitterId },
+    });
+  };
+
+  await savedForm("payment-form", "payment-save-next");
+  await savedForm("expense-form", "expense-save-next");
+
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ["reset-payment", "rental-1"],
+    ["next-payment"],
+    ["reset-expense"],
+    [
+      "next-expense",
+      {
+        propertyId: "property-1",
+        accountId: "rental-1",
+        category: "repair",
+        payee: "Plumber",
+        paymentMethod: "check",
+      },
+    ],
+  ]);
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(saveCalls.map(({ kind, payload }) => ({ kind, payload }))),
+    ),
+    [
+      {
+        kind: "payment",
+        payload: {
+          ownerId: "workspace-1",
+          account: {
+            id: "rental-1",
+            property_id: "property-1",
+            account_type: "rental",
+          },
+          amount: 500,
+          receivedDate: "2026-10-05",
+          paymentMethod: "check",
+          incomeCategory: "rent",
+          memo: "October",
+        },
+      },
+      {
+        kind: "expense",
+        payload: {
+          ownerId: "workspace-1",
+          ...expenseValues,
+        },
+      },
+    ],
+  );
+});
+
 test("payment and expense forms report rejected saves without clearing the entries", async () => {
   const context = vm.createContext({ window: {}, Event });
   loadLedgerEntryForms(context);
