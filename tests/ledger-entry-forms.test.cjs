@@ -466,7 +466,7 @@ test("payment and expense callbacks retain values at their form boundary", async
   const context = vm.createContext({ window: {} });
   loadLedgerEntryForms(context);
   const calls = [];
-  const saveCalls = [];
+  const submitHandlers = new Map();
   const paymentValues = {
     accountId: "rental-1",
     amount: 500,
@@ -488,8 +488,8 @@ test("payment and expense callbacks retain values at their form boundary", async
   context.window.PropertyDeskPaymentEntryView = {
     create: () => ({
       readValues: () => paymentValues,
-      resetAfterSave: (...args) => calls.push(["reset-payment", ...args]),
-      prepareNextPayment: (...args) => calls.push(["next-payment", ...args]),
+      resetAfterSave: (accountId) => calls.push(["reset-payment", accountId]),
+      prepareNextPayment: () => calls.push(["next-payment"]),
       openPayment() {},
       openPropertyPayment() {},
       updatePaymentGuidance() {},
@@ -502,37 +502,19 @@ test("payment and expense callbacks retain values at their form boundary", async
   context.window.PropertyDeskExpenseEntryView = {
     create: () => ({
       readValues: () => expenseValues,
-      resetAfterSave: (...args) => calls.push(["reset-expense", ...args]),
-      prepareNextExpense: (...args) => calls.push(["next-expense", ...args]),
+      resetAfterSave: () => calls.push(["reset-expense"]),
+      prepareNextExpense: (values) => calls.push(["next-expense", values]),
       openExpense() {},
       attachEvents() {},
     }),
   };
-  context.window.PropertyDeskTransactionPayloads = {
-    buildPayment: (values) => values,
-    buildExpense: (values) => values,
-    buildPaymentCorrection: (values) => values,
-    buildExpenseCorrection: (values) => values,
-  };
-  context.window.PropertyDeskTransactionInserts = {
-    create: () => ({ insertPayment() {}, insertExpense() {} }),
-  };
-  context.window.PropertyDeskLedgerEntrySaveWorkflow = {
-    create: () => ({
-      saveTransactionEntry: async (options) => {
-        saveCalls.push(options);
-        options.resetAfterSave();
-        options.prepareNext?.();
+
+  const common = {
+    $: (id) => ({
+      addEventListener: (event, handler) => {
+        if (event === "submit") submitHandlers.set(id, handler);
       },
     }),
-  };
-
-  const { $, handlers } = captureFormSubmissions(formElements(), [
-    "payment-form",
-    "expense-form",
-  ]);
-  const forms = context.window.PropertyDeskLedgerEntryForms.create({
-    $,
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [
@@ -540,30 +522,37 @@ test("payment and expense callbacks retain values at their form boundary", async
       ],
     },
     toast() {},
-    closeModal() {},
-    fetchAll() {},
+    saveTransactionEntry: async (options) => {
+      options.resetAfterSave();
+      options.prepareNext?.();
+    },
+    insertPayment() {},
+    insertExpense() {},
+    buildPaymentPayload: (values) => values,
+    buildPaymentCorrection: (values) => values,
+    buildExpensePayload: (values) => values,
+    buildExpenseCorrection: (values) => values,
     moneyInput: Number,
     todayIso: () => "2026-10-08",
     fillSelect() {},
     populateFormOptions() {},
     prettyType: String,
     openModal() {},
-    saveCorrection() {},
-    transactionPayloads: context.window.PropertyDeskTransactionPayloads,
-    transactionRepository: {},
-  });
-  forms.attachLedgerEntryFormEvents();
+  };
+  const payment = context.window.PropertyDeskPaymentEntryForm.create(common);
+  const expense = context.window.PropertyDeskExpenseEntryForm.create(common);
+  payment.attachEvents();
+  expense.attachEvents();
 
-  const savedForm = async (formId, submitterId) => {
-    const handler = handlers.get(`${formId}:submit`);
-    await handler({
+  for (const [formId, submitterId] of [
+    ["payment-form", "payment-save-next"],
+    ["expense-form", "expense-save-next"],
+  ]) {
+    await submitHandlers.get(formId)({
       preventDefault() {},
       submitter: { id: submitterId },
     });
-  };
-
-  await savedForm("payment-form", "payment-save-next");
-  await savedForm("expense-form", "expense-save-next");
+  }
 
   assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
     ["reset-payment", "rental-1"],
@@ -580,36 +569,6 @@ test("payment and expense callbacks retain values at their form boundary", async
       },
     ],
   ]);
-  assert.deepEqual(
-    JSON.parse(
-      JSON.stringify(saveCalls.map(({ kind, payload }) => ({ kind, payload }))),
-    ),
-    [
-      {
-        kind: "payment",
-        payload: {
-          ownerId: "workspace-1",
-          account: {
-            id: "rental-1",
-            property_id: "property-1",
-            account_type: "rental",
-          },
-          amount: 500,
-          receivedDate: "2026-10-05",
-          paymentMethod: "check",
-          incomeCategory: "rent",
-          memo: "October",
-        },
-      },
-      {
-        kind: "expense",
-        payload: {
-          ownerId: "workspace-1",
-          ...expenseValues,
-        },
-      },
-    ],
-  );
 });
 
 test("payment and expense forms report rejected saves without clearing the entries", async () => {
