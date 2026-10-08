@@ -18,12 +18,12 @@ The root-level workspace modules and `features/workspace-runtime.js` create the 
 
 ## Feature workflows
 
-- **Properties and overview:** `features/property-workspace-workflow.js` connects the Properties grid, overview, and property detail actions. Portfolio models own sorting, filtering, payment status, totals, and reminder-link content.
+- **Properties and overview:** `features/property-workspace-workflow.js` connects the Properties grid, overview, and property detail actions. Portfolio models own sorting, filtering, payment status, totals, and reminder-link content. Quick notes and archive/restore writes share the owner-scoped refresh path in `features/property-record-update-maintenance.js`; holder labels remain a separate set-replacement workflow.
 - **Property and account entry:** `features/property-account-forms-workflow.js` composes the property and account forms. Payment and expense forms remain separate because they have different validation and transaction behavior.
 - **Accounts and deposits:** `features/account-deposit-workspace-workflow.js` joins account details with rental deposit details and adjustments. The account and deposit workflows keep their calculations, persistence, and event handling in focused modules.
 - **Transactions:** `features/transaction-workspace-workflow.js` composes transaction records with correction and void maintenance. `features/transaction-association-model.js` joins loaded payment/expense rows to account and property records and builds search text; `features/transaction-display-row-model.js` then projects only table fields, keeping workspace identifiers and search-only values out of the display shape. Corrections preserve the original entry and link its replacement; voids preserve the audit trail.
-- **Reports and data transfer:** `features/report-workspace-workflow.js` connects report rendering with CSV export. `features/imports.js` coordinates account, payment, and expense imports; `features/backup-workspace-workflow.js` builds workspace ZIP backups with private agreement files.
-- **Workspace settings:** `features/app-shell-workflow.js` joins workspace settings and navigation. Profile, member access, reminder activity, and theme controls remain separate concerns.
+- **Reports and data transfer:** `features/report-workspace-workflow.js` connects report rendering with CSV export. `features/imports.js` coordinates account, payment, and expense imports; payment and expense validation share lookup, row-error, and duplicate-marking utilities while retaining their transaction-specific rules. `features/backup-workspace-workflow.js` builds workspace ZIP backups with private agreement files.
+- **Workspace settings:** `features/app-shell-workflow.js` joins workspace settings and navigation. `features/workspace-member-maintenance.js` owns membership confirmation, persistence, and uncertain-response reconciliation; profile, reminder activity, and theme controls remain separate concerns.
 - **Private agreements:** Property document workflows use a workspace-scoped repository for upload, deletion, and short-lived signed links.
 
 ## Shared domain logic
