@@ -36,6 +36,8 @@ The browser app uses plain HTML, CSS, and JavaScript with no build step. `app.js
 
 The module scripts are loaded by `index.html` and listed in the service worker shell. Keep the shell list in sync when adding or removing a browser module; increment the shell cache version when a cached file changes.
 
+Recent focused modules keep import and property activity responsibilities small: `features/account-import-terms.js` validates imported account terms, `features/import-preview-table.js` renders the staged CSV table, and `features/import-commit-reporting.js` reports completed import results. `features/property-activity-transactions.js` prepares transaction rows for a property's activity view, and `features/date-utils.js` provides shared ISO date formatting alongside calendar and schedule helpers.
+
 The app is installable as a PWA when served over HTTPS. Dark mode is the default, with a light/dark toggle remembered on the device. It caches only the static shell for faster launch; database records and authentication responses are never added to the service-worker cache. Payment and expense entry still requires a connection in this first version.
 
 See `email-setup.md` for the MailerSend reminder schedule and the current domain setup status.
