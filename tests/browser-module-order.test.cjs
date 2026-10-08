@@ -72,10 +72,11 @@ test("every feature API is consumed by another runtime module", () => {
     const featurePath = path.join("features", filename);
     const source = fs.readFileSync(path.join(root, featurePath), "utf8");
     for (const [, api] of source.matchAll(/window\.(PropertyDesk\w+)\s*=/g)) {
+      const reference = new RegExp(`window\\.${api}\\b`);
       const hasConsumer = runtimeModules.some(
         (runtimeModule) =>
           runtimeModule.filename !== featurePath &&
-          runtimeModule.source.includes(api),
+          reference.test(runtimeModule.source),
       );
       assert.ok(hasConsumer, `${api} in ${filename} has a runtime consumer`);
     }
