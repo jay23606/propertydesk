@@ -124,6 +124,7 @@ const SHELL_FILES = [
   './features/imports.js',
   './features/property-activity-details.js',
   './features/property-documents-view.js',
+  './features/property-activity-transactions.js',
   './features/property-activity-model.js',
   './features/property-activity-view.js',
   './features/property-details.js',

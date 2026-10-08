@@ -7,6 +7,7 @@ const vm = require("node:vm");
 test("property activity details include posted and voided records without counting voids", () => {
   const context = vm.createContext({ window: {} });
   for (const filename of [
+    "property-activity-transactions.js",
     "property-activity-model.js",
     "property-activity-view.js",
     "property-activity-details.js",
@@ -76,6 +77,18 @@ test("property activity details include posted and voided records without counti
 
 test("property activity model aggregates posted cash flow and sorts eight recent rows", () => {
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-activity-transactions.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "property-activity-model.js"),
