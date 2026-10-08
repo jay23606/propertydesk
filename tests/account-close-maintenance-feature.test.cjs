@@ -32,6 +32,7 @@ test("account close maintenance preserves the account history", async () => {
   const calls = [];
   const messages = [];
   const state = {
+    accounts: [{ id: "account-1", status: "closed" }],
     client: {
       from(table) {
         return {
@@ -93,7 +94,9 @@ test("account close maintenance reports rejected requests without closing detail
   );
   const calls = [];
   const messages = [];
+  const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    state,
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => ({
         from: () => ({
@@ -113,10 +116,46 @@ test("account close maintenance reports rejected requests without closing detail
   await assert.doesNotReject(
     feature.saveCloseAccount({ id: "account-1", name: "Rental" }),
   );
-  assert.deepEqual(calls, []);
+  assert.deepEqual(calls, ["refresh"]);
   assert.deepEqual(messages, [
-    "Account close result couldn't be confirmed. Reload the account before trying again.",
+    "Accounts were refreshed. Check the account status before trying again.",
   ]);
+});
+
+test("account close confirms a lost response from refreshed account status", async () => {
+  const context = vm.createContext({ window: {} });
+  loadRepositoryWriteFeedback(context);
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "account-close-maintenance.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const calls = [];
+  const messages = [];
+  const state = { accounts: [{ id: "account-1", status: "active" }] };
+  const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    state,
+    repository: {
+      close: async () => {
+        throw new Error("connection lost");
+      },
+    },
+    closeAccountDetails: () => calls.push("close-details"),
+    fetchAll: async () => {
+      state.accounts[0].status = "closed";
+      calls.push("refresh");
+    },
+    toast: (message) => messages.push(message),
+  });
+
+  assert.equal(
+    await feature.saveCloseAccount({ id: "account-1", name: "Rental" }),
+    true,
+  );
+  assert.deepEqual(calls, ["refresh", "close-details"]);
+  assert.deepEqual(messages, ["Account closed"]);
 });
 
 test("account close maintenance reports database errors before closing details", async () => {
