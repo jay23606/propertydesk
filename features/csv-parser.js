@@ -28,9 +28,13 @@
     return index;
   }
 
-  function consumeUnquotedCharacter(context, char, next, index) {
+  function validateAfterQuotedField(context, char) {
     if (context.afterQuote && char !== "," && char !== "\n" && char !== "\r")
       throw new Error("CSV has unexpected characters after a quoted field.");
+  }
+
+  function consumeUnquotedCharacter(context, char, next, index) {
+    validateAfterQuotedField(context, char);
     if (char === '"') {
       if (context.field.length)
         throw new Error("CSV has a quote inside an unquoted field.");

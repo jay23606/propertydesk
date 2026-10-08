@@ -31,15 +31,23 @@
     return amount;
   }
 
-  function csvRate(value, label, { optional = false } = {}) {
-    const raw = String(value ?? "")
+  function parseCsvRate(raw, value, label) {
+    if (!/^\d+(?:\.\d{1,5})?$/.test(raw))
+      throw new Error(`Invalid rate “${value}” for ${label}.`);
+    return Number(raw);
+  }
+
+  function normalizedCsvRate(value) {
+    return String(value ?? "")
       .trim()
       .replace(/%$/, "")
       .trim();
+  }
+
+  function csvRate(value, label, { optional = false } = {}) {
+    const raw = normalizedCsvRate(value);
     if (!raw && optional) return 0;
-    if (!/^\d+(?:\.\d{1,5})?$/.test(raw))
-      throw new Error(`Invalid rate “${value}” for ${label}.`);
-    const rate = Number(raw);
+    const rate = parseCsvRate(raw, value, label);
     if (!Number.isFinite(rate) || rate < 0 || rate > 100)
       throw new Error(`Rate for ${label} must be between 0 and 100%.`);
     return rate;
