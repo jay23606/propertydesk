@@ -1,0 +1,27 @@
+.breakdown {
+  padding: 0 20px 20px;
+}
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 55px;
+  gap: 12px;
+  align-items: center;
+  margin: 14px 0;
+  font-size: 11px;
+  color: #647067;
+}
+.bar-track {
+  height: 7px;
+  border-radius: 10px;
+  background: #edf0ec;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: #6da184;
+}
+.breakdown-row strong {
+  text-align: right;
+  color: #3f4d44;
+}
