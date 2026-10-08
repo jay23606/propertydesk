@@ -221,7 +221,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     screenWorkflow,
-    /workflows\.content\.create\([\s\S]*?workflows\.management\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
+    /workflows\.content\.create\([\s\S]*?workflows: workflows\.contentModules,[\s\S]*?workflows\.management\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
   );
   const workspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "property-workspace-workflow.js"),

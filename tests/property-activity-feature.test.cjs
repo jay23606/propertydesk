@@ -225,11 +225,32 @@ test("property detail content workflow connects activity summaries to property r
     openModal() {},
     propertyAddress() {},
     unusedDependency: true,
+    workflows: {
+      documentsView: context.window.PropertyDeskPropertyDocumentsView,
+      accountTable: context.window.PropertyDeskPropertyDetailsAccountTable,
+      detailsView: context.window.PropertyDeskPropertyDetailsView,
+      activityDetails: context.window.PropertyDeskPropertyActivityDetails,
+      detailsModel: context.window.PropertyDeskPropertyDetailsModel,
+      details: context.window.PropertyDeskPropertyDetails,
+    },
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailContentWorkflow.create(
       detailsDependencies,
     );
+  const contentWorkflowSource = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-detail-content-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    contentWorkflowSource,
+    /window\.PropertyDeskProperty(?:DocumentsView|DetailsAccountTable|DetailsView|ActivityDetails|DetailsModel|Details)\.create/,
+  );
 
   assert.equal(viewContext.fmtDate, detailsDependencies.fmtDate);
   assert.equal(viewContext.esc, detailsDependencies.esc);

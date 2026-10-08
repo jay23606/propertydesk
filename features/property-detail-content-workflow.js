@@ -16,40 +16,39 @@
     accountBalance,
     openModal,
     propertyAddress,
+    workflows,
   }) {
-    const { propertyDocumentsHTML } =
-      window.PropertyDeskPropertyDocumentsView.create({ fmtDate, esc });
-    const { propertyAccountsHTML } =
-      window.PropertyDeskPropertyDetailsAccountTable.create({
-        money,
-        esc,
-        prettyType,
-        paymentFrequencyLabel,
-        accountBalance,
-      });
-    const { propertyDetailsHTML } =
-      window.PropertyDeskPropertyDetailsView.create({
-        money,
-        esc,
-        propertyDocumentsHTML,
-        propertyAccountsHTML,
-      });
-    const { renderPropertyActivity } =
-      window.PropertyDeskPropertyActivityDetails.create({
-        state,
-        isPosted,
-        sumIncome,
-        sumOperatingExpenses,
-        money,
-        fmtDate,
-        esc,
-      });
-    const { buildPropertyDetailData } =
-      window.PropertyDeskPropertyDetailsModel.create({
-        state,
-        propertyAddress,
-      });
-    const { openPropertyDetails } = window.PropertyDeskPropertyDetails.create({
+    const { propertyDocumentsHTML } = workflows.documentsView.create({
+      fmtDate,
+      esc,
+    });
+    const { propertyAccountsHTML } = workflows.accountTable.create({
+      money,
+      esc,
+      prettyType,
+      paymentFrequencyLabel,
+      accountBalance,
+    });
+    const { propertyDetailsHTML } = workflows.detailsView.create({
+      money,
+      esc,
+      propertyDocumentsHTML,
+      propertyAccountsHTML,
+    });
+    const { renderPropertyActivity } = workflows.activityDetails.create({
+      state,
+      isPosted,
+      sumIncome,
+      sumOperatingExpenses,
+      money,
+      fmtDate,
+      esc,
+    });
+    const { buildPropertyDetailData } = workflows.detailsModel.create({
+      state,
+      propertyAddress,
+    });
+    const { openPropertyDetails } = workflows.details.create({
       $,
       state,
       money,

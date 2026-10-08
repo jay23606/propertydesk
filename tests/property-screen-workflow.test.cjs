@@ -87,32 +87,42 @@ test("property screen workflow passes detail actions to management and returns b
   documents.workflow = context.window.PropertyDeskPropertyDocumentWorkflow;
   documents.documentsWorkflow = { create() {} };
   documents.documentEventsWorkflow = { create() {} };
+  const propertyScreenWorkflows = {
+    content: context.window.PropertyDeskPropertyDetailContentWorkflow,
+    management: context.window.PropertyDeskPropertyDetailManagementWorkflow,
+    holders: context.window.PropertyDeskPropertyHolderWorkflow,
+    contentModules: {
+      documentsView: context.window.PropertyDeskPropertyDocumentsView,
+      accountTable: context.window.PropertyDeskPropertyDetailsAccountTable,
+      detailsView: context.window.PropertyDeskPropertyDetailsView,
+      activityDetails: context.window.PropertyDeskPropertyActivityDetails,
+      detailsModel: context.window.PropertyDeskPropertyDetailsModel,
+      details: context.window.PropertyDeskPropertyDetails,
+    },
+    managementModules: {
+      archive: context.window.PropertyDeskPropertyArchive,
+      detailEvents: context.window.PropertyDeskPropertyDetailEvents,
+      quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
+    },
+    holderModules: {
+      management: context.window.PropertyDeskPropertyHolderManagement,
+      events: context.window.PropertyDeskPropertyHolderEvents,
+    },
+  };
 
   const workflow = context.window.PropertyDeskPropertyScreenWorkflow.create({
     content,
     management,
     holders,
     documents,
-    workflows: {
-      content: context.window.PropertyDeskPropertyDetailContentWorkflow,
-      management: context.window.PropertyDeskPropertyDetailManagementWorkflow,
-      holders: context.window.PropertyDeskPropertyHolderWorkflow,
-      managementModules: {
-        archive: context.window.PropertyDeskPropertyArchive,
-        detailEvents: context.window.PropertyDeskPropertyDetailEvents,
-        quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
-      },
-      holderModules: {
-        management: context.window.PropertyDeskPropertyHolderManagement,
-        events: context.window.PropertyDeskPropertyHolderEvents,
-      },
-    },
+    workflows: propertyScreenWorkflows,
   });
 
   assert.equal(calls[0][0], "content");
   assert.equal(calls[0][1].state, content.state);
   assert.equal(calls[0][1].isPosted, content.isPosted);
   assert.equal(calls[0][1].propertyAddress, content.propertyAddress);
+  assert.equal(calls[0][1].workflows, propertyScreenWorkflows.contentModules);
   assert.equal("unusedContentValue" in calls[0][1], false);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "$",
@@ -128,6 +138,7 @@ test("property screen workflow passes detail actions to management and returns b
     "state",
     "sumIncome",
     "sumOperatingExpenses",
+    "workflows",
   ]);
   assert.equal(calls[1][0], "management");
   assert.equal(calls[1][1].closeModal, management.closeModal);

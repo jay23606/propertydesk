@@ -434,6 +434,14 @@
         content: window.PropertyDeskPropertyDetailContentWorkflow,
         management: window.PropertyDeskPropertyDetailManagementWorkflow,
         holders: window.PropertyDeskPropertyHolderWorkflow,
+        contentModules: {
+          documentsView: window.PropertyDeskPropertyDocumentsView,
+          accountTable: window.PropertyDeskPropertyDetailsAccountTable,
+          detailsView: window.PropertyDeskPropertyDetailsView,
+          activityDetails: window.PropertyDeskPropertyActivityDetails,
+          detailsModel: window.PropertyDeskPropertyDetailsModel,
+          details: window.PropertyDeskPropertyDetails,
+        },
         managementModules: {
           archive: window.PropertyDeskPropertyArchive,
           detailEvents: window.PropertyDeskPropertyDetailEvents,

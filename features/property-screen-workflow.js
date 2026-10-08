@@ -23,6 +23,7 @@
       accountBalance: content.accountBalance,
       openModal: content.openModal,
       propertyAddress: content.propertyAddress,
+      workflows: workflows.contentModules,
     });
     const actions = workflows.management.create({
       $: management.$,
