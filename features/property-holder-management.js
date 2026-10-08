@@ -3,6 +3,15 @@
   "use strict";
 
   function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
+    async function refreshUncertainLabels(id, refreshFailureMessage) {
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => openPropertyDetails(id),
+        toast,
+        refreshFailureMessage,
+      });
+    }
+
     async function savePropertyHolders(selectedMemberIds = []) {
       const id = state.selectedPropertyId;
       if (!id) return;
@@ -16,6 +25,10 @@
       } catch {
         toast(
           "Account-holder labels couldn't be saved right now. Check your connection and try again.",
+        );
+        await refreshUncertainLabels(
+          id,
+          "Account-holder label update status couldn't be confirmed, and the workspace could not refresh. Reload to verify the current labels.",
         );
         return;
       }
@@ -35,17 +48,18 @@
           toast(
             "Account-holder labels couldn't be saved right now. Check your connection and try again.",
           );
+          await refreshUncertainLabels(
+            id,
+            "Account-holder labels may be partially saved, and the workspace could not refresh. Reload to verify the current labels.",
+          );
           return;
         }
         if (error) {
           toast(error.message);
-          await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-            fetchAll,
-            afterRefresh: () => openPropertyDetails(id),
-            toast,
-            refreshFailureMessage:
-              "Account-holder labels could not be fully saved, and the workspace could not refresh. Reload to verify the current labels.",
-          });
+          await refreshUncertainLabels(
+            id,
+            "Account-holder labels could not be fully saved, and the workspace could not refresh. Reload to verify the current labels.",
+          );
           return;
         }
       }
