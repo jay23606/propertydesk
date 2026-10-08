@@ -290,6 +290,10 @@ test("workspace member feature loads before settings and is precached", () => {
   assert.match(worker, /'\.\/features\/workspace-members-view\.js'/);
   assert.ok(
     html.indexOf("features/workspace-member-repository.js") <
+      html.indexOf("features/workspace-member-maintenance.js"),
+  );
+  assert.ok(
+    html.indexOf("features/workspace-member-maintenance.js") <
       html.indexOf("features/workspace-members.js"),
   );
   assert.ok(
@@ -305,6 +309,7 @@ test("workspace member feature loads before settings and is precached", () => {
   assert.match(worker, /'\.\/features\/repository-write-feedback\.js'/);
   assert.match(worker, /'\.\/features\/workspace-record-write-workflow\.js'/);
   assert.match(worker, /'\.\/features\/workspace-member-repository\.js'/);
+  assert.match(worker, /'\.\/features\/workspace-member-maintenance\.js'/);
   assert.ok(
     html.indexOf("features/workspace-members.js") <
       html.indexOf("features/workspace.js"),

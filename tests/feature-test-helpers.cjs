@@ -79,6 +79,7 @@ function loadWorkspaceFeatures(context) {
     "repository-write-feedback.js",
     "workspace-members-view.js",
     "workspace-member-repository.js",
+    "workspace-member-maintenance.js",
     "workspace-members.js",
     "workspace.js",
   ]) {
