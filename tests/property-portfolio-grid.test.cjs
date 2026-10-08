@@ -90,8 +90,9 @@ test("Properties workflow returns explicit view and action operations", () => {
         },
       },
       PropertyDeskPropertyViews: {
-        create: () => {
+        create: (options) => {
           calls.push("property views");
+          passed.views = options;
           return { renderProperties() {}, attachEvents() {} };
         },
       },
@@ -129,6 +130,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     propertyRepository,
     openPropertyDetails: action,
     openAccountForProperty: action,
+    unusedDependency: true,
   });
 
   assert.deepEqual(calls, [
@@ -151,6 +153,15 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal(passed.quickNote.fetchAll, action);
   assert.equal(passed.quickNote.streetAddress, action);
   assert.equal(passed.quickNote.repository, propertyRepository);
+  assert.equal("unusedDependency" in passed.quickNote, false);
+  assert.deepEqual(Object.keys(passed.views).sort(), [
+    "$",
+    "esc",
+    "portfolioModel",
+    "portfolioTable",
+    "state",
+  ]);
+  assert.equal("unusedDependency" in passed.views, false);
   assert.equal(passed.actions.$, action);
   assert.equal(passed.actions.openPayment, action);
   assert.equal(passed.actions.editPropertyQuickNote, editPropertyQuickNote);

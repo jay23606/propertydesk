@@ -2,31 +2,29 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      esc,
-      money,
-      paymentFrequencyLabel,
-      monthlyScheduledEstimate,
-      summarizeAccount,
-      amountDueSince,
-      propertyAddress,
-      streetAddress,
-      monthStart,
-      dateOnly,
-      monthEnd,
-      lateReminderMailto,
-      paymentStatusInMonth,
-      toast,
-      fetchAll,
-      openPayment,
-      openPropertyDetails,
-      openAccountForProperty,
-      propertyRepository,
-    } = context;
-
+  function create({
+    $,
+    state,
+    esc,
+    money,
+    paymentFrequencyLabel,
+    monthlyScheduledEstimate,
+    summarizeAccount,
+    amountDueSince,
+    propertyAddress,
+    streetAddress,
+    monthStart,
+    dateOnly,
+    monthEnd,
+    lateReminderMailto,
+    paymentStatusInMonth,
+    toast,
+    fetchAll,
+    openPayment,
+    openPropertyDetails,
+    openAccountForProperty,
+    propertyRepository,
+  }) {
     const portfolioTable = window.PropertyDeskPropertyPortfolioTable.create({
       esc,
       money,

@@ -2,9 +2,13 @@
 (() => {
   "use strict";
 
-  function createPropertyViews(context) {
-    const { $, state, esc, portfolioTable, portfolioModel } = context;
-
+  function createPropertyViews({
+    $,
+    state,
+    esc,
+    portfolioTable,
+    portfolioModel,
+  }) {
     function attachEvents() {
       $("property-search").addEventListener("input", renderProperties);
       $("property-filter").addEventListener("change", renderProperties);
