@@ -218,6 +218,12 @@ test("account form view resets and populates fields without owning persistence",
   });
 
   assert.equal(Object.isFrozen(view), true);
+  assert.deepEqual(Object.keys(view).sort(), [
+    "attachEvents",
+    "editAccount",
+    "readValues",
+    "resetAccountForm",
+  ]);
   view.editAccount({
     id: "account-1",
     account_type: "note",

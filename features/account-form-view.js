@@ -117,7 +117,6 @@
 
     return Object.freeze({
       resetAccountForm,
-      updateLoanFields,
       readValues,
       editAccount,
       attachEvents,
