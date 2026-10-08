@@ -3,7 +3,7 @@ const {
   assertNoBrowserErrors,
   assertNoUnhandledRejections,
   captureUnhandledRejections,
-  assertVersionedAppScriptAvailableOffline,
+  assertVersionedShellAssetsAvailableOffline,
   assertThemeToggleWorks,
   reloadThroughServiceWorker,
 } = require("./smoke-browser-support.cjs");
@@ -73,8 +73,10 @@ async function main() {
     await reloadThroughServiceWorker(page);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
     await assertNoUnhandledRejections(page, "Startup");
-    console.log("Smoke: checking versioned shell assets while offline.");
-    await assertVersionedAppScriptAvailableOffline(page, context);
+    console.log(
+      "Smoke: checking versioned app and theme assets while offline.",
+    );
+    await assertVersionedShellAssetsAvailableOffline(page, context);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Offline shell");
     await assertNoUnhandledRejections(page, "Offline shell");
 

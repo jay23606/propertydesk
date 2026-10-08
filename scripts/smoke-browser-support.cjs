@@ -22,26 +22,50 @@ async function reloadThroughServiceWorker(page) {
   );
 }
 
-async function assertVersionedAppScriptAvailableOffline(page, context) {
-  const scriptURL = await page.evaluate(() => {
-    const script = Array.from(document.scripts).find(
+async function assertVersionedShellAssetsAvailableOffline(page, context) {
+  const assets = await page.evaluate(() => {
+    const appScript = Array.from(document.scripts).find(
       (item) => item.src && new URL(item.src).pathname.endsWith("/app.js"),
     );
-    if (!script) throw new Error("The app script is missing from the page.");
-    const url = new URL(script.src);
-    url.searchParams.set("offline-smoke", "versioned-shell");
-    return url.href;
+    const themeStylesheet = Array.from(document.querySelectorAll("link[href]"))
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/theme.css"));
+    if (!appScript) throw new Error("The app script is missing from the page.");
+    if (!themeStylesheet)
+      throw new Error("The theme stylesheet is missing from the page.");
+    return [
+      {
+        label: "app script",
+        url: appScript.src,
+        expected: "PropertyDesk",
+      },
+      {
+        label: "theme stylesheet",
+        url: themeStylesheet,
+        expected: 'html[data-theme="dark"]',
+      },
+    ].map((asset) => {
+      const url = new URL(asset.url);
+      url.searchParams.set("offline-smoke", "versioned-shell");
+      return { ...asset, url: url.href };
+    });
   });
   await context.setOffline(true);
   try {
-    const response = await page.evaluate(async (assetURL) => {
-      const asset = await fetch(assetURL, { cache: "reload" });
-      return { ok: asset.ok, status: asset.status, body: await asset.text() };
-    }, scriptURL);
-    if (!response.ok || !response.body.includes("PropertyDesk")) {
-      throw new Error(
-        `The versioned app script was unavailable offline (HTTP ${response.status}).`,
-      );
+    for (const asset of assets) {
+      const response = await page.evaluate(async (assetURL) => {
+        const result = await fetch(assetURL, { cache: "reload" });
+        return {
+          ok: result.ok,
+          status: result.status,
+          body: await result.text(),
+        };
+      }, asset.url);
+      if (!response.ok || !response.body.includes(asset.expected)) {
+        throw new Error(
+          `The versioned ${asset.label} was unavailable offline (HTTP ${response.status}).`,
+        );
+      }
     }
   } finally {
     await context.setOffline(false);
@@ -112,7 +136,7 @@ function captureUnhandledRejections(page) {
 
 module.exports = {
   reloadThroughServiceWorker,
-  assertVersionedAppScriptAvailableOffline,
+  assertVersionedShellAssetsAvailableOffline,
   assertThemeToggleWorks,
   assertNoBrowserErrors,
   assertNoUnhandledRejections,
