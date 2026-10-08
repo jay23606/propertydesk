@@ -26,3 +26,23 @@ test("event routers do not return mutable interface objects", () => {
     assert.doesNotMatch(source, /\breturn\s+\{/u, file);
   }
 });
+
+test("database queries stay inside repository adapters", () => {
+  const featureDirectory = path.join(__dirname, "..", "features");
+  const featureFiles = fs
+    .readdirSync(featureDirectory)
+    .filter((file) => file.endsWith(".js"));
+  const queryFiles = featureFiles.filter((file) =>
+    /\.(from|rpc)\s*\(/u.test(
+      fs.readFileSync(path.join(featureDirectory, file), "utf8"),
+    ),
+  );
+  const allowedFiles = new Set([
+    "repository-query-utils.js",
+    ...featureFiles.filter((file) => file.endsWith("-repository.js")),
+  ]);
+
+  for (const file of queryFiles) {
+    assert.equal(allowedFiles.has(file), true, file);
+  }
+});
