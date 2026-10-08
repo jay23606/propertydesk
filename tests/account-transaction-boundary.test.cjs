@@ -9,7 +9,7 @@ test("app composes independent property and account forms before action routing"
 
   assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
-  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountForms\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
@@ -31,8 +31,16 @@ test("app composes independent property and account forms before action routing"
     transactionWorkflow,
     /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;[\s\S]*?saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
-  assert.match(
+  assert.doesNotMatch(
     app,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+  );
+  const transactionWorkspace = fs.readFileSync(
+    path.join(root, "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    transactionWorkspace,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)[\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
 });

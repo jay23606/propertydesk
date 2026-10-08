@@ -9,12 +9,15 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+  );
   assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.match(
@@ -29,6 +32,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "workspace-deposit-context",
     "transaction-maintenance-workflow",
     "transaction-records-workflow",
+    "transaction-workspace-workflow",
   ]) {
     const script = `features/${feature}.js`;
     assert.ok(

@@ -183,36 +183,34 @@
         repository: repositories.accounts,
       },
     });
-  const transactionMaintenance =
-    window.PropertyDeskTransactionMaintenanceWorkflow.create({
-      correction: {
-        $,
-        state,
-        toast,
-        fetchAll,
-        closeModal,
-        prettyType,
-        EventClass: Event,
-        OptionClass: Option,
-        repository: repositories.transactions,
-        findCorrectionTarget:
-          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
-      },
-      voiding: {
-        state,
-        toast,
-        fetchAll,
-        repository: repositories.transactions,
-        resolveVoidTarget:
-          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-        buildVoidPayload:
-          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-      },
-      events: { documentRef: document },
-    });
   const transactionRecords =
-    window.PropertyDeskTransactionRecordsWorkflow.create({
-      maintenance: transactionMaintenance,
+    window.PropertyDeskTransactionWorkspaceWorkflow.create({
+      maintenance: {
+        correction: {
+          $,
+          state,
+          toast,
+          fetchAll,
+          closeModal,
+          prettyType,
+          EventClass: Event,
+          OptionClass: Option,
+          repository: repositories.transactions,
+          findCorrectionTarget:
+            window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+        },
+        voiding: {
+          state,
+          toast,
+          fetchAll,
+          repository: repositories.transactions,
+          resolveVoidTarget:
+            window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+          buildVoidPayload:
+            window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+        },
+        events: { documentRef: document },
+      },
       entries: {
         $,
         state,

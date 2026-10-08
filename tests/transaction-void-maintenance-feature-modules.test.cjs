@@ -169,10 +169,21 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
   assert.deepEqual(calls, [["toast", "This transaction type can't be voided"]]);
 });
 
-test("app composes transaction history and maintenance actions independently", () => {
+test("transaction workspace connects maintenance and records at the app root", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
+  );
+  const transactionWorkspace = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.match(
+    transactionWorkspace,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)/,
+  );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
     "utf8",
