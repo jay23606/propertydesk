@@ -9,6 +9,27 @@
     sumOperatingExpenses,
     accountBalance,
   }) {
+    function summarizeAccounts(accounts) {
+      return accounts.reduce(
+        (summary, account) => {
+          if (account.account_type === "rental") {
+            summary.accountCounts.rental += 1;
+          } else {
+            summary.principal += accountBalance(account);
+            if (account.account_type === "land_contract")
+              summary.accountCounts.land_contract += 1;
+            if (account.account_type === "note")
+              summary.accountCounts.note += 1;
+          }
+          return summary;
+        },
+        {
+          principal: 0,
+          accountCounts: { rental: 0, land_contract: 0, note: 0 },
+        },
+      );
+    }
+
     function buildReportModel(year = new Date().getFullYear()) {
       const income = sumIncome(
         state.payments.filter(
@@ -20,27 +41,15 @@
           (expense) => dateOnly(expense.expense_date)?.getFullYear() === year,
         ),
       );
-      const principal = state.accounts
-        .filter((account) => account.account_type !== "rental")
-        .reduce((sum, account) => sum + accountBalance(account), 0);
+      const accountSummary = summarizeAccounts(state.accounts);
 
       return {
         year,
         income,
         costs,
         netCashFlow: income - costs,
-        principal,
-        accountCounts: {
-          rental: state.accounts.filter(
-            (account) => account.account_type === "rental",
-          ).length,
-          land_contract: state.accounts.filter(
-            (account) => account.account_type === "land_contract",
-          ).length,
-          note: state.accounts.filter(
-            (account) => account.account_type === "note",
-          ).length,
-        },
+        principal: accountSummary.principal,
+        accountCounts: accountSummary.accountCounts,
         importBatches: state.importBatches,
       };
     }

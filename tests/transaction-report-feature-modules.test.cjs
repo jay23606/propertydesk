@@ -334,6 +334,11 @@ test("report views summarize the current-year ledger and escape import history",
   assert.equal(model.income, 600);
   assert.equal(model.costs, 100);
   assert.equal(model.principal, 2000);
+  assert.deepEqual(JSON.parse(JSON.stringify(model.accountCounts)), {
+    rental: 1,
+    land_contract: 1,
+    note: 1,
+  });
   assert.equal($("report-ytd").textContent, "$600.00");
   assert.equal($("report-expenses-ytd").textContent, "$100.00");
   assert.equal($("report-net-ytd").textContent, "$500.00");
