@@ -30,9 +30,16 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
     const themeStylesheet = Array.from(document.querySelectorAll("link[href]"))
       .map((item) => item.href)
       .find((href) => new URL(href).pathname.endsWith("/theme.css"));
+    const portfolioStylesheet = Array.from(
+      document.querySelectorAll("link[href]"),
+    )
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/portfolio.css"));
     if (!appScript) throw new Error("The app script is missing from the page.");
     if (!themeStylesheet)
       throw new Error("The theme stylesheet is missing from the page.");
+    if (!portfolioStylesheet)
+      throw new Error("The portfolio stylesheet is missing from the page.");
     return [
       {
         label: "app script",
@@ -43,6 +50,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
         label: "theme stylesheet",
         url: themeStylesheet,
         expected: 'html[data-theme="dark"]',
+      },
+      {
+        label: "portfolio stylesheet",
+        url: portfolioStylesheet,
+        expected: ".portfolio-table table",
       },
     ].map((asset) => {
       const url = new URL(asset.url);

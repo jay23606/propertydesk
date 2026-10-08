@@ -275,35 +275,10 @@
   border-color: #edd8d3;
   background: #fff;
 }
-.portfolio-table tbody td.payment-received-this-month {
-  background: #e7f3eb;
-}
-.portfolio-table tbody tr:hover td.payment-received-this-month {
-  background: #dceee2;
-}
-.portfolio-table tbody td.payment-paid-in-full-this-month {
-  background: #b8d9c3;
-}
-.portfolio-table tbody tr:hover td.payment-paid-in-full-this-month {
-  background: #a6cfb4;
-}
-.portfolio-table tbody td.payment-not-received-this-month {
-  background: #fbe9e9;
-}
-.portfolio-table tbody tr:hover td.payment-not-received-this-month {
-  background: #f6dddd;
-}
 .document-row small {
   font-size: 10px;
   color: var(--muted);
   margin-top: 3px;
-}
-.portfolio-table {
-  overflow: auto;
-}
-.portfolio-row-actions {
-  display: flex;
-  gap: 6px;
 }
 .table-subtext {
   display: block;
@@ -311,38 +286,6 @@
   color: #89958c;
   font-size: 10px;
   line-height: 1.3;
-}
-.property-row-name {
-  font-size: 12px;
-}
-.property-row-note {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  margin-top: 2px;
-  padding: 1px 0;
-  border: 0;
-  background: transparent;
-  color: #8a968d;
-  font-size: 10px;
-  line-height: 1.35;
-  text-align: left;
-  white-space: normal;
-}
-.property-row-note em {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow-wrap: anywhere;
-  font-style: italic;
-}
-.property-row-note:not(.has-note) {
-  color: #9aa49c;
-}
-.property-row-note:hover {
-  color: var(--green);
-  text-decoration: underline;
 }
 .member-form {
   display: flex;

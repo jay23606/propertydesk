@@ -74,7 +74,7 @@ async function main() {
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Startup");
     await assertNoUnhandledRejections(page, "Startup");
     console.log(
-      "Smoke: checking versioned app and theme assets while offline.",
+      "Smoke: checking versioned app and feature styles while offline.",
     );
     await assertVersionedShellAssetsAvailableOffline(page, context);
     assertNoBrowserErrors(runtimeErrors, consoleErrors, "Offline shell");
