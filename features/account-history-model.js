@@ -2,6 +2,13 @@
 (() => {
   "use strict";
 
+  const auditActionLabels = Object.freeze({
+    created: "Created",
+    updated: "Updated",
+    voided: "Voided",
+    deleted: "Deleted",
+  });
+
   function createAccountHistoryModel({ state, repository }) {
     const { loadAccountAuditEvents } = repository;
     async function loadAccountHistory(account, payments) {
@@ -20,16 +27,7 @@
       );
       const auditEvents = history.map((event) => ({
         target: event.entity_type === "pd_accounts" ? "account" : "payment",
-        action:
-          event.action === "created"
-            ? "Created"
-            : event.action === "updated"
-              ? "Updated"
-              : event.action === "voided"
-                ? "Voided"
-                : event.action === "deleted"
-                  ? "Deleted"
-                  : "Recorded",
+        action: auditActionLabels[event.action] || "Recorded",
         reason:
           event.action === "voided"
             ? paymentById.get(event.entity_id)?.void_reason || ""
