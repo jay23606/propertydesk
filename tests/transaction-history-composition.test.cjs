@@ -15,7 +15,7 @@ test("app composes transaction history separately from maintenance actions", () 
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection: transactionMaintenance\.saveCorrection/,
+    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection,/,
   );
   assert.match(
     transactionWorkflow,

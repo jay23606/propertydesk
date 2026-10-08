@@ -15,7 +15,11 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   const attachTransactionFilterEvents = () => {};
   const attachTransactionActionEvents = () => {};
   const maintenance = {
-    marker: "maintenance",
+    saveCorrection,
+    createTransactionActionHandlers(options) {
+      passed.actions = options;
+      return { attachTransactionActionEvents };
+    },
   };
   const entries = {
     $: () => {},
@@ -49,18 +53,6 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   };
   const context = vm.createContext({
     window: {
-      PropertyDeskTransactionMaintenanceWorkflow: {
-        create(options) {
-          passed.maintenance = options;
-          return {
-            saveCorrection,
-            createTransactionActionHandlers(options) {
-              passed.actions = options;
-              return { attachTransactionActionEvents };
-            },
-          };
-        },
-      },
       PropertyDeskLedgerEntryForms: {
         create(options) {
           passed.entries = options;
@@ -98,7 +90,6 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   );
 
   assert.equal(Object.isFrozen(workflow), true);
-  assert.equal(passed.maintenance, maintenance);
   for (const [key, value] of Object.entries(entries)) {
     if (key === "unusedEntryDependency") continue;
     assert.equal(passed.entries[key], value);

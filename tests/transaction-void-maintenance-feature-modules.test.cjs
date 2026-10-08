@@ -148,6 +148,7 @@ test("transaction void entry rejects unsupported kinds before asking for confirm
 test("app composes transaction history and maintenance actions independently", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
     "utf8",
@@ -156,13 +157,10 @@ test("app composes transaction history and maintenance actions independently", (
     transactionWorkflow,
     /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
+  assert.match(transactionWorkflow, /createTransactionActionHandlers\(/);
   assert.match(
     transactionWorkflow,
-    /transactionMaintenance\.createTransactionActionHandlers\(/,
-  );
-  assert.match(
-    transactionWorkflow,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)/,
+    /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;/,
   );
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);

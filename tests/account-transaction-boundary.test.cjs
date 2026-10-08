@@ -29,6 +29,10 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     transactionWorkflow,
-    /saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+    /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;[\s\S]*?saveCorrection,[\s\S]*?PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
 });

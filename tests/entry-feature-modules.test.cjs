@@ -21,10 +21,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
-  );
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
@@ -100,11 +97,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(
     transactionRecordsWorkflow,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(maintenance\)/,
-  );
-  assert.match(
-    transactionRecordsWorkflow,
-    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection: transactionMaintenance\.saveCorrection/,
+    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection,/,
   );
   assert.match(
     transactionRecordsWorkflow,
@@ -112,7 +105,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(
     transactionRecordsWorkflow,
-    /openPayment: ledgerEntryForms\.openPayment/,
+    /createTransactionActionHandlers\(\{[\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
   assert.doesNotMatch(app, /PropertyDeskEntryWorkflow/);
 });

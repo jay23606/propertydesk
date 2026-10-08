@@ -33,8 +33,7 @@
       sumOperatingExpenses,
     },
   }) {
-    const transactionMaintenance =
-      window.PropertyDeskTransactionMaintenanceWorkflow.create(maintenance);
+    const { saveCorrection, createTransactionActionHandlers } = maintenance;
     const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
       $,
       state,
@@ -49,7 +48,7 @@
       openModal,
       transactionRepository,
       transactionPayloads,
-      saveCorrection: transactionMaintenance.saveCorrection,
+      saveCorrection,
     });
     const transactionViews = window.PropertyDeskTransactionViews.create({
       $: viewQuery,
@@ -64,12 +63,11 @@
       sumIncome,
       sumOperatingExpenses,
     });
-    const { attachTransactionActionEvents } =
-      transactionMaintenance.createTransactionActionHandlers({
-        openPayment: ledgerEntryForms.openPayment,
-        openExpense: ledgerEntryForms.openExpense,
-        updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
-      });
+    const { attachTransactionActionEvents } = createTransactionActionHandlers({
+      openPayment: ledgerEntryForms.openPayment,
+      openExpense: ledgerEntryForms.openExpense,
+      updatePaymentGuidance: ledgerEntryForms.updatePaymentGuidance,
+    });
 
     return Object.freeze({
       attachLedgerEntryFormEvents: ledgerEntryForms.attachLedgerEntryFormEvents,
