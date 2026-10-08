@@ -2,7 +2,13 @@
 (() => {
   "use strict";
 
-  function createProfileSettings({ state, authClient, toast, updateGreeting }) {
+  function createProfileSettings({
+    state,
+    authClient,
+    toast,
+    updateGreeting,
+    writeFeedback,
+  }) {
     async function saveProfile(displayName) {
       if (!displayName) {
         toast("Enter a display name");
@@ -11,7 +17,7 @@
 
       let data;
       let reconciled = false;
-      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
+      const saved = await writeFeedback.run({
         operation: async () => {
           const result = await authClient.updateUser({
             data: { display_name: displayName },

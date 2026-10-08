@@ -89,6 +89,7 @@ function loadWorkspaceFeatures(context) {
     );
   }
   return {
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     profile: context.window.PropertyDeskWorkspaceProfileWorkflow,
     memberView: context.window.PropertyDeskWorkspaceMembersView,
     memberMaintenance: context.window.PropertyDeskWorkspaceMemberMaintenance,

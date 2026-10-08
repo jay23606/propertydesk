@@ -11,6 +11,7 @@
     reminder,
     memberRepository,
     authClient,
+    writeFeedback,
     workflows,
     confirmAction = (message) => window.confirm(message),
   }) {
@@ -28,6 +29,7 @@
       state,
       authClient,
       toast,
+      writeFeedback,
       workflows: workflows.profileModules,
     });
     const memberView = workflows.memberView.create({

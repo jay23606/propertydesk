@@ -204,6 +204,7 @@
       },
       memberRepository: repositories.workspaceMembers,
       authClient,
+      writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
     },
     navigation: {
       $,
