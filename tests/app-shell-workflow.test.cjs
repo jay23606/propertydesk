@@ -10,7 +10,6 @@ test("app shell composes workspace settings and navigation explicitly", () => {
   const workspaceActions = {
     updateGreeting() {},
     renderWorkspacePage() {},
-    previewReminderEmail() {},
     attachProfileEvents() {},
     attachWorkspaceMemberEvents() {},
   };
@@ -61,7 +60,6 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "attachProfileEvents",
     "attachWorkspaceMemberEvents",
     "navigate",
-    "previewReminderEmail",
     "renderWorkspacePage",
     "updateGreeting",
   ]);

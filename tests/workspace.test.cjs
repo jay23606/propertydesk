@@ -42,7 +42,6 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
           passed.reminderWorkflow = options;
           return {
             renderReminderActivity: () => reminderActivityRenders++,
-            previewReminderEmail: () => "preview",
           };
         },
       },
@@ -79,7 +78,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   );
   assert.equal(workflow.updateGreeting, updateGreeting);
   assert.equal(Object.isFrozen(workflow), true);
-  assert.equal(typeof workflow.previewReminderEmail, "function");
+  assert.equal("previewReminderEmail" in workflow, false);
   workflow.renderWorkspacePage();
   assert.equal(passed.displayName, "Owner");
   assert.equal(reminderActivityRenders, 1);

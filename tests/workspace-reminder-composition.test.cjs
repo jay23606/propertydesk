@@ -3,26 +3,22 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("app shell shares workspace reminder preview with account forms", () => {
+test("account forms receive reminder preview independently of workspace activity", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  const workspace = fs.readFileSync(
-    path.join(root, "features", "workspace.js"),
+  const workspaceReminder = fs.readFileSync(
+    path.join(root, "features", "workspace-reminder-workflow.js"),
     "utf8",
   );
 
-  assert.match(
-    workspace,
-    /PropertyDeskWorkspaceReminderWorkflow\.create\(reminder\)/,
+  assert.match(app, /PropertyDeskReminderPreviewWorkflow\.create\(/);
+  assert.doesNotMatch(
+    workspaceReminder,
+    /ReminderPreviewModel|PropertyDeskReminderPreview\./,
   );
-  assert.match(
-    app,
-    /const \{[\s\S]*?previewReminderEmail,[\s\S]*?\} = appShell/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
     app,
     /PropertyDeskPropertyAccountFormsWorkflow\.create\(\{[\s\S]*?account: \{[\s\S]*?previewReminderEmail,/,
@@ -32,6 +28,7 @@ test("app shell shares workspace reminder preview with account forms", () => {
     "features/reminder-activity-view.js",
     "features/reminder-preview.js",
     "features/reminder-preview-model.js",
+    "features/reminder-preview-workflow.js",
     "features/workspace-reminder-workflow.js",
     "features/property-form.js",
     "features/account-form.js",

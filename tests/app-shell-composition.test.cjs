@@ -19,7 +19,7 @@ test("app shell composes workspace settings and page navigation", () => {
 
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?workspace: \{[\s\S]*?reminder: \{[\s\S]*?openModal: modal\.openModal,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
+    /PropertyDeskReminderPreviewWorkflow\.create\([\s\S]*?openModal: modal\.openModal,[\s\S]*?PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
     appShell,
@@ -38,6 +38,7 @@ test("app shell composes workspace settings and page navigation", () => {
     /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,[\s\S]*?attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
   );
   for (const script of [
+    "features/reminder-preview-workflow.js",
     "features/workspace.js",
     "features/navigation.js",
     "features/app-shell-workflow.js",

@@ -1,24 +1,8 @@
-/* Compose reminder activity and its recipient-facing email preview. */
+/* Compose the Workspace reminder delivery activity view. */
 (() => {
   "use strict";
 
-  function createWorkspaceReminderWorkflow({
-    $,
-    state,
-    esc,
-    fmtDate,
-    money,
-    amountDueSince,
-    unpaidDueAccrualStart,
-    monthEnd,
-    dateOnly,
-    monthStart,
-    propertyAddress,
-    todayIso,
-    moneyInput,
-    toast,
-    openModal,
-  }) {
+  function createWorkspaceReminderWorkflow({ $, state, esc, fmtDate, money }) {
     const activityModel = window.PropertyDeskReminderActivityModel.create({
       state,
     });
@@ -30,27 +14,7 @@
         money,
         model: activityModel,
       });
-    const previewModel = window.PropertyDeskReminderPreviewModel.create({
-      amountDueSince,
-      unpaidDueAccrualStart,
-      monthEnd,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      money,
-    });
-    const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-      $,
-      state,
-      todayIso,
-      moneyInput,
-      toast,
-      esc,
-      model: previewModel,
-      openModal,
-    });
-
-    return Object.freeze({ renderReminderActivity, previewReminderEmail });
+    return Object.freeze({ renderReminderActivity });
   }
 
   window.PropertyDeskWorkspaceReminderWorkflow = Object.freeze({

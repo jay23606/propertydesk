@@ -66,7 +66,6 @@ function loadWorkspaceFeatures(context) {
   context.window.PropertyDeskWorkspaceReminderWorkflow ||= {
     create: () => ({
       renderReminderActivity() {},
-      previewReminderEmail() {},
     }),
   };
   for (const filename of [

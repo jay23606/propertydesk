@@ -99,6 +99,23 @@
       propertyAddress,
       prettyType,
     });
+  const { previewReminderEmail } =
+    window.PropertyDeskReminderPreviewWorkflow.create({
+      $,
+      state,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      monthEnd,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      money,
+      todayIso,
+      moneyInput,
+      toast,
+      esc,
+      openModal: modal.openModal,
+    });
   const appShell = window.PropertyDeskAppShellWorkflow.create({
     workspace: {
       $,
@@ -112,16 +129,6 @@
         esc,
         fmtDate,
         money,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        monthEnd,
-        dateOnly,
-        monthStart,
-        propertyAddress,
-        todayIso,
-        moneyInput,
-        toast,
-        openModal: modal.openModal,
       },
       memberRepository: repositories.workspaceMembers,
       authClient,
@@ -134,7 +141,6 @@
     },
   });
   const {
-    previewReminderEmail,
     updateGreeting,
     attachProfileEvents,
     attachWorkspaceMemberEvents,

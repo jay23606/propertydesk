@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("workspace reminder activity stays under the app shell and independent of navigation", () => {
+test("workspace reminder activity stays independent of account email preview", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -27,21 +27,19 @@ test("workspace reminder activity stays under the app shell and independent of n
   );
   assert.match(
     reminderWorkflow,
-    /function createWorkspaceReminderWorkflow\(\{[\s\S]*?state,[\s\S]*?\}\) \{[\s\S]*?ReminderActivityModel\.create\(\{\s*state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\(/,
+    /function createWorkspaceReminderWorkflow\(\{[\s\S]*?state,[\s\S]*?\}\) \{[\s\S]*?ReminderActivityModel\.create\(\{\s*state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,/,
   );
   assert.match(
     reminderWorkflow,
     /ReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
   );
-  assert.match(
-    reminderWorkflow,
-    /PropertyDeskReminderPreview\.create\(\{[\s\S]*?model: previewModel/,
-  );
+  assert.doesNotMatch(reminderWorkflow, /ReminderPreview/);
   for (const feature of [
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",
     "features/reminder-preview-model.js",
     "features/reminder-preview.js",
+    "features/reminder-preview-workflow.js",
     "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.includes(feature));

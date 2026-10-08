@@ -256,7 +256,11 @@ test("app passes reminder services into the app-shell coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?workspace: \{[\s\S]*?reminder: \{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
+    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?workspace: \{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository:/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskReminderPreviewWorkflow\.create\(\{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
   );
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);

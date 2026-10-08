@@ -12,7 +12,6 @@
     return Object.freeze({
       updateGreeting: workspacePage.updateGreeting,
       renderWorkspacePage: workspacePage.renderWorkspacePage,
-      previewReminderEmail: workspacePage.previewReminderEmail,
       attachProfileEvents: workspacePage.attachProfileEvents,
       attachWorkspaceMemberEvents: workspacePage.attachWorkspaceMemberEvents,
       navigate: pageNavigation.navigate,

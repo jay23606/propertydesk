@@ -4,28 +4,16 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("workspace reminder workflow composes activity and preview features", () => {
+test("workspace reminder workflow composes only its activity view", () => {
   const calls = [];
   const activityModel = { kind: "activity model" };
-  const previewModel = { kind: "preview model" };
   const renderReminderActivity = () => "activity";
-  const previewReminderEmail = () => "preview";
   const reminder = {
     $() {},
     state: {},
     esc() {},
     fmtDate() {},
     money() {},
-    amountDueSince() {},
-    unpaidDueAccrualStart() {},
-    monthEnd() {},
-    dateOnly() {},
-    monthStart() {},
-    propertyAddress() {},
-    todayIso() {},
-    moneyInput() {},
-    toast() {},
-    openModal() {},
     unusedDependency: true,
   };
   const context = vm.createContext({
@@ -40,18 +28,6 @@ test("workspace reminder workflow composes activity and preview features", () =>
         create(options) {
           calls.push(["activity-view", options]);
           return { renderReminderActivity };
-        },
-      },
-      PropertyDeskReminderPreviewModel: {
-        create(options) {
-          calls.push(["preview-model", options]);
-          return previewModel;
-        },
-      },
-      PropertyDeskReminderPreview: {
-        create(options) {
-          calls.push(["preview", options]);
-          return { previewReminderEmail };
         },
       },
     },
@@ -69,7 +45,7 @@ test("workspace reminder workflow composes activity and preview features", () =>
 
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["activity-model", "activity-view", "preview-model", "preview"],
+    ["activity-model", "activity-view"],
   );
   assert.equal(calls[0][1].state, reminder.state);
   assert.deepEqual(Object.keys(calls[0][1]), ["state"]);
@@ -78,39 +54,6 @@ test("workspace reminder workflow composes activity and preview features", () =>
   assert.equal(calls[1][1].fmtDate, reminder.fmtDate);
   assert.equal(calls[1][1].money, reminder.money);
   assert.equal(calls[1][1].model, activityModel);
-  assert.equal(calls[2][1].amountDueSince, reminder.amountDueSince);
-  assert.equal(calls[2][1].propertyAddress, reminder.propertyAddress);
-  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
-    "amountDueSince",
-    "dateOnly",
-    "money",
-    "monthEnd",
-    "monthStart",
-    "propertyAddress",
-    "unpaidDueAccrualStart",
-  ]);
-  assert.equal(calls[3][1].$, reminder.$);
-  assert.equal(calls[3][1].state, reminder.state);
-  assert.equal(calls[3][1].todayIso, reminder.todayIso);
-  assert.equal(calls[3][1].moneyInput, reminder.moneyInput);
-  assert.equal(calls[3][1].toast, reminder.toast);
-  assert.equal(calls[3][1].esc, reminder.esc);
-  assert.equal(calls[3][1].model, previewModel);
-  assert.equal(calls[3][1].openModal, reminder.openModal);
-  assert.deepEqual(Object.keys(calls[3][1]).sort(), [
-    "$",
-    "esc",
-    "model",
-    "moneyInput",
-    "openModal",
-    "state",
-    "toast",
-    "todayIso",
-  ]);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "previewReminderEmail",
-    "renderReminderActivity",
-  ]);
-  assert.equal(workflow.previewReminderEmail, previewReminderEmail);
+  assert.deepEqual(Object.keys(workflow), ["renderReminderActivity"]);
   assert.equal(workflow.renderReminderActivity, renderReminderActivity);
 });
