@@ -189,13 +189,6 @@ html[data-theme="dark"] .schedule-table {
 html[data-theme="dark"] .table-subtext {
   color: #a7b3aa;
 }
-html[data-theme="dark"] .auth-view {
-  background: radial-gradient(ellipse at 50% 20%, #26372c 0, #151b17 58%);
-}
-html[data-theme="dark"] .auth-intro,
-html[data-theme="dark"] .privacy-note {
-  color: #a4b0a7;
-}
 html[data-theme="dark"] .text-button {
   color: #78c99d;
 }

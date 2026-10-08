@@ -5,6 +5,9 @@
   padding: 25px;
   background: radial-gradient(ellipse at 50% 20%, #edf3ec 0, #f7f8f5 55%);
 }
+html[data-theme="dark"] .auth-view {
+  background: radial-gradient(ellipse at 50% 20%, #26372c 0, #151b17 58%);
+}
 .auth-card {
   width: min(100%, 405px);
   background: #fff;
@@ -26,6 +29,10 @@
   font-size: 12px;
   color: #89948c;
   margin: 7px 0 22px;
+}
+html[data-theme="dark"] .auth-intro,
+html[data-theme="dark"] .privacy-note {
+  color: #a4b0a7;
 }
 .form-stack {
   display: grid;

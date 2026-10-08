@@ -9,6 +9,7 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const reminders = fs.readFileSync(path.join(root, "reminders.css"), "utf8");
+  const auth = fs.readFileSync(path.join(root, "auth.css"), "utf8");
   const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
   const stylesheetOrder = [
     ...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g),
@@ -20,6 +21,9 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
       stylesheetOrder.indexOf("reminders.css"),
   );
   assert.match(theme, /html\[data-theme="dark"\]/);
+  assert.doesNotMatch(theme, /\.auth-view|\.auth-intro|\.privacy-note/);
+  assert.match(auth, /html\[data-theme="dark"\] \.auth-view/);
+  assert.match(auth, /html\[data-theme="dark"\] \.privacy-note/);
   assert.doesNotMatch(
     theme,
     /\.reminder-(?:toggle-row|preview|status|accepted|failed|skipped|sending)/,
