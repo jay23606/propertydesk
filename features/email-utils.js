@@ -5,38 +5,8 @@
   const { splitEmailAddresses, isValidEmailAddress } =
     globalThis.PropertyDeskEmailAddressUtils;
 
-  function paymentReminderMessage({
-    address,
-    subjectAddress = address,
-    unpaidDue,
-    senderName,
-    recipientName,
-    month,
-    asOf,
-  }) {
-    const period =
-      month ||
-      new Intl.DateTimeFormat(undefined, {
-        month: "long",
-        year: "numeric",
-      }).format(new Date());
-    const amountDate = asOf || new Date().toISOString().slice(0, 10);
-    const subject = `Payment reminder for ${subjectAddress} · ${period}`;
-    const body = [
-      `Hello ${String(recipientName || "").trim() || "there"},`,
-      "",
-      `Our records show no rent or installment payment recorded for ${period}.`,
-      "",
-      `Unpaid due as of ${amountDate}: ${unpaidDue}`,
-      `Property: ${address}`,
-      "",
-      "If you have already paid or believe this is incorrect, please contact your landlord or seller.",
-      "",
-      "Thank you,",
-      senderName || "PropertyDesk",
-    ].join("\n");
-    return { subject, body };
-  }
+  const paymentReminderMessage =
+    globalThis.PropertyDeskReminderCopy.buildReminderCopy;
 
   function lateReminderMailto({
     email,

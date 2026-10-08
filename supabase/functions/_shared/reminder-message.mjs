@@ -1,3 +1,7 @@
+import "./reminder-copy.js";
+
+const { buildReminderCopy } = globalThis.PropertyDeskReminderCopy;
+
 function escapeHtml(value) {
   return value.replace(
     /[&<>"']/g,
@@ -28,10 +32,17 @@ export function reminderMessage(
   ]
     .filter(Boolean)
     .join(", ");
-  const subject = `Payment reminder for ${property.address} · ${label}`;
   const name = account.party_name?.trim() || "there";
   const sender = "PropertyDesk";
-  const text = `Hello ${name},\n\nOur records show no rent or installment payment recorded for ${label}.\n\nUnpaid due as of ${monthEnd}: $${amountDue.toFixed(2)}\nProperty: ${address}\n\nIf you have already paid or believe this is incorrect, please contact your landlord or seller.\n\nThank you,\n${sender}`;
+  const { subject, body: text } = buildReminderCopy({
+    subjectAddress: property.address,
+    address,
+    unpaidDue: `$${amountDue.toFixed(2)}`,
+    recipientName: name,
+    senderName: sender,
+    month: label,
+    asOf: monthEnd,
+  });
   const html = `<p>Hello ${escapeHtml(name)},</p><p>Our records show no rent or installment payment recorded for ${escapeHtml(label)}.</p><p><strong>Unpaid due as of ${escapeHtml(monthEnd)}:</strong> $${amountDue.toFixed(2)}<br><strong>Property:</strong> ${escapeHtml(address)}</p><p>If you have already paid or believe this is incorrect, please contact your landlord or seller.</p><p>Thank you,<br>${sender}</p>`;
   return { subject, text, html };
 }

@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/email-address-utils.js");
+require("../supabase/functions/_shared/reminder-copy.js");
 const { lateReminderMailto } = require("../features/email-utils.js");
 
 function parts(href) {
@@ -93,10 +94,15 @@ test("the app renders the account holder as a mailto link instead of an account-
     views,
     /class="table-action" data-detail="\$\{esc\(account\.id\)\}">${esc\(account\.party_name/,
   );
+  assert.ok(
+    html.indexOf("supabase/functions/_shared/reminder-copy.js") <
+      html.indexOf("features/email-utils.js"),
+  );
   assert.ok(html.indexOf("features/email-utils.js") < html.indexOf("app.js"));
   assert.ok(
     html.indexOf("features/property-views.js") < html.indexOf("app.js"),
   );
+  assert.match(worker, /\.\/supabase\/functions\/_shared\/reminder-copy\.js/);
   assert.match(worker, /'\.\/features\/email-utils\.js'/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
 });

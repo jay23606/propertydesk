@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/email-address-utils.js");
+require("../supabase/functions/_shared/reminder-copy.js");
 const { paymentReminderMessage } = require("../features/email-utils.js");
 
 const utilsPromise =
