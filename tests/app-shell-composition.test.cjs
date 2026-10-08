@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("workspace shell connects settings rendering and page routing", () => {
+test("app composes workspace settings and page navigation directly", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -12,22 +12,14 @@ test("workspace shell connects settings rendering and page routing", () => {
     path.join(root, "features", "workspace.js"),
     "utf8",
   );
-  const shell = fs.readFileSync(
-    path.join(root, "features", "workspace-shell-workflow.js"),
-    "utf8",
-  );
 
   assert.match(
     app,
-    /WorkspaceShellWorkflow\.create\(\{[\s\S]*?navigation: \{[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
+    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity: workspaceReminder\.renderReminderActivity,[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
-    shell,
-    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\([\s\S]*?openModal: reminder\.openModal/,
-  );
-  assert.match(
-    shell,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?renderReminderActivity,[\s\S]*?PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
+    app,
+    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,[\s\S]*?documentRef: document,[\s\S]*?windowRef: window,/,
   );
   assert.match(
     workspace,
@@ -35,12 +27,12 @@ test("workspace shell connects settings rendering and page routing", () => {
   );
   assert.match(
     app,
-    /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
+    /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,[\s\S]*?attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
   );
   for (const script of [
     "features/workspace.js",
     "features/navigation.js",
-    "features/workspace-shell-workflow.js",
+    "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));
     assert.ok(worker.includes(`'./${script}'`));

@@ -3,39 +3,35 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 
-test("workspace shell connects reminder activity, preview, and navigation", () => {
+test("reminder activity and preview are composed independently of navigation", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  const shellWorkflow = fs.readFileSync(
-    path.join(root, "features", "workspace-shell-workflow.js"),
+  const reminderWorkflow = fs.readFileSync(
+    path.join(root, "features", "workspace-reminder-workflow.js"),
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskWorkspaceShellWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(
-    shellWorkflow,
-    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\([\s\S]*?PropertyDeskWorkspace\.create\([\s\S]*?renderReminderActivity,[\s\S]*?PropertyDeskNavigation\.create\(/,
+    reminderWorkflow,
+    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\(/,
   );
   assert.match(
-    shellWorkflow,
+    reminderWorkflow,
     /ReminderActivityView\.create\(\{[\s\S]*?model: activityModel,/,
   );
   assert.match(
-    shellWorkflow,
+    reminderWorkflow,
     /PropertyDeskReminderPreview\.create\(\{[\s\S]*?model: previewModel/,
-  );
-  assert.match(
-    shellWorkflow,
-    /PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspace\.renderWorkspacePage,/,
   );
   for (const feature of [
     "features/reminder-activity-model.js",
     "features/reminder-activity-view.js",
     "features/reminder-preview-model.js",
     "features/reminder-preview.js",
-    "features/workspace-shell-workflow.js",
+    "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.includes(feature));
     assert.ok(worker.includes(`'./${feature}'`));
