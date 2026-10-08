@@ -52,6 +52,9 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
     )
       .map((item) => item.href)
       .find((href) => new URL(href).pathname.endsWith("/imports.css"));
+    const ledgerStylesheet = Array.from(document.querySelectorAll("link[href]"))
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/ledger.css"));
     if (!appScript) throw new Error("The app script is missing from the page.");
     if (!themeStylesheet)
       throw new Error("The theme stylesheet is missing from the page.");
@@ -65,6 +68,8 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
       );
     if (!importsStylesheet)
       throw new Error("The imports stylesheet is missing from the page.");
+    if (!ledgerStylesheet)
+      throw new Error("The ledger stylesheet is missing from the page.");
     return [
       {
         label: "app script",
@@ -95,6 +100,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
         label: "imports stylesheet",
         url: importsStylesheet,
         expected: ".import-preview-table",
+      },
+      {
+        label: "ledger stylesheet",
+        url: ledgerStylesheet,
+        expected: ".transaction-voided",
       },
     ].map((asset) => {
       const url = new URL(asset.url);

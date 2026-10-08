@@ -1,0 +1,18 @@
+.expense-pill {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  background: #fbefea;
+  color: #a35f45;
+}
+.negative-amount {
+  color: #a35f45 !important;
+}
+.transaction-voided {
+  opacity: 0.6;
+}
+.transaction-voided td strong {
+  text-decoration: line-through;
+}
