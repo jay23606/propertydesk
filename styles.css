@@ -199,17 +199,6 @@ button {
   color: var(--muted);
   margin-top: 3px;
 }
-.icon-button {
-  border: 0;
-  background: transparent;
-  color: #78847c;
-  font-size: 21px;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-.icon-button:hover {
-  background: #f2f4f0;
-}
 .main-area {
   margin-left: 252px;
   min-height: 100vh;
@@ -292,43 +281,6 @@ button {
   margin: 7px 0 0;
   color: #87928b;
   font-size: 13px;
-}
-.button {
-  border: 1px solid #dfe5df;
-  border-radius: 7px;
-  padding: 10px 14px;
-  background: #fff;
-  color: #46534b;
-  font-size: 12px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  white-space: nowrap;
-  transition: 0.15s;
-}
-.button:hover {
-  border-color: #b7c7bb;
-  background: #f9fbf9;
-}
-.button.primary {
-  background: var(--green);
-  border-color: var(--green);
-  color: white;
-}
-.button.primary:hover {
-  background: var(--green-dark);
-}
-.button.secondary {
-  background: #fff;
-}
-.button.compact {
-  padding: 9px 12px;
-}
-.button.full {
-  width: 100%;
-  padding: 12px;
 }
 .stats-grid {
   display: grid;
@@ -415,17 +367,6 @@ button {
   font-size: 11px;
   color: #929d94;
   margin: 5px 0 0;
-}
-.link-button {
-  border: 0;
-  background: transparent;
-  color: var(--green);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 5px;
-}
-.link-button span {
-  padding-left: 5px;
 }
 .list-body {
   padding: 0 20px 12px;
@@ -715,16 +656,6 @@ button {
   font-size: 11px;
   line-height: 1.5;
   margin: 8px 0;
-}
-.text-button {
-  display: block;
-  border: 0;
-  background: none;
-  color: var(--green);
-  font-size: 11px;
-  font-weight: 700;
-  margin: 0 auto;
-  padding: 5px;
 }
 .detail-kpis {
   display: grid;
