@@ -17,10 +17,11 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     app,
     /transactionMaintenance\.createTransactionActionHandlers\(/,
   );
-  assert.match(app, /PropertyDeskAccountScreenWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.match(
     app,
-    /AccountScreenWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountActions: \{[\s\S]*?closeModal,[\s\S]*?editAccount,[\s\S]*?openPayment,/,
+    /AccountDetailContentWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
   );
   assert.match(
     app,
@@ -32,7 +33,6 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "deposit-details-workflow",
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
-    "account-screen-workflow",
     "transaction-maintenance-workflow",
   ]) {
     const script = `features/${feature}.js`;

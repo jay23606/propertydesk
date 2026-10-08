@@ -5,35 +5,39 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
-test("app delegates account actions and deposit adjustments to separate workflows", () => {
+test("app composes account details apart from account and deposit maintenance", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskAccountScreenWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountActions:/,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(\{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
   );
+  assert.match(
+    app,
+    /PropertyDeskAccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: repositories\.accounts/,
+  );
+  assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
-  assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create/);
-  const accountScreenWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "account-screen-workflow.js"),
+  const accountDetailWorkflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-detail-content-workflow.js",
+    ),
     "utf8",
   );
+  assert.match(accountDetailWorkflow, /AccountHistoryModel\.create\(/);
   assert.match(
-    accountScreenWorkflow,
-    /AccountDetailContentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository/,
+    accountDetailWorkflow,
+    /depositSectionHTML,\s*renderAccountHistory,/,
   );
-  assert.match(
-    accountScreenWorkflow,
-    /depositSectionHTML: content\.depositSectionHTML/,
-  );
-  assert.doesNotMatch(
-    accountScreenWorkflow,
-    /DepositDetailsWorkflow|DepositAdjustmentWorkflow/,
-  );
-  assert.match(
-    accountScreenWorkflow,
-    /AccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: accountActions\.repository/,
-  );
+  assert.doesNotMatch(accountDetailWorkflow, /AccountDetailActionWorkflow/);
   const depositWorkspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
     "utf8",
@@ -100,108 +104,9 @@ test("app delegates account actions and deposit adjustments to separate workflow
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*depositWorkspace\.attachDepositAdjustmentEvents,/,
   );
+  assert.doesNotMatch(html, /account-screen-workflow/);
+  assert.doesNotMatch(worker, /account-screen-workflow/);
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
-});
-
-test("account screen workflow composes only account detail and close actions", () => {
-  const calls = [];
-  const context = vm.createContext({
-    window: {
-      PropertyDeskAccountDetailContentWorkflow: {
-        create(content) {
-          calls.push(["content", content]);
-          return { openAccountDetails() {} };
-        },
-      },
-      PropertyDeskAccountDetailActionWorkflow: {
-        create(actions) {
-          calls.push(["accountActions", actions]);
-          return { attachAccountDetailActionEvents() {} };
-        },
-      },
-    },
-  });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(__dirname, "..", "features", "account-screen-workflow.js"),
-      "utf8",
-    ),
-    context,
-  );
-  const content = {
-    $() {},
-    state: {},
-    money() {},
-    fmtDate() {},
-    esc() {},
-    sumPosted() {},
-    prettyType() {},
-    paymentFrequencyLabel() {},
-    summarizeAccount() {},
-    amortizationSchedule() {},
-    openModal() {},
-    propertyAddress() {},
-    depositSectionHTML() {},
-    accountHistoryRepository: {},
-    unusedContentValue: true,
-  };
-  const accountActions = {
-    $() {},
-    state: {},
-    toast() {},
-    fetchAll() {},
-    closeModal() {},
-    editAccount() {},
-    openPayment() {},
-    repository: { close() {} },
-    unusedDependency: true,
-  };
-  const workflow = context.window.PropertyDeskAccountScreenWorkflow.create({
-    content,
-    accountActions,
-  });
-
-  assert.equal(calls[0][0], "content");
-  assert.equal(calls[0][1].state, content.state);
-  assert.equal(
-    calls[0][1].accountHistoryRepository,
-    content.accountHistoryRepository,
-  );
-  assert.equal(calls[0][1].depositSectionHTML, content.depositSectionHTML);
-  assert.equal("unusedContentValue" in calls[0][1], false);
-  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
-    "$",
-    "accountHistoryRepository",
-    "amortizationSchedule",
-    "depositSectionHTML",
-    "esc",
-    "fmtDate",
-    "money",
-    "openModal",
-    "paymentFrequencyLabel",
-    "prettyType",
-    "propertyAddress",
-    "state",
-    "sumPosted",
-    "summarizeAccount",
-  ]);
-  assert.equal(calls[1][0], "accountActions");
-  assert.equal(calls[1][1].repository, accountActions.repository);
-  assert.equal("unusedDependency" in calls[1][1], false);
-  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
-    "$",
-    "closeModal",
-    "editAccount",
-    "fetchAll",
-    "openPayment",
-    "repository",
-    "state",
-    "toast",
-  ]);
-  assert.deepEqual(Object.keys(workflow).sort(), [
-    "attachAccountDetailActionEvents",
-    "openAccountDetails",
-  ]);
 });
 
 test("deposit workspace connects held-balance details to adjustment actions", () => {

@@ -274,34 +274,33 @@
       validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
     },
   });
-  const { openAccountDetails, attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountScreenWorkflow.create({
-      content: {
-        $,
-        state,
-        money,
-        fmtDate,
-        esc,
-        sumPosted,
-        prettyType,
-        paymentFrequencyLabel,
-        summarizeAccount,
-        amortizationSchedule,
-        openModal,
-        propertyAddress,
-        depositSectionHTML: depositWorkspace.depositSectionHTML,
-        accountHistoryRepository: repositories.accountHistory,
-      },
-      accountActions: {
-        $,
-        state,
-        toast,
-        fetchAll,
-        closeModal,
-        editAccount: accountForm.editAccount,
-        openPayment,
-        repository: repositories.accounts,
-      },
+  const { openAccountDetails } =
+    window.PropertyDeskAccountDetailContentWorkflow.create({
+      $,
+      state,
+      money,
+      fmtDate,
+      esc,
+      sumPosted,
+      prettyType,
+      paymentFrequencyLabel,
+      summarizeAccount,
+      amortizationSchedule,
+      openModal,
+      propertyAddress,
+      depositSectionHTML: depositWorkspace.depositSectionHTML,
+      accountHistoryRepository: repositories.accountHistory,
+    });
+  const { attachAccountDetailActionEvents } =
+    window.PropertyDeskAccountDetailActionWorkflow.create({
+      $,
+      state,
+      toast,
+      fetchAll,
+      closeModal,
+      editAccount: accountForm.editAccount,
+      openPayment,
+      repository: repositories.accounts,
     });
   const {
     attachPropertyDetailEvents,
