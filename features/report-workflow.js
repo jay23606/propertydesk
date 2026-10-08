@@ -1,4 +1,4 @@
-/* Compose Reports calculations, rendering, and CSV export actions. */
+/* Compose Reports calculations and screen rendering. */
 (() => {
   "use strict";
 
@@ -12,9 +12,6 @@
       accountBalance,
       esc,
       money,
-      todayIso,
-      prettyType,
-      downloadBlob,
     } = context;
     const { buildReportModel } = window.PropertyDeskReportModel.create({
       state,
@@ -29,17 +26,7 @@
       money,
       buildReportModel,
     });
-    const { attachEvents: attachReportExportEvents } =
-      window.PropertyDeskReportExport.create({
-        $,
-        state,
-        todayIso,
-        prettyType,
-        accountBalance,
-        downloadBlob,
-      });
-
-    return Object.freeze({ renderReports, attachReportExportEvents });
+    return Object.freeze({ renderReports });
   }
 
   window.PropertyDeskReportWorkflow = Object.freeze({ create });

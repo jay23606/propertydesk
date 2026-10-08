@@ -67,21 +67,18 @@ test("backup and report exports own separate button bindings", () => {
   }
 });
 
-test("app delegates Reports rendering and export composition to its workflow", () => {
+test("app composes Reports rendering and CSV export independently", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
-  );
+  assert.match(app, /PropertyDeskReportExport\.create\(/);
+  assert.doesNotMatch(app, /PropertyDeskReport(?:Model|Views)\.create\(/);
   assert.match(app, /renderers:[\s\S]*?renderReports/);
   assert.match(app, /eventBindersAfterAuth:[\s\S]*?attachReportExportEvents/);
 });
 
-test("Reports workflow composes calculation, view, and export modules", () => {
+test("Reports workflow composes calculation and view modules only", () => {
   const received = {};
   const renderReports = () => {};
-  const attachReportExportEvents = () => {};
   const buildReportModel = () => {};
   const context = vm.createContext({
     window: {
@@ -95,12 +92,6 @@ test("Reports workflow composes calculation, view, and export modules", () => {
         create: (options) => {
           received.view = options;
           return { renderReports };
-        },
-      },
-      PropertyDeskReportExport: {
-        create: (options) => {
-          received.export = options;
-          return { attachEvents: attachReportExportEvents };
         },
       },
     },
@@ -121,9 +112,6 @@ test("Reports workflow composes calculation, view, and export modules", () => {
     accountBalance() {},
     esc() {},
     money() {},
-    todayIso() {},
-    prettyType() {},
-    downloadBlob() {},
   };
   const workflow =
     context.window.PropertyDeskReportWorkflow.create(dependencies);
@@ -140,13 +128,8 @@ test("Reports workflow composes calculation, view, and export modules", () => {
   assert.equal(received.view.esc, dependencies.esc);
   assert.equal(received.view.money, dependencies.money);
   assert.equal(received.view.buildReportModel, buildReportModel);
-  assert.equal(received.export.state, dependencies.state);
-  assert.equal(received.export.todayIso, dependencies.todayIso);
-  assert.equal(received.export.prettyType, dependencies.prettyType);
-  assert.equal(received.export.accountBalance, dependencies.accountBalance);
-  assert.equal(received.export.downloadBlob, dependencies.downloadBlob);
   assert.equal(workflow.renderReports, renderReports);
-  assert.equal(workflow.attachReportExportEvents, attachReportExportEvents);
+  assert.deepEqual(Object.keys(workflow), ["renderReports"]);
 });
 
 test("account CSV export keeps rental balances blank and escapes spreadsheet fields", async () => {
