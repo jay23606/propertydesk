@@ -6,6 +6,7 @@
     $,
     state,
     groupAccountsByProperty,
+    isActiveAccount,
     esc,
     money,
     paymentFrequencyLabel,
@@ -55,6 +56,7 @@
     const filterModel = window.PropertyDeskPropertyPortfolioFilterModel.create({
       state,
       propertyAddress,
+      isActiveAccount,
     });
     const portfolioModel = window.PropertyDeskPropertyPortfolioModel.create({
       state,

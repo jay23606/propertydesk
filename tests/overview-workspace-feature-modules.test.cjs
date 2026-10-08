@@ -179,7 +179,7 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Model|Events)?\.create\(/);
   assert.match(
     workflow,
-    /PropertyDeskOverviewModel.create\(\{\s*state,\s*propertySummaryModel,\s*groupAccountsByProperty,[\s\S]*?postedOnOrAfter,/,
+    /PropertyDeskOverviewModel.create\(\{\s*state,\s*isActiveAccount,\s*propertySummaryModel,\s*groupAccountsByProperty,[\s\S]*?postedOnOrAfter,/,
   );
   assert.match(app, /renderers:[\s\S]*?renderOverview/);
   assert.match(app, /eventBindersBeforeAuth:[\s\S]*?attachOverviewEvents/);
@@ -255,12 +255,14 @@ test("overview workflow exposes its renderer and event binder directly", () => {
   const openPropertyDetails = () => {};
   const openPropertyPayment = () => {};
   const groupAccountsByProperty = () => new Map();
+  const isActiveAccount = () => true;
   const isPosted = () => true;
   const summarizeAccount = () => ({});
   const workflow = context.window.PropertyDeskOverviewWorkflow.create({
     openPropertyDetails,
     openPropertyPayment,
     groupAccountsByProperty,
+    isActiveAccount,
     isPosted,
     summarizeAccount,
   });
@@ -275,8 +277,10 @@ test("overview workflow exposes its renderer and event binder directly", () => {
   ]);
   assert.equal(passed.activityModelOptions.isPosted, isPosted);
   assert.equal(passed.propertySummary.summarizeAccount, summarizeAccount);
+  assert.equal(passed.propertySummary.isActiveAccount, isActiveAccount);
   assert.equal(passed.model.propertySummaryModel, propertySummaryModel);
   assert.equal(passed.model.groupAccountsByProperty, groupAccountsByProperty);
+  assert.equal(passed.model.isActiveAccount, isActiveAccount);
   assert.equal(passed.view.overviewModel, overviewModel);
   assert.equal(passed.events.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.events.openPropertyPayment, openPropertyPayment);

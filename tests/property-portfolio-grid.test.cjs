@@ -32,7 +32,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /PropertyDeskPropertyWorkspaceWorkflow\.create\(\{\s*groupAccountsByProperty:\s*window\.PropertyDeskPropertyAccountIndex\.groupByProperty,/,
+    /PropertyDeskPropertyWorkspaceWorkflow\.create\(\{\s*groupAccountsByProperty:\s*window\.PropertyDeskPropertyAccountIndex\.groupByProperty,\s*isActiveAccount:\s*window\.PropertyDeskAccountStatusUtils\.isActiveAccount,/,
   );
   assert.match(
     app,
@@ -89,8 +89,9 @@ test("Properties workflow returns explicit view and action operations", () => {
         },
       },
       PropertyDeskPropertyPortfolioFilterModel: {
-        create: () => {
+        create: (options) => {
           calls.push("filter model");
+          passed.filterModel = options;
           return {};
         },
       },
@@ -129,6 +130,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     $: action,
     state,
     groupAccountsByProperty: action,
+    isActiveAccount: action,
     toast: action,
     fetchAll: action,
     streetAddress: action,
@@ -155,6 +157,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     "renderProperties",
   ]);
   assert.equal(passed.quickNote.state, state);
+  assert.equal(passed.filterModel.isActiveAccount, action);
   assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
   assert.equal(passed.quickNote.toast, action);
   assert.equal(passed.quickNote.fetchAll, action);
@@ -542,6 +545,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   const filterModel =
     context.window.PropertyDeskPropertyPortfolioFilterModel.create({
       state,
+      isActiveAccount:
+        context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
       propertyAddress: dependencies.propertyAddress,
     });
   const portfolioModel =

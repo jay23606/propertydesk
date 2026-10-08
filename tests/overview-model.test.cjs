@@ -108,6 +108,8 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
   const propertySummaryModel =
     context.window.PropertyDeskOverviewPropertySummaryModel.create({
       state,
+      isActiveAccount:
+        context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
       monthlyScheduledEstimate: (rows) =>
         rows.reduce((sum, account) => sum + account.payment_amount, 0),
       summarizeAccount:
@@ -120,6 +122,8 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
     });
   const model = context.window.PropertyDeskOverviewModel.create({
     state,
+    isActiveAccount:
+      context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
     propertySummaryModel,
     groupAccountsByProperty:
       context.window.PropertyDeskPropertyAccountIndex.groupByProperty,

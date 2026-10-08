@@ -331,6 +331,7 @@
   } = window.PropertyDeskPropertyWorkspaceWorkflow.create({
     groupAccountsByProperty:
       window.PropertyDeskPropertyAccountIndex.groupByProperty,
+    isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
     detail: {
       content: {
         $,

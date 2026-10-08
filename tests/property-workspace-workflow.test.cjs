@@ -20,6 +20,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   const state = {};
   const propertyAddress = () => "address";
   const groupAccountsByProperty = () => new Map();
+  const isActiveAccount = () => true;
   const lateReminderMailto = () => "reminder";
   const overview = {
     state,
@@ -75,7 +76,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   );
 
   const workspace = context.window.PropertyDeskPropertyWorkspaceWorkflow.create(
-    { detail, overview, portfolio, groupAccountsByProperty },
+    { detail, overview, portfolio, groupAccountsByProperty, isActiveAccount },
   );
 
   assert.deepEqual(
@@ -95,12 +96,14 @@ test("property workspace shares detail actions across overview and grid", () => 
   ]);
   assert.equal(calls[1][1].state, state);
   assert.equal(calls[1][1].groupAccountsByProperty, groupAccountsByProperty);
+  assert.equal(calls[1][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[1][1].propertyAddress, propertyAddress);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[2][1].state, state);
   assert.equal(calls[2][1].groupAccountsByProperty, groupAccountsByProperty);
+  assert.equal(calls[2][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[2][1].propertyAddress, propertyAddress);
   assert.equal(calls[2][1].lateReminderMailto, lateReminderMailto);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);

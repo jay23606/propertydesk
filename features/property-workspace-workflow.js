@@ -7,6 +7,7 @@
     overview,
     portfolio,
     groupAccountsByProperty,
+    isActiveAccount,
   }) {
     const propertyDetails = window.PropertyDeskPropertyScreenWorkflow.create({
       content: detail.content,
@@ -18,6 +19,7 @@
       $: overview.$,
       state: overview.state,
       groupAccountsByProperty,
+      isActiveAccount,
       monthlyScheduledEstimate: overview.monthlyScheduledEstimate,
       summarizeAccount: overview.summarizeAccount,
       collectedSince: overview.collectedSince,
@@ -38,6 +40,7 @@
       $: portfolio.$,
       state: portfolio.state,
       groupAccountsByProperty,
+      isActiveAccount,
       esc: portfolio.esc,
       money: portfolio.money,
       paymentFrequencyLabel: portfolio.paymentFrequencyLabel,

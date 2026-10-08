@@ -2,10 +2,9 @@
 (() => {
   "use strict";
 
-  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
-
   function createOverviewPropertySummaryModel({
     state,
+    isActiveAccount,
     monthlyScheduledEstimate,
     summarizeAccount,
   }) {

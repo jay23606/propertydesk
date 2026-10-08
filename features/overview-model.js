@@ -2,10 +2,9 @@
 (() => {
   "use strict";
 
-  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
-
   function createOverviewModel({
     state,
+    isActiveAccount,
     propertySummaryModel,
     groupAccountsByProperty,
     collectedSince,

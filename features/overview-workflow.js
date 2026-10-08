@@ -6,6 +6,7 @@
     $,
     state,
     groupAccountsByProperty,
+    isActiveAccount,
     monthlyScheduledEstimate,
     summarizeAccount,
     collectedSince,
@@ -25,11 +26,13 @@
     const propertySummaryModel =
       window.PropertyDeskOverviewPropertySummaryModel.create({
         state,
+        isActiveAccount,
         monthlyScheduledEstimate,
         summarizeAccount,
       });
     const overviewModel = window.PropertyDeskOverviewModel.create({
       state,
+      isActiveAccount,
       propertySummaryModel,
       groupAccountsByProperty,
       activityModel: window.PropertyDeskOverviewActivityModel.create({
