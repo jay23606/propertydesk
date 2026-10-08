@@ -8,6 +8,7 @@ function loadTransactionModules() {
   const context = vm.createContext({ window: {} });
   for (const filename of [
     "transaction-list-filter-model.js",
+    "transaction-display-row-model.js",
     "transaction-list-model.js",
     "transaction-summary-model.js",
     "transaction-row-view.js",
@@ -19,6 +20,71 @@ function loadTransactionModules() {
   }
   return context;
 }
+
+test("transaction display projection omits loaded records and search data", () => {
+  const context = loadTransactionModules();
+  const model = context.window.PropertyDeskTransactionDisplayRowModel.create({
+    expenseCategoryLabel: (value) => `Category: ${value}`,
+  });
+  const displayRow = model.toDisplayRow({
+    kind: "expense",
+    date: "2026-10-03",
+    amount: 75,
+    item: {
+      id: "expense-1",
+      user_id: "private-owner-id",
+      account_id: "account-1",
+      property_id: "property-1",
+      category: "repair",
+      payee: "Plumber",
+      payment_method: "check",
+      status: "posted",
+      memo: "Leak repair",
+      void_reason: null,
+      correction_of_expense_id: null,
+    },
+    account: {
+      id: "account-1",
+      user_id: "private-owner-id",
+      account_type: "rental",
+      name: "Tenant account",
+      party_name: "Tenant Name",
+      property_id: "property-1",
+    },
+    property: {
+      id: "property-1",
+      user_id: "private-owner-id",
+      name: "Rental home",
+    },
+    searchText: "tenant name rental home plumber leak repair",
+  });
+
+  assert.deepEqual(Object.keys(displayRow).sort(), [
+    "amount",
+    "correctionOf",
+    "date",
+    "detailsType",
+    "item",
+    "kind",
+    "partyName",
+    "paymentMethod",
+    "propertyName",
+    "transactionType",
+  ]);
+  assert.deepEqual(Object.keys(displayRow.item).sort(), [
+    "id",
+    "memo",
+    "status",
+    "void_reason",
+  ]);
+  assert.equal(displayRow.partyName, "Tenant Name");
+  assert.equal(displayRow.propertyName, "Rental home");
+  assert.equal(displayRow.paymentMethod, "Plumber");
+  assert.equal(displayRow.detailsType, "Category: repair");
+  assert.equal(Object.hasOwn(displayRow, "searchText"), false);
+  assert.equal(Object.hasOwn(displayRow, "account"), false);
+  assert.equal(Object.hasOwn(displayRow, "property"), false);
+});
 
 test("transaction list model filters rows and resolves their display associations", () => {
   const context = loadTransactionModules();

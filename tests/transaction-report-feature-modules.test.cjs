@@ -30,6 +30,7 @@ test("property and transaction views own their search and filter bindings", () =
     if (file === "transaction-views.js") {
       for (const dependency of [
         "transaction-list-filter-model.js",
+        "transaction-display-row-model.js",
         "transaction-list-model.js",
         "transaction-summary-model.js",
         "transaction-row-view.js",
@@ -75,6 +76,7 @@ test("transaction view renders filtered rows and independent month totals", () =
   const context = vm.createContext({ window: {} });
   for (const dependency of [
     "transaction-list-filter-model.js",
+    "transaction-display-row-model.js",
     "transaction-list-model.js",
     "transaction-summary-model.js",
     "transaction-row-view.js",
