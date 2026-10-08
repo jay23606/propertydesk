@@ -30,7 +30,7 @@
       });
     }
 
-    return { attachPropertyDocumentEvents };
+    return Object.freeze({ attachPropertyDocumentEvents });
   }
 
   window.PropertyDeskPropertyDetailDocumentEvents = Object.freeze({

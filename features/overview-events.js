@@ -21,7 +21,7 @@
       });
     }
 
-    return { attachEvents };
+    return Object.freeze({ attachEvents });
   }
 
   window.PropertyDeskOverviewEvents = Object.freeze({

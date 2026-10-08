@@ -66,7 +66,7 @@
       });
     }
 
-    return { attachEvents };
+    return Object.freeze({ attachEvents });
   }
 
   window.PropertyDeskImportPreviewEvents = Object.freeze({

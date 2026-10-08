@@ -44,7 +44,7 @@
       });
     }
 
-    return { attachAccountDetailActionEvents };
+    return Object.freeze({ attachAccountDetailActionEvents });
   }
 
   window.PropertyDeskAccountDetailEvents = Object.freeze({

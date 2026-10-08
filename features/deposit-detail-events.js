@@ -26,7 +26,7 @@
       });
     }
 
-    return { attachDepositAdjustmentEvents };
+    return Object.freeze({ attachDepositAdjustmentEvents });
   }
 
   window.PropertyDeskDepositDetailEvents = Object.freeze({

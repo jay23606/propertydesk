@@ -14,3 +14,15 @@ test("workflow coordinators do not return mutable interface objects", () => {
     assert.doesNotMatch(source, /\breturn\s+\{/u, file);
   }
 });
+
+test("event routers do not return mutable interface objects", () => {
+  const featureDirectory = path.join(__dirname, "..", "features");
+  const eventFiles = fs
+    .readdirSync(featureDirectory)
+    .filter((file) => file.endsWith("-events.js"));
+
+  for (const file of eventFiles) {
+    const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
+    assert.doesNotMatch(source, /\breturn\s+\{/u, file);
+  }
+});

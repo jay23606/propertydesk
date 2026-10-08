@@ -16,7 +16,7 @@
       });
     }
 
-    return { attachPropertyHolderEvents };
+    return Object.freeze({ attachPropertyHolderEvents });
   }
 
   window.PropertyDeskPropertyHolderEvents = Object.freeze({ create });

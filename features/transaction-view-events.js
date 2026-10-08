@@ -21,7 +21,7 @@
       });
     }
 
-    return { attachTransactionActionEvents };
+    return Object.freeze({ attachTransactionActionEvents });
   }
 
   window.PropertyDeskTransactionViewEvents = Object.freeze({
