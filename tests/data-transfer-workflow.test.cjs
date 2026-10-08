@@ -17,15 +17,16 @@ test("app wires CSV import and private backup workspace workflow independently",
     path.join(root, "features", "imports.js"),
     "utf8",
   );
-  assert.match(imports, /PropertyDeskImportPreview\.create\(/);
-  assert.match(imports, /PropertyDeskImportPreviewEvents\.create\(/);
-  assert.match(imports, /window\.PropertyDeskImportRows/);
-  assert.match(imports, /window\.PropertyDeskImportWorkflows/);
+  assert.match(imports, /preview\.create\(/);
+  assert.match(imports, /previewEvents\.create\(/);
+  assert.match(imports, /importRows;/);
+  assert.match(imports, /validators;/);
+  assert.doesNotMatch(imports, /window\.PropertyDesk(?!ImportFeature)/);
   assert.match(imports, /stageImport: importPreview\.stageImport/);
   assert.match(imports, /repository,\s*\n\s*writeFeedback,\s*\n\s*\}\);/);
-  assert.doesNotMatch(
+  assert.match(
     app,
-    /PropertyDeskImportRows|PropertyDeskImportWorkflows/,
+    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?validators: window\.PropertyDeskImportWorkflows,[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
   );
   assert.match(
     app,

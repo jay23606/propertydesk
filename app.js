@@ -642,6 +642,20 @@
     toast,
     repository: repositories.imports,
     writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+    modules: {
+      importRows: window.PropertyDeskImportRows,
+      csvParser: window.PropertyDeskCsvParser,
+      validators: window.PropertyDeskImportWorkflows,
+      preview: window.PropertyDeskImportPreview,
+      previewEvents: window.PropertyDeskImportPreviewEvents,
+      commit: window.PropertyDeskImportCommit,
+      review: window.PropertyDeskImportReview,
+      accountImport: window.PropertyDeskAccountImport,
+      accountImportPayload: window.PropertyDeskAccountImportPayload,
+      csvImportFile: window.PropertyDeskCsvImportFile,
+      transactionImport: window.PropertyDeskTransactionImportFeature,
+      transactionImportWorkflow: window.PropertyDeskTransactionImportWorkflow,
+    },
   });
   const { attachBackupExportEvents } =
     window.PropertyDeskBackupWorkspaceWorkflow.create({

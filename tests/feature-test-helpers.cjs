@@ -254,6 +254,24 @@ function loadImportFeatures(context) {
   }
 }
 
+function importFeatureModules(context) {
+  const { window } = context;
+  return {
+    importRows: window.PropertyDeskImportRows,
+    csvParser: window.PropertyDeskCsvParser,
+    validators: window.PropertyDeskImportWorkflows,
+    preview: window.PropertyDeskImportPreview,
+    previewEvents: window.PropertyDeskImportPreviewEvents,
+    commit: window.PropertyDeskImportCommit,
+    review: window.PropertyDeskImportReview,
+    accountImport: window.PropertyDeskAccountImport,
+    accountImportPayload: window.PropertyDeskAccountImportPayload,
+    csvImportFile: window.PropertyDeskCsvImportFile,
+    transactionImport: window.PropertyDeskTransactionImportFeature,
+    transactionImportWorkflow: window.PropertyDeskTransactionImportWorkflow,
+  };
+}
+
 function loadImportPreview(context) {
   for (const filename of [
     "import-correction-view.js",
@@ -303,6 +321,7 @@ module.exports = {
   propertyFormDependencies,
   loadPropertyAndAccountForms,
   loadImportFeatures,
+  importFeatureModules,
   loadImportPreview,
   formElements,
 };

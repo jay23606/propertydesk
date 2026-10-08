@@ -13,59 +13,70 @@
     toast,
     repository,
     writeFeedback,
+    modules,
   }) {
-    const { selectImportRows, createImportLookup } =
-      window.PropertyDeskImportRows;
-    const { parseCSV } = window.PropertyDeskCsvParser;
+    const {
+      importRows,
+      csvParser,
+      validators,
+      preview,
+      previewEvents,
+      commit,
+      review,
+      accountImport,
+      accountImportPayload,
+      csvImportFile,
+      transactionImport,
+      transactionImportWorkflow,
+    } = modules;
+    const { selectImportRows, createImportLookup } = importRows;
+    const { parseCSV } = csvParser;
     const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
-      window.PropertyDeskImportWorkflows;
-    const importPreview = window.PropertyDeskImportPreview.create({
+      validators;
+    const importPreview = preview.create({
       $,
       state,
       selectImportRows,
       esc,
       openModal,
     });
-    const { attachEvents: attachPreviewEvents } =
-      window.PropertyDeskImportPreviewEvents.create({
-        $,
-        state,
-        selectImportRows,
-        renderImportPreview: importPreview.renderImportPreview,
-        updateImportCommitButton: importPreview.updateImportCommitButton,
-        closeModal,
-        toast,
-      });
-    const { commitAccounts, commitTransactions } =
-      window.PropertyDeskImportCommit.create({
-        state,
-        fetchAll,
-        status: $("import-status"),
-        toast,
-        repository,
-        writeFeedback,
-      });
-    const importReview = window.PropertyDeskImportReview.create({
+    const { attachEvents: attachPreviewEvents } = previewEvents.create({
+      $,
+      state,
+      selectImportRows,
+      renderImportPreview: importPreview.renderImportPreview,
+      updateImportCommitButton: importPreview.updateImportCommitButton,
+      closeModal,
+      toast,
+    });
+    const { commitAccounts, commitTransactions } = commit.create({
+      state,
+      fetchAll,
+      status: $("import-status"),
+      toast,
+      repository,
+      writeFeedback,
+    });
+    const importReview = review.create({
       stageImport: importPreview.stageImport,
     });
-    const accounts = window.PropertyDeskAccountImport.create({
+    const accounts = accountImport.create({
       $,
       state,
       parseCSV,
       validateAccountRows,
       todayIso,
-      buildPayloads: window.PropertyDeskAccountImportPayload.build,
+      buildPayloads: accountImportPayload.build,
       commitAccounts,
       importReview,
-      createFileWorkflow: window.PropertyDeskCsvImportFile.create,
+      createFileWorkflow: csvImportFile.create,
     });
-    const transactions = window.PropertyDeskTransactionImportFeature.create({
+    const transactions = transactionImport.create({
       shared: {
         $,
         createImportLookup,
-        createFileWorkflow: window.PropertyDeskCsvImportFile.create,
-        createTransactionImportWorkflow:
-          window.PropertyDeskTransactionImportWorkflow.create,
+        createFileWorkflow: csvImportFile.create,
+        createTransactionImportWorkflow: transactionImportWorkflow.create,
       },
       payment: {
         state,

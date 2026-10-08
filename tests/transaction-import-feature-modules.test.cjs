@@ -3,6 +3,7 @@ const test = require("node:test");
 const {
   loadImportFeatures,
   loadImportPreview,
+  importFeatureModules,
   formElements,
 } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
@@ -284,6 +285,7 @@ test("payment and expense CSV importers save their own validated transaction pay
     }),
     fetchAll: async () => {},
     toast() {},
+    modules: importFeatureModules(context),
   });
   const expense = {
     property_name: property.name,
@@ -538,6 +540,7 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     closeModal() {},
     fetchAll: async () => {},
     toast() {},
+    modules: importFeatureModules(context),
   });
 
   feature.attachAccountEvents();

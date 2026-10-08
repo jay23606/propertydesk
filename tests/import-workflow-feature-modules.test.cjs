@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadImportFeatures } = require("./feature-test-helpers.cjs");
+const {
+  loadImportFeatures,
+  importFeatureModules,
+} = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -29,7 +32,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       addEventListener: (event, handler) =>
         handlers.set(`${id}:${event}`, handler),
     }),
-    createImportLookup() {},
+    modules: importFeatureModules(context),
   });
   assert.deepEqual(Object.keys(feature), [
     "attachPreviewEvents",
@@ -142,6 +145,7 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     toast() {},
     repository: { kind: "injected-import-repository" },
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    modules: importFeatureModules(context),
     unrelatedDependency() {},
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
