@@ -26,6 +26,7 @@
       repository,
       writeFeedback,
       selectRecordWriteCompletion,
+      recordSaveMaintenance: workflows.recordSaveMaintenance,
     });
 
     async function saveProperty(event) {

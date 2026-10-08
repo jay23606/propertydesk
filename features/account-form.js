@@ -38,6 +38,7 @@
       repository,
       writeFeedback,
       selectRecordWriteCompletion,
+      recordSaveMaintenance: workflows.recordSaveMaintenance,
     });
     const { resetAccountForm, readValues, editAccount } = formView;
     const { openAccountForProperty } = workflows.propertyAction.create({

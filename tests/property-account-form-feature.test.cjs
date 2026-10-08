@@ -123,6 +123,7 @@ test("property form projects view values into a database-safe property payload",
       view: context.window.PropertyDeskPropertyFormView,
       saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
       maintenance: context.window.PropertyDeskPropertySaveMaintenance,
+      recordSaveMaintenance: { create() {} },
     },
   });
   form.attachEvents();
@@ -145,6 +146,15 @@ test("property form projects view values into a database-safe property payload",
 test("property and account maintenance save inserts and updates to their own tables", async () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
+  for (const filename of [
+    "account-form-maintenance.js",
+    "property-save-maintenance.js",
+  ]) {
+    assert.doesNotMatch(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      /window\.PropertyDeskWorkspaceRecordSaveMaintenance/,
+    );
+  }
   const writes = [];
   const state = {
     client: {

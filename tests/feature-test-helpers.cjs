@@ -151,6 +151,8 @@ function ledgerEntryDependencies(context, state = {}) {
 function workspaceRecordWriteDependencies(context) {
   return {
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    recordSaveMaintenance:
+      context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         .selectRecordWriteCompletion,
@@ -170,6 +172,8 @@ function accountFormDependencies(context, state = {}) {
       view: context.window.PropertyDeskAccountFormView,
       saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
       maintenance: context.window.PropertyDeskAccountFormMaintenance,
+      recordSaveMaintenance:
+        context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
       propertyAction: context.window.PropertyDeskPropertyAccountAction,
     },
   };
@@ -194,6 +198,8 @@ function propertyFormDependencies(context, state = {}) {
       view: context.window.PropertyDeskPropertyFormView,
       saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
       maintenance: context.window.PropertyDeskPropertySaveMaintenance,
+      recordSaveMaintenance:
+        context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
     },
   };
 }

@@ -9,18 +9,18 @@
     repository,
     writeFeedback,
     selectRecordWriteCompletion,
+    recordSaveMaintenance,
   }) {
-    const { saveRecord } =
-      window.PropertyDeskWorkspaceRecordSaveMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-        writeFeedback,
-        selectRecordWriteCompletion,
-        collection: "accounts",
-        recordLabel: "Account",
-      });
+    const { saveRecord } = recordSaveMaintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+      writeFeedback,
+      selectRecordWriteCompletion,
+      collection: "accounts",
+      recordLabel: "Account",
+    });
     return Object.freeze({ saveAccount: saveRecord });
   }
 

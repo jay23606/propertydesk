@@ -231,11 +231,15 @@
           view: window.PropertyDeskPropertyFormView,
           saveWorkflow: window.PropertyDeskWorkspaceFormSaveWorkflow,
           maintenance: window.PropertyDeskPropertySaveMaintenance,
+          recordSaveMaintenance:
+            window.PropertyDeskWorkspaceRecordSaveMaintenance,
         },
         accountFormModules: {
           view: window.PropertyDeskAccountFormView,
           saveWorkflow: window.PropertyDeskWorkspaceFormSaveWorkflow,
           maintenance: window.PropertyDeskAccountFormMaintenance,
+          recordSaveMaintenance:
+            window.PropertyDeskWorkspaceRecordSaveMaintenance,
           propertyAction: window.PropertyDeskPropertyAccountAction,
         },
       },
