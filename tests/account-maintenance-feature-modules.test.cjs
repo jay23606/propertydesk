@@ -4,15 +4,18 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("account detail workspace connects content and actions", () => {
+test("account and deposit workspaces connect at one feature boundary", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:DepositWorkspace|AccountDetailWorkspace)Workflow\.create\(/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
@@ -46,6 +49,19 @@ test("account detail workspace connects content and actions", () => {
   assert.match(
     accountWorkspaceWorkflow,
     /PropertyDeskAccountDetailContentWorkflow\.create\(content\)[\s\S]*?PropertyDeskAccountDetailActionWorkflow\.create\(actions\)/,
+  );
+  const accountDepositWorkspaceWorkflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-deposit-workspace-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.match(
+    accountDepositWorkspaceWorkflow,
+    /PropertyDeskDepositWorkspaceWorkflow\.create\(deposits\)[\s\S]*?PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   const depositWorkspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
@@ -120,10 +136,13 @@ test("account detail workspace connects content and actions", () => {
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /PropertyDeskAccountDepositWorkspaceWorkflow\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
   );
-  assert.match(html, /features\/account-detail-workspace-workflow\.js/);
-  assert.match(worker, /'\.\/features\/account-detail-workspace-workflow\.js'/);
+  assert.match(html, /features\/account-deposit-workspace-workflow\.js/);
+  assert.match(
+    worker,
+    /'\.\/features\/account-deposit-workspace-workflow\.js'/,
+  );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 

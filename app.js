@@ -263,28 +263,32 @@
     navigate,
     documentRef: document,
   });
-  const depositWorkspace = window.PropertyDeskDepositWorkspaceWorkflow.create({
-    details: {
-      state,
-      depositLedger,
-      money,
-      fmtDate,
-      esc,
+  const {
+    openAccountDetails,
+    attachAccountDetailActionEvents,
+    attachDepositAdjustmentEvents,
+  } = window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
+    deposits: {
+      details: {
+        state,
+        depositLedger,
+        money,
+        fmtDate,
+        esc,
+      },
+      adjustments: {
+        $,
+        state,
+        todayIso,
+        toast,
+        fetchAll,
+        moneyInput,
+        repository: repositories.deposits,
+        prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
+        validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
+      },
     },
-    adjustments: {
-      $,
-      state,
-      todayIso,
-      toast,
-      fetchAll,
-      moneyInput,
-      repository: repositories.deposits,
-      prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
-      validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
-    },
-  });
-  const { openAccountDetails, attachAccountDetailActionEvents } =
-    window.PropertyDeskAccountDetailWorkspaceWorkflow.create({
+    accountDetails: {
       content: {
         $,
         state,
@@ -298,7 +302,6 @@
         amortizationSchedule,
         openModal,
         propertyAddress,
-        depositSectionHTML: depositWorkspace.depositSectionHTML,
         accountHistoryRepository: repositories.accountHistory,
       },
       actions: {
@@ -311,8 +314,8 @@
         openPayment,
         repository: repositories.accounts,
       },
-    });
-  const { attachDepositAdjustmentEvents } = depositWorkspace;
+    },
+  });
   const {
     attachPropertyDetailEvents,
     attachPropertyQuickActionEvents,

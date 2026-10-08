@@ -10,7 +10,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
@@ -18,7 +18,10 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     app,
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
-  assert.match(app, /PropertyDeskAccountDetailWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:DepositWorkspace|AccountDetailWorkspace)Workflow\.create\(/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
@@ -31,6 +34,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   for (const feature of [
     "account-detail-action-workflow",
     "account-detail-workspace-workflow",
+    "account-deposit-workspace-workflow",
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
     "workspace-deposit-context",
