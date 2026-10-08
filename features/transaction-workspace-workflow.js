@@ -7,6 +7,7 @@
     entries,
     views,
     maintenanceWorkflows,
+    recordWorkflows,
   }) {
     const transactionMaintenance =
       window.PropertyDeskTransactionMaintenanceWorkflow.create({
@@ -19,6 +20,7 @@
       maintenance: transactionMaintenance,
       entries,
       views,
+      workflows: recordWorkflows,
     });
   }
 

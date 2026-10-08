@@ -51,28 +51,31 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     sumOperatingExpenses: () => {},
     unusedViewDependency: true,
   };
+  const workflows = {
+    entryForms: { create: null },
+    views: { create: null },
+  };
   const context = vm.createContext({
-    window: {
-      PropertyDeskLedgerEntryForms: {
-        create(options) {
-          passed.entries = options;
-          return {
-            openPayment,
-            openPropertyPayment() {},
-            openExpense,
-            updatePaymentGuidance,
-            attachLedgerEntryFormEvents,
-          };
-        },
-      },
-      PropertyDeskTransactionViews: {
-        create(options) {
-          passed.views = options;
-          return { renderPayments, attachTransactionFilterEvents };
-        },
-      },
-    },
+    window: {},
   });
+  workflows.entryForms = {
+    create(options) {
+      passed.entries = options;
+      return {
+        openPayment,
+        openPropertyPayment() {},
+        openExpense,
+        updatePaymentGuidance,
+        attachLedgerEntryFormEvents,
+      };
+    },
+  };
+  workflows.views = {
+    create(options) {
+      passed.views = options;
+      return { renderPayments, attachTransactionFilterEvents };
+    },
+  };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
@@ -86,6 +89,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
       maintenance,
       entries,
       views,
+      workflows,
     },
   );
 

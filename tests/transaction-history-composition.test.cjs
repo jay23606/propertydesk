@@ -23,11 +23,11 @@ test("transaction workspace composes history and maintenance actions", () => {
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection,/,
+    /workflows\.entryForms\.create\([\s\S]*?saveCorrection,/,
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+    /workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
   assert.match(
     transactionWorkflow,

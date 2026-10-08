@@ -4,6 +4,7 @@
 
   function createTransactionRecordsWorkflow({
     maintenance,
+    workflows,
     entries: {
       $,
       state,
@@ -34,7 +35,7 @@
     },
   }) {
     const { saveCorrection, createTransactionActionHandlers } = maintenance;
-    const ledgerEntryForms = window.PropertyDeskLedgerEntryForms.create({
+    const ledgerEntryForms = workflows.entryForms.create({
       $,
       state,
       moneyInput,
@@ -50,7 +51,7 @@
       transactionPayloads,
       saveCorrection,
     });
-    const transactionViews = window.PropertyDeskTransactionViews.create({
+    const transactionViews = workflows.views.create({
       $: viewQuery,
       state: viewState,
       dateOnly,

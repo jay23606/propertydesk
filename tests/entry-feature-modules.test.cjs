@@ -109,11 +109,11 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(
     transactionRecordsWorkflow,
-    /PropertyDeskLedgerEntryForms\.create\([\s\S]*?saveCorrection,/,
+    /workflows\.entryForms\.create\([\s\S]*?saveCorrection,/,
   );
   assert.match(
     transactionRecordsWorkflow,
-    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+    /workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
   assert.match(
     transactionRecordsWorkflow,
@@ -188,7 +188,7 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(
     transactionRecordsWorkflow,
-    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+    /workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
   assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
   assert.doesNotMatch(

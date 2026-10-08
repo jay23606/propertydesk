@@ -230,6 +230,10 @@
         voidEntry: window.PropertyDeskTransactionVoidEntry,
         events: window.PropertyDeskTransactionMaintenanceEvents,
       },
+      recordWorkflows: {
+        entryForms: window.PropertyDeskLedgerEntryForms,
+        views: window.PropertyDeskTransactionViews,
+      },
       entries: {
         $,
         state,

@@ -25,6 +25,7 @@ test("transaction workspace connects maintenance to the records workflow", () =>
     voidEntry: { create() {} },
     events: { create() {} },
   };
+  const recordWorkflows = { entryForms: {}, views: {} };
   const context = vm.createContext({
     window: {
       PropertyDeskTransactionMaintenanceWorkflow: {
@@ -64,6 +65,7 @@ test("transaction workspace connects maintenance to the records workflow", () =>
       entries,
       views,
       maintenanceWorkflows,
+      recordWorkflows,
     });
 
   assert.deepEqual(Object.keys(passed.maintenance).sort(), [
@@ -94,6 +96,7 @@ test("transaction workspace connects maintenance to the records workflow", () =>
   assert.equal(passed.records.maintenance, maintenanceApi);
   assert.equal(passed.records.entries, entries);
   assert.equal(passed.records.views, views);
+  assert.equal(passed.records.workflows, recordWorkflows);
   assert.equal(workflow, recordsApi);
 });
 
@@ -116,9 +119,24 @@ test("transaction workspace connects maintenance and records at the app root", (
     transactionWorkspace,
     /PropertyDeskTransactionRecordsWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
+  assert.match(transactionWorkspace, /workflows: recordWorkflows/);
   assert.match(
     app,
     /maintenanceWorkflows: \{[\s\S]*?PropertyDeskTransactionMaintenanceEvents/,
+  );
+  assert.match(
+    app,
+    /recordWorkflows: \{\s*entryForms: window\.PropertyDeskLedgerEntryForms,\s*views: window\.PropertyDeskTransactionViews,/,
+  );
+  const transactionRecords = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
+    "utf8",
+  );
+  assert.match(transactionRecords, /workflows\.entryForms\.create\(/);
+  assert.match(transactionRecords, /workflows\.views\.create\(/);
+  assert.doesNotMatch(
+    transactionRecords,
+    /window\.PropertyDesk(?:LedgerEntryForms|TransactionViews)\.create/,
   );
   assert.doesNotMatch(
     transactionWorkspace,
@@ -130,7 +148,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     transactionWorkflow,
-    /PropertyDeskTransactionViews\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+    /workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,/,
   );
   assert.match(transactionWorkflow, /createTransactionActionHandlers\(/);
   assert.match(
