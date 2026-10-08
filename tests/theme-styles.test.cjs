@@ -20,8 +20,14 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
       stylesheetOrder.indexOf("reminders.css"),
   );
   assert.match(theme, /html\[data-theme="dark"\]/);
-  assert.doesNotMatch(theme, /\.auth-view|\.auth-intro|\.privacy-note/);
+  assert.doesNotMatch(
+    theme,
+    /\.auth-view|\.auth-card|\.auth-intro|\.privacy-note|\.form-stack|\.auth-theme-toggle/,
+  );
   assert.match(auth, /html\[data-theme="dark"\] \.auth-view/);
+  assert.match(auth, /html\[data-theme="dark"\] \.auth-card/);
+  assert.match(auth, /html\[data-theme="dark"\] \.form-stack input:focus/);
+  assert.match(auth, /\.auth-theme-toggle/);
   assert.match(auth, /html\[data-theme="dark"\] \.privacy-note/);
   assert.doesNotMatch(
     theme,

@@ -25,6 +25,11 @@ html[data-theme="dark"] .profile-row {
   background: #fff;
   color: inherit;
 }
+html[data-theme="dark"] .member-form input {
+  background: #18211b;
+  color: #e4ece6;
+  border-color: #435248;
+}
 .member-form .field-hint {
   flex-basis: 100%;
   margin: 0;

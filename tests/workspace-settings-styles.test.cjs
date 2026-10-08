@@ -28,9 +28,10 @@ test("workspace member management styles stay in their feature stylesheet", () =
   assert.match(workspace, /\.member-form/);
   assert.match(workspace, /\.member-list/);
   assert.match(workspace, /\.member-row/);
+  assert.match(workspace, /html\[data-theme="dark"\] \.member-form input/);
   assert.match(workspace, /html\[data-theme="dark"\] \.privacy-card/);
   assert.match(workspace, /html\[data-theme="dark"\] \.profile-row/);
   const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
-  assert.doesNotMatch(theme, /\.privacy-card|\.profile-row/);
+  assert.doesNotMatch(theme, /\.privacy-card|\.profile-row|\.member-form/);
   assert.doesNotMatch(shared, /\.member-(?:form|list|row)/);
 });

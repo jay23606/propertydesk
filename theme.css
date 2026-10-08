@@ -9,16 +9,6 @@
   font-size: 15px;
   line-height: 1;
 }
-.auth-theme-toggle {
-  align-self: flex-end;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--surface);
-  color: var(--ink);
-  padding: 8px 10px;
-  font-size: 11px;
-  font-weight: 700;
-}
 @media (max-width: 760px) {
   .topbar-actions .theme-label {
     display: none;
@@ -56,7 +46,6 @@ html[data-theme="dark"] .panel,
 html[data-theme="dark"] .property-card,
 html[data-theme="dark"] .table-wrap,
 html[data-theme="dark"] .modal-card,
-html[data-theme="dark"] .auth-card,
 html[data-theme="dark"] .search-box {
   background: var(--surface);
   color: var(--ink);
@@ -134,15 +123,12 @@ html[data-theme="dark"] .table-wrap tbody tr:hover {
 html[data-theme="dark"] .modal-backdrop {
   background: #050907c9;
 }
-html[data-theme="dark"] .modal-form label,
-html[data-theme="dark"] .form-stack label {
+html[data-theme="dark"] .modal-form label {
   color: #b3c0b7;
 }
 html[data-theme="dark"] .modal-form input,
 html[data-theme="dark"] .modal-form select,
 html[data-theme="dark"] .modal-form textarea,
-html[data-theme="dark"] .form-stack input,
-html[data-theme="dark"] .member-form input,
 html[data-theme="dark"] .toolbar select {
   background: #18211b;
   color: #e4ece6;
@@ -152,14 +138,12 @@ html[data-theme="dark"] .search-box input {
   color: #e4ece6;
 }
 html[data-theme="dark"] .modal-form input::placeholder,
-html[data-theme="dark"] .modal-form textarea::placeholder,
-html[data-theme="dark"] .form-stack input::placeholder {
+html[data-theme="dark"] .modal-form textarea::placeholder {
   color: #7f9085;
 }
 html[data-theme="dark"] .modal-form input:focus,
 html[data-theme="dark"] .modal-form select:focus,
-html[data-theme="dark"] .modal-form textarea:focus,
-html[data-theme="dark"] .form-stack input:focus {
+html[data-theme="dark"] .modal-form textarea:focus {
   border-color: #58aa7b;
   box-shadow: 0 0 0 3px #294735;
 }

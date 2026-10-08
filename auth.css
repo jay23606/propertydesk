@@ -8,6 +8,16 @@
 html[data-theme="dark"] .auth-view {
   background: radial-gradient(ellipse at 50% 20%, #26372c 0, #151b17 58%);
 }
+.auth-theme-toggle {
+  align-self: flex-end;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
 .auth-card {
   width: min(100%, 405px);
   background: #fff;
@@ -15,6 +25,11 @@ html[data-theme="dark"] .auth-view {
   border-radius: 13px;
   padding: 33px 35px 27px;
   box-shadow: 0 15px 55px #273b2b0d;
+}
+html[data-theme="dark"] .auth-card {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
 }
 .auth-card .brand {
   padding: 0;
@@ -45,6 +60,9 @@ html[data-theme="dark"] .privacy-note {
   color: #6d7971;
   font-weight: 600;
 }
+html[data-theme="dark"] .form-stack label {
+  color: #b3c0b7;
+}
 .form-stack input {
   width: 100%;
   border: 1px solid #e1e7e1;
@@ -55,9 +73,21 @@ html[data-theme="dark"] .privacy-note {
   font-size: 12px;
   outline: none;
 }
+html[data-theme="dark"] .form-stack input {
+  background: #18211b;
+  color: #e4ece6;
+  border-color: #435248;
+}
+html[data-theme="dark"] .form-stack input::placeholder {
+  color: #7f9085;
+}
 .form-stack input:focus {
   border-color: #7dad91;
   box-shadow: 0 0 0 3px #e9f2ec;
+}
+html[data-theme="dark"] .form-stack input:focus {
+  border-color: #58aa7b;
+  box-shadow: 0 0 0 3px #294735;
 }
 .privacy-note {
   display: flex;
