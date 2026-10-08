@@ -82,7 +82,6 @@ test("property holder and archive workflows reconcile rejected writes before ret
   await assert.doesNotReject(holderManagement.savePropertyHolders());
   await assert.doesNotReject(archive.toggleArchiveProperty());
   assert.deepEqual(messages, [
-    "Account-holder labels couldn't be saved right now. Check your connection and try again.",
     "Account-holder label update status couldn't be confirmed, and the workspace could not refresh. Reload to verify the current labels.",
     "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
   ]);
@@ -307,6 +306,7 @@ test("property holder refreshes displayed labels after a partial save failure", 
     state: {
       workspaceOwnerId: "workspace-1",
       selectedPropertyId: "property-1",
+      propertyHolders: [],
     },
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => events.push(["refresh"]),
@@ -323,6 +323,10 @@ test("property holder refreshes displayed labels after a partial save failure", 
     ["toast", "Insert failed"],
     ["refresh"],
     ["open", "property-1"],
+    [
+      "toast",
+      "Current account-holder labels were refreshed. Check them before retrying.",
+    ],
   ]);
 });
 
@@ -380,14 +384,25 @@ test("property holder reloads after a rejected label write with an unknown resul
       );
     }
     const events = [];
+    const state = {
+      workspaceOwnerId: "workspace-1",
+      selectedPropertyId: "property-1",
+      propertyHolders: [],
+    };
     const workflow = context.window.PropertyDeskPropertyHolderManagement.create(
       {
-        state: {
-          workspaceOwnerId: "workspace-1",
-          selectedPropertyId: "property-1",
-        },
+        state,
         toast: (message) => events.push(["toast", message]),
-        fetchAll: async () => events.push(["refresh"]),
+        fetchAll: async () => {
+          state.propertyHolders = [
+            {
+              user_id: "workspace-1",
+              property_id: "property-1",
+              member_user_id: "member-1",
+            },
+          ];
+          events.push(["refresh"]);
+        },
         openPropertyDetails: (id) => events.push(["open", id]),
         repository: {
           clearPropertyHolders: async () => {
@@ -402,15 +417,13 @@ test("property holder reloads after a rejected label write with an unknown resul
       },
     );
 
-    await workflow.savePropertyHolders(["member-1"]);
+    const saved = await workflow.savePropertyHolders(["member-1"]);
 
+    assert.equal(saved, true);
     assert.deepEqual(events, [
-      [
-        "toast",
-        "Account-holder labels couldn't be saved right now. Check your connection and try again.",
-      ],
       ["refresh"],
       ["open", "property-1"],
+      ["toast", "Account-holder labels saved"],
     ]);
   }
 });

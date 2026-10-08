@@ -3,13 +3,42 @@
   "use strict";
 
   function create({ state, toast, fetchAll, openPropertyDetails, repository }) {
-    async function refreshUncertainLabels(id, refreshFailureMessage) {
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        afterRefresh: () => openPropertyDetails(id),
-        toast,
-        refreshFailureMessage,
-      });
+    async function refreshUncertainLabels(
+      id,
+      expectedMemberIds,
+      refreshFailureMessage,
+    ) {
+      let labelsMatch = false;
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            const actualMemberIds = (state.propertyHolders || [])
+              .filter(
+                (row) =>
+                  row.user_id === state.workspaceOwnerId &&
+                  row.property_id === id,
+              )
+              .map((row) => row.member_user_id)
+              .sort();
+            const expected = expectedMemberIds.slice().sort();
+            labelsMatch =
+              actualMemberIds.length === expected.length &&
+              actualMemberIds.every(
+                (memberId, index) => memberId === expected[index],
+              );
+            openPropertyDetails(id);
+          },
+          toast,
+          refreshFailureMessage,
+        });
+      if (!refreshed) return false;
+      toast(
+        labelsMatch
+          ? "Account-holder labels saved"
+          : "Current account-holder labels were refreshed. Check them before retrying.",
+      );
+      return labelsMatch;
     }
 
     async function savePropertyHolders(selectedMemberIds = []) {
@@ -23,14 +52,11 @@
           id,
         ));
       } catch {
-        toast(
-          "Account-holder labels couldn't be saved right now. Check your connection and try again.",
-        );
-        await refreshUncertainLabels(
+        return refreshUncertainLabels(
           id,
+          selectedMemberIds,
           "Account-holder label update status couldn't be confirmed, and the workspace could not refresh. Reload to verify the current labels.",
         );
-        return;
       }
       if (deleteError) {
         toast(deleteError.message);
@@ -45,19 +71,17 @@
             selectedMemberIds,
           ));
         } catch {
-          toast(
-            "Account-holder labels couldn't be saved right now. Check your connection and try again.",
-          );
-          await refreshUncertainLabels(
+          return refreshUncertainLabels(
             id,
+            selectedMemberIds,
             "Account-holder labels may be partially saved, and the workspace could not refresh. Reload to verify the current labels.",
           );
-          return;
         }
         if (error) {
           toast(error.message);
           await refreshUncertainLabels(
             id,
+            selectedMemberIds,
             "Account-holder labels could not be fully saved, and the workspace could not refresh. Reload to verify the current labels.",
           );
           return;
