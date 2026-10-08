@@ -333,7 +333,7 @@ test("transaction void maintenance reports rejected requests without refreshing"
     feature.saveVoidTransaction("income", "payment-1", "Entered in error"),
   );
   assert.deepEqual(messages, [
-    "Transaction couldn't be voided right now. Please try again.",
+    "Transaction void result couldn't be confirmed. Reload transaction history before trying again.",
   ]);
 });
 

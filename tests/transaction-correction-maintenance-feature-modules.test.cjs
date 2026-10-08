@@ -157,7 +157,7 @@ test("transaction correction failures preserve the open form and pending correct
   assert.equal(closes, 0);
   assert.equal(refreshes, 0);
   assert.deepEqual(messages, [
-    "Correction failed; original entry is unchanged. Check your connection and try again.",
+    "Correction result couldn't be confirmed. Reload transaction history before trying again.",
     "This correction is no longer available.",
   ]);
 });

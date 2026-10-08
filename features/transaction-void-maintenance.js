@@ -25,7 +25,7 @@
           }),
         toast,
         failureMessage:
-          "Transaction couldn't be voided right now. Please try again.",
+          "Transaction void result couldn't be confirmed. Reload transaction history before trying again.",
         resultFailureMessage: ({ data }) =>
           data
             ? null

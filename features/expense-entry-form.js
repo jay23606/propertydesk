@@ -70,7 +70,7 @@
         buildCorrection: buildExpenseCorrection,
         insert: insertExpense,
         failureMessage:
-          "Expense couldn't be saved right now. Check your connection and try again.",
+          "Expense result couldn't be confirmed. Reload the Transactions list before recording it again.",
         label: "Expense",
         modalId: "expense-modal",
         resetAfterSave: expenseView.resetAfterSave,

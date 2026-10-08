@@ -502,8 +502,8 @@ test("payment and expense forms report rejected saves without clearing the entri
     handlers.get("expense-form:submit")({ preventDefault() {} }),
   );
   assert.deepEqual(messages, [
-    "Payment couldn't be saved right now. Check your connection and try again.",
-    "Expense couldn't be saved right now. Check your connection and try again.",
+    "Payment result couldn't be confirmed. Reload the Properties or Transactions list before recording it again.",
+    "Expense result couldn't be confirmed. Reload the Transactions list before recording it again.",
   ]);
   assert.deepEqual(JSON.parse(JSON.stringify(corrections)), [
     [

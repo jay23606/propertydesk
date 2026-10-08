@@ -35,7 +35,7 @@
         operation: () => repository.insert(prepared.payload),
         toast,
         failureMessage:
-          "Deposit adjustment failed. Check your connection and try again.",
+          "Deposit adjustment result couldn't be confirmed. Reload the deposit ledger before recording it again.",
         errorMessage: (error) => `Deposit adjustment failed: ${error.message}`,
       });
       if (!saved) return false;

@@ -19,7 +19,7 @@
           }),
         toast,
         failureMessage:
-          "Correction failed; original entry is unchanged. Check your connection and try again.",
+          "Correction result couldn't be confirmed. Reload transaction history before trying again.",
         errorMessage: (error) =>
           `Correction failed; original entry is unchanged. ${error.message}`,
       });

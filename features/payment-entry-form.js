@@ -65,7 +65,7 @@
         buildCorrection: buildPaymentCorrection,
         insert: insertPayment,
         failureMessage:
-          "Payment couldn't be saved right now. Check your connection and try again.",
+          "Payment result couldn't be confirmed. Reload the Properties or Transactions list before recording it again.",
         label: "Payment",
         modalId: "payment-modal",
         resetAfterSave: paymentView.resetAfterSave,
