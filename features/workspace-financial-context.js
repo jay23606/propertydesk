@@ -12,9 +12,7 @@
       isDueReducingPayment: postedLedgerUtils.isDueReducingPayment,
       isActiveAccount,
     });
-    const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create({
-      sumPosted: postedLedgerUtils.sumPosted,
-    });
+    const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create();
     const depositCalculations = window.PropertyDeskDepositLedgerUtils.create({
       isPosted: postedLedgerUtils.isPosted,
     });

@@ -110,7 +110,7 @@ test("workspace financial context composes ledger, account, loan, and deposit se
   );
   assert.equal(calls[0][1].isDueReducingPayment, isDueReducingPayment);
   assert.equal(calls[0][1].isActiveAccount, isActiveAccount);
-  assert.equal(calls[1][1].sumPosted, sumPosted);
+  assert.equal(calls[1][1], undefined);
   assert.equal(calls[2][1].isPosted, isPosted);
   assert.equal(calls[3][1].state, state);
   assert.equal(calls[3][1].ledger.todayIso, todayIso);

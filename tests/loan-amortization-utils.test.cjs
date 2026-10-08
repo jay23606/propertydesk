@@ -13,9 +13,7 @@ const scheduleUtils = scheduleFactory.create({
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
 });
-const loanUtils = loanAmortizationFactory.create({
-  sumPosted: ledgerUtils.sumPosted,
-});
+const loanUtils = loanAmortizationFactory.create();
 const depositUtils = depositFactory.create({ isPosted: ledgerUtils.isPosted });
 const { amountDueSince } = scheduleUtils;
 const { amortizationSchedule, scheduledLoanBalance } = loanUtils;
@@ -41,7 +39,11 @@ test("financial calculation modules keep focused APIs and load before the app", 
   }
   assert.equal(typeof scheduleUtils.amountDueSince, "function");
   assert.equal(typeof loanUtils.amortizationSchedule, "function");
-  assert.equal(typeof loanUtils.principalBalance, "function");
+  assert.equal(typeof loanUtils.scheduledLoanBalance, "function");
+  assert.deepEqual(Object.keys(loanUtils).sort(), [
+    "amortizationSchedule",
+    "scheduledLoanBalance",
+  ]);
   assert.equal(typeof depositUtils.securityDepositBalance, "function");
   assert.deepEqual(
     Object.keys(ledgerUtils).sort(),
@@ -79,30 +81,6 @@ test("scheduled loan balance follows amortization and accepts positive or negati
     ),
     125,
   );
-});
-
-test("voided principal allocations do not reduce the account balance", () => {
-  const payments = [
-    { principal_amount: "120.00", status: "posted" },
-    { principal_amount: "80.00", status: "voided" },
-    { principal_amount: "30.00" },
-  ];
-  assert.equal(loanUtils.principalBalance("500.00", payments), 350);
-  assert.equal(loanUtils.principalBalance(40, [{ principal_amount: 50 }]), 0);
-});
-
-test("ledger opening balance can differ from contract principal and ignores earlier payments", () => {
-  const payments = [
-    { principal_amount: 200, received_date: "2025-12-31" },
-    { principal_amount: 125, received_date: "2026-01-01" },
-    { principal_amount: 100, received_date: "2026-01-02" },
-    { principal_amount: 25, received_date: "2026-02-01", status: "voided" },
-  ];
-  assert.equal(
-    loanUtils.principalBalance(1000, payments, 500, "2026-01-01"),
-    400,
-  );
-  assert.equal(loanUtils.principalBalance(1000, payments, 0, "2026-01-01"), 0);
 });
 
 test("on-time land-contract schedule provides the hypothetical balance independently of payments received", () => {

@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createLoanAmortizationUtils({ sumPosted }) {
+  function createLoanAmortizationUtils() {
     const monthDateWithAnchor =
       globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
     if (!monthDateWithAnchor)
@@ -116,26 +116,6 @@
       );
     }
 
-    function principalBalance(
-      originalPrincipal,
-      payments,
-      openingBalance = originalPrincipal,
-      openingDate = null,
-    ) {
-      const eligible = openingDate
-        ? payments.filter(
-            (payment) =>
-              !payment.received_date ||
-              String(payment.received_date) > String(openingDate),
-          )
-        : payments;
-      return Math.max(
-        0,
-        Number(openingBalance ?? originalPrincipal ?? 0) -
-          sumPosted(eligible, "principal_amount"),
-      );
-    }
-
     function amortizationSchedule(
       originalPrincipal,
       annualRate,
@@ -155,7 +135,6 @@
 
     return Object.freeze({
       amortizationSchedule,
-      principalBalance,
       scheduledLoanBalance,
     });
   }
