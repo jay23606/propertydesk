@@ -30,7 +30,7 @@
       return saveDepositAdjustment(accountId, type, amount, reason);
     }
 
-    return { recordDepositAdjustment };
+    return Object.freeze({ recordDepositAdjustment });
   }
 
   window.PropertyDeskDepositAdjustmentEntry = Object.freeze({ create });

@@ -49,7 +49,7 @@
       });
     }
 
-    return { saveDepositAdjustment };
+    return Object.freeze({ saveDepositAdjustment });
   }
 
   window.PropertyDeskDepositMaintenance = Object.freeze({ create });

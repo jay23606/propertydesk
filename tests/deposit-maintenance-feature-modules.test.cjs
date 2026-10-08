@@ -138,6 +138,8 @@ test("deposit maintenance retains adjustment audit details", async () => {
     promptAction: () => prompts.shift(),
   });
 
+  assert.equal(Object.isFrozen(maintenance), true);
+  assert.equal(Object.isFrozen(entry), true);
   assert.equal(
     await entry.recordDepositAdjustment("rental-1", "retained"),
     true,

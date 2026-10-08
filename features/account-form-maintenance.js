@@ -12,7 +12,7 @@
       });
     }
 
-    return { saveAccount };
+    return Object.freeze({ saveAccount });
   }
 
   window.PropertyDeskAccountFormMaintenance = Object.freeze({ create });

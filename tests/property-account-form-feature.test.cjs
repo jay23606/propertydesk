@@ -108,6 +108,7 @@ test("property and account maintenance save inserts and updates to their own tab
       getClient: () => state.client,
     }),
   });
+  assert.equal(Object.isFrozen(account), true);
   assert.deepEqual(Object.keys(account), ["saveAccount"]);
 
   assert.equal(
