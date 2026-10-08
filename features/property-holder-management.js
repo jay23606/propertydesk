@@ -40,8 +40,10 @@
         if (error) {
           toast(error.message);
           try {
-            await fetchAll();
-            openPropertyDetails(id);
+            await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+              fetchAll,
+              afterRefresh: () => openPropertyDetails(id),
+            });
           } catch {
             return;
           }

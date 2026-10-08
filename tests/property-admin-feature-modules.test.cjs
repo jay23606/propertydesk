@@ -345,6 +345,41 @@ test("property holder save persists the member IDs supplied by the event layer",
   assert.deepEqual(messages, ["Account-holder labels saved"]);
 });
 
+test("property holder refreshes displayed labels after a partial save failure", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const source of [
+    "repository-write-feedback.js",
+    "property-holder-management.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", source), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
+    state: {
+      workspaceOwnerId: "workspace-1",
+      selectedPropertyId: "property-1",
+    },
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => events.push(["refresh"]),
+    openPropertyDetails: (id) => events.push(["open", id]),
+    repository: {
+      clearPropertyHolders: async () => ({ error: null }),
+      addPropertyHolders: async () => ({ error: new Error("Insert failed") }),
+    },
+  });
+
+  await workflow.savePropertyHolders(["member-1"]);
+
+  assert.deepEqual(events, [
+    ["toast", "Insert failed"],
+    ["refresh"],
+    ["open", "property-1"],
+  ]);
+});
+
 test("quick note and grid actions load before the Properties workflow", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
