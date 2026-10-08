@@ -34,7 +34,7 @@ Manual reminder drafts and automated reminders share the message builder in `sup
 
 Every browser feature script must be loaded by `index.html` after its dependencies and included in the service worker's `SHELL_FILES` list. When a cached shell file changes, increment `CACHE_NAME` in `sw.js`. The worker caches the static shell only; it must not cache authenticated responses or workspace records.
 
-Styles are layered by purpose: `styles.css` provides the base and app shell, `shared.css` owns reusable components, and the feature stylesheets own their screens and controls: `auth.css`, `portfolio.css`, `overview.css`, `reports.css`, `reminders.css`, `workspace-settings.css`, `property-details.css`, `account-form.css`, `imports.css`, and `ledger.css`. Keep a component's light and dark rules together in the stylesheet that owns it. `theme.css` owns theme variables and global app chrome, and remains last in the stylesheet order for rules that apply across the app.
+Styles are layered by purpose: `styles.css` provides the base and app shell, `shared.css` owns reusable components, and the feature stylesheets own their screens and controls: `auth.css`, `portfolio.css`, `overview.css`, `reports.css`, `reminders.css`, `workspace-settings.css`, `property-details.css`, `account-form.css`, `account-history.css`, `imports.css`, and `ledger.css`. Keep a component's light and dark rules together in the stylesheet that owns it. `theme.css` owns theme variables and global app chrome, and remains last in the stylesheet order for rules that apply across the app.
 
 ## Verification
 
