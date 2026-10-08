@@ -11,15 +11,16 @@
     accountBalance,
     esc,
     money,
+    workflows,
   }) {
-    const { buildReportModel } = window.PropertyDeskReportModel.create({
+    const { buildReportModel } = workflows.model.create({
       state,
       dateOnly,
       sumIncome,
       sumOperatingExpenses,
       accountBalance,
     });
-    const { renderReports } = window.PropertyDeskReportViews.create({
+    const { renderReports } = workflows.views.create({
       $,
       esc,
       money,

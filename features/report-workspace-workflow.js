@@ -2,8 +2,8 @@
 (() => {
   "use strict";
 
-  function createReportWorkspaceWorkflow({ rendering, exporting }) {
-    const { renderReports } = window.PropertyDeskReportWorkflow.create({
+  function createReportWorkspaceWorkflow({ rendering, exporting, workflows }) {
+    const { renderReports } = workflows.report.create({
       $: rendering.$,
       state: rendering.state,
       dateOnly: rendering.dateOnly,
@@ -12,9 +12,10 @@
       accountBalance: rendering.accountBalance,
       esc: rendering.esc,
       money: rendering.money,
+      workflows: { model: workflows.model, views: workflows.views },
     });
     const { attachEvents: attachReportExportEvents } =
-      window.PropertyDeskReportExport.create({
+      workflows.exporter.create({
         $: exporting.$,
         state: exporting.state,
         todayIso: exporting.todayIso,

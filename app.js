@@ -95,6 +95,12 @@
         accountBalance,
         downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       },
+      workflows: {
+        report: window.PropertyDeskReportWorkflow,
+        exporter: window.PropertyDeskReportExport,
+        model: window.PropertyDeskReportModel,
+        views: window.PropertyDeskReportViews,
+      },
     });
   const modal = window.PropertyDeskModalController.create({
     $,

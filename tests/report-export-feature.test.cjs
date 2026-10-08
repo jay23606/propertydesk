@@ -80,7 +80,7 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   );
   assert.match(
     workspace,
-    /PropertyDeskReportWorkflow\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?PropertyDeskReportExport\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,
+    /workflows\.report\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?workflows\.exporter\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,
   );
 });
 
@@ -108,6 +108,12 @@ test("report workspace preserves rendering and export APIs", () => {
     unusedExportingValue: true,
   };
   const passed = {};
+  const workflows = {
+    report: { create: null },
+    exporter: { create: null },
+    model: {},
+    views: {},
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskReportWorkflow: {
@@ -124,6 +130,8 @@ test("report workspace preserves rendering and export APIs", () => {
       },
     },
   });
+  workflows.report = context.window.PropertyDeskReportWorkflow;
+  workflows.exporter = context.window.PropertyDeskReportExport;
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "report-workspace-workflow.js"),
@@ -135,6 +143,7 @@ test("report workspace preserves rendering and export APIs", () => {
   const workspace = context.window.PropertyDeskReportWorkspaceWorkflow.create({
     rendering,
     exporting,
+    workflows,
   });
 
   assert.deepEqual(Object.keys(passed.rendering).sort(), [
@@ -146,6 +155,7 @@ test("report workspace preserves rendering and export APIs", () => {
     "state",
     "sumIncome",
     "sumOperatingExpenses",
+    "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.exporting).sort(), [
     "$",
@@ -155,8 +165,12 @@ test("report workspace preserves rendering and export APIs", () => {
     "state",
     "todayIso",
   ]);
-  for (const key of Object.keys(passed.rendering))
+  for (const key of Object.keys(passed.rendering)) {
+    if (key === "workflows") continue;
     assert.equal(passed.rendering[key], rendering[key]);
+  }
+  assert.equal(passed.rendering.workflows.model, workflows.model);
+  assert.equal(passed.rendering.workflows.views, workflows.views);
   for (const key of Object.keys(passed.exporting))
     assert.equal(passed.exporting[key], exporting[key]);
   assert.equal(workspace.renderReports, renderReports);
@@ -200,6 +214,10 @@ test("Reports workflow composes calculation and view modules only", () => {
     accountBalance() {},
     esc() {},
     money() {},
+    workflows: {
+      model: context.window.PropertyDeskReportModel,
+      views: context.window.PropertyDeskReportViews,
+    },
   };
   const workflow =
     context.window.PropertyDeskReportWorkflow.create(dependencies);
