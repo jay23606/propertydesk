@@ -48,13 +48,12 @@
           return;
         }
       }
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      openPropertyDetails(id);
-      toast("Account-holder labels saved");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: () => openPropertyDetails(id),
+        toast,
+        successMessage: "Account-holder labels saved",
+      });
     }
 
     return { savePropertyHolders };

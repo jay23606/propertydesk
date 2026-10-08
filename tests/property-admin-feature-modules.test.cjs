@@ -270,6 +270,7 @@ test("property holder save persists the member IDs supplied by the event layer",
   const context = vm.createContext({ window: {} });
   for (const source of [
     "repository-query-utils.js",
+    "repository-write-feedback.js",
     "property-holder-repository.js",
     "property-holder-management.js",
   ]) {

@@ -28,12 +28,11 @@
       if (!(await persistProperty(payload, id))) return;
       closeModal($("property-modal"));
       formView.resetPropertyForm();
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast(id ? "Property updated" : "Property added");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage: id ? "Property updated" : "Property added",
+      });
     }
 
     return {

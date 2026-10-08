@@ -33,12 +33,11 @@
       }
       if (!(await savePropertyQuickNote(id, state.workspaceOwnerId, note)))
         return;
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      toast(note ? "Property note saved" : "Property note removed");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        toast,
+        successMessage: note ? "Property note saved" : "Property note removed",
+      });
     }
 
     return { editPropertyQuickNote };

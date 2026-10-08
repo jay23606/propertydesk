@@ -113,6 +113,26 @@ test("post-write refresh shows success only after workspace data reloads", async
   assert.deepEqual(events, ["refresh", ["toast", "Payment corrected"]]);
 });
 
+test("post-write refresh runs domain callbacks between reload and success feedback", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      fetchAll: async () => events.push("refresh"),
+      afterRefresh: () => events.push("restore-details"),
+      toast: (message) => events.push(["toast", message]),
+      successMessage: "Property archived",
+    }),
+    true,
+  );
+  assert.deepEqual(events, [
+    "refresh",
+    "restore-details",
+    ["toast", "Property archived"],
+  ]);
+});
+
 test("post-write refresh suppresses success feedback when reload fails", async () => {
   const events = [];
   const feedback = createFeedback();

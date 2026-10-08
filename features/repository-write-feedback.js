@@ -30,12 +30,18 @@
     return true;
   }
 
-  async function refreshWorkspace({ fetchAll, toast, successMessage }) {
+  async function refreshWorkspace({
+    fetchAll,
+    afterRefresh,
+    toast,
+    successMessage,
+  }) {
     try {
       await fetchAll();
     } catch {
       return false;
     }
+    afterRefresh?.();
     toast(successMessage);
     return true;
   }

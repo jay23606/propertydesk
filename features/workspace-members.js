@@ -20,14 +20,15 @@
           "Workspace member couldn't be added right now. Check your connection and try again.",
       });
       if (!saved) return;
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      refreshWorkspaceSettings();
-      toast("Workspace member added");
-      return true;
+      if (
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: refreshWorkspaceSettings,
+          toast,
+          successMessage: "Workspace member added",
+        })
+      )
+        return true;
     }
 
     async function removeWorkspaceMember(memberId) {
@@ -48,13 +49,12 @@
           "Workspace member couldn't be removed right now. Check your connection and try again.",
       });
       if (!removed) return;
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      refreshWorkspaceSettings();
-      toast("Workspace access removed");
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        afterRefresh: refreshWorkspaceSettings,
+        toast,
+        successMessage: "Workspace access removed",
+      });
     }
 
     function attachWorkspaceMemberEvents() {
