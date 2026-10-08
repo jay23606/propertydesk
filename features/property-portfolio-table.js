@@ -17,6 +17,8 @@
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5zM4 6l8 6 8-6"/></svg>';
   const SMS_ICON =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.5a2.5 2.5 0 0 1-1-2z"/><path d="M8 9h8M8 12h5"/></svg>';
+  const PAYMENT_ICON =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.4 8.5c-.6-.7-1.6-1-2.8-1-1.5 0-2.5.8-2.5 1.9 0 2.7 5.4 1.3 5.4 4.3 0 1.2-1.1 2.1-2.8 2.1-1.4 0-2.5-.5-3.2-1.3M12 5.8v12.4"/></svg>';
 
   function create({ esc, money, paymentFrequencyLabel }) {
     function propertyAddressCell(property, street) {
@@ -56,7 +58,7 @@
       return `<tr>
         <td class="${PAYMENT_STATUS_CLASS[paymentStatus]}" title="${PAYMENT_STATUS_TITLE[paymentStatus]}">
         <strong class="portfolio-mobile-due">${money(due)}</strong>
-        <button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button>
+        <button type="button" class="button primary compact portfolio-payment-action" data-account-payment="${esc(account.id)}" title="Record payment" aria-label="Record payment">${PAYMENT_ICON}</button>
         </td>
         <td class="portfolio-due">${money(due)}</td>
         ${propertyAddressCell(property, street)}

@@ -55,17 +55,17 @@
     z-index: 4;
     background: #fafbf9;
   }
-  .portfolio-table tbody tr:hover td:nth-child(1),
-  .portfolio-table tbody tr:hover td:nth-child(2),
-  .portfolio-table tbody tr:hover td:nth-child(3),
-  .portfolio-table tbody tr:hover td:nth-child(4),
-  .portfolio-table tbody tr:hover td:nth-child(5) {
+  .portfolio-table tbody tr:hover td:nth-child(1) {
     background: #fbfcfa;
   }
   .portfolio-table td:nth-child(1) .button {
-    width: max-content;
-    padding: 4px 6px;
-    font-size: 9px;
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+  .portfolio-table .portfolio-payment-action {
+    margin-inline: auto;
   }
   .portfolio-mobile-due {
     display: block;
@@ -88,28 +88,13 @@
     padding-left: 3px;
   }
   .portfolio-table td:nth-child(3) {
-    position: sticky;
-    left: 92px;
-    width: 116px;
-    min-width: 116px;
-    max-width: 116px;
-    z-index: 2;
-    background: #fff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .portfolio-table th:nth-child(3) {
-    position: sticky;
-    left: 92px;
-    width: 116px;
-    min-width: 116px;
-    max-width: 116px;
-    z-index: 4;
-    background: #fafbf9;
+    min-width: 145px;
+    max-width: 190px;
+    overflow-wrap: anywhere;
   }
   .portfolio-table td:nth-child(3) .table-action {
     display: block;
-    max-width: 110px;
+    max-width: 100%;
     overflow-wrap: anywhere;
     white-space: normal;
     vertical-align: middle;
@@ -117,34 +102,10 @@
   .portfolio-table .property-row-note {
     display: none;
   }
-  .portfolio-table th:nth-child(4),
-  .portfolio-table td:nth-child(4),
-  .portfolio-table th:nth-child(5),
-  .portfolio-table td:nth-child(5) {
-    position: sticky;
-    width: 42px;
-    min-width: 42px;
-    max-width: 42px;
-    z-index: 2;
-    background: #fff;
-  }
-  .portfolio-table th:nth-child(4),
-  .portfolio-table td:nth-child(4) {
-    left: 208px;
-  }
-  .portfolio-table th:nth-child(5),
-  .portfolio-table td:nth-child(5) {
-    left: 250px;
-    box-shadow: 3px 0 6px #1c30200d;
-  }
-  .portfolio-table th:nth-child(4),
-  .portfolio-table th:nth-child(5) {
-    z-index: 4;
-    background: #fafbf9;
-  }
   .portfolio-table td.portfolio-contact-action {
     padding-right: 2px;
     padding-left: 2px;
+    min-width: 42px;
   }
   .portfolio-table .portfolio-icon-action {
     width: 30px;
@@ -183,6 +144,25 @@
 .portfolio-icon-action:hover {
   background: var(--surface);
 }
+.portfolio-payment-action {
+  display: flex;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  padding: 0;
+}
+.portfolio-payment-action svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
 .portfolio-icon-action.unavailable {
   opacity: 0.38;
 }
@@ -200,17 +180,13 @@
   font-weight: 700;
   white-space: nowrap;
 }
-.portfolio-table tfoot td:nth-child(1),
-.portfolio-table tfoot td:nth-child(2) {
+.portfolio-table tfoot td:nth-child(1) {
   position: sticky;
   z-index: 2;
   background: var(--canvas);
 }
 .portfolio-table tfoot td:nth-child(1) {
   left: 0;
-}
-.portfolio-table tfoot td:nth-child(2) {
-  left: 96px;
 }
 .portfolio-table tfoot .table-subtext {
   display: block;
@@ -273,73 +249,22 @@
   color: var(--green);
   text-decoration: underline;
 }
-html[data-theme="dark"] .portfolio-table th:nth-child(1),
-html[data-theme="dark"] .portfolio-table th:nth-child(2),
-html[data-theme="dark"] .portfolio-table th:nth-child(3),
-html[data-theme="dark"] .portfolio-table th:nth-child(4),
-html[data-theme="dark"] .portfolio-table th:nth-child(5) {
+html[data-theme="dark"] .portfolio-table th:nth-child(1) {
   background: #2c4033;
 }
-html[data-theme="dark"] .portfolio-table td:nth-child(1),
-html[data-theme="dark"] .portfolio-table td:nth-child(2),
-html[data-theme="dark"] .portfolio-table td:nth-child(3),
-html[data-theme="dark"] .portfolio-table td:nth-child(4),
-html[data-theme="dark"] .portfolio-table td:nth-child(5) {
+html[data-theme="dark"] .portfolio-table td:nth-child(1) {
   background: #24352b;
 }
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(2),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(3),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(4),
-html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(5) {
+html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(1) {
   background: #304838;
 }
 @media (max-width: 760px) {
-  .portfolio-table th:nth-child(1),
-  .portfolio-table td:nth-child(1) {
-    left: 0;
-  }
-  .portfolio-table th:nth-child(2),
-  .portfolio-table td:nth-child(2) {
-    display: none;
-  }
-  .portfolio-table th:nth-child(3),
-  .portfolio-table td:nth-child(3) {
-    left: 92px;
-  }
-  .portfolio-table th:nth-child(4),
-  .portfolio-table td:nth-child(4) {
-    left: 208px;
-  }
-  .portfolio-table th:nth-child(5),
-  .portfolio-table td:nth-child(5) {
-    left: 250px;
-  }
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
     width: 92px;
   }
   .portfolio-table tfoot td:nth-child(2) {
     display: none;
-  }
-  .portfolio-table tfoot td:nth-child(3) {
-    position: sticky;
-    left: 92px;
-    width: 116px;
-    background: var(--canvas);
-  }
-  .portfolio-table tfoot td:nth-child(4) {
-    position: sticky;
-    left: 208px;
-    width: 42px;
-    background: var(--canvas);
-  }
-  .portfolio-table tfoot td:nth-child(5) {
-    position: sticky;
-    left: 250px;
-    width: 42px;
-    background: var(--canvas);
-    box-shadow: 3px 0 6px #1c30200d;
   }
 }
 html[data-theme="dark"] .portfolio-table tbody td.payment-received-this-month {
@@ -381,6 +306,10 @@ html[data-theme="dark"]
 html[data-theme="dark"] .portfolio-table .table-action,
 html[data-theme="dark"] .portfolio-table .property-party-name {
   color: #83e2a8;
+}
+html[data-theme="dark"] .portfolio-table .property-row-name,
+html[data-theme="dark"] .portfolio-table .property-party-name {
+  color: #f1f7f2;
 }
 html[data-theme="dark"] .property-row-note {
   color: #a7b3aa;

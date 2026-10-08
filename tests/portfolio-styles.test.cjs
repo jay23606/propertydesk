@@ -30,16 +30,29 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /html\[data-theme="dark"\] \.portfolio-table/);
   assert.match(
     portfolio,
-    /@media \(max-width: 760px\)[\s\S]*?\.portfolio-table th:nth-child\(5\),\s*\.portfolio-table td:nth-child\(5\)\s*\{\s*left: 250px;/,
-    "mobile layout keeps the combined Payment/Due, Address, Email, and SMS columns visible",
+    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;/,
+    "mobile keeps only the first payment column pinned",
+  );
+  assert.doesNotMatch(
+    portfolio,
+    /\.portfolio-table (?:th|td):nth-child\([345]\)\s*\{[^}]*position: sticky/s,
+    "the address and reminder columns scroll with the rest of the grid",
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td:nth-child\(1\) \.button\s*\{\s*width: max-content;\s*padding: 4px 6px;/,
+    /\.portfolio-table td:nth-child\(1\) \.button\s*\{\s*width: 30px;\s*min-width: 30px;\s*height: 30px;\s*padding: 0;/,
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td:nth-child\(3\)\s*\{[\s\S]*?width: 116px;/,
+    /\.portfolio-table \.portfolio-payment-action\s*\{\s*margin-inline: auto;/,
+  );
+  assert.match(
+    portfolio,
+    /\.portfolio-table td:nth-child\(3\)\s*\{\s*min-width: 145px;/,
+  );
+  assert.match(
+    portfolio,
+    /html\[data-theme="dark"\] \.portfolio-table \.property-row-name,\s*html\[data-theme="dark"\] \.portfolio-table \.property-party-name\s*\{\s*color: #f1f7f2;/,
   );
   assert.doesNotMatch(styles, /\.portfolio-(?:panel|table|due)/);
   assert.doesNotMatch(shared, /\.portfolio-|\.property-row-note/);

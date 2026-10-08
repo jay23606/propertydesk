@@ -19,6 +19,8 @@
       openModal,
       transactionRepository,
       transactionPayloads,
+      expenseAccountPolicy,
+      workflows: entryWorkflows,
     },
     views: {
       $: viewQuery,
@@ -49,6 +51,8 @@
       openModal,
       transactionRepository,
       transactionPayloads,
+      expenseAccountPolicy,
+      workflows: entryWorkflows,
       saveCorrection,
     });
     const transactionViews = workflows.views.create({

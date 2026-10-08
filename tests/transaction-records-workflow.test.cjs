@@ -14,6 +14,12 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   const renderPayments = () => {};
   const attachTransactionFilterEvents = () => {};
   const attachTransactionActionEvents = () => {};
+  const expenseAccountPolicy = {};
+  const entryWorkflows = {
+    paymentView: {},
+    expenseView: {},
+    propertyPaymentAction: {},
+  };
   const maintenance = {
     saveCorrection,
     createTransactionActionHandlers(options) {
@@ -35,6 +41,8 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     openModal: () => {},
     transactionRepository: {},
     transactionPayloads: {},
+    expenseAccountPolicy,
+    workflows: entryWorkflows,
     unusedEntryDependency: true,
   };
   const views = {
@@ -103,6 +111,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   assert.deepEqual(Object.keys(passed.entries).sort(), [
     "$",
     "closeModal",
+    "expenseAccountPolicy",
     "fetchAll",
     "fillSelect",
     "moneyInput",
@@ -115,7 +124,10 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     "todayIso",
     "transactionPayloads",
     "transactionRepository",
+    "workflows",
   ]);
+  assert.equal(passed.entries.expenseAccountPolicy, expenseAccountPolicy);
+  assert.equal(passed.entries.workflows, entryWorkflows);
   for (const [key, value] of Object.entries(views)) {
     if (key === "unusedViewDependency") continue;
     assert.equal(passed.views[key], value);
