@@ -69,66 +69,6 @@ test("repository write feedback exposes only its supported API", () => {
   assert.equal(Object.isFrozen(feedback), true);
 });
 
-test("record-write completion selects only supported lifecycle options", () => {
-  const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-record-write-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  const recordWrites = context.window.PropertyDeskWorkspaceRecordWriteWorkflow;
-  const recordWriter = recordWrites.create({
-    run() {},
-    reconcileWorkspaceChange() {},
-    finishWorkspaceWrite() {},
-  });
-  assert.deepEqual(Object.keys(recordWriter).sort(), [
-    "saveAndRefreshWorkspaceRecord",
-    "saveWorkspaceRecord",
-  ]);
-  const onSaved = () => {};
-  const onRefreshed = () => {};
-  const afterRefresh = () => {};
-  const selected = recordWrites.selectRecordWriteCompletion({
-    onSaved,
-    onRefreshed,
-    afterRefresh,
-    operation() {},
-    state: {},
-    payload: {},
-    toast() {},
-    unrecognized: true,
-  });
-
-  assert.equal(selected.onSaved, onSaved);
-  assert.equal(selected.onRefreshed, onRefreshed);
-  assert.equal(selected.afterRefresh, afterRefresh);
-  assert.deepEqual(Object.keys(selected).sort(), [
-    "afterRefresh",
-    "onReconciled",
-    "onRefreshed",
-    "onSaved",
-    "savedRefreshFailureMessage",
-    "successMessage",
-  ]);
-  assert.equal("operation" in selected, false);
-  assert.equal("state" in selected, false);
-  assert.equal("payload" in selected, false);
-  assert.equal("toast" in selected, false);
-  assert.equal("unrecognized" in selected, false);
-  assert.deepEqual(
-    Object.keys(recordWrites.selectRecordWriteCompletion()).sort(),
-    Object.keys(selected).sort(),
-  );
-});
-
 test("repository write feedback shows returned database errors", async () => {
   const messages = [];
   const feedback = createFeedback();

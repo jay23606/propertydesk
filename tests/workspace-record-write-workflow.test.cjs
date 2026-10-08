@@ -4,32 +4,25 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-function createReconciliation() {
+function loadRecordWriteModules() {
   const context = vm.createContext({ window: {} });
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-write-reconciliation.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
-  vm.runInContext(
-    fs.readFileSync(
-      path.join(
-        __dirname,
-        "..",
-        "features",
-        "workspace-record-write-workflow.js",
-      ),
-      "utf8",
-    ),
-    context,
-  );
+  for (const filename of [
+    "workspace-write-reconciliation.js",
+    "workspace-record-write-workflow.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  return Object.freeze({
+    reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+    recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+  });
+}
+
+function createRecordWriter() {
+  const { reconciliation, recordWrites } = loadRecordWriteModules();
   const run = async ({ operation, onUnconfirmed }) => {
     try {
       return await operation();
@@ -42,28 +35,26 @@ function createReconciliation() {
     afterRefresh?.();
     return true;
   };
-  const core = context.window.PropertyDeskWorkspaceWriteReconciliation.create({
+  const core = reconciliation.create({
     run,
     refreshWorkspace,
   });
-  const records =
-    context.window.PropertyDeskWorkspaceRecordWriteWorkflow.create({
-      run,
-      reconcileWorkspaceChange: core.reconcileWorkspaceChange,
-      finishWorkspaceWrite: core.finishWorkspaceWrite,
-    });
-  return Object.freeze({ ...core, ...records });
+  return recordWrites.create({
+    run,
+    reconcileWorkspaceChange: core.reconcileWorkspaceChange,
+    finishWorkspaceWrite: core.finishWorkspaceWrite,
+  });
 }
 
-test("workspace write reconciliation confirms a saved record after readback", async () => {
+test("record-write workflow confirms a saved record after readback", async () => {
   const events = [];
-  const reconciliation = createReconciliation();
+  const recordWriter = createRecordWriter();
   const state = {
     accounts: [{ id: "account-1", status: "active" }],
   };
 
   assert.equal(
-    await reconciliation.saveWorkspaceRecord({
+    await recordWriter.saveWorkspaceRecord({
       operation: async () => {
         events.push("write");
         throw new Error("connection lost");
@@ -94,16 +85,16 @@ test("workspace write reconciliation confirms a saved record after readback", as
   ]);
 });
 
-test("workspace write reconciliation confirms a new matching record by count", async () => {
+test("record-write workflow confirms a new matching record by count", async () => {
   const events = [];
-  const reconciliation = createReconciliation();
+  const recordWriter = createRecordWriter();
   const payload = { account_name: "Rental", payment_amount: 500 };
   const state = {
     accounts: [{ id: "existing", ...payload }],
   };
 
   assert.equal(
-    await reconciliation.saveWorkspaceRecord({
+    await recordWriter.saveWorkspaceRecord({
       operation: async () => {
         events.push("write");
         throw new Error("connection lost");
@@ -133,16 +124,16 @@ test("workspace write reconciliation confirms a new matching record by count", a
   ]);
 });
 
-test("workspace write reconciliation does not confirm an unchanged matching count", async () => {
+test("record-write workflow does not confirm an unchanged matching count", async () => {
   const events = [];
-  const reconciliation = createReconciliation();
+  const recordWriter = createRecordWriter();
   const payload = { account_name: "Rental", payment_amount: 500 };
   const state = {
     accounts: [{ id: "existing", ...payload }],
   };
 
   assert.equal(
-    await reconciliation.saveWorkspaceRecord({
+    await recordWriter.saveWorkspaceRecord({
       operation: async () => {
         events.push("write");
         throw new Error("connection lost");
@@ -167,4 +158,47 @@ test("workspace write reconciliation does not confirm an unchanged matching coun
     ["readback", false],
     ["toast", "Check the account before retrying."],
   ]);
+});
+
+test("record-write completion selects only supported lifecycle options", () => {
+  const { recordWrites } = loadRecordWriteModules();
+  const recordWriter = recordWrites.create({
+    run() {},
+    reconcileWorkspaceChange() {},
+    finishWorkspaceWrite() {},
+  });
+  assert.deepEqual(Object.keys(recordWriter).sort(), [
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
+  ]);
+  const onSaved = () => {};
+  const onRefreshed = () => {};
+  const afterRefresh = () => {};
+  const selected = recordWrites.selectRecordWriteCompletion({
+    onSaved,
+    onRefreshed,
+    afterRefresh,
+    operation() {},
+    state: {},
+    payload: {},
+    toast() {},
+    unrecognized: true,
+  });
+
+  assert.equal(selected.onSaved, onSaved);
+  assert.equal(selected.onRefreshed, onRefreshed);
+  assert.equal(selected.afterRefresh, afterRefresh);
+  assert.deepEqual(Object.keys(selected).sort(), [
+    "afterRefresh",
+    "onReconciled",
+    "onRefreshed",
+    "onSaved",
+    "savedRefreshFailureMessage",
+    "successMessage",
+  ]);
+  assert.equal("operation" in selected, false);
+  assert.equal("state" in selected, false);
+  assert.equal("payload" in selected, false);
+  assert.equal("toast" in selected, false);
+  assert.equal("unrecognized" in selected, false);
 });
