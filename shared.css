@@ -158,6 +158,12 @@
   color: #98a39a;
   font-size: 12px;
 }
+.field-hint {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #97a198;
+  margin: 0;
+}
 .detail-kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -31,8 +31,26 @@
   display: grid;
   gap: 15px;
 }
+.form-stack label {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  color: #6d7971;
+  font-weight: 600;
+}
 .form-stack input {
+  width: 100%;
+  border: 1px solid #e1e7e1;
+  border-radius: 6px;
   padding: 11px;
+  background: #fff;
+  color: #334138;
+  font-size: 12px;
+  outline: none;
+}
+.form-stack input:focus {
+  border-color: #7dad91;
+  box-shadow: 0 0 0 3px #e9f2ec;
 }
 .privacy-note {
   display: flex;

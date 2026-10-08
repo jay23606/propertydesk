@@ -549,8 +549,7 @@ button {
   display: grid;
   gap: 13px;
 }
-.modal-form label,
-.form-stack label {
+.modal-form label {
   display: grid;
   gap: 6px;
   font-size: 11px;
@@ -559,8 +558,7 @@ button {
 }
 .modal-form input,
 .modal-form select,
-.modal-form textarea,
-.form-stack input {
+.modal-form textarea {
   width: 100%;
   border: 1px solid #e1e7e1;
   border-radius: 6px;
@@ -572,8 +570,7 @@ button {
 }
 .modal-form input:focus,
 .modal-form select:focus,
-.modal-form textarea:focus,
-.form-stack input:focus {
+.modal-form textarea:focus {
   border-color: #7dad91;
   box-shadow: 0 0 0 3px #e9f2ec;
 }
@@ -584,12 +581,6 @@ button {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 11px;
-}
-.field-hint {
-  font-size: 10px;
-  line-height: 1.5;
-  color: #97a198;
-  margin: 0;
 }
 .modal-actions {
   display: flex;
