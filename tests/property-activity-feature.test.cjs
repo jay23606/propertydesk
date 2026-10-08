@@ -220,6 +220,7 @@ test("property detail content workflow connects activity summaries to property r
     accountBalance() {},
     openModal() {},
     propertyAddress() {},
+    unusedDependency: true,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailContentWorkflow.create(
@@ -247,6 +248,7 @@ test("property detail content workflow connects activity summaries to property r
     detailsDependencies.accountBalance,
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
+  assert.equal("unusedDependency" in detailContext, false);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.equal(modelContext.state, detailsDependencies.state);
   assert.equal(

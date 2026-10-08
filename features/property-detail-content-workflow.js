@@ -2,22 +2,21 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      isPosted,
-      sumIncome,
-      sumOperatingExpenses,
-      money,
-      fmtDate,
-      esc,
-      prettyType,
-      paymentFrequencyLabel,
-      accountBalance,
-      openModal,
-      propertyAddress,
-    } = context;
+  function create({
+    $,
+    state,
+    isPosted,
+    sumIncome,
+    sumOperatingExpenses,
+    money,
+    fmtDate,
+    esc,
+    prettyType,
+    paymentFrequencyLabel,
+    accountBalance,
+    openModal,
+    propertyAddress,
+  }) {
     const { propertyDocumentsHTML } =
       window.PropertyDeskPropertyDocumentsView.create({ fmtDate, esc });
     const { propertyAccountsHTML } =

@@ -65,6 +65,7 @@ test("property detail coordinator connects archive and quick actions", () => {
     openExpense,
     openAccountForProperty,
     propertyRepository,
+    unusedDependency: true,
   };
   const workflow =
     context.window.PropertyDeskPropertyDetailManagementWorkflow.create(
@@ -73,6 +74,9 @@ test("property detail coordinator connects archive and quick actions", () => {
 
   assert.equal(passed.archive.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.archive.repository, propertyRepository);
+  assert.equal("unusedDependency" in passed.archive, false);
+  assert.equal("unusedDependency" in passed.detail, false);
+  assert.equal("unusedDependency" in passed.quick, false);
   assert.equal(passed.quick.openPayment, openPayment);
   assert.equal(passed.quick.openExpense, openExpense);
   assert.equal(passed.quick.openAccountForProperty, openAccountForProperty);

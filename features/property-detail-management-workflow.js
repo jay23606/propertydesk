@@ -2,22 +2,21 @@
 (() => {
   "use strict";
 
-  function createPropertyDetailManagementWorkflow(context) {
-    const {
-      $,
-      state,
-      toast,
-      fetchAll,
-      todayIso,
-      openPropertyDetails,
-      closeModal,
-      editAccount,
-      openAccountDetails,
-      openPayment,
-      openExpense,
-      openAccountForProperty,
-      propertyRepository,
-    } = context;
+  function createPropertyDetailManagementWorkflow({
+    $,
+    state,
+    toast,
+    fetchAll,
+    todayIso,
+    openPropertyDetails,
+    closeModal,
+    editAccount,
+    openAccountDetails,
+    openPayment,
+    openExpense,
+    openAccountForProperty,
+    propertyRepository,
+  }) {
     const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
       {
         state,
