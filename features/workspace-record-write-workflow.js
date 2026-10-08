@@ -2,22 +2,22 @@
 (() => {
   "use strict";
 
+  function selectRecordWriteCompletion(options = {}) {
+    return {
+      onSaved: options.onSaved,
+      onRefreshed: options.onRefreshed,
+      onReconciled: options.onReconciled,
+      afterRefresh: options.afterRefresh,
+      successMessage: options.successMessage,
+      savedRefreshFailureMessage: options.savedRefreshFailureMessage,
+    };
+  }
+
   function createWorkspaceRecordWriteWorkflow({
     run,
     reconcileWorkspaceChange,
     finishWorkspaceWrite,
   }) {
-    function selectRecordWriteCompletion(options = {}) {
-      return {
-        onSaved: options.onSaved,
-        onRefreshed: options.onRefreshed,
-        onReconciled: options.onReconciled,
-        afterRefresh: options.afterRefresh,
-        successMessage: options.successMessage,
-        savedRefreshFailureMessage: options.savedRefreshFailureMessage,
-      };
-    }
-
     function payloadMatchesRecord(record, payload) {
       return Object.entries(payload).every(([key, value]) => {
         const actual = record[key];
@@ -124,5 +124,6 @@
 
   window.PropertyDeskWorkspaceRecordWriteWorkflow = Object.freeze({
     create: createWorkspaceRecordWriteWorkflow,
+    selectRecordWriteCompletion,
   });
 })();

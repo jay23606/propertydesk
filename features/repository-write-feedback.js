@@ -78,6 +78,5 @@
     runAndRefreshWorkspaceChange: reconciliation.runAndRefreshWorkspaceChange,
     saveWorkspaceRecord: recordWrites.saveWorkspaceRecord,
     saveAndRefreshWorkspaceRecord: recordWrites.saveAndRefreshWorkspaceRecord,
-    selectRecordWriteCompletion: recordWrites.selectRecordWriteCompletion,
   });
 })();

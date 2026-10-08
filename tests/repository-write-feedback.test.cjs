@@ -65,17 +65,29 @@ test("repository write feedback exposes only its supported API", () => {
     "runAndRefreshWorkspaceChange",
     "saveAndRefreshWorkspaceRecord",
     "saveWorkspaceRecord",
-    "selectRecordWriteCompletion",
   ]);
   assert.equal(Object.isFrozen(feedback), true);
 });
 
 test("record-write completion selects only supported lifecycle options", () => {
-  const feedback = createFeedback();
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-record-write-workflow.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
+  const recordWrites = context.window.PropertyDeskWorkspaceRecordWriteWorkflow;
   const onSaved = () => {};
   const onRefreshed = () => {};
   const afterRefresh = () => {};
-  const selected = feedback.selectRecordWriteCompletion({
+  const selected = recordWrites.selectRecordWriteCompletion({
     onSaved,
     onRefreshed,
     afterRefresh,
@@ -103,7 +115,7 @@ test("record-write completion selects only supported lifecycle options", () => {
   assert.equal("toast" in selected, false);
   assert.equal("unrecognized" in selected, false);
   assert.deepEqual(
-    Object.keys(feedback.selectRecordWriteCompletion()).sort(),
+    Object.keys(recordWrites.selectRecordWriteCompletion()).sort(),
     Object.keys(selected).sort(),
   );
 });

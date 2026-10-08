@@ -9,7 +9,7 @@
             .saveAndRefreshWorkspaceRecord
         : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
       return save({
-        ...window.PropertyDeskRepositoryWriteFeedback.selectRecordWriteCompletion(
+        ...window.PropertyDeskWorkspaceRecordWriteWorkflow.selectRecordWriteCompletion(
           completion,
         ),
         operation: () => repository.save(payload, accountId),
