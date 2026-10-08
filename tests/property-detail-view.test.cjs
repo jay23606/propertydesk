@@ -245,7 +245,12 @@ test("Properties table templates escape untrusted labels and render visible tota
     paymentFrequencyLabel: () => "Monthly",
   });
 
-  const addressHTML = table.propertyAddressCell(
+  assert.deepEqual(Object.keys(table).sort(), [
+    "accountRowHTML",
+    "emptyPropertyRowHTML",
+    "totalsRowHTML",
+  ]);
+  const addressHTML = table.emptyPropertyRowHTML(
     { id: "<property>", notes: "<repair>" },
     "<10 Oak St>",
   );

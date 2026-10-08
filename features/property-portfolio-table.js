@@ -99,7 +99,6 @@
     return Object.freeze({
       accountRowHTML,
       emptyPropertyRowHTML,
-      propertyAddressCell,
       totalsRowHTML,
     });
   }
