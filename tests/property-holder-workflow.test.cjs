@@ -40,6 +40,10 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     fetchAll() {},
     repository: {},
     openPropertyDetails() {},
+    workflows: {
+      management: context.window.PropertyDeskPropertyHolderManagement,
+      events: context.window.PropertyDeskPropertyHolderEvents,
+    },
   };
   const workflow =
     context.window.PropertyDeskPropertyHolderWorkflow.create(dependencies);

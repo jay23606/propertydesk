@@ -16,19 +16,18 @@
     openExpense,
     openAccountForProperty,
     propertyRepository,
+    workflows,
   }) {
-    const { toggleArchiveProperty } = window.PropertyDeskPropertyArchive.create(
-      {
-        state,
-        toast,
-        fetchAll,
-        todayIso,
-        openPropertyDetails,
-        repository: propertyRepository,
-      },
-    );
+    const { toggleArchiveProperty } = workflows.archive.create({
+      state,
+      toast,
+      fetchAll,
+      todayIso,
+      openPropertyDetails,
+      repository: propertyRepository,
+    });
     const { attachEvents: attachPropertyDetailEvents } =
-      window.PropertyDeskPropertyDetailEvents.create({
+      workflows.detailEvents.create({
         $,
         state,
         closeModal,
@@ -36,7 +35,7 @@
         openAccountDetails,
       });
     const { attachEvents: attachPropertyQuickActionEvents } =
-      window.PropertyDeskPropertyDetailQuickActions.create({
+      workflows.quickActions.create({
         $,
         state,
         closeModal,

@@ -65,6 +65,11 @@ test("property detail coordinator connects archive and quick actions", () => {
     openExpense,
     openAccountForProperty,
     propertyRepository,
+    workflows: {
+      archive: context.window.PropertyDeskPropertyArchive,
+      detailEvents: context.window.PropertyDeskPropertyDetailEvents,
+      quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
+    },
     unusedDependency: true,
   };
   const workflow =

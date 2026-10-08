@@ -97,6 +97,15 @@ test("property screen workflow passes detail actions to management and returns b
       content: context.window.PropertyDeskPropertyDetailContentWorkflow,
       management: context.window.PropertyDeskPropertyDetailManagementWorkflow,
       holders: context.window.PropertyDeskPropertyHolderWorkflow,
+      managementModules: {
+        archive: context.window.PropertyDeskPropertyArchive,
+        detailEvents: context.window.PropertyDeskPropertyDetailEvents,
+        quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
+      },
+      holderModules: {
+        management: context.window.PropertyDeskPropertyHolderManagement,
+        events: context.window.PropertyDeskPropertyHolderEvents,
+      },
     },
   });
 

@@ -434,6 +434,15 @@
         content: window.PropertyDeskPropertyDetailContentWorkflow,
         management: window.PropertyDeskPropertyDetailManagementWorkflow,
         holders: window.PropertyDeskPropertyHolderWorkflow,
+        managementModules: {
+          archive: window.PropertyDeskPropertyArchive,
+          detailEvents: window.PropertyDeskPropertyDetailEvents,
+          quickActions: window.PropertyDeskPropertyDetailQuickActions,
+        },
+        holderModules: {
+          management: window.PropertyDeskPropertyHolderManagement,
+          events: window.PropertyDeskPropertyHolderEvents,
+        },
       },
     },
     overview: {

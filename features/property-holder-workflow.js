@@ -9,20 +9,19 @@
     fetchAll,
     repository,
     openPropertyDetails,
+    workflows,
   }) {
-    const { savePropertyHolders } =
-      window.PropertyDeskPropertyHolderManagement.create({
-        state,
-        toast,
-        fetchAll,
-        repository,
-        openPropertyDetails,
-      });
-    const { attachPropertyHolderEvents } =
-      window.PropertyDeskPropertyHolderEvents.create({
-        $,
-        savePropertyHolders,
-      });
+    const { savePropertyHolders } = workflows.management.create({
+      state,
+      toast,
+      fetchAll,
+      repository,
+      openPropertyDetails,
+    });
+    const { attachPropertyHolderEvents } = workflows.events.create({
+      $,
+      savePropertyHolders,
+    });
 
     return Object.freeze({ attachPropertyHolderEvents });
   }

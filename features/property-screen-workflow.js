@@ -38,6 +38,7 @@
       openExpense: management.openExpense,
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
+      workflows: workflows.managementModules,
     });
     const { attachPropertyHolderEvents } = workflows.holders.create({
       $: holders.$,
@@ -46,6 +47,7 @@
       fetchAll: holders.fetchAll,
       repository: holders.repository,
       openPropertyDetails: details.openPropertyDetails,
+      workflows: workflows.holderModules,
     });
     const { attachPropertyDocumentEvents } = documents.workflow.create({
       $: documents.$,
