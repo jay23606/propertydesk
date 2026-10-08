@@ -22,6 +22,32 @@ async function reloadThroughServiceWorker(page) {
   );
 }
 
+async function assertVersionedAppScriptAvailableOffline(page, context) {
+  const scriptURL = await page.evaluate(() => {
+    const script = Array.from(document.scripts).find(
+      (item) => item.src && new URL(item.src).pathname.endsWith("/app.js"),
+    );
+    if (!script) throw new Error("The app script is missing from the page.");
+    const url = new URL(script.src);
+    url.searchParams.set("offline-smoke", "versioned-shell");
+    return url.href;
+  });
+  await context.setOffline(true);
+  try {
+    const response = await page.evaluate(async (assetURL) => {
+      const asset = await fetch(assetURL, { cache: "reload" });
+      return { ok: asset.ok, status: asset.status, body: await asset.text() };
+    }, scriptURL);
+    if (!response.ok || !response.body.includes("PropertyDesk")) {
+      throw new Error(
+        `The versioned app script was unavailable offline (HTTP ${response.status}).`,
+      );
+    }
+  } finally {
+    await context.setOffline(false);
+  }
+}
+
 function assertNoBrowserErrors(pageErrors, consoleErrors, label) {
   if (pageErrors.length || consoleErrors.length) {
     throw new Error(
@@ -56,6 +82,7 @@ function captureUnhandledRejections(page) {
 
 module.exports = {
   reloadThroughServiceWorker,
+  assertVersionedAppScriptAvailableOffline,
   assertNoBrowserErrors,
   assertNoUnhandledRejections,
   captureUnhandledRejections,
