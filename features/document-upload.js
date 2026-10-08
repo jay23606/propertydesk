@@ -57,13 +57,11 @@
     }
 
     async function reopenPropertyDetails(propertyId) {
-      toast("Agreement uploaded privately");
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      openPropertyDetails(propertyId);
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        beforeRefresh: () => toast("Agreement uploaded privately"),
+        afterRefresh: () => openPropertyDetails(propertyId),
+      });
     }
 
     async function uploadPropertyDocument(input) {

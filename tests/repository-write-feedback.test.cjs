@@ -133,6 +133,44 @@ test("post-write refresh runs domain callbacks between reload and success feedba
   ]);
 });
 
+test("post-write refresh can show success before reload and reopen after it", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      beforeRefresh: () =>
+        events.push(["toast", "Agreement uploaded privately"]),
+      fetchAll: async () => events.push("refresh"),
+      afterRefresh: () => events.push("reopen-property"),
+    }),
+    true,
+  );
+  assert.deepEqual(events, [
+    ["toast", "Agreement uploaded privately"],
+    "refresh",
+    "reopen-property",
+  ]);
+});
+
+test("post-write refresh keeps early success feedback when reload fails", async () => {
+  const events = [];
+  const feedback = createFeedback();
+
+  assert.equal(
+    await feedback.refreshWorkspace({
+      beforeRefresh: () => events.push(["toast", "Agreement deleted"]),
+      fetchAll: async () => {
+        events.push("refresh");
+        throw new Error("offline");
+      },
+      afterRefresh: () => events.push("reopen-property"),
+    }),
+    false,
+  );
+  assert.deepEqual(events, [["toast", "Agreement deleted"], "refresh"]);
+});
+
 test("post-write refresh suppresses success feedback when reload fails", async () => {
   const events = [];
   const feedback = createFeedback();

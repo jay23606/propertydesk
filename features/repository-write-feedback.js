@@ -32,17 +32,19 @@
 
   async function refreshWorkspace({
     fetchAll,
+    beforeRefresh,
     afterRefresh,
     toast,
     successMessage,
   }) {
+    beforeRefresh?.();
     try {
       await fetchAll();
     } catch {
       return false;
     }
     afterRefresh?.();
-    toast(successMessage);
+    if (successMessage) toast(successMessage);
     return true;
   }
 

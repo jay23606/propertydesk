@@ -63,13 +63,11 @@
     }
 
     async function refreshDeletedProperty(propertyId) {
-      toast("Agreement deleted");
-      try {
-        await fetchAll();
-      } catch {
-        return;
-      }
-      openPropertyDetails(propertyId);
+      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+        fetchAll,
+        beforeRefresh: () => toast("Agreement deleted"),
+        afterRefresh: () => openPropertyDetails(propertyId),
+      });
     }
 
     async function deletePropertyDocument(id) {

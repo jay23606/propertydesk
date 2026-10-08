@@ -6,6 +6,7 @@ const vm = require("node:vm");
 
 function loadDocumentModules(context) {
   for (const filename of [
+    "repository-write-feedback.js",
     "document-repository.js",
     "document-upload-policy.js",
     "document-upload.js",
