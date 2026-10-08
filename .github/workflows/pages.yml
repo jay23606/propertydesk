@@ -135,13 +135,14 @@ jobs:
       - run: npx playwright install chromium
       - name: Check the deployed app in Chromium
         run: |
-          for attempt in 1 2 3; do
-            if timeout --signal=TERM 180s npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"; then
+          for attempt in 1 2 3 4 5; do
+            if timeout --signal=TERM 90s npm run smoke:deployed -- "${{ needs.deploy.outputs.page_url }}"; then
               exit 0
             fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "Live smoke attempt $attempt failed; retrying after Pages propagation."
-              sleep 10
+            if [ "$attempt" -lt 5 ]; then
+              delay=$((attempt * 10))
+              echo "Live smoke attempt $attempt failed; retrying in ${delay}s after Pages propagation."
+              sleep "$delay"
             fi
           done
           exit 1
