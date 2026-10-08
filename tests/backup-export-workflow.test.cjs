@@ -8,11 +8,19 @@ test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,[\s\S]*?workflows: \{[\s\S]*?PropertyDeskBackupExport,/,
   );
   assert.match(
     app,
     /downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,/,
+  );
+  const workflow = fs.readFileSync(
+    path.join(__dirname, "..", "features", "backup-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    workflow,
+    /window\.PropertyDeskBackup(?:Utils|Records|Export)\.create/,
   );
 });
 
@@ -113,6 +121,11 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
       includedFiles: [],
     }),
     documentRepository: {},
+    workflows: {
+      utils: context.window.PropertyDeskBackupUtils,
+      records: context.window.PropertyDeskBackupRecords,
+      exporter: context.window.PropertyDeskBackupExport,
+    },
   };
   const workflow =
     context.window.PropertyDeskBackupWorkspaceWorkflow.create(dependencies);

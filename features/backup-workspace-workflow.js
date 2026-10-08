@@ -14,13 +14,14 @@
     loadAllPages,
     collectBackupAgreementFiles,
     documentRepository,
+    workflows,
   }) {
-    const backup = window.PropertyDeskBackupUtils.create({ workspaceTables });
-    const records = window.PropertyDeskBackupRecords.create({
+    const backup = workflows.utils.create({ workspaceTables });
+    const records = workflows.records.create({
       tables: backup.tables,
       loadAllPages,
     });
-    const exporter = window.PropertyDeskBackupExport.create({
+    const exporter = workflows.exporter.create({
       $,
       state,
       isClientReady,

@@ -542,6 +542,11 @@
       collectBackupAgreementFiles:
         window.PropertyDeskBackupAgreementFiles.collect,
       documentRepository: repositories.documents,
+      workflows: {
+        utils: window.PropertyDeskBackupUtils,
+        records: window.PropertyDeskBackupRecords,
+        exporter: window.PropertyDeskBackupExport,
+      },
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,
