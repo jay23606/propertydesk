@@ -7,24 +7,39 @@
     expenseCategoryLabel,
     filterModel,
   }) {
+    function findTransactionProperty(row, account) {
+      const propertyId =
+        row.kind === "expense" ? row.item.property_id : account?.property_id;
+      return state.properties.find((candidate) => candidate.id === propertyId);
+    }
+
+    function searchField(value) {
+      return value || "";
+    }
+
+    function transactionSearchText(row, account, property) {
+      return [
+        account?.name,
+        account?.party_name,
+        property?.name,
+        row.item.memo,
+        row.item.payee,
+      ]
+        .map(searchField)
+        .join(" ")
+        .toLowerCase();
+    }
+
     function associateTransaction(row) {
       const account = state.accounts.find(
         (candidate) => candidate.id === row.item.account_id,
       );
-      const property =
-        row.kind === "expense"
-          ? state.properties.find(
-              (candidate) => candidate.id === row.item.property_id,
-            )
-          : state.properties.find(
-              (candidate) => candidate.id === account?.property_id,
-            );
+      const property = findTransactionProperty(row, account);
       return {
         ...row,
         account,
         property,
-        searchText:
-          `${account?.name || ""} ${account?.party_name || ""} ${property?.name || ""} ${row.item.memo || ""} ${row.item.payee || ""}`.toLowerCase(),
+        searchText: transactionSearchText(row, account, property),
       };
     }
 
