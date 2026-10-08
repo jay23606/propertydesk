@@ -135,6 +135,10 @@
       openModal: modal.openModal,
       splitEmailAddresses:
         window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
+      workflows: {
+        model: window.PropertyDeskReminderPreviewModel,
+        preview: window.PropertyDeskReminderPreview,
+      },
     });
   const appShell = window.PropertyDeskAppShellWorkflow.create({
     workspaceWorkflow: window.PropertyDeskWorkspace,

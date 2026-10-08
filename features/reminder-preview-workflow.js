@@ -19,8 +19,9 @@
     esc,
     openModal,
     splitEmailAddresses,
+    workflows,
   }) {
-    const model = window.PropertyDeskReminderPreviewModel.create({
+    const model = workflows.model.create({
       paymentReminderMessage,
       amountDueSince,
       unpaidDueAccrualStart,
@@ -30,7 +31,7 @@
       propertyAddress,
       money,
     });
-    const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
+    const { previewReminderEmail } = workflows.preview.create({
       $,
       state,
       todayIso,

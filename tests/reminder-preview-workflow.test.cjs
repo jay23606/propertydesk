@@ -49,9 +49,21 @@ test("reminder preview workflow composes the account editor preview directly", (
     esc() {},
     openModal() {},
     splitEmailAddresses() {},
+    workflows: {
+      model: context.window.PropertyDeskReminderPreviewModel,
+      preview: context.window.PropertyDeskReminderPreview,
+    },
   };
   const workflow =
     context.window.PropertyDeskReminderPreviewWorkflow.create(services);
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "reminder-preview-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskReminderPreview(?:Model)?\.create/,
+  );
 
   assert.deepEqual(
     calls.map(([name]) => name),
