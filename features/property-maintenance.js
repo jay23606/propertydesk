@@ -36,14 +36,24 @@
       });
     }
 
-    function savePropertyQuickNote(propertyId, ownerId, note, onUnconfirmed) {
-      return updateProperty(
-        propertyId,
-        ownerId,
-        { notes: note || null },
-        "Property note result couldn't be confirmed. Reload Properties before retrying.",
-        onUnconfirmed,
-      );
+    function savePropertyQuickNote(propertyId, ownerId, note, onReconciled) {
+      return window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
+        operation: () =>
+          repository.updateOwned(propertyId, ownerId, { notes: note || null }),
+        state,
+        collection: "properties",
+        payload: { notes: note || null },
+        recordId: propertyId,
+        fetchAll,
+        toast,
+        failureMessage:
+          "Property note result couldn't be confirmed. Reload Properties before retrying.",
+        refreshFailureMessage:
+          "Property note result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+        retryMessage:
+          "Property note result is shown in refreshed Properties. Check it before retrying.",
+        onReconciled,
+      });
     }
 
     function savePropertyArchive(
