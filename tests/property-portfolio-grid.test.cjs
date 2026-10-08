@@ -621,6 +621,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   assert.match(tableRows, /href="mailto:buyer@example\.com"/);
   assert.match(tableRows, /href="sms:\+15550102020"/);
   assert.match(tableRows, /data-account-edit="account-1"/);
+  assert.match(tableRows, /class="portfolio-mobile-due">\$50\.00/);
   assert.match(tableRows, /class="portfolio-icon-action unavailable"/);
   assert.match(totals.innerHTML, /\$130\.00/);
   assert.match(totals.innerHTML, /\$325\.00/);

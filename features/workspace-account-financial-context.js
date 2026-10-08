@@ -7,8 +7,9 @@
     ledger,
     amountDueSince,
     unpaidDueAccrualStart,
+    workflows,
   }) {
-    const ledgerContext = window.PropertyDeskLedgerContext.create({
+    const ledgerContext = workflows.ledger.create({
       state,
       todayIso: ledger.todayIso,
       scheduledLoanBalance: ledger.scheduledLoanBalance,
@@ -16,7 +17,7 @@
       postedOnOrAfter: ledger.postedOnOrAfter,
       sumPosted: ledger.sumPosted,
     });
-    const accountSummary = window.PropertyDeskAccountFinancialSummary.create({
+    const accountSummary = workflows.accountSummary.create({
       accountBalance: ledgerContext.accountBalance,
       amountDueSince,
       unpaidDueAccrualStart,

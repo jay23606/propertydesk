@@ -23,22 +23,21 @@ test("workspace account financial context shares state with ledger summaries", (
     unpaidDueAccrualStart() {},
   };
   let capturedAccountSummaryOptions;
-  const context = vm.createContext({
-    window: {
-      PropertyDeskLedgerContext: {
-        create(options) {
-          calls.push(["ledger", options]);
-          return { accountBalance };
-        },
-      },
-      PropertyDeskAccountFinancialSummary: {
-        create(options) {
-          capturedAccountSummaryOptions = options;
-          return { summarizeAccount };
-        },
+  const context = vm.createContext({ window: {} });
+  const workflows = {
+    ledger: {
+      create(options) {
+        calls.push(["ledger", options]);
+        return { accountBalance };
       },
     },
-  });
+    accountSummary: {
+      create(options) {
+        capturedAccountSummaryOptions = options;
+        return { summarizeAccount };
+      },
+    },
+  };
   vm.runInContext(
     fs.readFileSync(
       path.join(
@@ -57,6 +56,7 @@ test("workspace account financial context shares state with ledger summaries", (
       state,
       ledger: ledgerOptions,
       ...accountSummaryOptions,
+      workflows,
     });
 
   assert.equal(calls[0][0], "ledger");

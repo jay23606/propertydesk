@@ -64,6 +64,14 @@
     todayIso,
     postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
     isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
+    workflows: {
+      schedule: window.PropertyDeskScheduleUtils,
+      loanSchedule: window.PropertyDeskLoanAmortizationUtils,
+      accountFinancialContext:
+        window.PropertyDeskWorkspaceAccountFinancialContext,
+      ledgerContext: window.PropertyDeskLedgerContext,
+      accountSummary: window.PropertyDeskAccountFinancialSummary,
+    },
   });
   const {
     isPosted,

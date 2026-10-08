@@ -35,37 +35,38 @@ test("workspace financial context composes ledger, account, and loan services", 
     sumOperatingExpenses() {},
     sumPosted,
   };
-  const context = vm.createContext({
-    window: {
-      PropertyDeskScheduleUtils: {
-        create(options) {
-          calls.push(["schedule", options]);
-          return {
-            amountDueSince,
-            monthlyScheduledEstimate,
-            unpaidDueAccrualStart,
-          };
-        },
-      },
-      PropertyDeskLoanAmortizationUtils: {
-        create(options) {
-          calls.push(["loan", options]);
-          return { amortizationSchedule, scheduledLoanBalance };
-        },
-      },
-      PropertyDeskWorkspaceAccountFinancialContext: {
-        create(options) {
-          calls.push(["account-financials", options]);
-          return {
-            accountBalance,
-            scheduledMonthlyRunRate,
-            collectedSince,
-            summarizeAccount,
-          };
-        },
+  const context = vm.createContext({ window: {} });
+  const workflows = {
+    schedule: {
+      create(options) {
+        calls.push(["schedule", options]);
+        return {
+          amountDueSince,
+          monthlyScheduledEstimate,
+          unpaidDueAccrualStart,
+        };
       },
     },
-  });
+    loanSchedule: {
+      create(options) {
+        calls.push(["loan", options]);
+        return { amortizationSchedule, scheduledLoanBalance };
+      },
+    },
+    accountFinancialContext: {
+      create(options) {
+        calls.push(["account-financials", options]);
+        return {
+          accountBalance,
+          scheduledMonthlyRunRate,
+          collectedSince,
+          summarizeAccount,
+        };
+      },
+    },
+    ledgerContext: { create() {} },
+    accountSummary: { create() {} },
+  };
   const todayIso = () => "2026-10-07";
   vm.runInContext(
     fs.readFileSync(
@@ -81,6 +82,7 @@ test("workspace financial context composes ledger, account, and loan services", 
       todayIso,
       postedLedgerUtils,
       isActiveAccount,
+      workflows,
     },
   );
 

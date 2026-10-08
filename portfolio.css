@@ -15,6 +15,9 @@
   color: #354238 !important;
   font-variant-numeric: tabular-nums;
 }
+.portfolio-mobile-due {
+  display: none;
+}
 @media (max-width: 760px) {
   .portfolio-table {
     border-radius: 8px;
@@ -34,9 +37,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 76px;
-    min-width: 76px;
-    max-width: 76px;
+    width: 106px;
+    min-width: 106px;
+    max-width: 106px;
     z-index: 2;
     background: #fff;
   }
@@ -46,13 +49,7 @@
   }
   .portfolio-table th:nth-child(2),
   .portfolio-table td:nth-child(2) {
-    position: sticky;
-    left: 76px;
-    width: 68px;
-    min-width: 68px;
-    max-width: 68px;
-    z-index: 2;
-    background: #fff;
+    display: none;
   }
   .portfolio-table th:nth-child(2) {
     z-index: 4;
@@ -66,9 +63,21 @@
     background: #fbfcfa;
   }
   .portfolio-table td:nth-child(1) .button {
-    width: 68px;
+    width: 96px;
     padding: 7px 2px;
     font-size: 9px;
+  }
+  .portfolio-mobile-due {
+    display: block;
+    margin: 0 0 5px;
+    color: var(--green);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .portfolio-mobile-due small {
+    font-size: 8px;
+    font-weight: 500;
   }
   .portfolio-table .table-subtext {
     display: none;
@@ -80,10 +89,10 @@
   }
   .portfolio-table td:nth-child(3) {
     position: sticky;
-    left: 144px;
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
+    left: 106px;
+    width: 94px;
+    min-width: 94px;
+    max-width: 94px;
     z-index: 2;
     background: #fff;
     overflow: hidden;
@@ -91,19 +100,18 @@
   }
   .portfolio-table th:nth-child(3) {
     position: sticky;
-    left: 144px;
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
+    left: 106px;
+    width: 94px;
+    min-width: 94px;
+    max-width: 94px;
     z-index: 4;
     background: #fafbf9;
   }
   .portfolio-table td:nth-child(3) .table-action {
     display: block;
-    max-width: 84px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 88px;
+    overflow-wrap: anywhere;
+    white-space: normal;
     vertical-align: middle;
   }
   .portfolio-table .property-row-note {
@@ -122,11 +130,11 @@
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4) {
-    left: 234px;
+    left: 200px;
   }
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    left: 276px;
+    left: 242px;
     box-shadow: 3px 0 6px #1c30200d;
   }
   .portfolio-table th:nth-child(4),
@@ -293,43 +301,42 @@ html[data-theme="dark"] .portfolio-table tbody tr:hover td:nth-child(5) {
   }
   .portfolio-table th:nth-child(2),
   .portfolio-table td:nth-child(2) {
-    left: 76px;
+    display: none;
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    left: 144px;
+    left: 106px;
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4) {
-    left: 234px;
+    left: 200px;
   }
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    left: 276px;
+    left: 242px;
   }
   .portfolio-table tfoot td:nth-child(1) {
     left: 0;
-    width: 76px;
+    width: 106px;
   }
   .portfolio-table tfoot td:nth-child(2) {
-    left: 76px;
-    width: 68px;
+    display: none;
   }
   .portfolio-table tfoot td:nth-child(3) {
     position: sticky;
-    left: 144px;
-    width: 90px;
+    left: 106px;
+    width: 94px;
     background: var(--canvas);
   }
   .portfolio-table tfoot td:nth-child(4) {
     position: sticky;
-    left: 234px;
+    left: 200px;
     width: 42px;
     background: var(--canvas);
   }
   .portfolio-table tfoot td:nth-child(5) {
     position: sticky;
-    left: 276px;
+    left: 242px;
     width: 42px;
     background: var(--canvas);
     box-shadow: 3px 0 6px #1c30200d;

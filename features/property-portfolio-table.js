@@ -55,6 +55,7 @@
 
       return `<tr>
         <td class="${PAYMENT_STATUS_CLASS[paymentStatus]}" title="${PAYMENT_STATUS_TITLE[paymentStatus]}">
+        <strong class="portfolio-mobile-due">${money(due)}</strong>
         <button type="button" class="button primary compact" data-account-payment="${esc(account.id)}">＋ Payment</button>
         </td>
         <td class="portfolio-due">${money(due)}</td>
@@ -74,6 +75,7 @@
     function emptyPropertyRowHTML(property, street) {
       return `<tr>
         <td>
+        <strong class="portfolio-mobile-due">—</strong>
         <button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button>
         </td>
         <td class="portfolio-due">—</td>${propertyAddressCell(property, street)}<td></td><td></td><td colspan="2" class="muted">No rental or contract recorded</td>
@@ -87,6 +89,7 @@
         : "—";
       return `<tr>
         <td>
+        <strong class="portfolio-mobile-due">${money(totals.unpaidDue)} <small>Total due</small></strong>
         </td>
         <td class="portfolio-due">
         <strong>${money(totals.unpaidDue)}</strong>

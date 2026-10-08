@@ -7,25 +7,29 @@
     todayIso,
     postedLedgerUtils,
     isActiveAccount,
+    workflows,
   }) {
-    const schedule = window.PropertyDeskScheduleUtils.create({
+    const schedule = workflows.schedule.create({
       isDueReducingPayment: postedLedgerUtils.isDueReducingPayment,
       isActiveAccount,
     });
-    const loanSchedule = window.PropertyDeskLoanAmortizationUtils.create();
-    const financial =
-      window.PropertyDeskWorkspaceAccountFinancialContext.create({
-        state,
-        ledger: {
-          todayIso,
-          scheduledLoanBalance: loanSchedule.scheduledLoanBalance,
-          monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
-          postedOnOrAfter: postedLedgerUtils.postedOnOrAfter,
-          sumPosted: postedLedgerUtils.sumPosted,
-        },
-        amountDueSince: schedule.amountDueSince,
-        unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
-      });
+    const loanSchedule = workflows.loanSchedule.create();
+    const financial = workflows.accountFinancialContext.create({
+      state,
+      ledger: {
+        todayIso,
+        scheduledLoanBalance: loanSchedule.scheduledLoanBalance,
+        monthlyScheduledEstimate: schedule.monthlyScheduledEstimate,
+        postedOnOrAfter: postedLedgerUtils.postedOnOrAfter,
+        sumPosted: postedLedgerUtils.sumPosted,
+      },
+      amountDueSince: schedule.amountDueSince,
+      unpaidDueAccrualStart: schedule.unpaidDueAccrualStart,
+      workflows: {
+        ledger: workflows.ledgerContext,
+        accountSummary: workflows.accountSummary,
+      },
+    });
     return Object.freeze({
       isPosted: postedLedgerUtils.isPosted,
       paymentStatusInMonth: postedLedgerUtils.paymentStatusInMonth,

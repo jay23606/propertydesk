@@ -146,10 +146,15 @@ test("app coordinator passes the amortization helper into account details", () =
     "utf8",
   );
   assert.match(
-    financialWorkflow,
-    /PropertyDeskLoanAmortizationUtils\.create\(/,
+    app,
+    /workflows: \{\s*schedule: window\.PropertyDeskScheduleUtils,[\s\S]*?accountSummary: window\.PropertyDeskAccountFinancialSummary,/,
   );
-  assert.match(financialWorkflow, /PropertyDeskScheduleUtils\.create\(/);
+  assert.match(financialWorkflow, /workflows\.loanSchedule\.create\(/);
+  assert.match(financialWorkflow, /workflows\.schedule\.create\(/);
+  assert.doesNotMatch(
+    financialWorkflow,
+    /window\.PropertyDesk[A-Za-z]+\.create\(/,
+  );
   assert.doesNotMatch(
     financialWorkflow,
     /PropertyDeskDepositLedgerUtils\.create\(/,
@@ -182,7 +187,19 @@ test("app coordinator passes the amortization helper into account details", () =
   }
   assert.match(
     financialWorkflow,
-    /PropertyDeskWorkspaceAccountFinancialContext\.create\(/,
+    /workflows\.accountFinancialContext\.create\(/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "workspace-account-financial-context.js",
+      ),
+      "utf8",
+    ),
+    /window\.PropertyDesk[A-Za-z]+\.create\(/,
   );
   assert.doesNotMatch(
     financialWorkflow,

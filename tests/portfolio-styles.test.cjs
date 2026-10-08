@@ -30,8 +30,8 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /html\[data-theme="dark"\] \.portfolio-table/);
   assert.match(
     portfolio,
-    /@media \(max-width: 760px\)[\s\S]*?\.portfolio-table th:nth-child\(5\),\s*\.portfolio-table td:nth-child\(5\)\s*\{\s*left: 276px;/,
-    "mobile layout keeps the Email and SMS action columns beside Payment, Due, and Address",
+    /@media \(max-width: 760px\)[\s\S]*?\.portfolio-table th:nth-child\(5\),\s*\.portfolio-table td:nth-child\(5\)\s*\{\s*left: 242px;/,
+    "mobile layout keeps the combined Payment/Due, Address, Email, and SMS columns visible",
   );
   assert.doesNotMatch(styles, /\.portfolio-(?:panel|table|due)/);
   assert.doesNotMatch(shared, /\.portfolio-|\.property-row-note/);
