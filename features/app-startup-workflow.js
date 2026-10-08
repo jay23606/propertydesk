@@ -13,15 +13,16 @@
     renderers,
     eventBindersBeforeAuth,
     eventBindersAfterAuth,
+    workflows,
   }) {
-    const auth = window.PropertyDeskAuth.create({
+    const auth = workflows.auth.create({
       $: authContext.$,
       state: authContext.state,
       authClient,
       fetchAll: authContext.fetchAll,
       toast: authContext.toast,
     });
-    const lifecycle = window.PropertyDeskAppLifecycle.create({
+    const lifecycle = workflows.lifecycle.create({
       $,
       backendConfigured,
       initializeClient,

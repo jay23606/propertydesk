@@ -631,6 +631,10 @@
       attachBackupExportEvents,
       attachReportExportEvents,
     ],
+    workflows: {
+      auth: window.PropertyDeskAuth,
+      lifecycle: window.PropertyDeskAppLifecycle,
+    },
   });
   document.addEventListener("DOMContentLoaded", appLifecycle.initialize);
 })();
