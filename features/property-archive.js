@@ -24,25 +24,18 @@
       if (!property) return;
 
       const archived_at = property.archived_at ? null : todayIso();
-      let reconciled = false;
-      const saved = await savePropertyArchive(
-        id,
-        state.workspaceOwnerId,
-        archived_at,
-        ({ recordWasSaved }) => {
+      await savePropertyArchive({
+        propertyId: id,
+        ownerId: state.workspaceOwnerId,
+        archivedAt: archived_at,
+        onRefreshed: ({ recordWasSaved }) => {
           openPropertyDetails(id);
           if (!recordWasSaved) return;
-          reconciled = true;
           toast(archiveSuccessMessage(archived_at));
         },
-      );
-      if (!saved || reconciled) return;
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
         afterRefresh: () => openPropertyDetails(id),
-        toast,
         successMessage: archiveSuccessMessage(archived_at),
-        refreshFailureMessage: archived_at
+        savedRefreshFailureMessage: archived_at
           ? "Property was archived, but the workspace could not refresh. Reload to verify its status."
           : "Property was restored, but the workspace could not refresh. Reload to verify its status.",
       });

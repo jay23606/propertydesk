@@ -32,25 +32,9 @@
         toast("Quick notes are limited to 140 characters.");
         return;
       }
-      let reconciled = false;
-      const saved = await savePropertyQuickNote(
-        id,
-        state.workspaceOwnerId,
-        note,
-        () => {
-          reconciled = true;
-          toast(note ? "Property note saved" : "Property note removed");
-        },
+      await savePropertyQuickNote(id, state.workspaceOwnerId, note, () =>
+        toast(note ? "Property note saved" : "Property note removed"),
       );
-      if (!saved || reconciled) return;
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        toast,
-        successMessage: note ? "Property note saved" : "Property note removed",
-        refreshFailureMessage: note
-          ? "Property note was saved, but the workspace could not refresh. Reload to verify it."
-          : "Property note was removed, but the workspace could not refresh. Reload to verify it.",
-      });
     }
 
     return Object.freeze({ editPropertyQuickNote });
