@@ -15,7 +15,7 @@
       });
     }
 
-    return { addMember, removeMember };
+    return Object.freeze({ addMember, removeMember });
   }
 
   window.PropertyDeskWorkspaceMemberRepository = Object.freeze({ create });

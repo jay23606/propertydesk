@@ -13,7 +13,7 @@
       return resolved;
     }
 
-    return {
+    return Object.freeze({
       upload(path, file, contentType) {
         return client()
           .storage.from(BUCKET)
@@ -39,7 +39,7 @@
       signedUrl(path, expiresIn) {
         return client().storage.from(BUCKET).createSignedUrl(path, expiresIn);
       },
-    };
+    });
   }
 
   window.PropertyDeskDocumentRepository = Object.freeze({ create });

@@ -22,7 +22,7 @@
       return insertRecord(getClient(), "pd_property_holders", rows);
     }
 
-    return { clearPropertyHolders, addPropertyHolders };
+    return Object.freeze({ clearPropertyHolders, addPropertyHolders });
   }
 
   window.PropertyDeskPropertyHolderRepository = Object.freeze({ create });

@@ -30,7 +30,7 @@
       return data;
     }
 
-    return { commitAccounts, commitTransactions };
+    return Object.freeze({ commitAccounts, commitTransactions });
   }
 
   window.PropertyDeskImportRepository = Object.freeze({ create });
