@@ -40,6 +40,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
   );
   assert.match(
     app,
+    /openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?editAccount: propertyAccountForms\.editAccount,/,
+  );
+  assert.match(
+    app,
     /workflows: \{\s*table: window\.PropertyDeskPropertyPortfolioTable,[\s\S]*?events: window\.PropertyDeskPropertyViewEvents,/,
   );
   assert.doesNotMatch(
@@ -508,6 +512,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
         payment_frequency: "monthly",
         name: "Contract",
         party_name: "Buyer",
+        party_email: "buyer@example.com",
+        party_phone: "+1 (555) 010-2020",
       },
       {
         id: "account-2",
@@ -541,7 +547,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     dateOnly: (value) => new Date(`${value}T12:00:00`),
     monthEnd: () => "2026-10-31",
     lateReminderMailto: () => "mailto:buyer@example.com",
-    lateReminderSms: () => "sms:+15550102020",
+    lateReminderSms: ({ phone }) => (phone ? "sms:+15550102020" : ""),
     paymentStatusInMonth: () => "none",
     money,
   };
@@ -612,6 +618,10 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
   const totals = getElement("properties-totals");
   const tableRows = getElement("properties-table").innerHTML;
   assert.ok(tableRows.indexOf("Buyer") < tableRows.indexOf("Tenant"));
+  assert.match(tableRows, /href="mailto:buyer@example\.com"/);
+  assert.match(tableRows, /href="sms:\+15550102020"/);
+  assert.match(tableRows, /data-account-edit="account-1"/);
+  assert.match(tableRows, /class="portfolio-icon-action unavailable"/);
   assert.match(totals.innerHTML, /\$130\.00/);
   assert.match(totals.innerHTML, /\$325\.00/);
   assert.match(totals.innerHTML, /\$1000\.00/);

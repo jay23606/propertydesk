@@ -142,6 +142,12 @@ function accountFormDependencies(context, state = {}) {
     repository: context.window.PropertyDeskAccountRepository.create({
       getClient: () => state.client,
     }),
+    workflows: {
+      view: context.window.PropertyDeskAccountFormView,
+      saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
+      maintenance: context.window.PropertyDeskAccountFormMaintenance,
+      propertyAction: context.window.PropertyDeskPropertyAccountAction,
+    },
   };
 }
 
@@ -156,6 +162,11 @@ function propertyFormDependencies(context, state = {}) {
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
+    workflows: {
+      view: context.window.PropertyDeskPropertyFormView,
+      saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
+      maintenance: context.window.PropertyDeskPropertySaveMaintenance,
+    },
   };
 }
 

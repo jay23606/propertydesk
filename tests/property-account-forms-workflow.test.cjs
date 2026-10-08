@@ -47,11 +47,14 @@ test("property and account forms keep separate dependencies and expose explicit 
     closeModal: () => {},
     fetchAll: () => {},
     repository: { kind: "properties" },
+    workflows: { kind: "property-form-modules" },
     unusedDependency: true,
   };
   const workflows = {
     propertyForm: context.window.PropertyDeskPropertyForm,
     accountForm: context.window.PropertyDeskAccountForm,
+    propertyFormModules: property.workflows,
+    accountFormModules: { kind: "account-form-modules" },
   };
   const account = {
     $: () => {},
@@ -67,8 +70,10 @@ test("property and account forms keep separate dependencies and expose explicit 
     formModel: {},
     previewReminderEmail: () => {},
     repository: { kind: "accounts" },
+    workflows: { kind: "account-form-modules" },
     unusedDependency: true,
   };
+  workflows.accountFormModules = account.workflows;
   const forms = context.window.PropertyDeskPropertyAccountFormsWorkflow.create({
     property,
     account,
@@ -90,6 +95,7 @@ test("property and account forms keep separate dependencies and expose explicit 
     "repository",
     "state",
     "toast",
+    "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.account).sort(), [
     "$",
@@ -105,11 +111,14 @@ test("property and account forms keep separate dependencies and expose explicit 
     "state",
     "toast",
     "todayIso",
+    "workflows",
   ]);
   for (const key of Object.keys(passed.property))
     assert.equal(passed.property[key], property[key]);
   for (const key of Object.keys(passed.account))
     assert.equal(passed.account[key], account[key]);
+  assert.equal(passed.property.workflows, workflows.propertyFormModules);
+  assert.equal(passed.account.workflows, workflows.accountFormModules);
   assert.equal("unusedDependency" in passed.property, false);
   assert.equal("unusedDependency" in passed.account, false);
   assert.deepEqual(Object.keys(forms).sort(), [

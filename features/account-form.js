@@ -16,34 +16,32 @@
     formModel,
     previewReminderEmail,
     repository,
+    workflows,
   }) {
-    const formView = window.PropertyDeskAccountFormView.create({
+    const formView = workflows.view.create({
       $,
       todayIso,
       populateFormOptions,
       openModal,
     });
-    const { save: saveWorkspaceForm } =
-      window.PropertyDeskWorkspaceFormSaveWorkflow.create({
-        $,
-        closeModal,
-        toast,
-      });
-    const { saveAccount: persistAccount } =
-      window.PropertyDeskAccountFormMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-      });
+    const { save: saveWorkspaceForm } = workflows.saveWorkflow.create({
+      $,
+      closeModal,
+      toast,
+    });
+    const { saveAccount: persistAccount } = workflows.maintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+    });
     const { resetAccountForm, readValues, editAccount } = formView;
-    const { openAccountForProperty } =
-      window.PropertyDeskPropertyAccountAction.create({
-        $,
-        resetAccountForm,
-        populateFormOptions,
-        openModal,
-      });
+    const { openAccountForProperty } = workflows.propertyAction.create({
+      $,
+      resetAccountForm,
+      populateFormOptions,
+      openModal,
+    });
 
     async function saveAccount(event) {
       event.preventDefault();

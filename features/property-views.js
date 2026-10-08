@@ -54,9 +54,17 @@
                 monthly: row.scheduledPayment,
                 loanBalance: row.loanBalance,
                 partyName: row.partyName,
+                accountId: row.id,
                 paymentStatus: row.paymentStatus,
                 reminderHref: row.reminderHref,
-                recipientHint: row.recipientHint,
+                textReminderHref: row.textReminderHref,
+                hasEmail: Boolean(row.accountRecord.party_email),
+                emailHint: row.accountRecord.party_email
+                  ? "Draft late reminder email"
+                  : "No email saved",
+                textHint: row.textReminderHref
+                  ? "Open a text reminder draft"
+                  : "No phone saved",
               })
             : portfolioTable.emptyPropertyRowHTML(row.property, row.street),
         )

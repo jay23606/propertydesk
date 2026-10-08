@@ -8,6 +8,8 @@
     editPropertyQuickNote,
     openPropertyDetails,
     openAccountForProperty,
+    state,
+    editAccount,
   }) {
     function attachEvents() {
       $("properties-table").addEventListener("click", (event) => {
@@ -16,6 +18,16 @@
           event.preventDefault();
           event.stopPropagation();
           openPayment(payment.dataset.accountPayment);
+          return;
+        }
+        const accountEdit = event.target.closest("[data-account-edit]");
+        if (accountEdit) {
+          event.preventDefault();
+          event.stopPropagation();
+          const account = state.accounts.find(
+            (item) => String(item.id) === accountEdit.dataset.accountEdit,
+          );
+          if (account) editAccount(account);
           return;
         }
         const note = event.target.closest("[data-property-note]");

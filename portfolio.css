@@ -8,7 +8,7 @@
   overscroll-behavior-x: contain;
 }
 .portfolio-table table {
-  min-width: 1120px;
+  min-width: 1200px;
 }
 .portfolio-due {
   font-weight: 700;
@@ -89,14 +89,45 @@
   border-top: 2px solid var(--line);
   background: var(--canvas);
 }
-.portfolio-party-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+.portfolio-contact-action {
+  width: 48px;
+  min-width: 48px;
+  text-align: center;
 }
-.portfolio-text-reminder {
-  white-space: nowrap;
+.portfolio-icon-action {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+}
+.portfolio-icon-action svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+.portfolio-icon-action:hover {
+  background: var(--surface);
+}
+.portfolio-icon-action.unavailable {
+  opacity: 0.38;
+}
+.property-party-name {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
 }
 .portfolio-table tfoot td {
   font-weight: 700;

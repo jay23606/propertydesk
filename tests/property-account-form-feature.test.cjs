@@ -118,6 +118,11 @@ test("property form projects view values into a database-safe property payload",
     closeModal() {},
     fetchAll() {},
     repository: {},
+    workflows: {
+      view: context.window.PropertyDeskPropertyFormView,
+      saveWorkflow: context.window.PropertyDeskWorkspaceFormSaveWorkflow,
+      maintenance: context.window.PropertyDeskPropertySaveMaintenance,
+    },
   });
   form.attachEvents();
   await submit({ preventDefault() {} });

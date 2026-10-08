@@ -28,8 +28,11 @@ test("property view actions route payment, note, address, and add-account action
     }
     return elements.get(id);
   };
+  const account = { id: "account-9", party_name: "Buyer" };
   const feature = context.window.PropertyDeskPropertyViewEvents.create({
     $,
+    state: { accounts: [account] },
+    editAccount: (value) => calls.push(["edit-account", value.id]),
     openPayment: (id) => calls.push(["payment", id]),
     editPropertyQuickNote: (id) => calls.push(["note", id]),
     openPropertyDetails: (id) => calls.push(["open", id]),
@@ -39,6 +42,7 @@ test("property view actions route payment, note, address, and add-account action
 
   for (const [selector, dataset] of [
     ["[data-account-payment]", { accountPayment: "account-1" }],
+    ["[data-account-edit]", { accountEdit: "account-9" }],
     ["[data-property-note]", { propertyNote: "property-1" }],
     ["[data-property-open]", { propertyOpen: "property-2" }],
     ["[data-property-account]", { propertyAccount: "property-3" }],
@@ -52,6 +56,7 @@ test("property view actions route payment, note, address, and add-account action
 
   assert.deepEqual(calls, [
     ["payment", "account-1"],
+    ["edit-account", "account-9"],
     ["note", "property-1"],
     ["open", "property-2"],
     ["open-account", "property-3"],

@@ -26,6 +26,7 @@
     openPayment,
     openPropertyDetails,
     openAccountForProperty,
+    editAccount,
     propertyRepository,
     workflows,
   }) {
@@ -87,6 +88,8 @@
         editPropertyQuickNote,
         openPropertyDetails,
         openAccountForProperty,
+        state,
+        editAccount,
       });
 
     return Object.freeze({

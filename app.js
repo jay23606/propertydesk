@@ -193,6 +193,17 @@
       workflows: {
         propertyForm: window.PropertyDeskPropertyForm,
         accountForm: window.PropertyDeskAccountForm,
+        propertyFormModules: {
+          view: window.PropertyDeskPropertyFormView,
+          saveWorkflow: window.PropertyDeskWorkspaceFormSaveWorkflow,
+          maintenance: window.PropertyDeskPropertySaveMaintenance,
+        },
+        accountFormModules: {
+          view: window.PropertyDeskAccountFormView,
+          saveWorkflow: window.PropertyDeskWorkspaceFormSaveWorkflow,
+          maintenance: window.PropertyDeskAccountFormMaintenance,
+          propertyAction: window.PropertyDeskPropertyAccountAction,
+        },
       },
       property: {
         $,
@@ -538,6 +549,7 @@
       openPayment,
       propertyRepository: repositories.properties,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,
+      editAccount: propertyAccountForms.editAccount,
       workflows: {
         table: window.PropertyDeskPropertyPortfolioTable,
         reminderModel: window.PropertyDeskPropertyPortfolioReminderModel,

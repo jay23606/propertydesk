@@ -63,6 +63,7 @@
       openPayment: portfolio.openPayment,
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
+      editAccount: portfolio.editAccount,
       propertyRepository: portfolio.propertyRepository,
       workflows: portfolio.workflows,
     });

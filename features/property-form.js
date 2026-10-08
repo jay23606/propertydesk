@@ -9,21 +9,20 @@
     closeModal,
     fetchAll,
     repository,
+    workflows,
   }) {
-    const formView = window.PropertyDeskPropertyFormView.create({ $ });
-    const { save: saveWorkspaceForm } =
-      window.PropertyDeskWorkspaceFormSaveWorkflow.create({
-        $,
-        closeModal,
-        toast,
-      });
-    const { saveProperty: persistProperty } =
-      window.PropertyDeskPropertySaveMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-      });
+    const formView = workflows.view.create({ $ });
+    const { save: saveWorkspaceForm } = workflows.saveWorkflow.create({
+      $,
+      closeModal,
+      toast,
+    });
+    const { saveProperty: persistProperty } = workflows.maintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+    });
 
     async function saveProperty(event) {
       event.preventDefault();

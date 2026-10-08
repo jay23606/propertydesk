@@ -14,6 +14,7 @@
       closeModal: property.closeModal,
       fetchAll: property.fetchAll,
       repository: property.repository,
+      workflows: workflows.propertyFormModules,
     });
     const accountForm = workflows.accountForm.create({
       $: account.$,
@@ -29,6 +30,7 @@
       formModel: account.formModel,
       previewReminderEmail: account.previewReminderEmail,
       repository: account.repository,
+      workflows: workflows.accountFormModules,
     });
 
     return Object.freeze({

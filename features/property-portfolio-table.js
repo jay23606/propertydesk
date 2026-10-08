@@ -13,6 +13,10 @@
     partial: "Partial payment received this month",
     full: "Full scheduled amount received this month",
   });
+  const EMAIL_ICON =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5zM4 6l8 6 8-6"/></svg>';
+  const SMS_ICON =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.5a2.5 2.5 0 0 1-1-2z"/><path d="M8 9h8M8 12h5"/></svg>';
 
   function create({ esc, money, paymentFrequencyLabel }) {
     function propertyAddressCell(property, street) {
@@ -31,10 +35,13 @@
       monthly,
       loanBalance,
       partyName,
+      accountId,
       paymentStatus,
       reminderHref,
       textReminderHref,
-      recipientHint,
+      hasEmail,
+      emailHint,
+      textHint,
     }) {
       const paymentAmount =
         account.payment_frequency === "monthly"
@@ -52,11 +59,10 @@
         </td>
         <td class="portfolio-due">${money(due)}</td>
         ${propertyAddressCell(property, street)}
+        <td class="portfolio-contact-action">${hasEmail ? `<a class="portfolio-icon-action" href="${esc(reminderHref)}" title="${esc(emailHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${EMAIL_ICON}</a>` : `<span class="portfolio-icon-action unavailable" title="${esc(emailHint)}" aria-label="${esc(emailHint)}">${EMAIL_ICON}</span>`}</td>
+        <td class="portfolio-contact-action">${textReminderHref ? `<a class="portfolio-icon-action" href="${esc(textReminderHref)}" title="${esc(textHint)}" aria-label="${esc(`Draft text reminder for ${partyName}`)}">${SMS_ICON}</a>` : `<span class="portfolio-icon-action unavailable" title="${esc(textHint)}" aria-label="${esc(textHint)}">${SMS_ICON}</span>`}</td>
         <td>
-        <div class="portfolio-party-actions">
-        <a class="table-action" href="${esc(reminderHref)}" title="${esc(recipientHint)}" aria-label="${esc(`Draft late reminder email for ${partyName}`)}">${esc(partyName)}</a>
-        ${textReminderHref ? `<a class="table-action portfolio-text-reminder" href="${esc(textReminderHref)}" title="Open a text reminder draft" aria-label="${esc(`Draft text reminder for ${partyName}`)}">Text</a>` : ""}
-        </div>
+        <button type="button" class="table-action property-party-name" data-account-edit="${esc(accountId)}" aria-label="Edit account for ${esc(partyName)}">${esc(partyName)}</button>
         <small class="table-subtext">${esc(account.name)}${inactiveHint}</small>
         </td>
         <td>${paymentAmount}<small class="table-subtext">${frequencyHint}</small>
@@ -70,7 +76,7 @@
         <td>
         <button type="button" class="button secondary compact" data-property-account="${esc(property.id)}">＋ Add account</button>
         </td>
-        <td class="portfolio-due">—</td>${propertyAddressCell(property, street)}<td colspan="2" class="muted">No rental or contract recorded</td>
+        <td class="portfolio-due">—</td>${propertyAddressCell(property, street)}<td></td><td></td><td colspan="2" class="muted">No rental or contract recorded</td>
         <td>—</td>
         </tr>`;
     }
@@ -87,6 +93,8 @@
         </td>
         <td>
         </td>
+        <td></td>
+        <td></td>
         <td>
         <strong>Visible totals</strong>
         </td>
