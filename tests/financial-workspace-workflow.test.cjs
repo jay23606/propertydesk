@@ -10,19 +10,15 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskTransactionRecordsWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
-  assert.doesNotMatch(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.match(
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
@@ -34,7 +30,6 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "deposit-workspace-workflow",
     "transaction-maintenance-workflow",
     "transaction-records-workflow",
-    "account-deposit-workspace-workflow",
   ]) {
     const script = `features/${feature}.js`;
     assert.ok(

@@ -184,7 +184,6 @@ const SHELL_FILES = [
   './features/account-detail-action-workflow.js',
   './features/deposit-adjustment-workflow.js',
   './features/deposit-workspace-workflow.js',
-  './features/account-deposit-workspace-workflow.js',
   './features/transaction-correction-view.js',
   './features/transaction-correction-model.js',
   './features/transaction-correction-form.js',

@@ -11,13 +11,9 @@ test("app composes account details apart from account and deposit maintenance", 
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
-  assert.doesNotMatch(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\(/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   const accountDetailWorkflow = fs.readFileSync(
@@ -106,26 +102,9 @@ test("app composes account details apart from account and deposit maintenance", 
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
   );
-  const accountDepositWorkspaceWorkflow = fs.readFileSync(
-    path.join(
-      __dirname,
-      "..",
-      "features",
-      "account-deposit-workspace-workflow.js",
-    ),
-    "utf8",
-  );
   assert.match(
-    accountDepositWorkspaceWorkflow,
-    /PropertyDeskDepositWorkspaceWorkflow\.create\(deposit\)/,
-  );
-  assert.match(
-    accountDepositWorkspaceWorkflow,
+    app,
     /PropertyDeskAccountDetailContentWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
-  );
-  assert.match(
-    accountDepositWorkspaceWorkflow,
-    /PropertyDeskAccountDetailActionWorkflow\.create\(accountActions\)/,
   );
   assert.doesNotMatch(html, /account-screen-workflow/);
   assert.doesNotMatch(worker, /account-screen-workflow/);
