@@ -42,10 +42,10 @@
       });
     }
 
-    return {
+    return Object.freeze({
       resetPropertyForm: formView.resetPropertyForm,
       attachEvents: () => formView.attachEvents(saveProperty),
-    };
+    });
   }
 
   window.PropertyDeskPropertyForm = Object.freeze({

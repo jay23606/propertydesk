@@ -86,10 +86,10 @@
       expenseView.attachEvents();
     }
 
-    return {
+    return Object.freeze({
       openExpense: expenseView.openExpense,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskExpenseEntryForm = Object.freeze({

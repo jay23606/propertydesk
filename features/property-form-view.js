@@ -26,7 +26,7 @@
       $("property-form").addEventListener("submit", saveProperty);
     }
 
-    return { resetPropertyForm, readValues, attachEvents };
+    return Object.freeze({ resetPropertyForm, readValues, attachEvents });
   }
 
   window.PropertyDeskPropertyFormView = Object.freeze({ create });

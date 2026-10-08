@@ -308,6 +308,9 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({
     ...ledgerEntryDependencies(context),
   });
+  assert.equal(Object.isFrozen(property), true);
+  assert.equal(Object.isFrozen(account), true);
+  assert.equal(Object.isFrozen(ledger), true);
   const actions = context.window.PropertyDeskCreateActions.create({});
   for (const [feature, names] of [
     [property, ["resetPropertyForm", "attachEvents"]],
@@ -388,6 +391,8 @@ test("payment and expense form workflows publish explicit view operations", () =
   const expense =
     context.window.PropertyDeskExpenseEntryForm.create(dependencies);
 
+  assert.equal(Object.isFrozen(payment), true);
+  assert.equal(Object.isFrozen(expense), true);
   assert.deepEqual(Object.keys(viewDependencies.payment).sort(), [
     "$",
     "fillSelect",

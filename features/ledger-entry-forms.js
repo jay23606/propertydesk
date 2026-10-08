@@ -76,13 +76,13 @@
     }
 
     // Keep only app-level actions; submit handlers stay inside their forms.
-    return {
+    return Object.freeze({
       updatePaymentGuidance: payments.updatePaymentGuidance,
       openPayment: payments.openPayment,
       openPropertyPayment: payments.openPropertyPayment,
       openExpense: expenses.openExpense,
       attachLedgerEntryFormEvents,
-    };
+    });
   }
 
   window.PropertyDeskLedgerEntryForms = Object.freeze({

@@ -44,6 +44,8 @@ test("property and account form modules expose separate APIs", () => {
     ...accountFormDependencies(context, dependencies.state),
   });
 
+  assert.equal(Object.isFrozen(property), true);
+  assert.equal(Object.isFrozen(account), true);
   assert.deepEqual(Object.keys(accountViewDependencies).sort(), [
     "$",
     "openModal",
@@ -179,6 +181,7 @@ test("property form view reads normalized values, resets the form, and binds sub
     $: elements,
   });
 
+  assert.equal(Object.isFrozen(view), true);
   assert.deepEqual(JSON.parse(JSON.stringify(view.readValues())), {
     id: "property-1",
     name: "House",
@@ -212,6 +215,7 @@ test("account form view resets and populates fields without owning persistence",
     openModal: (id) => opened.push(id),
   });
 
+  assert.equal(Object.isFrozen(view), true);
   view.editAccount({
     id: "account-1",
     account_type: "note",

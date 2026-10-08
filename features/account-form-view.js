@@ -115,13 +115,13 @@
       $("account-type").addEventListener("change", updateLoanFields);
     }
 
-    return {
+    return Object.freeze({
       resetAccountForm,
       updateLoanFields,
       readValues,
       editAccount,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskAccountFormView = Object.freeze({

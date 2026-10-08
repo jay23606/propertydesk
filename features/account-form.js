@@ -99,11 +99,11 @@
       formView.attachEvents(saveAccount, previewReminderEmail);
     }
 
-    return {
+    return Object.freeze({
       openAccountForProperty,
       editAccount,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskAccountForm = Object.freeze({ create: createAccountForm });

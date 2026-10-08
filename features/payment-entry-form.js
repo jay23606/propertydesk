@@ -79,12 +79,12 @@
       paymentView.attachEvents();
     }
 
-    return {
+    return Object.freeze({
       updatePaymentGuidance: paymentView.updatePaymentGuidance,
       openPayment: paymentView.openPayment,
       openPropertyPayment,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskPaymentEntryForm = Object.freeze({
