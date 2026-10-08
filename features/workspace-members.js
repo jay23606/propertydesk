@@ -21,27 +21,47 @@
       );
     }
 
-    async function addWorkspaceMember(email) {
-      if (!email) return;
+    function persistMembershipChange({
+      operation,
+      isConfirmed,
+      failureMessage,
+      refreshFailureMessage,
+      retryMessage,
+      successMessage,
+      savedRefreshFailureMessage,
+    }) {
       return window.PropertyDeskRepositoryWriteFeedback.runAndRefreshWorkspaceChange(
         {
-          operation: () => repository.addMember(email),
+          operation,
           fetchAll,
-          isConfirmed: () => memberWithEmailExists(email),
+          isConfirmed,
           toast,
-          failureMessage:
-            "Workspace member addition result couldn't be confirmed. Reload workspace settings before trying again.",
-          refreshFailureMessage:
-            "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
-          retryMessage:
-            "Workspace member addition wasn't confirmed. Check settings before retrying.",
+          failureMessage,
+          refreshFailureMessage,
+          retryMessage,
           afterRefresh: refreshWorkspaceSettings,
-          successMessage: "Workspace member added",
-          savedRefreshFailureMessage:
-            "Workspace member was added, but the workspace could not refresh. Reload to verify access.",
-          onReconciled: () => toast("Workspace member added"),
+          successMessage,
+          savedRefreshFailureMessage,
+          onReconciled: () => toast(successMessage),
         },
       );
+    }
+
+    async function addWorkspaceMember(email) {
+      if (!email) return;
+      return persistMembershipChange({
+        operation: () => repository.addMember(email),
+        isConfirmed: () => memberWithEmailExists(email),
+        failureMessage:
+          "Workspace member addition result couldn't be confirmed. Reload workspace settings before trying again.",
+        refreshFailureMessage:
+          "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+        retryMessage:
+          "Workspace member addition wasn't confirmed. Check settings before retrying.",
+        successMessage: "Workspace member added",
+        savedRefreshFailureMessage:
+          "Workspace member was added, but the workspace could not refresh. Reload to verify access.",
+      });
     }
 
     async function removeWorkspaceMember(memberId) {
@@ -55,28 +75,22 @@
         )
       )
         return;
-      return window.PropertyDeskRepositoryWriteFeedback.runAndRefreshWorkspaceChange(
-        {
-          operation: () => repository.removeMember(memberId),
-          fetchAll,
-          isConfirmed: () =>
-            !state.workspaceMembers.some(
-              (item) => item.member_user_id === memberId,
-            ),
-          toast,
-          failureMessage:
-            "Workspace member removal result couldn't be confirmed. Reload workspace settings before trying again.",
-          refreshFailureMessage:
-            "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
-          retryMessage:
-            "Workspace member still appears in settings. Check access before retrying.",
-          afterRefresh: refreshWorkspaceSettings,
-          successMessage: "Workspace access removed",
-          savedRefreshFailureMessage:
-            "Workspace access was removed, but the workspace could not refresh. Reload to verify access.",
-          onReconciled: () => toast("Workspace access removed"),
-        },
-      );
+      return persistMembershipChange({
+        operation: () => repository.removeMember(memberId),
+        isConfirmed: () =>
+          !state.workspaceMembers.some(
+            (item) => item.member_user_id === memberId,
+          ),
+        failureMessage:
+          "Workspace member removal result couldn't be confirmed. Reload workspace settings before trying again.",
+        refreshFailureMessage:
+          "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
+        retryMessage:
+          "Workspace member still appears in settings. Check access before retrying.",
+        successMessage: "Workspace access removed",
+        savedRefreshFailureMessage:
+          "Workspace access was removed, but the workspace could not refresh. Reload to verify access.",
+      });
     }
 
     function attachWorkspaceMemberEvents() {
