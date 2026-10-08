@@ -2,17 +2,16 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      state,
-      toast,
-      fetchAll,
-      openPropertyDetails,
-      makeId,
-      confirm = (message) => window.confirm(message),
-      openWindow = (...args) => window.open(...args),
-      repository,
-    } = context;
+  function create({
+    state,
+    toast,
+    fetchAll,
+    openPropertyDetails,
+    makeId,
+    confirm = (message) => window.confirm(message),
+    openWindow = (...args) => window.open(...args),
+    repository,
+  }) {
     const { uploadPropertyDocument } = window.PropertyDeskDocumentUpload.create(
       {
         state,

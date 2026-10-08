@@ -2,20 +2,19 @@
 (() => {
   "use strict";
 
-  function create(context) {
-    const {
-      $,
-      state,
-      isClientReady,
-      createBackup,
-      todayIso,
-      toast,
-      downloadBlob,
-      zipUtils,
-      loadBackupRecords,
-      collectBackupAgreementFiles,
-      documentRepository,
-    } = context;
+  function create({
+    $,
+    state,
+    isClientReady,
+    createBackup,
+    todayIso,
+    toast,
+    downloadBlob,
+    zipUtils,
+    loadBackupRecords,
+    collectBackupAgreementFiles,
+    documentRepository,
+  }) {
     const archive = window.PropertyDeskBackupArchive.create({
       createBackup,
       zipUtils,
