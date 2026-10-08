@@ -391,6 +391,9 @@
         repository: repositories.propertyHolders,
       },
       documents: {
+        workflow: window.PropertyDeskPropertyDocumentWorkflow,
+        documentsWorkflow: window.PropertyDeskDocuments,
+        documentEventsWorkflow: window.PropertyDeskPropertyDetailDocumentEvents,
         $,
         state,
         toast,

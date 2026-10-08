@@ -9,21 +9,22 @@
     fetchAll,
     openPropertyDetails,
     repository,
+    documentsWorkflow,
+    documentEventsWorkflow,
   }) {
-    const documents = window.PropertyDeskDocuments.create({
+    const documents = documentsWorkflow.create({
       state,
       toast,
       fetchAll,
       openPropertyDetails,
       repository,
     });
-    const { attachPropertyDocumentEvents } =
-      window.PropertyDeskPropertyDetailDocumentEvents.create({
-        $,
-        uploadPropertyDocument: documents.uploadPropertyDocument,
-        deletePropertyDocument: documents.deletePropertyDocument,
-        openPropertyDocument: documents.openPropertyDocument,
-      });
+    const { attachPropertyDocumentEvents } = documentEventsWorkflow.create({
+      $,
+      uploadPropertyDocument: documents.uploadPropertyDocument,
+      deletePropertyDocument: documents.deletePropertyDocument,
+      openPropertyDocument: documents.openPropertyDocument,
+    });
 
     return Object.freeze({ attachPropertyDocumentEvents });
   }

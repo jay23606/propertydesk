@@ -264,11 +264,11 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     screenWorkflow,
-    /PropertyDeskPropertyDocumentWorkflow\.create\([\s\S]*?repository: documents\.documentRepository/,
+    /documents\.workflow\.create\([\s\S]*?repository: documents\.documentRepository/,
   );
   assert.match(
     documentWorkflow,
-    /PropertyDeskDocuments\.create\([\s\S]*?PropertyDeskPropertyDetailDocumentEvents\.create\(/,
+    /documentsWorkflow\.create\([\s\S]*?documentEventsWorkflow\.create\(/,
   );
   assert.match(
     app,

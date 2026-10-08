@@ -115,7 +115,7 @@ test("property document workflow connects private actions and detail events", ()
   );
   assert.match(
     workflow,
-    /PropertyDeskPropertyDetailDocumentEvents\.create\([\s\S]*?uploadPropertyDocument: documents\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: documents\.deletePropertyDocument,[\s\S]*?openPropertyDocument: documents\.openPropertyDocument,/,
+    /documentEventsWorkflow\.create\([\s\S]*?uploadPropertyDocument: documents\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: documents\.deletePropertyDocument,[\s\S]*?openPropertyDocument: documents\.openPropertyDocument,/,
   );
   assert.match(app, /attachPropertyDocumentEvents/);
   assert.ok(html.includes("features/property-document-workflow.js"));
@@ -168,6 +168,9 @@ test("property document workflow routes actions through one explicit binder", ()
     fetchAll() {},
     openPropertyDetails() {},
     repository: {},
+    documentsWorkflow: context.window.PropertyDeskDocuments,
+    documentEventsWorkflow:
+      context.window.PropertyDeskPropertyDetailDocumentEvents,
   };
   const workflow =
     context.window.PropertyDeskPropertyDocumentWorkflow.create(dependencies);

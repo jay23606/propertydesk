@@ -84,6 +84,9 @@ test("property screen workflow passes detail actions to management and returns b
     ),
     context,
   );
+  documents.workflow = context.window.PropertyDeskPropertyDocumentWorkflow;
+  documents.documentsWorkflow = { create() {} };
+  documents.documentEventsWorkflow = { create() {} };
 
   const workflow = context.window.PropertyDeskPropertyScreenWorkflow.create({
     content,
@@ -133,6 +136,11 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[3][1].state, documents.state);
   assert.equal(calls[3][1].toast, documents.toast);
   assert.equal(calls[3][1].fetchAll, documents.fetchAll);
+  assert.equal(calls[3][1].documentsWorkflow, documents.documentsWorkflow);
+  assert.equal(
+    calls[3][1].documentEventsWorkflow,
+    documents.documentEventsWorkflow,
+  );
   assert.equal(workflow.openPropertyDetails, openPropertyDetails);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyDetailEvents",

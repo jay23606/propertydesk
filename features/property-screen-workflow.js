@@ -47,15 +47,16 @@
         repository: holders.repository,
         openPropertyDetails: details.openPropertyDetails,
       });
-    const { attachPropertyDocumentEvents } =
-      window.PropertyDeskPropertyDocumentWorkflow.create({
-        $: documents.$,
-        state: documents.state,
-        toast: documents.toast,
-        fetchAll: documents.fetchAll,
-        openPropertyDetails: details.openPropertyDetails,
-        repository: documents.documentRepository,
-      });
+    const { attachPropertyDocumentEvents } = documents.workflow.create({
+      $: documents.$,
+      state: documents.state,
+      toast: documents.toast,
+      fetchAll: documents.fetchAll,
+      openPropertyDetails: details.openPropertyDetails,
+      repository: documents.documentRepository,
+      documentsWorkflow: documents.documentsWorkflow,
+      documentEventsWorkflow: documents.documentEventsWorkflow,
+    });
 
     return Object.freeze({
       openPropertyDetails: details.openPropertyDetails,
