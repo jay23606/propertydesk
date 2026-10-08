@@ -22,20 +22,38 @@
       return null;
     }
 
-    async function removeStoredAgreement(doc) {
+    async function removeStoredAgreement(doc, propertyId) {
       let error;
       try {
         ({ error } = await repository.remove(doc.storage_path));
       } catch (requestError) {
-        toast(
-          `Agreement removal failed: ${requestError.message || "Check your connection and try again."}`,
-        );
+        await refreshAfterStorageRemovalFailure(doc, propertyId, requestError);
         return false;
       }
       if (error) {
         toast(`Agreement removal failed: ${error.message}`);
         return false;
       }
+      return true;
+    }
+
+    async function refreshAfterStorageRemovalFailure(
+      doc,
+      propertyId,
+      requestError,
+    ) {
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => openPropertyDetails(propertyId),
+          toast,
+          refreshFailureMessage:
+            "Agreement file removal result couldn't be confirmed. Reload property details and check the agreement before retrying.",
+        });
+      if (!refreshed) return false;
+      toast(
+        `Agreement file removal result couldn't be confirmed. The agreement record for ${doc.file_name} was kept; verify the file before retrying. ${requestError.message || ""}`,
+      );
       return true;
     }
 
@@ -107,7 +125,7 @@
         )
       )
         return;
-      if (!(await removeStoredAgreement(doc))) return;
+      if (!(await removeStoredAgreement(doc, propertyId))) return;
       if (!(await deleteDocumentRecord(doc, propertyId))) return;
       await refreshDeletedProperty(propertyId);
     }

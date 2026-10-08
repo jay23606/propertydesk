@@ -438,6 +438,49 @@ test("document deletion reports a deleted file when the workspace refresh fails"
   ]);
 });
 
+test("document deletion refreshes and keeps its record after an uncertain storage response", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const doc = {
+    id: "doc-1",
+    user_id: "workspace-1",
+    property_id: "property-1",
+    storage_path: "workspace-1/property-1/file.pdf",
+    file_name: "file.pdf",
+  };
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [doc],
+  };
+  const events = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => events.push(["refresh"]),
+    openPropertyDetails: (propertyId) => events.push(["open", propertyId]),
+    confirm: () => true,
+    repository: {
+      remove: async () => {
+        throw new Error("connection lost");
+      },
+      deleteMetadata: async () =>
+        assert.fail("uncertain storage removal must keep its metadata"),
+    },
+  });
+
+  await feature.deletePropertyDocument("doc-1");
+
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["open", "property-1"],
+    [
+      "toast",
+      "Agreement file removal result couldn't be confirmed. The agreement record for file.pdf was kept; verify the file before retrying. connection lost",
+    ],
+  ]);
+});
+
 test("document deletion refreshes after an uncertain metadata response", async () => {
   const context = vm.createContext({ window: {} });
   loadDocumentModules(context);
@@ -530,7 +573,9 @@ test("private document workflows handle rejected storage requests without leakin
   const feature = createDocuments(context, {
     state,
     toast: (message) => messages.push(message),
-    fetchAll: async () => assert.fail("a rejected request must not refresh"),
+    fetchAll: async () => {
+      throw new Error("refresh offline");
+    },
     openPropertyDetails: () =>
       assert.fail("a rejected request must not reopen details"),
     confirm: () => true,
@@ -549,7 +594,7 @@ test("private document workflows handle rejected storage requests without leakin
   assert.equal(viewer.closed, true);
   assert.deepEqual(messages, [
     "Agreement upload result couldn't be confirmed, and private file cleanup couldn't be verified. Check storage before retrying. upload offline",
-    "Agreement removal failed: storage offline",
+    "Agreement file removal result couldn't be confirmed. Reload property details and check the agreement before retrying.",
     "Agreement link failed: signing offline",
   ]);
 });
