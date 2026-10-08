@@ -57,6 +57,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     fetchAll: async () => {
       refreshed = true;
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (property) => property.address,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
@@ -101,6 +102,7 @@ test("property quick notes enforce the character limit before writing", async ()
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("an overlong note must not refresh"),
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (property) => property.address,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
@@ -140,6 +142,7 @@ test("quick note reconciles a lost response against refreshed property state", a
       property.notes = "Updated note";
       events.push(["refresh"]);
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (item) => item.address,
     repository: {
       updateOwned: async () => {

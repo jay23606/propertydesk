@@ -2,13 +2,14 @@
 (() => {
   "use strict";
 
-  function create({ state, fetchAll, toast, repository }) {
+  function create({ state, fetchAll, toast, repository, writeFeedback }) {
     const { savePropertyUpdate } =
       window.PropertyDeskPropertyRecordUpdateMaintenance.create({
         state,
         fetchAll,
         toast,
         repository,
+        writeFeedback,
       });
 
     function savePropertyQuickNote(propertyId, ownerId, note, onReconciled) {

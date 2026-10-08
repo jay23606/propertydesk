@@ -23,9 +23,15 @@
 }
 @media (max-width: 760px) {
   .portfolio-table {
-    width: calc(100% + 30px);
-    margin-inline: -15px;
+    box-sizing: border-box;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
     border-radius: 0;
+  }
+  .portfolio-table table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: fixed;
   }
   .portfolio-table th,
   .portfolio-table td {
@@ -93,16 +99,24 @@
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 28vw;
-    min-width: 28vw;
-    max-width: 28vw;
+    width: 30vw;
+    min-width: 30vw;
+    max-width: 30vw;
     overflow-wrap: anywhere;
+  }
+  .portfolio-table th:nth-child(4),
+  .portfolio-table td:nth-child(4),
+  .portfolio-table th:nth-child(5),
+  .portfolio-table td:nth-child(5) {
+    width: 7.5vw;
+    min-width: 7.5vw;
+    max-width: 7.5vw;
   }
   .portfolio-table th:nth-child(6),
   .portfolio-table td:nth-child(6) {
-    width: 40vw;
-    min-width: 40vw;
-    max-width: 40vw;
+    width: 41vw;
+    min-width: 41vw;
+    max-width: 41vw;
     overflow-wrap: anywhere;
     white-space: normal;
   }
@@ -117,15 +131,15 @@
     display: none;
   }
   .portfolio-table td.portfolio-contact-action {
-    width: 9vw;
-    min-width: 9vw;
-    max-width: 9vw;
+    width: 7.5vw;
+    min-width: 7.5vw;
+    max-width: 7.5vw;
     padding-right: 0;
     padding-left: 0;
   }
   .portfolio-table .portfolio-icon-action {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
 }
 

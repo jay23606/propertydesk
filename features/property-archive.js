@@ -9,6 +9,7 @@
     todayIso,
     openPropertyDetails,
     repository,
+    writeFeedback,
   }) {
     const { savePropertyArchive } =
       window.PropertyDeskPropertyStatusMaintenance.create({
@@ -16,6 +17,7 @@
         fetchAll,
         toast,
         repository,
+        writeFeedback,
       });
 
     async function toggleArchiveProperty() {

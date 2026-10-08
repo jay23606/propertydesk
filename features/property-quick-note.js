@@ -8,6 +8,7 @@
     fetchAll,
     streetAddress,
     repository,
+    writeFeedback,
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
   }) {
@@ -17,6 +18,7 @@
         fetchAll,
         toast,
         repository,
+        writeFeedback,
       });
 
     async function editPropertyQuickNote(id) {

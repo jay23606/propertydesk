@@ -156,6 +156,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     isActiveAccount: action,
     toast: action,
     fetchAll: action,
+    writeFeedback: { kind: "write-feedback" },
     streetAddress: action,
     openPayment: action,
     propertyRepository,
@@ -185,6 +186,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
   assert.equal(passed.quickNote.toast, action);
   assert.equal(passed.quickNote.fetchAll, action);
+  assert.equal(passed.quickNote.writeFeedback.kind, "write-feedback");
   assert.equal(passed.quickNote.streetAddress, action);
   assert.equal(passed.quickNote.repository, propertyRepository);
   assert.equal("unusedDependency" in passed.quickNote, false);

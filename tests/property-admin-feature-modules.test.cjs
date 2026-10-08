@@ -74,6 +74,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
     fetchAll: async () => {
       throw new Error("offline");
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
@@ -119,6 +120,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
       property.archived_at = "2026-10-08";
       events.push(["refresh"]);
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-08",
     openPropertyDetails: (id) => events.push(["open", id]),
     repository: {
@@ -195,6 +197,7 @@ test("archive and restore use status maintenance and reopen updated details", as
         ([operation]) => operation === "update",
       )[1].archived_at;
     },
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-06",
     openPropertyDetails: (id) => calls.push(["open", id]),
     repository: context.window.PropertyDeskPropertyRepository.create({

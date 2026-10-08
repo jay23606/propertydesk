@@ -26,6 +26,7 @@ test("property screen workflow passes detail actions to management and returns b
   const management = {
     closeModal() {},
     toast() {},
+    writeFeedback: { kind: "write-feedback" },
     unusedDependency: true,
   };
   const holders = {
@@ -143,6 +144,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[1][0], "management");
   assert.equal(calls[1][1].closeModal, management.closeModal);
   assert.equal(calls[1][1].toast, management.toast);
+  assert.equal(calls[1][1].writeFeedback, management.writeFeedback);
   assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal("propertyHolderRepository" in calls[1][1], false);

@@ -23,6 +23,7 @@
     paymentStatusInMonth,
     toast,
     fetchAll,
+    writeFeedback,
     openPayment,
     openPropertyDetails,
     openAccountForProperty,
@@ -80,6 +81,7 @@
       fetchAll,
       streetAddress,
       repository: propertyRepository,
+      writeFeedback,
     });
     const { attachEvents: attachPropertyActionEvents } =
       workflows.events.create({
