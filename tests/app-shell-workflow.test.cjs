@@ -42,15 +42,32 @@ test("app shell composes workspace settings and navigation explicitly", () => {
   );
 
   const workspace = { state: {}, reminder: { state: {} } };
-  const navigation = { state: workspace.state, documentRef: {} };
+  const navigationSelector = () => {};
+  const navigation = {
+    $: navigationSelector,
+    state: workspace.state,
+    documentRef: {},
+    windowRef: {},
+    unusedNavigationValue: true,
+  };
   const appShell = context.window.PropertyDeskAppShellWorkflow.create({
     workspace,
     navigation,
   });
 
   assert.equal(passed.workspace, workspace);
+  assert.deepEqual(Object.keys(passed.navigation).sort(), [
+    "$",
+    "documentRef",
+    "renderWorkspacePage",
+    "state",
+    "windowRef",
+  ]);
+  assert.equal("unusedNavigationValue" in passed.navigation, false);
+  assert.equal(passed.navigation.$, navigationSelector);
   assert.equal(passed.navigation.state, navigation.state);
   assert.equal(passed.navigation.documentRef, navigation.documentRef);
+  assert.equal(passed.navigation.windowRef, navigation.windowRef);
   assert.equal(
     passed.navigation.renderWorkspacePage,
     workspaceActions.renderWorkspacePage,
@@ -60,7 +77,6 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "attachProfileEvents",
     "attachWorkspaceMemberEvents",
     "navigate",
-    "renderWorkspacePage",
     "updateGreeting",
   ]);
   assert.equal(appShell.updateGreeting, workspaceActions.updateGreeting);
