@@ -969,8 +969,6 @@ button {
   color: #8f9a91;
   font-size: 10px;
 }
-.config-banner ~ .auth-view {
-}
 .detail-kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1158,9 +1156,6 @@ button {
   }
   .form-row {
     grid-template-columns: 1fr;
-  }
-  .form-row:has(#property-city) {
-    grid-template-columns: 2fr 1fr 1fr;
   }
   .import-actions {
     align-items: flex-start;
