@@ -143,6 +143,54 @@ test("transaction inserts reconcile a lost response against refreshed ledger row
   assert.deepEqual(messages, []);
 });
 
+test("transaction entry completion reuses its readback refresh after a lost response", async () => {
+  const events = [];
+  const payload = { amount: 550, memo: "October payment" };
+  const state = { payments: [], expenses: [] };
+  let refreshes = 0;
+  const inserts = loadTransactionInserts(
+    {
+      from: () => ({
+        insert: async () => {
+          throw new Error("connection lost");
+        },
+      }),
+    },
+    [],
+    {
+      state,
+      fetchAll: async () => {
+        state.payments = [payload];
+        refreshes++;
+        events.push("refresh");
+      },
+    },
+  );
+
+  assert.equal(
+    await inserts.insertPayment({
+      payload,
+      failureMessage: "Payment could not be confirmed",
+      completion: {
+        onSaved: () => events.push("reset-before-refresh"),
+        onRefreshed: ({ recordWasSaved }) =>
+          events.push(["readback", recordWasSaved]),
+        afterRefresh: () => events.push("normal completion"),
+        onReconciled: () => events.push("confirmed completion"),
+        successMessage: "Payment recorded",
+        savedRefreshFailureMessage: "Saved; refresh failed",
+      },
+    }),
+    true,
+  );
+  assert.equal(refreshes, 1);
+  assert.deepEqual(events, [
+    "refresh",
+    ["readback", true],
+    "confirmed completion",
+  ]);
+});
+
 test("transaction inserts ask the user to inspect refreshed rows before retrying", async () => {
   const messages = [];
   const inserts = loadTransactionInserts(

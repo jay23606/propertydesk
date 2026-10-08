@@ -36,8 +36,12 @@ test("shared transaction save routes corrections and completes successful entrie
     event: { submitter: { id: "payment-save-next" } },
     payload: { amount: 550 },
     buildCorrection: (payload) => ({ ...payload, correction: true }),
-    insert: async ({ payload }) => {
+    insert: async ({ payload, completion }) => {
       calls.push(["insert", payload]);
+      completion.onSaved();
+      calls.push(["refresh"]);
+      completion.afterRefresh();
+      calls.push(["toast", completion.successMessage]);
       return true;
     },
     failureMessage: "payment failed",
@@ -121,7 +125,12 @@ test("saved transaction explains refresh failure to prevent duplicate entry", as
     event: { submitter: { id: "payment-save" } },
     payload: { amount: 550 },
     buildCorrection: (payload) => payload,
-    insert: async () => true,
+    insert: async ({ completion }) => {
+      completion.onSaved();
+      calls.push(["refresh"]);
+      calls.push(["toast", completion.savedRefreshFailureMessage]);
+      return true;
+    },
     failureMessage: "payment failed",
     label: "Payment",
     modalId: "payment-modal",

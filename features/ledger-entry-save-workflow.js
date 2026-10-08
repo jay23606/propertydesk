@@ -2,8 +2,8 @@
 (() => {
   "use strict";
 
-  function create({ $, state, saveCorrection, closeModal, fetchAll, toast }) {
-    async function finishSuccessfulEntry({
+  function create({ $, state, saveCorrection, closeModal, toast }) {
+    function successfulEntryCompletion({
       label,
       addAnother,
       modalId,
@@ -12,19 +12,26 @@
       prepareNext,
       nextArguments = [],
     }) {
-      resetAfterSave(...resetArguments);
-      await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-        fetchAll,
-        afterRefresh: () => {
-          if (addAnother) prepareNext(...nextArguments);
-          else closeModal($(modalId));
+      const successMessage = addAnother
+        ? `${label} recorded. Ready for the next entry`
+        : `${label} recorded`;
+      function finishFormAction() {
+        if (addAnother) prepareNext(...nextArguments);
+        else closeModal($(modalId));
+      }
+
+      return {
+        onSaved: () => resetAfterSave(...resetArguments),
+        onRefreshed: ({ recordWasSaved }) => {
+          if (!recordWasSaved) return;
+          resetAfterSave(...resetArguments);
+          finishFormAction();
         },
-        toast,
-        successMessage: addAnother
-          ? `${label} recorded. Ready for the next entry`
-          : `${label} recorded`,
-        refreshFailureMessage: `${label} was saved, but the workspace could not refresh. Reload before recording it again.`,
-      });
+        afterRefresh: finishFormAction,
+        onReconciled: () => toast(successMessage),
+        successMessage,
+        savedRefreshFailureMessage: `${label} was saved, but the workspace could not refresh. Reload before recording it again.`,
+      };
     }
 
     async function saveTransactionEntry({
@@ -46,10 +53,7 @@
         return;
       }
 
-      const saved = await insert({ payload, failureMessage });
-      if (!saved) return;
-
-      await finishSuccessfulEntry({
+      const completion = successfulEntryCompletion({
         label,
         addAnother: event.submitter?.id === `${kind}-save-next`,
         modalId,
@@ -58,6 +62,7 @@
         prepareNext,
         nextArguments,
       });
+      return insert({ payload, failureMessage, completion });
     }
 
     return Object.freeze({ saveTransactionEntry });

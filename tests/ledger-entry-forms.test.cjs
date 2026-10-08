@@ -218,13 +218,24 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     toast: (message) => calls.push(`toast:${message}`),
   });
   assert.deepEqual(Object.keys(workflow), ["saveTransactionEntry"]);
+  async function insertAndComplete({ completion }) {
+    completion.onSaved();
+    calls.push("refresh");
+    if (failRefresh) {
+      calls.push(`toast:${completion.savedRefreshFailureMessage}`);
+      return false;
+    }
+    completion.afterRefresh();
+    calls.push(`toast:${completion.successMessage}`);
+    return true;
+  }
 
   await workflow.saveTransactionEntry({
     kind: "payment",
     event: { submitter: { id: "payment-save-button" } },
     payload: {},
     buildCorrection: () => ({}),
-    insert: async () => true,
+    insert: insertAndComplete,
     failureMessage: "Payment unavailable",
     label: "Payment",
     modalId: "payment-modal",
@@ -236,7 +247,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     event: { submitter: { id: "expense-save-next" } },
     payload: {},
     buildCorrection: () => ({}),
-    insert: async () => true,
+    insert: insertAndComplete,
     failureMessage: "Expense unavailable",
     label: "Expense",
     modalId: "expense-modal",
@@ -261,7 +272,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
     event: { submitter: { id: "payment-save-button" } },
     payload: {},
     buildCorrection: () => ({}),
-    insert: async () => true,
+    insert: insertAndComplete,
     failureMessage: "Payment unavailable",
     label: "Payment",
     modalId: "payment-modal",
