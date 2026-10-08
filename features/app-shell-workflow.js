@@ -7,6 +7,7 @@
     navigation,
     workspaceWorkflow,
     navigationWorkflow,
+    workspaceWorkflows,
   }) {
     const workspacePage = workspaceWorkflow.create({
       $: workspace.$,
@@ -18,6 +19,7 @@
       memberRepository: workspace.memberRepository,
       authClient: workspace.authClient,
       confirmAction: workspace.confirmAction,
+      workflows: workspaceWorkflows,
     });
     const pageNavigation = navigationWorkflow.create({
       $: navigation.$,

@@ -10,9 +10,10 @@ const vm = require("node:vm");
 
 test("workspace feature owns profile and member form bindings", () => {
   const context = vm.createContext({ window: {} });
-  loadWorkspaceFeatures(context);
+  const workflows = loadWorkspaceFeatures(context);
   const handlers = new Map();
   const feature = context.window.PropertyDeskWorkspace.create({
+    workflows,
     memberRepository: { addMember() {}, removeMember() {} },
     reminder: {
       $() {},
@@ -151,7 +152,7 @@ test("adding a workspace member keeps the address when refresh fails", async () 
 
 test("workspace setting writes report rejected requests and retain entered values", async () => {
   const context = vm.createContext({ window: {} });
-  loadWorkspaceFeatures(context);
+  const workflows = loadWorkspaceFeatures(context);
   const elements = new Map([
     ["display-name", { value: "New Label" }],
     ["member-email", { value: " spouse@example.test " }],
@@ -195,6 +196,7 @@ test("workspace setting writes report rejected requests and retain entered value
     user: { id: "owner-1", user_metadata: { display_name: "Owner" } },
   };
   const feature = context.window.PropertyDeskWorkspace.create({
+    workflows,
     $,
     state,
     authClient: createAuthClient(context, state),

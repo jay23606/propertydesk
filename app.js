@@ -139,6 +139,16 @@
   const appShell = window.PropertyDeskAppShellWorkflow.create({
     workspaceWorkflow: window.PropertyDeskWorkspace,
     navigationWorkflow: window.PropertyDeskNavigation,
+    workspaceWorkflows: {
+      profile: window.PropertyDeskWorkspaceProfileWorkflow,
+      memberView: window.PropertyDeskWorkspaceMembersView,
+      members: window.PropertyDeskWorkspaceMembers,
+      profileModules: {
+        display: window.PropertyDeskProfileDisplay,
+        view: window.PropertyDeskProfileSettingsView,
+        settings: window.PropertyDeskProfileSettings,
+      },
+    },
     workspace: {
       $,
       state,

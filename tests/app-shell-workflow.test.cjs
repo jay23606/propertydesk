@@ -54,6 +54,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     unusedWorkspaceValue: true,
   };
   const navigationSelector = () => {};
+  const workspaceWorkflows = {};
   const navigation = {
     $: navigationSelector,
     state: workspace.state,
@@ -64,6 +65,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
   const appShell = context.window.PropertyDeskAppShellWorkflow.create({
     workspace,
     navigation,
+    workspaceWorkflows,
     workspaceWorkflow: context.window.PropertyDeskWorkspace,
     navigationWorkflow: context.window.PropertyDeskNavigation,
   });
@@ -78,10 +80,14 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "reminder",
     "state",
     "toast",
+    "workflows",
   ]);
   assert.equal("unusedWorkspaceValue" in passed.workspace, false);
-  for (const key of Object.keys(passed.workspace))
+  assert.equal(passed.workspace.workflows, workspaceWorkflows);
+  for (const key of Object.keys(passed.workspace)) {
+    if (key === "workflows") continue;
     assert.equal(passed.workspace[key], workspace[key]);
+  }
   assert.deepEqual(Object.keys(passed.navigation).sort(), [
     "$",
     "documentRef",

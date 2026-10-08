@@ -52,9 +52,22 @@ test("workspace profile workflow joins display, editing, and settings rendering"
     state,
     authClient: {},
     toast() {},
+    workflows: {
+      display: context.window.PropertyDeskProfileDisplay,
+      view: context.window.PropertyDeskProfileSettingsView,
+      settings: context.window.PropertyDeskProfileSettings,
+    },
   };
   const workflow =
     context.window.PropertyDeskWorkspaceProfileWorkflow.create(dependencies);
+  const workflowSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-profile-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    workflowSource,
+    /window\.PropertyDesk(?:ProfileDisplay|ProfileSettingsView|ProfileSettings)\.create/,
+  );
 
   assert.equal(passed.display.state, state);
   assert.equal(passed.settings.authClient, dependencies.authClient);

@@ -15,6 +15,14 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   const attachMemberEvents = () => eventCalls.push("members");
   const context = vm.createContext({
     window: {
+      PropertyDeskWorkspaceReminderWorkflow: {
+        create(options) {
+          passed.reminderWorkflow = options;
+          return {
+            renderReminderActivity: () => reminderActivityRenders++,
+          };
+        },
+      },
       PropertyDeskWorkspaceProfileWorkflow: {
         create(options) {
           passed.profileWorkflow = options;
@@ -35,14 +43,6 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
         create(options) {
           passed.memberActions = options;
           return { attachWorkspaceMemberEvents: attachMemberEvents };
-        },
-      },
-      PropertyDeskWorkspaceReminderWorkflow: {
-        create(options) {
-          passed.reminderWorkflow = options;
-          return {
-            renderReminderActivity: () => reminderActivityRenders++,
-          };
         },
       },
     },
@@ -73,7 +73,21 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     fetchAll() {},
     memberRepository,
     reminder,
+    workflows: {
+      profile: context.window.PropertyDeskWorkspaceProfileWorkflow,
+      memberView: context.window.PropertyDeskWorkspaceMembersView,
+      members: context.window.PropertyDeskWorkspaceMembers,
+      profileModules: {},
+    },
   });
+  const workspaceSource = fs.readFileSync(
+    path.join(root, "features", "workspace.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    workspaceSource,
+    /window\.PropertyDeskWorkspace(?:ProfileWorkflow|MembersView|Members)\.create/,
+  );
 
   assert.equal(passed.profileWorkflow.state, state);
   assert.equal(passed.reminderWorkflow.state, state);

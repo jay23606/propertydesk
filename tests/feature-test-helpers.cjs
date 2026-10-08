@@ -88,6 +88,16 @@ function loadWorkspaceFeatures(context) {
       context,
     );
   }
+  return {
+    profile: context.window.PropertyDeskWorkspaceProfileWorkflow,
+    memberView: context.window.PropertyDeskWorkspaceMembersView,
+    members: context.window.PropertyDeskWorkspaceMembers,
+    profileModules: {
+      display: context.window.PropertyDeskProfileDisplay,
+      view: context.window.PropertyDeskProfileSettingsView,
+      settings: context.window.PropertyDeskProfileSettings,
+    },
+  };
 }
 
 function loadLedgerEntryForms(context) {

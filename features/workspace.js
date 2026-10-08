@@ -11,6 +11,7 @@
     reminder,
     memberRepository,
     authClient,
+    workflows,
     confirmAction = (message) => window.confirm(message),
   }) {
     const reminderWorkflow = reminder.workflow.create({
@@ -22,13 +23,14 @@
       activityModelWorkflow: reminder.activityModelWorkflow,
       activityViewWorkflow: reminder.activityViewWorkflow,
     });
-    const profileWorkflow = window.PropertyDeskWorkspaceProfileWorkflow.create({
+    const profileWorkflow = workflows.profile.create({
       $,
       state,
       authClient,
       toast,
+      workflows: workflows.profileModules,
     });
-    const memberView = window.PropertyDeskWorkspaceMembersView.create({
+    const memberView = workflows.memberView.create({
       $,
       state,
       esc,
@@ -43,7 +45,7 @@
       reminderWorkflow.renderReminderActivity();
     }
 
-    const members = window.PropertyDeskWorkspaceMembers.create({
+    const members = workflows.members.create({
       state,
       toast,
       fetchAll,

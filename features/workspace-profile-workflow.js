@@ -2,13 +2,13 @@
 (() => {
   "use strict";
 
-  function create({ $, state, authClient, toast }) {
-    const profileDisplay = window.PropertyDeskProfileDisplay.create({
+  function create({ $, state, authClient, toast, workflows }) {
+    const profileDisplay = workflows.display.create({
       $,
       state,
     });
-    const profileView = window.PropertyDeskProfileSettingsView.create({ $ });
-    const profile = window.PropertyDeskProfileSettings.create({
+    const profileView = workflows.view.create({ $ });
+    const profile = workflows.settings.create({
       state,
       authClient,
       toast,

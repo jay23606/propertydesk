@@ -7,7 +7,7 @@ const vm = require("node:vm");
 
 test("workspace settings render member labels and escape untrusted text", () => {
   const context = vm.createContext({ window: {} });
-  loadWorkspaceFeatures(context);
+  const workflows = loadWorkspaceFeatures(context);
   let memberOptions;
   let memberViewOptions;
   const memberView = context.window.PropertyDeskWorkspaceMembersView;
@@ -24,6 +24,8 @@ test("workspace settings render member labels and escape untrusted text", () => 
       return workspaceMembers.create(options);
     },
   };
+  workflows.memberView = context.window.PropertyDeskWorkspaceMembersView;
+  workflows.members = context.window.PropertyDeskWorkspaceMembers;
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id))
@@ -57,6 +59,7 @@ test("workspace settings render member labels and escape untrusted text", () => 
     ],
   };
   const feature = context.window.PropertyDeskWorkspace.create({
+    workflows,
     $: element,
     state,
     esc: (value) =>
