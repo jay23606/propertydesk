@@ -14,38 +14,31 @@
     monthStart,
     sumIncome,
     sumOperatingExpenses,
+    modules,
   }) {
-    const filterModel = window.PropertyDeskTransactionListFilterModel.create({
-      dateOnly,
+    const filterModel = modules.filterModel.create({ dateOnly });
+    const associationModel = modules.associationModel.create({ state });
+    const displayRowModel = modules.displayRowModel.create({
+      expenseCategoryLabel,
     });
-    const associationModel =
-      window.PropertyDeskTransactionAssociationModel.create({ state });
-    const displayRowModel =
-      window.PropertyDeskTransactionDisplayRowModel.create({
-        expenseCategoryLabel,
-      });
-    const { buildTransactionList } =
-      window.PropertyDeskTransactionListModel.create({
-        state,
-        associationModel,
-        displayRowModel,
-        filterModel,
-      });
-    const { currentMonthTotals } =
-      window.PropertyDeskTransactionSummaryModel.create({
-        state,
-        postedOnOrAfter,
-        monthStart,
-        sumIncome,
-        sumOperatingExpenses,
-      });
-    const { transactionRowHTML } = window.PropertyDeskTransactionRowView.create(
-      {
-        esc,
-        money,
-        fmtDate,
-      },
-    );
+    const { buildTransactionList } = modules.listModel.create({
+      state,
+      associationModel,
+      displayRowModel,
+      filterModel,
+    });
+    const { currentMonthTotals } = modules.summaryModel.create({
+      state,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    });
+    const { transactionRowHTML } = modules.rowView.create({
+      esc,
+      money,
+      fmtDate,
+    });
 
     function attachTransactionFilterEvents() {
       $("payment-search").addEventListener("input", renderPayments);

@@ -4,6 +4,18 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
+function transactionViewModules(context) {
+  const { window } = context;
+  return {
+    filterModel: window.PropertyDeskTransactionListFilterModel,
+    associationModel: window.PropertyDeskTransactionAssociationModel,
+    displayRowModel: window.PropertyDeskTransactionDisplayRowModel,
+    listModel: window.PropertyDeskTransactionListModel,
+    summaryModel: window.PropertyDeskTransactionSummaryModel,
+    rowView: window.PropertyDeskTransactionRowView,
+  };
+}
+
 test("property and transaction views own their search and filter bindings", () => {
   for (const [file, globalName, expected] of [
     [
@@ -58,6 +70,9 @@ test("property and transaction views own their search and filter bindings", () =
       documentRef: { addEventListener() {} },
       correctTransaction() {},
       voidTransaction() {},
+      ...(file === "transaction-views.js"
+        ? { modules: transactionViewModules(context) }
+        : {}),
     });
 
     const attachFilters =
@@ -71,6 +86,15 @@ test("property and transaction views own their search and filter bindings", () =
       [...handlers.values()].every((handler) => typeof handler === "function"),
     );
   }
+  const transactionViews = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-views.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    transactionViews,
+    /window\.PropertyDesk(?!TransactionViews)/,
+    "the transaction view coordinator receives its child modules explicitly",
+  );
 });
 
 test("transaction view renders filtered rows and independent month totals", () => {
@@ -149,6 +173,7 @@ test("transaction view renders filtered rows and independent month totals", () =
     sumIncome: (rows) => rows.reduce((sum, row) => sum + Number(row.amount), 0),
     sumOperatingExpenses: (rows) =>
       rows.reduce((sum, row) => sum + Number(row.amount), 0),
+    modules: transactionViewModules(context),
   });
 
   feature.renderPayments();

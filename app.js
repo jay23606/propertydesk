@@ -315,7 +315,17 @@
       },
       recordWorkflows: {
         entryForms: window.PropertyDeskLedgerEntryForms,
-        views: window.PropertyDeskTransactionViews,
+        views: {
+          create: window.PropertyDeskTransactionViews.create,
+          modules: {
+            filterModel: window.PropertyDeskTransactionListFilterModel,
+            associationModel: window.PropertyDeskTransactionAssociationModel,
+            displayRowModel: window.PropertyDeskTransactionDisplayRowModel,
+            listModel: window.PropertyDeskTransactionListModel,
+            summaryModel: window.PropertyDeskTransactionSummaryModel,
+            rowView: window.PropertyDeskTransactionRowView,
+          },
+        },
       },
       workflows: {
         maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,

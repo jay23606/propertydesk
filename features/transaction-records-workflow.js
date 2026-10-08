@@ -71,6 +71,7 @@
       monthStart,
       sumIncome,
       sumOperatingExpenses,
+      modules: workflows.views.modules,
     });
     const { attachTransactionActionEvents } = createTransactionActionHandlers({
       openPayment: ledgerEntryForms.openPayment,

@@ -153,7 +153,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     app,
-    /recordWorkflows: \{\s*entryForms: window\.PropertyDeskLedgerEntryForms,\s*views: window\.PropertyDeskTransactionViews,/,
+    /recordWorkflows: \{\s*entryForms: window\.PropertyDeskLedgerEntryForms,\s*views: \{\s*create: window\.PropertyDeskTransactionViews\.create,\s*modules: \{[\s\S]*?rowView: window\.PropertyDeskTransactionRowView,/,
   );
   const transactionRecords = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),

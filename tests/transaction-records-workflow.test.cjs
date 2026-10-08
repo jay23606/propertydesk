@@ -65,7 +65,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   };
   const workflows = {
     entryForms: { create: null },
-    views: { create: null },
+    views: { create: null, modules: { rowView: {} } },
   };
   const context = vm.createContext({
     window: {},
@@ -83,6 +83,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     },
   };
   workflows.views = {
+    modules: { rowView: {} },
     create(options) {
       passed.views = options;
       return { renderPayments, attachTransactionFilterEvents };
@@ -149,12 +150,14 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
       "fmtDate",
       "money",
       "monthStart",
+      "modules",
       "postedOnOrAfter",
       "state",
       "sumIncome",
       "sumOperatingExpenses",
     ].sort(),
   );
+  assert.equal(passed.views.modules, workflows.views.modules);
   assert.equal(passed.actions.openPayment, openPayment);
   assert.equal(passed.actions.openExpense, openExpense);
   assert.equal(passed.actions.updatePaymentGuidance, updatePaymentGuidance);
