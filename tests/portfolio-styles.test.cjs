@@ -55,12 +55,17 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table \.portfolio-icon-action\s*\{\s*width: 28px;\s*height: 28px;/,
+    /\.portfolio-table \.portfolio-icon-action\s*\{\s*width: 24px;\s*height: 24px;/,
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td\.portfolio-contact-action\s*\{\s*width: 7\.5vw;\s*min-width: 7\.5vw;\s*max-width: 7\.5vw;/,
+    /\.portfolio-table td\.portfolio-contact-action\s*\{\s*width: 6\.5vw;\s*min-width: 6\.5vw;\s*max-width: 6\.5vw;/,
     "mobile keeps the Email and SMS action columns compact",
+  );
+  assert.match(
+    portfolio,
+    /\.portfolio-table th,\s*\.portfolio-table td\s*\{\s*box-sizing: border-box;\s*padding-block: 8px;\s*padding-inline: 0;/,
+    "mobile table cells have no horizontal padding that pushes later columns into view",
   );
   assert.match(
     portfolio,
@@ -68,7 +73,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(3\),\s*\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 30vw;\s*min-width: 30vw;\s*max-width: 30vw;/,
+    /\.portfolio-table th:nth-child\(3\),\s*\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 32vw;\s*min-width: 32vw;\s*max-width: 32vw;/,
     "mobile gives the address column more room and allows its text to wrap",
   );
   assert.match(

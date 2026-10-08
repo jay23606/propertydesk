@@ -70,6 +70,8 @@ async function smokeSignedInWorkflows(browser, url) {
       addressWidth: cells[2]?.getBoundingClientRect().width ?? 0,
       emailWidth: cells[3]?.getBoundingClientRect().width ?? 0,
       smsWidth: cells[4]?.getBoundingClientRect().width ?? 0,
+      addressPadding: cells[2] ? getComputedStyle(cells[2]).paddingLeft : null,
+      emailPadding: cells[3] ? getComputedStyle(cells[3]).paddingLeft : null,
       firstFiveRight: cells[5]?.getBoundingClientRect().right ?? 0,
       wrapperRight: table?.getBoundingClientRect().right ?? 0,
       hiddenDue: cells[1]
@@ -89,12 +91,22 @@ async function smokeSignedInWorkflows(browser, url) {
     `mobile payment column should be at most 56px; got ${mobileGrid.paymentWidth}px`,
   );
   assert.ok(
-    mobileGrid.addressWidth >= 100,
+    mobileGrid.addressWidth >= 120,
     `mobile address column should have room for wrapped addresses: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
     mobileGrid.emailWidth <= 36 && mobileGrid.smsWidth <= 36,
     `mobile Email and SMS columns should each be at most 40px: ${JSON.stringify(mobileGrid)}`,
+  );
+  assert.equal(
+    mobileGrid.addressPadding,
+    "0px",
+    `mobile address should not have left/right padding: ${JSON.stringify(mobileGrid)}`,
+  );
+  assert.equal(
+    mobileGrid.emailPadding,
+    "0px",
+    `mobile reminder action columns should not have left/right padding: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
     mobileGrid.nameWidth >= 145,

@@ -35,7 +35,9 @@
   }
   .portfolio-table th,
   .portfolio-table td {
-    padding: 8px 9px;
+    box-sizing: border-box;
+    padding-block: 8px;
+    padding-inline: 0;
   }
   .portfolio-table th {
     font-size: 8px;
@@ -94,23 +96,22 @@
   }
   .portfolio-table th,
   .portfolio-table td {
-    padding-right: 3px;
-    padding-left: 3px;
+    padding-inline: 0;
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 30vw;
-    min-width: 30vw;
-    max-width: 30vw;
+    width: 32vw;
+    min-width: 32vw;
+    max-width: 32vw;
     overflow-wrap: anywhere;
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4),
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    width: 7.5vw;
-    min-width: 7.5vw;
-    max-width: 7.5vw;
+    width: 6.5vw;
+    min-width: 6.5vw;
+    max-width: 6.5vw;
   }
   .portfolio-table th:nth-child(6),
   .portfolio-table td:nth-child(6) {
@@ -131,15 +132,19 @@
     display: none;
   }
   .portfolio-table td.portfolio-contact-action {
-    width: 7.5vw;
-    min-width: 7.5vw;
-    max-width: 7.5vw;
+    width: 6.5vw;
+    min-width: 6.5vw;
+    max-width: 6.5vw;
     padding-right: 0;
     padding-left: 0;
   }
   .portfolio-table .portfolio-icon-action {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
+  }
+  .portfolio-table .portfolio-icon-action svg {
+    width: 15px;
+    height: 15px;
   }
 }
 
