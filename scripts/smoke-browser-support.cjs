@@ -1,15 +1,17 @@
 async function reloadThroughServiceWorker(page) {
-  await page.evaluate(async () => {
+  await page.evaluate(() => {
     if (!("serviceWorker" in navigator)) {
       throw new Error(
         "This browser does not support the PropertyDesk app shell.",
       );
     }
-    const registration = await navigator.serviceWorker.ready;
-    if (!registration.active) {
-      throw new Error("The PropertyDesk service worker did not become active.");
-    }
   });
+  await page.waitForFunction(
+    async () =>
+      Boolean((await navigator.serviceWorker.getRegistration())?.active),
+    null,
+    { timeout: 15000 },
+  );
   await page.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForFunction(
     () => Boolean(navigator.serviceWorker.controller),
