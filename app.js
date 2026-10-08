@@ -450,7 +450,7 @@
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
     authClient,
-    authContext: { $, state, authClient, fetchAll, toast },
+    authContext: { $, state, fetchAll, toast },
     renderers: [
       updateGreeting,
       renderOverview,

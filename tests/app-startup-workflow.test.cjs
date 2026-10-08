@@ -64,11 +64,10 @@ test("app startup composes auth and lifecycle at the original event position", (
   const selector = () => {};
   const fetchAll = async () => {};
   const toast = () => {};
-  const lifecycle = context.window.PropertyDeskAppStartupWorkflow.create({
+  const startupContext = {
     authContext: {
       $: selector,
       state: { name: "shared-state" },
-      authClient,
       fetchAll,
       toast,
       unusedStartupValue: true,
@@ -79,8 +78,11 @@ test("app startup composes auth and lifecycle at the original event position", (
     renderers,
     eventBindersBeforeAuth: [firstBinder, secondBinder],
     eventBindersAfterAuth: [thirdBinder],
-  });
+  };
+  const lifecycle =
+    context.window.PropertyDeskAppStartupWorkflow.create(startupContext);
 
+  assert.equal("authClient" in startupContext.authContext, false);
   assert.deepEqual(Object.keys(lifecycle).sort(), ["initialize", "render"]);
 });
 

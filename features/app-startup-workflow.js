@@ -18,7 +18,7 @@
     const auth = window.PropertyDeskAuth.create({
       $: authContext.$,
       state: authContext.state,
-      authClient: authContext.authClient,
+      authClient,
       fetchAll: authContext.fetchAll,
       toast: authContext.toast,
     });
