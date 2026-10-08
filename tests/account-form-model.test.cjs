@@ -55,3 +55,60 @@ test("account form model requires an address when reminders are enabled", () => 
     error: "Add at least one tenant/buyer email before enabling reminders.",
   });
 });
+
+test("account form model builds named payload values from form fields", () => {
+  const form = {
+    type: "land_contract",
+    propertyId: "property-1",
+    name: "Land contract",
+    partyName: "Buyer",
+    partyPhone: "555-0100",
+    reminderEnabled: false,
+    startDate: "2026-01-01",
+    nextDueDate: "2026-02-01",
+    paymentAmount: "750",
+    paymentFrequency: "monthly",
+    originalPrincipal: "90000",
+    principalInterestAmount: "600",
+    escrowAmount: "150",
+    balanceAdjustment: "0",
+    interestRate: "5.5",
+    termMonths: "360",
+    balloonDate: "",
+    agreementEffectiveDate: "",
+    agreementChangeReason: "",
+    lateFee: "0",
+    graceDays: "0",
+    notes: "",
+  };
+  const result = loadModel().payloadValuesFromForm(form, "workspace-1", [
+    "buyer@example.test",
+  ]);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), {
+    ownerId: "workspace-1",
+    propertyId: "property-1",
+    accountType: "land_contract",
+    name: "Land contract",
+    partyName: "Buyer",
+    partyEmails: ["buyer@example.test"],
+    partyPhone: "555-0100",
+    reminderEnabled: false,
+    startDate: "2026-01-01",
+    nextDueDate: "2026-02-01",
+    paymentAmount: "750",
+    paymentFrequency: "monthly",
+    originalPrincipal: "90000",
+    principalInterestAmount: "600",
+    escrowAmount: "150",
+    balanceAdjustment: "0",
+    interestRate: "5.5",
+    termMonths: "360",
+    balloonDate: "",
+    agreementEffectiveDate: "",
+    agreementChangeReason: "",
+    lateFee: "0",
+    graceDays: "0",
+    notes: "",
+  });
+});

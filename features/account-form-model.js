@@ -19,5 +19,37 @@
     return { emails, error: "" };
   }
 
-  window.PropertyDeskAccountFormModel = Object.freeze({ partyEmails });
+  function payloadValuesFromForm(form, ownerId, partyEmails) {
+    return {
+      ownerId,
+      propertyId: form.propertyId,
+      accountType: form.type,
+      name: form.name,
+      partyName: form.partyName,
+      partyEmails,
+      partyPhone: form.partyPhone,
+      reminderEnabled: form.reminderEnabled,
+      startDate: form.startDate,
+      nextDueDate: form.nextDueDate,
+      paymentAmount: form.paymentAmount,
+      paymentFrequency: form.paymentFrequency,
+      originalPrincipal: form.originalPrincipal,
+      principalInterestAmount: form.principalInterestAmount,
+      escrowAmount: form.escrowAmount,
+      balanceAdjustment: form.balanceAdjustment,
+      interestRate: form.interestRate,
+      termMonths: form.termMonths,
+      balloonDate: form.balloonDate,
+      agreementEffectiveDate: form.agreementEffectiveDate,
+      agreementChangeReason: form.agreementChangeReason,
+      lateFee: form.lateFee,
+      graceDays: form.graceDays,
+      notes: form.notes,
+    };
+  }
+
+  window.PropertyDeskAccountFormModel = Object.freeze({
+    partyEmails,
+    payloadValuesFromForm,
+  });
 })();

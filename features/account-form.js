@@ -58,32 +58,11 @@
         return;
       }
       const payload = buildAccountPayload(
-        {
-          ownerId: state.workspaceOwnerId,
-          propertyId: form.propertyId,
-          accountType: form.type,
-          name: form.name,
-          partyName: form.partyName,
-          partyEmails: contacts.emails,
-          partyPhone: form.partyPhone,
-          reminderEnabled: form.reminderEnabled,
-          startDate: form.startDate,
-          nextDueDate: form.nextDueDate,
-          paymentAmount: form.paymentAmount,
-          paymentFrequency: form.paymentFrequency,
-          originalPrincipal: form.originalPrincipal,
-          principalInterestAmount: form.principalInterestAmount,
-          escrowAmount: form.escrowAmount,
-          balanceAdjustment: form.balanceAdjustment,
-          interestRate: form.interestRate,
-          termMonths: form.termMonths,
-          balloonDate: form.balloonDate,
-          agreementEffectiveDate: form.agreementEffectiveDate,
-          agreementChangeReason: form.agreementChangeReason,
-          lateFee: form.lateFee,
-          graceDays: form.graceDays,
-          notes: form.notes,
-        },
+        formModel.payloadValuesFromForm(
+          form,
+          state.workspaceOwnerId,
+          contacts.emails,
+        ),
         moneyInput,
       );
       await saveWorkspaceForm({
