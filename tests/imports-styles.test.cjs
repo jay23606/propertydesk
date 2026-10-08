@@ -31,8 +31,12 @@ test("import review styles stay in their feature stylesheet", () => {
     /\.import-preview-table tr\.duplicate-import-row:hover/,
   );
   assert.match(imports, /html\[data-theme="dark"\] \.duplicate-import-toggle/);
+  assert.match(imports, /html\[data-theme="dark"\] \.import-actions/);
   const theme = fs.readFileSync(path.join(root, "theme.css"), "utf8");
-  assert.doesNotMatch(theme, /\.duplicate-import-(?:row|toggle)/);
+  assert.doesNotMatch(
+    theme,
+    /\.duplicate-import-(?:row|toggle)|\.import-actions/,
+  );
   assert.doesNotMatch(
     shared,
     /\.import-(?:preview|history|correction)|\.duplicate-import-/,

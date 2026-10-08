@@ -6,6 +6,9 @@
   border-top: 1px solid #eff1ed;
   gap: 20px;
 }
+html[data-theme="dark"] .import-actions {
+  border-color: var(--line);
+}
 .import-actions strong {
   font-size: 12px;
 }

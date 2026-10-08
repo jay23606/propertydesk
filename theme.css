@@ -107,7 +107,6 @@ html[data-theme="dark"] .avatar {
   background: #304537;
   color: #a5e0bb;
 }
-html[data-theme="dark"] .privacy-card,
 html[data-theme="dark"] .detail-kpi {
   background: #252f29;
   border-color: var(--line);
@@ -118,11 +117,9 @@ html[data-theme="dark"] .config-banner {
   color: #f1d995;
 }
 html[data-theme="dark"] .list-row,
-html[data-theme="dark"] .profile-row,
 html[data-theme="dark"] .modal-heading,
 html[data-theme="dark"] .modal-actions,
-html[data-theme="dark"] .detail-section,
-html[data-theme="dark"] .import-actions {
+html[data-theme="dark"] .detail-section {
   border-color: var(--line);
 }
 html[data-theme="dark"] .table-wrap th,

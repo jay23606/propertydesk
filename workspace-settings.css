@@ -1,4 +1,11 @@
 /* Workspace member management styles. */
+html[data-theme="dark"] .privacy-card {
+  background: #252f29;
+  border-color: var(--line);
+}
+html[data-theme="dark"] .profile-row {
+  border-color: var(--line);
+}
 .member-form {
   display: flex;
   align-items: end;
