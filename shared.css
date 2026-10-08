@@ -13,6 +13,27 @@
   opacity: 0;
   cursor: pointer;
 }
+.status-pill,
+.kind-pill {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  background: #eaf3ed;
+  color: #47805e;
+}
+.kind-pill {
+  background: #edf1f3;
+  color: #637f8c;
+}
+.table-action {
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 11px;
+}
 @media (max-width: 760px) {
   .heading-actions {
     flex-wrap: wrap;
