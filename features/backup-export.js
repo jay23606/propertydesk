@@ -57,7 +57,7 @@
       $("export-all").addEventListener("click", exportAll);
     }
 
-    return { attachBackupExportEvents };
+    return Object.freeze({ attachBackupExportEvents });
   }
 
   window.PropertyDeskBackupExport = Object.freeze({ create });

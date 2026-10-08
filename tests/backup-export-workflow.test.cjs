@@ -51,6 +51,7 @@ test("backup export requires an initialized runtime client", async () => {
     documentRepository: {},
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   feature.attachBackupExportEvents();
   await exportHandler();
 

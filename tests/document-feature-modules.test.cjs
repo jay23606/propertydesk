@@ -70,6 +70,7 @@ test("private document module exposes upload, delete, and open workflows", () =>
   const feature = createDocuments(context, {
     state: { client: {} },
   });
+  assert.equal(Object.isFrozen(feature), true);
   for (const action of [
     "uploadPropertyDocument",
     "deletePropertyDocument",

@@ -36,11 +36,11 @@
         repository,
       });
 
-    return {
+    return Object.freeze({
       uploadPropertyDocument,
       deletePropertyDocument,
       openPropertyDocument,
-    };
+    });
   }
 
   window.PropertyDeskDocuments = Object.freeze({ create });
