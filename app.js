@@ -127,6 +127,8 @@
       toast,
       esc,
       openModal: modal.openModal,
+      splitEmailAddresses:
+        window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
     });
   const appShell = window.PropertyDeskAppShellWorkflow.create({
     workspace: {

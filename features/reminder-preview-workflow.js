@@ -18,6 +18,7 @@
     toast,
     esc,
     openModal,
+    splitEmailAddresses,
   }) {
     const model = window.PropertyDeskReminderPreviewModel.create({
       paymentReminderMessage,
@@ -36,6 +37,7 @@
       moneyInput,
       toast,
       esc,
+      splitEmailAddresses,
       model,
       openModal,
     });

@@ -2,8 +2,6 @@
 (() => {
   "use strict";
 
-  const { splitEmailAddresses } = window.PropertyDeskEmailAddressUtils;
-
   function create({
     $,
     state,
@@ -13,6 +11,7 @@
     esc,
     openModal,
     model: previewModel,
+    splitEmailAddresses,
   }) {
     function previewReminderEmail() {
       const property = state.properties.find(

@@ -48,6 +48,7 @@ test("reminder preview workflow composes the account editor preview directly", (
     toast() {},
     esc() {},
     openModal() {},
+    splitEmailAddresses() {},
   };
   const workflow =
     context.window.PropertyDeskReminderPreviewWorkflow.create(services);
@@ -70,6 +71,7 @@ test("reminder preview workflow composes the account editor preview directly", (
   assert.equal(calls[1][1].state, services.state);
   assert.equal(calls[1][1].model, model);
   assert.equal(calls[1][1].openModal, services.openModal);
+  assert.equal(calls[1][1].splitEmailAddresses, services.splitEmailAddresses);
   assert.deepEqual(Object.keys(workflow), ["previewReminderEmail"]);
   assert.equal(workflow.previewReminderEmail, previewReminderEmail);
 });

@@ -3,7 +3,7 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-require("../features/email-address-utils.js");
+const emailAddressUtils = require("../features/email-address-utils.js");
 require("../supabase/functions/_shared/reminder-copy.js");
 const emailUtils = require("../features/email-utils.js");
 test("reminder preview uses current form values and escapes recipient-facing text", () => {
@@ -81,6 +81,7 @@ test("reminder preview uses current form values and escapes recipient-facing tex
           })[char],
       ),
     openModal: (id) => calls.push(id),
+    splitEmailAddresses: emailAddressUtils.splitEmailAddresses,
     model,
   });
 
