@@ -589,32 +589,6 @@ button {
 .report-panel {
   margin-bottom: 16px;
 }
-.import-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 17px 20px;
-  border-top: 1px solid #eff1ed;
-  gap: 20px;
-}
-.import-actions strong {
-  font-size: 12px;
-}
-.import-actions p {
-  font-size: 11px;
-  color: #929c94;
-  margin: 5px 0;
-}
-.file-button {
-  position: relative;
-  overflow: hidden;
-}
-.file-button input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
 .empty-state {
   padding: 45px 16px;
   text-align: center;
@@ -962,9 +936,6 @@ button {
   }
   .form-row {
     grid-template-columns: 1fr;
-  }
-  .import-actions {
-    align-items: flex-start;
   }
   .detail-kpis {
     grid-template-columns: 1fr 1fr 1fr;

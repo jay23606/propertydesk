@@ -3,6 +3,16 @@
   gap: 8px;
   align-items: center;
 }
+.file-button {
+  position: relative;
+  overflow: hidden;
+}
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
 @media (max-width: 760px) {
   .heading-actions {
     flex-wrap: wrap;

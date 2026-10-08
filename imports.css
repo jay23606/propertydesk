@@ -1,3 +1,19 @@
+.import-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 17px 20px;
+  border-top: 1px solid #eff1ed;
+  gap: 20px;
+}
+.import-actions strong {
+  font-size: 12px;
+}
+.import-actions p {
+  font-size: 11px;
+  color: #929c94;
+  margin: 5px 0;
+}
 .import-preview-table {
   max-height: 48vh;
   overflow: auto;
@@ -80,6 +96,9 @@
   outline-offset: 1px;
 }
 @media (max-width: 760px) {
+  .import-actions {
+    align-items: flex-start;
+  }
   .import-preview-table table {
     min-width: 620px;
   }
