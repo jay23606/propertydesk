@@ -223,7 +223,7 @@ test("workspace setting writes report rejected requests and retain entered value
   assert.equal($("display-name").value, "New Label");
   assert.equal($("member-email").value, " spouse@example.test ");
   assert.deepEqual(messages, [
-    "Display name couldn't be saved right now. Check your connection and try again.",
+    "Display name result couldn't be confirmed. Reload your profile before trying again.",
     "Workspace member addition result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
     "Workspace member removal result couldn't be confirmed, and settings could not refresh. Reload before retrying.",
   ]);

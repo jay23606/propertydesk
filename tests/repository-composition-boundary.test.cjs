@@ -6,7 +6,7 @@ const test = require("node:test");
 const repositoryFactory = /window\.PropertyDesk\w*Repository\.create\s*\(/g;
 const databaseAccess = /\.(?:from|rpc)\s*\(/;
 const authClientAccess =
-  /\.auth\.(?:onAuthStateChange|signUp|signInWithPassword|getSession|signOut|resetPasswordForEmail|updateUser)\s*\(/;
+  /\.auth\.(?:onAuthStateChange|signUp|signInWithPassword|getSession|getUser|signOut|resetPasswordForEmail|updateUser)\s*\(/;
 const dataAccessModules = new Set([
   "account-history-repository.js",
   "account-repository.js",

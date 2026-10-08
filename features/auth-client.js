@@ -14,6 +14,7 @@
       signUp: (...args) => auth().signUp(...args),
       signInWithPassword: (...args) => auth().signInWithPassword(...args),
       getSession: (...args) => auth().getSession(...args),
+      getUser: (...args) => auth().getUser(...args),
       signOut: (...args) => auth().signOut(...args),
       resetPasswordForEmail: (...args) => auth().resetPasswordForEmail(...args),
       updateUser: (...args) => auth().updateUser(...args),

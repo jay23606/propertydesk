@@ -27,6 +27,7 @@ test("auth client resolves the current backend lazily and forwards auth calls", 
     "signUp",
     "signInWithPassword",
     "getSession",
+    "getUser",
     "signOut",
     "resetPasswordForEmail",
     "updateUser",
@@ -53,7 +54,9 @@ test("auth client resolves the current backend lazily and forwards auth calls", 
 
   const replacementAuth = {
     getSession: async () => "replacement-client",
+    getUser: async () => "replacement-user",
   };
   client = { auth: replacementAuth };
   assert.equal(await adapter.getSession(), "replacement-client");
+  assert.equal(await adapter.getUser(), "replacement-user");
 });

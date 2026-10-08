@@ -420,3 +420,78 @@ test("profile settings save the display label and refresh the shared shell", asy
   assert.equal(state.user.user_metadata.display_name, "Property Manager");
   assert.deepEqual(messages, ["Display name saved"]);
 });
+
+test("profile settings confirm a lost update response from the authenticated user", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "profile-settings.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  const calls = [];
+  const user = {
+    id: "owner-1",
+    user_metadata: { display_name: "Property Manager" },
+  };
+  const state = {
+    user: { id: "owner-1", user_metadata: { display_name: "Old label" } },
+  };
+  const profile = context.window.PropertyDeskProfileSettings.create({
+    state,
+    authClient: {
+      updateUser: async () => {
+        throw new Error("connection lost");
+      },
+      getUser: async () => {
+        calls.push("read-back");
+        return { data: { user }, error: null };
+      },
+    },
+    toast: (message) => messages.push(message),
+    updateGreeting: () => calls.push("greeting"),
+  });
+
+  await profile.saveProfile("Property Manager");
+
+  assert.equal(state.user, user);
+  assert.deepEqual(calls, ["read-back", "greeting"]);
+  assert.deepEqual(messages, ["Display name saved"]);
+});
+
+test("profile settings show refreshed server state when an uncertain update did not apply", async () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "profile-settings.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const messages = [];
+  const actualUser = {
+    id: "owner-1",
+    user_metadata: { display_name: "Old label" },
+  };
+  const state = { user: { id: "owner-1" } };
+  const profile = context.window.PropertyDeskProfileSettings.create({
+    state,
+    authClient: {
+      updateUser: async () => {
+        throw new Error("connection lost");
+      },
+      getUser: async () => ({ data: { user: actualUser }, error: null }),
+    },
+    toast: (message) => messages.push(message),
+    updateGreeting() {},
+  });
+
+  await profile.saveProfile("New label");
+
+  assert.equal(state.user, actualUser);
+  assert.deepEqual(messages, [
+    "Display name was not updated. Your current profile was refreshed; review it before retrying.",
+  ]);
+});
