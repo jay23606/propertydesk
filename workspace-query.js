@@ -28,6 +28,8 @@
     }
 
     async function loadAllPages(table, pageSize = 500) {
+      if (!Number.isSafeInteger(pageSize) || pageSize < 1)
+        throw new RangeError("Page size must be a positive integer.");
       const currentClient = client();
       const rows = [];
       for (let offset = 0; ; offset += pageSize) {
