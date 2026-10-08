@@ -28,6 +28,10 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
   assert.match(auth, /html\[data-theme="dark"\] \.auth-card/);
   assert.match(auth, /html\[data-theme="dark"\] \.form-stack input:focus/);
   assert.match(auth, /\.auth-theme-toggle/);
+  assert.match(auth, /\.config-banner/);
+  assert.match(auth, /html\[data-theme="dark"\] \.config-banner/);
+  assert.doesNotMatch(styles, /\.config-banner/);
+  assert.doesNotMatch(theme, /\.config-banner/);
   assert.match(auth, /html\[data-theme="dark"\] \.privacy-note/);
   assert.doesNotMatch(
     theme,

@@ -5,6 +5,19 @@
   padding: 25px;
   background: radial-gradient(ellipse at 50% 20%, #edf3ec 0, #f7f8f5 55%);
 }
+.config-banner {
+  padding: 11px 22px;
+  background: #fff4dc;
+  border-bottom: 1px solid #f3dda8;
+  text-align: center;
+  color: #745a1b;
+  font-size: 13px;
+}
+html[data-theme="dark"] .config-banner {
+  background: #3c3320;
+  border-color: #61512b;
+  color: #f1d995;
+}
 html[data-theme="dark"] .auth-view {
   background: radial-gradient(ellipse at 50% 20%, #26372c 0, #151b17 58%);
 }

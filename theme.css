@@ -96,11 +96,6 @@ html[data-theme="dark"] .avatar {
   background: #304537;
   color: #a5e0bb;
 }
-html[data-theme="dark"] .config-banner {
-  background: #3c3320;
-  border-color: #61512b;
-  color: #f1d995;
-}
 html[data-theme="dark"] .modal-heading,
 html[data-theme="dark"] .modal-actions {
   border-color: var(--line);

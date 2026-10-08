@@ -42,14 +42,6 @@ button {
 .hidden {
   display: none !important;
 }
-.config-banner {
-  padding: 11px 22px;
-  background: #fff4dc;
-  border-bottom: 1px solid #f3dda8;
-  text-align: center;
-  color: #745a1b;
-  font-size: 13px;
-}
 .app-shell {
   min-height: 100vh;
 }
