@@ -11,6 +11,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
+    "property-record-update-maintenance.js",
     "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
@@ -82,6 +83,7 @@ test("property quick notes enforce the character limit before writing", async ()
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
+    "property-record-update-maintenance.js",
     "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
@@ -116,6 +118,7 @@ test("quick note reconciles a lost response against refreshed property state", a
     "workspace-write-reconciliation.js",
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
+    "property-record-update-maintenance.js",
     "property-note-maintenance.js",
     "property-quick-note.js",
   ]) {
@@ -157,6 +160,16 @@ test("quick note and grid actions load before the Properties workflow", () => {
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  for (const maintenance of [
+    "property-note-maintenance.js",
+    "property-status-maintenance.js",
+  ]) {
+    assert.ok(
+      html.indexOf("features/property-record-update-maintenance.js") <
+        html.indexOf(`features/${maintenance}`),
+      "shared property update maintenance should load before its callers",
+    );
+  }
   assert.ok(
     html.indexOf("features/property-quick-note.js") <
       html.indexOf("features/property-portfolio-workflow.js"),
@@ -168,6 +181,7 @@ test("quick note and grid actions load before the Properties workflow", () => {
   );
   for (const source of [
     "property-quick-note.js",
+    "property-record-update-maintenance.js",
     "property-view-events.js",
     "property-portfolio-workflow.js",
   ]) {

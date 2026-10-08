@@ -3,6 +3,14 @@
   "use strict";
 
   function create({ state, fetchAll, toast, repository }) {
+    const { savePropertyUpdate } =
+      window.PropertyDeskPropertyRecordUpdateMaintenance.create({
+        state,
+        fetchAll,
+        toast,
+        repository,
+      });
+
     function savePropertyArchive({
       propertyId,
       ownerId,
@@ -12,30 +20,21 @@
       successMessage,
       savedRefreshFailureMessage,
     }) {
-      return window.PropertyDeskRepositoryWriteFeedback.saveAndRefreshWorkspaceRecord(
-        {
-          operation: () =>
-            repository.updateOwned(propertyId, ownerId, {
-              archived_at: archivedAt,
-            }),
-          state,
-          collection: "properties",
-          payload: { archived_at: archivedAt },
-          recordId: propertyId,
-          fetchAll,
-          toast,
-          failureMessage:
-            "Property status result couldn't be confirmed. Reload Properties before retrying.",
-          refreshFailureMessage:
-            "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
-          retryMessage:
-            "Property status is shown in refreshed details. Check it before retrying.",
-          onRefreshed,
-          afterRefresh,
-          successMessage,
-          savedRefreshFailureMessage,
-        },
-      );
+      return savePropertyUpdate({
+        propertyId,
+        ownerId,
+        payload: { archived_at: archivedAt },
+        failureMessage:
+          "Property status result couldn't be confirmed. Reload Properties before retrying.",
+        refreshFailureMessage:
+          "Property status result couldn't be confirmed, and Properties could not refresh. Reload before retrying.",
+        retryMessage:
+          "Property status is shown in refreshed details. Check it before retrying.",
+        onRefreshed,
+        afterRefresh,
+        successMessage,
+        savedRefreshFailureMessage,
+      });
     }
 
     return Object.freeze({ savePropertyArchive });

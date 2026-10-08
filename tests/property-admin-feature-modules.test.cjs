@@ -13,6 +13,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
     "workspace-write-reconciliation.js",
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
+    "property-record-update-maintenance.js",
     "property-holder-repository.js",
     "property-holder-management.js",
     "property-repository.js",
@@ -95,6 +96,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
     "workspace-write-reconciliation.js",
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
+    "property-record-update-maintenance.js",
     "property-status-maintenance.js",
     "property-archive.js",
   ]) {
@@ -143,6 +145,7 @@ test("archive and restore use status maintenance and reopen updated details", as
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "property-repository.js",
+    "property-record-update-maintenance.js",
     "property-status-maintenance.js",
     "property-archive.js",
   ]) {
