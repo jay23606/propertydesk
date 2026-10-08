@@ -10,12 +10,12 @@
     const date = dateOnly(value);
     return date ? date.toLocaleDateString(undefined, options) : "—";
   };
-  const todayIso = () => {
-    const date = new Date();
+  const isoDate = (date) => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${date.getFullYear()}-${month}-${day}`;
   };
+  const todayIso = () => isoDate(new Date());
   const monthStart = () => {
     const date = new Date();
     date.setDate(1);
@@ -58,6 +58,7 @@
   const dateUtils = Object.freeze({
     dateOnly,
     fmtDate,
+    isoDate,
     todayIso,
     monthStart,
     monthEnd,
@@ -68,6 +69,7 @@
     window.PropertyDeskDateUtils = Object.freeze({
       dateOnly,
       fmtDate,
+      isoDate,
       todayIso,
       monthStart,
       monthEnd,

@@ -3,9 +3,9 @@
   "use strict";
 
   function createLoanAmortizationUtils() {
-    const monthDateWithAnchor =
-      globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
-    if (!monthDateWithAnchor)
+    const { monthDateWithAnchor, isoDate } =
+      globalThis.PropertyDeskDateUtils || {};
+    if (!monthDateWithAnchor || !isoDate)
       throw new Error("PropertyDeskDateUtils must load before loan utils.");
     const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
     if (!roundCurrency)
@@ -64,12 +64,8 @@
       const anchor = /^\d{4}-\d{2}-\d{2}$/.test(String(startDate || ""))
         ? new Date(`${startDate}T12:00:00`)
         : new Date();
-      return (offset) => {
-        const date = monthDateWithAnchor(anchor, offset, anchor.getDate());
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${date.getFullYear()}-${month}-${day}`;
-      };
+      return (offset) =>
+        isoDate(monthDateWithAnchor(anchor, offset, anchor.getDate()));
     }
 
     function rowsForTerms({ principal, months, rate, payment }, dueDate) {

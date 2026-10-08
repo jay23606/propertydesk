@@ -6,6 +6,7 @@ test("date-only parsing and display formatting preserve local calendar dates", (
   const date = dates.dateOnly("2026-10-05");
 
   assert.equal(dates.dateOnly(null), null);
+  assert.equal(dates.isoDate(date), "2026-10-05");
   assert.equal(date.getFullYear(), 2026);
   assert.equal(date.getMonth(), 9);
   assert.equal(date.getDate(), 5);
