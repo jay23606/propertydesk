@@ -20,7 +20,7 @@ test("workspace reminder activity and preview stay independent of navigation", (
   );
   assert.match(
     reminderWorkflow,
-    /ReminderActivityModel\.create\(\{\s*state: reminder\.state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\(/,
+    /function createWorkspaceReminderWorkflow\(\{[\s\S]*?state,[\s\S]*?\}\) \{[\s\S]*?ReminderActivityModel\.create\(\{\s*state,[\s\S]*?ReminderActivityView\.create\([\s\S]*?model: activityModel,[\s\S]*?ReminderPreviewModel\.create\([\s\S]*?ReminderPreview\.create\(/,
   );
   assert.match(
     reminderWorkflow,

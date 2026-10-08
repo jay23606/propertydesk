@@ -26,6 +26,7 @@ test("workspace reminder workflow composes activity and preview features", () =>
     moneyInput() {},
     toast() {},
     openModal() {},
+    unusedDependency: true,
   };
   const context = vm.createContext({
     window: {
@@ -71,11 +72,41 @@ test("workspace reminder workflow composes activity and preview features", () =>
     ["activity-model", "activity-view", "preview-model", "preview"],
   );
   assert.equal(calls[0][1].state, reminder.state);
+  assert.deepEqual(Object.keys(calls[0][1]), ["state"]);
+  assert.equal(calls[1][1].$, reminder.$);
+  assert.equal(calls[1][1].esc, reminder.esc);
+  assert.equal(calls[1][1].fmtDate, reminder.fmtDate);
+  assert.equal(calls[1][1].money, reminder.money);
   assert.equal(calls[1][1].model, activityModel);
   assert.equal(calls[2][1].amountDueSince, reminder.amountDueSince);
   assert.equal(calls[2][1].propertyAddress, reminder.propertyAddress);
+  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
+    "amountDueSince",
+    "dateOnly",
+    "money",
+    "monthEnd",
+    "monthStart",
+    "propertyAddress",
+    "unpaidDueAccrualStart",
+  ]);
+  assert.equal(calls[3][1].$, reminder.$);
+  assert.equal(calls[3][1].state, reminder.state);
+  assert.equal(calls[3][1].todayIso, reminder.todayIso);
+  assert.equal(calls[3][1].moneyInput, reminder.moneyInput);
+  assert.equal(calls[3][1].toast, reminder.toast);
+  assert.equal(calls[3][1].esc, reminder.esc);
   assert.equal(calls[3][1].model, previewModel);
   assert.equal(calls[3][1].openModal, reminder.openModal);
+  assert.deepEqual(Object.keys(calls[3][1]).sort(), [
+    "$",
+    "esc",
+    "model",
+    "moneyInput",
+    "openModal",
+    "state",
+    "toast",
+    "todayIso",
+  ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "previewReminderEmail",
     "renderReminderActivity",

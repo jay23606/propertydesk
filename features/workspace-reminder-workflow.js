@@ -2,36 +2,52 @@
 (() => {
   "use strict";
 
-  function createWorkspaceReminderWorkflow(reminder) {
+  function createWorkspaceReminderWorkflow({
+    $,
+    state,
+    esc,
+    fmtDate,
+    money,
+    amountDueSince,
+    unpaidDueAccrualStart,
+    monthEnd,
+    dateOnly,
+    monthStart,
+    propertyAddress,
+    todayIso,
+    moneyInput,
+    toast,
+    openModal,
+  }) {
     const activityModel = window.PropertyDeskReminderActivityModel.create({
-      state: reminder.state,
+      state,
     });
     const { renderReminderActivity } =
       window.PropertyDeskReminderActivityView.create({
-        $: reminder.$,
-        esc: reminder.esc,
-        fmtDate: reminder.fmtDate,
-        money: reminder.money,
+        $,
+        esc,
+        fmtDate,
+        money,
         model: activityModel,
       });
     const previewModel = window.PropertyDeskReminderPreviewModel.create({
-      amountDueSince: reminder.amountDueSince,
-      unpaidDueAccrualStart: reminder.unpaidDueAccrualStart,
-      monthEnd: reminder.monthEnd,
-      dateOnly: reminder.dateOnly,
-      monthStart: reminder.monthStart,
-      propertyAddress: reminder.propertyAddress,
-      money: reminder.money,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      monthEnd,
+      dateOnly,
+      monthStart,
+      propertyAddress,
+      money,
     });
     const { previewReminderEmail } = window.PropertyDeskReminderPreview.create({
-      $: reminder.$,
-      state: reminder.state,
-      todayIso: reminder.todayIso,
-      moneyInput: reminder.moneyInput,
-      toast: reminder.toast,
-      esc: reminder.esc,
+      $,
+      state,
+      todayIso,
+      moneyInput,
+      toast,
+      esc,
       model: previewModel,
-      openModal: reminder.openModal,
+      openModal,
     });
 
     return { renderReminderActivity, previewReminderEmail };
