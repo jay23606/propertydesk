@@ -54,7 +54,7 @@
       $("reset-password-cancel").addEventListener("click", cancelPasswordReset);
     }
 
-    return {
+    return Object.freeze({
       attachEvents,
       passwordValues,
       requestEmail,
@@ -63,7 +63,7 @@
       setRequestDisabled,
       setSubmitBusy,
       showPasswordReset,
-    };
+    });
   }
 
   window.PropertyDeskAuthRecoveryView = Object.freeze({ create });

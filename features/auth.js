@@ -67,13 +67,13 @@
       attachRecoveryEvents();
     }
 
-    return {
+    return Object.freeze({
       showConfigError,
       setAuthMode,
       handleAuthStateChange,
       restoreAuthSession,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskAuth = Object.freeze({ create });

@@ -26,7 +26,7 @@
       }
     }
 
-    return { requestPasswordReset };
+    return Object.freeze({ requestPasswordReset });
   }
 
   window.PropertyDeskAuthResetRequest = Object.freeze({

@@ -62,6 +62,7 @@ test("auth feature delegates session restoration and state changes to its sessio
     documentRef: { querySelector: () => element("auth-intro") },
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   await feature.restoreAuthSession();
   assert.equal(state.user.id, "owner-1");
   assert.equal(state.passwordRecoveryInProgress, true);
@@ -295,6 +296,7 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
     },
     documentRef: { querySelector: () => element("auth-intro") },
   });
+  assert.equal(Object.isFrozen(form), true);
   form.attachEvents();
   assert.deepEqual(Object.keys(form).sort(), ["attachEvents", "setAuthMode"]);
 

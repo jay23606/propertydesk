@@ -89,7 +89,11 @@
       finishSignOut();
     }
 
-    return { handleAuthStateChange, restoreAuthSession, signOut };
+    return Object.freeze({
+      handleAuthStateChange,
+      restoreAuthSession,
+      signOut,
+    });
   }
 
   window.PropertyDeskAuthSession = Object.freeze({ create: createAuthSession });

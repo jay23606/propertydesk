@@ -54,10 +54,10 @@
       view.attachEvents({ toggleAuthMode, submitAuth });
     }
 
-    return {
+    return Object.freeze({
       setAuthMode: view.setAuthMode,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskAuthForm = Object.freeze({ create: createAuthForm });

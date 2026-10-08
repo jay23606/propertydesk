@@ -36,6 +36,7 @@ test("authentication screens own sign-in, workspace, and configuration presentat
     documentRef,
   });
 
+  assert.equal(Object.isFrozen(screens), true);
   screens.showAuth();
   assert.equal(element("auth-view").classes.has("hidden"), false);
   assert.equal(element("app-view").classes.has("hidden"), true);

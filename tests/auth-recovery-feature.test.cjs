@@ -53,6 +53,7 @@ test("password recovery saves the new password before resuming workspace access"
     },
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   feature.attachEvents();
   await handlers.get("password-reset-form:submit")({ preventDefault() {} });
 

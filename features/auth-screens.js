@@ -28,7 +28,7 @@
       showAuth();
     }
 
-    return { showAuth, showApp, showConfigError };
+    return Object.freeze({ showAuth, showApp, showConfigError });
   }
 
   window.PropertyDeskAuthScreens = Object.freeze({ create: createAuthScreens });

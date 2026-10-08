@@ -86,11 +86,11 @@
       });
     }
 
-    return {
+    return Object.freeze({
       showPasswordReset,
       isPasswordRecoverySession,
       attachEvents,
-    };
+    });
   }
 
   window.PropertyDeskAuthRecovery = Object.freeze({

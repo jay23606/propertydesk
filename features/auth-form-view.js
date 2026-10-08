@@ -51,13 +51,13 @@
       $("auth-form").addEventListener("submit", submitAuth);
     }
 
-    return {
+    return Object.freeze({
       attachEvents,
       credentials,
       setAuthMode,
       setMessage,
       setSubmitting,
-    };
+    });
   }
 
   window.PropertyDeskAuthFormView = Object.freeze({ create });
