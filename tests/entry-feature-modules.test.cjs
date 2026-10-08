@@ -28,8 +28,11 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.doesNotMatch(app, /PropertyDeskLedgerWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
+  );
   assert.match(app, /accountHistoryRepository: repositories\.accountHistory/);
   assert.match(app, /PropertyDeskReportWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskReport(?:Model|Views)\.create\(/);
@@ -143,11 +146,11 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create/);
   assert.match(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailActionWorkflow\.create\(\{[\s\S]*?repository: repositories\.accounts/,
+    /PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?actions: \{[\s\S]*?repository: repositories\.accounts/,
   );
   assert.match(app, /amortizationSchedule,/);
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);

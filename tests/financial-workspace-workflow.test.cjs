@@ -18,8 +18,11 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     app,
     /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
   );
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
+  );
   assert.match(
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachTransactionFilterEvents,\s*attachTransactionActionEvents,\s*attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
@@ -27,6 +30,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
 
   for (const feature of [
     "account-detail-action-workflow",
+    "account-detail-workspace-workflow",
     "deposit-adjustment-workflow",
     "deposit-workspace-workflow",
     "workspace-deposit-context",

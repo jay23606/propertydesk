@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("app composes account details apart from account and deposit maintenance", () => {
+test("account detail workspace connects content and actions", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
@@ -12,8 +12,11 @@ test("app composes account details apart from account and deposit maintenance", 
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.match(app, /PropertyDeskDepositWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailContentWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDetailActionWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDetailWorkspaceWorkflow\.create\(/);
+  assert.doesNotMatch(
+    app,
+    /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
   const accountDetailWorkflow = fs.readFileSync(
@@ -31,6 +34,19 @@ test("app composes account details apart from account and deposit maintenance", 
     /depositSectionHTML,\s*renderAccountHistory,/,
   );
   assert.doesNotMatch(accountDetailWorkflow, /AccountDetailActionWorkflow/);
+  const accountWorkspaceWorkflow = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-detail-workspace-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.match(
+    accountWorkspaceWorkflow,
+    /PropertyDeskAccountDetailContentWorkflow\.create\(content\)[\s\S]*?PropertyDeskAccountDetailActionWorkflow\.create\(actions\)/,
+  );
   const depositWorkspaceWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-workspace-workflow.js"),
     "utf8",
@@ -104,10 +120,10 @@ test("app composes account details apart from account and deposit maintenance", 
   );
   assert.match(
     app,
-    /PropertyDeskAccountDetailContentWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /PropertyDeskAccountDetailWorkspaceWorkflow\.create\([\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
   );
-  assert.doesNotMatch(html, /account-screen-workflow/);
-  assert.doesNotMatch(worker, /account-screen-workflow/);
+  assert.match(html, /features\/account-detail-workspace-workflow\.js/);
+  assert.match(worker, /'\.\/features\/account-detail-workspace-workflow\.js'/);
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 
