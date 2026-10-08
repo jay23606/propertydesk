@@ -28,7 +28,6 @@
       window.PropertyDeskWorkspaceFormSaveWorkflow.create({
         $,
         closeModal,
-        fetchAll,
         toast,
       });
     const { saveAccount: persistAccount } =

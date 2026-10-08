@@ -3,8 +3,12 @@
   "use strict";
 
   function create({ state, fetchAll, toast, repository }) {
-    function saveProperty(payload, propertyId) {
-      return window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
+    function saveProperty(payload, propertyId, completion) {
+      const save = completion
+        ? window.PropertyDeskRepositoryWriteFeedback
+            .saveAndRefreshWorkspaceRecord
+        : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
+      return save({
         operation: () => repository.save(payload, propertyId),
         state,
         collection: "properties",
@@ -18,6 +22,7 @@
           "Property save result couldn't be confirmed, and Properties could not refresh. Reload before trying again.",
         retryMessage:
           "Properties were refreshed. Check the property before trying to save it again.",
+        ...completion,
       });
     }
 

@@ -3,8 +3,12 @@
   "use strict";
 
   function create({ state, fetchAll, toast, repository }) {
-    function saveAccount(payload, accountId) {
-      return window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord({
+    function saveAccount(payload, accountId, completion) {
+      const save = completion
+        ? window.PropertyDeskRepositoryWriteFeedback
+            .saveAndRefreshWorkspaceRecord
+        : window.PropertyDeskRepositoryWriteFeedback.saveWorkspaceRecord;
+      return save({
         operation: () => repository.save(payload, accountId),
         state,
         collection: "accounts",
@@ -18,6 +22,7 @@
           "Account save result couldn't be confirmed, and Properties could not refresh. Reload before trying again.",
         retryMessage:
           "Properties were refreshed. Check the account before trying to save it again.",
+        ...completion,
       });
     }
 

@@ -15,7 +15,6 @@
       window.PropertyDeskWorkspaceFormSaveWorkflow.create({
         $,
         closeModal,
-        fetchAll,
         toast,
       });
     const { saveProperty: persistProperty } =

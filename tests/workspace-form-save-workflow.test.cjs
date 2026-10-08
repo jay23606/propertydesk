@@ -9,6 +9,7 @@ function loadWorkflow() {
   for (const filename of [
     "repository-write-feedback.js",
     "workspace-form-save-workflow.js",
+    "property-maintenance.js",
   ]) {
     vm.runInContext(
       fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
@@ -23,11 +24,13 @@ test("shared workspace form save closes, resets, refreshes, and labels add or ed
   const workflow = loadWorkflow().create({
     $: (id) => ({ id }),
     closeModal: ({ id }) => events.push(["close", id]),
-    fetchAll: async () => events.push(["refresh"]),
     toast: (message) => events.push(["toast", message]),
   });
-  const persist = async (payload, id) => {
+  const persist = async (payload, id, completion) => {
     events.push(["persist", payload, id]);
+    completion.onSaved();
+    events.push(["refresh"]);
+    events.push(["toast", completion.successMessage]);
     return true;
   };
   const resetForm = () => events.push(["reset"]);
@@ -74,7 +77,6 @@ test("failed workspace form persistence leaves the form open and unchanged", asy
   const workflow = loadWorkflow().create({
     $: (id) => ({ id }),
     closeModal: () => events.push(["close"]),
-    fetchAll: async () => events.push(["refresh"]),
     toast: (message) => events.push(["toast", message]),
   });
 
@@ -93,4 +95,60 @@ test("failed workspace form persistence leaves the form open and unchanged", asy
     false,
   );
   assert.deepEqual(events, [["persist"]]);
+});
+
+test("a form save confirmed by readback reuses its refresh before closing", async () => {
+  const context = vm.createContext({ window: {} });
+  for (const filename of [
+    "repository-write-feedback.js",
+    "workspace-form-save-workflow.js",
+    "property-maintenance.js",
+  ]) {
+    vm.runInContext(
+      fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
+      context,
+    );
+  }
+  const events = [];
+  const property = { id: "property-1", address: "Old address" };
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    properties: [property],
+  };
+  const maintenance = context.window.PropertyDeskPropertyMaintenance.create({
+    state,
+    fetchAll: async () => {
+      Object.assign(property, { address: "New address" });
+      events.push("refresh");
+    },
+    toast: (message) => events.push(`toast:${message}`),
+    repository: {
+      save: async () => {
+        throw new Error("connection lost");
+      },
+    },
+  });
+  const workflow = context.window.PropertyDeskWorkspaceFormSaveWorkflow.create({
+    $: (id) => id,
+    closeModal: (id) => events.push(`close:${id}`),
+    toast: (message) => events.push(`toast:${message}`),
+  });
+
+  assert.equal(
+    await workflow.save({
+      persist: maintenance.saveProperty,
+      payload: { address: "New address" },
+      id: "property-1",
+      modalId: "property-modal",
+      resetForm: () => events.push("reset"),
+      label: "Property",
+    }),
+    true,
+  );
+  assert.deepEqual(events, [
+    "refresh",
+    "close:property-modal",
+    "reset",
+    "toast:Property updated",
+  ]);
 });
