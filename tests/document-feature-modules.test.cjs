@@ -606,13 +606,16 @@ test("uncertain document metadata writes keep the private file for reconciliatio
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",
     documents: [],
+    removed: [],
     client: {
       storage: {
         from() {
           return {
             upload: async () => ({ error: null }),
-            remove: async () =>
-              assert.fail("uncertain metadata must not delete its file"),
+            remove: async (paths) => {
+              state.removed.push(...paths);
+              return { error: null };
+            },
           };
         },
       },
@@ -627,8 +630,9 @@ test("uncertain document metadata writes keep the private file for reconciliatio
   const feature = createDocuments(context, {
     state,
     toast: (message) => messages.push(message),
-    fetchAll: async () =>
-      assert.fail("an unconfirmed write must not show success"),
+    fetchAll: async () => {
+      throw new Error("offline");
+    },
     openPropertyDetails: () =>
       assert.fail("an unconfirmed write must not reopen details"),
     makeId: () => "file-id",
@@ -641,6 +645,102 @@ test("uncertain document metadata writes keep the private file for reconciliatio
     }),
   );
 
-  assert.match(messages[0], /status couldn't be confirmed/i);
+  assert.match(messages[0], /record result couldn't be confirmed/i);
+  assert.match(messages[0], /properties could not refresh/i);
   assert.match(messages[0], /file was kept/i);
+  assert.deepEqual(state.removed, []);
+});
+
+test("document upload confirms a lost metadata response from refreshed records", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    client: {
+      storage: {
+        from: () => ({ upload: async () => ({ error: null }) }),
+      },
+      from: () => ({
+        insert: async (metadata) => {
+          state.pendingMetadata = metadata;
+          throw new Error("connection lost");
+        },
+      }),
+    },
+  };
+  const events = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => {
+      state.documents = [{ id: "document-1", ...state.pendingMetadata }];
+      events.push(["refresh"]);
+    },
+    openPropertyDetails: (id) => events.push(["open", id]),
+    makeId: () => "file-id",
+  });
+
+  await feature.uploadPropertyDocument({
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  });
+
+  assert.deepEqual(events, [
+    ["refresh"],
+    ["open", "property-1"],
+    ["toast", "Agreement uploaded privately"],
+  ]);
+});
+
+test("document upload removes the private orphan after refreshed metadata is absent", async () => {
+  const context = vm.createContext({ window: {} });
+  loadDocumentModules(context);
+  const state = {
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    documents: [],
+    removed: [],
+    client: {
+      storage: {
+        from: () => ({
+          upload: async () => ({ error: null }),
+          remove: async (paths) => {
+            state.removed.push(...paths);
+            return { error: null };
+          },
+        }),
+      },
+      from: () => ({
+        insert: async () => {
+          throw new Error("connection lost");
+        },
+      }),
+    },
+  };
+  const events = [];
+  const feature = createDocuments(context, {
+    state,
+    toast: (message) => events.push(["toast", message]),
+    fetchAll: async () => events.push(["refresh"]),
+    openPropertyDetails: () => assert.fail("missing metadata must not reopen"),
+    makeId: () => "file-id",
+  });
+
+  await feature.uploadPropertyDocument({
+    files: [{ name: "Agreement.pdf", size: 5, type: "application/pdf" }],
+    value: "selected",
+  });
+
+  assert.deepEqual(state.removed, [
+    "workspace-1/property-1/file-id-Agreement.pdf",
+  ]);
+  assert.deepEqual(events, [
+    ["refresh"],
+    [
+      "toast",
+      "Agreement record was not saved; uploaded file removed. You can retry the upload. connection lost",
+    ],
+  ]);
 });

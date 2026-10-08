@@ -32,22 +32,20 @@
     }
 
     async function saveDocumentMetadata(propertyId, file, path, contentType) {
+      const metadata = {
+        user_id: state.workspaceOwnerId,
+        property_id: propertyId,
+        account_id: null,
+        file_name: file.name,
+        storage_path: path,
+        content_type: file.type || contentType,
+        file_size: file.size,
+      };
       let error;
       try {
-        ({ error } = await repository.insertMetadata({
-          user_id: state.workspaceOwnerId,
-          property_id: propertyId,
-          account_id: null,
-          file_name: file.name,
-          storage_path: path,
-          content_type: file.type || contentType,
-          file_size: file.size,
-        }));
+        ({ error } = await repository.insertMetadata(metadata));
       } catch (requestError) {
-        toast(
-          `Agreement record status couldn't be confirmed. Reload the property details before retrying; the private file was kept to avoid breaking a saved record. ${requestError.message || "Check your connection and try again."}`,
-        );
-        return false;
+        return reconcileUnconfirmedMetadata(propertyId, metadata, requestError);
       }
       if (error) {
         const cleaned = await removeUploadedFile(path);
@@ -57,6 +55,39 @@
         return false;
       }
       return true;
+    }
+
+    async function reconcileUnconfirmedMetadata(propertyId, metadata, error) {
+      let recordWasSaved = false;
+      const refreshed =
+        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
+          fetchAll,
+          afterRefresh: () => {
+            recordWasSaved = state.documents.some(
+              (document) =>
+                document.user_id === metadata.user_id &&
+                document.property_id === propertyId &&
+                document.storage_path === metadata.storage_path,
+            );
+            if (recordWasSaved) openPropertyDetails(propertyId);
+          },
+          toast,
+          refreshFailureMessage:
+            "Agreement record result couldn't be confirmed, and Properties could not refresh. The private file was kept; reload property details before retrying.",
+        });
+      if (!refreshed) return false;
+      if (recordWasSaved) {
+        toast("Agreement uploaded privately");
+        return "reconciled";
+      }
+
+      const cleaned = await removeUploadedFile(metadata.storage_path);
+      toast(
+        cleaned
+          ? `Agreement record was not saved; uploaded file removed. You can retry the upload. ${error.message || ""}`
+          : `Agreement record was not found after refresh, but private file cleanup couldn't be verified. Check storage before retrying. ${error.message || ""}`,
+      );
+      return false;
     }
 
     async function reopenPropertyDetails(propertyId) {
@@ -85,8 +116,14 @@
       const { contentType, safeName } = upload;
       const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
       if (!(await uploadFile(path, file, contentType))) return;
-      if (!(await saveDocumentMetadata(propertyId, file, path, contentType)))
-        return;
+      const savedMetadata = await saveDocumentMetadata(
+        propertyId,
+        file,
+        path,
+        contentType,
+      );
+      if (!savedMetadata) return;
+      if (savedMetadata === "reconciled") return;
       await reopenPropertyDetails(propertyId);
     }
 
