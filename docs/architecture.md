@@ -34,6 +34,8 @@ Manual reminder drafts and automated reminders share the message builder in `sup
 
 Every browser feature script must be loaded by `index.html` after its dependencies and included in the service worker's `SHELL_FILES` list. When a cached shell file changes, increment `CACHE_NAME` in `sw.js`. The worker caches the static shell only; it must not cache authenticated responses or workspace records.
 
+Styles are layered by purpose: `styles.css` provides the base, `overrides.css` holds layout adjustments, `reminders.css` owns reminder controls, and `theme.css` owns light and dark mode rules. Keep theme-specific overrides in `theme.css` so the selected palette is applied after feature styles.
+
 ## Verification
 
 Use `npm test` for module and feature-boundary tests, `npm run lint` for undefined or unused names, and `npm run format:check` for browser code and tests. GitHub Actions runs those checks and a candidate Chromium smoke test before deployment. After deployment, run `npm run smoke:deployed -- https://jay23606.github.io/propertydesk/` to verify the live app and signed-in workflows.
