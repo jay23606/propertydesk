@@ -28,5 +28,6 @@ test("theme styles are isolated, loaded last, and included in the PWA shell", ()
     /\.reminder-(?:toggle-row|preview|status|accepted|failed|skipped|sending)/,
   );
   assert.doesNotMatch(styles, /html\[data-theme="dark"\]/);
+  assert.doesNotMatch(theme, /\.loan-fields|\.list-row/);
   assert.match(reminders, /html\[data-theme="dark"\] \.reminder-status/);
 });

@@ -5,6 +5,9 @@
   display: grid;
   gap: 12px;
 }
+html[data-theme="dark"] .loan-fields {
+  border-color: var(--line);
+}
 .loan-fields legend {
   font-size: 11px;
   font-weight: 700;

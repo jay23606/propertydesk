@@ -29,6 +29,7 @@ test("shared component styles load after the base and before feature styles", ()
     ".status-pill",
     ".kind-pill",
     ".table-subtext",
+    ".list-row",
     ".detail-kpi",
     ".detail-section",
     ".schedule-table",

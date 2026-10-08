@@ -160,6 +160,9 @@ html[data-theme="dark"] .kind-pill {
   font-size: 10px;
   line-height: 1.3;
 }
+html[data-theme="dark"] .list-row {
+  border-color: var(--line);
+}
 html[data-theme="dark"] .table-subtext {
   color: #a7b3aa;
 }
