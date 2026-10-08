@@ -42,6 +42,9 @@ test("browser feature scripts load after their declared API dependencies", () =>
     }
   }
 
+  const apiConsumers = new Map(
+    [...apiOwners.keys()].map((api) => [api, new Set()]),
+  );
   for (const [dependent, contents] of moduleSources) {
     const referencedApis = new Set(
       [
@@ -57,11 +60,19 @@ test("browser feature scripts load after their declared API dependencies", () =>
         `${dependent} references ${api} without a browser script`,
       );
       if (dependency === dependent) continue;
+      apiConsumers.get(api).add(dependent);
 
       assert.ok(
         scriptSources.indexOf(dependency) < scriptSources.indexOf(dependent),
         `${dependency} must load before ${dependent} (${api})`,
       );
     }
+  }
+
+  for (const [api, source] of apiOwners) {
+    assert.ok(
+      apiConsumers.get(api).size > 0,
+      `${source} publishes ${api}, but no browser module uses it`,
+    );
   }
 });
