@@ -61,10 +61,7 @@
       view.attachEvents({ addWorkspaceMember, removeWorkspaceMember });
     }
 
-    return {
-      renderWorkspaceMembers: view.renderWorkspaceMembers,
-      attachWorkspaceMemberEvents,
-    };
+    return { attachWorkspaceMemberEvents };
   }
 
   window.PropertyDeskWorkspaceMembers = Object.freeze({ create });

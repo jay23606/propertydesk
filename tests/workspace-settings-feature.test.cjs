@@ -79,10 +79,7 @@ test("adding a workspace member clears the address only after successful refresh
     }),
   });
 
-  assert.deepEqual(Object.keys(feature).sort(), [
-    "attachWorkspaceMemberEvents",
-    "renderWorkspaceMembers",
-  ]);
+  assert.deepEqual(Object.keys(feature), ["attachWorkspaceMemberEvents"]);
   feature.attachWorkspaceMemberEvents();
   await handlers.get("member-add-form:submit")({ preventDefault() {} });
 
