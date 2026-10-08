@@ -9,6 +9,7 @@ require("../features/transaction-options.js");
 require("../features/display-utils.js");
 require("../features/import-row-utils.js");
 require("../features/account-import-identity.js");
+require("../features/account-import-terms.js");
 require("../features/payment-import-allocation.js");
 require("../features/expense-account-policy.js");
 const { selectImportRows } = require("../features/import-row-utils.js");

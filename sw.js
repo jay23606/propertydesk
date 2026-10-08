@@ -16,6 +16,7 @@ const SHELL_FILES = [
   './supabase/functions/_shared/reminder-copy.js',
   './features/import-row-utils.js',
   './features/account-import-identity.js',
+  './features/account-import-terms.js',
   './features/account-import-validation.js',
   './features/expense-import-validation.js',
   './features/payment-import-allocation.js',
