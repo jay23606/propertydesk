@@ -14,6 +14,10 @@
   background: #fff;
   border-bottom: 1px solid #eff1ed;
 }
+html[data-theme="dark"] .audit-row {
+  background: var(--surface);
+  border-color: var(--line);
+}
 .audit-row:last-child {
   border-bottom: 0;
 }
@@ -28,9 +32,15 @@
   color: #8c6256;
   font-size: 10px;
 }
+html[data-theme="dark"] .audit-row small {
+  color: #c49685;
+}
 .audit-row time {
   flex: 0 0 auto;
   color: #89948c;
   font-size: 10px;
   text-align: right;
+}
+html[data-theme="dark"] .audit-row time {
+  color: var(--muted);
 }

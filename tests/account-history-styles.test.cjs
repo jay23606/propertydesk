@@ -19,6 +19,9 @@ test("account history styles stay with the account history feature", () => {
 
   assert.match(history, /\.audit-list/);
   assert.match(history, /\.audit-row/);
+  assert.match(history, /html\[data-theme="dark"\] \.audit-row/);
+  assert.match(history, /html\[data-theme="dark"\] \.audit-row small/);
+  assert.match(history, /html\[data-theme="dark"\] \.audit-row time/);
   assert.doesNotMatch(shared, /\.audit-list|\.audit-row/);
   assert.ok(
     stylesheetOrder.indexOf("account-history.css") >
