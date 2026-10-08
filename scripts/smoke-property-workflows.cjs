@@ -27,6 +27,34 @@ async function smokePropertyWorkflows(
     .first()
     .click();
   await signedInPage.locator('.nav-link[data-view="properties"]').click();
+  await signedInPage.setViewportSize({ width: 390, height: 844 });
+  const mobilePortfolio = await signedInPage.evaluate(() => {
+    const scroller = document.querySelector(".portfolio-table");
+    const firstCell = document.querySelector(
+      "#properties-table td:first-child",
+    );
+    const paymentButton = firstCell?.querySelector("[data-account-payment]");
+    if (!scroller || !firstCell || !paymentButton) return null;
+    scroller.scrollLeft = 240;
+    const viewport = scroller.getBoundingClientRect();
+    const button = paymentButton.getBoundingClientRect();
+    return {
+      hasHorizontalOverflow: scroller.scrollWidth > scroller.clientWidth,
+      firstColumnIsSticky: getComputedStyle(firstCell).position === "sticky",
+      paymentButtonStaysVisible:
+        button.left >= viewport.left && button.right <= viewport.right,
+    };
+  });
+  if (
+    !mobilePortfolio?.hasHorizontalOverflow ||
+    !mobilePortfolio.firstColumnIsSticky ||
+    !mobilePortfolio.paymentButtonStaysVisible
+  ) {
+    throw new Error(
+      "The mobile Properties grid did not keep the Payment button visible while scrolling.",
+    );
+  }
+  await signedInPage.setViewportSize({ width: 1280, height: 720 });
   await signedInPage
     .locator('#properties-table [data-property-open="smoke-property"]')
     .first()
