@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createTransactionViewEvents({
+  function createTransactionMaintenanceEvents({
     documentRef = document,
     correctTransaction,
     voidTransaction,
@@ -24,7 +24,7 @@
     return Object.freeze({ attachTransactionActionEvents });
   }
 
-  window.PropertyDeskTransactionViewEvents = Object.freeze({
-    create: createTransactionViewEvents,
+  window.PropertyDeskTransactionMaintenanceEvents = Object.freeze({
+    create: createTransactionMaintenanceEvents,
   });
 })();

@@ -155,7 +155,7 @@ test("transaction view renders filtered rows and independent month totals", () =
   assert.equal($("net-cash-flow").textContent, "$500.00");
 });
 
-test("transaction action router loads after its view and is precached", () => {
+test("transaction maintenance router loads after its view and is precached", () => {
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -163,34 +163,40 @@ test("transaction action router loads after its view and is precached", () => {
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   assert.ok(
     html.indexOf("features/transaction-views.js") <
-      html.indexOf("features/transaction-view-events.js") &&
-      html.indexOf("features/transaction-view-events.js") <
+      html.indexOf("features/transaction-maintenance-events.js") &&
+      html.indexOf("features/transaction-maintenance-events.js") <
         html.indexOf("app.js"),
-    "transaction view should load before its action router and the app",
+    "transaction view should load before its maintenance router and the app",
   );
-  assert.match(worker, /'\.\/features\/transaction-view-events\.js'/);
+  assert.match(worker, /'\.\/features\/transaction-maintenance-events\.js'/);
 });
 
-test("transaction action router routes correction and void actions to maintenance", () => {
+test("transaction maintenance router routes correction and void actions", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-view-events.js"),
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "transaction-maintenance-events.js",
+      ),
       "utf8",
     ),
     context,
   );
   const calls = [];
   let clickHandler;
-  const feature = context.window.PropertyDeskTransactionViewEvents.create({
-    documentRef: {
-      addEventListener(name, handler) {
-        if (name === "click") clickHandler = handler;
+  const feature =
+    context.window.PropertyDeskTransactionMaintenanceEvents.create({
+      documentRef: {
+        addEventListener(name, handler) {
+          if (name === "click") clickHandler = handler;
+        },
       },
-    },
-    correctTransaction: (...args) => calls.push(["correct", ...args]),
-    voidTransaction: (...args) => calls.push(["void", ...args]),
-  });
+      correctTransaction: (...args) => calls.push(["correct", ...args]),
+      voidTransaction: (...args) => calls.push(["void", ...args]),
+    });
   feature.attachTransactionActionEvents();
 
   for (const [selector, dataset] of [

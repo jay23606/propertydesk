@@ -46,7 +46,7 @@
         updatePaymentGuidance,
       });
       const { attachTransactionActionEvents } =
-        window.PropertyDeskTransactionViewEvents.create({
+        window.PropertyDeskTransactionMaintenanceEvents.create({
           documentRef: eventsContext.documentRef,
           correctTransaction,
           voidTransaction,
