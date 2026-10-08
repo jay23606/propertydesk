@@ -24,13 +24,13 @@
 @media (max-width: 760px) {
   .portfolio-table {
     box-sizing: border-box;
-    width: 100vw;
-    margin-inline: calc(50% - 50vw);
+    width: calc(100% + 30px);
+    margin-inline: -15px;
     border-radius: 0;
   }
   .portfolio-table table {
-    width: 100%;
-    min-width: 100%;
+    width: 182vw;
+    min-width: 182vw;
     table-layout: fixed;
   }
   .portfolio-table th,
@@ -50,9 +50,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 14vw;
-    min-width: 14vw;
-    max-width: 14vw;
+    width: 11vw;
+    min-width: 11vw;
+    max-width: 11vw;
     z-index: 2;
     background: #fff;
     text-align: center;
@@ -100,9 +100,9 @@
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 32vw;
-    min-width: 32vw;
-    max-width: 32vw;
+    width: 35vw;
+    min-width: 35vw;
+    max-width: 35vw;
     overflow-wrap: anywhere;
   }
   .portfolio-table th:nth-child(4),
@@ -137,6 +137,14 @@
     max-width: 6.5vw;
     padding-right: 0;
     padding-left: 0;
+  }
+  .portfolio-table th:nth-child(7),
+  .portfolio-table td:nth-child(7),
+  .portfolio-table th:nth-child(8),
+  .portfolio-table td:nth-child(8) {
+    width: 41vw;
+    min-width: 41vw;
+    max-width: 41vw;
   }
   .portfolio-table .portfolio-icon-action {
     width: 24px;
