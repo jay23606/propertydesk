@@ -60,6 +60,7 @@
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
       toast: portfolio.toast,
       fetchAll: portfolio.fetchAll,
+      writeFeedback: portfolio.writeFeedback,
       openPayment: portfolio.openPayment,
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
