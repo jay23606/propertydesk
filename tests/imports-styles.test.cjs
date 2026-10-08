@@ -6,7 +6,7 @@ const test = require("node:test");
 test("import review styles stay in their feature stylesheet", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  const overrides = fs.readFileSync(path.join(root, "overrides.css"), "utf8");
+  const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const imports = fs.readFileSync(path.join(root, "imports.css"), "utf8");
   const stylesheetOrder = [
     ...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g),
@@ -16,7 +16,7 @@ test("import review styles stay in their feature stylesheet", () => {
 
   assert.ok(
     stylesheetOrder.indexOf("imports.css") >
-      stylesheetOrder.indexOf("overrides.css"),
+      stylesheetOrder.indexOf("shared.css"),
   );
   assert.ok(
     stylesheetOrder.indexOf("imports.css") <
@@ -26,7 +26,7 @@ test("import review styles stay in their feature stylesheet", () => {
   assert.match(imports, /\.import-preview-errors/);
   assert.match(imports, /\.import-correction-table/);
   assert.doesNotMatch(
-    overrides,
+    shared,
     /\.import-(?:preview|history|correction)|\.duplicate-import-/,
   );
 });

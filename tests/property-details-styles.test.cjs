@@ -6,7 +6,7 @@ const test = require("node:test");
 test("property detail styles stay in their feature stylesheet", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  const overrides = fs.readFileSync(path.join(root, "overrides.css"), "utf8");
+  const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const details = fs.readFileSync(
     path.join(root, "property-details.css"),
     "utf8",
@@ -19,7 +19,7 @@ test("property detail styles stay in their feature stylesheet", () => {
 
   assert.ok(
     stylesheetOrder.indexOf("property-details.css") >
-      stylesheetOrder.indexOf("overrides.css"),
+      stylesheetOrder.indexOf("shared.css"),
   );
   assert.ok(
     stylesheetOrder.indexOf("property-details.css") <
@@ -30,7 +30,7 @@ test("property detail styles stay in their feature stylesheet", () => {
   assert.match(details, /\.document-list/);
   assert.match(details, /\.holder-choices/);
   assert.doesNotMatch(
-    overrides,
+    shared,
     /\.property-detail-(?:actions|kpis|table)|\.document-list|\.document-row|\.document-name-link|\.holder-choices/,
   );
 });

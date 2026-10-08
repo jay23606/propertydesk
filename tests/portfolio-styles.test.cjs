@@ -7,7 +7,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-  const overrides = fs.readFileSync(path.join(root, "overrides.css"), "utf8");
+  const shared = fs.readFileSync(path.join(root, "shared.css"), "utf8");
   const portfolio = fs.readFileSync(path.join(root, "portfolio.css"), "utf8");
   const stylesheetOrder = [
     ...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g),
@@ -17,7 +17,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
 
   assert.ok(
     stylesheetOrder.indexOf("portfolio.css") >
-      stylesheetOrder.indexOf("overrides.css"),
+      stylesheetOrder.indexOf("shared.css"),
   );
   assert.ok(
     stylesheetOrder.indexOf("portfolio.css") <
@@ -27,5 +27,5 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /\.portfolio-table/);
   assert.match(portfolio, /\.property-row-note/);
   assert.doesNotMatch(styles, /\.portfolio-(?:panel|table|due)/);
-  assert.doesNotMatch(overrides, /\.portfolio-|\.property-row-note/);
+  assert.doesNotMatch(shared, /\.portfolio-|\.property-row-note/);
 });

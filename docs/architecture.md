@@ -34,7 +34,7 @@ Manual reminder drafts and automated reminders share the message builder in `sup
 
 Every browser feature script must be loaded by `index.html` after its dependencies and included in the service worker's `SHELL_FILES` list. When a cached shell file changes, increment `CACHE_NAME` in `sw.js`. The worker caches the static shell only; it must not cache authenticated responses or workspace records.
 
-Styles are layered by purpose: `styles.css` provides the base, `overrides.css` holds shared layout adjustments, `portfolio.css` owns the Properties grid and table, `overview.css` owns the Overview property summaries, `reminders.css` owns reminder controls, `workspace-settings.css` owns workspace member management, `property-details.css` owns property detail tables and documents, `imports.css` owns import review and correction styles, `ledger.css` owns transaction status and amount styles, and `theme.css` owns light and dark mode rules. Keep theme-specific overrides in `theme.css` so the selected palette is applied after feature styles.
+Styles are layered by purpose: `styles.css` provides the base, `shared.css` owns common heading, audit, and table-note components, `portfolio.css` owns the Properties grid and table, `overview.css` owns the Overview property summaries, `reminders.css` owns reminder controls, `workspace-settings.css` owns workspace member management, `property-details.css` owns property detail tables and documents, `imports.css` owns import review and correction styles, `ledger.css` owns transaction status and amount styles, and `theme.css` owns light and dark mode rules. Keep theme-specific overrides in `theme.css` so the selected palette is applied after feature styles.
 
 ## Verification
 

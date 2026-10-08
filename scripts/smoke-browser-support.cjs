@@ -27,6 +27,9 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
     const appScript = Array.from(document.scripts).find(
       (item) => item.src && new URL(item.src).pathname.endsWith("/app.js"),
     );
+    const sharedStylesheet = Array.from(document.querySelectorAll("link[href]"))
+      .map((item) => item.href)
+      .find((href) => new URL(href).pathname.endsWith("/shared.css"));
     const themeStylesheet = Array.from(document.querySelectorAll("link[href]"))
       .map((item) => item.href)
       .find((href) => new URL(href).pathname.endsWith("/theme.css"));
@@ -61,6 +64,8 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
       .map((item) => item.href)
       .find((href) => new URL(href).pathname.endsWith("/ledger.css"));
     if (!appScript) throw new Error("The app script is missing from the page.");
+    if (!sharedStylesheet)
+      throw new Error("The shared stylesheet is missing from the page.");
     if (!themeStylesheet)
       throw new Error("The theme stylesheet is missing from the page.");
     if (!portfolioStylesheet)
@@ -78,6 +83,11 @@ async function assertVersionedShellAssetsAvailableOffline(page, context) {
     if (!ledgerStylesheet)
       throw new Error("The ledger stylesheet is missing from the page.");
     return [
+      {
+        label: "shared stylesheet",
+        url: sharedStylesheet,
+        expected: ".table-subtext",
+      },
       {
         label: "app script",
         url: appScript.src,
