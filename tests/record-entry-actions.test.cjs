@@ -5,6 +5,7 @@ const {
   loadPropertyAndAccountForms,
   ledgerEntryDependencies,
   accountFormDependencies,
+  accountFormModel,
   propertyFormDependencies,
 } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
@@ -56,7 +57,7 @@ test("record-entry feature owns form event bindings and category hints", () => {
     fetchAll() {},
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
-    formModel: context.window.PropertyDeskAccountFormModel,
+    formModel: accountFormModel(context),
     ...accountFormDependencies(context),
   });
   const entryForms = context.window.PropertyDeskLedgerEntryForms.create({

@@ -4,6 +4,7 @@ const {
   loadLedgerEntryForms,
   ledgerEntryDependencies,
   accountFormDependencies,
+  accountFormModel,
   propertyFormDependencies,
   loadPropertyAndAccountForms,
   formElements,
@@ -338,7 +339,7 @@ test("property/account forms and ledger-entry forms expose separate workflows", 
     ...formContext,
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
-    formModel: context.window.PropertyDeskAccountFormModel,
+    formModel: accountFormModel(context),
     ...accountFormDependencies(context),
   });
   const ledger = context.window.PropertyDeskLedgerEntryForms.create({

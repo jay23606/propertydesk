@@ -5,6 +5,7 @@ const test = require("node:test");
 const {
   loadPropertyAndAccountForms,
   accountFormDependencies,
+  accountFormModel,
   propertyFormDependencies,
   formElements,
 } = require("./feature-test-helpers.cjs");
@@ -42,7 +43,7 @@ test("property and account form modules expose separate APIs", () => {
   const account = context.window.PropertyDeskAccountForm.create({
     ...dependencies,
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
-    formModel: context.window.PropertyDeskAccountFormModel,
+    formModel: accountFormModel(context),
     ...accountFormDependencies(context, dependencies.state),
   });
 
@@ -482,7 +483,7 @@ test("property and account forms report rejected saves without running success a
     openModal() {},
     previewReminderEmail: () => {},
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
-    formModel: context.window.PropertyDeskAccountFormModel,
+    formModel: accountFormModel(context),
     ...accountFormDependencies(context, state),
   });
 

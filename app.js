@@ -183,7 +183,9 @@
         openModal,
         previewReminderEmail,
         buildAccountPayload: window.PropertyDeskAccountPayload.build,
-        formModel: window.PropertyDeskAccountFormModel,
+        formModel: window.PropertyDeskAccountFormModel.create(
+          window.PropertyDeskEmailAddressUtils,
+        ),
         repository: repositories.accounts,
       },
     });

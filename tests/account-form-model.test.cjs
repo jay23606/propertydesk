@@ -13,6 +13,8 @@ function loadModel() {
     ),
     context,
   );
+  const emailAddressUtils = context.window.PropertyDeskEmailAddressUtils;
+  delete context.window.PropertyDeskEmailAddressUtils;
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "account-form-model.js"),
@@ -20,7 +22,7 @@ function loadModel() {
     ),
     context,
   );
-  return context.window.PropertyDeskAccountFormModel;
+  return context.window.PropertyDeskAccountFormModel.create(emailAddressUtils);
 }
 
 test("account form model normalizes a list of party email addresses", () => {

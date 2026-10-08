@@ -84,7 +84,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /buildAccountPayload: window\.PropertyDeskAccountPayload\.build/,
   );
-  assert.match(app, /formModel: window\.PropertyDeskAccountFormModel/);
+  assert.match(
+    app,
+    /formModel: window\.PropertyDeskAccountFormModel\.create\([\s\S]*?window\.PropertyDeskEmailAddressUtils,\s*\)/,
+  );
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
     app,

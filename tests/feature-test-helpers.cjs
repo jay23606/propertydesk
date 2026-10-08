@@ -134,6 +134,12 @@ function accountFormDependencies(context, state = {}) {
   };
 }
 
+function accountFormModel(context) {
+  return context.window.PropertyDeskAccountFormModel.create(
+    context.window.PropertyDeskEmailAddressUtils,
+  );
+}
+
 function propertyFormDependencies(context, state = {}) {
   return {
     repository: context.window.PropertyDeskPropertyRepository.create({
@@ -242,6 +248,7 @@ module.exports = {
   loadLedgerEntryForms,
   ledgerEntryDependencies,
   accountFormDependencies,
+  accountFormModel,
   propertyFormDependencies,
   loadPropertyAndAccountForms,
   loadImportFeatures,
