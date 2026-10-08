@@ -131,6 +131,8 @@
         window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
     });
   const appShell = window.PropertyDeskAppShellWorkflow.create({
+    workspaceWorkflow: window.PropertyDeskWorkspace,
+    navigationWorkflow: window.PropertyDeskNavigation,
     workspace: {
       $,
       state,

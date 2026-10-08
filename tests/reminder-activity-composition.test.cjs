@@ -19,7 +19,7 @@ test("workspace reminder activity stays independent of account email preview", (
       path.join(root, "features", "app-shell-workflow.js"),
       "utf8",
     ),
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?PropertyDeskNavigation\.create\(\{/,
+    /workspaceWorkflow\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?navigationWorkflow\.create\(\{/,
   );
   assert.match(
     fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),

@@ -23,7 +23,15 @@ test("app shell composes workspace settings and page navigation", () => {
   );
   assert.match(
     appShell,
-    /PropertyDeskWorkspace\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?PropertyDeskNavigation\.create\(\{[\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
+    /workspaceWorkflow\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?navigationWorkflow\.create\(\{[\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
+  );
+  assert.doesNotMatch(
+    appShell,
+    /window\.PropertyDesk(?:Workspace|Navigation)\.create/,
+  );
+  assert.match(
+    app,
+    /workspaceWorkflow: window\.PropertyDeskWorkspace,[\s\S]*?navigationWorkflow: window\.PropertyDeskNavigation,/,
   );
   assert.match(
     workspace,

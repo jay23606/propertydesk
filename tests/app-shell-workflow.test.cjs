@@ -64,6 +64,8 @@ test("app shell composes workspace settings and navigation explicitly", () => {
   const appShell = context.window.PropertyDeskAppShellWorkflow.create({
     workspace,
     navigation,
+    workspaceWorkflow: context.window.PropertyDeskWorkspace,
+    navigationWorkflow: context.window.PropertyDeskNavigation,
   });
 
   assert.deepEqual(Object.keys(passed.workspace).sort(), [

@@ -2,8 +2,13 @@
 (() => {
   "use strict";
 
-  function createAppShellWorkflow({ workspace, navigation }) {
-    const workspacePage = window.PropertyDeskWorkspace.create({
+  function createAppShellWorkflow({
+    workspace,
+    navigation,
+    workspaceWorkflow,
+    navigationWorkflow,
+  }) {
+    const workspacePage = workspaceWorkflow.create({
       $: workspace.$,
       state: workspace.state,
       esc: workspace.esc,
@@ -14,7 +19,7 @@
       authClient: workspace.authClient,
       confirmAction: workspace.confirmAction,
     });
-    const pageNavigation = window.PropertyDeskNavigation.create({
+    const pageNavigation = navigationWorkflow.create({
       $: navigation.$,
       state: navigation.state,
       renderWorkspacePage: workspacePage.renderWorkspacePage,
