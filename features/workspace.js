@@ -19,9 +19,14 @@
       authClient,
       toast,
     });
+    const memberView = window.PropertyDeskWorkspaceMembersView.create({
+      $,
+      state,
+      esc,
+    });
     function renderWorkspaceSettings() {
       profileWorkflow.renderProfileSettings();
-      members.renderWorkspaceMembers();
+      memberView.renderWorkspaceMembers();
     }
 
     function renderWorkspacePage() {
@@ -29,12 +34,11 @@
       renderReminderActivity();
     }
 
-    const members = window.PropertyDeskWorkspaceMembersWorkflow.create({
-      $,
+    const members = window.PropertyDeskWorkspaceMembers.create({
       state,
-      esc,
       toast,
       fetchAll,
+      view: memberView,
       refreshWorkspaceSettings: renderWorkspaceSettings,
       repository: memberRepository,
       confirmAction,

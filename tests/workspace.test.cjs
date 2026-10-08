@@ -25,13 +25,16 @@ test("workspace workflow composes profile settings with member settings", () => 
           };
         },
       },
-      PropertyDeskWorkspaceMembersWorkflow: {
+      PropertyDeskWorkspaceMembersView: {
         create(options) {
-          passed.memberWorkflow = options;
-          return {
-            renderWorkspaceMembers: () => renderWorkspaceMembers(),
-            attachWorkspaceMemberEvents: attachMemberEvents,
-          };
+          passed.memberView = options;
+          return { renderWorkspaceMembers };
+        },
+      },
+      PropertyDeskWorkspaceMembers: {
+        create(options) {
+          passed.memberActions = options;
+          return { attachWorkspaceMemberEvents: attachMemberEvents };
         },
       },
     },
@@ -55,15 +58,23 @@ test("workspace workflow composes profile settings with member settings", () => 
 
   assert.equal(passed.profileWorkflow.state, state);
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
-  assert.equal(passed.memberWorkflow.repository, memberRepository);
+  assert.equal(passed.memberActions.repository, memberRepository);
+  assert.equal(
+    passed.memberActions.view.renderWorkspaceMembers,
+    renderWorkspaceMembers,
+  );
+  assert.equal(
+    typeof passed.memberActions.refreshWorkspaceSettings,
+    "function",
+  );
   assert.equal(workflow.updateGreeting, updateGreeting);
   workflow.renderWorkspacePage();
   assert.equal(passed.displayName, "Owner");
   assert.equal(reminderActivityRenders, 1);
-  passed.memberWorkflow.refreshWorkspaceSettings();
+  passed.memberActions.refreshWorkspaceSettings();
   assert.equal(reminderActivityRenders, 1);
   workflow.attachProfileEvents();
   workflow.attachWorkspaceMemberEvents();
-  assert.equal(passed.memberWorkflow.esc instanceof Function, true);
+  assert.equal(passed.memberView.esc instanceof Function, true);
   assert.deepEqual(eventCalls, ["profile", "members"]);
 });
