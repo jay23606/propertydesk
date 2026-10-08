@@ -4,8 +4,17 @@
 
   function resolveVoidTarget(kind) {
     if (kind === "income")
-      return { table: "pd_payments", label: "income entry" };
-    if (kind === "expense") return { table: "pd_expenses", label: "expense" };
+      return {
+        table: "pd_payments",
+        label: "income entry",
+        collection: "payments",
+      };
+    if (kind === "expense")
+      return {
+        table: "pd_expenses",
+        label: "expense",
+        collection: "expenses",
+      };
     return null;
   }
 

@@ -30,8 +30,7 @@
               }),
             fetchAll,
             isConfirmed: () => {
-              const rows =
-                state?.[kind === "income" ? "payments" : "expenses"] || [];
+              const rows = state?.[target.collection] || [];
               return rows.some(
                 (row) =>
                   row.id === id &&

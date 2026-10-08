@@ -56,7 +56,7 @@
             toast(successMessage);
           },
           successMessage,
-          savedRefreshFailureMessage: `${kind === "payment" ? "Payment" : "Expense"} correction was saved, but the workspace could not refresh. Reload before trying again.`,
+          savedRefreshFailureMessage: `${type.label} correction was saved, but the workspace could not refresh. Reload before trying again.`,
         },
       );
     }
