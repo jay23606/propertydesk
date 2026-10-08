@@ -42,19 +42,17 @@
     };
   }
 
-  function createExpenseImport(context) {
-    const {
-      $,
-      state,
-      parseCSV,
-      validateExpenseRows,
-      commitTransactions,
-      importReview,
-      createImportLookup,
-      createFileWorkflow,
-      createTransactionImportWorkflow,
-    } = context;
-
+  function createExpenseImport({
+    $,
+    state,
+    parseCSV,
+    validateExpenseRows,
+    commitTransactions,
+    importReview,
+    createImportLookup,
+    createFileWorkflow,
+    createTransactionImportWorkflow,
+  }) {
     return createTransactionImportWorkflow({
       $,
       parseCSV,

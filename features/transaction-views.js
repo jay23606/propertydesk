@@ -2,20 +2,19 @@
 (() => {
   "use strict";
 
-  function createTransactionViews(context) {
-    const {
-      $,
-      state,
-      dateOnly,
-      fmtDate,
-      esc,
-      expenseCategoryLabel,
-      money,
-      postedOnOrAfter,
-      monthStart,
-      sumIncome,
-      sumOperatingExpenses,
-    } = context;
+  function createTransactionViews({
+    $,
+    state,
+    dateOnly,
+    fmtDate,
+    esc,
+    expenseCategoryLabel,
+    money,
+    postedOnOrAfter,
+    monthStart,
+    sumIncome,
+    sumOperatingExpenses,
+  }) {
     const filterModel = window.PropertyDeskTransactionListFilterModel.create({
       dateOnly,
     });

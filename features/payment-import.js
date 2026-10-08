@@ -2,19 +2,17 @@
 (() => {
   "use strict";
 
-  function createPaymentImport(context) {
-    const {
-      $,
-      state,
-      parseCSV,
-      validatePaymentRows,
-      commitTransactions,
-      importReview,
-      createImportLookup,
-      createFileWorkflow,
-      createTransactionImportWorkflow,
-    } = context;
-
+  function createPaymentImport({
+    $,
+    state,
+    parseCSV,
+    validatePaymentRows,
+    commitTransactions,
+    importReview,
+    createImportLookup,
+    createFileWorkflow,
+    createTransactionImportWorkflow,
+  }) {
     return createTransactionImportWorkflow({
       $,
       parseCSV,

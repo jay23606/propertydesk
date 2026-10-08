@@ -2,18 +2,17 @@
 (() => {
   "use strict";
 
-  function createImportWorkflows(context) {
-    const {
-      $,
-      state,
-      esc,
-      openModal,
-      closeModal,
-      todayIso,
-      fetchAll,
-      toast,
-      repository,
-    } = context;
+  function createImportWorkflows({
+    $,
+    state,
+    esc,
+    openModal,
+    closeModal,
+    todayIso,
+    fetchAll,
+    toast,
+    repository,
+  }) {
     const { selectImportRows, createImportLookup } =
       window.PropertyDeskImportRows;
     const { parseCSV } = window.PropertyDeskCsvParser;
