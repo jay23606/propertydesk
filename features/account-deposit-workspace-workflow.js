@@ -8,7 +8,20 @@
     const accountDetailWorkspace =
       window.PropertyDeskAccountDetailWorkspaceWorkflow.create({
         content: {
-          ...accountDetails.content,
+          $: accountDetails.content.$,
+          state: accountDetails.content.state,
+          money: accountDetails.content.money,
+          fmtDate: accountDetails.content.fmtDate,
+          esc: accountDetails.content.esc,
+          sumPosted: accountDetails.content.sumPosted,
+          prettyType: accountDetails.content.prettyType,
+          paymentFrequencyLabel: accountDetails.content.paymentFrequencyLabel,
+          summarizeAccount: accountDetails.content.summarizeAccount,
+          amortizationSchedule: accountDetails.content.amortizationSchedule,
+          openModal: accountDetails.content.openModal,
+          propertyAddress: accountDetails.content.propertyAddress,
+          accountHistoryRepository:
+            accountDetails.content.accountHistoryRepository,
           depositSectionHTML: depositWorkspace.depositSectionHTML,
         },
         actions: accountDetails.actions,

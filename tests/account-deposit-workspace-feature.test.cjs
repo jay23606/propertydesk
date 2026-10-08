@@ -47,7 +47,23 @@ test("account and deposit workspace exposes only its supported operations", () =
     context,
   );
   const deposits = { detailOptions: {} };
-  const accountDetails = { content: { contentOption: true }, actions: {} };
+  const content = {
+    $: () => {},
+    state: {},
+    money: () => {},
+    fmtDate: () => {},
+    esc: () => {},
+    sumPosted: () => {},
+    prettyType: () => {},
+    paymentFrequencyLabel: () => {},
+    summarizeAccount: () => {},
+    amortizationSchedule: () => {},
+    openModal: () => {},
+    propertyAddress: () => {},
+    accountHistoryRepository: {},
+    unusedContentValue: true,
+  };
+  const accountDetails = { content, actions: {} };
   const workspace =
     context.window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
       deposits,
@@ -61,7 +77,27 @@ test("account and deposit workspace exposes only its supported operations", () =
     "openAccountDetails",
   ]);
   assert.equal(passed.deposits, deposits);
-  assert.equal(passed.accountDetails.content.contentOption, true);
+  assert.deepEqual(Object.keys(passed.accountDetails.content).sort(), [
+    "$",
+    "accountHistoryRepository",
+    "amortizationSchedule",
+    "depositSectionHTML",
+    "esc",
+    "fmtDate",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "state",
+    "sumPosted",
+    "summarizeAccount",
+  ]);
+  assert.equal("unusedContentValue" in passed.accountDetails.content, false);
+  for (const key of Object.keys(content)) {
+    if (key === "unusedContentValue") continue;
+    assert.equal(passed.accountDetails.content[key], content[key]);
+  }
   assert.equal(
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
