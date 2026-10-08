@@ -2,20 +2,23 @@
 (() => {
   "use strict";
 
+  function greetingForHour(hour) {
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  }
+
+  function displayNameFor(user) {
+    return (
+      user?.user_metadata?.display_name || user?.email?.split("@")[0] || "there"
+    );
+  }
+
   function createProfileDisplay({ $, state, now = () => new Date() }) {
     function updateGreeting() {
       const currentTime = now();
-      const hour = currentTime.getHours();
-      const greeting =
-        hour < 12
-          ? "Good morning"
-          : hour < 18
-            ? "Good afternoon"
-            : "Good evening";
-      const displayName =
-        state.user?.user_metadata?.display_name ||
-        state.user?.email?.split("@")[0] ||
-        "there";
+      const greeting = greetingForHour(currentTime.getHours());
+      const displayName = displayNameFor(state.user);
       $("greeting-name").textContent = `, ${displayName}`;
       $("page-overview").querySelector("h1").firstChild.textContent = greeting;
       $("user-email").textContent = displayName;
