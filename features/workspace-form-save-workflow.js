@@ -11,6 +11,7 @@
         fetchAll,
         toast,
         successMessage: `${label} ${id ? "updated" : "added"}`,
+        refreshFailureMessage: `${label} was saved, but the workspace could not refresh. Reload to verify the change.`,
       });
       return true;
     }

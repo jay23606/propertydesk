@@ -30,6 +30,9 @@
         afterRefresh: () => openPropertyDetails(id),
         toast,
         successMessage: archived_at ? "Property archived" : "Property restored",
+        refreshFailureMessage: archived_at
+          ? "Property was archived, but the workspace could not refresh. Reload to verify its status."
+          : "Property was restored, but the workspace could not refresh. Reload to verify its status.",
       });
     }
 

@@ -37,6 +37,9 @@
         fetchAll,
         toast,
         successMessage: note ? "Property note saved" : "Property note removed",
+        refreshFailureMessage: note
+          ? "Property note was saved, but the workspace could not refresh. Reload to verify it."
+          : "Property note was removed, but the workspace could not refresh. Reload to verify it.",
       });
     }
 

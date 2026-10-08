@@ -46,6 +46,8 @@
           type === "retained"
             ? "Deposit retention recorded"
             : "Deposit retention reversed",
+        refreshFailureMessage:
+          "Deposit adjustment was saved, but the workspace could not refresh. Reload before recording another adjustment.",
       });
     }
 

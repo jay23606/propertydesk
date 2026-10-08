@@ -55,6 +55,8 @@
         afterRefresh: () => openPropertyDetails(id),
         toast,
         successMessage: "Account-holder labels saved",
+        refreshFailureMessage:
+          "Account-holder labels were saved, but the workspace could not refresh. Reload to verify them.",
       });
     }
 

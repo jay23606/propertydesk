@@ -16,6 +16,8 @@
         fetchAll,
         toast,
         successMessage: "Account closed",
+        refreshFailureMessage:
+          "Account was closed, but the workspace could not refresh. Reload to verify its status.",
       });
     }
 

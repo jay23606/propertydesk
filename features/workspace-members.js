@@ -26,6 +26,8 @@
           afterRefresh: refreshWorkspaceSettings,
           toast,
           successMessage: "Workspace member added",
+          refreshFailureMessage:
+            "Workspace member was added, but the workspace could not refresh. Reload to verify access.",
         })
       )
         return true;
@@ -54,6 +56,8 @@
         afterRefresh: refreshWorkspaceSettings,
         toast,
         successMessage: "Workspace access removed",
+        refreshFailureMessage:
+          "Workspace access was removed, but the workspace could not refresh. Reload to verify access.",
       });
     }
 
