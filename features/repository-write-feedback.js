@@ -184,11 +184,61 @@
     });
   }
 
+  async function runAndRefreshWorkspaceChange({
+    operation,
+    fetchAll,
+    isConfirmed,
+    toast,
+    failureMessage,
+    errorMessage,
+    resultFailureMessage,
+    refreshFailureMessage,
+    retryMessage,
+    onSaved,
+    afterRefresh,
+    successMessage,
+    savedRefreshFailureMessage,
+    onReconciled,
+  }) {
+    let reconciled = false;
+    const saved = await run({
+      operation,
+      toast,
+      failureMessage,
+      errorMessage,
+      resultFailureMessage,
+      onUnconfirmed: () =>
+        reconcileWorkspaceChange({
+          fetchAll,
+          isConfirmed,
+          toast,
+          refreshFailureMessage,
+          retryMessage,
+          onConfirmed: () => {
+            reconciled = true;
+            onReconciled?.();
+          },
+        }),
+    });
+    if (!saved || reconciled) return saved;
+
+    onSaved?.();
+    return refreshWorkspace({
+      fetchAll,
+      afterRefresh,
+      toast,
+      successMessage,
+      refreshFailureMessage:
+        savedRefreshFailureMessage || refreshFailureMessage,
+    });
+  }
+
   window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
     run,
     refreshWorkspace,
     reconcileWorkspaceChange,
     saveWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,
+    runAndRefreshWorkspaceChange,
   });
 })();

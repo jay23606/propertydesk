@@ -18,23 +18,16 @@
         return;
       }
       const payload = buildVoidPayload(reason, timestamp());
-      let reconciled = false;
-      const saved = await window.PropertyDeskRepositoryWriteFeedback.run({
-        operation: () =>
-          repository.voidPosted({
-            target,
-            id,
-            payload,
-          }),
-        toast,
-        failureMessage:
-          "Transaction void result couldn't be confirmed. Reload transaction history before trying again.",
-        resultFailureMessage: ({ data }) =>
-          data
-            ? null
-            : "This transaction was already voided or is no longer available.",
-        onUnconfirmed: () =>
-          window.PropertyDeskRepositoryWriteFeedback.reconcileWorkspaceChange({
+      const successMessage = "Transaction voided; original entry preserved";
+      const saved =
+        await window.PropertyDeskRepositoryWriteFeedback.runAndRefreshWorkspaceChange(
+          {
+            operation: () =>
+              repository.voidPosted({
+                target,
+                id,
+                payload,
+              }),
             fetchAll,
             isConfirmed: () => {
               const rows =
@@ -48,28 +41,23 @@
               );
             },
             toast,
+            failureMessage:
+              "Transaction void result couldn't be confirmed. Reload transaction history before trying again.",
+            resultFailureMessage: ({ data }) =>
+              data
+                ? null
+                : "This transaction was already voided or is no longer available.",
             refreshFailureMessage:
               "Transaction void result couldn't be confirmed, and transaction history could not refresh. Reload before trying again.",
             retryMessage:
               "Transaction history was refreshed. Check it before trying to void this entry again.",
-            onConfirmed: () => {
-              reconciled = true;
-              toast("Transaction voided; original entry preserved");
-            },
-          }),
-      });
-      if (!saved) return;
-      if (reconciled) return true;
-      if (
-        await window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace({
-          fetchAll,
-          toast,
-          successMessage: "Transaction voided; original entry preserved",
-          refreshFailureMessage:
-            "Transaction was voided, but the workspace could not refresh. Reload to verify its status before making another change.",
-        })
-      )
-        return true;
+            onReconciled: () => toast(successMessage),
+            successMessage,
+            savedRefreshFailureMessage:
+              "Transaction was voided, but the workspace could not refresh. Reload to verify its status before making another change.",
+          },
+        );
+      return saved || undefined;
     }
 
     return Object.freeze({ saveVoidTransaction });
