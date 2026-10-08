@@ -15,7 +15,7 @@
       return { active: result.active, totals: result.totals, entries };
     }
 
-    return { depositLedger };
+    return Object.freeze({ depositLedger });
   }
 
   window.PropertyDeskDepositContext = Object.freeze({ create });

@@ -16,7 +16,7 @@
       return saveCloseAccount(account);
     }
 
-    return { closeAccount };
+    return Object.freeze({ closeAccount });
   }
 
   window.PropertyDeskAccountCloseEntry = Object.freeze({ create });

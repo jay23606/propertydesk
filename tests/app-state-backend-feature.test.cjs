@@ -204,7 +204,7 @@ test("deposit context scopes held-balance calculations to the selected account",
   const payments = [{ id: "p1" }];
   const expenses = [{ id: "e1" }];
   const passed = {};
-  const deposit = context.window.PropertyDeskDepositContext.create({
+  const depositContext = context.window.PropertyDeskDepositContext.create({
     state: { depositEntries, payments, expenses },
     securityDepositBalance(entries, passedPayments, passedExpenses) {
       passed.entries = entries;
@@ -215,7 +215,9 @@ test("deposit context scopes held-balance calculations to the selected account",
         totals: { held: entries.reduce((sum, row) => sum + row.amount, 0) },
       };
     },
-  }).depositLedger("a1");
+  });
+  assert.equal(Object.isFrozen(depositContext), true);
+  const deposit = depositContext.depositLedger("a1");
 
   assert.equal(deposit.entries.length, 1);
   assert.equal(deposit.entries[0], depositEntries[0]);

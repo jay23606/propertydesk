@@ -19,7 +19,7 @@
       });
     }
 
-    return { saveCloseAccount };
+    return Object.freeze({ saveCloseAccount });
   }
 
   window.PropertyDeskAccountCloseMaintenance = Object.freeze({ create });

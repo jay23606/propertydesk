@@ -57,6 +57,7 @@ test("account close maintenance preserves the account history", async () => {
     toast: (message) => messages.push(message),
   });
 
+  assert.equal(Object.isFrozen(feature), true);
   await feature.saveCloseAccount({ id: "account-1", name: "Rental" });
 
   assert.equal(updates[0][0], "pd_accounts");
@@ -167,6 +168,7 @@ test("account close entry confirms before delegating to persistence", async () =
     saveCloseAccount: (value) => calls.push(["save", value]),
   });
 
+  assert.equal(Object.isFrozen(entry), true);
   await entry.closeAccount(account);
 
   assert.deepEqual(calls, [
