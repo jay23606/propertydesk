@@ -165,7 +165,14 @@ test("app coordinator passes the amortization helper into account details", () =
       path.join(__dirname, "..", "features", "workspace-deposit-context.js"),
       "utf8",
     ),
-    /PropertyDeskDepositLedgerUtils\.create\([\s\S]*?PropertyDeskDepositContext\.create\(/,
+    /workflows\.depositLedger\.create\([\s\S]*?workflows\.depositContext\.create\(/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "workspace-deposit-context.js"),
+      "utf8",
+    ),
+    /window\.PropertyDesk[A-Za-z]+\.create\(/,
   );
   assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create/);
   assert.match(

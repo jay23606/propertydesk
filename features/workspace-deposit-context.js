@@ -2,11 +2,15 @@
 (() => {
   "use strict";
 
-  function createWorkspaceDepositContext({ state, postedLedgerUtils }) {
-    const depositCalculations = window.PropertyDeskDepositLedgerUtils.create({
+  function createWorkspaceDepositContext({
+    state,
+    postedLedgerUtils,
+    workflows,
+  }) {
+    const depositCalculations = workflows.depositLedger.create({
       isPosted: postedLedgerUtils.isPosted,
     });
-    return window.PropertyDeskDepositContext.create({
+    return workflows.depositContext.create({
       state,
       securityDepositBalance: depositCalculations.securityDepositBalance,
     });

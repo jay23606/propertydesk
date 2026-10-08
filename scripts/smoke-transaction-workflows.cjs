@@ -45,15 +45,12 @@ async function smokeTransactionWorkflows(signedInPage) {
     }
   }
   await signedInPage.locator('.nav-link[data-view="workspace"]').click();
-  const workspacePage = await signedInPage
-    .locator("#page-workspace")
-    .innerText();
-  if (
-    !workspacePage.includes("Email reminder activity") ||
-    !workspacePage.includes("Reminder attempts will appear here")
-  ) {
+  const reminderActivityVisible = await signedInPage
+    .locator("#reminder-activity-panel")
+    .isVisible();
+  if (reminderActivityVisible) {
     throw new Error(
-      "Workspace settings did not render reminder delivery activity.",
+      "Workspace settings showed automatic email reminder activity before its sending domain was configured.",
     );
   }
   await signedInPage.locator('.nav-link[data-view="payments"]').click();

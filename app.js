@@ -92,6 +92,10 @@
   const { depositLedger } = window.PropertyDeskWorkspaceDepositContext.create({
     state,
     postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
+    workflows: {
+      depositLedger: window.PropertyDeskDepositLedgerUtils,
+      depositContext: window.PropertyDeskDepositContext,
+    },
   });
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =

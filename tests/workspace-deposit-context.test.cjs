@@ -8,22 +8,21 @@ test("workspace deposit context composes posted-ledger math with account scoping
   const calls = [];
   const securityDepositBalance = () => ({ active: [], totals: {} });
   const depositLedger = () => ({ active: [], totals: {}, entries: [] });
-  const context = vm.createContext({
-    window: {
-      PropertyDeskDepositLedgerUtils: {
-        create(options) {
-          calls.push(["calculations", options]);
-          return { securityDepositBalance };
-        },
-      },
-      PropertyDeskDepositContext: {
-        create(options) {
-          calls.push(["workspace-data", options]);
-          return { depositLedger };
-        },
+  const context = vm.createContext({ window: {} });
+  const workflows = {
+    depositLedger: {
+      create(options) {
+        calls.push(["calculations", options]);
+        return { securityDepositBalance };
       },
     },
-  });
+    depositContext: {
+      create(options) {
+        calls.push(["workspace-data", options]);
+        return { depositLedger };
+      },
+    },
+  };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-deposit-context.js"),
@@ -39,6 +38,7 @@ test("workspace deposit context composes posted-ledger math with account scoping
     context.window.PropertyDeskWorkspaceDepositContext.create({
       state,
       postedLedgerUtils,
+      workflows,
     });
 
   assert.deepEqual(
