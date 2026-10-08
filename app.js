@@ -520,6 +520,11 @@
           accountTable: window.PropertyDeskPropertyDetailsAccountTable,
           detailsView: window.PropertyDeskPropertyDetailsView,
           activityDetails: window.PropertyDeskPropertyActivityDetails,
+          activityModules: {
+            transactions: window.PropertyDeskPropertyActivityTransactions,
+            model: window.PropertyDeskPropertyActivityModel,
+            view: window.PropertyDeskPropertyActivityView,
+          },
           detailsModel: window.PropertyDeskPropertyDetailsModel,
           details: window.PropertyDeskPropertyDetails,
         },

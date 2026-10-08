@@ -62,6 +62,11 @@ test("property activity details include posted and voided records without counti
     fmtDate: (date) => date,
     esc: (value) =>
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+    workflows: {
+      transactions: context.window.PropertyDeskPropertyActivityTransactions,
+      model: context.window.PropertyDeskPropertyActivityModel,
+      view: context.window.PropertyDeskPropertyActivityView,
+    },
   });
 
   const result = activity.renderPropertyActivity("property-1", [
@@ -73,6 +78,13 @@ test("property activity details include posted and voided records without counti
   assert.match(result.html, /transaction-voided/);
   assert.match(result.html, /&lt;cancelled&gt;/);
   assert.match(result.html, /−\$75\.00/);
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "property-activity-details.js"),
+      "utf8",
+    ),
+    /window\.PropertyDeskPropertyActivity(?:Transactions|Model|View)\.create/,
+  );
 });
 
 test("property activity model aggregates posted cash flow and sorts eight recent rows", () => {
@@ -230,6 +242,11 @@ test("property detail content workflow connects activity summaries to property r
       accountTable: context.window.PropertyDeskPropertyDetailsAccountTable,
       detailsView: context.window.PropertyDeskPropertyDetailsView,
       activityDetails: context.window.PropertyDeskPropertyActivityDetails,
+      activityModules: {
+        transactions: {},
+        model: {},
+        view: {},
+      },
       detailsModel: context.window.PropertyDeskPropertyDetailsModel,
       details: context.window.PropertyDeskPropertyDetails,
     },
@@ -284,6 +301,11 @@ test("property detail content workflow connects activity summaries to property r
   assert.equal(activityContext.state, detailsDependencies.state);
   assert.equal(activityContext.isPosted, detailsDependencies.isPosted);
   assert.equal(activityContext.sumIncome, detailsDependencies.sumIncome);
+  assert.deepEqual(JSON.parse(JSON.stringify(activityContext.workflows)), {
+    transactions: {},
+    model: {},
+    view: {},
+  });
   assert.deepEqual(Object.keys(workflow), ["openPropertyDetails"]);
   assert.equal(workflow.openPropertyDetails(), "property details");
 });

@@ -43,6 +43,7 @@
       money,
       fmtDate,
       esc,
+      workflows: workflows.activityModules,
     });
     const { buildPropertyDetailData } = workflows.detailsModel.create({
       state,

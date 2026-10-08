@@ -10,23 +10,21 @@
     money,
     fmtDate,
     esc,
+    workflows,
   }) {
-    const { buildRecentTransactions } =
-      window.PropertyDeskPropertyActivityTransactions.create();
-    const { buildPropertyActivity } =
-      window.PropertyDeskPropertyActivityModel.create({
-        state,
-        isPosted,
-        sumIncome,
-        sumOperatingExpenses,
-        buildRecentTransactions,
-      });
-    const { renderRecentActivity } =
-      window.PropertyDeskPropertyActivityView.create({
-        money,
-        fmtDate,
-        esc,
-      });
+    const { buildRecentTransactions } = workflows.transactions.create();
+    const { buildPropertyActivity } = workflows.model.create({
+      state,
+      isPosted,
+      sumIncome,
+      sumOperatingExpenses,
+      buildRecentTransactions,
+    });
+    const { renderRecentActivity } = workflows.view.create({
+      money,
+      fmtDate,
+      esc,
+    });
 
     function renderPropertyActivity(propertyId, accounts) {
       const activity = buildPropertyActivity(propertyId, accounts);
