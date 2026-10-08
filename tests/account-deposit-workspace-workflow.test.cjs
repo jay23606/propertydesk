@@ -77,6 +77,10 @@ test("account and deposit workspace share detail rendering and events", () => {
 
   const workspace =
     context.window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
+      depositWorkspaceWorkflow:
+        context.window.PropertyDeskDepositWorkspaceWorkflow,
+      accountDetailWorkspaceWorkflow:
+        context.window.PropertyDeskAccountDetailWorkspaceWorkflow,
       deposits,
       accountDetails: { content, actions },
     });

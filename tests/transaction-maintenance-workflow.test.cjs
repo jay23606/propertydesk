@@ -12,6 +12,19 @@ function loadWorkflow(context, filename) {
 }
 
 test("transaction maintenance coordinator joins isolated correction and void actions", () => {
+  const source = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "transaction-maintenance-workflow.js",
+    ),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDeskTransaction(?:Correction|Void|MaintenanceEvents)[^.]*\.create/,
+  );
   const passed = {};
   const saveCorrection = () => {};
   const voidTransaction = () => {};
@@ -84,6 +97,12 @@ test("transaction maintenance coordinator joins isolated correction and void act
     correction: correctionContext,
     voiding: voidingContext,
     events: eventsContext,
+    workflows: {
+      correction: context.window.PropertyDeskTransactionCorrectionWorkflow,
+      voidMaintenance: context.window.PropertyDeskTransactionVoidMaintenance,
+      voidEntry: context.window.PropertyDeskTransactionVoidEntry,
+      events: context.window.PropertyDeskTransactionMaintenanceEvents,
+    },
   };
   const workflow =
     context.window.PropertyDeskTransactionMaintenanceWorkflow.create(

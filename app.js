@@ -275,6 +275,9 @@
     attachAccountDetailActionEvents,
     attachDepositAdjustmentEvents,
   } = window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
+    depositWorkspaceWorkflow: window.PropertyDeskDepositWorkspaceWorkflow,
+    accountDetailWorkspaceWorkflow:
+      window.PropertyDeskAccountDetailWorkspaceWorkflow,
     deposits: {
       details: {
         state,

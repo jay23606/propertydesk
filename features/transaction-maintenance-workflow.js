@@ -6,8 +6,14 @@
     correction: correctionContext,
     voiding: voidingContext,
     events: eventsContext,
+    workflows: {
+      correction: correctionWorkflow,
+      voidMaintenance: voidMaintenanceWorkflow,
+      voidEntry: voidEntryWorkflow,
+      events: maintenanceEventsWorkflow,
+    },
   }) {
-    const correction = window.PropertyDeskTransactionCorrectionWorkflow.create({
+    const correction = correctionWorkflow.create({
       $: correctionContext.$,
       state: correctionContext.state,
       toast: correctionContext.toast,
@@ -19,17 +25,16 @@
       repository: correctionContext.repository,
       findCorrectionTarget: correctionContext.findCorrectionTarget,
     });
-    const { saveVoidTransaction } =
-      window.PropertyDeskTransactionVoidMaintenance.create({
-        state: voidingContext.state,
-        toast: voidingContext.toast,
-        fetchAll: voidingContext.fetchAll,
-        timestamp: voidingContext.timestamp,
-        resolveVoidTarget: voidingContext.resolveVoidTarget,
-        buildVoidPayload: voidingContext.buildVoidPayload,
-        repository: voidingContext.repository,
-      });
-    const { voidTransaction } = window.PropertyDeskTransactionVoidEntry.create({
+    const { saveVoidTransaction } = voidMaintenanceWorkflow.create({
+      state: voidingContext.state,
+      toast: voidingContext.toast,
+      fetchAll: voidingContext.fetchAll,
+      timestamp: voidingContext.timestamp,
+      resolveVoidTarget: voidingContext.resolveVoidTarget,
+      buildVoidPayload: voidingContext.buildVoidPayload,
+      repository: voidingContext.repository,
+    });
+    const { voidTransaction } = voidEntryWorkflow.create({
       toast: voidingContext.toast,
       saveVoidTransaction,
       resolveVoidTarget: voidingContext.resolveVoidTarget,
@@ -46,7 +51,7 @@
         updatePaymentGuidance,
       });
       const { attachTransactionActionEvents } =
-        window.PropertyDeskTransactionMaintenanceEvents.create({
+        maintenanceEventsWorkflow.create({
           documentRef: eventsContext.documentRef,
           correctTransaction,
           voidTransaction,

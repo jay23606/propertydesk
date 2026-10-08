@@ -33,6 +33,10 @@ test("transaction workspace connects maintenance to the records workflow", () =>
           return recordsApi;
         },
       },
+      PropertyDeskTransactionCorrectionWorkflow: { create() {} },
+      PropertyDeskTransactionVoidMaintenance: { create() {} },
+      PropertyDeskTransactionVoidEntry: { create() {} },
+      PropertyDeskTransactionMaintenanceEvents: { create() {} },
     },
   });
   vm.runInContext(
@@ -59,10 +63,27 @@ test("transaction workspace connects maintenance to the records workflow", () =>
     "correction",
     "events",
     "voiding",
+    "workflows",
   ]);
   assert.equal(passed.maintenance.correction, maintenance.correction);
   assert.equal(passed.maintenance.voiding, maintenance.voiding);
   assert.equal(passed.maintenance.events, maintenance.events);
+  assert.equal(
+    passed.maintenance.workflows.correction,
+    context.window.PropertyDeskTransactionCorrectionWorkflow,
+  );
+  assert.equal(
+    passed.maintenance.workflows.voidMaintenance,
+    context.window.PropertyDeskTransactionVoidMaintenance,
+  );
+  assert.equal(
+    passed.maintenance.workflows.voidEntry,
+    context.window.PropertyDeskTransactionVoidEntry,
+  );
+  assert.equal(
+    passed.maintenance.workflows.events,
+    context.window.PropertyDeskTransactionMaintenanceEvents,
+  );
   assert.equal(passed.records.maintenance, maintenanceApi);
   assert.equal(passed.records.entries, entries);
   assert.equal(passed.records.views, views);
@@ -82,7 +103,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   );
   assert.match(
     transactionWorkspace,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,/,
+    /PropertyDeskTransactionMaintenanceWorkflow\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows:/,
   );
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),

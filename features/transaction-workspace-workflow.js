@@ -8,6 +8,12 @@
         correction: maintenance.correction,
         voiding: maintenance.voiding,
         events: maintenance.events,
+        workflows: {
+          correction: window.PropertyDeskTransactionCorrectionWorkflow,
+          voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
+          voidEntry: window.PropertyDeskTransactionVoidEntry,
+          events: window.PropertyDeskTransactionMaintenanceEvents,
+        },
       });
     return window.PropertyDeskTransactionRecordsWorkflow.create({
       maintenance: transactionMaintenance,
