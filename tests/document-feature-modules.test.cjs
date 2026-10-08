@@ -10,6 +10,7 @@ function loadDocumentModules(context) {
     "workspace-record-write-workflow.js",
     "repository-write-feedback.js",
     "document-repository.js",
+    "document-upload-maintenance.js",
     "document-upload-policy.js",
     "document-upload.js",
     "document-delete.js",
