@@ -36,7 +36,9 @@
           toast: ui.toast,
           fetchAll: services.fetchAll,
           moneyInput: ui.moneyInput,
-          repository: services.depositRepository,
+          repository: {
+            insert: services.depositRepository.insert,
+          },
           saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
           prepareAdjustment: workflows.adjustmentModel.prepare,
           validateAdjustment: workflows.adjustmentModel.validate,

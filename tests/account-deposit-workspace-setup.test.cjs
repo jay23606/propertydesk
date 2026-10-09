@@ -75,6 +75,7 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
       "saveAndRefreshWorkspaceRecord",
     ].map((key) => [key, { name: key }]),
   );
+  services.depositRepository = { insert() {}, unusedDelete() {} };
   services.accountRepository = {
     save() {},
     close() {},
@@ -133,9 +134,12 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
     received.deposits.adjustments.getCollection,
     records.getDepositCollection,
   );
+  assert.deepEqual(Object.keys(received.deposits.adjustments.repository), [
+    "insert",
+  ]);
   assert.equal(
-    received.deposits.adjustments.repository,
-    services.depositRepository,
+    received.deposits.adjustments.repository.insert,
+    services.depositRepository.insert,
   );
   assert.equal(
     received.deposits.adjustments.prepareAdjustment,

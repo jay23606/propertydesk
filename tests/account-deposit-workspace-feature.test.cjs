@@ -366,7 +366,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.doesNotMatch(depositWorkflow, /writeFeedback/);
   assert.match(
     setup,
-    /adjustments: \{[\s\S]*?repository: services\.depositRepository,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
+    /adjustments: \{[\s\S]*?repository: \{\s*insert: services\.depositRepository\.insert,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
     setup,
