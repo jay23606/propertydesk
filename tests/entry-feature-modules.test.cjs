@@ -332,9 +332,9 @@ test("property workspace composes screens and shares detail actions", () => {
     workflow,
     /openPropertyDetails: propertyDetails\.openPropertyDetails/,
   );
-  assert.match(workflow, /detail\.workflows\.screen\.create\(/);
-  assert.match(workflow, /workflow\.create\(\{\s*\$: overview\.\$/);
-  assert.match(workflow, /workflow\.create\(\{\s*\$: portfolio\.\$/);
+  assert.match(workflow, /screen\.create\(\{ \.\.\.detail, workflows \}/);
+  assert.match(workflow, /workflow\.create\(\{\s*\.\.\.overview,/);
+  assert.match(workflow, /workflow\.create\(\{\s*\.\.\.portfolio,/);
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",

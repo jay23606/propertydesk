@@ -37,6 +37,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "getSenderName",
   ];
   const records = Object.fromEntries(recordKeys.map((key) => [key, () => key]));
+  records.unusedRecordValue = true;
   const uiKeys = [
     "$",
     "isPosted",
@@ -71,6 +72,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "promptAction",
   ];
   const ui = Object.fromEntries(uiKeys.map((key) => [key, () => key]));
+  ui.unusedUiValue = true;
   const serviceKeys = [
     "fetchAll",
     "propertyRepository",
@@ -88,6 +90,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "openPropertyPayment",
   ];
   const services = Object.fromEntries(serviceKeys.map((key) => [key, { key }]));
+  services.unusedServiceValue = true;
   const workflows = {
     workspace,
     quickNote: {
@@ -184,5 +187,17 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   assert.equal(received.portfolio.editPropertyQuickNote, editPropertyQuickNote);
   assert.equal("getWorkspaceOwnerId" in received.portfolio, false);
   assert.equal("propertyRepository" in received.portfolio, false);
+  for (const scope of [
+    received.detail.content,
+    received.detail.management,
+    received.detail.holders,
+    received.detail.documents,
+    received.overview,
+    received.portfolio,
+  ]) {
+    assert.equal("unusedRecordValue" in scope, false);
+    assert.equal("unusedUiValue" in scope, false);
+    assert.equal("unusedServiceValue" in scope, false);
+  }
   assert.doesNotMatch(source, /\bstate\b/);
 });

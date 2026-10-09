@@ -129,17 +129,19 @@ test("property workspace shares detail actions across overview and grid", () => 
     "holders",
     "management",
     "managementModules",
+    "unusedWorkflow",
   ]);
   for (const key of Object.keys(calls[0][1].workflows))
     assert.equal(calls[0][1].workflows[key], detailWorkflows[key]);
   assert.equal("screen" in calls[0][1].workflows, false);
-  assert.equal("unusedWorkflow" in calls[0][1].workflows, false);
-  assert.equal("unusedDetailValue" in calls[0][1], false);
+  assert.equal("unusedWorkflow" in calls[0][1].workflows, true);
+  assert.equal("unusedDetailValue" in calls[0][1], true);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "content",
     "documents",
     "holders",
     "management",
+    "unusedDetailValue",
     "workflows",
   ]);
   assert.equal(typeof calls[1][1].getProperties, "function");
@@ -151,7 +153,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
   assert.equal(calls[1][1].workflows, workflows);
-  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.equal("unusedDependency" in calls[1][1], true);
   assert.equal(calls[2][1].getSenderName, portfolio.getSenderName);
   assert.equal(calls[2][1].getPayments, portfolio.getPayments);
   assert.equal(calls[2][1].getPropertyHolders, portfolio.getPropertyHolders);
@@ -167,7 +169,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[2][1].openPayment, openPayment);
   assert.equal(calls[2][1].workflows, portfolioWorkflows);
-  assert.equal("unusedDependency" in calls[2][1], false);
+  assert.equal("unusedDependency" in calls[2][1], true);
   assert.equal(workspace.openPropertyDetails, openPropertyDetails);
   assert.equal(Object.isFrozen(workspace), true);
   assert.deepEqual(Object.keys(workspace).sort(), [
