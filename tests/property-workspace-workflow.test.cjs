@@ -33,9 +33,8 @@ test("property workspace shares detail actions across overview and grid", () => 
   const isActiveAccount = () => true;
   const lateReminderMailto = () => "reminder";
   const lateReminderSms = () => "sms";
-  const promptAction = () => "note";
+  const editPropertyQuickNote = () => "note";
   const portfolioWorkflows = {};
-  const saveAndRefreshWorkspaceRecord = () => {};
   const overviewWorkflow = {
     create(options) {
       calls.push(["overview", options]);
@@ -68,12 +67,10 @@ test("property workspace shares detail actions across overview and grid", () => 
     getProperties: () => [],
     getAccounts: () => [],
     getWorkspaceMembers: () => [],
-    getWorkspaceOwnerId: () => "owner-1",
     propertyAddress,
     lateReminderMailto,
     lateReminderSms,
-    saveAndRefreshWorkspaceRecord,
-    promptAction,
+    editPropertyQuickNote,
     openPayment,
     workflows: portfolioWorkflows,
     unusedDependency: true,
@@ -161,17 +158,12 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[2][1].getProperties, portfolio.getProperties);
   assert.equal(calls[2][1].getAccounts, portfolio.getAccounts);
   assert.equal(calls[2][1].getWorkspaceMembers, portfolio.getWorkspaceMembers);
-  assert.equal(calls[2][1].getWorkspaceOwnerId, portfolio.getWorkspaceOwnerId);
   assert.equal(calls[2][1].groupAccountsByProperty, groupAccountsByProperty);
   assert.equal(calls[2][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[2][1].propertyAddress, propertyAddress);
   assert.equal(calls[2][1].lateReminderMailto, lateReminderMailto);
   assert.equal(calls[2][1].lateReminderSms, lateReminderSms);
-  assert.equal(
-    calls[2][1].saveAndRefreshWorkspaceRecord,
-    saveAndRefreshWorkspaceRecord,
-  );
-  assert.equal(calls[2][1].promptAction, promptAction);
+  assert.equal(calls[2][1].editPropertyQuickNote, editPropertyQuickNote);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[2][1].openPayment, openPayment);
   assert.equal(calls[2][1].workflows, portfolioWorkflows);

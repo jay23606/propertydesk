@@ -10,7 +10,7 @@
     getProperties,
     getAccounts,
     getWorkspaceMembers,
-    getWorkspaceOwnerId,
+    editPropertyQuickNote,
     groupAccountsByProperty,
     isActiveAccount,
     esc,
@@ -28,14 +28,10 @@
     lateReminderSms,
     paymentStatusInMonth,
     toast,
-    fetchAll,
-    saveAndRefreshWorkspaceRecord,
-    promptAction,
     openPayment,
     openPropertyDetails,
     openAccountForProperty,
     editAccount,
-    propertyRepository,
     openModal,
     workflows,
   }) {
@@ -113,18 +109,6 @@
       openEmailTemplateSettings: () => reminderTemplates.openEditor("email"),
       openSmsTemplateSettings: () => reminderTemplates.openEditor("sms"),
       attachTemplateEvents: reminderTemplates.attachEvents,
-    });
-    const { editPropertyQuickNote } = workflows.quickNote.create({
-      getProperties,
-      getWorkspaceOwnerId,
-      toast,
-      fetchAll,
-      promptAction,
-      streetAddress,
-      repository: propertyRepository,
-      saveAndRefreshWorkspaceRecord,
-      noteMaintenance: workflows.noteMaintenance,
-      recordUpdateMaintenance: workflows.recordUpdateMaintenance,
     });
     const { attachEvents: attachPropertyActionEvents } =
       workflows.events.create({

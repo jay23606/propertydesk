@@ -57,6 +57,7 @@
     groupAccountsByProperty,
     isActiveAccount,
     openPropertyDetails,
+    editPropertyQuickNote,
     workflow,
   }) {
     return workflow.create({
@@ -67,7 +68,6 @@
       getProperties: portfolio.getProperties,
       getAccounts: portfolio.getAccounts,
       getWorkspaceMembers: portfolio.getWorkspaceMembers,
-      getWorkspaceOwnerId: portfolio.getWorkspaceOwnerId,
       groupAccountsByProperty,
       isActiveAccount,
       esc: portfolio.esc,
@@ -85,14 +85,11 @@
       lateReminderSms: portfolio.lateReminderSms,
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
       toast: portfolio.toast,
-      fetchAll: portfolio.fetchAll,
-      saveAndRefreshWorkspaceRecord: portfolio.saveAndRefreshWorkspaceRecord,
-      promptAction: portfolio.promptAction,
       openPayment: portfolio.openPayment,
       openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
       editAccount: portfolio.editAccount,
-      propertyRepository: portfolio.propertyRepository,
+      editPropertyQuickNote,
       openModal: portfolio.openModal,
       workflows: portfolio.workflows,
     });
@@ -119,6 +116,7 @@
       groupAccountsByProperty,
       isActiveAccount,
       openPropertyDetails: propertyDetails.openPropertyDetails,
+      editPropertyQuickNote: portfolio.editPropertyQuickNote,
       workflow: workflows.portfolio,
     });
 

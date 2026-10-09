@@ -20,6 +20,8 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
       return result;
     },
   };
+  const editPropertyQuickNote = () => {};
+  let receivedQuickNote;
   const recordKeys = [
     "beginAuditRequest",
     "setSelectedPropertyId",
@@ -88,6 +90,16 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   const services = Object.fromEntries(serviceKeys.map((key) => [key, { key }]));
   const workflows = {
     workspace,
+    quickNote: {
+      workflow: {
+        create(options) {
+          receivedQuickNote = options;
+          return { editPropertyQuickNote };
+        },
+      },
+      noteMaintenance: { key: "note-maintenance" },
+      recordUpdateMaintenance: { key: "record-update-maintenance" },
+    },
     groupAccountsByProperty: { key: "property-index" },
     isActiveAccount: { key: "active-account" },
     overview: { key: "overview-workflow" },
@@ -115,6 +127,21 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
       workflows,
     }),
     result,
+  );
+
+  assert.equal(receivedQuickNote.getProperties, records.getProperties);
+  assert.equal(
+    receivedQuickNote.getWorkspaceOwnerId,
+    records.getWorkspaceOwnerId,
+  );
+  assert.equal(receivedQuickNote.repository, services.propertyRepository);
+  assert.equal(
+    receivedQuickNote.noteMaintenance,
+    workflows.quickNote.noteMaintenance,
+  );
+  assert.equal(
+    receivedQuickNote.recordUpdateMaintenance,
+    workflows.quickNote.recordUpdateMaintenance,
   );
 
   assert.equal(
@@ -153,10 +180,9 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   assert.equal(received.overview.workflows, workflows.overviewModules);
   assert.equal(received.portfolio.getSenderName, records.getSenderName);
   assert.equal(received.portfolio.lateReminderMailto, ui.lateReminderMailto);
-  assert.equal(
-    received.portfolio.propertyRepository,
-    services.propertyRepository,
-  );
   assert.equal(received.portfolio.workflows, workflows.portfolioModules);
+  assert.equal(received.portfolio.editPropertyQuickNote, editPropertyQuickNote);
+  assert.equal("getWorkspaceOwnerId" in received.portfolio, false);
+  assert.equal("propertyRepository" in received.portfolio, false);
   assert.doesNotMatch(source, /\bstate\b/);
 });

@@ -28,7 +28,6 @@ test("app composes the Properties grid and action operations explicitly", () => 
     "workflows.portfolioModel.create(",
     "workflows.pdfExport.create(",
     "workflows.views.create(",
-    "workflows.quickNote.create(",
     "workflows.events.create(",
   ].map((marker) => workflow.indexOf(marker));
   assert.ok(order.every((position) => position >= 0));
@@ -59,9 +58,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(setup, /promptAction: ui\.promptAction/);
   assert.match(setup, /openPayment: services\.openPayment/);
   assert.match(
-    workflow,
-    /workflows\.quickNote\.create\(\{[\s\S]*?promptAction,/,
+    setup,
+    /workflows\.quickNote\.workflow\.create\(\{[\s\S]*?promptAction,[\s\S]*?noteMaintenance: workflows\.quickNote\.noteMaintenance/,
   );
+  assert.doesNotMatch(workflow, /workflows\.quickNote/);
   assert.match(
     app,
     /openAccountForProperty: propertyAccountForms\.openAccountForProperty/,
@@ -69,7 +69,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(setup, /workflows: workflows\.portfolioModules/);
   assert.doesNotMatch(
     workflow,
-    /window\.PropertyDeskProperty(?:Portfolio(?:Table|ReminderModel|AccountRowModel|FilterModel|Model)|Views|QuickNote|ViewEvents)\.create/,
+    /window\.PropertyDeskProperty(?:Portfolio(?:Table|ReminderModel|AccountRowModel|FilterModel|Model)|Views|ViewEvents)\.create/,
   );
   assert.doesNotMatch(
     app,
@@ -90,11 +90,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
   assert.match(worker, /'\.\/features\/property-workspace-setup\.js'/);
 });
 
-test("Properties workflow returns explicit view and action operations", () => {
+test("Properties portfolio returns explicit view and action operations", () => {
   const calls = [];
   const action = () => {};
   const editPropertyQuickNote = () => {};
-  const propertyRepository = {};
   const state = {
     user: { user_metadata: { display_name: "Jay" } },
     payments: [],
@@ -164,15 +163,6 @@ test("Properties workflow returns explicit view and action operations", () => {
           return { renderProperties() {}, attachEvents() {} };
         },
       },
-      PropertyDeskPropertyQuickNote: {
-        create: (options) => {
-          calls.push("quick note");
-          passed.quickNote = options;
-          return { editPropertyQuickNote };
-        },
-      },
-      PropertyDeskPropertyNoteMaintenance: {},
-      PropertyDeskPropertyRecordUpdateMaintenance: {},
       PropertyDeskPropertyViewEvents: {
         create: (options) => {
           calls.push("portfolio actions");
@@ -210,10 +200,6 @@ test("Properties workflow returns explicit view and action operations", () => {
     portfolioModel: context.window.PropertyDeskPropertyPortfolioModel,
     pdfExport: context.window.PropertyDeskPropertyPdfExport,
     views: context.window.PropertyDeskPropertyViews,
-    quickNote: context.window.PropertyDeskPropertyQuickNote,
-    noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
-    recordUpdateMaintenance:
-      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     events: context.window.PropertyDeskPropertyViewEvents,
   };
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
@@ -224,16 +210,11 @@ test("Properties workflow returns explicit view and action operations", () => {
     getProperties: () => state.properties,
     getAccounts: () => state.accounts,
     getWorkspaceMembers: () => state.workspaceMembers,
-    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    editPropertyQuickNote,
     groupAccountsByProperty: action,
     isActiveAccount: action,
     toast: action,
-    fetchAll: action,
-    saveAndRefreshWorkspaceRecord: action,
-    promptAction: action,
-    streetAddress: action,
     openPayment: action,
-    propertyRepository,
     openPropertyDetails: action,
     openAccountForProperty: action,
     workflows,
@@ -250,7 +231,6 @@ test("Properties workflow returns explicit view and action operations", () => {
     "portfolio model",
     "pdf export",
     "property views",
-    "quick note",
     "portfolio actions",
   ]);
   assert.deepEqual(Object.keys(workflow).sort(), [
@@ -258,22 +238,8 @@ test("Properties workflow returns explicit view and action operations", () => {
     "attachPropertyGridEvents",
     "renderProperties",
   ]);
-  assert.equal(passed.quickNote.getProperties(), state.properties);
-  assert.equal(passed.quickNote.getWorkspaceOwnerId(), state.workspaceOwnerId);
   assert.equal(passed.filterModel.isActiveAccount, action);
   assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
-  assert.equal(passed.quickNote.toast, action);
-  assert.equal(passed.quickNote.fetchAll, action);
-  assert.equal(passed.quickNote.promptAction, action);
-  assert.equal(passed.quickNote.saveAndRefreshWorkspaceRecord, action);
-  assert.equal(passed.quickNote.streetAddress, action);
-  assert.equal(passed.quickNote.repository, propertyRepository);
-  assert.equal(passed.quickNote.noteMaintenance, workflows.noteMaintenance);
-  assert.equal(
-    passed.quickNote.recordUpdateMaintenance,
-    workflows.recordUpdateMaintenance,
-  );
-  assert.equal("unusedDependency" in passed.quickNote, false);
   assert.deepEqual(Object.keys(passed.views).sort(), [
     "$",
     "attachTemplateEvents",

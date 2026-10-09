@@ -3,6 +3,19 @@
   "use strict";
 
   function createPropertyWorkspaceSetup({ records, ui, services, workflows }) {
+    const { editPropertyQuickNote } = workflows.quickNote.workflow.create({
+      getProperties: records.getProperties,
+      getWorkspaceOwnerId: records.getWorkspaceOwnerId,
+      toast: ui.toast,
+      fetchAll: services.fetchAll,
+      streetAddress: ui.streetAddress,
+      promptAction: ui.promptAction,
+      repository: services.propertyRepository,
+      saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
+      noteMaintenance: workflows.quickNote.noteMaintenance,
+      recordUpdateMaintenance: workflows.quickNote.recordUpdateMaintenance,
+    });
+
     return workflows.workspace.create({
       groupAccountsByProperty: workflows.groupAccountsByProperty,
       isActiveAccount: workflows.isActiveAccount,
@@ -118,7 +131,6 @@
         getProperties: records.getProperties,
         getAccounts: records.getAccounts,
         getWorkspaceMembers: records.getWorkspaceMembers,
-        getWorkspaceOwnerId: records.getWorkspaceOwnerId,
         esc: ui.esc,
         money: ui.money,
         paymentFrequencyLabel: ui.paymentFrequencyLabel,
@@ -134,14 +146,11 @@
         lateReminderSms: ui.lateReminderSms,
         paymentStatusInMonth: ui.paymentStatusInMonth,
         toast: ui.toast,
-        fetchAll: services.fetchAll,
-        saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
-        promptAction: ui.promptAction,
         openPayment: services.openPayment,
-        propertyRepository: services.propertyRepository,
         openModal: ui.openModal,
         openAccountForProperty: services.openAccountForProperty,
         editAccount: services.editAccount,
+        editPropertyQuickNote,
         workflows: workflows.portfolioModules,
       },
     });

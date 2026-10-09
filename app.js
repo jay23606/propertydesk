@@ -695,14 +695,16 @@
         filterModel: window.PropertyDeskPropertyPortfolioFilterModel,
         portfolioModel: window.PropertyDeskPropertyPortfolioModel,
         views: window.PropertyDeskPropertyViews,
-        quickNote: window.PropertyDeskPropertyQuickNote,
-        noteMaintenance: window.PropertyDeskPropertyNoteMaintenance,
-        recordUpdateMaintenance:
-          window.PropertyDeskPropertyRecordUpdateMaintenance,
         events: window.PropertyDeskPropertyViewEvents,
         pdfExport: window.PropertyDeskPropertyPdfExport,
         templateStore: window.PropertyDeskReminderTemplateStore,
         templateSettings: window.PropertyDeskReminderTemplateSettings,
+      },
+      quickNote: {
+        workflow: window.PropertyDeskPropertyQuickNote,
+        noteMaintenance: window.PropertyDeskPropertyNoteMaintenance,
+        recordUpdateMaintenance:
+          window.PropertyDeskPropertyRecordUpdateMaintenance,
       },
     },
   });
