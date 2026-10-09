@@ -13,7 +13,7 @@
     recordSaveMaintenance,
   }) {
     const { saveRecord } = recordSaveMaintenance.create({
-      state,
+      getRecords: () => state.accounts,
       fetchAll,
       toast,
       repository,

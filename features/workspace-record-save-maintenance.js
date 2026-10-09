@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getRecords,
     fetchAll,
     toast,
     repository,
@@ -20,7 +20,7 @@
       return save({
         ...selectRecordWriteCompletion(completion),
         operation: () => repository.save(payload, recordId),
-        getCollection: (name) => state?.[name],
+        getCollection: () => getRecords?.(),
         collection,
         payload,
         recordId,

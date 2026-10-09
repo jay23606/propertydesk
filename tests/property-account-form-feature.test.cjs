@@ -157,6 +157,8 @@ test("property and account maintenance save inserts and updates to their own tab
   }
   const writes = [];
   const state = {
+    properties: [],
+    accounts: [],
     client: {
       from(table) {
         return {
@@ -185,6 +187,7 @@ test("property and account maintenance save inserts and updates to their own tab
   const messages = [];
   const property = context.window.PropertyDeskPropertySaveMaintenance.create({
     ...workspaceRecordWriteDependencies(context),
+    state,
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -195,6 +198,7 @@ test("property and account maintenance save inserts and updates to their own tab
   assert.deepEqual(Object.keys(property), ["saveProperty"]);
   const account = context.window.PropertyDeskAccountFormMaintenance.create({
     ...workspaceRecordWriteDependencies(context),
+    state,
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -253,6 +257,32 @@ test("property and account maintenance save inserts and updates to their own tab
     },
   ]);
   assert.deepEqual(messages, []);
+});
+
+test("property and account form reconciliation stay within their own rows", async () => {
+  const context = vm.createContext({ window: {} });
+  loadPropertyAndAccountForms(context);
+  const properties = [{ id: "property-1" }];
+  const accounts = [{ id: "account-1" }];
+  const options = {
+    state: { properties, accounts },
+    fetchAll() {},
+    toast() {},
+    repository: { save() {} },
+    recordSaveMaintenance:
+      context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
+    saveWorkspaceRecord: async ({ getCollection }) => getCollection("accounts"),
+    saveAndRefreshWorkspaceRecord: async ({ getCollection }) =>
+      getCollection("accounts"),
+    selectRecordWriteCompletion: () => ({}),
+  };
+  const property =
+    context.window.PropertyDeskPropertySaveMaintenance.create(options);
+  const account =
+    context.window.PropertyDeskAccountFormMaintenance.create(options);
+
+  assert.equal(await property.saveProperty({ name: "Home" }), properties);
+  assert.equal(await account.saveAccount({ name: "Rental" }), accounts);
 });
 
 test("account form confirms a lost save response from refreshed account data", async () => {
