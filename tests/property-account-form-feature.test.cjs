@@ -14,9 +14,11 @@ const vm = require("node:vm");
 test("property and account form modules expose separate APIs", () => {
   const context = vm.createContext({ window: {} });
   loadPropertyAndAccountForms(context);
+  const state = {};
   const dependencies = {
     $: formElements(),
-    state: {},
+    getProperties: () => [],
+    getWorkspaceOwnerId: () => null,
     toast() {},
     closeModal() {},
     fetchAll() {},
@@ -27,7 +29,7 @@ test("property and account form modules expose separate APIs", () => {
   };
   const property = context.window.PropertyDeskPropertyForm.create({
     ...dependencies,
-    ...propertyFormDependencies(context, dependencies.state),
+    ...propertyFormDependencies(context, state),
   });
   let accountViewDependencies;
   context.window.PropertyDeskAccountFormView = {
@@ -45,7 +47,7 @@ test("property and account form modules expose separate APIs", () => {
     ...dependencies,
     buildAccountPayload: context.window.PropertyDeskAccountPayload.build,
     formModel: accountFormModel(context),
-    ...accountFormDependencies(context, dependencies.state),
+    ...accountFormDependencies(context, state),
   });
 
   assert.equal(Object.isFrozen(property), true);
@@ -114,7 +116,8 @@ test("property form projects view values into a database-safe property payload",
 
   const form = context.window.PropertyDeskPropertyForm.create({
     $: () => ({}),
-    state: { workspaceOwnerId: "workspace-1" },
+    getProperties: () => [],
+    getWorkspaceOwnerId: () => "workspace-1",
     toast() {},
     closeModal() {},
     fetchAll() {},
@@ -187,7 +190,7 @@ test("property and account maintenance save inserts and updates to their own tab
   const messages = [];
   const property = context.window.PropertyDeskPropertySaveMaintenance.create({
     ...workspaceRecordWriteDependencies(context),
-    state,
+    getProperties: () => state.properties,
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -198,7 +201,7 @@ test("property and account maintenance save inserts and updates to their own tab
   assert.deepEqual(Object.keys(property), ["saveProperty"]);
   const account = context.window.PropertyDeskAccountFormMaintenance.create({
     ...workspaceRecordWriteDependencies(context),
-    state,
+    getAccounts: () => state.accounts,
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -265,7 +268,8 @@ test("property and account form reconciliation stay within their own rows", asyn
   const properties = [{ id: "property-1" }];
   const accounts = [{ id: "account-1" }];
   const options = {
-    state: { properties, accounts },
+    getProperties: () => properties,
+    getAccounts: () => accounts,
     fetchAll() {},
     toast() {},
     repository: { save() {} },
@@ -299,7 +303,7 @@ test("account form confirms a lost save response from refreshed account data", a
   const messages = [];
   const maintenance = context.window.PropertyDeskAccountFormMaintenance.create({
     ...workspaceRecordWriteDependencies(context),
-    state,
+    getAccounts: () => state.accounts,
     fetchAll: async () => {
       state.accounts.push({ ...payload, id: "account-1" });
       refreshes += 1;
@@ -334,7 +338,7 @@ test("property form confirms a lost save response from refreshed property data",
   const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
     {
       ...workspaceRecordWriteDependencies(context),
-      state,
+      getProperties: () => state.properties,
       fetchAll: async () => {
         state.properties.push({ ...payload, id: "property-1" });
         refreshes += 1;
@@ -516,7 +520,9 @@ test("property and account forms report rejected saves without running success a
   };
   const dependencies = {
     $,
-    state,
+    getAccounts: () => state.accounts,
+    getProperties: () => state.properties,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     toast: (message) => messages.push(message),
     closeModal: () => assert.fail("rejected save must keep its form open"),
     fetchAll: async () => {

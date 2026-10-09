@@ -42,7 +42,9 @@ test("property and account forms keep separate dependencies and expose explicit 
 
   const property = {
     $: () => {},
-    state: {},
+    getProperties: () => [],
+    getWorkspaceOwnerId: () => null,
+    getProperties: () => [],
     toast: () => {},
     closeModal: () => {},
     fetchAll: () => {},
@@ -61,7 +63,8 @@ test("property and account forms keep separate dependencies and expose explicit 
   };
   const account = {
     $: () => {},
-    state: {},
+    getAccounts: () => [],
+    getWorkspaceOwnerId: () => null,
     moneyInput: () => {},
     toast: () => {},
     closeModal: () => {},
@@ -94,16 +97,28 @@ test("property and account forms keep separate dependencies and expose explicit 
     /window\.PropertyDesk(?:Property|Account)Form\.create/,
   );
   assert.doesNotMatch(source, /writeFeedback/);
+  for (const filename of [
+    "account-form.js",
+    "account-form-maintenance.js",
+    "property-save-maintenance.js",
+  ]) {
+    const moduleSource = fs.readFileSync(
+      path.join(root, "features", filename),
+      "utf8",
+    );
+    assert.doesNotMatch(moduleSource, /\bstate\s*[,.=]/);
+  }
 
   assert.deepEqual(Object.keys(passed.property).sort(), [
     "$",
     "closeModal",
     "fetchAll",
+    "getProperties",
+    "getWorkspaceOwnerId",
     "repository",
     "saveAndRefreshWorkspaceRecord",
     "saveWorkspaceRecord",
     "selectRecordWriteCompletion",
-    "state",
     "toast",
     "workflows",
   ]);
@@ -113,6 +128,8 @@ test("property and account forms keep separate dependencies and expose explicit 
     "closeModal",
     "fetchAll",
     "formModel",
+    "getAccounts",
+    "getWorkspaceOwnerId",
     "moneyInput",
     "openModal",
     "populateFormOptions",
@@ -121,7 +138,6 @@ test("property and account forms keep separate dependencies and expose explicit 
     "saveAndRefreshWorkspaceRecord",
     "saveWorkspaceRecord",
     "selectRecordWriteCompletion",
-    "state",
     "toast",
     "todayIso",
     "workflows",

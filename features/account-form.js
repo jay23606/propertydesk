@@ -4,7 +4,8 @@
 
   function createAccountForm({
     $,
-    state,
+    getAccounts,
+    getWorkspaceOwnerId,
     moneyInput,
     toast,
     closeModal,
@@ -33,7 +34,7 @@
       toast,
     });
     const { saveAccount: persistAccount } = workflows.maintenance.create({
-      state,
+      getAccounts,
       fetchAll,
       toast,
       repository,
@@ -64,7 +65,7 @@
       const payload = buildAccountPayload(
         formModel.payloadValuesFromForm(
           form,
-          state.workspaceOwnerId,
+          getWorkspaceOwnerId(),
           contacts.emails,
         ),
         moneyInput,

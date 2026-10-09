@@ -4,7 +4,8 @@
 
   function createPropertyForm({
     $,
-    state,
+    getProperties,
+    getWorkspaceOwnerId,
     toast,
     closeModal,
     fetchAll,
@@ -21,7 +22,7 @@
       toast,
     });
     const { saveProperty: persistProperty } = workflows.maintenance.create({
-      state,
+      getProperties,
       fetchAll,
       toast,
       repository,
@@ -35,7 +36,7 @@
       event.preventDefault();
       const values = formView.readValues();
       const payload = {
-        user_id: state.workspaceOwnerId,
+        user_id: getWorkspaceOwnerId(),
         name: values.name,
         address: values.address,
         city: values.city,

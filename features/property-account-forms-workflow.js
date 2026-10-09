@@ -9,7 +9,8 @@
   }) {
     const propertyForm = workflows.propertyForm.create({
       $: property.$,
-      state: property.state,
+      getProperties: property.getProperties,
+      getWorkspaceOwnerId: property.getWorkspaceOwnerId,
       toast: property.toast,
       closeModal: property.closeModal,
       fetchAll: property.fetchAll,
@@ -21,7 +22,8 @@
     });
     const accountForm = workflows.accountForm.create({
       $: account.$,
-      state: account.state,
+      getAccounts: account.getAccounts,
+      getWorkspaceOwnerId: account.getWorkspaceOwnerId,
       moneyInput: account.moneyInput,
       toast: account.toast,
       closeModal: account.closeModal,

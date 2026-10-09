@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getAccounts,
     fetchAll,
     toast,
     repository,
@@ -13,7 +13,7 @@
     recordSaveMaintenance,
   }) {
     const { saveRecord } = recordSaveMaintenance.create({
-      getRecords: () => state.accounts,
+      getRecords: getAccounts,
       fetchAll,
       toast,
       repository,

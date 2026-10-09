@@ -328,7 +328,8 @@
       },
       property: {
         $,
-        state,
+        getProperties: () => state.properties,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
         toast,
         closeModal,
         fetchAll,
@@ -342,7 +343,8 @@
       },
       account: {
         $,
-        state,
+        getAccounts: () => state.accounts,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
         moneyInput,
         todayIso,
         toast,

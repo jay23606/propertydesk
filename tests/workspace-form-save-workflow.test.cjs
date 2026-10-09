@@ -144,7 +144,7 @@ test("a form save confirmed by readback reuses its refresh before closing", asyn
   const maintenance = context.window.PropertyDeskPropertySaveMaintenance.create(
     {
       ...workspaceRecordWriteDependencies(context),
-      state,
+      getProperties: () => state.properties,
       fetchAll: async () => {
         Object.assign(property, { address: "New address" });
         events.push("refresh");
