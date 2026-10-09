@@ -519,6 +519,7 @@
       todayIso,
       confirmAction,
       openWindow,
+      schedule: window.setTimeout.bind(window),
       monthlyScheduledEstimate,
       summarizeAccount,
       collectedSince,

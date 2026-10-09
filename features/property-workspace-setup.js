@@ -150,6 +150,7 @@
         lateReminderSms: ui.lateReminderSms,
         paymentStatusInMonth: ui.paymentStatusInMonth,
         toast: ui.toast,
+        schedule: ui.schedule,
         openPayment: services.openPayment,
         openModal: ui.openModal,
         openAccountForProperty: services.openAccountForProperty,

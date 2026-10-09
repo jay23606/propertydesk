@@ -28,6 +28,7 @@
     lateReminderSms,
     paymentStatusInMonth,
     toast,
+    schedule,
     openPayment,
     openPropertyDetails,
     openAccountForProperty,
@@ -46,6 +47,7 @@
       $,
       openModal,
       toast,
+      schedule,
       store: reminderTemplateStore,
       onChange: () => propertyViews.renderProperties(),
     });

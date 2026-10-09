@@ -16,6 +16,7 @@
     money,
     toast,
     openWindow = () => window.open("", "_blank"),
+    schedule = (callback, delay) => window.setTimeout(callback, delay),
     now = () => new Date(),
   }) {
     function reportHTML(rows) {
@@ -88,7 +89,7 @@
       reportWindow.document.open();
       reportWindow.document.write(reportHTML(rows));
       reportWindow.document.close();
-      window.setTimeout(() => reportWindow.print(), 250);
+      schedule(() => reportWindow.print(), 250);
     }
 
     function attachEvents() {

@@ -45,8 +45,8 @@ function createFeature(overrides = {}) {
     { hasAccount: false, property: { notes: "No account" } },
   ];
   const window = {
-    setTimeout(callback) {
-      callback();
+    setTimeout() {
+      assert.fail("PDF print delay must use the injected scheduler");
     },
   };
   const context = vm.createContext({
@@ -76,6 +76,10 @@ function createFeature(overrides = {}) {
     },
     openWindow: () =>
       overrides.openWindow ? overrides.openWindow(reportWindow) : reportWindow,
+    schedule(callback, delay) {
+      assert.equal(delay, 250);
+      callback();
+    },
     now: () => new Date("2026-10-09T12:00:00Z"),
   });
   return { feature, output, click: () => click() };
