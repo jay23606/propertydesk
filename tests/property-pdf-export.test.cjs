@@ -101,7 +101,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     { hasAccount: false, property: { notes: "Vacant property note" } },
   ]);
 
-  assert.match(html, /@page \{ size: letter landscape; margin: \.2in; \}/);
+  assert.match(html, /@page \{ size: letter landscape; margin: \.3in; \}/);
   assert.match(html, /body \{ width: 100%; margin: 0;/);
   assert.match(
     html,
@@ -115,7 +115,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(
     html,
-    /@media print \{\s*html, body \{ width: 10\.6in; max-width: 10\.6in; \}\s*table \{ width: 10\.6in; max-width: 10\.6in; \}/,
+    /@media print \{\s*html, body \{ width: 10\.2in; max-width: 10\.2in; \}\s*table \{ width: 10\.2in; max-width: 10\.2in; \}/,
   );
   assert.match(html, /10 Main St, Altoona, PA 16601/);
   assert.match(html, /tenant@example\.com/);

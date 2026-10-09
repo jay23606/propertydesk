@@ -50,7 +50,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PropertyDesk property report</title>
 <style>
-  @page { size: letter landscape; margin: .2in; }
+  @page { size: letter landscape; margin: .3in; }
   * { box-sizing: border-box; }
   body { width: 100%; margin: 0; color: #17231f; font: ${fontSize}px/1.2 Arial, sans-serif; }
   header { display: flex; align-items: baseline; justify-content: space-between; width: 100%; margin: 0 0 8px; }
@@ -67,8 +67,8 @@
   tr { height: ${Math.max(11, Math.min(20, 540 / rowCount))}px; break-inside: avoid; }
   .empty { padding: 12px; color: #58665f; text-align: center; }
   @media print {
-    html, body { width: 10.6in; max-width: 10.6in; }
-    table { width: 10.6in; max-width: 10.6in; }
+    html, body { width: 10.2in; max-width: 10.2in; }
+    table { width: 10.2in; max-width: 10.2in; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style></head><body>
