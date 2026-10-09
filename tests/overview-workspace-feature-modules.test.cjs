@@ -156,6 +156,10 @@ test("overview renderer displays its summary model and quick-payment card", () =
 test("overview workflow composes dashboard models, rendering, and actions", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const setup = fs.readFileSync(
+    path.join(root, "features", "property-workspace-setup.js"),
+    "utf8",
+  );
   const workflow = fs.readFileSync(
     path.join(root, "features/overview-workflow.js"),
     "utf8",
@@ -175,7 +179,8 @@ test("overview workflow composes dashboard models, rendering, and actions", () =
     order,
     [...order].sort((left, right) => left - right),
   );
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
+  assert.match(setup, /overview: workflows\.overview/);
   assert.doesNotMatch(app, /PropertyDeskOverview(?:Model|Events)?\.create\(/);
   assert.match(
     workflow,

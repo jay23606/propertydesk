@@ -7,6 +7,10 @@ const vm = require("node:vm");
 test("app composes the Properties grid and action operations explicitly", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const setup = fs.readFileSync(
+    path.join(root, "features", "property-workspace-setup.js"),
+    "utf8",
+  );
   const workflow = fs.readFileSync(
     path.join(root, "features/property-portfolio-workflow.js"),
     "utf8",
@@ -31,10 +35,10 @@ test("app composes the Properties grid and action operations explicitly", () => 
     order,
     [...order].sort((left, right) => left - right),
   );
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.match(
-    app,
-    /PropertyDeskPropertyWorkspaceWorkflow\.create\(\{\s*groupAccountsByProperty:\s*window\.PropertyDeskPropertyAccountIndex\.groupByProperty,\s*isActiveAccount:\s*window\.PropertyDeskAccountStatusUtils\.isActiveAccount,/,
+    setup,
+    /workflows\.workspace\.create\(\{\s*groupAccountsByProperty:\s*workflows\.groupAccountsByProperty,\s*isActiveAccount:\s*workflows\.isActiveAccount,/,
   );
   assert.match(
     workflow,
@@ -48,22 +52,20 @@ test("app composes the Properties grid and action operations explicitly", () => 
     /window\.PropertyDeskAccountStatusUtils/,
   );
   assert.match(
-    app,
-    /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
+    setup,
+    /propertyRepository: services\.propertyRepository,[\s\S]*?openAccountForProperty: services\.openAccountForProperty/,
   );
-  assert.match(app, /promptAction,\s*openPayment,/);
+  assert.match(setup, /promptAction: ui\.promptAction/);
+  assert.match(setup, /openPayment: services\.openPayment/);
   assert.match(
     workflow,
     /workflows\.quickNote\.create\(\{[\s\S]*?promptAction,/,
   );
   assert.match(
     app,
-    /openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?editAccount: propertyAccountForms\.editAccount,/,
+    /openAccountForProperty: propertyAccountForms\.openAccountForProperty/,
   );
-  assert.match(
-    app,
-    /workflows: \{\s*table: window\.PropertyDeskPropertyPortfolioTable,[\s\S]*?events: window\.PropertyDeskPropertyViewEvents,/,
-  );
+  assert.match(setup, /workflows: workflows\.portfolioModules/);
   assert.doesNotMatch(
     workflow,
     /window\.PropertyDeskProperty(?:Portfolio(?:Table|ReminderModel|AccountRowModel|FilterModel|Model)|Views|QuickNote|ViewEvents)\.create/,
@@ -82,6 +84,9 @@ test("app composes the Properties grid and action operations explicitly", () => 
     worker.includes(`'./${script}'`),
     "Properties workflow is precached",
   );
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
+  assert.match(html, /features\/property-workspace-setup\.js/);
+  assert.match(worker, /'\.\/features\/property-workspace-setup\.js'/);
 });
 
 test("Properties workflow returns explicit view and action operations", () => {

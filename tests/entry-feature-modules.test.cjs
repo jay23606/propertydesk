@@ -219,7 +219,7 @@ test("app coordinator passes the amortization helper into account details", () =
     /workflows\.workspace\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?actions: \{[\s\S]*?repository: services\.accountRepository/,
   );
   assert.match(app, /amortizationSchedule,/);
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.match(
     app,
     /propertyFormModules: \{\s*view: window\.PropertyDeskPropertyFormView,[\s\S]*?recordSaveMaintenance:\s*window\.PropertyDeskWorkspaceRecordSaveMaintenance,[\s\S]*?accountFormModules: \{\s*view: window\.PropertyDeskAccountFormView,[\s\S]*?recordSaveMaintenance:\s*window\.PropertyDeskWorkspaceRecordSaveMaintenance,/,
@@ -259,7 +259,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /attachPropertyHolderEvents/);
   assert.match(app, /attachPropertyDetailEvents/);
   assert.match(app, /attachPropertyQuickActionEvents/);
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.doesNotMatch(app, /attachPropertyViewEvents/);
   assert.doesNotMatch(
     app,
@@ -326,6 +326,7 @@ test("property workspace composes screens and shares detail actions", () => {
     "features/property-detail-management-workflow.js",
     "features/property-screen-workflow.js",
     "features/property-workspace-workflow.js",
+    "features/property-workspace-setup.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview-view.js",
@@ -347,15 +348,15 @@ test("property workspace composes screens and shares detail actions", () => {
     );
     assert.match(worker, new RegExp(`'\\./${script.replaceAll("/", "\\/")}'`));
   }
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.ok(
-    html.indexOf("features/property-workspace-workflow.js") <
+    html.indexOf("features/property-workspace-setup.js") <
       html.indexOf("app.js"),
   );
-  assert.match(worker, /\.\/features\/property-workspace-workflow\.js/);
+  assert.match(worker, /\.\/features\/property-workspace-setup\.js/);
   assert.ok(
     app.indexOf("PropertyDeskAccountDepositWorkspaceSetup.create(") <
-      app.indexOf("PropertyDeskPropertyWorkspaceWorkflow.create("),
+      app.indexOf("PropertyDeskPropertyWorkspaceSetup.create("),
   );
 });
 

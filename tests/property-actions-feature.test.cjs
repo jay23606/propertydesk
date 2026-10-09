@@ -216,8 +216,13 @@ test("property detail events own editing and quick-action bindings", () => {
 });
 
 test("app composes property detail content, actions, and document routes", () => {
-  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const setup = fs.readFileSync(
+    path.join(root, "features", "property-workspace-setup.js"),
+    "utf8",
+  );
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDeskPropertyDetail(?:Content|Management)Workflow\.create\(/,
@@ -231,8 +236,13 @@ test("app composes property detail content, actions, and document routes", () =>
     /workflows\.content\.create\([\s\S]*?workflows: workflows\.contentModules,[\s\S]*?workflows\.management\.create\([\s\S]*?openPropertyDetails: details\.openPropertyDetails/,
   );
   const workspaceWorkflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "property-workspace-workflow.js"),
+    path.join(root, "features", "property-workspace-workflow.js"),
     "utf8",
+  );
+  assert.match(setup, /workflows\.workspace\.create\(/);
+  assert.match(
+    setup,
+    /documents: \{[\s\S]*?documentRepository: services\.documentRepository/,
   );
   assert.match(
     workspaceWorkflow,

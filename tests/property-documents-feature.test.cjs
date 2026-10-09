@@ -83,13 +83,17 @@ test("property detail document events route private document actions to document
 test("property document workflow connects private actions and detail events", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const setup = fs.readFileSync(
+    path.join(root, "features", "property-workspace-setup.js"),
+    "utf8",
+  );
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.match(
-    app,
-    /documents:[\s\S]*?confirm: confirmAction,[\s\S]*?openWindow,/,
+    setup,
+    /documents: \{[\s\S]*?confirm: ui\.confirmAction,[\s\S]*?openWindow: ui\.openWindow,/,
   );
   assert.doesNotMatch(
     app,
@@ -114,10 +118,7 @@ test("property document workflow connects private actions and detail events", ()
     "utf8",
   );
   assert.match(registry, /documents: repositories\.documents\.create\(/);
-  assert.match(
-    app,
-    /documents:[\s\S]*?documentRepository: repositories\.documents,/,
-  );
+  assert.match(setup, /documentRepository: services\.documentRepository/);
   assert.match(
     workflow,
     /documentEventsWorkflow\.create\([\s\S]*?uploadPropertyDocument: documents\.uploadPropertyDocument,[\s\S]*?deletePropertyDocument: documents\.deletePropertyDocument,[\s\S]*?openPropertyDocument: documents\.openPropertyDocument,/,
