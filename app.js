@@ -177,7 +177,8 @@
   const { fillSelect, populateFormOptions } =
     window.PropertyDeskFormOptions.create({
       $,
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
       esc,
       propertyAddress,
       prettyType,

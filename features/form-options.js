@@ -2,7 +2,15 @@
 (() => {
   "use strict";
 
-  function create({ $, state, esc, propertyAddress, prettyType, modules }) {
+  function create({
+    $,
+    getProperties,
+    getAccounts,
+    esc,
+    propertyAddress,
+    prettyType,
+    modules,
+  }) {
     const { accountTypes, paymentFrequencies, propertyKinds } =
       modules.domainOptions;
     const {
@@ -47,17 +55,17 @@
     }
 
     function populateFormOptions() {
-      const propertyOptions = state.properties.map((property) => ({
+      const propertyOptions = getProperties().map((property) => ({
         value: property.id,
         label: `${property.name} — ${propertyAddress(property)}`,
       }));
-      const paymentOptions = state.accounts
+      const paymentOptions = getAccounts()
         .filter((account) => account.status === "active")
         .map((account) => ({
           value: account.id,
           label: `${account.party_name || account.name} — ${prettyType(account.account_type)}`,
         }));
-      const expenseAccountOptions = state.accounts.map((account) => ({
+      const expenseAccountOptions = getAccounts().map((account) => ({
         value: account.id,
         label: `${account.name} — ${prettyType(account.account_type)}`,
       }));

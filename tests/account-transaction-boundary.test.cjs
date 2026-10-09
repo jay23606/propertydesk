@@ -11,6 +11,11 @@ test("app composes independent property and account forms before action routing"
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
   assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  const formOptions = fs.readFileSync(
+    path.join(root, "features", "form-options.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(formOptions, /\bstate\b/);
   assert.match(
     app,
     /const transactionMaintenance =\s*window\.PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?\);\s*const ledgerWorkflow = window\.PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,

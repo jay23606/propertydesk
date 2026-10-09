@@ -91,7 +91,8 @@ function createController() {
   });
   const formOptions = context.window.PropertyDeskFormOptions.create({
     $: getElement,
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
     esc: (value) =>
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     propertyAddress: (property) => property.address,

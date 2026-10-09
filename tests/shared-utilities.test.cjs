@@ -83,7 +83,8 @@ test("form options are populated from shared domain and transaction catalogs", (
   };
   context.window.PropertyDeskFormOptions.create({
     $,
-    state: { properties: [], accounts: [] },
+    getProperties: () => [],
+    getAccounts: () => [],
     esc: String,
     propertyAddress: String,
     prettyType: String,
