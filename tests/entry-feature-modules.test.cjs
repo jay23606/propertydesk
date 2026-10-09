@@ -275,9 +275,9 @@ test("property workspace composes screens and shares detail actions", () => {
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
-    "detail.workflows.screen.create(",
-    "workflows.overview.create(",
-    "workflows.portfolio.create(",
+    "const propertyDetails = createPropertyDetails(detail);",
+    "const propertyOverview = createPropertyOverview({",
+    "const properties = createPropertiesPortfolio({",
   ].map((marker) => workflow.indexOf(marker));
 
   assert.ok(creationOrder.every((position) => position >= 0));
@@ -287,6 +287,9 @@ test("property workspace composes screens and shares detail actions", () => {
     workflow,
     /openPropertyDetails: propertyDetails\.openPropertyDetails/,
   );
+  assert.match(workflow, /detail\.workflows\.screen\.create\(/);
+  assert.match(workflow, /workflow\.create\(\{\s*\$: overview\.\$/);
+  assert.match(workflow, /workflow\.create\(\{\s*\$: portfolio\.\$/);
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",

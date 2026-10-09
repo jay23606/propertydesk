@@ -2,22 +2,24 @@
 (() => {
   "use strict";
 
-  function createPropertyWorkspaceWorkflow({
-    detail,
-    overview,
-    portfolio,
-    groupAccountsByProperty,
-    isActiveAccount,
-    workflows,
-  }) {
-    const propertyDetails = detail.workflows.screen.create({
+  function createPropertyDetails(detail) {
+    return detail.workflows.screen.create({
       content: detail.content,
       management: detail.management,
       holders: detail.holders,
       documents: detail.documents,
       workflows: detail.workflows,
     });
-    const propertyOverview = workflows.overview.create({
+  }
+
+  function createPropertyOverview({
+    overview,
+    groupAccountsByProperty,
+    isActiveAccount,
+    openPropertyDetails,
+    workflow,
+  }) {
+    return workflow.create({
       $: overview.$,
       state: overview.state,
       groupAccountsByProperty,
@@ -35,11 +37,20 @@
       propertyAddress: overview.propertyAddress,
       prettyType: overview.prettyType,
       fmtDate: overview.fmtDate,
-      openPropertyDetails: propertyDetails.openPropertyDetails,
+      openPropertyDetails,
       openPropertyPayment: overview.openPropertyPayment,
       workflows: overview.workflows,
     });
-    const properties = workflows.portfolio.create({
+  }
+
+  function createPropertiesPortfolio({
+    portfolio,
+    groupAccountsByProperty,
+    isActiveAccount,
+    openPropertyDetails,
+    workflow,
+  }) {
+    return workflow.create({
       $: portfolio.$,
       state: portfolio.state,
       groupAccountsByProperty,
@@ -62,11 +73,36 @@
       fetchAll: portfolio.fetchAll,
       writeFeedback: portfolio.writeFeedback,
       openPayment: portfolio.openPayment,
-      openPropertyDetails: propertyDetails.openPropertyDetails,
+      openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
       editAccount: portfolio.editAccount,
       propertyRepository: portfolio.propertyRepository,
       workflows: portfolio.workflows,
+    });
+  }
+
+  function createPropertyWorkspaceWorkflow({
+    detail,
+    overview,
+    portfolio,
+    groupAccountsByProperty,
+    isActiveAccount,
+    workflows,
+  }) {
+    const propertyDetails = createPropertyDetails(detail);
+    const propertyOverview = createPropertyOverview({
+      overview,
+      groupAccountsByProperty,
+      isActiveAccount,
+      openPropertyDetails: propertyDetails.openPropertyDetails,
+      workflow: workflows.overview,
+    });
+    const properties = createPropertiesPortfolio({
+      portfolio,
+      groupAccountsByProperty,
+      isActiveAccount,
+      openPropertyDetails: propertyDetails.openPropertyDetails,
+      workflow: workflows.portfolio,
     });
 
     return Object.freeze({
