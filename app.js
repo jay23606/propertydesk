@@ -7,6 +7,7 @@
   const promptAction = (message, initialValue) =>
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
+  const reportError = (message, error) => window.console?.error(message, error);
   const transactionTimestamp = () => new Date().toISOString();
   const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
     modules: {
@@ -65,6 +66,7 @@
       workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
     },
     toast,
+    reportError,
     tables: window.PropertyDeskWorkspaceTables,
     workflows: {
       backendClient: window.PropertyDeskBackendClient,

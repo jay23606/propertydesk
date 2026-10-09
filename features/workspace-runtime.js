@@ -7,6 +7,7 @@
     supabase,
     repositories,
     toast,
+    reportError,
     tables,
     workflows,
   }) {
@@ -41,6 +42,7 @@
       state,
       workspaceData,
       toast,
+      reportError,
     });
 
     return Object.freeze({

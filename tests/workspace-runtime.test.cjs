@@ -26,11 +26,13 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   const repositoryAdapters = { accounts: { name: "accounts" } };
   const fetchAll = async () => {};
   const setRender = () => {};
+  const reportError = () => {};
   const options = {
     config: { supabaseUrl: "https://example.test" },
     supabase: { createClient() {} },
     repositories,
     toast() {},
+    reportError,
     tables: { properties: "pd_properties" },
     workflows: {},
   };
@@ -118,6 +120,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[7][1].state, state);
   assert.equal(calls[7][1].workspaceData, workspaceData);
   assert.equal(calls[7][1].toast, options.toast);
+  assert.equal(calls[7][1].reportError, options.reportError);
   assert.equal("render" in calls[7][1], false);
   assert.equal(runtime.isClientReady(), false);
   assert.equal(runtime.initializeClient(), client);
@@ -141,6 +144,10 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.match(
     app,
     /const appLifecycle = window\.PropertyDeskAppStartupWorkflow\.create\([\s\S]*?\}\);\s*setWorkspaceRender\(appLifecycle\.render\);\s*document\.addEventListener\("DOMContentLoaded", appLifecycle\.initialize\);/,
+  );
+  assert.match(
+    app,
+    /const reportError = \(message, error\) =>\s*window\.console\?\.error\(message, error\);/,
   );
   assert.deepEqual(Object.keys(runtime).sort(), [
     "authClient",

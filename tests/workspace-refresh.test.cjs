@@ -4,7 +4,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-function createRefresh({ state, workspaceData, toast, render }) {
+function createRefresh({
+  state,
+  workspaceData,
+  toast,
+  render,
+  reportError = () => {},
+}) {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -18,6 +24,7 @@ function createRefresh({ state, workspaceData, toast, render }) {
     workspaceData,
     toast,
     render,
+    reportError,
   });
 }
 
@@ -222,9 +229,7 @@ test("an older overlapping refresh cannot replace newer workspace data", async (
 test("workspace render failures are logged, shown to the user, and rethrown", async () => {
   const failure = new Error("missing amortization helper");
   const calls = [];
-  const context = vm.createContext({
-    window: { console: { error: (...args) => calls.push(["error", ...args]) } },
-  });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-refresh.js"),
@@ -241,6 +246,7 @@ test("workspace render failures are logged, shown to the user, and rethrown", as
       loadWorkspaceRecords: async () => ({ properties: [] }),
     },
     toast: (message) => calls.push(["toast", message]),
+    reportError: (...args) => calls.push(["error", ...args]),
     render: () => {
       throw failure;
     },

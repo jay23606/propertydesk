@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ state, workspaceData, toast, render }) {
+  function create({ state, workspaceData, toast, render, reportError }) {
     let latestFetchId = 0;
     let renderCallback = render;
 
@@ -51,10 +51,7 @@
         }
         renderCallback();
       } catch (error) {
-        window.console?.error(
-          "PropertyDesk failed to render workspace data.",
-          error,
-        );
+        reportError("PropertyDesk failed to render workspace data.", error);
         toast(
           "Workspace data loaded but could not be displayed. Reload and try again.",
         );
