@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getCollection,
     fetchAll,
     toast,
     repository,
@@ -24,7 +24,7 @@
     }) {
       return saveAndRefreshWorkspaceRecord({
         operation: () => repository.updateOwned(propertyId, ownerId, payload),
-        getCollection: (name) => state?.[name],
+        getCollection,
         collection: "properties",
         payload,
         recordId: propertyId,

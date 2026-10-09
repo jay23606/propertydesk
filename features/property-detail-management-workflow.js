@@ -20,7 +20,12 @@
     workflows,
   }) {
     const { toggleArchiveProperty } = workflows.archive.create({
-      state,
+      getSelectedPropertyId: () => state.selectedPropertyId,
+      getProperty: (propertyId) =>
+        state.properties.find((property) => property.id === propertyId) || null,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getCollection: (collection) =>
+        collection === "properties" ? state.properties : null,
       toast,
       fetchAll,
       todayIso,

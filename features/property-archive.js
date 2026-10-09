@@ -3,7 +3,10 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getProperty,
+    getWorkspaceOwnerId,
+    getCollection,
     toast,
     fetchAll,
     todayIso,
@@ -14,7 +17,7 @@
     recordUpdateMaintenance,
   }) {
     const { savePropertyArchive } = statusMaintenance.create({
-      state,
+      getCollection,
       fetchAll,
       toast,
       repository,
@@ -23,14 +26,14 @@
     });
 
     async function toggleArchiveProperty() {
-      const id = state.selectedPropertyId;
-      const property = state.properties.find((item) => item.id === id);
+      const id = getSelectedPropertyId();
+      const property = getProperty(id);
       if (!property) return;
 
       const archived_at = property.archived_at ? null : todayIso();
       await savePropertyArchive({
         propertyId: id,
-        ownerId: state.workspaceOwnerId,
+        ownerId: getWorkspaceOwnerId(),
         archivedAt: archived_at,
         onRefreshed: ({ recordWasSaved }) => {
           openPropertyDetails(id);

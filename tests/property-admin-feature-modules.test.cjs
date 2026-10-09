@@ -29,6 +29,17 @@ function propertyHolderState(state) {
   };
 }
 
+function propertyArchiveState(state) {
+  return {
+    getSelectedPropertyId: () => state.selectedPropertyId,
+    getProperty: (id) =>
+      state.properties.find((property) => property.id === id) || null,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getCollection: (collection) =>
+      collection === "properties" ? state.properties : null,
+  };
+}
+
 function propertyRecordSaveOperation(context) {
   return createWriteFeedback(context).saveAndRefreshWorkspaceRecord;
 }
@@ -100,7 +111,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
       }),
     });
   const archive = context.window.PropertyDeskPropertyArchive.create({
-    state,
+    ...propertyArchiveState(state),
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       throw new Error("offline");
@@ -149,7 +160,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
     properties: [property],
   };
   const archive = context.window.PropertyDeskPropertyArchive.create({
-    state,
+    ...propertyArchiveState(state),
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => {
       property.archived_at = "2026-10-08";
@@ -227,7 +238,7 @@ test("archive and restore use status maintenance and reopen updated details", as
     },
   };
   const archive = context.window.PropertyDeskPropertyArchive.create({
-    state,
+    ...propertyArchiveState(state),
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       calls.push(["refresh"]);

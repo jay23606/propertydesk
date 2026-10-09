@@ -47,7 +47,12 @@ test("property detail coordinator connects archive and quick actions", () => {
     context,
   );
 
-  const state = { client: { id: "workspace-client" } };
+  const state = {
+    client: { id: "workspace-client" },
+    selectedPropertyId: "property-1",
+    workspaceOwnerId: "workspace-1",
+    properties: [{ id: "property-1", archived_at: null }],
+  };
   const openPropertyDetails = () => {};
   const openPayment = () => {};
   const openExpense = () => {};
@@ -85,6 +90,11 @@ test("property detail coordinator connects archive and quick actions", () => {
     );
 
   assert.equal(passed.archive.openPropertyDetails, openPropertyDetails);
+  assert.equal(passed.archive.getSelectedPropertyId(), "property-1");
+  assert.equal(passed.archive.getProperty("property-1"), state.properties[0]);
+  assert.equal(passed.archive.getWorkspaceOwnerId(), "workspace-1");
+  assert.equal(passed.archive.getCollection("properties"), state.properties);
+  assert.equal("state" in passed.archive, false);
   assert.equal(passed.archive.repository, propertyRepository);
   assert.equal(
     passed.archive.saveAndRefreshWorkspaceRecord,

@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getCollection,
     fetchAll,
     toast,
     repository,
@@ -11,7 +11,7 @@
     recordUpdateMaintenance,
   }) {
     const { savePropertyUpdate } = recordUpdateMaintenance.create({
-      state,
+      getCollection,
       fetchAll,
       toast,
       repository,

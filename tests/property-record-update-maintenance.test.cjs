@@ -32,7 +32,7 @@ test("property record maintenance receives only the record save operation", asyn
   const toast = () => {};
   const maintenance =
     context.window.PropertyDeskPropertyRecordUpdateMaintenance.create({
-      state,
+      getCollection: (collection) => state[collection],
       fetchAll,
       toast,
       repository,

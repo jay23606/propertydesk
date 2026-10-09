@@ -14,7 +14,8 @@
     recordUpdateMaintenance,
   }) {
     const { savePropertyQuickNote } = noteMaintenance.create({
-      state,
+      getCollection: (collection) =>
+        collection === "properties" ? state.properties : null,
       fetchAll,
       toast,
       repository,
