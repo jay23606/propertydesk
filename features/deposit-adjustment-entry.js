@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getAccount,
     moneyInput,
     toast,
     saveDepositAdjustment,
@@ -12,7 +12,7 @@
     resolveAdjustmentType,
   }) {
     async function recordDepositAdjustment(accountId, type) {
-      const account = state.accounts.find((row) => row.id === accountId);
+      const account = getAccount(accountId);
       const adjustmentType = resolveAdjustmentType(type);
       if (!account || account.account_type !== "rental" || !adjustmentType) {
         return false;

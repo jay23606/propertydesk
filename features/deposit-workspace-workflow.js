@@ -20,7 +20,9 @@
     const { attachDepositAdjustmentEvents } =
       workflows.adjustmentWorkflow.create({
         $: adjustments.$,
-        state: adjustments.state,
+        getAccount: adjustments.getAccount,
+        getWorkspaceOwnerId: adjustments.getWorkspaceOwnerId,
+        getCollection: adjustments.getCollection,
         todayIso: adjustments.todayIso,
         toast: adjustments.toast,
         fetchAll: adjustments.fetchAll,

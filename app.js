@@ -531,7 +531,11 @@
       },
       adjustments: {
         $,
-        state,
+        getAccount: (accountId) =>
+          state.accounts.find((account) => account.id === accountId) || null,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getCollection: (collection) =>
+          collection === "depositEntries" ? state.depositEntries : null,
         todayIso,
         toast,
         fetchAll,
@@ -586,7 +590,10 @@
       },
       actions: {
         $,
-        state,
+        getAccount: (accountId) =>
+          state.accounts.find((account) => account.id === accountId) || null,
+        getCollection: (collection) =>
+          collection === "accounts" ? state.accounts : null,
         toast,
         fetchAll,
         closeModal,

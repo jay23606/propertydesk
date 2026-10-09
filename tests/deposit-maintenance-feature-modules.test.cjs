@@ -29,6 +29,15 @@ function loadAdjustmentModel(context) {
   return context.window.PropertyDeskDepositAdjustmentModel;
 }
 
+function depositStateAccess(state) {
+  return {
+    getAccount: (id) => state.accounts.find((account) => account.id === id),
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getCollection: (name) =>
+      name === "depositEntries" ? state.depositEntries : null,
+  };
+}
+
 test("deposit adjustment model validates inputs and prepares audited payloads", () => {
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -153,7 +162,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
     },
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
-    state,
+    ...depositStateAccess(state),
     ...workspaceRecordWriteOptions(context),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
@@ -170,7 +179,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
       context.window.PropertyDeskDepositAdjustmentModel.resolveType,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
-    state,
+    getAccount: depositStateAccess(state).getAccount,
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
@@ -217,12 +226,13 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
   ];
   const messages = [];
   let inserts = 0;
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+  };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     ...workspaceRecordWriteOptions(context),
-    state: {
-      workspaceOwnerId: "workspace-1",
-      accounts: [{ id: "rental-1", account_type: "rental" }],
-    },
+    ...depositStateAccess(state),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("rejected adjustments must not refresh"),
@@ -296,7 +306,7 @@ test("deposit maintenance reconciles an adjustment after a lost response", async
     depositEntries: [],
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
-    state,
+    ...depositStateAccess(state),
     ...workspaceRecordWriteOptions(context),
     todayIso: () => "2026-10-08",
     toast: (message) => events.push(["toast", message]),
@@ -359,13 +369,14 @@ test("deposit maintenance asks to check the refreshed ledger before retrying", a
     context,
   );
   const events = [];
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    accounts: [{ id: "rental-1", account_type: "rental" }],
+    depositEntries: [],
+  };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     ...workspaceRecordWriteOptions(context),
-    state: {
-      workspaceOwnerId: "workspace-1",
-      accounts: [{ id: "rental-1", account_type: "rental" }],
-      depositEntries: [],
-    },
+    ...depositStateAccess(state),
     todayIso: () => "2026-10-08",
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => events.push(["refresh"]),
@@ -459,7 +470,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     },
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
-    state,
+    ...depositStateAccess(state),
     ...workspaceRecordWriteOptions(context),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
@@ -477,7 +488,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     resolveAdjustmentType: adjustmentModel.resolveType,
   });
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
-    state,
+    getAccount: depositStateAccess(state).getAccount,
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: maintenance.saveDepositAdjustment,
@@ -516,7 +527,7 @@ test("deposit adjustment entry validates the amount before asking for an audit r
     accounts: [{ id: "rental-1", account_type: "rental" }],
   };
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
-    state,
+    getAccount: depositStateAccess(state).getAccount,
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: () =>
@@ -560,9 +571,7 @@ test("deposit adjustment entry treats amount prompt cancellation as a no-op", as
   const messages = [];
   let promptCount = 0;
   const entry = context.window.PropertyDeskDepositAdjustmentEntry.create({
-    state: {
-      accounts: [{ id: "rental-1", account_type: "rental" }],
-    },
+    getAccount: () => ({ id: "rental-1", account_type: "rental" }),
     moneyInput: Number,
     toast: (message) => messages.push(message),
     saveDepositAdjustment: () =>

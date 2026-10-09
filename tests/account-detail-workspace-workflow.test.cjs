@@ -39,7 +39,8 @@ test("account detail workspace joins content rendering and action binding", () =
   };
   const actions = {
     $() {},
-    state: {},
+    getAccount() {},
+    getCollection() {},
     toast() {},
     fetchAll() {},
     closeModal() {},
@@ -117,10 +118,11 @@ test("account detail workspace joins content rendering and action binding", () =
     "confirmAction",
     "editAccount",
     "fetchAll",
+    "getAccount",
+    "getCollection",
     "openPayment",
     "repository",
     "saveAndRefreshWorkspaceRecord",
-    "state",
     "toast",
     "workflows",
   ]);

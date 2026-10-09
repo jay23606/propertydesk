@@ -49,7 +49,8 @@ test("property record maintenance receives only the record save operation", asyn
   });
 
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].state, state);
+  assert.equal(calls[0].getCollection("properties"), state.properties);
+  assert.equal("state" in calls[0], false);
   assert.equal(calls[0].collection, "properties");
   assert.equal(calls[0].payload, payload);
   assert.equal(calls[0].recordId, "property-1");

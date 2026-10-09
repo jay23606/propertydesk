@@ -20,7 +20,7 @@
       return save({
         ...selectRecordWriteCompletion(completion),
         operation: () => repository.save(payload, recordId),
-        state,
+        getCollection: (name) => state?.[name],
         collection,
         payload,
         recordId,

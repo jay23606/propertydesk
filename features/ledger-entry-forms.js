@@ -31,7 +31,12 @@
       buildExpenseCorrection,
     } = transactionPayloads;
     const { insertPayment, insertExpense } = modules.transactionInserts.create({
-      state,
+      getCollection: (collection) =>
+        collection === "payments"
+          ? state.payments
+          : collection === "expenses"
+            ? state.expenses
+            : null,
       fetchAll,
       toast,
       repository: transactionRepository,

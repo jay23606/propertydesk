@@ -31,7 +31,9 @@ test("account and deposit workspace share detail rendering and events", () => {
     },
     adjustments: {
       $() {},
-      state: {},
+      getAccount() {},
+      getWorkspaceOwnerId() {},
+      getCollection() {},
       todayIso() {},
       toast() {},
       fetchAll() {},
@@ -49,7 +51,8 @@ test("account and deposit workspace share detail rendering and events", () => {
   const content = { fmtDateTime() {}, accountHistoryRepository: {} };
   const actions = {
     $() {},
-    state: {},
+    getAccount() {},
+    getCollection() {},
     toast() {},
     fetchAll() {},
     closeModal() {},
@@ -125,13 +128,15 @@ test("account and deposit workspace share detail rendering and events", () => {
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
     "$",
     "fetchAll",
+    "getAccount",
+    "getCollection",
+    "getWorkspaceOwnerId",
     "moneyInput",
     "prepareAdjustment",
     "promptAction",
     "repository",
     "resolveAdjustmentType",
     "saveAndRefreshWorkspaceRecord",
-    "state",
     "toast",
     "todayIso",
     "validateAdjustment",
@@ -160,10 +165,11 @@ test("account and deposit workspace share detail rendering and events", () => {
     "confirmAction",
     "editAccount",
     "fetchAll",
+    "getAccount",
+    "getCollection",
     "openPayment",
     "repository",
     "saveAndRefreshWorkspaceRecord",
-    "state",
     "toast",
   ]);
   assert.equal("ignored" in passed.accountDetails.actions, false);

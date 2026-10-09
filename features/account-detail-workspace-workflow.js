@@ -34,7 +34,8 @@
     });
     const { attachAccountDetailActionEvents } = actionWorkflow.create({
       $: actions.$,
-      state: actions.state,
+      getAccount: actions.getAccount,
+      getCollection: actions.getCollection,
       toast: actions.toast,
       fetchAll: actions.fetchAll,
       closeModal: actions.closeModal,

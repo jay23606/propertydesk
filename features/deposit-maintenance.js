@@ -11,7 +11,9 @@
   }
 
   function create({
-    state,
+    getAccount,
+    getWorkspaceOwnerId,
+    getCollection,
     todayIso,
     toast,
     fetchAll,
@@ -21,14 +23,14 @@
     saveAndRefreshWorkspaceRecord,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {
-      const account = state.accounts.find((row) => row.id === accountId);
+      const account = getAccount(accountId);
       const adjustmentType = resolveAdjustmentType(type);
       if (!account || account.account_type !== "rental" || !adjustmentType) {
         return false;
       }
       const prepared = prepareAdjustment({
         account,
-        userId: state.workspaceOwnerId,
+        userId: getWorkspaceOwnerId(),
         accountId,
         type,
         amount,
@@ -39,7 +41,7 @@
       const message = adjustmentType.successMessage;
       return saveAndRefreshWorkspaceRecord({
         operation: () => repository.insert(prepared.payload),
-        state,
+        getCollection,
         collection: "depositEntries",
         payload: prepared.payload,
         fetchAll,

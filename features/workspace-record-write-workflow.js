@@ -29,7 +29,7 @@
 
     async function saveWorkspaceRecord({
       operation,
-      state,
+      getCollection,
       collection,
       payload,
       recordId,
@@ -42,7 +42,7 @@
       onRefreshed,
       onReconciled,
     }) {
-      const initialRecords = state?.[collection];
+      const initialRecords = getCollection?.(collection);
       const previousCount =
         recordId || !Array.isArray(initialRecords)
           ? null
@@ -56,7 +56,7 @@
               return reconcileWorkspaceChange({
                 fetchAll,
                 afterRefresh: () => {
-                  const records = state[collection] || [];
+                  const records = getCollection(collection) || [];
                   recordWasSaved = recordId
                     ? records.some(
                         (record) =>

@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getCollection,
     toast,
     fetchAll,
     closeAccountDetails,
@@ -13,7 +13,7 @@
     function saveCloseAccount(account) {
       return saveAndRefreshWorkspaceRecord({
         operation: () => repository.close(account.id),
-        state,
+        getCollection,
         collection: "accounts",
         payload: { status: "closed" },
         recordId: account.id,

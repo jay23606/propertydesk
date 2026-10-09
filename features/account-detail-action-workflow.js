@@ -4,7 +4,8 @@
 
   function createAccountDetailActionWorkflow({
     $,
-    state,
+    getAccount,
+    getCollection,
     toast,
     fetchAll,
     closeModal,
@@ -20,7 +21,7 @@
     },
   }) {
     const { saveCloseAccount } = closeMaintenanceWorkflow.create({
-      state,
+      getCollection,
       toast,
       fetchAll,
       closeAccountDetails: () => closeModal($("detail-modal")),
@@ -33,7 +34,7 @@
     });
     const { attachAccountDetailActionEvents } = detailEventsWorkflow.create({
       $,
-      state,
+      getAccount,
       closeModal,
       editAccount,
       openPayment,

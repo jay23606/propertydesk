@@ -59,7 +59,7 @@ test("record-write workflow confirms a saved record after readback", async () =>
         events.push("write");
         throw new Error("connection lost");
       },
-      state,
+      getCollection: (name) => state[name],
       collection: "accounts",
       payload: { status: "closed" },
       recordId: "account-1",
@@ -99,7 +99,7 @@ test("record-write workflow confirms a new matching record by count", async () =
         events.push("write");
         throw new Error("connection lost");
       },
-      state,
+      getCollection: (name) => state[name],
       collection: "accounts",
       payload,
       fetchAll: async () => {
@@ -138,7 +138,7 @@ test("record-write workflow does not confirm an unchanged matching count", async
         events.push("write");
         throw new Error("connection lost");
       },
-      state,
+      getCollection: (name) => state[name],
       collection: "accounts",
       payload,
       fetchAll: async () => events.push("refresh"),

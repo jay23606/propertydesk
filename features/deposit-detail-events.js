@@ -4,7 +4,7 @@
 
   function createDepositDetailEvents({
     $,
-    state,
+    getAccount,
     depositSectionHTML,
     recordDepositAdjustment,
   }) {
@@ -20,7 +20,7 @@
         );
         if (!saved) return;
 
-        const account = state.accounts.find((row) => row.id === accountId);
+        const account = getAccount(accountId);
         const section = $("detail-deposit-section");
         if (account && section) section.innerHTML = depositSectionHTML(account);
       });

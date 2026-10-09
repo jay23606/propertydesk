@@ -4,7 +4,9 @@
 
   function createDepositAdjustmentWorkflow({
     $,
-    state,
+    getAccount,
+    getWorkspaceOwnerId,
+    getCollection,
     todayIso,
     toast,
     fetchAll,
@@ -19,7 +21,9 @@
     workflows,
   }) {
     const { saveDepositAdjustment } = workflows.maintenance.create({
-      state,
+      getAccount,
+      getWorkspaceOwnerId,
+      getCollection,
       todayIso,
       toast,
       fetchAll,
@@ -29,7 +33,7 @@
       saveAndRefreshWorkspaceRecord,
     });
     const { recordDepositAdjustment } = workflows.entry.create({
-      state,
+      getAccount,
       moneyInput,
       toast,
       saveDepositAdjustment,
@@ -39,7 +43,7 @@
     });
     const { attachDepositAdjustmentEvents } = workflows.events.create({
       $,
-      state,
+      getAccount,
       depositSectionHTML,
       recordDepositAdjustment,
     });

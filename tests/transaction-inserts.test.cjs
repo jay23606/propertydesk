@@ -66,7 +66,7 @@ function loadTransactionInserts(client, messages = [], options = {}) {
       },
     });
   return context.window.PropertyDeskTransactionInserts.create({
-    state: options.state,
+    getCollection: (name) => options.state?.[name],
     fetchAll: options.fetchAll,
     toast: (message) => messages.push(message),
     saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
@@ -92,6 +92,7 @@ test("transaction inserts receive write services instead of reading globals", ()
     source,
     /window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
   );
+  assert.doesNotMatch(source, /\bstate\b/);
 });
 
 test("transaction entry actions write to their dedicated ledgers", async () => {

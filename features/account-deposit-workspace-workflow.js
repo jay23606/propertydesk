@@ -21,7 +21,9 @@
       },
       adjustments: {
         $: deposits.adjustments.$,
-        state: deposits.adjustments.state,
+        getAccount: deposits.adjustments.getAccount,
+        getWorkspaceOwnerId: deposits.adjustments.getWorkspaceOwnerId,
+        getCollection: deposits.adjustments.getCollection,
         todayIso: deposits.adjustments.todayIso,
         toast: deposits.adjustments.toast,
         fetchAll: deposits.adjustments.fetchAll,
@@ -66,7 +68,8 @@
       },
       actions: {
         $: accountDetails.actions.$,
-        state: accountDetails.actions.state,
+        getAccount: accountDetails.actions.getAccount,
+        getCollection: accountDetails.actions.getCollection,
         toast: accountDetails.actions.toast,
         fetchAll: accountDetails.actions.fetchAll,
         closeModal: accountDetails.actions.closeModal,

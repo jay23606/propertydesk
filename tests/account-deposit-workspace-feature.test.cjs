@@ -61,7 +61,9 @@ test("account and deposit workspace exposes only its supported operations", () =
     },
     adjustments: {
       $: () => {},
-      state: {},
+      getAccount: () => {},
+      getWorkspaceOwnerId: () => {},
+      getCollection: () => {},
       todayIso: () => {},
       toast: () => {},
       fetchAll: () => {},
@@ -100,7 +102,8 @@ test("account and deposit workspace exposes only its supported operations", () =
   };
   const actions = {
     $: () => {},
-    state: {},
+    getAccount: () => {},
+    getCollection: () => {},
     toast: () => {},
     fetchAll: () => {},
     closeModal: () => {},
@@ -144,13 +147,15 @@ test("account and deposit workspace exposes only its supported operations", () =
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
     "$",
     "fetchAll",
+    "getAccount",
+    "getCollection",
+    "getWorkspaceOwnerId",
     "moneyInput",
     "prepareAdjustment",
     "promptAction",
     "repository",
     "resolveAdjustmentType",
     "saveAndRefreshWorkspaceRecord",
-    "state",
     "toast",
     "todayIso",
     "validateAdjustment",
@@ -200,10 +205,11 @@ test("account and deposit workspace exposes only its supported operations", () =
     "confirmAction",
     "editAccount",
     "fetchAll",
+    "getAccount",
+    "getCollection",
     "openPayment",
     "repository",
     "saveAndRefreshWorkspaceRecord",
-    "state",
     "toast",
   ]);
   for (const key of Object.keys(passed.accountDetails.actions))
@@ -406,6 +412,35 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /'\.\/features\/account-deposit-workspace-workflow\.js'/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
+});
+
+test("account, deposit, and transaction persistence receive only record getters", () => {
+  const root = path.join(__dirname, "..");
+  const scopedModules = [
+    "features/account-deposit-workspace-workflow.js",
+    "features/account-detail-action-workflow.js",
+    "features/account-detail-events.js",
+    "features/account-close-maintenance.js",
+    "features/deposit-workspace-workflow.js",
+    "features/deposit-adjustment-workflow.js",
+    "features/deposit-adjustment-entry.js",
+    "features/deposit-detail-events.js",
+    "features/deposit-maintenance.js",
+    "features/workspace-record-write-workflow.js",
+    "features/transaction-inserts.js",
+  ];
+
+  for (const filename of scopedModules) {
+    const source = fs.readFileSync(path.join(root, filename), "utf8");
+    assert.doesNotMatch(source, /\bstate\b/, filename);
+  }
+  assert.match(
+    fs.readFileSync(
+      path.join(root, "features/workspace-record-write-workflow.js"),
+      "utf8",
+    ),
+    /getCollection\?\.\(collection\)/,
+  );
 });
 
 test("deposit workspace connects held-balance details to adjustment actions", () => {

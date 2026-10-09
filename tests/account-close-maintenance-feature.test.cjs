@@ -62,6 +62,7 @@ test("account close maintenance preserves the account history", async () => {
     },
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
+    getCollection: (name) => state[name],
     ...workspaceRecordWriteOptions(context),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -110,7 +111,7 @@ test("account close maintenance reports rejected requests without closing detail
   const messages = [];
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    state,
+    getCollection: (name) => state[name],
     ...workspaceRecordWriteOptions(context),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -152,7 +153,7 @@ test("account close confirms a lost response from refreshed account status", asy
   const messages = [];
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    state,
+    getCollection: (name) => state[name],
     ...workspaceRecordWriteOptions(context),
     repository: {
       close: async () => {

@@ -126,7 +126,8 @@ test("deposit detail event router refreshes the ledger after a recorded adjustme
   ]);
   const feature = context.window.PropertyDeskDepositDetailEvents.create({
     $: (id) => elements.get(id),
-    state: { accounts: [{ id: "rental-1", account_type: "rental" }] },
+    getAccount: (id) =>
+      id === "rental-1" ? { id, account_type: "rental" } : null,
     depositSectionHTML: () => `<p>Held balance: $${held.toFixed(2)}</p>`,
     recordDepositAdjustment: async (...args) => {
       calls.push(args);

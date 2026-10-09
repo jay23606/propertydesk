@@ -33,6 +33,8 @@ test("account detail action workflow wires only account close concerns", () => {
   const closeModal = (element) => (passed.closedModal = element);
   const saveAndRefreshWorkspaceRecord = () => {};
   const confirmAction = () => true;
+  const getAccount = () => null;
+  const getCollection = () => [];
   const context = vm.createContext({
     window: {
       PropertyDeskAccountCloseMaintenance: {
@@ -58,7 +60,8 @@ test("account detail action workflow wires only account close concerns", () => {
   loadWorkflow(context, "account-detail-action-workflow.js");
   const dependencies = {
     $,
-    state: {},
+    getAccount,
+    getCollection,
     toast() {},
     fetchAll() {},
     closeModal,
@@ -77,7 +80,7 @@ test("account detail action workflow wires only account close concerns", () => {
     context.window.PropertyDeskAccountDetailActionWorkflow.create(dependencies);
 
   assert.equal(Object.isFrozen(workflow), true);
-  assert.equal(passed.maintenance.state, dependencies.state);
+  assert.equal(passed.maintenance.getCollection, getCollection);
   assert.equal(
     dependencies.workflows.closeMaintenance,
     context.window.PropertyDeskAccountCloseMaintenance,
@@ -92,6 +95,7 @@ test("account detail action workflow wires only account close concerns", () => {
   assert.equal(passed.entry.confirmAction, confirmAction);
   assert.equal(passed.events.closeAccount, closeAccount);
   assert.equal(passed.events.editAccount, dependencies.editAccount);
+  assert.equal(passed.events.getAccount, getAccount);
   assert.equal(workflow.attachAccountDetailActionEvents, attachEvents);
   assert.deepEqual(Object.keys(workflow), ["attachAccountDetailActionEvents"]);
   passed.maintenance.closeAccountDetails();

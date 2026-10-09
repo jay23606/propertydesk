@@ -311,7 +311,7 @@ test("account detail event router dispatches edit, payment, and close actions", 
         clickHandler = handler;
       },
     }),
-    state: { accounts: [account] },
+    getAccount: (id) => (id === account.id ? account : null),
     closeModal: (modal) => calls.push(`close:${modal.id}`),
     editAccount: (value) => calls.push(`edit:${value.id}`),
     openPayment: (id) => calls.push(`payment:${id}`),

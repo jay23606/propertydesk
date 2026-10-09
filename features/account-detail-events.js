@@ -4,7 +4,7 @@
 
   function createAccountDetailEvents({
     $,
-    state,
+    getAccount,
     closeModal,
     editAccount,
     openPayment,
@@ -14,9 +14,7 @@
       $("detail-content").addEventListener("click", (event) => {
         const edit = event.target.closest("[data-account-detail-edit]");
         if (edit) {
-          const account = state.accounts.find(
-            (item) => item.id === edit.dataset.accountDetailEdit,
-          );
+          const account = getAccount(edit.dataset.accountDetailEdit);
           if (!account) return;
           closeModal($("detail-modal"));
           editAccount(account);
@@ -25,9 +23,7 @@
 
         const payment = event.target.closest("[data-account-detail-payment]");
         if (payment) {
-          const account = state.accounts.find(
-            (item) => item.id === payment.dataset.accountDetailPayment,
-          );
+          const account = getAccount(payment.dataset.accountDetailPayment);
           if (!account) return;
           closeModal($("detail-modal"));
           openPayment(account.id);
@@ -36,9 +32,7 @@
 
         const close = event.target.closest("[data-account-detail-close]");
         if (close) {
-          const account = state.accounts.find(
-            (item) => item.id === close.dataset.accountDetailClose,
-          );
+          const account = getAccount(close.dataset.accountDetailClose);
           if (account) closeAccount(account);
         }
       });

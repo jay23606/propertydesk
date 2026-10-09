@@ -24,7 +24,7 @@
     }) {
       return saveAndRefreshWorkspaceRecord({
         operation: () => repository.updateOwned(propertyId, ownerId, payload),
-        state,
+        getCollection: (name) => state?.[name],
         collection: "properties",
         payload,
         recordId: propertyId,

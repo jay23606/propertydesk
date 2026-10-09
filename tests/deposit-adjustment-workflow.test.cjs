@@ -21,6 +21,9 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   const recordDepositAdjustment = () => {};
   const attachDepositAdjustmentEvents = () => {};
   const saveAndRefreshWorkspaceRecord = () => {};
+  const getAccount = () => null;
+  const getWorkspaceOwnerId = () => "owner-1";
+  const getCollection = () => [];
   const context = vm.createContext({
     window: {
       PropertyDeskDepositMaintenance: {
@@ -46,7 +49,9 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   loadWorkflow(context, "deposit-adjustment-workflow.js");
   const dependencies = {
     $() {},
-    state: {},
+    getAccount,
+    getWorkspaceOwnerId,
+    getCollection,
     todayIso() {},
     toast() {},
     fetchAll() {},
@@ -77,6 +82,9 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
 
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance.repository, repository);
+  assert.equal(passed.maintenance.getAccount, getAccount);
+  assert.equal(passed.maintenance.getWorkspaceOwnerId, getWorkspaceOwnerId);
+  assert.equal(passed.maintenance.getCollection, getCollection);
   assert.equal(
     passed.maintenance.saveAndRefreshWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,
@@ -84,10 +92,12 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   assert.equal(passed.maintenance.prepareAdjustment, prepareAdjustment);
   assert.equal(passed.maintenance.resolveAdjustmentType, resolveAdjustmentType);
   assert.equal(passed.entry.moneyInput, dependencies.moneyInput);
+  assert.equal(passed.entry.getAccount, getAccount);
   assert.equal(passed.entry.validateAdjustment, validateAdjustment);
   assert.equal(passed.entry.resolveAdjustmentType, resolveAdjustmentType);
   assert.equal(passed.entry.promptAction, dependencies.promptAction);
   assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
+  assert.equal(passed.events.getAccount, getAccount);
   assert.equal(
     passed.events.depositSectionHTML,
     dependencies.depositSectionHTML,
