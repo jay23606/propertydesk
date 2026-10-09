@@ -2,41 +2,6 @@
 (() => {
   "use strict";
 
-  function createPropertyDetails(detail) {
-    const { screen, ...workflows } = detail.workflows;
-    return screen.create({ ...detail, workflows });
-  }
-
-  function createPropertyOverview({
-    overview,
-    groupAccountsByProperty,
-    isActiveAccount,
-    openPropertyDetails,
-    workflow,
-  }) {
-    return workflow.create({
-      ...overview,
-      groupAccountsByProperty,
-      isActiveAccount,
-      openPropertyDetails,
-    });
-  }
-
-  function createPropertiesPortfolio({
-    portfolio,
-    groupAccountsByProperty,
-    isActiveAccount,
-    openPropertyDetails,
-    workflow,
-  }) {
-    return workflow.create({
-      ...portfolio,
-      groupAccountsByProperty,
-      isActiveAccount,
-      openPropertyDetails,
-    });
-  }
-
   function createPropertyWorkspaceWorkflow({
     detail,
     overview,
@@ -45,20 +10,22 @@
     isActiveAccount,
     workflows,
   }) {
-    const propertyDetails = createPropertyDetails(detail);
-    const propertyOverview = createPropertyOverview({
-      overview,
-      groupAccountsByProperty,
-      isActiveAccount,
-      openPropertyDetails: propertyDetails.openPropertyDetails,
-      workflow: workflows.overview,
+    const { screen, ...detailWorkflows } = detail.workflows;
+    const propertyDetails = screen.create({
+      ...detail,
+      workflows: detailWorkflows,
     });
-    const properties = createPropertiesPortfolio({
-      portfolio,
+    const propertyOverview = workflows.overview.create({
+      ...overview,
       groupAccountsByProperty,
       isActiveAccount,
       openPropertyDetails: propertyDetails.openPropertyDetails,
-      workflow: workflows.portfolio,
+    });
+    const properties = workflows.portfolio.create({
+      ...portfolio,
+      groupAccountsByProperty,
+      isActiveAccount,
+      openPropertyDetails: propertyDetails.openPropertyDetails,
     });
 
     return Object.freeze({

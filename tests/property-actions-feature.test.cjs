@@ -246,7 +246,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     workspaceWorkflow,
-    /const \{ screen, \.\.\.workflows \} = detail\.workflows;[\s\S]*?return screen\.create\(\{ \.\.\.detail, workflows \}\);/,
+    /const \{ screen, \.\.\.detailWorkflows \} = detail\.workflows;[\s\S]*?screen\.create\(\{[\s\S]*?\.\.\.detail,[\s\S]*?workflows: detailWorkflows,/,
   );
   assert.doesNotMatch(workspaceWorkflow, /workflows:\s*detail\.workflows\b/);
   const workflow = fs.readFileSync(
