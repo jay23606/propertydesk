@@ -10,32 +10,12 @@
     workspaceWorkflows,
   }) {
     const workspacePage = workspaceWorkflow.create({
-      $: workspace.$,
-      getAccounts: workspace.getAccounts,
-      getProperties: workspace.getProperties,
-      getReminderLogs: workspace.getReminderLogs,
-      getUser: workspace.getUser,
-      setUser: workspace.setUser,
-      getWorkspaceMembers: workspace.getWorkspaceMembers,
-      getWorkspaceOwnerId: workspace.getWorkspaceOwnerId,
-      now: workspace.now,
-      esc: workspace.esc,
-      toast: workspace.toast,
-      fetchAll: workspace.fetchAll,
-      reminder: workspace.reminder,
-      memberRepository: workspace.memberRepository,
-      run: workspace.run,
-      runAndRefreshWorkspaceChange: workspace.runAndRefreshWorkspaceChange,
-      authClient: workspace.authClient,
-      confirmAction: workspace.confirmAction,
+      ...workspace,
       workflows: workspaceWorkflows,
     });
     const pageNavigation = navigationWorkflow.create({
-      $: navigation.$,
-      setView: navigation.setView,
+      ...navigation,
       renderWorkspacePage: workspacePage.renderWorkspacePage,
-      documentRef: navigation.documentRef,
-      windowRef: navigation.windowRef,
     });
 
     return Object.freeze({

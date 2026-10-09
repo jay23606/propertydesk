@@ -32,6 +32,7 @@ test("app shell setup maps workspace state, services, and navigation", () => {
       "setView",
     ].map((key) => [key, () => key]),
   );
+  records.unusedRecordValue = true;
   const ui = Object.fromEntries(
     [
       "$",
@@ -44,6 +45,7 @@ test("app shell setup maps workspace state, services, and navigation", () => {
       "windowRef",
     ].map((key) => [key, { key }]),
   );
+  ui.unusedUiValue = true;
   const services = Object.fromEntries(
     [
       "fetchAll",
@@ -53,6 +55,7 @@ test("app shell setup maps workspace state, services, and navigation", () => {
       "authClient",
     ].map((key) => [key, { key }]),
   );
+  services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     ["shell", "workspace", "navigation", "workspaceModules"].map((key) => [
       key,
@@ -80,6 +83,32 @@ test("app shell setup maps workspace state, services, and navigation", () => {
     services.runAndRefreshWorkspaceChange,
   );
   assert.equal(received.navigation.setView, records.setView);
+  assert.deepEqual(Object.keys(received.workspace).sort(), [
+    "$",
+    "authClient",
+    "confirmAction",
+    "esc",
+    "fetchAll",
+    "getAccounts",
+    "getProperties",
+    "getReminderLogs",
+    "getUser",
+    "getWorkspaceMembers",
+    "getWorkspaceOwnerId",
+    "memberRepository",
+    "now",
+    "reminder",
+    "run",
+    "runAndRefreshWorkspaceChange",
+    "setUser",
+    "toast",
+  ]);
+  assert.deepEqual(Object.keys(received.navigation).sort(), [
+    "$",
+    "documentRef",
+    "setView",
+    "windowRef",
+  ]);
   assert.equal(received.workspaceWorkflow, workflows.workspace);
   assert.equal(received.navigationWorkflow, workflows.navigation);
   assert.equal(received.workspaceWorkflows, workflows.workspaceModules);

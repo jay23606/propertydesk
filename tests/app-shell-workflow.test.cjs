@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("app shell composes workspace settings and navigation explicitly", () => {
+test("app shell forwards scoped workspace settings and navigation", () => {
   const root = path.join(__dirname, "..");
   const passed = {};
   const workspaceActions = {
@@ -60,7 +60,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     runAndRefreshWorkspaceChange: () => {},
     authClient: {},
     confirmAction: () => true,
-    unusedWorkspaceValue: true,
+    scopedWorkspaceValue: true,
   };
   const navigationSelector = () => {};
   const workspaceWorkflows = {};
@@ -69,7 +69,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     setView() {},
     documentRef: {},
     windowRef: {},
-    unusedNavigationValue: true,
+    scopedNavigationValue: true,
   };
   const appShell = context.window.PropertyDeskAppShellWorkflow.create({
     workspace,
@@ -96,11 +96,13 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "reminder",
     "run",
     "runAndRefreshWorkspaceChange",
+    "scopedWorkspaceValue",
     "setUser",
     "toast",
     "workflows",
   ]);
-  assert.equal("unusedWorkspaceValue" in passed.workspace, false);
+  assert.equal(passed.workspace.scopedWorkspaceValue, true);
+  assert.equal(Object.hasOwn(passed.workspace, "unusedWorkspaceValue"), false);
   assert.equal(passed.workspace.workflows, workspaceWorkflows);
   for (const key of Object.keys(passed.workspace)) {
     if (key === "workflows") continue;
@@ -110,10 +112,15 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "$",
     "documentRef",
     "renderWorkspacePage",
+    "scopedNavigationValue",
     "setView",
     "windowRef",
   ]);
-  assert.equal("unusedNavigationValue" in passed.navigation, false);
+  assert.equal(passed.navigation.scopedNavigationValue, true);
+  assert.equal(
+    Object.hasOwn(passed.navigation, "unusedNavigationValue"),
+    false,
+  );
   assert.equal(passed.navigation.$, navigationSelector);
   assert.equal(passed.navigation.setView, navigation.setView);
   assert.equal(passed.navigation.documentRef, navigation.documentRef);
