@@ -10,15 +10,17 @@
     openPropertyDetails,
     repository,
     writeFeedback,
+    statusMaintenance,
+    recordUpdateMaintenance,
   }) {
-    const { savePropertyArchive } =
-      window.PropertyDeskPropertyStatusMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-        writeFeedback,
-      });
+    const { savePropertyArchive } = statusMaintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+      writeFeedback,
+      recordUpdateMaintenance,
+    });
 
     async function toggleArchiveProperty() {
       const id = state.selectedPropertyId;

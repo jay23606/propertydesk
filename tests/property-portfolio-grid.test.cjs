@@ -121,6 +121,8 @@ test("Properties workflow returns explicit view and action operations", () => {
           return { editPropertyQuickNote };
         },
       },
+      PropertyDeskPropertyNoteMaintenance: {},
+      PropertyDeskPropertyRecordUpdateMaintenance: {},
       PropertyDeskPropertyViewEvents: {
         create: (options) => {
           calls.push("portfolio actions");
@@ -147,6 +149,9 @@ test("Properties workflow returns explicit view and action operations", () => {
     portfolioModel: context.window.PropertyDeskPropertyPortfolioModel,
     views: context.window.PropertyDeskPropertyViews,
     quickNote: context.window.PropertyDeskPropertyQuickNote,
+    noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     events: context.window.PropertyDeskPropertyViewEvents,
   };
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
@@ -189,6 +194,11 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal(passed.quickNote.writeFeedback.kind, "write-feedback");
   assert.equal(passed.quickNote.streetAddress, action);
   assert.equal(passed.quickNote.repository, propertyRepository);
+  assert.equal(passed.quickNote.noteMaintenance, workflows.noteMaintenance);
+  assert.equal(
+    passed.quickNote.recordUpdateMaintenance,
+    workflows.recordUpdateMaintenance,
+  );
   assert.equal("unusedDependency" in passed.quickNote, false);
   assert.deepEqual(Object.keys(passed.views).sort(), [
     "$",

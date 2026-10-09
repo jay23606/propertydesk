@@ -82,6 +82,8 @@
       streetAddress,
       repository: propertyRepository,
       writeFeedback,
+      noteMaintenance: workflows.noteMaintenance,
+      recordUpdateMaintenance: workflows.recordUpdateMaintenance,
     });
     const { attachEvents: attachPropertyActionEvents } =
       workflows.events.create({

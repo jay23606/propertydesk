@@ -2,15 +2,21 @@
 (() => {
   "use strict";
 
-  function create({ state, fetchAll, toast, repository, writeFeedback }) {
-    const { savePropertyUpdate } =
-      window.PropertyDeskPropertyRecordUpdateMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-        writeFeedback,
-      });
+  function create({
+    state,
+    fetchAll,
+    toast,
+    repository,
+    writeFeedback,
+    recordUpdateMaintenance,
+  }) {
+    const { savePropertyUpdate } = recordUpdateMaintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+      writeFeedback,
+    });
 
     function savePropertyQuickNote(propertyId, ownerId, note, onReconciled) {
       const message = note ? "Property note saved" : "Property note removed";

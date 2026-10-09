@@ -59,6 +59,9 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     },
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (property) => property.address,
+    noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
@@ -104,6 +107,9 @@ test("property quick notes enforce the character limit before writing", async ()
     fetchAll: async () => assert.fail("an overlong note must not refresh"),
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (property) => property.address,
+    noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
@@ -144,6 +150,9 @@ test("quick note reconciles a lost response against refreshed property state", a
     },
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     streetAddress: (item) => item.address,
+    noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: {
       updateOwned: async () => {
         throw new Error("connection lost");
@@ -163,6 +172,30 @@ test("quick note and grid actions load before the Properties workflow", () => {
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  for (const [filename, dependency] of [
+    [
+      "property-note-maintenance.js",
+      /window\.PropertyDeskPropertyRecordUpdateMaintenance\.create/,
+    ],
+    [
+      "property-status-maintenance.js",
+      /window\.PropertyDeskPropertyRecordUpdateMaintenance\.create/,
+    ],
+    [
+      "property-quick-note.js",
+      /window\.PropertyDeskPropertyNoteMaintenance\.create/,
+    ],
+    [
+      "property-archive.js",
+      /window\.PropertyDeskPropertyStatusMaintenance\.create/,
+    ],
+  ]) {
+    const source = fs.readFileSync(
+      path.join(__dirname, "..", "features", filename),
+      "utf8",
+    );
+    assert.doesNotMatch(source, dependency);
+  }
   for (const maintenance of [
     "property-note-maintenance.js",
     "property-status-maintenance.js",

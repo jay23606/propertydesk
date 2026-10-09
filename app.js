@@ -586,6 +586,9 @@
         },
         managementModules: {
           archive: window.PropertyDeskPropertyArchive,
+          statusMaintenance: window.PropertyDeskPropertyStatusMaintenance,
+          recordUpdateMaintenance:
+            window.PropertyDeskPropertyRecordUpdateMaintenance,
           detailEvents: window.PropertyDeskPropertyDetailEvents,
           quickActions: window.PropertyDeskPropertyDetailQuickActions,
         },
@@ -653,6 +656,9 @@
         portfolioModel: window.PropertyDeskPropertyPortfolioModel,
         views: window.PropertyDeskPropertyViews,
         quickNote: window.PropertyDeskPropertyQuickNote,
+        noteMaintenance: window.PropertyDeskPropertyNoteMaintenance,
+        recordUpdateMaintenance:
+          window.PropertyDeskPropertyRecordUpdateMaintenance,
         events: window.PropertyDeskPropertyViewEvents,
       },
     },

@@ -27,6 +27,8 @@
       openPropertyDetails,
       repository: propertyRepository,
       writeFeedback,
+      statusMaintenance: workflows.statusMaintenance,
+      recordUpdateMaintenance: workflows.recordUpdateMaintenance,
     });
     const { attachEvents: attachPropertyDetailEvents } =
       workflows.detailEvents.create({

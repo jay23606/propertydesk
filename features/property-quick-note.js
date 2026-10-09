@@ -9,17 +9,19 @@
     streetAddress,
     repository,
     writeFeedback,
+    noteMaintenance,
+    recordUpdateMaintenance,
     promptAction = (message, initialValue) =>
       window.prompt(message, initialValue),
   }) {
-    const { savePropertyQuickNote } =
-      window.PropertyDeskPropertyNoteMaintenance.create({
-        state,
-        fetchAll,
-        toast,
-        repository,
-        writeFeedback,
-      });
+    const { savePropertyQuickNote } = noteMaintenance.create({
+      state,
+      fetchAll,
+      toast,
+      repository,
+      writeFeedback,
+      recordUpdateMaintenance,
+    });
 
     async function editPropertyQuickNote(id) {
       const property = state.properties.find((item) => item.id === id);

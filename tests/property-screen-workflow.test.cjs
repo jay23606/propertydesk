@@ -104,6 +104,9 @@ test("property screen workflow passes detail actions to management and returns b
     },
     managementModules: {
       archive: context.window.PropertyDeskPropertyArchive,
+      statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
+      recordUpdateMaintenance:
+        context.window.PropertyDeskPropertyRecordUpdateMaintenance,
       detailEvents: context.window.PropertyDeskPropertyDetailEvents,
       quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
     },

@@ -79,6 +79,9 @@ test("property holder and archive workflows reconcile rejected writes before ret
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
+    statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),
@@ -124,6 +127,9 @@ test("archive reconciles a lost response against refreshed property state", asyn
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-08",
     openPropertyDetails: (id) => events.push(["open", id]),
+    statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: {
       updateOwned: async () => {
         throw new Error("connection lost");
@@ -201,6 +207,9 @@ test("archive and restore use status maintenance and reopen updated details", as
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     todayIso: () => "2026-10-06",
     openPropertyDetails: (id) => calls.push(["open", id]),
+    statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
+    recordUpdateMaintenance:
+      context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
       getClient: () => state.client,
     }),

@@ -2,10 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    saveCloseAccount,
-    confirmAction,
-  }) {
+  function create({ saveCloseAccount, confirmAction }) {
     function closeAccount(account) {
       if (
         !confirmAction(

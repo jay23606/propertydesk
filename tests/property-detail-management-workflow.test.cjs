@@ -18,6 +18,8 @@ test("property detail coordinator connects archive and quick actions", () => {
           return { toggleArchiveProperty() {} };
         },
       },
+      PropertyDeskPropertyStatusMaintenance: {},
+      PropertyDeskPropertyRecordUpdateMaintenance: {},
       PropertyDeskPropertyDetailEvents: {
         create: (options) => {
           passed.detail = options;
@@ -67,6 +69,9 @@ test("property detail coordinator connects archive and quick actions", () => {
     propertyRepository,
     workflows: {
       archive: context.window.PropertyDeskPropertyArchive,
+      statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
+      recordUpdateMaintenance:
+        context.window.PropertyDeskPropertyRecordUpdateMaintenance,
       detailEvents: context.window.PropertyDeskPropertyDetailEvents,
       quickActions: context.window.PropertyDeskPropertyDetailQuickActions,
     },
@@ -79,6 +84,14 @@ test("property detail coordinator connects archive and quick actions", () => {
 
   assert.equal(passed.archive.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.archive.repository, propertyRepository);
+  assert.equal(
+    passed.archive.statusMaintenance,
+    dependencies.workflows.statusMaintenance,
+  );
+  assert.equal(
+    passed.archive.recordUpdateMaintenance,
+    dependencies.workflows.recordUpdateMaintenance,
+  );
   assert.equal("unusedDependency" in passed.archive, false);
   assert.equal("unusedDependency" in passed.detail, false);
   assert.equal("unusedDependency" in passed.quick, false);
