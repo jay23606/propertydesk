@@ -27,6 +27,7 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       "setPendingCorrection",
     ].map((name) => [name, () => name]),
   );
+  records.unusedRecordValue = true;
   const ui = Object.fromEntries(
     [
       "$",
@@ -53,6 +54,7 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
   );
   ui.EventClass = class {};
   ui.OptionClass = class {};
+  ui.unusedUiValue = true;
   const services = Object.fromEntries(
     [
       "fetchAll",
@@ -66,6 +68,7 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       "sumOperatingExpenses",
     ].map((name) => [name, { name }]),
   );
+  services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     [
       "correctionModel",
@@ -110,8 +113,56 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
     "ui",
     "workflows",
   ]);
+  assert.deepEqual(Object.keys(received.records).sort(), [
+    "getAccounts",
+    "getExpenses",
+    "getPayments",
+    "getPendingCorrection",
+    "getProperties",
+    "getWorkspaceOwnerId",
+    "setPendingCorrection",
+  ]);
+  assert.deepEqual(Object.keys(received.ui).sort(), [
+    "$",
+    "EventClass",
+    "OptionClass",
+    "closeModal",
+    "confirmAction",
+    "dateOnly",
+    "documentRef",
+    "esc",
+    "expenseCategoryLabel",
+    "fillSelect",
+    "fmtDate",
+    "money",
+    "moneyInput",
+    "monthStart",
+    "now",
+    "openModal",
+    "populateFormOptions",
+    "prettyType",
+    "promptAction",
+    "toast",
+    "todayIso",
+    "transactionTimestamp",
+  ]);
+  assert.deepEqual(Object.keys(received.services).sort(), [
+    "fetchAll",
+    "postedOnOrAfter",
+    "runAndRefreshWorkspaceChange",
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
+    "selectRecordWriteCompletion",
+    "sumIncome",
+    "sumOperatingExpenses",
+    "transactionRepository",
+  ]);
   for (const [group, source] of Object.entries({ records, ui, services })) {
     for (const [name, value] of Object.entries(source)) {
+      if (name.startsWith("unused")) {
+        assert.equal(name in received[group], false);
+        continue;
+      }
       assert.equal(
         received[group][name],
         value,
