@@ -15,7 +15,7 @@
       state,
       fetchAll,
       toast,
-      writeFeedback,
+      refreshWorkspace: writeFeedback.refreshWorkspace,
     });
     const { finish } = modules.reporting.create({
       status,

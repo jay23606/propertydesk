@@ -32,6 +32,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       addEventListener: (event, handler) =>
         handlers.set(`${id}:${event}`, handler),
     }),
+    writeFeedback: { refreshWorkspace: async () => true },
     modules: importFeatureModules(context),
   });
   assert.deepEqual(Object.keys(feature), [

@@ -36,12 +36,14 @@ function loadCommitFeature() {
   };
 }
 
-test("import batch reconciliation uses injected workspace feedback", () => {
+test("import batch reconciliation receives only workspace refresh", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "import-batch-reconciliation.js"),
     "utf8",
   );
   assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(source, /writeFeedback/);
+  assert.match(source, /refreshWorkspace/);
 });
 
 test("import commits receive reconciliation and reporting dependencies", () => {

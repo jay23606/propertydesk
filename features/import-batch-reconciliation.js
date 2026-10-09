@@ -6,7 +6,7 @@
     state,
     fetchAll,
     toast,
-    writeFeedback,
+    refreshWorkspace,
   }) {
     function normalizedSourceName(sourceName) {
       return (
@@ -61,7 +61,7 @@
       if (baselineBatchIds === null || !fetchAll || error?.code) throw error;
 
       let committedBatch;
-      const refreshed = await writeFeedback.refreshWorkspace({
+      const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
           committedBatch = state.importBatches.find(

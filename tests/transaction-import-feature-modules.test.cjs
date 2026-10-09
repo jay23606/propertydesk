@@ -297,6 +297,7 @@ test("payment and expense CSV importers save their own validated transaction pay
     }),
     fetchAll: async () => {},
     toast() {},
+    writeFeedback: { refreshWorkspace: async () => true },
     modules: importFeatureModules(context),
   });
   const expense = {
@@ -554,6 +555,7 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     closeModal() {},
     fetchAll: async () => {},
     toast() {},
+    writeFeedback: { refreshWorkspace: async () => true },
     modules: importFeatureModules(context),
   });
 
