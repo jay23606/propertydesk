@@ -328,6 +328,7 @@ test("property workspace composes screens and shares detail actions", () => {
     "features/property-workspace-workflow.js",
     "features/property-workspace-setup.js",
     "features/import-workspace-setup.js",
+    "features/backup-workspace-setup.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview-view.js",

@@ -8,19 +8,28 @@ test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,[\s\S]*?workflows: \{[\s\S]*?exporter:/,
+    /PropertyDeskBackupWorkspaceSetup\.create\(\{[\s\S]*?getWorkspaceOwnerId:[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
+  );
+  const setup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "backup-workspace-setup.js"),
+    "utf8",
+  );
+  assert.match(setup, /workflows\.backup\.create\(/);
+  assert.match(
+    setup,
+    /getUser: records\.getUser,[\s\S]*?getWorkspaceOwnerId: records\.getWorkspaceOwnerId,/,
   );
   assert.match(
-    app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?getWorkspaceOwnerId: \(\) => state\.workspaceOwnerId,/,
+    setup,
+    /collectBackupAgreementFiles: services\.collectBackupAgreementFiles,[\s\S]*?documentRepository: services\.documentRepository,/,
   );
   assert.match(
     app,
     /exporter: \{\s*create: window\.PropertyDeskBackupExport\.create,\s*modules: \{ archive: window\.PropertyDeskBackupArchive \}/,
   );
   assert.match(
-    app,
-    /downloadBlob: window\.PropertyDeskDownloadUtils\.downloadBlob,[\s\S]*?zipUtils: window\.PropertyDeskZipUtils,/,
+    setup,
+    /downloadBlob: services\.downloadBlob,[\s\S]*?zipUtils: workflows\.zipUtils,/,
   );
   const workflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "backup-workspace-workflow.js"),

@@ -808,22 +808,24 @@
     },
   });
   const { attachBackupExportEvents } =
-    window.PropertyDeskBackupWorkspaceWorkflow.create({
-      $,
-      getUser: () => state.user,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      todayIso,
-      now,
-      toast,
-      downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
-      zipUtils: window.PropertyDeskZipUtils,
-      workspaceTables: window.PropertyDeskWorkspaceTables,
-      loadAllPages: loadAllWorkspacePages,
-      isClientReady,
-      collectBackupAgreementFiles:
-        window.PropertyDeskBackupAgreementFiles.collect,
-      documentRepository: repositories.documents,
+    window.PropertyDeskBackupWorkspaceSetup.create({
+      records: {
+        getUser: () => state.user,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      },
+      ui: { $, now, todayIso, toast },
+      services: {
+        isClientReady,
+        downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+        workspaceTables: window.PropertyDeskWorkspaceTables,
+        loadAllPages: loadAllWorkspacePages,
+        collectBackupAgreementFiles:
+          window.PropertyDeskBackupAgreementFiles.collect,
+        documentRepository: repositories.documents,
+      },
       workflows: {
+        backup: window.PropertyDeskBackupWorkspaceWorkflow,
+        zipUtils: window.PropertyDeskZipUtils,
         utils: window.PropertyDeskBackupUtils,
         records: window.PropertyDeskBackupRecords,
         exporter: {

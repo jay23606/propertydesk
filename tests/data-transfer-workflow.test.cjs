@@ -75,7 +75,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   assert.match(imports, /modules: modules\.commit\.modules/);
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?\}\);/,
+    /PropertyDeskBackupWorkspaceSetup\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?\}\);/,
   );
   assert.match(
     app,
@@ -92,6 +92,7 @@ test("app wires CSV import and private backup workspace workflow independently",
     "features/transaction-import-feature.js",
     "features/backup-export.js",
     "features/backup-workspace-workflow.js",
+    "features/backup-workspace-setup.js",
   ]) {
     assert.ok(
       html.indexOf(script) >= 0 &&
