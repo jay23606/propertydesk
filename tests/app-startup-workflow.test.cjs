@@ -23,6 +23,14 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.equal(authContext.resetWorkspaceState, resetWorkspaceState);
         assert.equal(authContext.$, selector);
         assert.equal(authContext.authClient, authClient);
+        assert.deepEqual(Object.keys(authContext.authClient).sort(), [
+          "getSession",
+          "resetPasswordForEmail",
+          "signInWithPassword",
+          "signOut",
+          "signUp",
+          "updateUser",
+        ]);
         assert.equal(authContext.fetchAll, fetchAll);
         assert.equal(authContext.toast, toast);
         assert.equal(authContext.paymentNotifications, paymentNotifications);
@@ -55,7 +63,10 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.equal("unusedStartupValue" in options, false);
         assert.equal(options.backendConfigured, true);
         assert.equal(options.initializeClient, initializeClient);
-        assert.equal(options.authClient, authClient);
+        assert.equal(options.authClient, lifecycleAuthClient);
+        assert.deepEqual(Object.keys(options.authClient), [
+          "onAuthStateChange",
+        ]);
         assert.equal(options.renderers, renderers);
         assert.equal(options.eventBinders[0], firstBinder);
         assert.equal(options.eventBinders[1], secondBinder);
@@ -80,7 +91,15 @@ test("app startup composes auth and lifecycle at the original event position", (
   const secondBinder = () => {};
   const thirdBinder = () => {};
   const initializeClient = () => {};
-  const authClient = {};
+  const authClient = {
+    signUp() {},
+    signInWithPassword() {},
+    getSession() {},
+    signOut() {},
+    resetPasswordForEmail() {},
+    updateUser() {},
+  };
+  const lifecycleAuthClient = { onAuthStateChange() {} };
   const selector = () => {};
   const fetchAll = async () => {};
   const toast = () => {};
@@ -106,6 +125,7 @@ test("app startup composes auth and lifecycle at the original event position", (
     backendConfigured: true,
     initializeClient,
     authClient,
+    lifecycleAuthClient,
     renderers,
     eventBindersBeforeAuth: [firstBinder, secondBinder],
     eventBindersAfterAuth: [thirdBinder],

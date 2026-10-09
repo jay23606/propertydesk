@@ -8,7 +8,7 @@ PropertyDesk is a plain HTML, CSS, and JavaScript app with no build step. Browse
 
 Workflow coordinators pass only the dependencies each child needs instead of forwarding a whole app context. Those explicit mappings keep feature boundaries visible and make accidental coupling easier to spot.
 
-`features/app-startup-setup.js` maps scoped app state, startup services, renderers, and event binders into `features/app-startup-workflow.js`, which joins authentication and `features/app-lifecycle.js`. The lifecycle attaches events, registers the service worker, initializes the backend, restores the auth session, and calls the renderers when workspace data changes.
+`features/app-startup-setup.js` maps scoped app state, startup services, renderers, and event binders into `features/app-startup-workflow.js`, which joins authentication and `features/app-lifecycle.js`. Authentication receives only the sign-in, recovery, and session operations it uses; the lifecycle receives only `onAuthStateChange`. The lifecycle attaches events, registers the service worker, initializes the backend, restores the auth session through the auth workflow, and calls the renderers when workspace data changes.
 
 ## Workspace data and access
 

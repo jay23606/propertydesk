@@ -7,6 +7,7 @@
     backendConfigured,
     initializeClient,
     authClient,
+    lifecycleAuthClient,
     todayIso,
     registerShell,
     authContext,
@@ -32,7 +33,7 @@
       $,
       backendConfigured,
       initializeClient,
-      authClient,
+      authClient: lifecycleAuthClient,
       todayIso,
       registerShell,
       auth: {

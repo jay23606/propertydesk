@@ -9,7 +9,17 @@
       initializeClient: services.initializeClient,
       todayIso: ui.todayIso,
       registerShell: services.registerShell,
-      authClient: services.authClient,
+      authClient: {
+        signUp: services.authClient.signUp,
+        signInWithPassword: services.authClient.signInWithPassword,
+        getSession: services.authClient.getSession,
+        signOut: services.authClient.signOut,
+        resetPasswordForEmail: services.authClient.resetPasswordForEmail,
+        updateUser: services.authClient.updateUser,
+      },
+      lifecycleAuthClient: {
+        onAuthStateChange: services.authClient.onAuthStateChange,
+      },
       authContext: {
         $: ui.$,
         getUser: records.getUser,

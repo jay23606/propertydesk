@@ -39,6 +39,18 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
       "paymentNotifications",
     ].map((name) => [name, { name }]),
   );
+  services.authClient = Object.fromEntries(
+    [
+      "onAuthStateChange",
+      "signUp",
+      "signInWithPassword",
+      "getSession",
+      "signOut",
+      "resetPasswordForEmail",
+      "updateUser",
+      "getUser",
+    ].map((name) => [name, () => name]),
+  );
   services.unusedServiceValue = true;
   const received = {};
   const result = { initialize() {}, render() {} };
@@ -65,6 +77,26 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
   assert.equal(received.backendConfigured, services.backendConfigured);
   assert.equal(received.initializeClient, services.initializeClient);
   assert.equal(received.registerShell, services.registerShell);
+  assert.deepEqual(Object.keys(received.authClient).sort(), [
+    "getSession",
+    "resetPasswordForEmail",
+    "signInWithPassword",
+    "signOut",
+    "signUp",
+    "updateUser",
+  ]);
+  assert.equal(received.authClient.signUp, services.authClient.signUp);
+  assert.equal(
+    received.authClient.resetPasswordForEmail,
+    services.authClient.resetPasswordForEmail,
+  );
+  assert.deepEqual(Object.keys(received.lifecycleAuthClient), [
+    "onAuthStateChange",
+  ]);
+  assert.equal(
+    received.lifecycleAuthClient.onAuthStateChange,
+    services.authClient.onAuthStateChange,
+  );
   assert.equal(received.authContext.getUser, records.getUser);
   assert.equal(received.authContext.setUser, records.setUser);
   assert.equal(
