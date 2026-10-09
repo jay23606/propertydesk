@@ -418,16 +418,7 @@
           window.PropertyDeskBackupAgreementFiles.collect,
         documentRepository: repositories.documents,
       },
-      workflows: {
-        backup: window.PropertyDeskBackupWorkspaceWorkflow,
-        zipUtils: window.PropertyDeskZipUtils,
-        utils: window.PropertyDeskBackupUtils,
-        records: window.PropertyDeskBackupRecords,
-        exporter: {
-          create: window.PropertyDeskBackupExport.create,
-          modules: { archive: window.PropertyDeskBackupArchive },
-        },
-      },
+      workflows: window.PropertyDeskBackupWorkspaceModuleCatalog.create(),
     });
   const appLifecycle = window.PropertyDeskAppStartupSetup.create({
     records: {

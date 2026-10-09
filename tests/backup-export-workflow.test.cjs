@@ -5,13 +5,14 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 test("backup workspace workflow owns backup dependency composition", () => {
-  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const root = path.join(__dirname, "..");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   assert.match(
     app,
     /PropertyDeskBackupWorkspaceSetup\.create\(\{\s*records: stateAccess\.backup,[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
   );
   const setup = fs.readFileSync(
-    path.join(__dirname, "..", "features", "backup-workspace-setup.js"),
+    path.join(root, "features", "backup-workspace-setup.js"),
     "utf8",
   );
   assert.match(setup, /workflows\.backup\.create\(/);
@@ -25,6 +26,14 @@ test("backup workspace workflow owns backup dependency composition", () => {
   );
   assert.match(
     app,
+    /workflows: window\.PropertyDeskBackupWorkspaceModuleCatalog\.create\(\)/,
+  );
+  const catalog = fs.readFileSync(
+    path.join(root, "features", "backup-workspace-module-catalog.js"),
+    "utf8",
+  );
+  assert.match(
+    catalog,
     /exporter: \{\s*create: window\.PropertyDeskBackupExport\.create,\s*modules: \{ archive: window\.PropertyDeskBackupArchive \}/,
   );
   assert.match(
@@ -32,7 +41,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
     /downloadBlob: services\.downloadBlob,[\s\S]*?zipUtils: workflows\.zipUtils,/,
   );
   const workflow = fs.readFileSync(
-    path.join(__dirname, "..", "features", "backup-workspace-workflow.js"),
+    path.join(root, "features", "backup-workspace-workflow.js"),
     "utf8",
   );
   assert.doesNotMatch(
@@ -40,7 +49,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
     /window\.PropertyDeskBackup(?:Utils|Records|Export)\.create/,
   );
   const exporter = fs.readFileSync(
-    path.join(__dirname, "..", "features", "backup-export.js"),
+    path.join(root, "features", "backup-export.js"),
     "utf8",
   );
   assert.doesNotMatch(exporter, /window\.PropertyDeskBackupArchive\.create/);
