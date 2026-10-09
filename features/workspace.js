@@ -78,7 +78,9 @@
     });
     const memberView = workflows.memberView.create({
       $,
-      state,
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getUser: () => state.user,
       esc,
     });
     function renderWorkspaceSettings() {

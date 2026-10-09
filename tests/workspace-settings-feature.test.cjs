@@ -23,6 +23,11 @@ test("workspace member maintenance uses its injected change operation", () => {
   );
   assert.match(members, /confirmAction,\s*\}\);/);
   assert.match(members, /runAndRefreshWorkspaceChange,/);
+  const memberView = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-members-view.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(memberView, /\bstate\b/);
 });
 
 test("workspace member maintenance reconciles against its injected roster", async () => {
@@ -126,7 +131,9 @@ test("adding a workspace member clears the address only after successful refresh
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
-      state,
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getUser: () => state.user,
       esc: String,
     }),
     toast: (message) => messages.push(message),
@@ -179,11 +186,9 @@ test("adding a workspace member keeps the address when refresh fails", async () 
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
-      state: {
-        workspaceMembers: [],
-        user: { id: "owner-1" },
-        workspaceOwnerId: "owner-1",
-      },
+      getWorkspaceMembers: () => [],
+      getWorkspaceOwnerId: () => "owner-1",
+      getUser: () => ({ id: "owner-1" }),
       esc: String,
     }),
     toast() {},

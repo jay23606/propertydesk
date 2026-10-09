@@ -2,13 +2,19 @@
 (() => {
   "use strict";
 
-  function create({ $, state, esc }) {
+  function create({
+    $,
+    getWorkspaceMembers,
+    getWorkspaceOwnerId,
+    getUser,
+    esc,
+  }) {
     function clearMemberEmail() {
       $("member-email").value = "";
     }
 
     function renderWorkspaceMembers() {
-      $("workspace-members").innerHTML = state.workspaceMembers
+      $("workspace-members").innerHTML = getWorkspaceMembers()
         .map(
           (member) => `
         <div class="member-row"><div><strong>${esc(member.display_name || member.email)}</strong><small>${esc(member.email)}${member.is_owner ? " · Owner" : " · Full workspace access"}</small></div>
@@ -17,7 +23,7 @@
         .join("");
       $("member-add-form").classList.toggle(
         "hidden",
-        state.workspaceOwnerId !== state.user?.id,
+        getWorkspaceOwnerId() !== getUser()?.id,
       );
     }
 
