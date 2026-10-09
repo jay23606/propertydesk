@@ -3,7 +3,7 @@
   "use strict";
 
   function createOverviewPropertySummaryModel({
-    state,
+    getPayments,
     isActiveAccount,
     monthlyScheduledEstimate,
     summarizeAccount,
@@ -11,7 +11,7 @@
     function summarizeProperty(property, relatedAccounts) {
       const active = relatedAccounts.filter(isActiveAccount);
       const financials = active.map((account) =>
-        summarizeAccount(account, state.payments),
+        summarizeAccount(account, getPayments()),
       );
 
       return {

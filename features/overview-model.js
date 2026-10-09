@@ -3,7 +3,9 @@
   "use strict";
 
   function createOverviewModel({
-    state,
+    getProperties,
+    getAccounts,
+    getPayments,
     isActiveAccount,
     propertySummaryModel,
     groupAccountsByProperty,
@@ -15,34 +17,34 @@
   }) {
     function buildOverview() {
       const currentMonthStart = monthStart();
-      const activeProperties = state.properties.filter(
+      const properties = getProperties();
+      const accounts = getAccounts();
+      const payments = getPayments();
+      const activeProperties = properties.filter(
         (property) => !property.archived_at,
       );
       const propertyById = new Map(
-        state.properties.map((property) => [property.id, property]),
+        properties.map((property) => [property.id, property]),
       );
-      const accountsByProperty = groupAccountsByProperty(state.accounts);
+      const accountsByProperty = groupAccountsByProperty(accounts);
       const accountById = new Map(
-        state.accounts.map((account) => [account.id, account]),
+        accounts.map((account) => [account.id, account]),
       );
       const postedThisMonth = postedOnOrAfter(
-        state.payments,
+        payments,
         "received_date",
         currentMonthStart,
       );
-      const upcoming = activityModel.upcomingPayments(
-        state.accounts,
-        propertyById,
-      );
+      const upcoming = activityModel.upcomingPayments(accounts, propertyById);
       const recent = activityModel.recentPayments(
-        state.payments,
+        payments,
         accountById,
         propertyById,
       );
 
       return {
         propertyCount: activeProperties.length,
-        accountCount: state.accounts.filter(
+        accountCount: accounts.filter(
           (account) =>
             isActiveAccount(account) &&
             !propertyById.get(account.property_id)?.archived_at,

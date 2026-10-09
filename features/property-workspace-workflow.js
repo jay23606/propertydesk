@@ -28,7 +28,9 @@
   }) {
     return workflow.create({
       $: overview.$,
-      state: overview.state,
+      getProperties: overview.getProperties,
+      getAccounts: overview.getAccounts,
+      getPayments: overview.getPayments,
       groupAccountsByProperty,
       isActiveAccount,
       monthlyScheduledEstimate: overview.monthlyScheduledEstimate,

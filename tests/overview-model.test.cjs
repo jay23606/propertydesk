@@ -104,10 +104,9 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
       status: "voided",
     },
   ];
-  const state = { properties, accounts, payments };
   const propertySummaryModel =
     context.window.PropertyDeskOverviewPropertySummaryModel.create({
-      state,
+      getPayments: () => payments,
       isActiveAccount:
         context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
       monthlyScheduledEstimate: (rows) =>
@@ -121,7 +120,9 @@ test("overview model aggregates current counts, upcoming accounts, activity, and
         }).summarizeAccount,
     });
   const model = context.window.PropertyDeskOverviewModel.create({
-    state,
+    getProperties: () => properties,
+    getAccounts: () => accounts,
+    getPayments: () => payments,
     isActiveAccount:
       context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
     propertySummaryModel,

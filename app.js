@@ -729,7 +729,9 @@
     },
     overview: {
       $,
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
       monthlyScheduledEstimate,
       summarizeAccount,
       collectedSince,

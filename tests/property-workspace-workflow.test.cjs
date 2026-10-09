@@ -54,7 +54,9 @@ test("property workspace shares detail actions across overview and grid", () => 
     },
   };
   const overview = {
-    state,
+    getProperties: () => [],
+    getAccounts: () => [],
+    getPayments: () => [],
     propertyAddress,
     openPropertyPayment,
     workflows,
@@ -138,7 +140,9 @@ test("property workspace shares detail actions across overview and grid", () => 
     "management",
     "workflows",
   ]);
-  assert.equal(calls[1][1].state, state);
+  assert.equal(typeof calls[1][1].getProperties, "function");
+  assert.equal(typeof calls[1][1].getAccounts, "function");
+  assert.equal(typeof calls[1][1].getPayments, "function");
   assert.equal(calls[1][1].groupAccountsByProperty, groupAccountsByProperty);
   assert.equal(calls[1][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[1][1].propertyAddress, propertyAddress);

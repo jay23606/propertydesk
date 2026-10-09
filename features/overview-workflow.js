@@ -4,7 +4,9 @@
 
   function create({
     $,
-    state,
+    getProperties,
+    getAccounts,
+    getPayments,
     groupAccountsByProperty,
     isActiveAccount,
     monthlyScheduledEstimate,
@@ -25,13 +27,15 @@
     workflows,
   }) {
     const propertySummaryModel = workflows.propertySummaryModel.create({
-      state,
+      getPayments,
       isActiveAccount,
       monthlyScheduledEstimate,
       summarizeAccount,
     });
     const overviewModel = workflows.overviewModel.create({
-      state,
+      getProperties,
+      getAccounts,
+      getPayments,
       isActiveAccount,
       propertySummaryModel,
       groupAccountsByProperty,
