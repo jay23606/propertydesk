@@ -18,7 +18,7 @@
       fetchAll: workspace.fetchAll,
       reminder: workspace.reminder,
       memberRepository: workspace.memberRepository,
-      writeFeedback: workspace.writeFeedback,
+      run: workspace.run,
       runAndRefreshWorkspaceChange: workspace.runAndRefreshWorkspaceChange,
       authClient: workspace.authClient,
       confirmAction: workspace.confirmAction,

@@ -31,7 +31,7 @@ test("workspace feature owns profile and member form bindings", () => {
   const handlers = new Map();
   const feature = context.window.PropertyDeskWorkspace.create({
     workflows,
-    writeFeedback: workflows.writeFeedback,
+    run: createRepositoryWriteFeedback(context).run,
     runAndRefreshWorkspaceChange: () => {},
     memberRepository: { addMember() {}, removeMember() {} },
     reminder: {
@@ -222,7 +222,7 @@ test("workspace setting writes report rejected requests and retain entered value
   };
   const feature = context.window.PropertyDeskWorkspace.create({
     workflows,
-    writeFeedback: workflows.writeFeedback,
+    run: createRepositoryWriteFeedback(context).run,
     runAndRefreshWorkspaceChange:
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     $,

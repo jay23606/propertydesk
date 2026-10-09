@@ -240,7 +240,7 @@
         money,
       },
       memberRepository: repositories.workspaceMembers,
-      writeFeedback,
+      run: writeFeedback.run,
       runAndRefreshWorkspaceChange: writeFeedback.runAndRefreshWorkspaceChange,
       confirmAction,
       authClient,

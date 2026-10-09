@@ -7,7 +7,7 @@
     authClient,
     toast,
     updateGreeting,
-    writeFeedback,
+    run,
   }) {
     async function saveProfile(displayName) {
       if (!displayName) {
@@ -17,7 +17,7 @@
 
       let data;
       let reconciled = false;
-      const saved = await writeFeedback.run({
+      const saved = await run({
         operation: async () => {
           const result = await authClient.updateUser({
             data: { display_name: displayName },

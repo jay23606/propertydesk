@@ -62,7 +62,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   const now = () => new Date("2026-10-08T12:00:00.000Z");
   const memberRepository = { addMember() {}, removeMember() {} };
   const confirmAction = () => true;
-  const writeFeedback = {};
+  const run = () => {};
   const runAndRefreshWorkspaceChange = () => {};
   const reminder = {
     $() {},
@@ -84,7 +84,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     toast() {},
     fetchAll() {},
     memberRepository,
-    writeFeedback,
+    run,
     runAndRefreshWorkspaceChange,
     confirmAction,
     reminder,
@@ -108,7 +108,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
 
   assert.equal(passed.profileWorkflow.state, state);
   assert.equal(passed.profileWorkflow.now, now);
-  assert.equal(passed.profileWorkflow.writeFeedback, writeFeedback);
+  assert.equal(passed.profileWorkflow.run, run);
   assert.equal(
     passed.memberActions.runAndRefreshWorkspaceChange,
     runAndRefreshWorkspaceChange,

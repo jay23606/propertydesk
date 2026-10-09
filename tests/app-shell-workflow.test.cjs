@@ -50,7 +50,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     fetchAll: () => {},
     reminder: { state: {} },
     memberRepository: {},
-    writeFeedback: { kind: "write-feedback" },
+    run: () => {},
     runAndRefreshWorkspaceChange: () => {},
     authClient: {},
     confirmAction: () => true,
@@ -82,11 +82,11 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "memberRepository",
     "now",
     "reminder",
+    "run",
     "runAndRefreshWorkspaceChange",
     "state",
     "toast",
     "workflows",
-    "writeFeedback",
   ]);
   assert.equal("unusedWorkspaceValue" in passed.workspace, false);
   assert.equal(passed.workspace.workflows, workspaceWorkflows);

@@ -12,7 +12,7 @@
     reminder,
     memberRepository,
     authClient,
-    writeFeedback,
+    run,
     runAndRefreshWorkspaceChange,
     workflows,
     confirmAction,
@@ -33,7 +33,7 @@
       now,
       authClient,
       toast,
-      writeFeedback,
+      run,
       workflows: workflows.profileModules,
     });
     const memberView = workflows.memberView.create({

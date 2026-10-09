@@ -2,15 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    $,
-    state,
-    now,
-    authClient,
-    toast,
-    writeFeedback,
-    workflows,
-  }) {
+  function create({ $, state, now, authClient, toast, run, workflows }) {
     const profileDisplay = workflows.display.create({
       $,
       state,
@@ -21,7 +13,7 @@
       state,
       authClient,
       toast,
-      writeFeedback,
+      run,
       updateGreeting: profileDisplay.updateGreeting,
     });
 

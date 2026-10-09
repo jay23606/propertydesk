@@ -54,7 +54,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
     now,
     authClient: {},
     toast() {},
-    writeFeedback: {},
+    run() {},
     workflows: {
       display: context.window.PropertyDeskProfileDisplay,
       view: context.window.PropertyDeskProfileSettingsView,
@@ -71,11 +71,12 @@ test("workspace profile workflow joins display, editing, and settings rendering"
     workflowSource,
     /window\.PropertyDesk(?:ProfileDisplay|ProfileSettingsView|ProfileSettings)\.create/,
   );
+  assert.doesNotMatch(workflowSource, /writeFeedback/);
 
   assert.equal(passed.display.state, state);
   assert.equal(passed.display.now, now);
   assert.equal(passed.settings.authClient, dependencies.authClient);
-  assert.equal(passed.settings.writeFeedback, dependencies.writeFeedback);
+  assert.equal(passed.settings.run, dependencies.run);
   assert.equal(passed.settings.updateGreeting, updateGreeting);
   assert.equal(workflow.updateGreeting, updateGreeting);
   assert.equal(Object.isFrozen(workflow), true);

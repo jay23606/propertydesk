@@ -23,7 +23,7 @@ test("app shell composes workspace settings and page navigation", () => {
   );
   assert.match(
     appShell,
-    /workspaceWorkflow\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?runAndRefreshWorkspaceChange: workspace\.runAndRefreshWorkspaceChange,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?navigationWorkflow\.create\(\{[\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
+    /workspaceWorkflow\.create\(\{[\s\S]*?memberRepository: workspace\.memberRepository,[\s\S]*?run: workspace\.run,[\s\S]*?runAndRefreshWorkspaceChange: workspace\.runAndRefreshWorkspaceChange,[\s\S]*?confirmAction: workspace\.confirmAction,[\s\S]*?navigationWorkflow\.create\(\{[\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
   );
   assert.doesNotMatch(
     appShell,
