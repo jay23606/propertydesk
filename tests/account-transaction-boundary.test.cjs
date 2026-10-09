@@ -123,4 +123,32 @@ test("app composes independent property and account forms before action routing"
     transactionMaintenance,
     /correctionModelWorkflow\.create\([\s\S]*?correctionWorkflow\.create\([\s\S]*?findCorrectionTarget: correctionModel\.findCorrectionTarget,[\s\S]*?voidMaintenanceWorkflow\.create\([\s\S]*?voidEntryWorkflow\.create\(/,
   );
+  assert.match(app, /transactionRepository: repositories\.transactions/);
+  assert.match(
+    composition,
+    /resolveVoidTarget: workflows\.voidModel\.resolveVoidTarget/,
+  );
+  assert.match(
+    composition,
+    /buildVoidPayload: workflows\.voidModel\.buildVoidPayload/,
+  );
+  assert.match(
+    transactionMaintenance,
+    /correctionModelWorkflow\.create\(\{[\s\S]*?getPayments: correctionContext\.getPayments,[\s\S]*?getExpenses: correctionContext\.getExpenses,[\s\S]*?getAccounts: correctionContext\.getAccounts/,
+  );
+  assert.match(
+    transactionMaintenance,
+    /findCorrectionTarget: correctionModel\.findCorrectionTarget/,
+  );
+});
+
+test("transaction workflows receive only scoped record getters", () => {
+  const root = path.join(__dirname, "..");
+  for (const filename of [
+    "features/transaction-inserts.js",
+    "features/transaction-workspace-workflow.js",
+  ]) {
+    const source = fs.readFileSync(path.join(root, filename), "utf8");
+    assert.doesNotMatch(source, /\bstate\b/, filename);
+  }
 });

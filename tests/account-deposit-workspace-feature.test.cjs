@@ -241,19 +241,6 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  const transactionComposition = fs.readFileSync(
-    path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
-    "utf8",
-  );
-  const transactionMaintenance = fs.readFileSync(
-    path.join(
-      __dirname,
-      "..",
-      "features",
-      "transaction-maintenance-workflow.js",
-    ),
-    "utf8",
-  );
   const setup = fs.readFileSync(
     path.join(
       __dirname,
@@ -381,31 +368,6 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     appServices,
     /modules\.writeFeedback\.factory\.create\(\{[\s\S]*?reconciliation: modules\.writeFeedback\.reconciliation,[\s\S]*?recordWrites: modules\.writeFeedback\.recordWrites/,
   );
-  assert.match(app, /transactionRepository: repositories\.transactions/);
-  assert.match(
-    transactionComposition,
-    /resolveVoidTarget: workflows\.voidModel\.resolveVoidTarget/,
-  );
-  assert.match(
-    transactionComposition,
-    /buildVoidPayload: workflows\.voidModel\.buildVoidPayload/,
-  );
-  assert.match(
-    transactionComposition,
-    /correction: \{[\s\S]*?getAccounts: records\.getAccounts,[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
-  );
-  assert.match(
-    transactionComposition,
-    /workflows: \{[\s\S]*?correctionModel: workflows\.correctionModel/,
-  );
-  assert.match(
-    transactionMaintenance,
-    /correctionModelWorkflow\.create\(\{[\s\S]*?getPayments,[\s\S]*?getExpenses,[\s\S]*?getAccounts/,
-  );
-  assert.match(
-    transactionMaintenance,
-    /findCorrectionTarget: correctionModel\.findCorrectionTarget/,
-  );
   assert.match(app, /accountRepository: repositories\.accounts/);
   assert.match(app, /depositRepository: repositories\.deposits/);
   assert.match(app, /action: window\.PropertyDeskAccountDetailActionWorkflow/);
@@ -442,7 +404,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 
-test("account, deposit, and transaction persistence receive only record getters", () => {
+test("account and deposit persistence use scoped record accessors", () => {
   const root = path.join(__dirname, "..");
   const scopedModules = [
     "features/account-deposit-workspace-workflow.js",
@@ -455,8 +417,6 @@ test("account, deposit, and transaction persistence receive only record getters"
     "features/deposit-detail-events.js",
     "features/deposit-maintenance.js",
     "features/workspace-record-write-workflow.js",
-    "features/transaction-inserts.js",
-    "features/transaction-workspace-workflow.js",
   ];
 
   for (const filename of scopedModules) {
