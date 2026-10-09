@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ state, workspaceData, toast, render = () => {} }) {
+  function create({ state, workspaceData, toast, render }) {
     let latestFetchId = 0;
     let renderCallback = render;
 
@@ -46,6 +46,9 @@
     function renderWorkspace(fetchId, userId) {
       if (!isCurrentFetch(fetchId, userId)) return;
       try {
+        if (typeof renderCallback !== "function") {
+          throw new Error("Workspace renderer is not configured");
+        }
         renderCallback();
       } catch (error) {
         window.console?.error(

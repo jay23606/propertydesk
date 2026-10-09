@@ -72,6 +72,26 @@ test("workspace refresh accepts its renderer after runtime construction", async 
   assert.deepEqual(calls, ["render"]);
 });
 
+test("workspace refresh reports a missing deferred renderer", async () => {
+  const messages = [];
+  const refresh = createRefresh({
+    state: {},
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
+      loadWorkspaceRecords: async () => ({ properties: [] }),
+    },
+    toast: (message) => messages.push(message),
+  });
+
+  await assert.rejects(
+    () => refresh.fetchAll(),
+    /Workspace renderer is not configured/,
+  );
+  assert.deepEqual(messages, [
+    "Workspace data loaded but could not be displayed. Reload and try again.",
+  ]);
+});
+
 test("workspace lookup failures show feedback and stop before loading records", async () => {
   const failure = new Error("Workspace lookup failed");
   const calls = [];
