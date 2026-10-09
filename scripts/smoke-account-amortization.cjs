@@ -7,10 +7,9 @@ async function smokeAccountAmortization(page, runtimeErrors, consoleErrors) {
   console.log("Smoke: checking account amortization rendering.");
   const detailText = await page.evaluate(async () => {
     const utilities = window.PropertyDeskLoanAmortizationUtils?.create({
-      modules: {
-        dateUtils: window.PropertyDeskDateUtils,
-        currencyUtils: window.PropertyDeskCurrencyUtils,
-      },
+      monthDateWithAnchor: window.PropertyDeskDateUtils.monthDateWithAnchor,
+      isoDate: window.PropertyDeskDateUtils.isoDate,
+      roundCurrency: window.PropertyDeskCurrencyUtils.roundCurrency,
       todayIso: () => "2026-10-08",
     });
     const details = window.PropertyDeskAccountDetails;
