@@ -11,7 +11,7 @@
   }) {
     function openModal(id) {
       $(id).classList.remove("hidden");
-      document.body.style.overflow = "hidden";
+      documentRef.body.style.overflow = "hidden";
     }
 
     function resetPaymentModal() {
@@ -32,7 +32,7 @@
 
     function closeModal(modal) {
       modal.classList.add("hidden");
-      document.body.style.overflow = "";
+      documentRef.body.style.overflow = "";
 
       if (modal.id === "import-preview-modal") setPendingImport(null);
       if (modal.id === "detail-modal") advanceAuditRequestId();

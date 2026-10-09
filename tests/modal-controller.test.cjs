@@ -40,7 +40,7 @@ function createController() {
     }
     return elements.get(id);
   };
-  const context = vm.createContext({ window: {}, document });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "domain-options.js"),
@@ -96,6 +96,7 @@ function createController() {
     advanceAuditRequestId: () => {
       state.auditRequestId++;
     },
+    documentRef: document,
   });
   const formOptions = context.window.PropertyDeskFormOptions.create({
     $: getElement,
