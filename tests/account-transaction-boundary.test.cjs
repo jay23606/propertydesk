@@ -25,7 +25,7 @@ test("app composes independent property and account forms before action routing"
   assert.doesNotMatch(formOptions, /\bstate\b/);
   assert.match(
     composition,
-    /workflows\.maintenance\.create\([\s\S]*?return workflows\.ledger\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
+    /maintenanceWorkflows\.workflow\.create\([\s\S]*?return ledgerWorkflows\.workflow\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
   );
   assert.match(transactionSetup, /workflows\.workspace\.create\(/);
   assert.match(
@@ -56,7 +56,7 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     composition,
-    /workflows: \{[\s\S]*?correctionModel: workflows\.correctionModel/,
+    /workflows: \{[\s\S]*?correctionModel: maintenanceWorkflows\.correctionModel/,
   );
   assert.doesNotMatch(
     composition.match(
@@ -126,11 +126,11 @@ test("app composes independent property and account forms before action routing"
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
     composition,
-    /resolveVoidTarget: workflows\.voidModel\.resolveVoidTarget/,
+    /resolveVoidTarget: maintenanceWorkflows\.voidModel\.resolveVoidTarget/,
   );
   assert.match(
     composition,
-    /buildVoidPayload: workflows\.voidModel\.buildVoidPayload/,
+    /buildVoidPayload: maintenanceWorkflows\.voidModel\.buildVoidPayload/,
   );
   assert.match(
     transactionMaintenance,

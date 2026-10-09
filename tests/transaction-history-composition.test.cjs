@@ -24,11 +24,11 @@ test("transaction maintenance stays separate from ledger history composition", (
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     composition,
-    /workflows\.ledger\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
+    /ledgerWorkflows\.workflow\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
   );
   assert.ok(
-    composition.indexOf("workflows.maintenance.create(") <
-      composition.indexOf("workflows.ledger.create("),
+    composition.indexOf("maintenanceWorkflows.workflow.create(") <
+      composition.indexOf("ledgerWorkflows.workflow.create("),
   );
   assert.match(
     maintenance,

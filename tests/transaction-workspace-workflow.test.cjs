@@ -73,37 +73,41 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   };
   const receivedMaintenance = {};
   const workflows = {
-    correctionModel: {
-      create() {
-        throw new Error("correction model belongs to maintenance workflow");
-      },
-    },
     maintenance: {
-      create(received) {
-        calls.push(["maintenance"]);
-        Object.assign(receivedMaintenance, received);
-        return maintenance;
+      correctionModel: {
+        create() {
+          throw new Error("correction model belongs to maintenance workflow");
+        },
       },
+      workflow: {
+        create(received) {
+          calls.push(["maintenance"]);
+          Object.assign(receivedMaintenance, received);
+          return maintenance;
+        },
+      },
+      correction: {},
+      correctionModules: {},
+      voidModel: { resolveVoidTarget() {}, buildVoidPayload() {} },
+      voidMaintenance: {},
+      voidEntry: {},
+      events: {},
     },
     ledger: {
-      create(received) {
-        calls.push(["ledger", received]);
-        return ledger;
+      workflow: {
+        create(received) {
+          calls.push(["ledger", received]);
+          return ledger;
+        },
       },
+      entryForms: { create() {}, modules: {} },
+      views: { create() {}, modules: {} },
+      transactionPayloads: {},
+      expenseAccountPolicy: {},
+      paymentView: {},
+      expenseView: {},
+      propertyPaymentAction: {},
     },
-    correction: {},
-    correctionModules: {},
-    voidModel: { resolveVoidTarget() {}, buildVoidPayload() {} },
-    voidMaintenance: {},
-    voidEntry: {},
-    maintenanceEvents: {},
-    entryForms: { create() {}, modules: {} },
-    views: { create() {}, modules: {} },
-    transactionPayloads: {},
-    expenseAccountPolicy: {},
-    paymentView: {},
-    expenseView: {},
-    propertyPaymentAction: {},
   };
 
   const result = context.window.PropertyDeskTransactionWorkspaceWorkflow.create(
@@ -132,7 +136,7 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   assert.equal(receivedMaintenance.voiding.getExpenses, records.getExpenses);
   assert.equal(
     receivedMaintenance.workflows.correctionModel,
-    workflows.correctionModel,
+    workflows.maintenance.correctionModel,
   );
   assert.equal(calls[1][0], "ledger");
   assert.equal(calls[1][1].saveCorrection, saveCorrection);

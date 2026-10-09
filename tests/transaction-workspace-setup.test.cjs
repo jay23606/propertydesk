@@ -121,13 +121,33 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
   }
   for (const [name, value] of Object.entries(workflows)) {
     if (name !== "workspace") {
-      assert.equal(
-        received.workflows[name],
-        value,
-        `workflows.${name} is preserved`,
-      );
+      const group = [
+        "correctionModel",
+        "maintenance",
+        "correction",
+        "correctionModules",
+        "voidModel",
+        "voidMaintenance",
+        "voidEntry",
+        "maintenanceEvents",
+      ].includes(name)
+        ? received.workflows.maintenance
+        : received.workflows.ledger;
+      const key =
+        name === "maintenanceEvents"
+          ? "events"
+          : name === "maintenance" || name === "ledger"
+            ? "workflow"
+            : name;
+      assert.equal(group[key], value, `workflows.${name} is preserved`);
     }
   }
+  assert.deepEqual(Object.keys(received.workflows).sort(), [
+    "ledger",
+    "maintenance",
+  ]);
+  assert.equal("ledger" in received.workflows.maintenance, false);
+  assert.equal("maintenance" in received.workflows.ledger, false);
 
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");

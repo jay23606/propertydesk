@@ -53,7 +53,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     /window\.PropertyDesk[A-Za-z]+\.create\(/,
   );
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
-  assert.match(transactionComposition, /workflows\.maintenance\.create\(/);
+  assert.match(
+    transactionComposition,
+    /maintenanceWorkflows\.workflow\.create\(/,
+  );
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(
@@ -138,11 +141,11 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     transactionComposition,
-    /workflows\.ledger\.create\(\{[\s\S]*?entries: \{[\s\S]*?transactionRepository: services\.transactionRepository,[\s\S]*?transactionPayloads: workflows\.transactionPayloads/,
+    /ledgerWorkflows\.workflow\.create\(\{[\s\S]*?entries: \{[\s\S]*?transactionRepository: services\.transactionRepository,[\s\S]*?transactionPayloads: ledgerWorkflows\.transactionPayloads/,
   );
   assert.match(
     transactionComposition,
-    /workflows\.ledger\.create\(\{[\s\S]*?views: \{[\s\S]*?sumOperatingExpenses: services\.sumOperatingExpenses/,
+    /ledgerWorkflows\.workflow\.create\(\{[\s\S]*?views: \{[\s\S]*?sumOperatingExpenses: services\.sumOperatingExpenses/,
   );
   const ledgerWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "ledger-workflow.js"),
@@ -299,7 +302,10 @@ test("app coordinator passes the amortization helper into account details", () =
   }
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create/);
-  assert.match(transactionComposition, /workflows\.maintenance\.create/);
+  assert.match(
+    transactionComposition,
+    /maintenanceWorkflows\.workflow\.create/,
+  );
 });
 
 test("property workspace composes screens and shares detail actions", () => {

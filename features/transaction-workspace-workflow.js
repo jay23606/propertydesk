@@ -6,9 +6,9 @@
     records,
     ui,
     services,
-    workflows,
+    workflows: { maintenance: maintenanceWorkflows, ledger: ledgerWorkflows },
   }) {
-    const transactionMaintenance = workflows.maintenance.create({
+    const transactionMaintenance = maintenanceWorkflows.workflow.create({
       correction: {
         $: ui.$,
         getAccounts: records.getAccounts,
@@ -36,32 +36,32 @@
         promptAction: ui.promptAction,
         repository: services.transactionRepository,
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-        resolveVoidTarget: workflows.voidModel.resolveVoidTarget,
-        buildVoidPayload: workflows.voidModel.buildVoidPayload,
+        resolveVoidTarget: maintenanceWorkflows.voidModel.resolveVoidTarget,
+        buildVoidPayload: maintenanceWorkflows.voidModel.buildVoidPayload,
       },
       events: { documentRef: ui.documentRef },
       workflows: {
-        correctionModel: workflows.correctionModel,
-        correction: workflows.correction,
-        correctionModules: workflows.correctionModules,
-        voidMaintenance: workflows.voidMaintenance,
-        voidEntry: workflows.voidEntry,
-        events: workflows.maintenanceEvents,
+        correctionModel: maintenanceWorkflows.correctionModel,
+        correction: maintenanceWorkflows.correction,
+        correctionModules: maintenanceWorkflows.correctionModules,
+        voidMaintenance: maintenanceWorkflows.voidMaintenance,
+        voidEntry: maintenanceWorkflows.voidEntry,
+        events: maintenanceWorkflows.events,
       },
     });
 
-    return workflows.ledger.create({
+    return ledgerWorkflows.workflow.create({
       saveCorrection: transactionMaintenance.saveCorrection,
       createTransactionActionHandlers:
         transactionMaintenance.createTransactionActionHandlers,
       workflows: {
         entryForms: {
-          create: workflows.entryForms.create,
-          modules: workflows.entryForms.modules,
+          create: ledgerWorkflows.entryForms.create,
+          modules: ledgerWorkflows.entryForms.modules,
         },
         views: {
-          create: workflows.views.create,
-          modules: workflows.views.modules,
+          create: ledgerWorkflows.views.create,
+          modules: ledgerWorkflows.views.modules,
         },
       },
       entries: {
@@ -82,15 +82,15 @@
         prettyType: ui.prettyType,
         openModal: ui.openModal,
         transactionRepository: services.transactionRepository,
-        transactionPayloads: workflows.transactionPayloads,
+        transactionPayloads: ledgerWorkflows.transactionPayloads,
         saveWorkspaceRecord: services.saveWorkspaceRecord,
         saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
         selectRecordWriteCompletion: services.selectRecordWriteCompletion,
-        expenseAccountPolicy: workflows.expenseAccountPolicy,
+        expenseAccountPolicy: ledgerWorkflows.expenseAccountPolicy,
         workflows: {
-          paymentView: workflows.paymentView,
-          expenseView: workflows.expenseView,
-          propertyPaymentAction: workflows.propertyPaymentAction,
+          paymentView: ledgerWorkflows.paymentView,
+          expenseView: ledgerWorkflows.expenseView,
+          propertyPaymentAction: ledgerWorkflows.propertyPaymentAction,
         },
       },
       views: {
