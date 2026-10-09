@@ -123,6 +123,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     "depositLedger",
     "esc",
     "fmtDate",
+    "ignored",
     "money",
   ]);
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
@@ -131,6 +132,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     "getAccount",
     "getCollection",
     "getWorkspaceOwnerId",
+    "ignored",
     "moneyInput",
     "prepareAdjustment",
     "promptAction",
@@ -159,20 +161,10 @@ test("account and deposit workspace share detail rendering and events", () => {
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
   );
-  assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
-    "$",
-    "closeModal",
-    "confirmAction",
-    "editAccount",
-    "fetchAll",
-    "getAccount",
-    "getCollection",
-    "openPayment",
-    "repository",
-    "saveAndRefreshWorkspaceRecord",
-    "toast",
-  ]);
-  assert.equal("ignored" in passed.accountDetails.actions, false);
+  assert.equal(passed.deposits.details, deposits.details);
+  assert.equal(passed.deposits.adjustments, deposits.adjustments);
+  assert.equal(passed.accountDetails.actions, actions);
+  assert.equal("ignored" in passed.accountDetails.actions, true);
   assert.equal(
     passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,

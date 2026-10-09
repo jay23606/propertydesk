@@ -39,6 +39,7 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
   const records = Object.fromEntries(
     recordMethods.map((key) => [key, () => key]),
   );
+  records.unusedRecordValue = true;
   const ui = Object.fromEntries(
     [
       "$",
@@ -63,6 +64,7 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
       "confirmAction",
     ].map((key) => [key, () => key]),
   );
+  ui.unusedUiValue = true;
   const services = Object.fromEntries(
     [
       "depositLedger",
@@ -73,6 +75,7 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
       "saveAndRefreshWorkspaceRecord",
     ].map((key) => [key, { name: key }]),
   );
+  services.unusedServiceValue = true;
   const workflows = {
     workspace,
     deposit: {
@@ -151,5 +154,62 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
     services.accountRepository,
   );
   assert.equal(received.accountDetails.actions.confirmAction, ui.confirmAction);
+  assert.deepEqual(Object.keys(received.deposits.details).sort(), [
+    "depositLedger",
+    "esc",
+    "fmtDate",
+    "money",
+  ]);
+  assert.deepEqual(Object.keys(received.deposits.adjustments).sort(), [
+    "$",
+    "fetchAll",
+    "getAccount",
+    "getCollection",
+    "getWorkspaceOwnerId",
+    "moneyInput",
+    "prepareAdjustment",
+    "promptAction",
+    "repository",
+    "resolveAdjustmentType",
+    "saveAndRefreshWorkspaceRecord",
+    "toast",
+    "todayIso",
+    "validateAdjustment",
+  ]);
+  assert.deepEqual(Object.keys(received.accountDetails.content).sort(), [
+    "$",
+    "accountHistoryRepository",
+    "amortizationSchedule",
+    "beginAuditRequest",
+    "esc",
+    "fmtDate",
+    "fmtDateTime",
+    "getAccount",
+    "getAgreementVersions",
+    "getPaymentsForAccount",
+    "getProperty",
+    "isCurrentAuditRequest",
+    "money",
+    "openModal",
+    "paymentFrequencyLabel",
+    "prettyType",
+    "propertyAddress",
+    "sumPosted",
+    "summarizeAccount",
+    "workflows",
+  ]);
+  assert.deepEqual(Object.keys(received.accountDetails.actions).sort(), [
+    "$",
+    "closeModal",
+    "confirmAction",
+    "editAccount",
+    "fetchAll",
+    "getAccount",
+    "getCollection",
+    "openPayment",
+    "repository",
+    "saveAndRefreshWorkspaceRecord",
+    "toast",
+  ]);
   assert.doesNotMatch(source, /\bstate\b/);
 });

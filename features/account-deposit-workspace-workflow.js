@@ -13,29 +13,8 @@
     accountDetailActionWorkflows,
   }) {
     const depositWorkspace = depositWorkspaceWorkflow.create({
-      details: {
-        depositLedger: deposits.details.depositLedger,
-        money: deposits.details.money,
-        fmtDate: deposits.details.fmtDate,
-        esc: deposits.details.esc,
-      },
-      adjustments: {
-        $: deposits.adjustments.$,
-        getAccount: deposits.adjustments.getAccount,
-        getWorkspaceOwnerId: deposits.adjustments.getWorkspaceOwnerId,
-        getCollection: deposits.adjustments.getCollection,
-        todayIso: deposits.adjustments.todayIso,
-        toast: deposits.adjustments.toast,
-        fetchAll: deposits.adjustments.fetchAll,
-        moneyInput: deposits.adjustments.moneyInput,
-        repository: deposits.adjustments.repository,
-        prepareAdjustment: deposits.adjustments.prepareAdjustment,
-        validateAdjustment: deposits.adjustments.validateAdjustment,
-        resolveAdjustmentType: deposits.adjustments.resolveAdjustmentType,
-        saveAndRefreshWorkspaceRecord:
-          deposits.adjustments.saveAndRefreshWorkspaceRecord,
-        promptAction: deposits.adjustments.promptAction,
-      },
+      details: deposits.details,
+      adjustments: deposits.adjustments,
       workflows: depositWorkflows,
     });
     const accountDetailWorkspace = accountDetailWorkspaceWorkflow.create({
@@ -43,43 +22,10 @@
       actionWorkflow: accountDetailActionWorkflow,
       actionWorkflows: accountDetailActionWorkflows,
       content: {
-        $: accountDetails.content.$,
-        getAccount: accountDetails.content.getAccount,
-        getProperty: accountDetails.content.getProperty,
-        getPaymentsForAccount: accountDetails.content.getPaymentsForAccount,
-        getAgreementVersions: accountDetails.content.getAgreementVersions,
-        beginAuditRequest: accountDetails.content.beginAuditRequest,
-        isCurrentAuditRequest: accountDetails.content.isCurrentAuditRequest,
-        money: accountDetails.content.money,
-        fmtDate: accountDetails.content.fmtDate,
-        fmtDateTime: accountDetails.content.fmtDateTime,
-        esc: accountDetails.content.esc,
-        sumPosted: accountDetails.content.sumPosted,
-        prettyType: accountDetails.content.prettyType,
-        paymentFrequencyLabel: accountDetails.content.paymentFrequencyLabel,
-        summarizeAccount: accountDetails.content.summarizeAccount,
-        amortizationSchedule: accountDetails.content.amortizationSchedule,
-        openModal: accountDetails.content.openModal,
-        propertyAddress: accountDetails.content.propertyAddress,
-        accountHistoryRepository:
-          accountDetails.content.accountHistoryRepository,
-        workflows: accountDetails.content.workflows,
+        ...accountDetails.content,
         depositSectionHTML: depositWorkspace.depositSectionHTML,
       },
-      actions: {
-        $: accountDetails.actions.$,
-        getAccount: accountDetails.actions.getAccount,
-        getCollection: accountDetails.actions.getCollection,
-        toast: accountDetails.actions.toast,
-        fetchAll: accountDetails.actions.fetchAll,
-        closeModal: accountDetails.actions.closeModal,
-        editAccount: accountDetails.actions.editAccount,
-        openPayment: accountDetails.actions.openPayment,
-        repository: accountDetails.actions.repository,
-        saveAndRefreshWorkspaceRecord:
-          accountDetails.actions.saveAndRefreshWorkspaceRecord,
-        confirmAction: accountDetails.actions.confirmAction,
-      },
+      actions: accountDetails.actions,
     });
 
     return Object.freeze({

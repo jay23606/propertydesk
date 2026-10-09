@@ -98,6 +98,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     openModal: () => {},
     propertyAddress: () => {},
     accountHistoryRepository: {},
+    workflows: {},
     unusedContentValue: true,
   };
   const actions = {
@@ -143,6 +144,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     "esc",
     "fmtDate",
     "money",
+    "unusedDetailValue",
   ]);
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
     "$",
@@ -158,14 +160,15 @@ test("account and deposit workspace exposes only its supported operations", () =
     "saveAndRefreshWorkspaceRecord",
     "toast",
     "todayIso",
+    "unusedAdjustmentValue",
     "validateAdjustment",
   ]);
   for (const key of Object.keys(passed.deposits.details))
     assert.equal(passed.deposits.details[key], deposits.details[key]);
   for (const key of Object.keys(passed.deposits.adjustments))
     assert.equal(passed.deposits.adjustments[key], deposits.adjustments[key]);
-  assert.equal("unusedDetailValue" in passed.deposits.details, false);
-  assert.equal("unusedAdjustmentValue" in passed.deposits.adjustments, false);
+  assert.equal(passed.deposits.details, deposits.details);
+  assert.equal(passed.deposits.adjustments, deposits.adjustments);
   assert.equal("unusedDepositValue" in passed.deposits, false);
   assert.deepEqual(Object.keys(passed.accountDetails.content).sort(), [
     "$",
@@ -188,33 +191,20 @@ test("account and deposit workspace exposes only its supported operations", () =
     "propertyAddress",
     "sumPosted",
     "summarizeAccount",
+    "unusedContentValue",
     "workflows",
   ]);
-  assert.equal("unusedContentValue" in passed.accountDetails.content, false);
   for (const key of Object.keys(content)) {
-    if (key === "unusedContentValue") continue;
     assert.equal(passed.accountDetails.content[key], content[key]);
   }
   assert.equal(
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
   );
-  assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
-    "$",
-    "closeModal",
-    "confirmAction",
-    "editAccount",
-    "fetchAll",
-    "getAccount",
-    "getCollection",
-    "openPayment",
-    "repository",
-    "saveAndRefreshWorkspaceRecord",
-    "toast",
-  ]);
+  assert.equal(passed.accountDetails.actions, actions);
   for (const key of Object.keys(passed.accountDetails.actions))
     assert.equal(passed.accountDetails.actions[key], actions[key]);
-  assert.equal("unusedActionValue" in passed.accountDetails.actions, false);
+  assert.equal("unusedActionValue" in passed.accountDetails.actions, true);
   assert.equal(
     passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,
@@ -308,7 +298,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /depositWorkspaceWorkflow\.create\([\s\S]*?details: \{[\s\S]*?depositLedger: deposits\.details\.depositLedger,[\s\S]*?adjustments: \{[\s\S]*?resolveAdjustmentType: deposits\.adjustments\.resolveAdjustmentType,[\s\S]*?workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?contentWorkflow: accountDetailContentWorkflow,[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML/,
+    /depositWorkspaceWorkflow\.create\(\{\s*details: deposits\.details,\s*adjustments: deposits\.adjustments,\s*workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?content: \{\s*\.\.\.accountDetails\.content,[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?actions: accountDetails\.actions/,
   );
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,
