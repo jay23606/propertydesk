@@ -2,24 +2,27 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   createAuthClient,
+  createRepositoryWriteFeedback,
   loadWorkspaceFeatures,
 } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-test("workspace member maintenance uses its injected write service", () => {
+test("workspace member maintenance uses its injected change operation", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "workspace-member-maintenance.js"),
     "utf8",
   );
   assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(source, /writeFeedback/);
   assert.doesNotMatch(source, /window\.confirm/);
   const members = fs.readFileSync(
     path.join(__dirname, "..", "features", "workspace-members.js"),
     "utf8",
   );
   assert.match(members, /confirmAction,\s*\}\);/);
+  assert.match(members, /runAndRefreshWorkspaceChange,/);
 });
 
 test("workspace feature owns profile and member form bindings", () => {
@@ -29,6 +32,7 @@ test("workspace feature owns profile and member form bindings", () => {
   const feature = context.window.PropertyDeskWorkspace.create({
     workflows,
     writeFeedback: workflows.writeFeedback,
+    runAndRefreshWorkspaceChange: () => {},
     memberRepository: { addMember() {}, removeMember() {} },
     reminder: {
       $() {},
@@ -91,12 +95,8 @@ test("adding a workspace member clears the address only after successful refresh
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state,
@@ -148,12 +148,8 @@ test("adding a workspace member keeps the address when refresh fails", async () 
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state: {
@@ -227,6 +223,8 @@ test("workspace setting writes report rejected requests and retain entered value
   const feature = context.window.PropertyDeskWorkspace.create({
     workflows,
     writeFeedback: workflows.writeFeedback,
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     $,
     state,
     authClient: createAuthClient(context, state),
@@ -287,12 +285,8 @@ test("workspace member actions reconcile lost responses against refreshed member
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       calls.push("refresh");

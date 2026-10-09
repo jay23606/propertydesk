@@ -19,6 +19,7 @@
       reminder: workspace.reminder,
       memberRepository: workspace.memberRepository,
       writeFeedback: workspace.writeFeedback,
+      runAndRefreshWorkspaceChange: workspace.runAndRefreshWorkspaceChange,
       authClient: workspace.authClient,
       confirmAction: workspace.confirmAction,
       workflows: workspaceWorkflows,

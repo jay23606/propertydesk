@@ -54,6 +54,13 @@ function workspaceRecordWriteOptions(context) {
   };
 }
 
+function workspaceChangeWriteOptions(context) {
+  return {
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
+  };
+}
+
 function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
@@ -383,6 +390,7 @@ module.exports = {
   loadRepositoryWriteFeedback,
   createRepositoryWriteFeedback,
   workspaceRecordWriteOptions,
+  workspaceChangeWriteOptions,
   loadAuthFeatures,
   authFeatureModules,
   createAuthClient,

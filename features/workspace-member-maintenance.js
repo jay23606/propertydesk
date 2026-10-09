@@ -8,7 +8,7 @@
     fetchAll,
     refreshWorkspaceSettings,
     repository,
-    writeFeedback,
+    runAndRefreshWorkspaceChange,
     confirmAction,
   }) {
     function memberWithEmailExists(email) {
@@ -30,7 +30,7 @@
       successMessage,
       savedRefreshFailureMessage,
     }) {
-      return writeFeedback.runAndRefreshWorkspaceChange({
+      return runAndRefreshWorkspaceChange({
         operation,
         fetchAll,
         isConfirmed,

@@ -63,6 +63,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   const memberRepository = { addMember() {}, removeMember() {} };
   const confirmAction = () => true;
   const writeFeedback = {};
+  const runAndRefreshWorkspaceChange = () => {};
   const reminder = {
     $() {},
     state,
@@ -84,6 +85,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     fetchAll() {},
     memberRepository,
     writeFeedback,
+    runAndRefreshWorkspaceChange,
     confirmAction,
     reminder,
     workflows: {
@@ -107,7 +109,10 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   assert.equal(passed.profileWorkflow.state, state);
   assert.equal(passed.profileWorkflow.now, now);
   assert.equal(passed.profileWorkflow.writeFeedback, writeFeedback);
-  assert.equal(passed.memberActions.writeFeedback, writeFeedback);
+  assert.equal(
+    passed.memberActions.runAndRefreshWorkspaceChange,
+    runAndRefreshWorkspaceChange,
+  );
   assert.equal(passed.memberActions.confirmAction, confirmAction);
   assert.equal(passed.reminderWorkflow.state, state);
   assert.deepEqual(Object.keys(passed.reminderWorkflow).sort(), [

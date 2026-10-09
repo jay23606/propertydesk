@@ -241,6 +241,7 @@
       },
       memberRepository: repositories.workspaceMembers,
       writeFeedback,
+      runAndRefreshWorkspaceChange: writeFeedback.runAndRefreshWorkspaceChange,
       confirmAction,
       authClient,
     },

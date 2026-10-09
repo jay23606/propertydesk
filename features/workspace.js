@@ -13,6 +13,7 @@
     memberRepository,
     authClient,
     writeFeedback,
+    runAndRefreshWorkspaceChange,
     workflows,
     confirmAction,
   }) {
@@ -58,7 +59,7 @@
       maintenanceWorkflow: workflows.memberMaintenance,
       refreshWorkspaceSettings: renderWorkspaceSettings,
       repository: memberRepository,
-      writeFeedback,
+      runAndRefreshWorkspaceChange,
       confirmAction,
     });
 
