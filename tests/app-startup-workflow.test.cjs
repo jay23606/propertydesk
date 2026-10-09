@@ -123,16 +123,27 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const setupSource = fs.readFileSync(
+    path.join(root, "features", "app-startup-setup.js"),
+    "utf8",
+  );
   const workflow = "features/app-startup-workflow.js";
+  const setup = "features/app-startup-setup.js";
 
   assert.ok(html.indexOf("features/auth.js") < html.indexOf(workflow));
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf(workflow));
-  assert.ok(html.indexOf(workflow) < html.indexOf("app.js"));
+  assert.ok(html.indexOf(workflow) < html.indexOf(setup));
+  assert.ok(html.indexOf(setup) < html.indexOf("app.js"));
   assert.ok(worker.includes(`'./${workflow}'`));
-  assert.match(app, /PropertyDeskAppStartupWorkflow\.create\(/);
+  assert.ok(worker.includes(`'./${setup}'`));
+  assert.match(app, /PropertyDeskAppStartupSetup\.create\(/);
   assert.match(
     app,
-    /authContext: \{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?setPasswordRecoveryInProgress:[\s\S]*?resetWorkspaceState: \(\) =>[\s\S]*?resetWorkspaceState\(state\),/,
+    /records: \{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?setPasswordRecoveryInProgress:[\s\S]*?resetWorkspaceState: \(\) =>[\s\S]*?resetWorkspaceState\(state\),/,
+  );
+  assert.match(
+    setupSource,
+    /authContext: \{[\s\S]*?getUser: records\.getUser,[\s\S]*?paymentNotifications: services\.paymentNotifications,/,
   );
   assert.doesNotMatch(
     fs.readFileSync(path.join(root, "features", "auth.js"), "utf8"),

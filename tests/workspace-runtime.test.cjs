@@ -157,7 +157,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   );
   assert.match(
     app,
-    /const appLifecycle = window\.PropertyDeskAppStartupWorkflow\.create\([\s\S]*?\}\);\s*setWorkspaceRender\(appLifecycle\.render\);\s*document\.addEventListener\("DOMContentLoaded", appLifecycle\.initialize\);/,
+    /const appLifecycle = window\.PropertyDeskAppStartupSetup\.create\([\s\S]*?\}\);\s*setWorkspaceRender\(appLifecycle\.render\);\s*document\.addEventListener\("DOMContentLoaded", appLifecycle\.initialize\);/,
   );
   assert.match(
     app,
