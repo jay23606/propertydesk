@@ -39,7 +39,11 @@
       workspaceQuery,
     });
     const workspaceRefresh = workflows.refresh.create({
-      state,
+      getUserId: () => state.user?.id,
+      setWorkspaceRecords: (records) => Object.assign(state, records),
+      setWorkspaceOwnerId: (workspaceOwnerId) => {
+        state.workspaceOwnerId = workspaceOwnerId;
+      },
       workspaceData,
       toast,
       reportError,

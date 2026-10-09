@@ -20,13 +20,29 @@ function createRefresh({
     context,
   );
   return context.window.PropertyDeskWorkspaceRefresh.create({
-    state,
+    getUserId: () => state.user?.id,
+    setWorkspaceRecords: (records) => Object.assign(state, records),
+    setWorkspaceOwnerId: (workspaceOwnerId) => {
+      state.workspaceOwnerId = workspaceOwnerId;
+    },
     workspaceData,
     toast,
     render,
     reportError,
   });
 }
+
+test("workspace refresh accepts only user and hydration operations", () => {
+  const state = { user: { id: "viewer-1" } };
+  const refresh = createRefresh({ state, workspaceData: {}, toast() {} });
+  assert.equal(typeof refresh.fetchAll, "function");
+  assert.equal(typeof refresh.setRender, "function");
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-refresh.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /\bstate\b/);
+});
 
 function deferred() {
   let resolve;
@@ -238,9 +254,9 @@ test("workspace render failures are logged, shown to the user, and rethrown", as
     context,
   );
   const refresh = context.window.PropertyDeskWorkspaceRefresh.create({
-    state: {
-      client: { rpc: async () => ({ data: "workspace-1", error: null }) },
-    },
+    getUserId: () => "viewer-1",
+    setWorkspaceRecords() {},
+    setWorkspaceOwnerId() {},
     workspaceData: {
       loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
       loadWorkspaceRecords: async () => ({ properties: [] }),

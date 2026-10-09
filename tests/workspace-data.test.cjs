@@ -254,6 +254,6 @@ test("workspace data modules load before app root and are precached", () => {
   assert.match(runtime, /workflows\.refresh\.create\(/);
   assert.match(
     runtime,
-    /workflows\.refresh\.create\(\{\s*state,\s*workspaceData,/,
+    /workflows\.refresh\.create\(\{\s*getUserId:[\s\S]*?setWorkspaceRecords:[\s\S]*?setWorkspaceOwnerId:[\s\S]*?workspaceData,/,
   );
 });

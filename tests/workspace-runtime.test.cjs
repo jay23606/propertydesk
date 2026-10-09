@@ -117,7 +117,21 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[6][1].reads, workspaceReads);
   assert.equal(calls[6][1].workspaceQuery, workspaceQuery);
   assert.equal(calls[7][0], "refresh");
-  assert.equal(calls[7][1].state, state);
+  assert.equal(calls[7][1].getUserId(), undefined);
+  state.user = { id: "viewer-1" };
+  assert.equal(calls[7][1].getUserId(), "viewer-1");
+  calls[7][1].setWorkspaceRecords({ properties: [{ id: "property-1" }] });
+  calls[7][1].setWorkspaceOwnerId("owner-1");
+  assert.deepEqual(state.properties, [{ id: "property-1" }]);
+  assert.equal(state.workspaceOwnerId, "owner-1");
+  assert.deepEqual(Object.keys(calls[7][1]).sort(), [
+    "getUserId",
+    "reportError",
+    "setWorkspaceOwnerId",
+    "setWorkspaceRecords",
+    "toast",
+    "workspaceData",
+  ]);
   assert.equal(calls[7][1].workspaceData, workspaceData);
   assert.equal(calls[7][1].toast, options.toast);
   assert.equal(calls[7][1].reportError, options.reportError);

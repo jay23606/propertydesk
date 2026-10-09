@@ -2,7 +2,15 @@
 (() => {
   "use strict";
 
-  function create({ state, workspaceData, toast, render, reportError }) {
+  function create({
+    getUserId,
+    setWorkspaceRecords,
+    setWorkspaceOwnerId,
+    workspaceData,
+    toast,
+    render,
+    reportError,
+  }) {
     let latestFetchId = 0;
     let renderCallback = render;
 
@@ -14,7 +22,7 @@
     }
 
     function isCurrentFetch(fetchId, userId) {
-      return fetchId === latestFetchId && state.user?.id === userId;
+      return fetchId === latestFetchId && getUserId() === userId;
     }
 
     async function resolveWorkspaceId(fetchId, userId) {
@@ -33,8 +41,8 @@
       try {
         const records = await workspaceData.loadWorkspaceRecords(workspaceId);
         if (!isCurrentFetch(fetchId, userId)) return false;
-        Object.assign(state, records);
-        state.workspaceOwnerId = workspaceId;
+        setWorkspaceRecords(records);
+        setWorkspaceOwnerId(workspaceId);
         return true;
       } catch (error) {
         if (!isCurrentFetch(fetchId, userId)) return false;
@@ -61,7 +69,7 @@
 
     async function fetchAll() {
       const fetchId = ++latestFetchId;
-      const userId = state.user?.id;
+      const userId = getUserId();
       const workspaceId = await resolveWorkspaceId(fetchId, userId);
       if (!workspaceId || !isCurrentFetch(fetchId, userId)) return;
       if (!(await hydrateWorkspace(workspaceId, fetchId, userId))) return;
