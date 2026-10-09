@@ -28,38 +28,24 @@
       tables: modules.workspaceRuntime.tables,
       workflows: modules.workspaceRuntime.workflows,
     });
-    const paymentNotifications = modules.paymentNotifications.create({
-      getWorkspaceIdentity: () => ({
-        ownerId: runtime.state.workspaceOwnerId,
-        viewerId: runtime.state.user?.id,
-      }),
-      getPaymentNotificationData: () => ({
-        members: runtime.state.workspaceMembers.map(
-          ({ member_user_id, display_name, email }) => ({
-            member_user_id,
-            display_name,
-            email,
-          }),
-        ),
-        accounts: runtime.state.accounts.map(({ id, property_id }) => ({
-          id,
-          property_id,
-        })),
-        properties: runtime.state.properties.map(
-          ({ id, address, city, state, postal_code }) => ({
-            id,
-            address,
-            city,
-            state,
-            postal_code,
-          }),
-        ),
-      }),
-      getClient: runtime.getClient,
-      toast,
-      money: modules.displayUtils.money,
-      propertyAddress: modules.propertyAddressUtils.propertyAddress,
-      refresh: runtime.fetchAll,
+    const paymentNotifications = modules.paymentNotificationSetup.create({
+      records: {
+        getWorkspaceOwnerId: () => runtime.state.workspaceOwnerId,
+        getUser: () => runtime.state.user,
+        getWorkspaceMembers: () => runtime.state.workspaceMembers,
+        getAccounts: () => runtime.state.accounts,
+        getProperties: () => runtime.state.properties,
+      },
+      ui: {
+        toast,
+        money: modules.displayUtils.money,
+        propertyAddress: modules.propertyAddressUtils.propertyAddress,
+      },
+      services: {
+        getClient: runtime.getClient,
+        refresh: runtime.fetchAll,
+      },
+      workflow: modules.paymentNotifications,
     });
     const financialContext = modules.financialContext.factory.create({
       getAccounts: () => runtime.state.accounts,

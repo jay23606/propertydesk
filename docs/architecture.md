@@ -4,7 +4,7 @@ PropertyDesk is a plain HTML, CSS, and JavaScript app with no build step. Browse
 
 ## Entry point
 
-`app.js` is the feature composition root. It supplies explicit dependencies to feature workflows and connects their renderers and event binders. `features/app-services.js` constructs shared write feedback, reminder, notification, workspace runtime, financial, and deposit services before feature wiring begins. Keep both modules focused on composition rather than moving domain rules or UI behavior into them.
+`app.js` is the feature composition root. It supplies explicit dependencies to feature workflows and connects their renderers and event binders. `features/app-services.js` constructs shared write feedback, reminder, notification, workspace runtime, financial, and deposit services before feature wiring begins. `features/payment-notification-setup.js` projects only the workspace identity, member labels, account/property links, and address fields needed by payment notifications. Keep these modules focused on composition rather than moving domain rules or UI behavior into them.
 
 Workflow coordinators pass only the dependencies each child needs instead of forwarding a whole app context. Those explicit mappings keep feature boundaries visible and make accidental coupling easier to spot.
 

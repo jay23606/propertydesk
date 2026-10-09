@@ -55,6 +55,7 @@
           refresh: window.PropertyDeskWorkspaceRefresh,
         },
       },
+      paymentNotificationSetup: window.PropertyDeskPaymentNotificationSetup,
       paymentNotifications: window.PropertyDeskPaymentNotifications,
       displayUtils: window.PropertyDeskDisplayUtils,
       propertyAddressUtils: window.PropertyDeskPropertyAddressUtils,

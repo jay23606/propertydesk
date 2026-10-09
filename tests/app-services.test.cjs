@@ -117,6 +117,15 @@ test("app services compose shared runtime and financial services explicitly", ()
 
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "payment-notification-setup.js"),
+      "utf8",
+    ),
+    context,
+  );
+  modules.paymentNotificationSetup =
+    context.window.PropertyDeskPaymentNotificationSetup;
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "app-services.js"),
       "utf8",
     ),
@@ -262,6 +271,11 @@ test("app services load before the app root and are in the PWA shell", () => {
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/payment-notification-setup.js") <
+      html.indexOf("features/app-services.js"),
+  );
+  assert.match(worker, /'\.\/features\/payment-notification-setup\.js'/);
   assert.ok(html.indexOf("features/app-services.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/app-services\.js'/);
 });
