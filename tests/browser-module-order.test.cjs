@@ -15,6 +15,21 @@ test("browser feature scripts load after their declared API dependencies", () =>
       (source) =>
         source.endsWith(".js") && fs.existsSync(path.join(root, source)),
     );
+  const featureFiles = fs
+    .readdirSync(path.join(root, "features"), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".js"))
+    .map((entry) => `features/${entry.name}`)
+    .sort();
+  const loadedFeatureFiles = scriptSources
+    .filter((source) => source.startsWith("features/"))
+    .sort();
+
+  assert.deepEqual(
+    loadedFeatureFiles,
+    featureFiles,
+    "every feature JavaScript file belongs to the ordered browser shell",
+  );
+
   const apiOwners = new Map();
   // Derive the browser dependency graph from the globals these scripts publish.
   const moduleSources = new Map(
