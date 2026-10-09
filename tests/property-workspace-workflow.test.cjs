@@ -27,7 +27,6 @@ test("property workspace shares detail actions across overview and grid", () => 
   };
   const openPropertyPayment = () => "overview-payment";
   const openPayment = () => "grid-payment";
-  const state = {};
   const workflows = {};
   const propertyAddress = () => "address";
   const groupAccountsByProperty = () => new Map();
@@ -63,7 +62,13 @@ test("property workspace shares detail actions across overview and grid", () => 
     unusedDependency: true,
   };
   const portfolio = {
-    state,
+    getSenderName: () => "Jay",
+    getPayments: () => [],
+    getPropertyHolders: () => [],
+    getProperties: () => [],
+    getAccounts: () => [],
+    getWorkspaceMembers: () => [],
+    getWorkspaceOwnerId: () => "owner-1",
     propertyAddress,
     lateReminderMailto,
     lateReminderSms,
@@ -150,7 +155,13 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
   assert.equal(calls[1][1].workflows, workflows);
   assert.equal("unusedDependency" in calls[1][1], false);
-  assert.equal(calls[2][1].state, state);
+  assert.equal(calls[2][1].getSenderName, portfolio.getSenderName);
+  assert.equal(calls[2][1].getPayments, portfolio.getPayments);
+  assert.equal(calls[2][1].getPropertyHolders, portfolio.getPropertyHolders);
+  assert.equal(calls[2][1].getProperties, portfolio.getProperties);
+  assert.equal(calls[2][1].getAccounts, portfolio.getAccounts);
+  assert.equal(calls[2][1].getWorkspaceMembers, portfolio.getWorkspaceMembers);
+  assert.equal(calls[2][1].getWorkspaceOwnerId, portfolio.getWorkspaceOwnerId);
   assert.equal(calls[2][1].groupAccountsByProperty, groupAccountsByProperty);
   assert.equal(calls[2][1].isActiveAccount, isActiveAccount);
   assert.equal(calls[2][1].propertyAddress, propertyAddress);

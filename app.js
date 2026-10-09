@@ -795,7 +795,14 @@
     },
     portfolio: {
       $,
-      state,
+      getSenderName: () =>
+        state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
+      getPayments: () => state.payments,
+      getPropertyHolders: () => state.propertyHolders,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
       esc,
       money,
       paymentFrequencyLabel,

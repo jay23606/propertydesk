@@ -89,7 +89,15 @@ test("Properties workflow returns explicit view and action operations", () => {
   const action = () => {};
   const editPropertyQuickNote = () => {};
   const propertyRepository = {};
-  const state = { properties: [], accounts: [], workspaceOwnerId: "owner-1" };
+  const state = {
+    user: { user_metadata: { display_name: "Jay" } },
+    payments: [],
+    propertyHolders: [],
+    properties: [],
+    accounts: [],
+    workspaceMembers: [],
+    workspaceOwnerId: "owner-1",
+  };
   const passed = {};
   const context = vm.createContext({
     window: {
@@ -194,7 +202,13 @@ test("Properties workflow returns explicit view and action operations", () => {
   };
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
     $: action,
-    state,
+    getSenderName: () => state.user.user_metadata.display_name,
+    getPayments: () => state.payments,
+    getPropertyHolders: () => state.propertyHolders,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
+    getWorkspaceMembers: () => state.workspaceMembers,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     groupAccountsByProperty: action,
     isActiveAccount: action,
     toast: action,

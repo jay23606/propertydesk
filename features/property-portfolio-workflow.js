@@ -4,7 +4,13 @@
 
   function create({
     $,
-    state,
+    getSenderName,
+    getPayments,
+    getPropertyHolders,
+    getProperties,
+    getAccounts,
+    getWorkspaceMembers,
+    getWorkspaceOwnerId,
     groupAccountsByProperty,
     isActiveAccount,
     esc,
@@ -46,8 +52,7 @@
       onChange: () => propertyViews.renderProperties(),
     });
     const reminderModel = workflows.reminderModel.create({
-      getSenderName: () =>
-        state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
+      getSenderName,
       propertyAddress,
       monthStart,
       dateOnly,
@@ -59,7 +64,7 @@
       money,
     });
     const accountRowModel = workflows.accountRowModel.create({
-      getPayments: () => state.payments,
+      getPayments,
       monthlyScheduledEstimate,
       summarizeAccount,
       amountDueSince,
@@ -69,13 +74,13 @@
       reminderModel,
     });
     const filterModel = workflows.filterModel.create({
-      getPropertyHolders: () => state.propertyHolders,
+      getPropertyHolders,
       propertyAddress,
       isActiveAccount,
     });
     const portfolioModel = workflows.portfolioModel.create({
-      getProperties: () => state.properties,
-      getAccounts: () => state.accounts,
+      getProperties,
+      getAccounts,
       accountRowModel,
       groupAccountsByProperty,
       streetAddress,
@@ -97,8 +102,8 @@
     });
     const propertyViews = workflows.views.create({
       $,
-      getWorkspaceMembers: () => state.workspaceMembers,
-      getProperties: () => state.properties,
+      getWorkspaceMembers,
+      getProperties,
       esc,
       portfolioTable,
       portfolioModel,
@@ -108,8 +113,8 @@
       attachTemplateEvents: reminderTemplates.attachEvents,
     });
     const { editPropertyQuickNote } = workflows.quickNote.create({
-      getProperties: () => state.properties,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getProperties,
+      getWorkspaceOwnerId,
       toast,
       fetchAll,
       promptAction,
@@ -127,7 +132,7 @@
         openPropertyDetails,
         openAccountForProperty,
         getAccount: (accountId) =>
-          state.accounts.find((account) => String(account.id) === accountId) ||
+          getAccounts().find((account) => String(account.id) === accountId) ||
           null,
         editAccount,
       });

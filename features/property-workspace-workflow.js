@@ -61,7 +61,13 @@
   }) {
     return workflow.create({
       $: portfolio.$,
-      state: portfolio.state,
+      getSenderName: portfolio.getSenderName,
+      getPayments: portfolio.getPayments,
+      getPropertyHolders: portfolio.getPropertyHolders,
+      getProperties: portfolio.getProperties,
+      getAccounts: portfolio.getAccounts,
+      getWorkspaceMembers: portfolio.getWorkspaceMembers,
+      getWorkspaceOwnerId: portfolio.getWorkspaceOwnerId,
       groupAccountsByProperty,
       isActiveAccount,
       esc: portfolio.esc,
