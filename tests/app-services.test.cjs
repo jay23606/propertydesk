@@ -59,7 +59,14 @@ test("app services compose shared runtime and financial services explicitly", ()
   const reminderCopy = {};
   const repositories = {};
   const tables = {};
-  const runtimeWorkflows = {};
+  const runtimeWorkflows = {
+    appState: {
+      resetWorkspaceState(target) {
+        resetStateTarget = target;
+      },
+    },
+  };
+  let resetStateTarget;
   const financialWorkflows = {};
   const depositWorkflows = {};
   const $ = () => {};
@@ -117,6 +124,14 @@ test("app services compose shared runtime and financial services explicitly", ()
 
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features", "app-state-access.js"),
+      "utf8",
+    ),
+    context,
+  );
+  modules.stateAccess = context.window.PropertyDeskAppStateAccess;
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features", "payment-notification-setup.js"),
       "utf8",
     ),
@@ -154,8 +169,9 @@ test("app services compose shared runtime and financial services explicitly", ()
     "loadAllWorkspacePages",
     "paymentNotifications",
     "repositories",
+    "resetWorkspaceState",
     "setRender",
-    "state",
+    "stateAccess",
     "toast",
     "writeFeedback",
   ]);
@@ -163,7 +179,18 @@ test("app services compose shared runtime and financial services explicitly", ()
   assert.equal(services.emailUtils, emailUtils);
   assert.equal("postedLedgerUtils" in services, false);
   assert.equal(services.toast, toast);
-  assert.equal(services.state, state);
+  assert.equal("state" in services, false);
+  assert.equal(typeof services.resetWorkspaceState, "function");
+  services.resetWorkspaceState();
+  assert.equal(resetStateTarget, state);
+  assert.equal(
+    services.stateAccess.financialContext.getAccounts(),
+    state.accounts,
+  );
+  assert.equal(
+    services.stateAccess.financialContext.getPayments(),
+    state.payments,
+  );
   assert.equal(services.repositories, repositories);
   assert.equal(services.paymentNotifications, paymentNotifications);
   assert.equal(services.financialContext, financialContext);
@@ -275,7 +302,12 @@ test("app services load before the app root and are in the PWA shell", () => {
     html.indexOf("features/payment-notification-setup.js") <
       html.indexOf("features/app-services.js"),
   );
+  assert.ok(
+    html.indexOf("features/app-state-access.js") <
+      html.indexOf("features/app-services.js"),
+  );
   assert.match(worker, /'\.\/features\/payment-notification-setup\.js'/);
+  assert.match(worker, /'\.\/features\/app-state-access\.js'/);
   assert.ok(html.indexOf("features/app-services.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/app-services\.js'/);
 });

@@ -41,9 +41,12 @@ test("app state accessors expose only the records needed by each feature", () =>
     "appShell",
     "backup",
     "createActions",
+    "depositContext",
+    "financialContext",
     "formOptions",
     "imports",
     "modal",
+    "paymentNotifications",
     "properties",
     "propertyAccountForms",
     "reminderPreview",
@@ -66,6 +69,22 @@ test("app state accessors expose only the records needed by each feature", () =>
     "getProperties",
     "getWorkspaceOwnerId",
     "setPendingCorrection",
+  ]);
+  assert.deepEqual(Object.keys(access.paymentNotifications).sort(), [
+    "getAccounts",
+    "getProperties",
+    "getUser",
+    "getWorkspaceMembers",
+    "getWorkspaceOwnerId",
+  ]);
+  assert.deepEqual(Object.keys(access.financialContext).sort(), [
+    "getAccounts",
+    "getPayments",
+  ]);
+  assert.deepEqual(Object.keys(access.depositContext).sort(), [
+    "getDepositEntries",
+    "getExpenses",
+    "getPayments",
   ]);
   assert.deepEqual(Object.keys(access.accountDeposit).sort(), [
     "beginAuditRequest",
@@ -164,7 +183,7 @@ test("app state access module loads before the root and is precached", () => {
   const script = "features/app-state-access.js";
   assert.ok(html.indexOf(script) < html.indexOf("app.js"));
   assert.ok(worker.includes(`'./${script}'`));
-  assert.match(app, /PropertyDeskAppStateAccess\.create\(state\)/);
+  assert.match(app, /stateAccess: window\.PropertyDeskAppStateAccess/);
   assert.doesNotMatch(app, /\bstate\.[A-Za-z_$]/);
   assert.match(app, /records: stateAccess\.transactions/);
   assert.match(app, /records: stateAccess\.properties/);

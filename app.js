@@ -80,6 +80,7 @@
           depositContext: window.PropertyDeskDepositContext,
         },
       },
+      stateAccess: window.PropertyDeskAppStateAccess,
     },
   });
   const {
@@ -87,7 +88,8 @@
     emailUtils,
     toast,
     backendConfigured,
-    state,
+    stateAccess,
+    resetWorkspaceState,
     fetchAll,
     loadAllWorkspacePages,
     repositories,
@@ -99,7 +101,6 @@
     financialContext,
     depositLedger,
   } = appServices;
-  const stateAccess = window.PropertyDeskAppStateAccess.create(state);
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -719,8 +720,7 @@
   const appLifecycle = window.PropertyDeskAppStartupSetup.create({
     records: {
       ...stateAccess.startup,
-      resetWorkspaceState: () =>
-        window.PropertyDeskAppState.resetWorkspaceState(state),
+      resetWorkspaceState,
     },
     ui: {
       $,

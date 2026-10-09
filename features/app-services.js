@@ -28,14 +28,13 @@
       tables: modules.workspaceRuntime.tables,
       workflows: modules.workspaceRuntime.workflows,
     });
+    const stateAccess = modules.stateAccess.create(runtime.state);
+    const resetWorkspaceState = () =>
+      modules.workspaceRuntime.workflows.appState.resetWorkspaceState(
+        runtime.state,
+      );
     const paymentNotifications = modules.paymentNotificationSetup.create({
-      records: {
-        getWorkspaceOwnerId: () => runtime.state.workspaceOwnerId,
-        getUser: () => runtime.state.user,
-        getWorkspaceMembers: () => runtime.state.workspaceMembers,
-        getAccounts: () => runtime.state.accounts,
-        getProperties: () => runtime.state.properties,
-      },
+      records: stateAccess.paymentNotifications,
       ui: {
         toast,
         money: modules.displayUtils.money,
@@ -48,8 +47,7 @@
       workflow: modules.paymentNotifications,
     });
     const financialContext = modules.financialContext.factory.create({
-      getAccounts: () => runtime.state.accounts,
-      getPayments: () => runtime.state.payments,
+      ...stateAccess.financialContext,
       todayIso: modules.dateUtils.todayIso,
       dateUtils: modules.dateUtils,
       currencyUtils: modules.currencyUtils,
@@ -58,9 +56,7 @@
       workflows: modules.financialContext.workflows,
     });
     const { depositLedger } = modules.depositContext.factory.create({
-      getDepositEntries: () => runtime.state.depositEntries,
-      getPayments: () => runtime.state.payments,
-      getExpenses: () => runtime.state.expenses,
+      ...stateAccess.depositContext,
       postedLedgerUtils,
       workflows: modules.depositContext.workflows,
     });
@@ -70,7 +66,8 @@
       emailUtils,
       toast,
       backendConfigured: runtime.backendConfigured,
-      state: runtime.state,
+      stateAccess,
+      resetWorkspaceState,
       fetchAll: runtime.fetchAll,
       loadAllWorkspacePages: runtime.loadAllWorkspacePages,
       repositories: runtime.repositories,

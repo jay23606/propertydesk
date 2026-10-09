@@ -73,6 +73,19 @@
       }),
       formOptions: group({ getProperties, getAccounts }),
       reminderPreview: group({ getProperties, getPayments }),
+      paymentNotifications: group({
+        getWorkspaceOwnerId,
+        getUser,
+        getWorkspaceMembers,
+        getAccounts,
+        getProperties,
+      }),
+      financialContext: group({ getAccounts, getPayments }),
+      depositContext: group({
+        getDepositEntries: () => state.depositEntries,
+        getPayments,
+        getExpenses,
+      }),
       appShell: group({
         getAccounts,
         getProperties,
