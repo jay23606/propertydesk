@@ -47,6 +47,16 @@ function setup() {
   });
   vm.runInContext(
     fs.readFileSync(
+      path.join(__dirname, "..", "features/reminder-template-store.js"),
+      "utf8",
+    ),
+    context,
+  );
+  const store = context.window.PropertyDeskReminderTemplateStore.create({
+    toast: (message) => messages.push(message),
+  });
+  vm.runInContext(
+    fs.readFileSync(
       path.join(__dirname, "..", "features/reminder-template-settings.js"),
       "utf8",
     ),
@@ -56,6 +66,7 @@ function setup() {
     $: (id) => elements.get(id),
     openModal: (id) => opened.push(id),
     toast: (message) => messages.push(message),
+    store,
     onChange() {},
   });
   return { feature, values, handlers, elements, opened, messages };

@@ -20,6 +20,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
 
   const order = [
     "workflows.table.create(",
+    "workflows.templateStore.create(",
     "workflows.templateSettings.create(",
     "workflows.reminderModel.create(",
     "workflows.accountRowModel.create(",
@@ -190,6 +191,16 @@ test("Properties workflow returns explicit view and action operations", () => {
   );
 
   const workflows = {
+    templateStore: {
+      create: () => ({
+        read: () => ({
+          email: { items: [], activeId: null },
+          sms: { items: [], activeId: null },
+        }),
+        write: () => true,
+        getTemplate: () => ({}),
+      }),
+    },
     table: context.window.PropertyDeskPropertyPortfolioTable,
     templateSettings: context.window.PropertyDeskReminderTemplateSettings,
     reminderModel: context.window.PropertyDeskPropertyPortfolioReminderModel,

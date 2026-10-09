@@ -700,6 +700,7 @@
           window.PropertyDeskPropertyRecordUpdateMaintenance,
         events: window.PropertyDeskPropertyViewEvents,
         pdfExport: window.PropertyDeskPropertyPdfExport,
+        templateStore: window.PropertyDeskReminderTemplateStore,
         templateSettings: window.PropertyDeskReminderTemplateSettings,
       },
     },

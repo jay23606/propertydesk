@@ -45,10 +45,12 @@
       paymentFrequencyLabel,
       isActiveAccount,
     });
+    const reminderTemplateStore = workflows.templateStore.create({ toast });
     const reminderTemplates = workflows.templateSettings.create({
       $,
       openModal,
       toast,
+      store: reminderTemplateStore,
       onChange: () => propertyViews.renderProperties(),
     });
     const reminderModel = workflows.reminderModel.create({
