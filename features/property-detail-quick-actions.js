@@ -4,7 +4,7 @@
 
   function create({
     $,
-    state,
+    getSelectedPropertyId,
     closeModal,
     openPayment,
     openExpense,
@@ -13,19 +13,19 @@
   }) {
     function attachEvents() {
       $("property-detail-add-income").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
+        const propertyId = getSelectedPropertyId();
         if (!propertyId) return;
         closeModal($("property-detail-modal"));
         openPayment(null, propertyId);
       });
       $("property-detail-add-expense").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
+        const propertyId = getSelectedPropertyId();
         if (!propertyId) return;
         closeModal($("property-detail-modal"));
         openExpense(propertyId);
       });
       $("property-detail-add-account").addEventListener("click", () => {
-        const propertyId = state.selectedPropertyId;
+        const propertyId = getSelectedPropertyId();
         if (!propertyId) return;
         closeModal($("property-detail-modal"));
         openAccountForProperty(propertyId);

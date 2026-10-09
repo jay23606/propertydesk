@@ -779,6 +779,7 @@
       promptAction,
       openPayment,
       propertyRepository: repositories.properties,
+      openModal,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,
       editAccount: propertyAccountForms.editAccount,
       workflows: {
@@ -793,6 +794,8 @@
         recordUpdateMaintenance:
           window.PropertyDeskPropertyRecordUpdateMaintenance,
         events: window.PropertyDeskPropertyViewEvents,
+        pdfExport: window.PropertyDeskPropertyPdfExport,
+        templateSettings: window.PropertyDeskReminderTemplateSettings,
       },
     },
   });

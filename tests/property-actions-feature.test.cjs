@@ -129,10 +129,7 @@ test("property detail events own editing and quick-action bindings", () => {
   const propertyModal = getElement("property-detail-modal");
   const feature = context.window.PropertyDeskPropertyDetailEvents.create({
     $: getElement,
-    state: {
-      selectedPropertyId: "property-1",
-      accounts: [{ id: "account-1" }],
-    },
+    getAccount: (id) => (id === "account-1" ? { id } : null),
     closeModal: (modal) => calls.push(`close:${modal.id}`),
     editAccount: (account) => calls.push(`edit:${account.id}`),
     openAccountDetails: (id) => calls.push(`open-account:${id}`),
@@ -146,7 +143,7 @@ test("property detail events own editing and quick-action bindings", () => {
   const quickActions =
     context.window.PropertyDeskPropertyDetailQuickActions.create({
       $: getElement,
-      state: quickActionState,
+      getSelectedPropertyId: () => quickActionState.selectedPropertyId,
       closeModal: (modal) => calls.push(`close:${modal.id}`),
       openPayment: (...args) => calls.push(`payment:${args.join(":")}`),
       openExpense: (propertyId) => calls.push(`expense:${propertyId}`),

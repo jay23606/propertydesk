@@ -26,6 +26,9 @@ test("property and transaction views own their search and filter bindings", () =
         "property-filter:change",
         "property-holder-filter:change",
         "show-archived:change",
+        "properties-export-pdf:click",
+        "properties-email-template:click",
+        "properties-sms-template:click",
       ],
     ],
     [

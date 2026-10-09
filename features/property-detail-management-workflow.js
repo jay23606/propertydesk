@@ -38,7 +38,8 @@
     const { attachEvents: attachPropertyDetailEvents } =
       workflows.detailEvents.create({
         $,
-        state,
+        getAccount: (accountId) =>
+          state.accounts.find((account) => account.id === accountId) || null,
         closeModal,
         editAccount,
         openAccountDetails,
@@ -46,7 +47,7 @@
     const { attachEvents: attachPropertyQuickActionEvents } =
       workflows.quickActions.create({
         $,
-        state,
+        getSelectedPropertyId: () => state.selectedPropertyId,
         closeModal,
         openPayment,
         openExpense,

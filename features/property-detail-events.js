@@ -4,7 +4,7 @@
 
   function createPropertyDetailEvents({
     $,
-    state,
+    getAccount,
     closeModal,
     editAccount,
     openAccountDetails,
@@ -14,9 +14,7 @@
       detailContent.addEventListener("click", (event) => {
         const button = event.target.closest("[data-edit-account]");
         if (button) {
-          const account = state.accounts.find(
-            (item) => item.id === button.dataset.editAccount,
-          );
+          const account = getAccount(button.dataset.editAccount);
           if (!account) return;
           event.preventDefault();
           closeModal($("property-detail-modal"));

@@ -52,6 +52,7 @@ test("property detail coordinator connects archive and quick actions", () => {
     selectedPropertyId: "property-1",
     workspaceOwnerId: "workspace-1",
     properties: [{ id: "property-1", archived_at: null }],
+    accounts: [],
   };
   const openPropertyDetails = () => {};
   const openPayment = () => {};
@@ -111,6 +112,8 @@ test("property detail coordinator connects archive and quick actions", () => {
   assert.equal("unusedDependency" in passed.archive, false);
   assert.equal("unusedDependency" in passed.detail, false);
   assert.equal("unusedDependency" in passed.quick, false);
+  assert.equal(passed.detail.getAccount("missing"), null);
+  assert.equal(passed.quick.getSelectedPropertyId(), "property-1");
   assert.equal(passed.quick.openPayment, openPayment);
   assert.equal(passed.quick.openExpense, openExpense);
   assert.equal(passed.quick.openAccountForProperty, openAccountForProperty);

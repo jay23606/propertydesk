@@ -222,6 +222,27 @@
   min-width: 48px;
   text-align: center;
 }
+
+.portfolio-template-action {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.portfolio-template-action:hover {
+  color: var(--green);
+}
+
+.template-edit-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
 .portfolio-icon-action {
   display: inline-flex;
   width: 32px;

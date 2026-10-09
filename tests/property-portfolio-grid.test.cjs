@@ -16,10 +16,12 @@ test("app composes the Properties grid and action operations explicitly", () => 
 
   const order = [
     "workflows.table.create(",
+    "workflows.templateSettings.create(",
     "workflows.reminderModel.create(",
     "workflows.accountRowModel.create(",
     "workflows.filterModel.create(",
     "workflows.portfolioModel.create(",
+    "workflows.pdfExport.create(",
     "workflows.views.create(",
     "workflows.quickNote.create(",
     "workflows.events.create(",
@@ -97,6 +99,17 @@ test("Properties workflow returns explicit view and action operations", () => {
           return {};
         },
       },
+      PropertyDeskReminderTemplateSettings: {
+        create: (options) => {
+          calls.push("template settings");
+          passed.templates = options;
+          return {
+            getTemplate: () => null,
+            openEditor: action,
+            attachEvents: action,
+          };
+        },
+      },
       PropertyDeskPropertyPortfolioAccountRowModel: {
         create: () => {
           calls.push("account rows");
@@ -113,7 +126,14 @@ test("Properties workflow returns explicit view and action operations", () => {
         create: (options) => {
           calls.push("portfolio model");
           passed.portfolioModel = options;
-          return {};
+          return { buildRows: () => [] };
+        },
+      },
+      PropertyDeskPropertyPdfExport: {
+        create: (options) => {
+          calls.push("pdf export");
+          passed.pdfExport = options;
+          return { exportPDF: action };
         },
       },
       PropertyDeskPropertyPortfolioFilterModel: {
@@ -158,11 +178,13 @@ test("Properties workflow returns explicit view and action operations", () => {
 
   const workflows = {
     table: context.window.PropertyDeskPropertyPortfolioTable,
+    templateSettings: context.window.PropertyDeskReminderTemplateSettings,
     reminderModel: context.window.PropertyDeskPropertyPortfolioReminderModel,
     accountRowModel:
       context.window.PropertyDeskPropertyPortfolioAccountRowModel,
     filterModel: context.window.PropertyDeskPropertyPortfolioFilterModel,
     portfolioModel: context.window.PropertyDeskPropertyPortfolioModel,
+    pdfExport: context.window.PropertyDeskPropertyPdfExport,
     views: context.window.PropertyDeskPropertyViews,
     quickNote: context.window.PropertyDeskPropertyQuickNote,
     noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
@@ -185,15 +207,18 @@ test("Properties workflow returns explicit view and action operations", () => {
     openPropertyDetails: action,
     openAccountForProperty: action,
     workflows,
+    openModal: action,
     unusedDependency: true,
   });
 
   assert.deepEqual(calls, [
     "table",
+    "template settings",
     "reminder model",
     "account rows",
     "filter model",
     "portfolio model",
+    "pdf export",
     "property views",
     "quick note",
     "portfolio actions",
@@ -220,11 +245,17 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal("unusedDependency" in passed.quickNote, false);
   assert.deepEqual(Object.keys(passed.views).sort(), [
     "$",
+    "attachTemplateEvents",
     "esc",
+    "exportPDF",
+    "openEmailTemplateSettings",
+    "openSmsTemplateSettings",
     "portfolioModel",
     "portfolioTable",
     "state",
   ]);
+  assert.equal(passed.views.exportPDF, action);
+  assert.equal(typeof passed.pdfExport.getRows, "function");
   assert.equal("unusedDependency" in passed.views, false);
   assert.equal(passed.actions.$, action);
   assert.equal(passed.actions.openPayment, action);
@@ -431,6 +462,7 @@ test("Properties reminder model builds the manual reminder details", () => {
     recipientName: "Buyer",
     month: "October 2026",
     asOf: "2026-10-31",
+    template: null,
   });
   assert.deepEqual(JSON.parse(JSON.stringify(smsOptions[0])), {
     ...JSON.parse(JSON.stringify(options[0])),

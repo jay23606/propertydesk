@@ -93,6 +93,40 @@ test("late reminder text link opens the phone composer with the same reminder bo
   assert.equal(lateReminderSms({ phone: "   " }), "");
 });
 
+test("custom email and SMS templates replace supported reminder placeholders", () => {
+  const email = parts(
+    lateReminderMailto({
+      email: "buyer@example.test",
+      address: "10 Oak St",
+      unpaidDue: "$125.00",
+      recipientName: "Jamie",
+      senderName: "Jay",
+      month: "October 2026",
+      template: {
+        subject: "{month}: {address}",
+        body: "Hello {name}: {amount} for {address} ({year}) — {sender}",
+      },
+    }),
+  );
+  assert.equal(email.subject, "October 2026: 10 Oak St");
+  assert.equal(email.body, "Hello Jamie: $125.00 for 10 Oak St (2026) — Jay");
+
+  const sms = new URL(
+    lateReminderSms({
+      phone: "555-0102",
+      address: "10 Oak St",
+      unpaidDue: "$125.00",
+      recipientName: "Jamie",
+      month: "October 2026",
+      template: { body: "Hi {name}, {amount} is due at {address} in {month}." },
+    }),
+  );
+  assert.equal(
+    sms.searchParams.get("body"),
+    "Hi Jamie, $125.00 is due at 10 Oak St in October 2026.",
+  );
+});
+
 test("the app renders the account holder as a mailto link instead of an account-details button", () => {
   const fs = require("node:fs");
   const path = require("node:path");

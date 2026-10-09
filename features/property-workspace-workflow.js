@@ -87,6 +87,7 @@
       openAccountForProperty: portfolio.openAccountForProperty,
       editAccount: portfolio.editAccount,
       propertyRepository: portfolio.propertyRepository,
+      openModal: portfolio.openModal,
       workflows: portfolio.workflows,
     });
   }

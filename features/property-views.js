@@ -8,12 +8,26 @@
     esc,
     portfolioTable,
     portfolioModel,
+    exportPDF = () => {},
+    openEmailTemplateSettings = () => {},
+    openSmsTemplateSettings = () => {},
+    attachTemplateEvents = () => {},
   }) {
     function attachEvents() {
       $("property-search").addEventListener("input", renderProperties);
       $("property-filter").addEventListener("change", renderProperties);
       $("property-holder-filter").addEventListener("change", renderProperties);
       $("show-archived").addEventListener("change", renderProperties);
+      $("properties-export-pdf").addEventListener("click", exportPDF);
+      $("properties-email-template").addEventListener(
+        "click",
+        openEmailTemplateSettings,
+      );
+      $("properties-sms-template").addEventListener(
+        "click",
+        openSmsTemplateSettings,
+      );
+      attachTemplateEvents();
     }
     function renderProperties() {
       const holder = $("property-holder-filter"),

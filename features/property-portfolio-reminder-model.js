@@ -10,6 +10,8 @@
     monthEnd,
     lateReminderMailto,
     lateReminderSms,
+    getEmailTemplate = () => null,
+    getSmsTemplate = () => null,
     money,
   }) {
     function buildReminderDetails(property, account, unpaidDue) {
@@ -29,8 +31,14 @@
         }),
         asOf: monthEnd(),
       };
-      const reminderHref = lateReminderMailto(reminderDetails);
-      const textReminderHref = lateReminderSms(reminderDetails);
+      const reminderHref = lateReminderMailto({
+        ...reminderDetails,
+        template: getEmailTemplate(),
+      });
+      const textReminderHref = lateReminderSms({
+        ...reminderDetails,
+        template: getSmsTemplate(),
+      });
       const recipientHint = account.party_email
         ? "Draft late reminder email"
         : "No email saved; opens an unaddressed late reminder draft";

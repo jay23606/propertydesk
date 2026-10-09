@@ -112,6 +112,8 @@
     <script defer src="features/property-note-maintenance.js"></script>
     <script defer src="features/property-status-maintenance.js"></script>
     <script defer src="features/property-quick-note.js"></script>
+    <script defer src="features/reminder-template-settings.js"></script>
+    <script defer src="features/property-pdf-export.js"></script>
     <script defer src="features/property-portfolio-workflow.js"></script>
     <script defer src="features/transaction-list-filter-model.js"></script>
     <script defer src="features/transaction-display-row-model.js"></script>
@@ -547,6 +549,14 @@
                 </p>
               </div>
               <div class="heading-actions">
+                <button
+                  id="properties-export-pdf"
+                  class="button secondary"
+                  type="button"
+                  title="Print or save the visible Properties list as a one-page PDF"
+                >
+                  ↓ Print / save PDF
+                </button>
                 <button class="button secondary" data-open="property-modal">
                   ＋ Add property</button
                 ><button class="button primary" data-open="account-modal">
@@ -587,8 +597,26 @@
                     </th>
                     <th>UNPAID DUE</th>
                     <th>PROPERTY / ADDRESS</th>
-                    <th aria-sort="ascending" title="Sorted A–Z">EMAIL</th>
-                    <th>SMS</th>
+                    <th>
+                      <button
+                        id="properties-email-template"
+                        class="portfolio-template-action"
+                        type="button"
+                        title="Manage shared email templates"
+                      >
+                        EMAIL
+                      </button>
+                    </th>
+                    <th>
+                      <button
+                        id="properties-sms-template"
+                        class="portfolio-template-action"
+                        type="button"
+                        title="Manage shared SMS templates"
+                      >
+                        SMS
+                      </button>
+                    </th>
                     <th aria-sort="ascending" title="Sorted A–Z">
                       BUYER / TENANT · ACCOUNT
                     </th>
@@ -1241,6 +1269,78 @@
       </section>
     </div>
 
+    <div id="reminder-template-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close></div>
+      <section
+        class="modal-card modal-wide"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reminder-template-title"
+      >
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">SHARED REMINDER SETTINGS</p>
+            <h2 id="reminder-template-title">Email templates</h2>
+          </div>
+          <button class="icon-button" data-close aria-label="Close">×</button>
+        </div>
+        <div class="modal-form">
+          <label
+            >Template to use for all properties<select
+              id="reminder-template-select"
+            ></select
+          ></label>
+          <div class="form-row">
+            <label
+              >Template name<input id="reminder-template-name" maxlength="80"
+            /></label>
+            <div class="template-edit-actions">
+              <button
+                id="reminder-template-add"
+                class="button secondary"
+                type="button"
+              >
+                ＋ Add template
+              </button>
+              <button
+                id="reminder-template-delete"
+                class="button secondary hidden"
+                type="button"
+              >
+                Delete template
+              </button>
+            </div>
+          </div>
+          <label id="reminder-template-subject-row"
+            >Email subject<input id="reminder-template-subject" maxlength="180"
+          /></label>
+          <label
+            >Message<textarea
+              id="reminder-template-body"
+              rows="8"
+              maxlength="2000"
+            ></textarea>
+          </label>
+          <p class="field-hint">
+            Placeholders: {name}, {amount}, {address}, {month}, {year}, and
+            {sender}. Selection and templates are stored in this browser and
+            shared by all properties here.
+          </p>
+          <div class="modal-actions">
+            <button class="button secondary" type="button" data-close>
+              Cancel
+            </button>
+            <button
+              id="reminder-template-save"
+              class="button primary"
+              type="button"
+            >
+              Save template
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
     <div
       id="payment-modal"
       class="modal hidden"
