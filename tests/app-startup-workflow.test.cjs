@@ -26,7 +26,7 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.equal(authContext.fetchAll, fetchAll);
         assert.equal(authContext.toast, toast);
         assert.equal(authContext.paymentNotifications, paymentNotifications);
-        assert.equal(authContext.scopedAuthValue, true);
+        assert.equal("unusedAuthContextValue" in authContext, false);
         assert.deepEqual(authContext.modules, { screens: "auth-screens" });
         assert.deepEqual(Object.keys(authContext).sort(), [
           "$",
@@ -37,7 +37,6 @@ test("app startup composes auth and lifecycle at the original event position", (
           "modules",
           "paymentNotifications",
           "resetWorkspaceState",
-          "scopedAuthValue",
           "setPasswordRecoveryInProgress",
           "setUser",
           "toast",
@@ -102,7 +101,7 @@ test("app startup composes auth and lifecycle at the original event position", (
       fetchAll,
       toast,
       paymentNotifications,
-      scopedAuthValue: true,
+      unusedAuthContextValue: true,
     },
     backendConfigured: true,
     initializeClient,
