@@ -11,7 +11,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   assert.match(
     app,
-    /PropertyDeskImportWorkspaceWorkflow\.create\(\{[\s\S]*?getWorkspaceOwnerId:[\s\S]*?getPendingImport:[\s\S]*?setPendingImport:[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?refreshWorkspace: writeFeedback\.refreshWorkspace,/,
+    /PropertyDeskImportWorkspaceSetup\.create\(\{[\s\S]*?getPendingImport:[\s\S]*?setPendingImport:[\s\S]*?repository: repositories\.imports,[\s\S]*?refreshWorkspace: writeFeedback\.refreshWorkspace,/,
   );
   assert.doesNotMatch(
     app,
@@ -36,6 +36,15 @@ test("app wires CSV import and private backup workspace workflow independently",
     app,
     /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?preview: \{[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
   );
+  const importSetup = fs.readFileSync(
+    path.join(root, "features", "import-workspace-setup.js"),
+    "utf8",
+  );
+  assert.match(importSetup, /workflows\.imports\.create\(/);
+  assert.match(importSetup, /getPendingImport: records\.getPendingImport/);
+  assert.match(importSetup, /setPendingImport: records\.setPendingImport/);
+  assert.match(importSetup, /repository: services\.repository/);
+  assert.doesNotMatch(importSetup, /\bstate\b/);
   const importWorkspace = fs.readFileSync(
     path.join(root, "features", "import-workspace-workflow.js"),
     "utf8",
@@ -79,6 +88,7 @@ test("app wires CSV import and private backup workspace workflow independently",
     "features/imports.js",
     "features/import-validation-workflow.js",
     "features/import-workspace-workflow.js",
+    "features/import-workspace-setup.js",
     "features/transaction-import-feature.js",
     "features/backup-export.js",
     "features/backup-workspace-workflow.js",
