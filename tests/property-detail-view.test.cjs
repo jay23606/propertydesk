@@ -177,7 +177,10 @@ test("opening a property delegates modal markup and preserves scoped details", (
     });
   const feature = context.window.PropertyDeskPropertyDetails.create({
     $,
-    state,
+    beginAuditRequest: () => state.auditRequestId++,
+    setSelectedPropertyId: (id) => {
+      state.selectedPropertyId = id;
+    },
     buildPropertyDetailData,
     openModal: (id) => opened.push(id),
     renderPropertyActivity: (...args) => {
@@ -193,6 +196,8 @@ test("opening a property delegates modal markup and preserves scoped details", (
 
   feature.openPropertyDetails(property.id);
 
+  assert.equal(state.auditRequestId, 1);
+  assert.equal(state.selectedPropertyId, property.id);
   assert.equal(activityCalls.length, 1);
   assert.equal(activityCalls[0][0], property.id);
   assert.deepEqual(activityCalls[0][1], [account]);

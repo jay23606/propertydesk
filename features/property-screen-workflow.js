@@ -11,7 +11,8 @@
   }) {
     const details = workflows.content.create({
       $: content.$,
-      state: content.state,
+      beginAuditRequest: content.beginAuditRequest,
+      setSelectedPropertyId: content.setSelectedPropertyId,
       getPayments: content.getPayments,
       getExpenses: content.getExpenses,
       getProperties: content.getProperties,

@@ -223,7 +223,8 @@ test("property detail content workflow connects activity summaries to property r
   );
   const detailsDependencies = {
     $() {},
-    state: {},
+    beginAuditRequest() {},
+    setSelectedPropertyId() {},
     getPayments() {},
     getExpenses() {},
     getProperties() {},
@@ -297,6 +298,14 @@ test("property detail content workflow connects activity summaries to property r
   );
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal("unusedDependency" in detailContext, false);
+  assert.equal(
+    detailContext.beginAuditRequest,
+    detailsDependencies.beginAuditRequest,
+  );
+  assert.equal(
+    detailContext.setSelectedPropertyId,
+    detailsDependencies.setSelectedPropertyId,
+  );
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
   assert.equal(modelContext.getProperties, detailsDependencies.getProperties);
   assert.equal(modelContext.getAccounts, detailsDependencies.getAccounts);

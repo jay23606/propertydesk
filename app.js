@@ -627,7 +627,10 @@
     detail: {
       content: {
         $,
-        state,
+        beginAuditRequest: () => ++state.auditRequestId,
+        setSelectedPropertyId: (id) => {
+          state.selectedPropertyId = id;
+        },
         getPayments: () => state.payments,
         getExpenses: () => state.expenses,
         getProperties: () => state.properties,

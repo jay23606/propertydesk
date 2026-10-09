@@ -4,14 +4,15 @@
 
   function createPropertyDetails({
     $,
-    state,
+    beginAuditRequest,
+    setSelectedPropertyId,
     openModal,
     buildPropertyDetailData,
     renderPropertyActivity,
     propertyDetailsHTML,
   }) {
     function openPropertyDetails(id) {
-      state.auditRequestId++;
+      beginAuditRequest();
       const detailData = buildPropertyDetailData(id);
       if (!detailData) return;
       const {
@@ -21,7 +22,7 @@
         workspaceMembers,
         propertyHolders,
       } = detailData;
-      state.selectedPropertyId = id;
+      setSelectedPropertyId(id);
       const activity = renderPropertyActivity(id, accounts);
       $("property-detail-title").textContent = property.name;
       $("property-detail-address").textContent = detailData.propertyAddressText;

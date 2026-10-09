@@ -9,7 +9,8 @@ test("property screen workflow passes detail actions to management and returns b
   const openPropertyDetails = () => "details";
   const content = {
     $() {},
-    state: {},
+    beginAuditRequest() {},
+    setSelectedPropertyId() {},
     getPayments() {},
     getExpenses() {},
     getProperties() {},
@@ -140,7 +141,11 @@ test("property screen workflow passes detail actions to management and returns b
   });
 
   assert.equal(calls[0][0], "content");
-  assert.equal(calls[0][1].state, content.state);
+  assert.equal(calls[0][1].beginAuditRequest, content.beginAuditRequest);
+  assert.equal(
+    calls[0][1].setSelectedPropertyId,
+    content.setSelectedPropertyId,
+  );
   assert.equal(calls[0][1].getPayments, content.getPayments);
   assert.equal(calls[0][1].getExpenses, content.getExpenses);
   assert.equal(calls[0][1].getProperties, content.getProperties);
@@ -155,6 +160,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "$",
     "accountBalance",
+    "beginAuditRequest",
     "esc",
     "fmtDate",
     "getAccounts",
@@ -170,7 +176,7 @@ test("property screen workflow passes detail actions to management and returns b
     "paymentFrequencyLabel",
     "prettyType",
     "propertyAddress",
-    "state",
+    "setSelectedPropertyId",
     "sumIncome",
     "sumOperatingExpenses",
     "workflows",

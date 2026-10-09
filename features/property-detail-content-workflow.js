@@ -4,7 +4,8 @@
 
   function create({
     $,
-    state,
+    beginAuditRequest,
+    setSelectedPropertyId,
     getPayments,
     getExpenses,
     getProperties,
@@ -63,7 +64,8 @@
     });
     const { openPropertyDetails } = workflows.details.create({
       $,
-      state,
+      beginAuditRequest,
+      setSelectedPropertyId,
       money,
       fmtDate,
       esc,
