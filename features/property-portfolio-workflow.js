@@ -46,7 +46,8 @@
       onChange: () => propertyViews.renderProperties(),
     });
     const reminderModel = workflows.reminderModel.create({
-      state,
+      getSenderName: () =>
+        state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
       propertyAddress,
       monthStart,
       dateOnly,
@@ -58,7 +59,7 @@
       money,
     });
     const accountRowModel = workflows.accountRowModel.create({
-      state,
+      getPayments: () => state.payments,
       monthlyScheduledEstimate,
       summarizeAccount,
       amountDueSince,
@@ -68,12 +69,13 @@
       reminderModel,
     });
     const filterModel = workflows.filterModel.create({
-      state,
+      getPropertyHolders: () => state.propertyHolders,
       propertyAddress,
       isActiveAccount,
     });
     const portfolioModel = workflows.portfolioModel.create({
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
       accountRowModel,
       groupAccountsByProperty,
       streetAddress,

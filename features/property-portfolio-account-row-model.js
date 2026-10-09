@@ -3,7 +3,7 @@
   "use strict";
 
   function createAccountRowModel({
-    state,
+    getPayments,
     monthlyScheduledEstimate,
     summarizeAccount,
     amountDueSince,
@@ -26,7 +26,7 @@
     function buildAccountRow(property, account, street) {
       const { unpaidDue, loanBalance, hasLoanBalance } = summarizeAccount(
         account,
-        state.payments,
+        getPayments(),
       );
       const scheduleAccount = scheduledAccount(account);
       const scheduledPayment = monthlyScheduledEstimate([scheduleAccount]);
@@ -37,7 +37,7 @@
         amountDueSince([scheduleAccount], [], monthStart(), monthEnd()) ||
         Number(account.payment_amount || 0);
       const paymentStatus = paymentStatusInMonth(
-        state.payments,
+        getPayments(),
         account.id,
         monthStart(),
         scheduledThisMonth,

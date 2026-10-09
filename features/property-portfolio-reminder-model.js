@@ -3,7 +3,7 @@
   "use strict";
 
   function createPropertyPortfolioReminderModel({
-    state,
+    getSenderName = () => "PropertyDesk",
     propertyAddress,
     monthStart,
     dateOnly,
@@ -22,8 +22,7 @@
         address: propertyAddress(property),
         subjectAddress: property.address,
         unpaidDue: money(unpaidDue),
-        senderName:
-          state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
+        senderName: getSenderName(),
         recipientName: partyName,
         month: dateOnly(monthStart()).toLocaleDateString(undefined, {
           month: "long",

@@ -317,7 +317,7 @@ test("Properties account-row model derives balances and reminder details", () =>
   let dueAccountKeys;
   const reminderModel =
     context.window.PropertyDeskPropertyPortfolioReminderModel.create({
-      state,
+      getSenderName: () => state.user.user_metadata.display_name,
       propertyAddress: (property) => property.address,
       monthStart: () => "2026-10-01",
       dateOnly: () => new Date("2026-10-01T12:00:00"),
@@ -331,7 +331,7 @@ test("Properties account-row model derives balances and reminder details", () =>
     });
   const model =
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
-      state,
+      getPayments: () => state.payments,
       monthlyScheduledEstimate: ([account]) => {
         scheduledAccountKeys = Object.keys(account).sort();
         return account.payment_amount;
@@ -429,7 +429,7 @@ test("Properties reminder model builds the manual reminder details", () => {
   const smsOptions = [];
   const model =
     context.window.PropertyDeskPropertyPortfolioReminderModel.create({
-      state: { user: { user_metadata: { display_name: " Owner " } } },
+      getSenderName: () => "Owner",
       propertyAddress: (property) => property.address,
       monthStart: () => "2026-10-01",
       dateOnly: () => new Date("2026-10-01T12:00:00"),
@@ -634,7 +634,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     });
   const accountRowModel =
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({
-      state,
+      getPayments: () => state.payments,
       monthlyScheduledEstimate: dependencies.monthlyScheduledEstimate,
       summarizeAccount: dependencies.summarizeAccount,
       amountDueSince: dependencies.amountDueSince,
@@ -643,7 +643,7 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
       paymentStatusInMonth: dependencies.paymentStatusInMonth,
       reminderModel:
         context.window.PropertyDeskPropertyPortfolioReminderModel.create({
-          state,
+          getSenderName: () => "PropertyDesk",
           propertyAddress: dependencies.propertyAddress,
           monthStart: dependencies.monthStart,
           dateOnly: dependencies.dateOnly,
@@ -655,14 +655,15 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     });
   const filterModel =
     context.window.PropertyDeskPropertyPortfolioFilterModel.create({
-      state,
+      getPropertyHolders: () => state.propertyHolders,
       isActiveAccount:
         context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
       propertyAddress: dependencies.propertyAddress,
     });
   const portfolioModel =
     context.window.PropertyDeskPropertyPortfolioModel.create({
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
       accountRowModel,
       groupAccountsByProperty:
         context.window.PropertyDeskPropertyAccountIndex.groupByProperty,

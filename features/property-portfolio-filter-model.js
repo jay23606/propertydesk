@@ -3,13 +3,13 @@
   "use strict";
 
   function createPropertyPortfolioFilterModel({
-    state,
+    getPropertyHolders,
     propertyAddress,
     isActiveAccount,
   }) {
     function holdersByProperty() {
       const holdersByProperty = new Map();
-      for (const row of state.propertyHolders) {
+      for (const row of getPropertyHolders()) {
         const holders = holdersByProperty.get(row.property_id) || new Set();
         holders.add(row.member_user_id);
         holdersByProperty.set(row.property_id, holders);

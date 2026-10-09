@@ -3,7 +3,8 @@
   "use strict";
 
   function createPropertyPortfolioModel({
-    state,
+    getProperties,
+    getAccounts,
     accountRowModel,
     groupAccountsByProperty,
     streetAddress,
@@ -51,11 +52,11 @@
     }
 
     function buildRows({ query, type, holderId, showArchived }) {
-      const accountsByProperty = groupAccountsByProperty(state.accounts);
+      const accountsByProperty = groupAccountsByProperty(getAccounts());
       const assignedHolders = filterModel.holdersByProperty();
       const rows = [];
 
-      for (const property of state.properties) {
+      for (const property of getProperties()) {
         rows.push(
           ...rowsForProperty(
             property,

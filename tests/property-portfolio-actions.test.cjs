@@ -85,13 +85,14 @@ test("property portfolio indexes accounts and holders once per grid build", () =
   );
   const filterModel =
     context.window.PropertyDeskPropertyPortfolioFilterModel.create({
-      state,
+      getPropertyHolders: () => state.propertyHolders,
       isActiveAccount:
         context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
       propertyAddress: (property) => property.address,
     });
   const model = context.window.PropertyDeskPropertyPortfolioModel.create({
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
     groupAccountsByProperty:
       context.window.PropertyDeskPropertyAccountIndex.groupByProperty,
     accountRowModel: {
