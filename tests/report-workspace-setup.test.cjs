@@ -41,8 +41,11 @@ test("report setup wires read-only records and export services explicitly", () =
     "prettyType",
   ];
   const records = Object.fromEntries(recordKeys.map((key) => [key, () => key]));
+  records.unusedRecordValue = true;
   const ui = Object.fromEntries(uiKeys.map((key) => [key, () => key]));
+  ui.unusedUiValue = true;
   const services = { downloadBlob: { key: "download" } };
+  services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     ["report", "exporter", "model", "views"].map((key) => [key, { key }]),
   );
@@ -67,5 +70,29 @@ test("report setup wires read-only records and export services explicitly", () =
   assert.equal(received.workflows.exporter, workflows.exporter);
   assert.equal(received.workflows.model, workflows.model);
   assert.equal(received.workflows.views, workflows.views);
+  assert.deepEqual(Object.keys(received.rendering).sort(), [
+    "$",
+    "accountBalance",
+    "dateOnly",
+    "esc",
+    "fmtDateTime",
+    "getAccounts",
+    "getExpenses",
+    "getImportBatches",
+    "getPayments",
+    "money",
+    "now",
+    "sumIncome",
+    "sumOperatingExpenses",
+  ]);
+  assert.deepEqual(Object.keys(received.exporting).sort(), [
+    "$",
+    "accountBalance",
+    "downloadBlob",
+    "getAccounts",
+    "getProperties",
+    "prettyType",
+    "todayIso",
+  ]);
   assert.doesNotMatch(source, /\bstate\b/);
 });

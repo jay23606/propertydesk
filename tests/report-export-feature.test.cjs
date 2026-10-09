@@ -93,7 +93,7 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   assert.doesNotMatch(setup, /\bstate\b/);
   assert.match(
     workspace,
-    /workflows\.report\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?workflows\.exporter\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,
+    /workflows\.report\.create\(\{\s*\.\.\.rendering,[\s\S]*?workflows: \{ model: workflows\.model, views: workflows\.views \},[\s\S]*?workflows\.exporter\.create\(\{\s*\.\.\.exporting,/,
   );
 });
 
@@ -179,6 +179,7 @@ test("report workspace preserves rendering and export APIs", () => {
     "now",
     "sumIncome",
     "sumOperatingExpenses",
+    "unusedRenderingValue",
     "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.exporting).sort(), [
@@ -189,6 +190,7 @@ test("report workspace preserves rendering and export APIs", () => {
     "getProperties",
     "prettyType",
     "todayIso",
+    "unusedExportingValue",
   ]);
   assert.doesNotMatch(
     fs.readFileSync(
