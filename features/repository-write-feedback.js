@@ -59,24 +59,26 @@
     return true;
   }
 
-  const reconciliation = window.PropertyDeskWorkspaceWriteReconciliation.create(
-    {
+  function create({ modules }) {
+    const reconciliation = modules.reconciliation.create({
       run,
       refreshWorkspace,
-    },
-  );
-  const recordWrites = window.PropertyDeskWorkspaceRecordWriteWorkflow.create({
-    run,
-    reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
-    finishWorkspaceWrite: reconciliation.finishWorkspaceWrite,
-  });
+    });
+    const recordWrites = modules.recordWrites.create({
+      run,
+      reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
+      finishWorkspaceWrite: reconciliation.finishWorkspaceWrite,
+    });
 
-  window.PropertyDeskRepositoryWriteFeedback = Object.freeze({
-    run,
-    refreshWorkspace,
-    reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
-    runAndRefreshWorkspaceChange: reconciliation.runAndRefreshWorkspaceChange,
-    saveWorkspaceRecord: recordWrites.saveWorkspaceRecord,
-    saveAndRefreshWorkspaceRecord: recordWrites.saveAndRefreshWorkspaceRecord,
-  });
+    return Object.freeze({
+      run,
+      refreshWorkspace,
+      reconcileWorkspaceChange: reconciliation.reconcileWorkspaceChange,
+      runAndRefreshWorkspaceChange: reconciliation.runAndRefreshWorkspaceChange,
+      saveWorkspaceRecord: recordWrites.saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord: recordWrites.saveAndRefreshWorkspaceRecord,
+    });
+  }
+
+  window.PropertyDeskRepositoryWriteFeedback = Object.freeze({ create });
 })();

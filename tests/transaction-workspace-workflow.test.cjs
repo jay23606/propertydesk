@@ -118,14 +118,8 @@ test("transaction workspace connects maintenance to the records workflow", () =>
 test("transaction workspace connects maintenance and records at the app root", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
-  assert.match(
-    app,
-    /correction: \{[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback,/,
-  );
-  assert.match(
-    app,
-    /voiding: \{[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback,/,
-  );
+  assert.match(app, /correction: \{[\s\S]*?writeFeedback,/);
+  assert.match(app, /voiding: \{[\s\S]*?writeFeedback,/);
   assert.match(
     app,
     /workflows: \{\s*maintenance: window\.PropertyDeskTransactionMaintenanceWorkflow,\s*records: window\.PropertyDeskTransactionRecordsWorkflow,/,

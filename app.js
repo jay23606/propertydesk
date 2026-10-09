@@ -3,6 +3,12 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
+    modules: {
+      reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
+      recordWrites: window.PropertyDeskWorkspaceRecordWriteWorkflow,
+    },
+  });
   let appLifecycle;
   function render() {
     appLifecycle.render();
@@ -203,7 +209,7 @@
         money,
       },
       memberRepository: repositories.workspaceMembers,
-      writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+      writeFeedback,
       authClient,
     },
     navigation: {
@@ -250,7 +256,7 @@
         closeModal,
         fetchAll,
         repository: repositories.properties,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         selectRecordWriteCompletion:
           window.PropertyDeskWorkspaceRecordWriteWorkflow
             .selectRecordWriteCompletion,
@@ -271,7 +277,7 @@
           window.PropertyDeskEmailAddressUtils,
         ),
         repository: repositories.accounts,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         selectRecordWriteCompletion:
           window.PropertyDeskWorkspaceRecordWriteWorkflow
             .selectRecordWriteCompletion,
@@ -292,7 +298,7 @@
           EventClass: Event,
           OptionClass: Option,
           repository: repositories.transactions,
-          writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+          writeFeedback,
           findCorrectionTarget:
             window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
         },
@@ -304,7 +310,7 @@
           promptAction: (message, initialValue) =>
             window.prompt(message, initialValue),
           repository: repositories.transactions,
-          writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+          writeFeedback,
           resolveVoidTarget:
             window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
           buildVoidPayload:
@@ -363,7 +369,7 @@
         openModal,
         transactionRepository: repositories.transactions,
         transactionPayloads: window.PropertyDeskTransactionPayloads,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         selectRecordWriteCompletion:
           window.PropertyDeskWorkspaceRecordWriteWorkflow
             .selectRecordWriteCompletion,
@@ -451,7 +457,7 @@
         fetchAll,
         moneyInput,
         repository: repositories.deposits,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
         resolveAdjustmentType:
@@ -493,7 +499,7 @@
         editAccount: propertyAccountForms.editAccount,
         openPayment,
         repository: repositories.accounts,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         confirmAction: (message) => window.confirm(message),
       },
     },
@@ -539,7 +545,7 @@
         fetchAll,
         todayIso,
         propertyRepository: repositories.properties,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         closeModal,
         editAccount: propertyAccountForms.editAccount,
         openAccountDetails,
@@ -553,7 +559,7 @@
         toast,
         fetchAll,
         repository: repositories.propertyHolders,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
       },
       documents: {
         workflow: window.PropertyDeskPropertyDocumentWorkflow,
@@ -564,7 +570,7 @@
         toast,
         fetchAll,
         documentRepository: repositories.documents,
-        writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        writeFeedback,
         modules: {
           upload: window.PropertyDeskDocumentUpload,
           uploadMaintenance: window.PropertyDeskDocumentUploadMaintenance,
@@ -656,7 +662,7 @@
       paymentStatusInMonth,
       toast,
       fetchAll,
-      writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+      writeFeedback,
       openPayment,
       propertyRepository: repositories.properties,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,
@@ -691,7 +697,7 @@
     fetchAll,
     toast,
     repository: repositories.imports,
-    writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback,
     modules: {
       importRows: window.PropertyDeskImportRows,
       csvParser: window.PropertyDeskCsvParser,

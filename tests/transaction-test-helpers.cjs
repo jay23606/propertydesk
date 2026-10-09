@@ -27,8 +27,19 @@ function transactionVoidModelOptions(context) {
       context,
     );
   }
+  const feedback = context.window.PropertyDeskRepositoryWriteFeedback;
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback:
+      typeof feedback?.create === "function"
+        ? feedback.create({
+            modules: {
+              reconciliation:
+                context.window.PropertyDeskWorkspaceWriteReconciliation,
+              recordWrites:
+                context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+            },
+          })
+        : feedback || {},
     resolveVoidTarget:
       context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
     buildVoidPayload:
@@ -37,8 +48,19 @@ function transactionVoidModelOptions(context) {
 }
 
 function transactionWriteFeedbackOptions(context) {
+  const feedback = context.window.PropertyDeskRepositoryWriteFeedback;
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback:
+      typeof feedback?.create === "function"
+        ? feedback.create({
+            modules: {
+              reconciliation:
+                context.window.PropertyDeskWorkspaceWriteReconciliation,
+              recordWrites:
+                context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+            },
+          })
+        : feedback || {},
   };
 }
 

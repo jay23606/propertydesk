@@ -27,7 +27,12 @@ function loadCommitFeature() {
       reporting: context.window.PropertyDeskImportCommitReporting,
     },
     repository: context.window.PropertyDeskImportRepository,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
   };
 }
 

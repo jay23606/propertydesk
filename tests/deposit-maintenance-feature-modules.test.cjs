@@ -151,7 +151,12 @@ test("deposit maintenance retains adjustment audit details", async () => {
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => {
@@ -214,7 +219,12 @@ test("deposit maintenance only proceeds with a ready audited adjustment", async 
   const messages = [];
   let inserts = 0;
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -293,7 +303,12 @@ test("deposit maintenance reconciles an adjustment after a lost response", async
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     todayIso: () => "2026-10-08",
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => {
@@ -356,7 +371,12 @@ test("deposit maintenance asks to check the refreshed ledger before retrying", a
   );
   const events = [];
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [{ id: "rental-1", account_type: "rental" }],
@@ -456,7 +476,12 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
   };
   const maintenance = context.window.PropertyDeskDepositMaintenance.create({
     state,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     todayIso: () => "2026-10-04",
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),

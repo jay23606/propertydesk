@@ -36,6 +36,17 @@ function loadRepositoryWriteFeedback(context) {
   );
 }
 
+function createRepositoryWriteFeedback(context) {
+  const feedback = context.window.PropertyDeskRepositoryWriteFeedback;
+  if (typeof feedback?.create !== "function") return feedback;
+  return feedback.create({
+    modules: {
+      reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+      recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+    },
+  });
+}
+
 function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
@@ -103,7 +114,7 @@ function loadWorkspaceFeatures(context) {
     );
   }
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: createRepositoryWriteFeedback(context),
     profile: context.window.PropertyDeskWorkspaceProfileWorkflow,
     memberView: context.window.PropertyDeskWorkspaceMembersView,
     memberMaintenance: context.window.PropertyDeskWorkspaceMemberMaintenance,
@@ -149,7 +160,7 @@ function ledgerEntryDependencies(context, state = {}) {
       ? repositoryFactory.create({ getClient: () => state.client })
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: createRepositoryWriteFeedback(context),
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
@@ -170,7 +181,7 @@ function ledgerEntryDependencies(context, state = {}) {
 
 function workspaceRecordWriteDependencies(context) {
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: createRepositoryWriteFeedback(context),
     recordSaveMaintenance:
       context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
     selectRecordWriteCompletion:
@@ -181,7 +192,7 @@ function workspaceRecordWriteDependencies(context) {
 
 function accountFormDependencies(context, state = {}) {
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: createRepositoryWriteFeedback(context),
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
@@ -207,7 +218,7 @@ function accountFormModel(context) {
 
 function propertyFormDependencies(context, state = {}) {
   return {
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: createRepositoryWriteFeedback(context),
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
@@ -355,6 +366,7 @@ function formElements(values = {}) {
 
 module.exports = {
   loadRepositoryWriteFeedback,
+  createRepositoryWriteFeedback,
   loadAuthFeatures,
   authFeatureModules,
   createAuthClient,

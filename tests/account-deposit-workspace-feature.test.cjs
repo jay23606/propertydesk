@@ -327,11 +327,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.match(depositWorkflow, /writeFeedback,/);
   assert.match(
     app,
-    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback/,
+    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?writeFeedback,/,
   );
   assert.match(
     app,
-    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?writeFeedback: window\.PropertyDeskRepositoryWriteFeedback/,
+    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?writeFeedback,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskRepositoryWriteFeedback\.create\(\{[\s\S]*?reconciliation: window\.PropertyDeskWorkspaceWriteReconciliation,[\s\S]*?recordWrites: window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
   );
   assert.match(app, /repository: repositories\.transactions/);
   assert.match(

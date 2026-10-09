@@ -154,7 +154,12 @@ test("profile settings save the display label and refresh the shared shell", asy
       updateUser: (...args) => state.client.auth.updateUser(...args),
     },
     toast: (message) => messages.push(message),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     updateGreeting: () => calls.push("refresh-greeting"),
   });
   const view = context.window.PropertyDeskProfileSettingsView.create({
@@ -232,7 +237,12 @@ test("profile settings confirm a lost update response from the authenticated use
       },
     },
     toast: (message) => messages.push(message),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     updateGreeting: () => calls.push("greeting"),
   });
 
@@ -298,7 +308,12 @@ test("profile settings show refreshed server state when an uncertain update did 
       getUser: async () => ({ data: { user: actualUser }, error: null }),
     },
     toast: (message) => messages.push(message),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     updateGreeting() {},
   });
 

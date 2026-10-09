@@ -85,7 +85,12 @@ test("adding a workspace member clears the address only after successful refresh
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state,
@@ -137,7 +142,12 @@ test("adding a workspace member keeps the address when refresh fails", async () 
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     view: context.window.PropertyDeskWorkspaceMembersView.create({
       $: element,
       state: {
@@ -271,7 +281,12 @@ test("workspace member actions reconcile lost responses against refreshed member
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
     state,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       calls.push("refresh");

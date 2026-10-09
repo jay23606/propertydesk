@@ -62,7 +62,12 @@ function loadTransactionInserts(client, messages = [], options = {}) {
     state: options.state,
     fetchAll: options.fetchAll,
     toast: (message) => messages.push(message),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         .selectRecordWriteCompletion,

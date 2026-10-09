@@ -32,7 +32,12 @@ function createDocuments(context, options) {
       context.window.PropertyDeskDocumentRepository.create({
         getClient: () => options.state.client,
       }),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+      modules: {
+        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+    }),
     modules: {
       upload: context.window.PropertyDeskDocumentUpload,
       uploadMaintenance: context.window.PropertyDeskDocumentUploadMaintenance,

@@ -37,7 +37,12 @@ function createFeedback() {
     ),
     context,
   );
-  return context.window.PropertyDeskRepositoryWriteFeedback;
+  return context.window.PropertyDeskRepositoryWriteFeedback.create({
+    modules: {
+      reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+      recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+    },
+  });
 }
 
 test("repository write feedback returns success without notifying", async () => {
