@@ -677,7 +677,10 @@
       },
       management: {
         $,
-        state,
+        getSelectedPropertyId: () => state.selectedPropertyId,
+        getProperties: () => state.properties,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getAccounts: () => state.accounts,
         toast,
         fetchAll,
         todayIso,

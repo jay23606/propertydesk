@@ -35,7 +35,10 @@
     });
     const actions = workflows.management.create({
       $: management.$,
-      state: management.state,
+      getSelectedPropertyId: management.getSelectedPropertyId,
+      getProperties: management.getProperties,
+      getWorkspaceOwnerId: management.getWorkspaceOwnerId,
+      getAccounts: management.getAccounts,
       toast: management.toast,
       fetchAll: management.fetchAll,
       todayIso: management.todayIso,

@@ -32,6 +32,19 @@ test("property screen workflow passes detail actions to management and returns b
     unusedContentValue: true,
   };
   const management = {
+    $() {},
+    getSelectedPropertyId() {},
+    getProperties() {},
+    getWorkspaceOwnerId() {},
+    getAccounts() {},
+    fetchAll() {},
+    todayIso() {},
+    editAccount() {},
+    openAccountDetails() {},
+    openPayment() {},
+    openExpense() {},
+    openAccountForProperty() {},
+    propertyRepository: { kind: "property-repository" },
     closeModal() {},
     toast() {},
     saveAndRefreshWorkspaceRecord() {},
@@ -182,6 +195,14 @@ test("property screen workflow passes detail actions to management and returns b
     "workflows",
   ]);
   assert.equal(calls[1][0], "management");
+  assert.equal(
+    calls[1][1].getSelectedPropertyId,
+    management.getSelectedPropertyId,
+  );
+  assert.equal(calls[1][1].getProperties, management.getProperties);
+  assert.equal(calls[1][1].getWorkspaceOwnerId, management.getWorkspaceOwnerId);
+  assert.equal(calls[1][1].getAccounts, management.getAccounts);
+  assert.equal("state" in calls[1][1], false);
   assert.equal(calls[1][1].closeModal, management.closeModal);
   assert.equal(calls[1][1].toast, management.toast);
   assert.equal(

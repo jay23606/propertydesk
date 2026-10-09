@@ -4,7 +4,10 @@
 
   function createPropertyDetailManagementWorkflow({
     $,
-    state,
+    getSelectedPropertyId,
+    getProperties,
+    getWorkspaceOwnerId,
+    getAccounts,
     toast,
     fetchAll,
     todayIso,
@@ -20,12 +23,12 @@
     workflows,
   }) {
     const { toggleArchiveProperty } = workflows.archive.create({
-      getSelectedPropertyId: () => state.selectedPropertyId,
+      getSelectedPropertyId,
       getProperty: (propertyId) =>
-        state.properties.find((property) => property.id === propertyId) || null,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getProperties().find((property) => property.id === propertyId) || null,
+      getWorkspaceOwnerId,
       getCollection: (collection) =>
-        collection === "properties" ? state.properties : null,
+        collection === "properties" ? getProperties() : null,
       toast,
       fetchAll,
       todayIso,
@@ -39,7 +42,7 @@
       workflows.detailEvents.create({
         $,
         getAccount: (accountId) =>
-          state.accounts.find((account) => account.id === accountId) || null,
+          getAccounts().find((account) => account.id === accountId) || null,
         closeModal,
         editAccount,
         openAccountDetails,
@@ -47,7 +50,7 @@
     const { attachEvents: attachPropertyQuickActionEvents } =
       workflows.quickActions.create({
         $,
-        getSelectedPropertyId: () => state.selectedPropertyId,
+        getSelectedPropertyId,
         closeModal,
         openPayment,
         openExpense,
