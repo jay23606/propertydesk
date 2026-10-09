@@ -279,10 +279,9 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     ),
     "utf8",
   );
-  assert.match(
-    accountWorkspaceWorkflow,
-    /contentWorkflow\.create\(\{\s*\.\.\.content,[\s\S]*?actionWorkflow\.create\(\{\s*\.\.\.actions,\s*workflows: actionWorkflows,/,
-  );
+  assert.match(accountWorkspaceWorkflow, /\$:\s*content\.\$/);
+  assert.match(accountWorkspaceWorkflow, /workflows: actionWorkflows,/);
+  assert.doesNotMatch(accountWorkspaceWorkflow, /\.\.\.content|\.\.\.actions/);
   assert.doesNotMatch(
     accountWorkspaceWorkflow,
     /window\.PropertyDeskAccountDetailContentWorkflow\.create/,
