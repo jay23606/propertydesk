@@ -40,10 +40,21 @@ test("app wires CSV import and private backup workspace workflow independently",
     path.join(root, "features", "import-workspace-workflow.js"),
     "utf8",
   );
-  assert.match(importWorkspace, /workflows\.validationApi\.create\(/);
+  assert.match(
+    importWorkspace,
+    /validationWorkflow\.create\(\{ workflows, modules \}\)/,
+  );
+  assert.doesNotMatch(
+    importWorkspace,
+    /workflows\.(?:csvValueUtils|accountImportTerms|paymentImportAllocation|validationApi)\.create\(/,
+  );
   assert.match(importWorkspace, /workflows\.feature\.create\(/);
-  assert.match(importWorkspace, /paymentAllocation: paymentImportAllocation/);
   assert.match(importWorkspace, /validators,/);
+  const importValidation = fs.readFileSync(
+    path.join(root, "features", "import-validation-workflow.js"),
+    "utf8",
+  );
+  assert.match(importValidation, /paymentAllocation: paymentImportAllocation/);
   assert.match(
     app,
     /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,\s*table: window\.PropertyDeskImportPreviewTable,/,
@@ -66,6 +77,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   for (const script of [
     "features/imports.js",
+    "features/import-validation-workflow.js",
     "features/import-workspace-workflow.js",
     "features/transaction-import-feature.js",
     "features/backup-export.js",

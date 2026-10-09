@@ -731,6 +731,7 @@
       validationApi: window.PropertyDeskImportValidationApi,
       feature: window.PropertyDeskImportFeature,
     },
+    validationWorkflow: window.PropertyDeskImportValidationWorkflow,
     modules: {
       currencyUtils: window.PropertyDeskCurrencyUtils,
       displayUtils: window.PropertyDeskDisplayUtils,

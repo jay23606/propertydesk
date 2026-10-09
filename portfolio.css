@@ -24,11 +24,8 @@
 @media (max-width: 760px) {
   .portfolio-table {
     box-sizing: border-box;
-    position: relative;
-    left: 50%;
-    width: 100vw;
-    margin: 0;
-    transform: translateX(-50%);
+    width: calc(100% + 30px);
+    margin-left: -15px;
     border-radius: 0;
     border-inline: 0;
   }
@@ -54,9 +51,9 @@
   .portfolio-table td:nth-child(1) {
     position: sticky;
     left: 0;
-    width: 18vw;
-    min-width: 18vw;
-    max-width: 18vw;
+    width: 16vw;
+    min-width: 16vw;
+    max-width: 16vw;
     z-index: 2;
     background: #fff;
     text-align: center;
@@ -104,24 +101,24 @@
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 34vw;
-    min-width: 34vw;
-    max-width: 34vw;
+    width: 38vw;
+    min-width: 38vw;
+    max-width: 38vw;
     overflow-wrap: anywhere;
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4),
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    width: 7vw;
-    min-width: 7vw;
-    max-width: 7vw;
+    width: 5.5vw;
+    min-width: 5.5vw;
+    max-width: 5.5vw;
   }
   .portfolio-table th:nth-child(6),
   .portfolio-table td:nth-child(6) {
-    width: 34vw;
-    min-width: 34vw;
-    max-width: 34vw;
+    width: 35vw;
+    min-width: 35vw;
+    max-width: 35vw;
     overflow-wrap: anywhere;
     white-space: normal;
   }
@@ -136,9 +133,9 @@
     display: none;
   }
   .portfolio-table td.portfolio-contact-action {
-    width: 7vw;
-    min-width: 7vw;
-    max-width: 7vw;
+    width: 5.5vw;
+    min-width: 5.5vw;
+    max-width: 5.5vw;
     padding-right: 0;
     padding-left: 0;
   }
@@ -151,9 +148,9 @@
     max-width: 41vw;
   }
   .portfolio-table .portfolio-icon-action {
-    width: 24px;
-    min-width: 24px;
-    height: 24px;
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
   }
   .portfolio-table .portfolio-payment-action {
     width: 16px;
@@ -171,29 +168,29 @@
 @media (max-width: 360px) {
   .portfolio-table th:nth-child(1),
   .portfolio-table td:nth-child(1) {
-    width: 20vw;
-    min-width: 20vw;
-    max-width: 20vw;
+    width: 16vw;
+    min-width: 16vw;
+    max-width: 16vw;
   }
   .portfolio-table th:nth-child(3),
   .portfolio-table td:nth-child(3) {
-    width: 34vw;
-    min-width: 34vw;
-    max-width: 34vw;
+    width: 38vw;
+    min-width: 38vw;
+    max-width: 38vw;
   }
   .portfolio-table th:nth-child(4),
   .portfolio-table td:nth-child(4),
   .portfolio-table th:nth-child(5),
   .portfolio-table td:nth-child(5) {
-    width: 7vw;
-    min-width: 7vw;
-    max-width: 7vw;
+    width: 6.5vw;
+    min-width: 6.5vw;
+    max-width: 6.5vw;
   }
   .portfolio-table th:nth-child(6),
   .portfolio-table td:nth-child(6) {
-    width: 32vw;
-    min-width: 32vw;
-    max-width: 32vw;
+    width: 33vw;
+    min-width: 33vw;
+    max-width: 33vw;
   }
   .portfolio-table .portfolio-icon-action {
     width: 16px;

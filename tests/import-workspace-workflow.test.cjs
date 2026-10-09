@@ -4,63 +4,10 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("import workspace builds validation rules before composing import actions", () => {
+test("import workspace supplies configured validators to the import feature", () => {
   const calls = [];
-  const values = Object.fromEntries(
-    ["csv", "terms", "allocation", "validators", "feature"].map((key) => [
-      key,
-      { key },
-    ]),
-  );
-  const workflows = {
-    csvValueUtils: {
-      create: (options) => (calls.push(["csv", options]), values.csv),
-    },
-    accountImportTerms: {
-      create: (options) => (calls.push(["terms", options]), values.terms),
-    },
-    paymentImportAllocation: {
-      create: (options) => (
-        calls.push(["allocation", options]),
-        values.allocation
-      ),
-    },
-    validationApi: {
-      create: (options) => (
-        calls.push(["validators", options]),
-        values.validators
-      ),
-    },
-    feature: {
-      create: (options) => (calls.push(["feature", options]), values.feature),
-    },
-  };
-  const moduleNames = [
-    "currencyUtils",
-    "displayUtils",
-    "domainOptions",
-    "transactionOptions",
-    "expenseAccountPolicy",
-    "emailAddresses",
-    "accountValidation",
-    "accountImportIdentity",
-    "expenseValidation",
-    "paymentValidation",
-    "importRows",
-    "csvParser",
-    "preview",
-    "previewEvents",
-    "commit",
-    "review",
-    "accountImport",
-    "accountImportPayload",
-    "csvImportFile",
-    "transactionImport",
-    "paymentImport",
-    "expenseImport",
-    "transactionImportWorkflow",
-  ];
-  const modules = Object.fromEntries(moduleNames.map((key) => [key, { key }]));
+  const validators = { validators: true };
+  const feature = { feature: true };
   const dependencies = {
     $() {},
     state: {},
@@ -72,8 +19,21 @@ test("import workspace builds validation rules before composing import actions",
     toast() {},
     repository: {},
     writeFeedback: {},
-    workflows,
-    modules,
+    workflows: {
+      feature: {
+        create(options) {
+          calls.push(["feature", options]);
+          return feature;
+        },
+      },
+    },
+    validationWorkflow: {
+      create(options) {
+        calls.push(["validation", options]);
+        return { validators };
+      },
+    },
+    modules: { csvParser: { parser: true } },
   };
   const context = vm.createContext({ window: {} });
   vm.runInContext(
@@ -87,20 +47,14 @@ test("import workspace builds validation rules before composing import actions",
   const result =
     context.window.PropertyDeskImportWorkspaceWorkflow.create(dependencies);
 
-  assert.equal(result, values.feature);
+  assert.equal(result, feature);
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["csv", "terms", "allocation", "validators", "feature"],
+    ["validation", "feature"],
   );
-  assert.equal(calls[1][1].modules.csvValueUtils, values.csv);
-  assert.equal(calls[2][1].modules.csvValueUtils, values.csv);
-  assert.equal(calls[3][1].account.modules.terms, values.terms);
-  assert.equal(
-    calls[3][1].payment.modules.paymentAllocation,
-    values.allocation,
-  );
-  assert.equal(calls[4][1].modules.validators, values.validators);
-  assert.equal(calls[4][1].repository, dependencies.repository);
-  assert.equal(calls[4][1].writeFeedback, dependencies.writeFeedback);
-  assert.equal(calls[4][1].modules.csvParser, modules.csvParser);
+  assert.equal(calls[0][1].modules, dependencies.modules);
+  assert.equal(calls[1][1].modules.validators, validators);
+  assert.equal(calls[1][1].modules.csvParser, dependencies.modules.csvParser);
+  assert.equal(calls[1][1].repository, dependencies.repository);
+  assert.equal(calls[1][1].writeFeedback, dependencies.writeFeedback);
 });
