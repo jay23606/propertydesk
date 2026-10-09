@@ -300,47 +300,7 @@
       sumIncome,
       sumOperatingExpenses,
     },
-    workflows: {
-      workspace: window.PropertyDeskTransactionWorkspaceWorkflow,
-      correctionModel: window.PropertyDeskTransactionCorrectionModel,
-      maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,
-      correction: window.PropertyDeskTransactionCorrectionWorkflow,
-      correctionModules: {
-        maintenance: window.PropertyDeskTransactionCorrectionMaintenance,
-        form: window.PropertyDeskTransactionCorrectionForm,
-        view: window.PropertyDeskTransactionCorrectionView,
-      },
-      voidModel: window.PropertyDeskTransactionVoidModel,
-      voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
-      voidEntry: window.PropertyDeskTransactionVoidEntry,
-      maintenanceEvents: window.PropertyDeskTransactionMaintenanceEvents,
-      ledger: window.PropertyDeskLedgerWorkflow,
-      entryForms: {
-        create: window.PropertyDeskLedgerEntryForms.create,
-        modules: {
-          transactionInserts: window.PropertyDeskTransactionInserts,
-          saveWorkflow: window.PropertyDeskLedgerEntrySaveWorkflow,
-          paymentForm: window.PropertyDeskPaymentEntryForm,
-          expenseForm: window.PropertyDeskExpenseEntryForm,
-        },
-      },
-      views: {
-        create: window.PropertyDeskTransactionViews.create,
-        modules: {
-          filterModel: window.PropertyDeskTransactionListFilterModel,
-          associationModel: window.PropertyDeskTransactionAssociationModel,
-          displayRowModel: window.PropertyDeskTransactionDisplayRowModel,
-          listModel: window.PropertyDeskTransactionListModel,
-          summaryModel: window.PropertyDeskTransactionSummaryModel,
-          rowView: window.PropertyDeskTransactionRowView,
-        },
-      },
-      transactionPayloads: window.PropertyDeskTransactionPayloads,
-      expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
-      paymentView: window.PropertyDeskPaymentEntryView,
-      expenseView: window.PropertyDeskExpenseEntryView,
-      propertyPaymentAction: window.PropertyDeskPropertyPaymentAction,
-    },
+    workflows: window.PropertyDeskTransactionWorkspaceModuleCatalog.create(),
   });
   const {
     attachLedgerEntryFormEvents,
@@ -400,39 +360,7 @@
       saveAndRefreshWorkspaceRecord:
         writeFeedback.saveAndRefreshWorkspaceRecord,
     },
-    workflows: {
-      workspace: window.PropertyDeskAccountDepositWorkspaceWorkflow,
-      deposit: {
-        workspace: window.PropertyDeskDepositWorkspaceWorkflow,
-        detailsModel: window.PropertyDeskDepositDetailsModel,
-        detailsView: window.PropertyDeskDepositDetailsView,
-        adjustmentWorkflow: window.PropertyDeskDepositAdjustmentWorkflow,
-        adjustmentModules: {
-          maintenance: window.PropertyDeskDepositMaintenance,
-          entry: window.PropertyDeskDepositAdjustmentEntry,
-          events: window.PropertyDeskDepositDetailEvents,
-        },
-      },
-      accountDetails: {
-        workspace: window.PropertyDeskAccountDetailWorkspaceWorkflow,
-        content: window.PropertyDeskAccountDetailContentWorkflow,
-        action: window.PropertyDeskAccountDetailActionWorkflow,
-        actionWorkflows: {
-          closeMaintenance: window.PropertyDeskAccountCloseMaintenance,
-          closeEntry: window.PropertyDeskAccountCloseEntry,
-          detailEvents: window.PropertyDeskAccountDetailEvents,
-        },
-        contentModules: {
-          accountHistoryModel: window.PropertyDeskAccountHistoryModel,
-          accountHistoryView: window.PropertyDeskAccountHistoryView,
-          accountLoanScheduleView: window.PropertyDeskAccountLoanScheduleView,
-          accountDetailsView: window.PropertyDeskAccountDetailsView,
-          accountDetailsModel: window.PropertyDeskAccountDetailsModel,
-          accountDetails: window.PropertyDeskAccountDetails,
-        },
-      },
-      adjustmentModel: window.PropertyDeskDepositAdjustmentModel,
-    },
+    workflows: window.PropertyDeskAccountDepositWorkspaceModuleCatalog.create(),
   });
   const {
     attachPropertyDetailEvents,

@@ -254,6 +254,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     ),
     "utf8",
   );
+  const moduleCatalog = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-deposit-workspace-module-catalog.js",
+    ),
+    "utf8",
+  );
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   assert.doesNotMatch(
     app,
@@ -378,9 +387,12 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(app, /accountRepository: repositories\.accounts/);
   assert.match(app, /depositRepository: repositories\.deposits/);
-  assert.match(app, /action: window\.PropertyDeskAccountDetailActionWorkflow/);
   assert.match(
-    app,
+    moduleCatalog,
+    /action: window\.PropertyDeskAccountDetailActionWorkflow/,
+  );
+  assert.match(
+    moduleCatalog,
     /content: window\.PropertyDeskAccountDetailContentWorkflow/,
   );
   assert.match(setup, /prepareAdjustment: workflows\.adjustmentModel\.prepare/);
