@@ -1,4 +1,12 @@
 const globals = require("globals");
+const commonRules = {
+  "no-constant-condition": "error",
+  "no-dupe-keys": "error",
+  "no-redeclare": "error",
+  "no-unreachable": "error",
+  "no-undef": "error",
+  "no-unused-vars": "error",
+};
 
 module.exports = [
   {
@@ -9,14 +17,7 @@ module.exports = [
       sourceType: "script",
       globals: { ...globals.browser, module: "readonly" },
     },
-    rules: {
-      "no-constant-condition": "error",
-      "no-undef": "error",
-      "no-dupe-keys": "error",
-      "no-redeclare": "error",
-      "no-unreachable": "error",
-      "no-unused-vars": "error",
-    },
+    rules: { ...commonRules },
   },
   {
     files: ["eslint.config.js", "*.cjs", "**/*.cjs"],
@@ -25,14 +26,7 @@ module.exports = [
       sourceType: "commonjs",
       globals: { ...globals.node, ...globals.browser },
     },
-    rules: {
-      "no-constant-condition": "error",
-      "no-undef": "error",
-      "no-dupe-keys": "error",
-      "no-redeclare": "error",
-      "no-unreachable": "error",
-      "no-unused-vars": "error",
-    },
+    rules: { ...commonRules },
   },
   {
     files: ["supabase/functions/**/*.mjs"],
@@ -41,13 +35,6 @@ module.exports = [
       sourceType: "module",
       globals: globals.browser,
     },
-    rules: {
-      "no-constant-condition": "error",
-      "no-undef": "error",
-      "no-dupe-keys": "error",
-      "no-redeclare": "error",
-      "no-unreachable": "error",
-      "no-unused-vars": "error",
-    },
+    rules: { ...commonRules },
   },
 ];
