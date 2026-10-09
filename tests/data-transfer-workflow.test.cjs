@@ -21,6 +21,10 @@ test("app wires CSV import and private backup workspace workflow independently",
     path.join(root, "features", "imports.js"),
     "utf8",
   );
+  const importCatalog = fs.readFileSync(
+    path.join(root, "features", "import-workspace-module-catalog.js"),
+    "utf8",
+  );
   assert.match(imports, /preview\.create\(/);
   assert.match(imports, /modules: modules\.preview\.modules/);
   assert.match(imports, /previewEvents\.create\(/);
@@ -34,7 +38,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     app,
-    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?preview: \{[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
+    /workflows:\s*window\.PropertyDeskImportWorkspaceModuleCatalog\.create\(\)/,
   );
   const importSetup = fs.readFileSync(
     path.join(root, "features", "import-workspace-setup.js"),
@@ -65,11 +69,11 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(importValidation, /paymentAllocation: paymentImportAllocation/);
   assert.match(
-    app,
+    importCatalog,
     /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,\s*table: window\.PropertyDeskImportPreviewTable,/,
   );
   assert.match(
-    app,
+    importCatalog,
     /commit: \{\s*create: window\.PropertyDeskImportCommit\.create,\s*modules: \{\s*batchReconciliation: window\.PropertyDeskImportBatchReconciliation,\s*reporting: window\.PropertyDeskImportCommitReporting,/,
   );
   assert.match(imports, /modules: modules\.commit\.modules/);
@@ -85,6 +89,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   assert.doesNotMatch(app, /PropertyDeskDataTransferWorkflow/);
 
   for (const script of [
+    "features/import-workspace-module-catalog.js",
     "features/imports.js",
     "features/import-validation-workflow.js",
     "features/import-workspace-workflow.js",
