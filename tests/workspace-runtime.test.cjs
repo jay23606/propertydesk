@@ -151,6 +151,10 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(runtime.authClient.id, "auth-client");
   assert.equal(runtime.repositories, repositoryAdapters);
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const browserAdapters = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-browser-adapters.js"),
+    "utf8",
+  );
   assert.doesNotMatch(
     app,
     /let appLifecycle|function render\(\) \{\s*appLifecycle\.render/,
@@ -160,8 +164,8 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     /const appLifecycle = window\.PropertyDeskAppStartupSetup\.create\([\s\S]*?\}\);\s*setWorkspaceRender\(appLifecycle\.render\);\s*document\.addEventListener\("DOMContentLoaded", appLifecycle\.initialize\);/,
   );
   assert.match(
-    app,
-    /const reportError = \(message, error\) =>\s*window\.console\?\.error\(message, error\);/,
+    browserAdapters,
+    /reportError: \(message, error\) =>\s*windowRef\.console\?\.error\(message, error\),/,
   );
   assert.deepEqual(Object.keys(runtime).sort(), [
     "authClient",

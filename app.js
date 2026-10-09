@@ -2,23 +2,20 @@
 (() => {
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
-  const confirmAction = (message) => window.confirm(message);
-  const promptAction = (message, initialValue) =>
-    window.prompt(message, initialValue);
-  const openWindow = (...args) => window.open(...args);
-  const makeId = () => window.crypto.randomUUID();
-  const browserStorage = Object.freeze({
-    getItem: (key) => window.localStorage.getItem(key),
-    setItem: (key, value) => window.localStorage.setItem(key, value),
+  const {
+    $,
+    confirmAction,
+    promptAction,
+    openWindow,
+    makeId,
+    browserStorage,
+    downloadBlob,
+    reportError,
+  } = window.PropertyDeskAppBrowserAdapters.create({
+    windowRef: window,
+    documentRef: document,
+    downloadUtils: window.PropertyDeskDownloadUtils,
   });
-  const downloadBlob = (blob, filename) =>
-    window.PropertyDeskDownloadUtils.downloadBlob(blob, filename, {
-      documentRef: document,
-      urlRef: window.URL,
-      defer: window.setTimeout.bind(window),
-    });
-  const reportError = (message, error) => window.console?.error(message, error);
   const appServices = window.PropertyDeskAppServices.create({
     $,
     config: window.PROPERTYDESK_CONFIG || {},

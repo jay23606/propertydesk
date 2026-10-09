@@ -15,17 +15,21 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     path.join(__dirname, "..", "app.js"),
     "utf8",
   );
+  const browserAdapters = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-browser-adapters.js"),
+    "utf8",
+  );
   assert.match(
-    appSource,
-    /const makeId = \(\) => window\.crypto\.randomUUID\(\);/,
+    browserAdapters,
+    /makeId: \(\) => windowRef\.crypto\.randomUUID\(\),/,
   );
   assert.match(
     appSource,
     /PropertyDeskPropertyWorkspaceSetup\.create\(\{[\s\S]*?makeId,/,
   );
   assert.match(
-    appSource,
-    /const browserStorage = Object\.freeze\(\{\s*getItem: \(key\) => window\.localStorage\.getItem\(key\),\s*setItem: \(key, value\) => window\.localStorage\.setItem\(key, value\),\s*\}\);/,
+    browserAdapters,
+    /browserStorage: Object\.freeze\(\{\s*getItem: \(key\) => windowRef\.localStorage\.getItem\(key\),\s*setItem: \(key, value\) => windowRef\.localStorage\.setItem\(key, value\),\s*\}\),/,
   );
 
   let received;

@@ -10,14 +10,17 @@ test("browser download helper clicks a temporary link and releases its URL", () 
     path.join(root, "features", "download-utils.js"),
     "utf8",
   );
-  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const browserAdapters = fs.readFileSync(
+    path.join(root, "features", "app-browser-adapters.js"),
+    "utf8",
+  );
   assert.doesNotMatch(
     source,
     /documentRef = document|urlRef = URL|defer = setTimeout/,
   );
   assert.match(
-    app,
-    /const downloadBlob = \(blob, filename\) =>[\s\S]*?documentRef: document,[\s\S]*?urlRef: window\.URL,[\s\S]*?defer: window\.setTimeout\.bind\(window\),/,
+    browserAdapters,
+    /downloadBlob: \(blob, filename\) =>[\s\S]*?documentRef,[\s\S]*?urlRef: windowRef\.URL,[\s\S]*?defer: windowRef\.setTimeout\.bind\(windowRef\),/,
   );
   const context = vm.createContext({ window: {} });
   vm.runInContext(

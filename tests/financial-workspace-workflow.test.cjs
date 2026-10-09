@@ -6,6 +6,10 @@ const test = require("node:test");
 test("app delegates account, deposit, and transaction maintenance", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const browserAdapters = fs.readFileSync(
+    path.join(root, "features", "app-browser-adapters.js"),
+    "utf8",
+  );
   const appServices = fs.readFileSync(
     path.join(root, "features", "app-services.js"),
     "utf8",
@@ -14,20 +18,23 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(
-    app,
-    /const confirmAction = \(message\) => window\.confirm\(message\);/,
+    browserAdapters,
+    /confirmAction: \(message\) => windowRef\.confirm\(message\),/,
   );
   assert.match(
-    app,
-    /const promptAction = \(message, initialValue\) =>\s*window\.prompt\(message, initialValue\);/,
+    browserAdapters,
+    /promptAction: \(message, initialValue\) =>\s*windowRef\.prompt\(message, initialValue\),/,
   );
   assert.match(
-    app,
-    /const openWindow = \(\.\.\.args\) => window\.open\(\.\.\.args\);/,
+    browserAdapters,
+    /openWindow: \(\.\.\.args\) => windowRef\.open\(\.\.\.args\),/,
   );
-  assert.equal((app.match(/window\.confirm\(/g) || []).length, 1);
-  assert.equal((app.match(/window\.prompt\(/g) || []).length, 1);
-  assert.equal((app.match(/window\.open\(/g) || []).length, 1);
+  assert.equal(
+    (browserAdapters.match(/windowRef\.confirm\(/g) || []).length,
+    1,
+  );
+  assert.equal((browserAdapters.match(/windowRef\.prompt\(/g) || []).length, 1);
+  assert.equal((browserAdapters.match(/windowRef\.open\(/g) || []).length, 1);
 
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
