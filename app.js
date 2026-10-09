@@ -141,7 +141,10 @@
     window.PropertyDeskReportWorkspaceWorkflow.create({
       rendering: {
         $,
-        state,
+        getPayments: () => state.payments,
+        getExpenses: () => state.expenses,
+        getAccounts: () => state.accounts,
+        getImportBatches: () => state.importBatches,
         now,
         dateOnly,
         sumIncome,

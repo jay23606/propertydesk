@@ -3,7 +3,10 @@
   "use strict";
 
   function createReportModel({
-    state,
+    getPayments,
+    getExpenses,
+    getAccounts,
+    getImportBatches,
     now,
     dateOnly,
     sumIncome,
@@ -33,16 +36,16 @@
 
     function buildReportModel(year = now().getFullYear()) {
       const income = sumIncome(
-        state.payments.filter(
+        getPayments().filter(
           (payment) => dateOnly(payment.received_date)?.getFullYear() === year,
         ),
       );
       const costs = sumOperatingExpenses(
-        state.expenses.filter(
+        getExpenses().filter(
           (expense) => dateOnly(expense.expense_date)?.getFullYear() === year,
         ),
       );
-      const accountSummary = summarizeAccounts(state.accounts);
+      const accountSummary = summarizeAccounts(getAccounts());
 
       return {
         year,
@@ -51,7 +54,7 @@
         netCashFlow: income - costs,
         principal: accountSummary.principal,
         accountCounts: accountSummary.accountCounts,
-        importBatches: state.importBatches,
+        importBatches: getImportBatches(),
       };
     }
 

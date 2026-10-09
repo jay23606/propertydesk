@@ -92,7 +92,10 @@ test("report workspace preserves rendering and export APIs", () => {
   const attachReportExportEvents = () => {};
   const rendering = {
     $() {},
-    state: {},
+    getPayments() {},
+    getExpenses() {},
+    getAccounts() {},
+    getImportBatches() {},
     now() {},
     dateOnly() {},
     sumIncome() {},
@@ -157,9 +160,12 @@ test("report workspace preserves rendering and export APIs", () => {
     "dateOnly",
     "esc",
     "fmtDateTime",
+    "getAccounts",
+    "getExpenses",
+    "getImportBatches",
+    "getPayments",
     "money",
     "now",
-    "state",
     "sumIncome",
     "sumOperatingExpenses",
     "workflows",
@@ -214,7 +220,10 @@ test("Reports workflow composes calculation and view modules only", () => {
   );
   const dependencies = {
     $() {},
-    state: {},
+    getPayments() {},
+    getExpenses() {},
+    getAccounts() {},
+    getImportBatches() {},
     now() {},
     dateOnly() {},
     sumIncome() {},
@@ -231,7 +240,10 @@ test("Reports workflow composes calculation and view modules only", () => {
   const workflow =
     context.window.PropertyDeskReportWorkflow.create(dependencies);
 
-  assert.equal(received.model.state, dependencies.state);
+  assert.equal(received.model.getPayments, dependencies.getPayments);
+  assert.equal(received.model.getExpenses, dependencies.getExpenses);
+  assert.equal(received.model.getAccounts, dependencies.getAccounts);
+  assert.equal(received.model.getImportBatches, dependencies.getImportBatches);
   assert.equal(received.model.now, dependencies.now);
   assert.equal(received.model.dateOnly, dependencies.dateOnly);
   assert.equal(received.model.sumIncome, dependencies.sumIncome);

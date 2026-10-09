@@ -5,7 +5,10 @@
   function createReportWorkspaceWorkflow({ rendering, exporting, workflows }) {
     const { renderReports } = workflows.report.create({
       $: rendering.$,
-      state: rendering.state,
+      getPayments: rendering.getPayments,
+      getExpenses: rendering.getExpenses,
+      getAccounts: rendering.getAccounts,
+      getImportBatches: rendering.getImportBatches,
       now: rendering.now,
       dateOnly: rendering.dateOnly,
       sumIncome: rendering.sumIncome,

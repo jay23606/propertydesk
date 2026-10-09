@@ -4,7 +4,10 @@
 
   function create({
     $,
-    state,
+    getPayments,
+    getExpenses,
+    getAccounts,
+    getImportBatches,
     now,
     dateOnly,
     sumIncome,
@@ -16,7 +19,10 @@
     workflows,
   }) {
     const { buildReportModel } = workflows.model.create({
-      state,
+      getPayments,
+      getExpenses,
+      getAccounts,
+      getImportBatches,
       now,
       dateOnly,
       sumIncome,

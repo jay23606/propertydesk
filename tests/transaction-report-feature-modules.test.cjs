@@ -340,7 +340,10 @@ test("report views summarize the current-year ledger and escape import history",
   const accountBalance = (account) =>
     account.id === "rental" ? 0 : account.id === "note" ? 1200 : 800;
   const reportModel = context.window.PropertyDeskReportModel.create({
-    state,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getAccounts: () => state.accounts,
+    getImportBatches: () => state.importBatches,
     now: () => new Date(`${year}-10-05T12:00:00`),
     dateOnly,
     sumIncome: (rows) =>
