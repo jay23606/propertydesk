@@ -300,25 +300,35 @@ test("payment and expense CSV importers save their own validated transaction pay
     staged.push({ title, rows, commit, note, report }),
   );
   const feature = context.window.PropertyDeskImportFeature.create({
-    $: (id) => {
-      const element = elements(id);
-      element.addEventListener = (event, handler) =>
-        fileHandlers.set(`${id}:${event}`, handler);
-      return element;
+    records: {
+      getWorkspaceOwnerId: () => "owner-1",
+      getImportBatches: () => [],
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getProperties: () => state.properties,
+      ...pendingImportAccess(state),
     },
-    getWorkspaceOwnerId: () => "owner-1",
-    getImportBatches: () => [],
-    getAccounts: () => state.accounts,
-    getPayments: () => state.payments,
-    getExpenses: () => state.expenses,
-    getProperties: () => state.properties,
-    ...pendingImportAccess(state),
-    repository: context.window.PropertyDeskImportRepository.create({
-      getClient: () => state.client,
-    }),
-    fetchAll: async () => {},
-    toast() {},
-    refreshWorkspace: async () => true,
+    ui: {
+      $: (id) => {
+        const element = elements(id);
+        element.addEventListener = (event, handler) =>
+          fileHandlers.set(`${id}:${event}`, handler);
+        return element;
+      },
+      esc: String,
+      openModal() {},
+      closeModal() {},
+      todayIso() {},
+      toast() {},
+    },
+    services: {
+      repository: context.window.PropertyDeskImportRepository.create({
+        getClient: () => state.client,
+      }),
+      fetchAll: async () => {},
+      refreshWorkspace: async () => true,
+    },
     modules: importFeatureModules(context),
   });
   const expense = {
@@ -565,24 +575,30 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
     state.pendingImport = { title, rows, commit, note, ...report };
   });
   const feature = context.window.PropertyDeskImportFeature.create({
-    $: element,
-    getWorkspaceOwnerId: () => "owner-1",
-    getImportBatches: () => [],
-    getAccounts: () => state.accounts,
-    getPayments: () => state.payments,
-    getExpenses: () => state.expenses,
-    getProperties: () => state.properties,
-    ...pendingImportAccess(state),
-    repository: context.window.PropertyDeskImportRepository.create({
-      getClient: () => state.client,
-    }),
-    esc: (value) => String(value ?? ""),
-    todayIso: () => "2026-10-04",
-    openModal() {},
-    closeModal() {},
-    fetchAll: async () => {},
-    toast() {},
-    refreshWorkspace: async () => true,
+    records: {
+      getWorkspaceOwnerId: () => "owner-1",
+      getImportBatches: () => [],
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getProperties: () => state.properties,
+      ...pendingImportAccess(state),
+    },
+    ui: {
+      $: element,
+      esc: (value) => String(value ?? ""),
+      todayIso: () => "2026-10-04",
+      openModal() {},
+      closeModal() {},
+      toast() {},
+    },
+    services: {
+      repository: context.window.PropertyDeskImportRepository.create({
+        getClient: () => state.client,
+      }),
+      fetchAll: async () => {},
+      refreshWorkspace: async () => true,
+    },
     modules: importFeatureModules(context),
   });
 

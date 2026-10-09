@@ -2,26 +2,19 @@
 (() => {
   "use strict";
 
-  function createImportWorkflows({
-    $,
-    getWorkspaceOwnerId,
-    getImportBatches,
-    getAccounts,
-    getPayments,
-    getExpenses,
-    getProperties,
-    getPendingImport,
-    setPendingImport,
-    esc,
-    openModal,
-    closeModal,
-    todayIso,
-    fetchAll,
-    toast,
-    repository,
-    refreshWorkspace,
-    modules,
-  }) {
+  function createImportWorkflows({ records, ui, services, modules }) {
+    const { $: getElement, esc, openModal, closeModal, todayIso, toast } = ui;
+    const {
+      getWorkspaceOwnerId,
+      getImportBatches,
+      getAccounts,
+      getPayments,
+      getExpenses,
+      getProperties,
+      getPendingImport,
+      setPendingImport,
+    } = records;
+    const { fetchAll, repository, refreshWorkspace } = services;
     const {
       importRows,
       csvParser,
@@ -41,7 +34,7 @@
     const { validateAccountRows, validatePaymentRows, validateExpenseRows } =
       validators;
     const importPreview = preview.create({
-      $,
+      $: getElement,
       getPendingImport,
       setPendingImport,
       selectImportRows,
@@ -50,7 +43,7 @@
       modules: modules.preview.modules,
     });
     const { attachEvents: attachPreviewEvents } = previewEvents.create({
-      $,
+      $: getElement,
       getPendingImport,
       setPendingImport,
       selectImportRows,
@@ -66,7 +59,7 @@
       getPayments,
       getExpenses,
       fetchAll,
-      status: $("import-status"),
+      status: getElement("import-status"),
       toast,
       repository,
       refreshWorkspace,
@@ -76,7 +69,7 @@
       stageImport: importPreview.stageImport,
     });
     const accounts = accountImport.create({
-      $,
+      $: getElement,
       getProperties,
       getAccounts,
       parseCSV,
@@ -89,7 +82,7 @@
     });
     const transactions = transactionImport.create({
       shared: {
-        $,
+        $: getElement,
         createImportLookup,
         createFileWorkflow: csvImportFile.create,
         createTransactionImportWorkflow: transactionImportWorkflow.create,

@@ -28,11 +28,32 @@ test("CSV import feature loads as an isolated browser module", () => {
   );
   const handlers = new Map();
   const feature = context.window.PropertyDeskImportFeature.create({
-    $: (id) => ({
-      addEventListener: (event, handler) =>
-        handlers.set(`${id}:${event}`, handler),
-    }),
-    refreshWorkspace: async () => true,
+    records: {
+      getWorkspaceOwnerId() {},
+      getImportBatches() {},
+      getAccounts() {},
+      getPayments() {},
+      getExpenses() {},
+      getProperties() {},
+      getPendingImport() {},
+      setPendingImport() {},
+    },
+    ui: {
+      $: (id) => ({
+        addEventListener: (event, handler) =>
+          handlers.set(`${id}:${event}`, handler),
+      }),
+      esc: String,
+      openModal() {},
+      closeModal() {},
+      todayIso() {},
+      toast() {},
+    },
+    services: {
+      fetchAll() {},
+      repository: {},
+      refreshWorkspace: async () => true,
+    },
     modules: importFeatureModules(context),
   });
   assert.deepEqual(Object.keys(feature), [
@@ -152,25 +173,33 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   );
   const state = {};
   const dependencies = {
-    $() {},
-    getWorkspaceOwnerId: () => state.workspaceOwnerId,
-    getImportBatches: () => state.importBatches,
-    getAccounts: () => state.accounts,
-    getPayments: () => state.payments,
-    getExpenses: () => state.expenses,
-    getProperties: () => state.properties,
-    getPendingImport: () => state.pendingImport,
-    setPendingImport: (value) => {
-      state.pendingImport = value;
+    records: {
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getImportBatches: () => state.importBatches,
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getProperties: () => state.properties,
+      getPendingImport: () => state.pendingImport,
+      setPendingImport: (value) => {
+        state.pendingImport = value;
+      },
     },
-    todayIso() {},
-    fetchAll() {},
-    toast() {},
-    repository: { kind: "injected-import-repository" },
-    refreshWorkspace:
-      context.window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace,
+    ui: {
+      $() {},
+      esc: String,
+      openModal() {},
+      closeModal() {},
+      todayIso() {},
+      toast() {},
+    },
+    services: {
+      fetchAll() {},
+      repository: { kind: "injected-import-repository" },
+      refreshWorkspace:
+        context.window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace,
+    },
     modules: importFeatureModules(context),
-    unrelatedDependency() {},
   };
   const imports = context.window.PropertyDeskImportFeature.create(dependencies);
 
@@ -181,8 +210,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachPaymentEvents",
     "attachExpenseEvents",
   ]);
-  assert.equal(passed.commit.repository, dependencies.repository);
-  assert.equal(passed.commit.refreshWorkspace, dependencies.refreshWorkspace);
+  assert.equal(passed.commit.repository, dependencies.services.repository);
+  assert.equal(
+    passed.commit.refreshWorkspace,
+    dependencies.services.refreshWorkspace,
+  );
   for (const key of [
     "getWorkspaceOwnerId",
     "getImportBatches",

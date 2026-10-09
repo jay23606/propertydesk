@@ -28,14 +28,7 @@ test("import workspace supplies configured validators to the import feature", ()
     "expenseAccountPolicy",
     "paymentValidation",
   ];
-  const workflows = Object.fromEntries(
-    [...validationWorkflowNames, "feature"].map((name) => [name, { name }]),
-  );
-  const modules = Object.fromEntries(
-    [...validationModuleNames, "csvParser"].map((name) => [name, { name }]),
-  );
-  const dependencies = {
-    $() {},
+  const records = {
     getWorkspaceOwnerId: () => state.workspaceOwnerId,
     getImportBatches: () => state.importBatches,
     getAccounts: () => state.accounts,
@@ -46,14 +39,33 @@ test("import workspace supplies configured validators to the import feature", ()
     setPendingImport: (value) => {
       state.pendingImport = value;
     },
+    unusedRecord: true,
+  };
+  const ui = {
+    $() {},
     esc() {},
     openModal() {},
     closeModal() {},
     todayIso() {},
-    fetchAll() {},
     toast() {},
+    unusedUi: true,
+  };
+  const services = {
+    fetchAll() {},
     repository: {},
     refreshWorkspace() {},
+    unusedService: true,
+  };
+  const workflows = Object.fromEntries(
+    [...validationWorkflowNames, "feature"].map((name) => [name, { name }]),
+  );
+  const modules = Object.fromEntries(
+    [...validationModuleNames, "csvParser"].map((name) => [name, { name }]),
+  );
+  const dependencies = {
+    records,
+    ui,
+    services,
     workflows: {
       ...workflows,
       feature: {
@@ -101,10 +113,8 @@ test("import workspace supplies configured validators to the import feature", ()
   assert.equal(calls[0][1].modules.currencyUtils, modules.currencyUtils);
   assert.equal(calls[1][1].modules.validators, validators);
   assert.equal(calls[1][1].modules.csvParser, modules.csvParser);
-  assert.equal(calls[1][1].repository, dependencies.repository);
-  assert.equal(calls[1][1].refreshWorkspace, dependencies.refreshWorkspace);
-  assert.equal(calls[1][1].getAccounts, dependencies.getAccounts);
-  assert.equal(calls[1][1].getPendingImport, dependencies.getPendingImport);
-  assert.equal(calls[1][1].setPendingImport, dependencies.setPendingImport);
+  assert.equal(calls[1][1].records, records);
+  assert.equal(calls[1][1].ui, ui);
+  assert.equal(calls[1][1].services, services);
   assert.equal("state" in calls[1][1], false);
 });

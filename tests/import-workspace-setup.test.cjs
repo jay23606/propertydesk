@@ -65,13 +65,29 @@ test("import workspace setup maps scoped records, UI, services, and modules", ()
     }),
     result,
   );
-  assert.equal(received.getWorkspaceOwnerId, records.getWorkspaceOwnerId);
-  assert.equal(received.getPendingImport, records.getPendingImport);
-  assert.equal(received.setPendingImport, records.setPendingImport);
-  assert.equal(received.$, ui.$);
-  assert.equal(received.closeModal, ui.closeModal);
-  assert.equal(received.repository, services.repository);
-  assert.equal(received.refreshWorkspace, services.refreshWorkspace);
+  assert.deepEqual(
+    Object.keys(received.records).sort(),
+    Object.keys(records).sort(),
+  );
+  assert.deepEqual(Object.keys(received.ui).sort(), [
+    "$",
+    "closeModal",
+    "esc",
+    "openModal",
+    "toast",
+    "todayIso",
+  ]);
+  assert.deepEqual(Object.keys(received.services).sort(), [
+    "fetchAll",
+    "refreshWorkspace",
+    "repository",
+  ]);
+  for (const key of Object.keys(received.records))
+    assert.equal(received.records[key], records[key]);
+  for (const key of Object.keys(received.ui))
+    assert.equal(received.ui[key], ui[key]);
+  for (const key of Object.keys(received.services))
+    assert.equal(received.services[key], services[key]);
   assert.equal(received.validationWorkflow, workflows.validation);
   assert.equal(received.modules, workflows.modules);
   assert.doesNotMatch(source, /\bstate\b/);
