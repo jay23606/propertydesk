@@ -134,6 +134,7 @@ function loadWorkspaceFeatures(context) {
     "workspace-member-repository.js",
     "workspace-member-maintenance.js",
     "workspace-members.js",
+    "workspace-reminder-activity-data.js",
     "workspace.js",
   ]) {
     vm.runInContext(
@@ -147,6 +148,8 @@ function loadWorkspaceFeatures(context) {
     memberView: context.window.PropertyDeskWorkspaceMembersView,
     memberMaintenance: context.window.PropertyDeskWorkspaceMemberMaintenance,
     members: context.window.PropertyDeskWorkspaceMembers,
+    reminderActivityData:
+      context.window.PropertyDeskWorkspaceReminderActivityData,
     profileModules: {
       display: context.window.PropertyDeskProfileDisplay,
       view: context.window.PropertyDeskProfileSettingsView,

@@ -279,6 +279,7 @@
         memberView: window.PropertyDeskWorkspaceMembersView,
         memberMaintenance: window.PropertyDeskWorkspaceMemberMaintenance,
         members: window.PropertyDeskWorkspaceMembers,
+        reminderActivityData: window.PropertyDeskWorkspaceReminderActivityData,
         profileModules: {
           display: window.PropertyDeskProfileDisplay,
           view: window.PropertyDeskProfileSettingsView,

@@ -54,6 +54,13 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     },
   });
   vm.runInContext(
+    fs.readFileSync(
+      path.join(root, "features", "workspace-reminder-activity-data.js"),
+      "utf8",
+    ),
+    context,
+  );
+  vm.runInContext(
     fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),
     context,
   );
@@ -126,6 +133,8 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
       memberView: context.window.PropertyDeskWorkspaceMembersView,
       memberMaintenance: context.window.PropertyDeskWorkspaceMemberMaintenance,
       members: context.window.PropertyDeskWorkspaceMembers,
+      reminderActivityData:
+        context.window.PropertyDeskWorkspaceReminderActivityData,
       profileModules: {},
     },
   });

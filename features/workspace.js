@@ -23,46 +23,14 @@
     workflows,
     confirmAction,
   }) {
-    function getReminderActivityData() {
-      return {
-        accounts: getAccounts().map(
-          ({ id, property_id, party_name, name }) => ({
-            id,
-            property_id,
-            party_name,
-            name,
-          }),
-        ),
-        properties: getProperties().map(({ id, address, name }) => ({
-          id,
-          address,
-          name,
-        })),
-        reminderLogs: getReminderLogs().map(
-          ({
-            account_id,
-            reminder_month,
-            recipient_index,
-            status,
-            reason,
-            unpaid_due,
-            attempted_at,
-          }) => ({
-            account_id,
-            reminder_month,
-            recipient_index,
-            status,
-            reason,
-            unpaid_due,
-            attempted_at,
-          }),
-        ),
-      };
-    }
-
+    const reminderActivityData = workflows.reminderActivityData.create({
+      getAccounts,
+      getProperties,
+      getReminderLogs,
+    });
     const reminderWorkflow = reminder.workflow.create({
       $: reminder.$,
-      getActivityData: getReminderActivityData,
+      getActivityData: reminderActivityData.getActivityData,
       esc: reminder.esc,
       fmtDate: reminder.fmtDate,
       fmtDateTime: reminder.fmtDateTime,

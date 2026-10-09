@@ -23,7 +23,7 @@ test("workspace reminder activity stays independent of account email preview", (
   );
   assert.match(
     fs.readFileSync(path.join(root, "features", "workspace.js"), "utf8"),
-    /reminder\.workflow\.create\(\{\s*\$: reminder\.\$,\s*getActivityData: getReminderActivityData,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*fmtDateTime: reminder\.fmtDateTime,\s*money: reminder\.money,\s*activityModelWorkflow: reminder\.activityModelWorkflow,\s*activityViewWorkflow: reminder\.activityViewWorkflow,/,
+    /workflows\.reminderActivityData\.create\(\{[\s\S]*?getAccounts,[\s\S]*?getProperties,[\s\S]*?getReminderLogs[\s\S]*?reminder\.workflow\.create\(\{\s*\$: reminder\.\$,\s*getActivityData: reminderActivityData\.getActivityData,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*fmtDateTime: reminder\.fmtDateTime,\s*money: reminder\.money,\s*activityModelWorkflow: reminder\.activityModelWorkflow,\s*activityViewWorkflow: reminder\.activityViewWorkflow,/,
   );
   assert.match(
     reminderWorkflow,
