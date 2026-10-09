@@ -21,6 +21,14 @@ function propertyHolderWriteOperations(context) {
   };
 }
 
+function propertyHolderState(state) {
+  return {
+    getSelectedPropertyId: () => state.selectedPropertyId,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getPropertyHolders: () => state.propertyHolders,
+  };
+}
+
 function propertyRecordSaveOperation(context) {
   return createWriteFeedback(context).saveAndRefreshWorkspaceRecord;
 }
@@ -78,7 +86,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
   };
   const holderManagement =
     context.window.PropertyDeskPropertyHolderManagement.create({
-      state,
+      ...propertyHolderState(state),
       toast: (message) => messages.push(message),
       fetchAll: async () => {
         throw new Error("offline");
@@ -303,7 +311,7 @@ test("property holder save persists the member IDs supplied by the event layer",
     },
   };
   const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
-    state,
+    ...propertyHolderState(state),
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
     ...propertyHolderWriteOperations(context),
@@ -355,11 +363,11 @@ test("property holder refreshes displayed labels after a partial save failure", 
   }
   const events = [];
   const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
-    state: {
+    ...propertyHolderState({
       workspaceOwnerId: "workspace-1",
       selectedPropertyId: "property-1",
       propertyHolders: [],
-    },
+    }),
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => events.push(["refresh"]),
     ...propertyHolderWriteOperations(context),
@@ -398,10 +406,10 @@ test("property holder reports when a partial save cannot refresh the displayed l
   }
   const events = [];
   const workflow = context.window.PropertyDeskPropertyHolderManagement.create({
-    state: {
+    ...propertyHolderState({
       workspaceOwnerId: "workspace-1",
       selectedPropertyId: "property-1",
-    },
+    }),
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => {
       events.push(["refresh"]);
@@ -449,7 +457,7 @@ test("property holder reloads after a rejected label write with an unknown resul
     };
     const workflow = context.window.PropertyDeskPropertyHolderManagement.create(
       {
-        state,
+        ...propertyHolderState(state),
         toast: (message) => events.push(["toast", message]),
         fetchAll: async () => {
           state.propertyHolders = [

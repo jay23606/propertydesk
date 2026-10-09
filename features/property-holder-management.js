@@ -3,7 +3,9 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getPropertyHolders,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -19,11 +21,10 @@
       return reconcileWorkspaceChange({
         fetchAll,
         isConfirmed: () => {
-          const actualMemberIds = (state.propertyHolders || [])
+          const actualMemberIds = (getPropertyHolders() || [])
             .filter(
               (row) =>
-                row.user_id === state.workspaceOwnerId &&
-                row.property_id === id,
+                row.user_id === getWorkspaceOwnerId() && row.property_id === id,
             )
             .map((row) => row.member_user_id)
             .sort();
@@ -45,13 +46,13 @@
     }
 
     async function savePropertyHolders(selectedMemberIds = []) {
-      const id = state.selectedPropertyId;
+      const id = getSelectedPropertyId();
       if (!id) return;
 
       let deleteError;
       try {
         ({ error: deleteError } = await repository.clearPropertyHolders(
-          state.workspaceOwnerId,
+          getWorkspaceOwnerId(),
           id,
         ));
       } catch {
@@ -69,7 +70,7 @@
         let error;
         try {
           ({ error } = await repository.addPropertyHolders(
-            state.workspaceOwnerId,
+            getWorkspaceOwnerId(),
             id,
             selectedMemberIds,
           ));

@@ -44,7 +44,9 @@
     });
     const { attachPropertyHolderEvents } = workflows.holders.create({
       $: holders.$,
-      state: holders.state,
+      getSelectedPropertyId: holders.getSelectedPropertyId,
+      getWorkspaceOwnerId: holders.getWorkspaceOwnerId,
+      getPropertyHolders: holders.getPropertyHolders,
       toast: holders.toast,
       fetchAll: holders.fetchAll,
       repository: holders.repository,
@@ -55,7 +57,9 @@
     });
     const { attachPropertyDocumentEvents } = documents.workflow.create({
       $: documents.$,
-      state: documents.state,
+      getSelectedPropertyId: documents.getSelectedPropertyId,
+      getWorkspaceOwnerId: documents.getWorkspaceOwnerId,
+      getDocuments: documents.getDocuments,
       toast: documents.toast,
       fetchAll: documents.fetchAll,
       openPropertyDetails: details.openPropertyDetails,

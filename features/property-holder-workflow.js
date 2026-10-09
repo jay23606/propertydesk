@@ -4,7 +4,9 @@
 
   function createPropertyHolderWorkflow({
     $,
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getPropertyHolders,
     toast,
     fetchAll,
     repository,
@@ -14,7 +16,9 @@
     workflows,
   }) {
     const { savePropertyHolders } = workflows.management.create({
-      state,
+      getSelectedPropertyId,
+      getWorkspaceOwnerId,
+      getPropertyHolders,
       toast,
       fetchAll,
       repository,

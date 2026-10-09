@@ -37,7 +37,9 @@ test("property-holder workflow connects saving to one explicit event binder", ()
 
   const dependencies = {
     $() {},
-    state: {},
+    getSelectedPropertyId() {},
+    getWorkspaceOwnerId() {},
+    getPropertyHolders() {},
     toast() {},
     fetchAll() {},
     repository: {},
@@ -72,14 +74,24 @@ test("property-holder workflow connects saving to one explicit event binder", ()
   assert.equal(calls[0][1].refreshWorkspace, refreshWorkspace);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "fetchAll",
+    "getPropertyHolders",
+    "getSelectedPropertyId",
+    "getWorkspaceOwnerId",
     "openPropertyDetails",
     "reconcileWorkspaceChange",
     "refreshWorkspace",
     "repository",
-    "state",
     "toast",
   ]);
-  assert.equal(calls[0][1].state, dependencies.state);
+  assert.equal(
+    calls[0][1].getSelectedPropertyId,
+    dependencies.getSelectedPropertyId,
+  );
+  assert.equal(
+    calls[0][1].getWorkspaceOwnerId,
+    dependencies.getWorkspaceOwnerId,
+  );
+  assert.equal(calls[0][1].getPropertyHolders, dependencies.getPropertyHolders);
   assert.equal(
     calls[0][1].openPropertyDetails,
     dependencies.openPropertyDetails,

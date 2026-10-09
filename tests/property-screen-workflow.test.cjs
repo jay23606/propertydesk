@@ -31,7 +31,9 @@ test("property screen workflow passes detail actions to management and returns b
   };
   const holders = {
     $() {},
-    state: {},
+    getSelectedPropertyId() {},
+    getWorkspaceOwnerId() {},
+    getPropertyHolders() {},
     toast() {},
     fetchAll() {},
     repository: { kind: "holder-repository" },
@@ -41,7 +43,9 @@ test("property screen workflow passes detail actions to management and returns b
   };
   const documents = {
     $() {},
-    state: {},
+    getSelectedPropertyId() {},
+    getWorkspaceOwnerId() {},
+    getDocuments() {},
     toast() {},
     fetchAll() {},
     documentRepository: { kind: "document-repository" },
@@ -162,7 +166,12 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal("propertyHolderRepository" in calls[1][1], false);
   assert.equal("documentRepository" in calls[1][1], false);
   assert.equal(calls[2][0], "propertyHolders");
-  assert.equal(calls[2][1].state, holders.state);
+  assert.equal(
+    calls[2][1].getSelectedPropertyId,
+    holders.getSelectedPropertyId,
+  );
+  assert.equal(calls[2][1].getWorkspaceOwnerId, holders.getWorkspaceOwnerId);
+  assert.equal(calls[2][1].getPropertyHolders, holders.getPropertyHolders);
   assert.equal(calls[2][1].repository, holders.repository);
   assert.equal(
     calls[2][1].reconcileWorkspaceChange,
@@ -181,7 +190,12 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[3][1].modules, documents.modules);
   assert.equal(calls[3][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[3][1].$, documents.$);
-  assert.equal(calls[3][1].state, documents.state);
+  assert.equal(
+    calls[3][1].getSelectedPropertyId,
+    documents.getSelectedPropertyId,
+  );
+  assert.equal(calls[3][1].getWorkspaceOwnerId, documents.getWorkspaceOwnerId);
+  assert.equal(calls[3][1].getDocuments, documents.getDocuments);
   assert.equal(calls[3][1].toast, documents.toast);
   assert.equal(calls[3][1].fetchAll, documents.fetchAll);
   assert.equal(calls[3][1].documentsWorkflow, documents.documentsWorkflow);

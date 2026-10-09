@@ -658,7 +658,9 @@
       },
       holders: {
         $,
-        state,
+        getSelectedPropertyId: () => state.selectedPropertyId,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getPropertyHolders: () => state.propertyHolders,
         toast,
         fetchAll,
         repository: repositories.propertyHolders,
