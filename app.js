@@ -565,6 +565,17 @@
         fetchAll,
         documentRepository: repositories.documents,
         writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        modules: {
+          upload: window.PropertyDeskDocumentUpload,
+          uploadPolicy: window.PropertyDeskDocumentUploadPolicy,
+          actions: {
+            create: window.PropertyDeskDocumentActions.create,
+            modules: {
+              delete: window.PropertyDeskDocumentDelete,
+              open: window.PropertyDeskDocumentOpen,
+            },
+          },
+        },
       },
       workflows: {
         screen: window.PropertyDeskPropertyScreenWorkflow,

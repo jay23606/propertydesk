@@ -170,6 +170,7 @@ test("property document workflow routes actions through one explicit binder", ()
     openPropertyDetails() {},
     repository: {},
     writeFeedback: { kind: "write-feedback" },
+    modules: { kind: "document-modules" },
     documentsWorkflow: context.window.PropertyDeskDocuments,
     documentEventsWorkflow:
       context.window.PropertyDeskPropertyDetailDocumentEvents,
@@ -180,6 +181,7 @@ test("property document workflow routes actions through one explicit binder", ()
   assert.equal(calls[0][0], "documents");
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "fetchAll",
+    "modules",
     "openPropertyDetails",
     "repository",
     "state",
@@ -187,6 +189,7 @@ test("property document workflow routes actions through one explicit binder", ()
     "writeFeedback",
   ]);
   assert.equal(calls[0][1].repository, dependencies.repository);
+  assert.equal(calls[0][1].modules, dependencies.modules);
   assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
   assert.equal(calls[1][0], "events");
   assert.equal(calls[1][1].$, dependencies.$);

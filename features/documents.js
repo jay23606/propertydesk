@@ -12,22 +12,21 @@
     openWindow = (...args) => window.open(...args),
     repository,
     writeFeedback,
+    modules,
   }) {
-    const { uploadPropertyDocument } = window.PropertyDeskDocumentUpload.create(
-      {
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-        makeId,
-        repository,
-        writeFeedback,
-        describeUpload: window.PropertyDeskDocumentUploadPolicy.describe,
-      },
-    );
+    const { uploadPropertyDocument } = modules.upload.create({
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+      makeId,
+      repository,
+      writeFeedback,
+      describeUpload: modules.uploadPolicy.describe,
+    });
 
     const { deletePropertyDocument, openPropertyDocument } =
-      window.PropertyDeskDocumentActions.create({
+      modules.actions.create({
         state,
         toast,
         fetchAll,
@@ -36,6 +35,7 @@
         openWindow,
         repository,
         writeFeedback,
+        modules: modules.actions.modules,
       });
 
     return Object.freeze({

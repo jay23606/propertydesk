@@ -43,6 +43,15 @@ test("document maintenance receives write feedback through explicit dependencies
 });
 
 test("document actions separate deletion and signed-link dependencies", () => {
+  const root = path.join(__dirname, "..");
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(root, "features", "document-actions.js"), "utf8"),
+    /window\.PropertyDeskDocument(?:Delete|Open)\.create/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(root, "features", "documents.js"), "utf8"),
+    /window\.PropertyDeskDocument(?:Upload|Actions|UploadPolicy)[^.]*\.create|window\.PropertyDeskDocumentUploadPolicy\.describe/,
+  );
   const passed = {};
   const deleteAction = () => "deleted";
   const openAction = () => "opened";
@@ -78,6 +87,10 @@ test("document actions separate deletion and signed-link dependencies", () => {
     openWindow() {},
     repository: {},
     writeFeedback: { kind: "write-feedback" },
+    modules: {
+      delete: context.window.PropertyDeskDocumentDelete,
+      open: context.window.PropertyDeskDocumentOpen,
+    },
   };
 
   const actions =

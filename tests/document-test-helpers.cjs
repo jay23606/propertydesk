@@ -33,6 +33,17 @@ function createDocuments(context, options) {
         getClient: () => options.state.client,
       }),
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    modules: {
+      upload: context.window.PropertyDeskDocumentUpload,
+      uploadPolicy: context.window.PropertyDeskDocumentUploadPolicy,
+      actions: {
+        create: context.window.PropertyDeskDocumentActions.create,
+        modules: {
+          delete: context.window.PropertyDeskDocumentDelete,
+          open: context.window.PropertyDeskDocumentOpen,
+        },
+      },
+    },
   });
 }
 

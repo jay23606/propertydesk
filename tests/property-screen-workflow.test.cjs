@@ -45,6 +45,7 @@ test("property screen workflow passes detail actions to management and returns b
     fetchAll() {},
     documentRepository: { kind: "document-repository" },
     writeFeedback: { kind: "write-feedback" },
+    modules: { kind: "document-modules" },
     unusedDependency: true,
   };
   const attachPropertyDocumentEvents = () => {};
@@ -165,6 +166,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[3][0], "propertyDocuments");
   assert.equal(calls[3][1].repository, documents.documentRepository);
   assert.equal(calls[3][1].writeFeedback, documents.writeFeedback);
+  assert.equal(calls[3][1].modules, documents.modules);
   assert.equal(calls[3][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[3][1].$, documents.$);
   assert.equal(calls[3][1].state, documents.state);

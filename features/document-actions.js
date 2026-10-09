@@ -11,19 +11,18 @@
     openWindow,
     repository,
     writeFeedback,
+    modules,
   }) {
-    const { deletePropertyDocument } = window.PropertyDeskDocumentDelete.create(
-      {
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-        confirm,
-        repository,
-        writeFeedback,
-      },
-    );
-    const { openPropertyDocument } = window.PropertyDeskDocumentOpen.create({
+    const { deletePropertyDocument } = modules.delete.create({
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+      confirm,
+      repository,
+      writeFeedback,
+    });
+    const { openPropertyDocument } = modules.open.create({
       state,
       toast,
       openWindow,

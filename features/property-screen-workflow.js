@@ -60,6 +60,7 @@
       openPropertyDetails: details.openPropertyDetails,
       repository: documents.documentRepository,
       writeFeedback: documents.writeFeedback,
+      modules: documents.modules,
       documentsWorkflow: documents.documentsWorkflow,
       documentEventsWorkflow: documents.documentEventsWorkflow,
     });
