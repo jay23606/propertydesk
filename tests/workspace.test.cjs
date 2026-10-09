@@ -103,7 +103,15 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   };
   const workflow = context.window.PropertyDeskWorkspace.create({
     $: () => ({ value: "" }),
-    state,
+    getAccounts: () => state.accounts,
+    getProperties: () => state.properties,
+    getReminderLogs: () => state.reminderLogs,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
+    getWorkspaceMembers: () => state.workspaceMembers,
+    getWorkspaceOwnerId: () => "owner-1",
     now,
     esc() {},
     toast() {},
@@ -130,6 +138,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     /window\.PropertyDeskWorkspace(?:ProfileWorkflow|MembersView|Members|MemberMaintenance)\.create/,
   );
   assert.doesNotMatch(workspaceSource, /window\.confirm/);
+  assert.doesNotMatch(workspaceSource, /\bstate\b/);
 
   assert.equal(passed.profileWorkflow.getUser(), state.user);
   assert.equal("state" in passed.profileWorkflow, false);

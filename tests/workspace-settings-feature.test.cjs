@@ -68,7 +68,6 @@ test("workspace feature owns profile and member form bindings", () => {
     memberRepository: { addMember() {}, removeMember() {} },
     reminder: {
       $() {},
-      state: {},
       esc() {},
       fmtDate() {},
       money() {},
@@ -79,6 +78,13 @@ test("workspace feature owns profile and member form bindings", () => {
         handlers.set(`${id}:${event}`, handler);
       },
     }),
+    getAccounts: () => [],
+    getProperties: () => [],
+    getReminderLogs: () => [],
+    getUser: () => null,
+    setUser() {},
+    getWorkspaceMembers: () => [],
+    getWorkspaceOwnerId: () => null,
   });
 
   feature.attachProfileEvents();
@@ -258,7 +264,15 @@ test("workspace setting writes report rejected requests and retain entered value
     runAndRefreshWorkspaceChange:
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
     $,
-    state,
+    getAccounts: () => state.accounts,
+    getProperties: () => state.properties,
+    getReminderLogs: () => state.reminderLogs,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
+    getWorkspaceMembers: () => state.workspaceMembers,
+    getWorkspaceOwnerId: () => "owner-1",
     authClient: createAuthClient(context, state),
     esc: String,
     toast: (message) => messages.push(message),
@@ -267,7 +281,6 @@ test("workspace setting writes report rejected requests and retain entered value
     },
     reminder: {
       $() {},
-      state,
       esc() {},
       fmtDate() {},
       money() {},

@@ -43,12 +43,18 @@ test("app shell composes workspace settings and navigation explicitly", () => {
 
   const workspace = {
     $: () => {},
-    state: {},
+    getAccounts: () => [],
+    getProperties: () => [],
+    getReminderLogs: () => [],
+    getUser: () => null,
+    setUser() {},
+    getWorkspaceMembers: () => [],
+    getWorkspaceOwnerId: () => null,
     now: () => new Date("2026-10-08T12:00:00.000Z"),
     esc: () => {},
     toast: () => {},
     fetchAll: () => {},
-    reminder: { state: {} },
+    reminder: {},
     memberRepository: {},
     run: () => {},
     runAndRefreshWorkspaceChange: () => {},
@@ -60,7 +66,7 @@ test("app shell composes workspace settings and navigation explicitly", () => {
   const workspaceWorkflows = {};
   const navigation = {
     $: navigationSelector,
-    state: workspace.state,
+    setView() {},
     documentRef: {},
     windowRef: {},
     unusedNavigationValue: true,
@@ -79,12 +85,18 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "confirmAction",
     "esc",
     "fetchAll",
+    "getAccounts",
+    "getProperties",
+    "getReminderLogs",
+    "getUser",
+    "getWorkspaceMembers",
+    "getWorkspaceOwnerId",
     "memberRepository",
     "now",
     "reminder",
     "run",
     "runAndRefreshWorkspaceChange",
-    "state",
+    "setUser",
     "toast",
     "workflows",
   ]);
@@ -98,12 +110,12 @@ test("app shell composes workspace settings and navigation explicitly", () => {
     "$",
     "documentRef",
     "renderWorkspacePage",
-    "state",
+    "setView",
     "windowRef",
   ]);
   assert.equal("unusedNavigationValue" in passed.navigation, false);
   assert.equal(passed.navigation.$, navigationSelector);
-  assert.equal(passed.navigation.state, navigation.state);
+  assert.equal(passed.navigation.setView, navigation.setView);
   assert.equal(passed.navigation.documentRef, navigation.documentRef);
   assert.equal(passed.navigation.windowRef, navigation.windowRef);
   assert.equal(

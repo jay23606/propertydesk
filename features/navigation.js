@@ -4,13 +4,13 @@
 
   function create({
     $,
-    state,
+    setView,
     renderWorkspacePage,
     documentRef = document,
     windowRef = window,
   }) {
     function navigate(view) {
-      state.view = view;
+      setView(view);
       documentRef.querySelectorAll(".page").forEach((page) => {
         page.classList.toggle("active", page.id === "page-" + view);
       });

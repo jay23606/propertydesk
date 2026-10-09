@@ -4,7 +4,13 @@
 
   function create({
     $,
-    state,
+    getAccounts,
+    getProperties,
+    getReminderLogs,
+    getUser,
+    setUser,
+    getWorkspaceMembers,
+    getWorkspaceOwnerId,
     now,
     esc,
     toast,
@@ -19,7 +25,7 @@
   }) {
     function getReminderActivityData() {
       return {
-        accounts: state.accounts.map(
+        accounts: getAccounts().map(
           ({ id, property_id, party_name, name }) => ({
             id,
             property_id,
@@ -27,12 +33,12 @@
             name,
           }),
         ),
-        properties: state.properties.map(({ id, address, name }) => ({
+        properties: getProperties().map(({ id, address, name }) => ({
           id,
           address,
           name,
         })),
-        reminderLogs: state.reminderLogs.map(
+        reminderLogs: getReminderLogs().map(
           ({
             account_id,
             reminder_month,
@@ -66,10 +72,8 @@
     });
     const profileWorkflow = workflows.profile.create({
       $,
-      getUser: () => state.user,
-      setUser: (user) => {
-        state.user = user;
-      },
+      getUser,
+      setUser,
       now,
       authClient,
       toast,
@@ -78,9 +82,9 @@
     });
     const memberView = workflows.memberView.create({
       $,
-      getWorkspaceMembers: () => state.workspaceMembers,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getUser: () => state.user,
+      getWorkspaceMembers,
+      getWorkspaceOwnerId,
+      getUser,
       esc,
     });
     function renderWorkspaceSettings() {
@@ -94,7 +98,7 @@
     }
 
     const members = workflows.members.create({
-      getWorkspaceMembers: () => state.workspaceMembers,
+      getWorkspaceMembers,
       toast,
       fetchAll,
       view: memberView,

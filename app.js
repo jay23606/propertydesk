@@ -267,7 +267,15 @@
     },
     workspace: {
       $,
-      state,
+      getAccounts: () => state.accounts,
+      getProperties: () => state.properties,
+      getReminderLogs: () => state.reminderLogs,
+      getUser: () => state.user,
+      setUser: (user) => {
+        state.user = user;
+      },
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
       now,
       esc,
       toast,
@@ -277,7 +285,6 @@
         activityModelWorkflow: window.PropertyDeskReminderActivityModel,
         activityViewWorkflow: window.PropertyDeskReminderActivityView,
         $,
-        state,
         esc,
         fmtDate,
         fmtDateTime,
@@ -291,7 +298,9 @@
     },
     navigation: {
       $,
-      state,
+      setView: (view) => {
+        state.view = view;
+      },
       documentRef: document,
       windowRef: window,
     },

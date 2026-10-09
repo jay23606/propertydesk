@@ -50,7 +50,9 @@ test("navigation owns page routing and workspace settings navigation", () => {
   const feature = context.window.PropertyDeskNavigation.create({
     $: (id) =>
       id === "page-crumb" ? crumb : id === "user-menu" ? userMenu : null,
-    state,
+    setView: (view) => {
+      state.view = view;
+    },
     renderWorkspacePage: () => routes.push("workspace-page"),
     documentRef,
     windowRef: { scrollTo: () => routes.push("scroll") },

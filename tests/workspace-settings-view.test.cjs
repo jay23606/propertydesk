@@ -61,7 +61,13 @@ test("workspace settings render member labels and escape untrusted text", () => 
   const feature = context.window.PropertyDeskWorkspace.create({
     workflows,
     $: element,
-    state,
+    getAccounts: () => [],
+    getProperties: () => [],
+    getReminderLogs: () => [],
+    getUser: () => state.user,
+    setUser() {},
+    getWorkspaceMembers: () => state.workspaceMembers,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     esc: (value) =>
       String(value ?? "").replace(
         /[&<>"']/g,
@@ -78,7 +84,6 @@ test("workspace settings render member labels and escape untrusted text", () => 
     fetchAll: async () => {},
     reminder: {
       $() {},
-      state,
       esc() {},
       fmtDate() {},
       fmtDateTime() {},
