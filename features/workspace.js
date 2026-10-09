@@ -13,7 +13,7 @@
     authClient,
     writeFeedback,
     workflows,
-    confirmAction = (message) => window.confirm(message),
+    confirmAction,
   }) {
     const reminderWorkflow = reminder.workflow.create({
       $: reminder.$,

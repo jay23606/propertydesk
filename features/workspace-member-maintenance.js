@@ -9,7 +9,7 @@
     refreshWorkspaceSettings,
     repository,
     writeFeedback,
-    confirmAction = (message) => window.confirm(message),
+    confirmAction,
   }) {
     function memberWithEmailExists(email) {
       const normalizedEmail = email.trim().toLowerCase();

@@ -225,6 +225,7 @@
       },
       memberRepository: repositories.workspaceMembers,
       writeFeedback,
+      confirmAction: (message) => window.confirm(message),
       authClient,
     },
     navigation: {

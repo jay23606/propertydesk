@@ -14,6 +14,12 @@ test("workspace member maintenance uses its injected write service", () => {
     "utf8",
   );
   assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(source, /window\.confirm/);
+  const members = fs.readFileSync(
+    path.join(__dirname, "..", "features", "workspace-members.js"),
+    "utf8",
+  );
+  assert.match(members, /confirmAction,\s*\}\);/);
 });
 
 test("workspace feature owns profile and member form bindings", () => {
