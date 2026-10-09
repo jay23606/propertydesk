@@ -138,13 +138,16 @@
   } = financialContext;
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =
-    window.PropertyDeskReportWorkspaceWorkflow.create({
-      rendering: {
-        $,
+    window.PropertyDeskReportWorkspaceSetup.create({
+      records: {
         getPayments: () => state.payments,
         getExpenses: () => state.expenses,
         getAccounts: () => state.accounts,
         getImportBatches: () => state.importBatches,
+        getProperties: () => state.properties,
+      },
+      ui: {
+        $,
         now,
         dateOnly,
         sumIncome,
@@ -153,17 +156,14 @@
         esc,
         money,
         fmtDateTime,
-      },
-      exporting: {
-        $,
-        getAccounts: () => state.accounts,
-        getProperties: () => state.properties,
         todayIso,
         prettyType,
-        accountBalance,
+      },
+      services: {
         downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       },
       workflows: {
+        reportWorkspace: window.PropertyDeskReportWorkspaceWorkflow,
         report: window.PropertyDeskReportWorkflow,
         exporter: window.PropertyDeskReportExport,
         model: window.PropertyDeskReportModel,

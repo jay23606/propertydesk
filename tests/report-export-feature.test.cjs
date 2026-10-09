@@ -72,7 +72,7 @@ test("backup and report exports own separate button bindings", () => {
 
 test("app delegates Reports rendering and CSV export to one coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskReportWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkspaceSetup\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskReport(?:Workflow|Export)\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskReport(?:Model|Views)\.create\(/);
   assert.match(app, /renderers:[\s\S]*?renderReports/);
@@ -83,8 +83,17 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   );
   assert.match(
     app,
-    /exporting: \{[\s\S]*?getAccounts: \(\) => state\.accounts,[\s\S]*?getProperties: \(\) => state\.properties,/,
+    /getAccounts: \(\) => state\.accounts,[\s\S]*?getProperties: \(\) => state\.properties,/,
   );
+  const setup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "report-workspace-setup.js"),
+    "utf8",
+  );
+  assert.match(setup, /workflows\.reportWorkspace\.create\(/);
+  assert.match(setup, /getPayments: records\.getPayments/);
+  assert.match(setup, /getProperties: records\.getProperties/);
+  assert.match(setup, /downloadBlob: services\.downloadBlob/);
+  assert.doesNotMatch(setup, /\bstate\b/);
   assert.match(
     workspace,
     /workflows\.report\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?workflows\.exporter\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,

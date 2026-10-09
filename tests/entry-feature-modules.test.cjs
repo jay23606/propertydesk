@@ -70,7 +70,7 @@ test("account records and ledger entries use separate workspace workflows", () =
     accountDepositSetup,
     /accountHistoryRepository: services\.accountHistoryRepository/,
   );
-  assert.match(app, /PropertyDeskReportWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskReportWorkspaceSetup\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
@@ -329,6 +329,7 @@ test("property workspace composes screens and shares detail actions", () => {
     "features/property-workspace-setup.js",
     "features/import-workspace-setup.js",
     "features/backup-workspace-setup.js",
+    "features/report-workspace-setup.js",
     "features/overview-property-summary-model.js",
     "features/overview-model.js",
     "features/overview-view.js",
