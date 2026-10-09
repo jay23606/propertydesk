@@ -320,7 +320,7 @@ test("property workspace composes screens and shares detail actions", () => {
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
   const creationOrder = [
-    "const propertyDetails = screen.create(",
+    "const propertyDetails = detail.workflows.screen.create({",
     "const propertyOverview = workflows.overview.create({",
     "const properties = workflows.portfolio.create({",
   ].map((marker) => workflow.indexOf(marker));
@@ -334,10 +334,14 @@ test("property workspace composes screens and shares detail actions", () => {
   );
   assert.match(
     workflow,
-    /screen\.create\(\{\s*\.\.\.detail,\s*workflows: detailWorkflows,/,
+    /content: detail\.content,[\s\S]*?workflows: \{[\s\S]*?contentModules: detail\.workflows\.contentModules,/,
   );
-  assert.match(workflow, /workflows\.overview\.create\(\{\s*\.\.\.overview,/);
-  assert.match(workflow, /workflows\.portfolio\.create\(\{\s*\.\.\.portfolio,/);
+  assert.match(workflow, /workflows\.overview\.create\(\{\s*\$: overview\.\$/);
+  assert.match(
+    workflow,
+    /workflows\.portfolio\.create\(\{\s*\$: portfolio\.\$/,
+  );
+  assert.doesNotMatch(workflow, /\.\.\.detail|\.\.\.overview|\.\.\.portfolio/);
   for (const script of [
     "features/property-detail-content-workflow.js",
     "features/property-detail-management-workflow.js",

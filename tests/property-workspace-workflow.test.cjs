@@ -16,6 +16,7 @@ test("property workspace shares detail actions across overview and grid", () => 
     managementModules: { name: "management modules" },
     holderModules: { name: "holder modules" },
     unusedWorkflow: { name: "unused" },
+    screen: null,
   };
   const detail = {
     content: {},
@@ -129,19 +130,41 @@ test("property workspace shares detail actions across overview and grid", () => 
     "holders",
     "management",
     "managementModules",
-    "unusedWorkflow",
   ]);
   for (const key of Object.keys(calls[0][1].workflows))
     assert.equal(calls[0][1].workflows[key], detailWorkflows[key]);
   assert.equal("screen" in calls[0][1].workflows, false);
-  assert.equal("unusedWorkflow" in calls[0][1].workflows, true);
-  assert.equal("unusedDetailValue" in calls[0][1], true);
+  assert.equal("unusedWorkflow" in calls[0][1].workflows, false);
+  assert.equal("unusedDetailValue" in calls[0][1], false);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "content",
     "documents",
     "holders",
     "management",
-    "unusedDetailValue",
+    "workflows",
+  ]);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+    "$",
+    "collectedSince",
+    "esc",
+    "fmtDate",
+    "getAccounts",
+    "getPayments",
+    "getProperties",
+    "groupAccountsByProperty",
+    "isActiveAccount",
+    "isPosted",
+    "money",
+    "monthStart",
+    "monthlyScheduledEstimate",
+    "openPropertyDetails",
+    "openPropertyPayment",
+    "postedOnOrAfter",
+    "prettyKind",
+    "prettyType",
+    "propertyAddress",
+    "scheduledMonthlyRunRate",
+    "summarizeAccount",
     "workflows",
   ]);
   assert.equal(typeof calls[1][1].getProperties, "function");
@@ -153,7 +176,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[1][1].openPropertyPayment, openPropertyPayment);
   assert.equal(calls[1][1].workflows, workflows);
-  assert.equal("unusedDependency" in calls[1][1], true);
+  assert.equal("unusedDependency" in calls[1][1], false);
   assert.equal(calls[2][1].getSenderName, portfolio.getSenderName);
   assert.equal(calls[2][1].getPayments, portfolio.getPayments);
   assert.equal(calls[2][1].getPropertyHolders, portfolio.getPropertyHolders);
@@ -169,7 +192,40 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[2][1].openPayment, openPayment);
   assert.equal(calls[2][1].workflows, portfolioWorkflows);
-  assert.equal("unusedDependency" in calls[2][1], true);
+  assert.equal("unusedDependency" in calls[2][1], false);
+  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
+    "$",
+    "amountDueSince",
+    "dateOnly",
+    "editAccount",
+    "editPropertyQuickNote",
+    "esc",
+    "getAccounts",
+    "getPayments",
+    "getProperties",
+    "getPropertyHolders",
+    "getSenderName",
+    "getWorkspaceMembers",
+    "groupAccountsByProperty",
+    "isActiveAccount",
+    "lateReminderMailto",
+    "lateReminderSms",
+    "money",
+    "monthEnd",
+    "monthStart",
+    "monthlyScheduledEstimate",
+    "openAccountForProperty",
+    "openModal",
+    "openPayment",
+    "openPropertyDetails",
+    "paymentFrequencyLabel",
+    "paymentStatusInMonth",
+    "propertyAddress",
+    "streetAddress",
+    "summarizeAccount",
+    "toast",
+    "workflows",
+  ]);
   assert.equal(workspace.openPropertyDetails, openPropertyDetails);
   assert.equal(Object.isFrozen(workspace), true);
   assert.deepEqual(Object.keys(workspace).sort(), [
