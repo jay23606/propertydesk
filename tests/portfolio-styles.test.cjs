@@ -28,7 +28,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /\.portfolio-table/);
   assert.match(
     portfolio,
-    /\.portfolio-table\s*\{\s*box-sizing: border-box;\s*width: calc\(100% \+ 30px\);\s*margin-inline: -15px;\s*border-radius: 0;\s*border-inline: 0;/,
+    /\.portfolio-table\s*\{\s*box-sizing: border-box;\s*width: 100vw;\s*margin-left: calc\(50% - 50vw\);\s*border-radius: 0;\s*border-inline: 0;/,
     "mobile grid reaches both screen edges without side gutters",
   );
   assert.match(
@@ -51,7 +51,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 13vw;\s*min-width: 13vw;/,
+    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 11\.5vw;\s*min-width: 11\.5vw;/,
   );
   assert.match(
     portfolio,
@@ -59,7 +59,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table td\.portfolio-contact-action\s*\{\s*width: 7vw;\s*min-width: 7vw;\s*max-width: 7vw;/,
+    /\.portfolio-table td\.portfolio-contact-action\s*\{\s*width: 5\.75vw;\s*min-width: 5\.75vw;\s*max-width: 5\.75vw;/,
     "mobile keeps the Email and SMS action columns compact",
   );
   assert.match(
@@ -73,17 +73,17 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(3\),\s*\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 39vw;\s*min-width: 39vw;\s*max-width: 39vw;/,
+    /\.portfolio-table th:nth-child\(3\),\s*\.portfolio-table td:nth-child\(3\)\s*\{\s*width: 42vw;\s*min-width: 42vw;\s*max-width: 42vw;/,
     "mobile gives the address column more room and allows its text to wrap",
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(6\),\s*\.portfolio-table td:nth-child\(6\)\s*\{\s*width: 34vw;\s*min-width: 34vw;\s*max-width: 34vw;/,
+    /\.portfolio-table th:nth-child\(6\),\s*\.portfolio-table td:nth-child\(6\)\s*\{\s*width: 35vw;\s*min-width: 35vw;\s*max-width: 35vw;/,
     "mobile gives the name column more room and allows names to wrap",
   );
   assert.match(
     portfolio,
-    /@media \(max-width: 360px\)\s*\{[^}]*\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*width: 14vw;/s,
+    /@media \(max-width: 360px\)\s*\{[^}]*\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*width: 12\.5vw;/s,
     "the due amount remains readable on narrow phones while the five priority columns still fill the viewport",
   );
   assert.match(

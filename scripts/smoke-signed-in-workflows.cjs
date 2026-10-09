@@ -66,6 +66,8 @@ async function smokeSignedInWorkflows(browser, url) {
     return {
       wrapperWidth: table?.clientWidth ?? 0,
       wrapperLeft: table?.getBoundingClientRect().left ?? 0,
+      wrapperRight: table?.getBoundingClientRect().right ?? 0,
+      viewportWidth: window.innerWidth,
       paymentWidth: cells[0]?.getBoundingClientRect().width ?? 0,
       addressWidth: cells[2]?.getBoundingClientRect().width ?? 0,
       emailWidth: cells[3]?.getBoundingClientRect().width ?? 0,
@@ -87,11 +89,11 @@ async function smokeSignedInWorkflows(browser, url) {
     "mobile combines the separate due column with the payment action",
   );
   assert.ok(
-    mobileGrid.paymentWidth <= 90,
+    mobileGrid.paymentWidth <= 50,
     `mobile due/payment column should stay compact; got ${mobileGrid.paymentWidth}px`,
   );
   assert.ok(
-    mobileGrid.addressWidth >= 120,
+    mobileGrid.addressWidth >= 155,
     `mobile address column should have room for wrapped addresses: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
@@ -109,12 +111,13 @@ async function smokeSignedInWorkflows(browser, url) {
     `mobile reminder action columns should not have left/right padding: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.nameWidth >= 115,
+    mobileGrid.nameWidth >= 130,
     `mobile tenant/buyer name column should have room for wrapped names: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.wrapperLeft <= 1,
-    `the mobile Properties grid should reach the screen edges: ${JSON.stringify(mobileGrid)}`,
+    mobileGrid.wrapperLeft <= 1 &&
+      Math.abs(mobileGrid.wrapperRight - mobileGrid.viewportWidth) <= 1,
+    `the mobile Properties grid should reach both screen edges: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
     mobileGrid.monthlyPaymentLeft >= mobileGrid.wrapperRight - 1,
