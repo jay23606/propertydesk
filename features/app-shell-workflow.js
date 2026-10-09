@@ -12,6 +12,7 @@
     const workspacePage = workspaceWorkflow.create({
       $: workspace.$,
       state: workspace.state,
+      now: workspace.now,
       esc: workspace.esc,
       toast: workspace.toast,
       fetchAll: workspace.fetchAll,

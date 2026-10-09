@@ -14,7 +14,7 @@
     );
   }
 
-  function createProfileDisplay({ $, state, now = () => new Date() }) {
+  function createProfileDisplay({ $, state, now }) {
     function updateGreeting() {
       const currentTime = now();
       const greeting = greetingForHour(currentTime.getHours());

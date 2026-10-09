@@ -216,6 +216,7 @@
     workspace: {
       $,
       state,
+      now,
       esc,
       toast,
       fetchAll,

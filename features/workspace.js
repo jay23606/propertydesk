@@ -5,6 +5,7 @@
   function create({
     $,
     state,
+    now,
     esc,
     toast,
     fetchAll,
@@ -28,6 +29,7 @@
     const profileWorkflow = workflows.profile.create({
       $,
       state,
+      now,
       authClient,
       toast,
       writeFeedback,

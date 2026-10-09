@@ -8,6 +8,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   const passed = {};
   const updateGreeting = () => {};
   const saveProfile = () => {};
+  const now = () => new Date("2026-10-08T12:00:00.000Z");
   const state = { user: { user_metadata: { display_name: "Workspace" } } };
   const context = vm.createContext({
     window: {
@@ -50,6 +51,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   const dependencies = {
     $() {},
     state,
+    now,
     authClient: {},
     toast() {},
     writeFeedback: {},
@@ -71,6 +73,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   );
 
   assert.equal(passed.display.state, state);
+  assert.equal(passed.display.now, now);
   assert.equal(passed.settings.authClient, dependencies.authClient);
   assert.equal(passed.settings.writeFeedback, dependencies.writeFeedback);
   assert.equal(passed.settings.updateGreeting, updateGreeting);

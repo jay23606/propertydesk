@@ -59,6 +59,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   );
 
   const state = { user: { user_metadata: { display_name: "Owner" } } };
+  const now = () => new Date("2026-10-08T12:00:00.000Z");
   const memberRepository = { addMember() {}, removeMember() {} };
   const confirmAction = () => true;
   const writeFeedback = {};
@@ -77,6 +78,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   const workflow = context.window.PropertyDeskWorkspace.create({
     $: () => ({ value: "" }),
     state,
+    now,
     esc() {},
     toast() {},
     fetchAll() {},
@@ -103,6 +105,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   assert.doesNotMatch(workspaceSource, /window\.confirm/);
 
   assert.equal(passed.profileWorkflow.state, state);
+  assert.equal(passed.profileWorkflow.now, now);
   assert.equal(passed.profileWorkflow.writeFeedback, writeFeedback);
   assert.equal(passed.memberActions.writeFeedback, writeFeedback);
   assert.equal(passed.memberActions.confirmAction, confirmAction);
