@@ -75,7 +75,6 @@ async function smokeSignedInWorkflows(browser, url) {
       addressPadding: cells[2] ? getComputedStyle(cells[2]).paddingLeft : null,
       emailPadding: cells[3] ? getComputedStyle(cells[3]).paddingLeft : null,
       firstFiveRight: cells[5]?.getBoundingClientRect().right ?? 0,
-      wrapperRight: table?.getBoundingClientRect().right ?? 0,
       hiddenDue: cells[1]
         ? getComputedStyle(cells[1]).display === "none"
         : false,

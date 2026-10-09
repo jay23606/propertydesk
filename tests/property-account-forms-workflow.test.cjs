@@ -44,7 +44,6 @@ test("property and account forms keep separate dependencies and expose explicit 
     $: () => {},
     getProperties: () => [],
     getWorkspaceOwnerId: () => null,
-    getProperties: () => [],
     toast: () => {},
     closeModal: () => {},
     fetchAll: () => {},

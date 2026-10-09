@@ -11,6 +11,7 @@ module.exports = [
     },
     rules: {
       "no-undef": "error",
+      "no-dupe-keys": "error",
       "no-unused-vars": "error",
     },
   },
@@ -23,6 +24,7 @@ module.exports = [
     },
     rules: {
       "no-undef": "error",
+      "no-dupe-keys": "error",
       "no-unused-vars": "error",
     },
   },
@@ -35,6 +37,7 @@ module.exports = [
     },
     rules: {
       "no-undef": "error",
+      "no-dupe-keys": "error",
       "no-unused-vars": "error",
     },
   },
