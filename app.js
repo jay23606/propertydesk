@@ -315,8 +315,32 @@
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
   const propertyAccountForms =
-    window.PropertyDeskPropertyAccountFormsWorkflow.create({
+    window.PropertyDeskPropertyAccountFormsSetup.create({
+      records: {
+        getProperties: () => state.properties,
+        getAccounts: () => state.accounts,
+        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      },
+      ui: {
+        $,
+        moneyInput,
+        todayIso,
+        toast,
+        closeModal,
+        populateFormOptions,
+        openModal,
+        previewReminderEmail,
+      },
+      services: {
+        fetchAll,
+        propertyRepository: repositories.properties,
+        accountRepository: repositories.accounts,
+        saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
+      },
       workflows: {
+        forms: window.PropertyDeskPropertyAccountFormsWorkflow,
         propertyForm: window.PropertyDeskPropertyForm,
         accountForm: window.PropertyDeskAccountForm,
         propertyFormModules: {
@@ -334,45 +358,10 @@
             window.PropertyDeskWorkspaceRecordSaveMaintenance,
           propertyAction: window.PropertyDeskPropertyAccountAction,
         },
-      },
-      property: {
-        $,
-        getProperties: () => state.properties,
-        getWorkspaceOwnerId: () => state.workspaceOwnerId,
-        toast,
-        closeModal,
-        fetchAll,
-        repository: repositories.properties,
-        saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
-        saveAndRefreshWorkspaceRecord:
-          writeFeedback.saveAndRefreshWorkspaceRecord,
-        selectRecordWriteCompletion:
-          window.PropertyDeskWorkspaceRecordWriteWorkflow
-            .selectRecordWriteCompletion,
-      },
-      account: {
-        $,
-        getAccounts: () => state.accounts,
-        getWorkspaceOwnerId: () => state.workspaceOwnerId,
-        moneyInput,
-        todayIso,
-        toast,
-        closeModal,
-        fetchAll,
-        populateFormOptions,
-        openModal,
-        previewReminderEmail,
-        buildAccountPayload: window.PropertyDeskAccountPayload.build,
-        formModel: window.PropertyDeskAccountFormModel.create(
-          window.PropertyDeskEmailAddressUtils,
-        ),
-        repository: repositories.accounts,
-        saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
-        saveAndRefreshWorkspaceRecord:
-          writeFeedback.saveAndRefreshWorkspaceRecord,
-        selectRecordWriteCompletion:
-          window.PropertyDeskWorkspaceRecordWriteWorkflow
-            .selectRecordWriteCompletion,
+        accountPayload: window.PropertyDeskAccountPayload,
+        accountFormModel: window.PropertyDeskAccountFormModel,
+        emailAddressUtils: window.PropertyDeskEmailAddressUtils,
+        recordWrite: window.PropertyDeskWorkspaceRecordWriteWorkflow,
       },
     });
   const ledgerWorkflow = window.PropertyDeskTransactionWorkspaceWorkflow.create(

@@ -92,7 +92,7 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "ledger-entry-forms.js"),
     "utf8",
   );
-  assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyAccountFormsSetup\.create\(/);
   const propertyAccountForms = fs.readFileSync(
     path.join(
       __dirname,
@@ -100,6 +100,10 @@ test("account records and ledger entries use separate workspace workflows", () =
       "features",
       "property-account-forms-workflow.js",
     ),
+    "utf8",
+  );
+  const propertyAccountFormsSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-account-forms-setup.js"),
     "utf8",
   );
   assert.match(
@@ -111,15 +115,15 @@ test("account records and ledger entries use separate workspace workflows", () =
     /workflows\.accountForm\.create\(\{[\s\S]*?repository: account\.repository,/,
   );
   assert.match(ledgerEntryForms, /attachLedgerEntryFormEvents/);
-  assert.match(app, /repository: repositories\.accounts/);
-  assert.match(app, /repository: repositories\.properties/);
+  assert.match(app, /accountRepository: repositories\.accounts/);
+  assert.match(app, /propertyRepository: repositories\.properties/);
   assert.match(
-    app,
-    /buildAccountPayload: window\.PropertyDeskAccountPayload\.build/,
+    propertyAccountFormsSetup,
+    /buildAccountPayload: workflows\.accountPayload\.build/,
   );
   assert.match(
-    app,
-    /formModel: window\.PropertyDeskAccountFormModel\.create\([\s\S]*?window\.PropertyDeskEmailAddressUtils,\s*\)/,
+    propertyAccountFormsSetup,
+    /formModel: workflows\.accountFormModel\.create\([\s\S]*?workflows\.emailAddressUtils,/,
   );
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(

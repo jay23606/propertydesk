@@ -21,7 +21,7 @@ test("account forms receive reminder preview independently of workspace activity
   );
   assert.match(
     app,
-    /PropertyDeskPropertyAccountFormsWorkflow\.create\(\{[\s\S]*?account: \{[\s\S]*?previewReminderEmail,/,
+    /PropertyDeskPropertyAccountFormsSetup\.create\(\{[\s\S]*?previewReminderEmail,/,
   );
   for (const feature of [
     "features/reminder-activity-model.js",

@@ -7,7 +7,7 @@ test("app composes independent property and account forms before action routing"
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
 
-  assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskPropertyAccountFormsSetup\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   const composition = fs.readFileSync(

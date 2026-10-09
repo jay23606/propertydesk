@@ -173,8 +173,11 @@ test("property/account form coordinator loads before app and is cached", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const feature = "features/property-account-forms-workflow.js";
+  const setup = "features/property-account-forms-setup.js";
 
   assert.ok(html.indexOf("features/account-form.js") < html.indexOf(feature));
-  assert.ok(html.indexOf(feature) < html.indexOf("app.js"));
+  assert.ok(html.indexOf(feature) < html.indexOf(setup));
+  assert.ok(html.indexOf(setup) < html.indexOf("app.js"));
   assert.ok(worker.includes(`'./${feature}'`));
+  assert.ok(worker.includes(`'./${setup}'`));
 });
