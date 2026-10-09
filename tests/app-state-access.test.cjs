@@ -15,7 +15,7 @@ function loadAccess() {
   return context.window.PropertyDeskAppStateAccess;
 }
 
-test("app state accessors stay live and scope account-related records", () => {
+test("app state accessors expose only the records needed by each feature", () => {
   const records = {
     accounts: [
       { id: "account-1", property_id: "property-1" },
@@ -36,32 +36,94 @@ test("app state accessors stay live and scope account-related records", () => {
   };
   const access = loadAccess().create(records);
 
-  assert.equal(access.getAccount("account-1"), records.accounts[0]);
-  assert.equal(access.getAccount("missing"), null);
-  assert.equal(access.getProperty("property-1"), records.properties[0]);
+  assert.deepEqual(Object.keys(access).sort(), [
+    "accountDeposit",
+    "appShell",
+    "backup",
+    "createActions",
+    "formOptions",
+    "imports",
+    "modal",
+    "properties",
+    "propertyAccountForms",
+    "reminderPreview",
+    "report",
+    "startup",
+    "transactions",
+  ]);
+  assert.deepEqual(Object.keys(access.report).sort(), [
+    "getAccounts",
+    "getExpenses",
+    "getImportBatches",
+    "getPayments",
+    "getProperties",
+  ]);
+  assert.deepEqual(Object.keys(access.transactions).sort(), [
+    "getAccounts",
+    "getExpenses",
+    "getPayments",
+    "getPendingCorrection",
+    "getProperties",
+    "getWorkspaceOwnerId",
+    "setPendingCorrection",
+  ]);
+  assert.deepEqual(Object.keys(access.accountDeposit).sort(), [
+    "beginAuditRequest",
+    "getAccount",
+    "getAccountCollection",
+    "getAgreementVersions",
+    "getDepositCollection",
+    "getPaymentsForAccount",
+    "getProperty",
+    "getWorkspaceOwnerId",
+    "isCurrentAuditRequest",
+  ]);
+  assert.equal("setUser" in access.report, false);
+  assert.equal("getPendingCorrection" in access.accountDeposit, false);
+  assert.equal(
+    access.accountDeposit.getAccount("account-1"),
+    records.accounts[0],
+  );
+  assert.equal(access.accountDeposit.getAccount("missing"), null);
+  assert.equal(
+    access.accountDeposit.getProperty("property-1"),
+    records.properties[0],
+  );
   assert.deepEqual(
-    Array.from(access.getPaymentsForAccount("account-1"), ({ id }) => id),
+    Array.from(
+      access.accountDeposit.getPaymentsForAccount("account-1"),
+      ({ id }) => id,
+    ),
     ["payment-1"],
   );
   assert.deepEqual(
-    Array.from(access.getAgreementVersions("account-2"), ({ id }) => id),
+    Array.from(
+      access.accountDeposit.getAgreementVersions("account-2"),
+      ({ id }) => id,
+    ),
     ["agreement-2"],
   );
-  assert.equal(access.getAccountCollection("accounts"), records.accounts);
-  assert.equal(access.getAccountCollection("payments"), null);
   assert.equal(
-    access.getDepositCollection("depositEntries"),
+    access.accountDeposit.getAccountCollection("accounts"),
+    records.accounts,
+  );
+  assert.equal(access.accountDeposit.getAccountCollection("payments"), null);
+  assert.equal(
+    access.accountDeposit.getDepositCollection("depositEntries"),
     records.depositEntries,
   );
-  assert.equal(access.getDepositCollection("expenses"), null);
-  assert.equal(access.beginAuditRequest(), 1);
-  assert.equal(access.isCurrentAuditRequest(1), true);
-  access.beginAuditRequest();
-  assert.equal(access.isCurrentAuditRequest(1), false);
+  assert.equal(access.accountDeposit.getDepositCollection("expenses"), null);
+  assert.equal(access.accountDeposit.beginAuditRequest(), 1);
+  assert.equal(access.accountDeposit.isCurrentAuditRequest(1), true);
+  access.properties.beginAuditRequest();
+  assert.equal(access.accountDeposit.isCurrentAuditRequest(1), false);
 
   records.accounts = [{ id: "account-3" }];
-  assert.equal(access.getAccounts(), records.accounts);
-  assert.equal(access.getAccount("account-3"), records.accounts[0]);
+  assert.equal(access.report.getAccounts(), records.accounts);
+  assert.equal(
+    access.accountDeposit.getAccount("account-3"),
+    records.accounts[0],
+  );
 });
 
 test("app state accessors own simple state changes and workspace labels", () => {
@@ -76,21 +138,23 @@ test("app state accessors own simple state changes and workspace labels", () => 
   };
   const access = loadAccess().create(state);
 
-  assert.equal(access.getSenderName(), "Jay Abdal");
-  assert.equal(access.getWorkspaceOwnerId(), "owner-1");
-  access.setUser({ user_metadata: {} });
-  assert.equal(access.getSenderName(), "PropertyDesk");
-  access.setView("properties");
-  access.setPendingImport({ id: "import-1" });
-  access.setPendingCorrection({ id: "payment-1" });
-  access.setSelectedPropertyId("property-1");
-  access.setPasswordRecoveryInProgress(true);
-  assert.equal(access.getView(), "properties");
-  assert.equal(access.getPendingImport().id, "import-1");
-  assert.equal(access.getPendingCorrection().id, "payment-1");
-  assert.equal(access.getSelectedPropertyId(), "property-1");
-  assert.equal(access.getPasswordRecoveryInProgress(), true);
+  assert.equal(access.properties.getSenderName(), "Jay Abdal");
+  assert.equal(access.appShell.getWorkspaceOwnerId(), "owner-1");
+  access.startup.setUser({ user_metadata: {} });
+  assert.equal(access.properties.getSenderName(), "PropertyDesk");
+  access.appShell.setView("properties");
+  access.imports.setPendingImport({ id: "import-1" });
+  access.transactions.setPendingCorrection({ id: "payment-1" });
+  access.properties.setSelectedPropertyId("property-1");
+  access.startup.setPasswordRecoveryInProgress(true);
+  assert.equal(state.view, "properties");
+  assert.equal(access.imports.getPendingImport().id, "import-1");
+  assert.equal(access.transactions.getPendingCorrection().id, "payment-1");
+  assert.equal(access.properties.getSelectedPropertyId(), "property-1");
+  assert.equal(access.startup.getPasswordRecoveryInProgress(), true);
   assert.equal(Object.isFrozen(access), true);
+  for (const group of Object.values(access))
+    assert.equal(Object.isFrozen(group), true);
 });
 
 test("app state access module loads before the root and is precached", () => {
@@ -102,4 +166,6 @@ test("app state access module loads before the root and is precached", () => {
   assert.ok(worker.includes(`'./${script}'`));
   assert.match(app, /PropertyDeskAppStateAccess\.create\(state\)/);
   assert.doesNotMatch(app, /\bstate\.[A-Za-z_$]/);
+  assert.match(app, /records: stateAccess\.transactions/);
+  assert.match(app, /records: stateAccess\.properties/);
 });

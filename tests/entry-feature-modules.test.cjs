@@ -393,7 +393,7 @@ test("app passes reminder services into the app-shell coordinator", () => {
   assert.match(setup, /workspaceWorkflow: workflows\.workspace/);
   assert.match(
     app,
-    /PropertyDeskReminderPreviewSetup\.create\(\{[\s\S]*?getPayments: appRecords\.getPayments,[\s\S]*?openModal: modal\.openModal,/,
+    /PropertyDeskReminderPreviewSetup\.create\(\{[\s\S]*?records: stateAccess\.reminderPreview,[\s\S]*?openModal: modal\.openModal,/,
   );
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);

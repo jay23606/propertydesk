@@ -8,7 +8,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceSetup\.create\(\{[\s\S]*?getWorkspaceOwnerId:[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
+    /PropertyDeskBackupWorkspaceSetup\.create\(\{\s*records: stateAccess\.backup,[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,/,
   );
   const setup = fs.readFileSync(
     path.join(__dirname, "..", "features", "backup-workspace-setup.js"),
