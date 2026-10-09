@@ -55,7 +55,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     transactionComposition,
-    /maintenanceWorkflows\.workflow\.create\(/,
+    /workflows: \{ maintenance: transactionMaintenance, ledger: ledgerWorkflows \}/,
   );
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
@@ -304,7 +304,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create/);
   assert.match(
     transactionComposition,
-    /maintenanceWorkflows\.workflow\.create/,
+    /workflows: \{ maintenance: transactionMaintenance, ledger: ledgerWorkflows \}/,
   );
 });
 

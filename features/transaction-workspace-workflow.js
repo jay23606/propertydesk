@@ -6,54 +6,8 @@
     records,
     ui,
     services,
-    workflows: { maintenance: maintenanceWorkflows, ledger: ledgerWorkflows },
+    workflows: { maintenance: transactionMaintenance, ledger: ledgerWorkflows },
   }) {
-    const transactionMaintenance = maintenanceWorkflows.workflow.create({
-      correction: {
-        $: ui.$,
-        getAccounts: records.getAccounts,
-        getPendingCorrection: records.getPendingCorrection,
-        setPendingCorrection: records.setPendingCorrection,
-        getPayments: records.getPayments,
-        getExpenses: records.getExpenses,
-        toast: ui.toast,
-        fetchAll: services.fetchAll,
-        closeModal: ui.closeModal,
-        prettyType: ui.prettyType,
-        promptAction: ui.promptAction,
-        EventClass: ui.EventClass,
-        OptionClass: ui.OptionClass,
-        repository: {
-          correct: services.transactionRepository.correct,
-        },
-        runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-      },
-      voiding: {
-        getPayments: records.getPayments,
-        getExpenses: records.getExpenses,
-        toast: ui.toast,
-        fetchAll: services.fetchAll,
-        timestamp: ui.transactionTimestamp,
-        confirmAction: ui.confirmAction,
-        promptAction: ui.promptAction,
-        repository: {
-          voidPosted: services.transactionRepository.voidPosted,
-        },
-        runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-        resolveVoidTarget: maintenanceWorkflows.voidModel.resolveVoidTarget,
-        buildVoidPayload: maintenanceWorkflows.voidModel.buildVoidPayload,
-      },
-      events: { documentRef: ui.documentRef },
-      workflows: {
-        correctionModel: maintenanceWorkflows.correctionModel,
-        correction: maintenanceWorkflows.correction,
-        correctionModules: maintenanceWorkflows.correctionModules,
-        voidMaintenance: maintenanceWorkflows.voidMaintenance,
-        voidEntry: maintenanceWorkflows.voidEntry,
-        events: maintenanceWorkflows.events,
-      },
-    });
-
     return ledgerWorkflows.workflow.create({
       saveCorrection: transactionMaintenance.saveCorrection,
       createTransactionActionHandlers:

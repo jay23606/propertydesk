@@ -68,6 +68,12 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       "sumOperatingExpenses",
     ].map((name) => [name, { name }]),
   );
+  services.transactionRepository = {
+    correct() {},
+    voidPosted() {},
+    insertPayment() {},
+    insertExpense() {},
+  };
   services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     [
@@ -89,6 +95,21 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       "propertyPaymentAction",
     ].map((name) => [name, { name }]),
   );
+  const maintenanceApi = {
+    saveCorrection() {},
+    createTransactionActionHandlers() {},
+  };
+  let maintenanceOptions;
+  workflows.maintenance = {
+    create(options) {
+      maintenanceOptions = options;
+      return maintenanceApi;
+    },
+  };
+  workflows.voidModel = {
+    resolveVoidTarget() {},
+    buildVoidPayload() {},
+  };
   const result = { attachEvents() {} };
   let received;
   workflows.workspace = {
@@ -170,34 +191,32 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       );
     }
   }
-  for (const [name, value] of Object.entries(workflows)) {
-    if (name !== "workspace") {
-      const group = [
-        "correctionModel",
-        "maintenance",
-        "correction",
-        "correctionModules",
-        "voidModel",
-        "voidMaintenance",
-        "voidEntry",
-        "maintenanceEvents",
-      ].includes(name)
-        ? received.workflows.maintenance
-        : received.workflows.ledger;
-      const key =
-        name === "maintenanceEvents"
-          ? "events"
-          : name === "maintenance" || name === "ledger"
-            ? "workflow"
-            : name;
-      assert.equal(group[key], value, `workflows.${name} is preserved`);
-    }
-  }
+  assert.equal(received.workflows.maintenance, maintenanceApi);
+  assert.equal(received.workflows.ledger.workflow, workflows.ledger);
+  assert.equal(received.workflows.ledger.entryForms, workflows.entryForms);
+  assert.equal(received.workflows.ledger.views, workflows.views);
+  assert.equal(maintenanceOptions.correction.getAccounts, records.getAccounts);
+  assert.equal(maintenanceOptions.correction.getPayments, records.getPayments);
+  assert.equal(
+    maintenanceOptions.correction.getPendingCorrection,
+    records.getPendingCorrection,
+  );
+  assert.deepEqual(Object.keys(maintenanceOptions.correction.repository), [
+    "correct",
+  ]);
+  assert.equal(
+    maintenanceOptions.correction.repository.correct,
+    services.transactionRepository.correct,
+  );
+  assert.equal(maintenanceOptions.voiding.getExpenses, records.getExpenses);
+  assert.deepEqual(Object.keys(maintenanceOptions.voiding.repository), [
+    "voidPosted",
+  ]);
+  assert.equal(maintenanceOptions.events.documentRef, ui.documentRef);
   assert.deepEqual(Object.keys(received.workflows).sort(), [
     "ledger",
     "maintenance",
   ]);
-  assert.equal("ledger" in received.workflows.maintenance, false);
   assert.equal("maintenance" in received.workflows.ledger, false);
 
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");

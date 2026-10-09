@@ -27,8 +27,12 @@ test("transaction maintenance stays separate from ledger history composition", (
     /ledgerWorkflows\.workflow\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
   );
   assert.ok(
-    composition.indexOf("maintenanceWorkflows.workflow.create(") <
-      composition.indexOf("ledgerWorkflows.workflow.create("),
+    fs
+      .readFileSync(
+        path.join(root, "features", "transaction-workspace-setup.js"),
+        "utf8",
+      )
+      .indexOf("workflows.maintenance.create(") >= 0,
   );
   assert.match(
     maintenance,
