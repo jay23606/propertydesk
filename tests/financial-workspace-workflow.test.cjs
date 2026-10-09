@@ -29,7 +29,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   assert.equal((app.match(/window\.prompt\(/g) || []).length, 1);
   assert.equal((app.match(/window\.open\(/g) || []).length, 1);
 
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
@@ -56,6 +56,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
     "workspace-deposit-context",
     "transaction-maintenance-workflow",
     "transaction-workspace-workflow",
+    "transaction-workspace-setup",
     "ledger-workflow",
   ]) {
     const script = `features/${feature}.js`;

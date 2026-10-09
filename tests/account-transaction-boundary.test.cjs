@@ -9,9 +9,13 @@ test("app composes independent property and account forms before action routing"
 
   assert.match(app, /PropertyDeskPropertyAccountFormsSetup\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   const composition = fs.readFileSync(
     path.join(root, "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
+  const transactionSetup = fs.readFileSync(
+    path.join(root, "features", "transaction-workspace-setup.js"),
     "utf8",
   );
   const formOptions = fs.readFileSync(
@@ -23,6 +27,12 @@ test("app composes independent property and account forms before action routing"
     composition,
     /workflows\.maintenance\.create\([\s\S]*?return workflows\.ledger\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
+  assert.match(transactionSetup, /workflows\.workspace\.create\(/);
+  assert.match(
+    transactionSetup,
+    /getPendingCorrection: records\.getPendingCorrection/,
+  );
+  assert.doesNotMatch(transactionSetup, /\bstate\./);
   assert.match(app, /getPendingCorrection: \(\) => state\.pendingCorrection/);
   assert.match(app, /setPendingCorrection: \(value\) =>/);
   assert.match(app, /getAccounts: \(\) => state\.accounts/);

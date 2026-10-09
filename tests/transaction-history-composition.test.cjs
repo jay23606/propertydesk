@@ -21,7 +21,7 @@ test("transaction maintenance stays separate from ledger history composition", (
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     composition,
     /workflows\.ledger\.create\(\{\s*maintenance: transactionMaintenance,/,
@@ -46,6 +46,8 @@ test("transaction maintenance stays separate from ledger history composition", (
   );
   assert.match(html, /features\/ledger-workflow\.js/);
   assert.match(worker, /'\.\/features\/ledger-workflow\.js'/);
+  assert.match(html, /features\/transaction-workspace-setup\.js/);
+  assert.match(worker, /'\.\/features\/transaction-workspace-setup\.js'/);
   assert.doesNotMatch(html, /transaction-records-workflow/);
   assert.doesNotMatch(worker, /transaction-records-workflow/);
 });

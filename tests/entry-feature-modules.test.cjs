@@ -13,6 +13,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
+  const transactionSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-workspace-setup.js"),
+    "utf8",
+  );
   const accountDepositSetup = fs.readFileSync(
     path.join(
       __dirname,
@@ -48,7 +52,7 @@ test("account records and ledger entries use separate workspace workflows", () =
     ),
     /window\.PropertyDesk[A-Za-z]+\.create\(/,
   );
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(transactionComposition, /workflows\.maintenance\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
@@ -127,11 +131,11 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
-    app,
-    /transactionPayloads: window\.PropertyDeskTransactionPayloads/,
+    transactionSetup,
+    /transactionPayloads: workflows\.transactionPayloads/,
   );
   assert.match(app, /PropertyDeskCreateActions\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     transactionComposition,
     /workflows\.ledger\.create\(\{[\s\S]*?entries: \{[\s\S]*?transactionRepository: services\.transactionRepository,[\s\S]*?transactionPayloads: workflows\.transactionPayloads/,
@@ -269,7 +273,7 @@ test("app coordinator passes the amortization helper into account details", () =
     app,
     /PropertyDesk(?:PropertyQuickNote|PropertyManagement)\.create/,
   );
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskRecordEntryWorkflow\.create\(/);
   const ledgerWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "ledger-workflow.js"),
@@ -293,7 +297,7 @@ test("app coordinator passes the amortization helper into account details", () =
     );
     assert.doesNotMatch(source, /pd_correct_transaction/);
   }
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create/);
   assert.match(transactionComposition, /workflows\.maintenance\.create/);
 });
@@ -406,7 +410,7 @@ test("app root composes shared state and workspace services directly", () => {
   assert.doesNotMatch(app, /PropertyDeskAccountFinancialSummary\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskDepositContext\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   assert.doesNotMatch(
     app,
