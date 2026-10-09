@@ -18,6 +18,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /repositories: \{\s*queryUtils: window\.PropertyDeskRepositoryQueryUtils,/,
   );
+  assert.match(
+    app,
+    /PropertyDeskFormOptions\.create\(\{[\s\S]*?modules: \{\s*domainOptions: window\.PropertyDeskDomainOptions,\s*transactionOptions: window\.PropertyDeskTransactionOptions,/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,

@@ -54,6 +54,14 @@ test("date, display, and money-input utilities preserve their shared contracts",
 });
 
 test("form options are populated from shared domain and transaction catalogs", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "form-options.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDesk(?:Domain|Transaction)Options/,
+  );
   const context = vm.createContext({
     window: {},
     Object,
@@ -79,6 +87,10 @@ test("form options are populated from shared domain and transaction catalogs", (
     esc: String,
     propertyAddress: String,
     prettyType: String,
+    modules: {
+      domainOptions: context.window.PropertyDeskDomainOptions,
+      transactionOptions: context.window.PropertyDeskTransactionOptions,
+    },
   });
 
   assert.match($("account-type").innerHTML, /value="land_contract"/);

@@ -96,6 +96,10 @@ function createController() {
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     propertyAddress: (property) => property.address,
     prettyType: (type) => type,
+    modules: {
+      domainOptions: context.window.PropertyDeskDomainOptions,
+      transactionOptions: context.window.PropertyDeskTransactionOptions,
+    },
   });
   return {
     controller,

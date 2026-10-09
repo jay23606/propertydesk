@@ -2,15 +2,15 @@
 (() => {
   "use strict";
 
-  function create({ $, state, esc, propertyAddress, prettyType }) {
+  function create({ $, state, esc, propertyAddress, prettyType, modules }) {
     const { accountTypes, paymentFrequencies, propertyKinds } =
-      window.PropertyDeskDomainOptions;
+      modules.domainOptions;
     const {
       incomeCategories,
       paymentMethods,
       expensePaymentMethods,
       expenseCategories,
-    } = window.PropertyDeskTransactionOptions;
+    } = modules.transactionOptions;
 
     function populateSelectOptions() {
       for (const [id, options] of [

@@ -153,6 +153,10 @@
       esc,
       propertyAddress,
       prettyType,
+      modules: {
+        domainOptions: window.PropertyDeskDomainOptions,
+        transactionOptions: window.PropertyDeskTransactionOptions,
+      },
     });
   const { previewReminderEmail } =
     window.PropertyDeskReminderPreviewWorkflow.create({
