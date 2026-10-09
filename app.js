@@ -702,60 +702,12 @@
       },
     },
   });
-  const csvValueUtils = window.PropertyDeskCsvValueUtils.create({
-    modules: { currencyUtils: window.PropertyDeskCurrencyUtils },
-  });
-  const accountImportTerms = window.PropertyDeskAccountImportTerms.create({
-    modules: {
-      csvValueUtils,
-      domainOptions: window.PropertyDeskDomainOptions,
-    },
-  });
-  const paymentImportAllocation =
-    window.PropertyDeskPaymentImportAllocation.create({
-      modules: {
-        csvValueUtils,
-        currencyUtils: window.PropertyDeskCurrencyUtils,
-        displayUtils: window.PropertyDeskDisplayUtils,
-      },
-    });
-  const importValidators = window.PropertyDeskImportValidationApi.create({
-    account: {
-      validator: window.PropertyDeskAccountImportValidation,
-      modules: {
-        importRows: window.PropertyDeskImportRows,
-        csvValueUtils,
-        identity: window.PropertyDeskAccountImportIdentity,
-        domainOptions: window.PropertyDeskDomainOptions,
-        terms: accountImportTerms,
-        emailAddresses: window.PropertyDeskEmailAddressUtils,
-      },
-    },
-    expense: {
-      validator: window.PropertyDeskExpenseImportValidation,
-      modules: {
-        importRows: window.PropertyDeskImportRows,
-        csvValueUtils,
-        transactionOptions: window.PropertyDeskTransactionOptions,
-        expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
-      },
-    },
-    payment: {
-      validator: window.PropertyDeskPaymentImportValidation,
-      modules: {
-        importRows: window.PropertyDeskImportRows,
-        csvValueUtils,
-        paymentAllocation: paymentImportAllocation,
-        transactionOptions: window.PropertyDeskTransactionOptions,
-      },
-    },
-  });
   const {
     attachPreviewEvents: attachImportPreviewEvents,
     attachAccountEvents: attachAccountImportEvents,
     attachPaymentEvents: attachPaymentImportEvents,
     attachExpenseEvents: attachExpenseImportEvents,
-  } = window.PropertyDeskImportFeature.create({
+  } = window.PropertyDeskImportWorkspaceWorkflow.create({
     $,
     state,
     esc,
@@ -766,10 +718,26 @@
     toast,
     repository: repositories.imports,
     writeFeedback,
+    workflows: {
+      csvValueUtils: window.PropertyDeskCsvValueUtils,
+      accountImportTerms: window.PropertyDeskAccountImportTerms,
+      paymentImportAllocation: window.PropertyDeskPaymentImportAllocation,
+      validationApi: window.PropertyDeskImportValidationApi,
+      feature: window.PropertyDeskImportFeature,
+    },
     modules: {
+      currencyUtils: window.PropertyDeskCurrencyUtils,
+      displayUtils: window.PropertyDeskDisplayUtils,
+      domainOptions: window.PropertyDeskDomainOptions,
+      transactionOptions: window.PropertyDeskTransactionOptions,
+      expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
+      emailAddresses: window.PropertyDeskEmailAddressUtils,
+      accountValidation: window.PropertyDeskAccountImportValidation,
+      accountImportIdentity: window.PropertyDeskAccountImportIdentity,
+      expenseValidation: window.PropertyDeskExpenseImportValidation,
+      paymentValidation: window.PropertyDeskPaymentImportValidation,
       importRows: window.PropertyDeskImportRows,
       csvParser: window.PropertyDeskCsvParser,
-      validators: importValidators,
       preview: {
         create: window.PropertyDeskImportPreview.create,
         modules: {

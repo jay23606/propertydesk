@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v786';
+const CACHE_NAME = 'propertydesk-shell-v787';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -142,6 +142,7 @@ const SHELL_FILES = [
   './features/import-commit-reporting.js',
   './features/import-commit.js',
   './features/imports.js',
+  './features/import-workspace-workflow.js',
   './features/property-activity-details.js',
   './features/property-documents-view.js',
   './features/property-activity-transactions.js',

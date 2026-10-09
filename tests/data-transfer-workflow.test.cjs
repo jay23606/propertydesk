@@ -11,7 +11,11 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   assert.match(
     app,
-    /PropertyDeskImportFeature\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?writeFeedback,/,
+    /PropertyDeskImportWorkspaceWorkflow\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?writeFeedback,/,
+  );
+  assert.doesNotMatch(
+    app,
+    /PropertyDesk(?:CsvValueUtils|AccountImportTerms|PaymentImportAllocation|ImportValidationApi)\.create\(/,
   );
   const imports = fs.readFileSync(
     path.join(root, "features", "imports.js"),
@@ -30,16 +34,16 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     app,
-    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?validators: importValidators,[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
+    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?preview: \{[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
   );
-  assert.match(
-    app,
-    /PropertyDeskImportValidationApi\.create\(\{[\s\S]*?validator: window\.PropertyDeskAccountImportValidation,[\s\S]*?validator: window\.PropertyDeskExpenseImportValidation,[\s\S]*?expenseAccountPolicy: window\.PropertyDeskExpenseAccountPolicy,[\s\S]*?validator: window\.PropertyDeskPaymentImportValidation/,
+  const importWorkspace = fs.readFileSync(
+    path.join(root, "features", "import-workspace-workflow.js"),
+    "utf8",
   );
-  assert.match(
-    app,
-    /PropertyDeskImportValidationApi\.create\(\{[\s\S]*?validator: window\.PropertyDeskAccountImportValidation,[\s\S]*?validator: window\.PropertyDeskExpenseImportValidation,[\s\S]*?validator: window\.PropertyDeskPaymentImportValidation/,
-  );
+  assert.match(importWorkspace, /workflows\.validationApi\.create\(/);
+  assert.match(importWorkspace, /workflows\.feature\.create\(/);
+  assert.match(importWorkspace, /paymentAllocation: paymentImportAllocation/);
+  assert.match(importWorkspace, /validators,/);
   assert.match(
     app,
     /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,\s*table: window\.PropertyDeskImportPreviewTable,/,
@@ -62,6 +66,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   for (const script of [
     "features/imports.js",
+    "features/import-workspace-workflow.js",
     "features/transaction-import-feature.js",
     "features/backup-export.js",
     "features/backup-workspace-workflow.js",
