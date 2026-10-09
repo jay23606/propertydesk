@@ -28,7 +28,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   assert.match(portfolio, /\.portfolio-table/);
   assert.match(
     portfolio,
-    /\.portfolio-table\s*\{\s*box-sizing: border-box;\s*width: calc\(100% \+ 30px\);\s*margin-inline: -15px;\s*border-radius: 0;/,
+    /\.portfolio-table\s*\{\s*box-sizing: border-box;\s*width: 100vw;\s*margin-inline: calc\(50% - 50vw\);\s*border-radius: 0;/,
     "mobile grid reaches both screen edges without side gutters",
   );
   assert.match(
@@ -51,7 +51,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 11vw;\s*min-width: 11vw;/,
+    /\.portfolio-table th:nth-child\(1\),\s*\.portfolio-table td:nth-child\(1\)\s*\{\s*position: sticky;\s*left: 0;\s*width: 14vw;\s*min-width: 14vw;/,
   );
   assert.match(
     portfolio,
@@ -78,7 +78,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table th:nth-child\(6\),\s*\.portfolio-table td:nth-child\(6\)\s*\{\s*width: 41vw;\s*min-width: 41vw;\s*max-width: 41vw;/,
+    /\.portfolio-table th:nth-child\(6\),\s*\.portfolio-table td:nth-child\(6\)\s*\{\s*width: 38vw;\s*min-width: 38vw;\s*max-width: 38vw;/,
     "mobile gives the name column more room and allows names to wrap",
   );
   assert.match(

@@ -18,6 +18,9 @@ test("CSV validation modules expose focused validators through the stable import
     "account-import-validation.js",
     "expense-import-validation.js",
     "payment-import-validation.js",
+    "csv-value-utils.js",
+    "account-import-terms.js",
+    "payment-import-allocation.js",
   ]) {
     const source = fs.readFileSync(
       path.join(__dirname, "..", "features", file),
@@ -25,7 +28,7 @@ test("CSV validation modules expose focused validators through the stable import
     );
     assert.doesNotMatch(
       source,
-      /globalThis\.PropertyDesk(?!\w+ImportValidation)/,
+      /globalThis\.PropertyDesk(?!(?:AccountImportValidation|ExpenseImportValidation|PaymentImportValidation|CsvValueUtils|AccountImportTerms|PaymentImportAllocation))/,
     );
   }
 });

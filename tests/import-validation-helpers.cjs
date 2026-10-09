@@ -2,15 +2,26 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
 require("../features/currency-utils.js");
-const csvValueUtils = require("../features/csv-value-utils.js");
+const csvValueUtils = require("../features/csv-value-utils.js").create({
+  modules: { currencyUtils: globalThis.PropertyDeskCurrencyUtils },
+});
 const emailAddresses = require("../features/email-address-utils.js");
 const domainOptions = require("../features/domain-options.js");
 const transactionOptions = require("../features/transaction-options.js");
 require("../features/display-utils.js");
 const importRows = require("../features/import-row-utils.js");
 const identity = require("../features/account-import-identity.js");
-const terms = require("../features/account-import-terms.js");
-const paymentAllocation = require("../features/payment-import-allocation.js");
+const terms = require("../features/account-import-terms.js").create({
+  modules: { csvValueUtils, domainOptions },
+});
+const paymentAllocation =
+  require("../features/payment-import-allocation.js").create({
+    modules: {
+      csvValueUtils,
+      currencyUtils: globalThis.PropertyDeskCurrencyUtils,
+      displayUtils: globalThis.PropertyDeskDisplayUtils,
+    },
+  });
 const expenseAccountPolicy = require("../features/expense-account-policy.js");
 const { selectImportRows } = require("../features/import-row-utils.js");
 const accountValidation = require("../features/account-import-validation.js");

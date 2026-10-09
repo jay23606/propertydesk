@@ -41,6 +41,7 @@ test("CSV parser rejects malformed headings and quoting and marks long rows", ()
 test("CSV parsing stays separate from field value validation", () => {
   assert.equal(typeof parseCSV, "function");
   const valueUtils = require("../features/csv-value-utils.js");
-  assert.equal(typeof valueUtils.csvMoney, "function");
+  assert.equal(typeof valueUtils.create, "function");
+  assert.equal("csvMoney" in valueUtils, false);
   assert.equal("parseCSV" in valueUtils, false);
 });

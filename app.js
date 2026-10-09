@@ -687,15 +687,32 @@
       },
     },
   });
+  const csvValueUtils = window.PropertyDeskCsvValueUtils.create({
+    modules: { currencyUtils: window.PropertyDeskCurrencyUtils },
+  });
+  const accountImportTerms = window.PropertyDeskAccountImportTerms.create({
+    modules: {
+      csvValueUtils,
+      domainOptions: window.PropertyDeskDomainOptions,
+    },
+  });
+  const paymentImportAllocation =
+    window.PropertyDeskPaymentImportAllocation.create({
+      modules: {
+        csvValueUtils,
+        currencyUtils: window.PropertyDeskCurrencyUtils,
+        displayUtils: window.PropertyDeskDisplayUtils,
+      },
+    });
   const importValidators = window.PropertyDeskImportValidationApi.create({
     account: {
       validator: window.PropertyDeskAccountImportValidation,
       modules: {
         importRows: window.PropertyDeskImportRows,
-        csvValueUtils: window.PropertyDeskCsvValueUtils,
+        csvValueUtils,
         identity: window.PropertyDeskAccountImportIdentity,
         domainOptions: window.PropertyDeskDomainOptions,
-        terms: window.PropertyDeskAccountImportTerms,
+        terms: accountImportTerms,
         emailAddresses: window.PropertyDeskEmailAddressUtils,
       },
     },
@@ -703,7 +720,7 @@
       validator: window.PropertyDeskExpenseImportValidation,
       modules: {
         importRows: window.PropertyDeskImportRows,
-        csvValueUtils: window.PropertyDeskCsvValueUtils,
+        csvValueUtils,
         transactionOptions: window.PropertyDeskTransactionOptions,
         expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
       },
@@ -712,8 +729,8 @@
       validator: window.PropertyDeskPaymentImportValidation,
       modules: {
         importRows: window.PropertyDeskImportRows,
-        csvValueUtils: window.PropertyDeskCsvValueUtils,
-        paymentAllocation: window.PropertyDeskPaymentImportAllocation,
+        csvValueUtils,
+        paymentAllocation: paymentImportAllocation,
         transactionOptions: window.PropertyDeskTransactionOptions,
       },
     },

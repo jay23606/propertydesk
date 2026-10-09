@@ -272,7 +272,10 @@ function loadImportFeatures(context) {
   loadImportPreview(context);
   require("../features/currency-utils.js");
   context.window.PropertyDeskCsvParser = require("../features/csv-parser.js");
-  context.window.PropertyDeskCsvValueUtils = require("../features/csv-value-utils.js");
+  context.window.PropertyDeskCsvValueUtils =
+    require("../features/csv-value-utils.js").create({
+      modules: { currencyUtils: globalThis.PropertyDeskCurrencyUtils },
+    });
   context.window.PropertyDeskImportRows = require("../features/import-row-utils.js");
   for (const filename of [
     "account-import-payload.js",
