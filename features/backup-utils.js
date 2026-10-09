@@ -7,11 +7,9 @@
       throw new Error("The workspace table catalog is required.");
     const tables = Object.freeze(Object.values(workspaceTables));
 
-    function createBackup(
-      records,
-      exportedAt = new Date().toISOString(),
-      includedFiles = [],
-    ) {
+    function createBackup(records, exportedAt, includedFiles = []) {
+      if (typeof exportedAt !== "string" || !exportedAt)
+        throw new TypeError("Backup export time must be provided.");
       const data = Object.fromEntries(
         tables.map((table) => [
           table,

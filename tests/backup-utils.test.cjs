@@ -103,4 +103,8 @@ test("private ZIP helper writes readable stored entries and rejects unsafe paths
     () => createZip([{ name: "../private.txt", data: "nope" }]),
     /relative paths/,
   );
+  assert.throws(
+    () => createZip([{ name: "valid.txt", data: "ok" }]),
+    /valid Date/,
+  );
 });

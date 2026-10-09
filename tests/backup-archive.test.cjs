@@ -46,8 +46,8 @@ test("backup archive assembles records and agreement files before ZIP encoding",
       return { manifest: { file_count: args[2].length }, data: args[0] };
     },
     zipUtils: {
-      createZip: (entries) => {
-        calls.push(["zip", entries]);
+      createZip: (entries, timestamp) => {
+        calls.push(["zip", entries, timestamp]);
         return archived;
       },
     },
@@ -67,6 +67,7 @@ test("backup archive assembles records and agreement files before ZIP encoding",
   assert.equal(calls[2][2], "2026-10-06T13:00:00.000Z");
   assert.equal(calls[2][3], includedFiles);
   const zipEntries = calls[3][1];
+  assert.equal(calls[3][2].toISOString(), "2026-10-06T13:00:00.000Z");
   assert.equal(zipEntries.length, 2);
   assert.equal(zipEntries[0].name, "propertydesk-backup.json");
   assert.deepEqual(JSON.parse(zipEntries[0].data).manifest, { file_count: 1 });

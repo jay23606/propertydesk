@@ -43,10 +43,9 @@
   }
 
   function dosTimestamp(date) {
-    const valid =
-      date instanceof Date && Number.isFinite(date.getTime())
-        ? date
-        : new Date();
+    if (!(date instanceof Date) || !Number.isFinite(date.getTime()))
+      throw new TypeError("ZIP timestamp must be a valid Date.");
+    const valid = date;
     const year = Math.max(1980, Math.min(2107, valid.getUTCFullYear()));
     return {
       time:
@@ -132,18 +131,18 @@
     return header;
   }
 
-  function createZip(entries, timestamp = new Date()) {
+  function createZip(entries, timestamp) {
     if (!Array.isArray(entries) || entries.length > 65535)
       throw new Error("ZIP archive supports up to 65,535 entries");
-    const names = new Set(),
-      localParts = [],
-      centralParts = [],
-      stamp = dosTimestamp(timestamp);
+    const names = new Set();
+    const preparedEntries = entries.map((entry) => zipEntryData(entry, names));
+    const stamp = dosTimestamp(timestamp);
+    const localParts = [],
+      centralParts = [];
     let localOffset = 0,
       centralSize = 0;
-    for (const entry of entries) {
-      const { nameBytes, bytes, checksum } = zipEntryData(entry, names),
-        size = bytes.byteLength,
+    for (const { nameBytes, bytes, checksum } of preparedEntries) {
+      const size = bytes.byteLength,
         localHeader = localFileHeader(checksum, size, nameBytes.length, stamp),
         centralHeader = centralDirectoryHeader(
           checksum,

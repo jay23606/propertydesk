@@ -87,8 +87,8 @@ async function smokeSignedInWorkflows(browser, url) {
     "mobile combines the separate due column with the payment action",
   );
   assert.ok(
-    mobileGrid.paymentWidth <= 56,
-    `mobile payment column should be at most 56px; got ${mobileGrid.paymentWidth}px`,
+    mobileGrid.paymentWidth <= 90,
+    `mobile due/payment column should stay compact; got ${mobileGrid.paymentWidth}px`,
   );
   assert.ok(
     mobileGrid.addressWidth >= 120,
@@ -109,7 +109,7 @@ async function smokeSignedInWorkflows(browser, url) {
     `mobile reminder action columns should not have left/right padding: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
-    mobileGrid.nameWidth >= 145,
+    mobileGrid.nameWidth >= 115,
     `mobile tenant/buyer name column should have room for wrapped names: ${JSON.stringify(mobileGrid)}`,
   );
   assert.ok(
@@ -137,6 +137,26 @@ async function smokeSignedInWorkflows(browser, url) {
   assert.ok(
     widerMobileGrid.monthlyPaymentLeft >= widerMobileGrid.wrapperRight - 1,
     `the sixth column should remain off-screen at 430px: ${JSON.stringify(widerMobileGrid)}`,
+  );
+  await signedInPage.setViewportSize({ width: 320, height: 740 });
+  const narrowMobileGrid = await signedInPage.evaluate(() => {
+    const table = document.querySelector(".portfolio-table");
+    const row = document.querySelector("#properties-table tr");
+    return {
+      wrapperLeft: table?.getBoundingClientRect().left ?? 0,
+      wrapperRight: table?.getBoundingClientRect().right ?? 0,
+      firstFiveRight: row?.cells[5]?.getBoundingClientRect().right ?? 0,
+      monthlyPaymentLeft: row?.cells[6]?.getBoundingClientRect().left ?? 0,
+    };
+  });
+  assert.ok(
+    narrowMobileGrid.wrapperLeft <= 1 &&
+      narrowMobileGrid.firstFiveRight <= narrowMobileGrid.wrapperRight + 1,
+    `the first five columns should fit edge-to-edge at 320px: ${JSON.stringify(narrowMobileGrid)}`,
+  );
+  assert.ok(
+    narrowMobileGrid.monthlyPaymentLeft >= narrowMobileGrid.wrapperRight - 1,
+    `the sixth column should stay off-screen at 320px: ${JSON.stringify(narrowMobileGrid)}`,
   );
   await signedInPage.setViewportSize({ width: 1280, height: 720 });
   await smokePropertyWorkflows(

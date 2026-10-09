@@ -61,6 +61,7 @@ test("backup export requires an initialized runtime client", async () => {
     modules: { archive: context.window.PropertyDeskBackupArchive },
     createBackup: () => assert.fail("backup must not be created before init"),
     todayIso: () => "2026-10-07",
+    now: () => new Date("2026-10-08T12:00:00.000Z"),
     toast: (message) => messages.push(message),
     downloadBlob: () => assert.fail("download must not start before init"),
     zipUtils: {},
@@ -117,10 +118,12 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     context,
   );
 
+  const now = () => new Date("2026-10-08T12:00:00.000Z");
   const dependencies = {
     $: () => null,
     state: { user: null },
     isClientReady: () => false,
+    now,
     todayIso: () => "2026-10-07",
     toast: () => {},
     downloadBlob: () => {},
@@ -148,6 +151,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
   assert.deepEqual(calls.records.tables, tables);
   assert.equal(calls.records.loadAllPages, dependencies.loadAllPages);
   assert.equal(calls.exporter.createBackup, createBackup);
+  assert.equal(calls.exporter.now, now);
   assert.equal(calls.exporter.isClientReady, dependencies.isClientReady);
   assert.equal(calls.exporter.loadBackupRecords, load);
   assert.equal(

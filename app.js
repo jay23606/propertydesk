@@ -775,6 +775,7 @@
       $,
       state,
       todayIso,
+      now,
       toast,
       downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
       zipUtils: window.PropertyDeskZipUtils,

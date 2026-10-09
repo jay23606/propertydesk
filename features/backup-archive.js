@@ -8,7 +8,7 @@
     loadBackupRecords,
     collectBackupAgreementFiles,
     documentRepository,
-    now = () => new Date(),
+    now,
   }) {
     async function prepare({ workspaceOwnerId }) {
       const records = await loadBackupRecords();
@@ -17,12 +17,17 @@
         repository: documentRepository,
         workspaceOwnerId,
       });
-      const backup = createBackup(records, now().toISOString(), includedFiles);
+      const exportedAt = now();
+      const backup = createBackup(
+        records,
+        exportedAt.toISOString(),
+        includedFiles,
+      );
       entries.unshift({
         name: "propertydesk-backup.json",
         data: JSON.stringify(backup, null, 2),
       });
-      const blob = zipUtils.createZip(entries);
+      const blob = zipUtils.createZip(entries, exportedAt);
       const recordCount = Object.values(records).reduce(
         (sum, tableRows) => sum + tableRows.length,
         0,

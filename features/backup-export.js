@@ -7,6 +7,7 @@
     state,
     isClientReady,
     createBackup,
+    now,
     todayIso,
     toast,
     downloadBlob,
@@ -22,6 +23,7 @@
       loadBackupRecords,
       collectBackupAgreementFiles,
       documentRepository,
+      now,
     });
 
     async function exportAll() {

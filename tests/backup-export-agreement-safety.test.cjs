@@ -89,6 +89,7 @@ test("backup export aborts before download when a private document path escapes 
     state,
     modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
+    now: () => new Date("2026-10-04T12:00:00.000Z"),
     createBackup: () =>
       assert.fail("invalid paths must stop before backup creation"),
     todayIso: () => "2026-10-04",
@@ -222,6 +223,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     state,
     modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
+    now: () => new Date("2026-10-04T12:00:00.000Z"),
     createBackup(records, exportedAt, includedFiles) {
       backupContents = { records, exportedAt, includedFiles };
       return { records };
@@ -240,8 +242,9 @@ test("backup export adds the validated private agreement to the ZIP and manifest
       return collectBackupAgreementFiles(options);
     },
     zipUtils: {
-      createZip(entries) {
+      createZip(entries, timestamp) {
         zipEntries = entries;
+        assert.equal(timestamp.toISOString(), "2026-10-04T12:00:00.000Z");
         return archived;
       },
     },

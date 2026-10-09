@@ -69,7 +69,10 @@ test("backup record loader paginates each workspace table into named records", a
     Array.from(backupRecords.tables),
     Object.values(workspaceTables),
   );
-  const backup = context.window.PropertyDeskBackupUtils.createBackup(records);
+  const backup = context.window.PropertyDeskBackupUtils.createBackup(
+    records,
+    "2026-10-08T12:00:00.000Z",
+  );
   assert.deepEqual(backup.manifest.included_tables, backupRecords.tables);
   assert.ok(Array.isArray(backup.data.pd_reminder_logs));
 });
