@@ -105,14 +105,14 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     { hasAccount: false, property: { notes: "Vacant property note" } },
   ]);
 
-  assert.match(html, /@page \{ size: letter landscape; margin: \.25in; \}/);
+  assert.match(html, /@page \{ size: letter landscape; margin: \.3in; \}/);
   assert.match(
     html,
-    /html, body \{ width: 100%; max-width: 100%; margin: 0; \}/,
+    /html, body \{ width: 100%; max-width: 100%; margin: 0; padding: 0; \}/,
   );
   assert.match(
     html,
-    /table \{ border-collapse: collapse; width: 99%; max-width: 99%; margin: 0; table-layout: fixed; \}/,
+    /table \{ border-collapse: collapse; width: 100%; max-width: 100%; margin: 0; table-layout: fixed; \}/,
   );
   assert.match(
     html,
@@ -122,7 +122,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(
     html,
-    /@media print \{\s*html, body \{ width: 100%; max-width: 100%; \}\s*table \{ width: 99%; max-width: 99%; \}/,
+    /@media print \{\s*html, body \{ width: 100%; max-width: 100%; margin: 0; padding: 0; \}\s*header, table \{ width: 100%; max-width: 100%; \}/,
   );
   assert.match(html, /10 Main St, Altoona, PA 16601/);
   assert.match(html, /tenant@example\.com/);
