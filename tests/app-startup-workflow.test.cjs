@@ -148,6 +148,10 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
     path.join(root, "features", "app-startup-setup.js"),
     "utf8",
   );
+  const startupCatalog = fs.readFileSync(
+    path.join(root, "features", "app-startup-module-catalog.js"),
+    "utf8",
+  );
   const workflow = "features/app-startup-workflow.js";
   const setup = "features/app-startup-setup.js";
 
@@ -155,9 +159,22 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
   assert.ok(html.indexOf("features/app-lifecycle.js") < html.indexOf(workflow));
   assert.ok(html.indexOf(workflow) < html.indexOf(setup));
   assert.ok(html.indexOf(setup) < html.indexOf("app.js"));
+  assert.ok(
+    html.indexOf("features/app-startup-module-catalog.js") <
+      html.indexOf("app.js"),
+  );
   assert.ok(worker.includes(`'./${workflow}'`));
   assert.ok(worker.includes(`'./${setup}'`));
+  assert.ok(worker.includes("'./features/app-startup-module-catalog.js'"));
   assert.match(app, /PropertyDeskAppStartupSetup\.create\(/);
+  assert.match(
+    app,
+    /workflows: window\.PropertyDeskAppStartupModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    startupCatalog,
+    /auth: \{\s*create: window\.PropertyDeskAuth\.create,[\s\S]*?recoveryView: window\.PropertyDeskAuthRecoveryView,[\s\S]*?lifecycle: window\.PropertyDeskAppLifecycle/,
+  );
   assert.match(
     app,
     /records: \{[\s\S]*?\.\.\.stateAccess\.startup,\s*resetWorkspaceState,/,

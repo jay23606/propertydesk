@@ -210,6 +210,22 @@ test("backup workspace module catalog owns its private archive exporter", () => 
   );
 });
 
+test("app startup module catalog owns auth screens and lifecycle dependencies", () => {
+  const { catalog, window } = loadCatalog(
+    "app-startup-module-catalog.js",
+    "PropertyDeskAppStartupModuleCatalog",
+  );
+
+  assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(catalog.startup, window.PropertyDeskAppStartupWorkflow);
+  assert.equal(catalog.auth.modules.screens, window.PropertyDeskAuthScreens);
+  assert.equal(
+    catalog.auth.modules.recoveryView,
+    window.PropertyDeskAuthRecoveryView,
+  );
+  assert.equal(catalog.lifecycle, window.PropertyDeskAppLifecycle);
+});
+
 test("workspace module catalogs load before the root and stay in the PWA shell", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
@@ -222,6 +238,7 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
     "features/property-account-forms-module-catalog.js",
     "features/app-shell-module-catalog.js",
     "features/backup-workspace-module-catalog.js",
+    "features/app-startup-module-catalog.js",
   ];
 
   for (const catalog of catalogs) {
@@ -255,5 +272,9 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   assert.match(
     app,
     /workflows:\s*window\.PropertyDeskBackupWorkspaceModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    app,
+    /workflows:\s*window\.PropertyDeskAppStartupModuleCatalog\.create\(\)/,
   );
 });

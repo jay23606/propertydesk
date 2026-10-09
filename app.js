@@ -475,22 +475,7 @@
       fetchAll,
       paymentNotifications,
     },
-    workflows: {
-      startup: window.PropertyDeskAppStartupWorkflow,
-      auth: {
-        create: window.PropertyDeskAuth.create,
-        modules: {
-          screens: window.PropertyDeskAuthScreens,
-          form: window.PropertyDeskAuthForm,
-          formView: window.PropertyDeskAuthFormView,
-          recovery: window.PropertyDeskAuthRecovery,
-          recoveryView: window.PropertyDeskAuthRecoveryView,
-          resetRequest: window.PropertyDeskAuthResetRequest,
-          session: window.PropertyDeskAuthSession,
-        },
-      },
-      lifecycle: window.PropertyDeskAppLifecycle,
-    },
+    workflows: window.PropertyDeskAppStartupModuleCatalog.create(),
   });
   setWorkspaceRender(appLifecycle.render);
   onDomContentLoaded(appLifecycle.initialize);
