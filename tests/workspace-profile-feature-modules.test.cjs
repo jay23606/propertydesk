@@ -25,12 +25,10 @@ test("profile display updates the shared app shell from the current workspace us
   };
   const feature = context.window.PropertyDeskProfileDisplay.create({
     $,
-    state: {
-      user: {
-        email: "owner@example.test",
-        user_metadata: { display_name: "Workspace Owner" },
-      },
-    },
+    getUser: () => ({
+      email: "owner@example.test",
+      user_metadata: { display_name: "Workspace Owner" },
+    }),
     now: () => ({
       getHours: () => 14,
       toLocaleDateString: () => "Mon, Oct 5",
@@ -149,7 +147,10 @@ test("profile settings save the display label and refresh the shared shell", asy
   };
   const feature = context.window.PropertyDeskProfileSettings.create({
     $: (id) => elements[id],
-    state,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
     authClient: {
       updateUser: (...args) => state.client.auth.updateUser(...args),
     },
@@ -226,7 +227,10 @@ test("profile settings confirm a lost update response from the authenticated use
     user: { id: "owner-1", user_metadata: { display_name: "Old label" } },
   };
   const profile = context.window.PropertyDeskProfileSettings.create({
-    state,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
     authClient: {
       updateUser: async () => {
         throw new Error("connection lost");
@@ -300,7 +304,10 @@ test("profile settings show refreshed server state when an uncertain update did 
   };
   const state = { user: { id: "owner-1" } };
   const profile = context.window.PropertyDeskProfileSettings.create({
-    state,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
     authClient: {
       updateUser: async () => {
         throw new Error("connection lost");

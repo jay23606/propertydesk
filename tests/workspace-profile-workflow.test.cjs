@@ -50,7 +50,10 @@ test("workspace profile workflow joins display, editing, and settings rendering"
 
   const dependencies = {
     $() {},
-    state,
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
     now,
     authClient: {},
     toast() {},
@@ -73,9 +76,11 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   );
   assert.doesNotMatch(workflowSource, /writeFeedback/);
 
-  assert.equal(passed.display.state, state);
+  assert.equal(passed.display.getUser(), state.user);
   assert.equal(passed.display.now, now);
   assert.equal(passed.settings.authClient, dependencies.authClient);
+  assert.equal(passed.settings.getUser(), state.user);
+  assert.equal(typeof passed.settings.setUser, "function");
   assert.equal(passed.settings.run, dependencies.run);
   assert.equal(passed.settings.updateGreeting, updateGreeting);
   assert.equal(workflow.updateGreeting, updateGreeting);

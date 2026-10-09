@@ -66,7 +66,10 @@
     });
     const profileWorkflow = workflows.profile.create({
       $,
-      state,
+      getUser: () => state.user,
+      setUser: (user) => {
+        state.user = user;
+      },
       now,
       authClient,
       toast,

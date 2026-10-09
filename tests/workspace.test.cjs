@@ -131,7 +131,9 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   );
   assert.doesNotMatch(workspaceSource, /window\.confirm/);
 
-  assert.equal(passed.profileWorkflow.state, state);
+  assert.equal(passed.profileWorkflow.getUser(), state.user);
+  assert.equal("state" in passed.profileWorkflow, false);
+  assert.equal(typeof passed.profileWorkflow.setUser, "function");
   assert.equal(passed.profileWorkflow.now, now);
   assert.equal(passed.profileWorkflow.run, run);
   assert.equal(

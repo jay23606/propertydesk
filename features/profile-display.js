@@ -14,11 +14,11 @@
     );
   }
 
-  function createProfileDisplay({ $, state, now }) {
+  function createProfileDisplay({ $, getUser, now }) {
     function updateGreeting() {
       const currentTime = now();
       const greeting = greetingForHour(currentTime.getHours());
-      const displayName = displayNameFor(state.user);
+      const displayName = displayNameFor(getUser());
       $("greeting-name").textContent = `, ${displayName}`;
       $("page-overview").querySelector("h1").firstChild.textContent = greeting;
       $("user-email").textContent = displayName;

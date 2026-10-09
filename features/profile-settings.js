@@ -3,7 +3,8 @@
   "use strict";
 
   function createProfileSettings({
-    state,
+    getUser,
+    setUser,
     authClient,
     toast,
     updateGreeting,
@@ -36,7 +37,7 @@
       if (!saved) return false;
       if (reconciled) return true;
 
-      state.user = data?.user || state.user;
+      setUser(data?.user || getUser());
       updateGreeting();
       toast("Display name saved");
       return true;
@@ -60,7 +61,7 @@
         return false;
       }
 
-      state.user = data.user;
+      setUser(data.user);
       updateGreeting();
       const saved = data.user.user_metadata?.display_name === displayName;
       toast(

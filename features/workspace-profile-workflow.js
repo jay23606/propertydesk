@@ -2,15 +2,25 @@
 (() => {
   "use strict";
 
-  function create({ $, state, now, authClient, toast, run, workflows }) {
+  function create({
+    $,
+    getUser,
+    setUser,
+    now,
+    authClient,
+    toast,
+    run,
+    workflows,
+  }) {
     const profileDisplay = workflows.display.create({
       $,
-      state,
+      getUser,
       now,
     });
     const profileView = workflows.view.create({ $ });
     const profile = workflows.settings.create({
-      state,
+      getUser,
+      setUser,
       authClient,
       toast,
       run,
@@ -18,7 +28,7 @@
     });
 
     function renderProfileSettings() {
-      profileView.setDisplayName(state.user?.user_metadata?.display_name || "");
+      profileView.setDisplayName(getUser()?.user_metadata?.display_name || "");
     }
 
     function attachProfileEvents() {
