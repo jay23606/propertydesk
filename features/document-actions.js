@@ -23,7 +23,10 @@
       fetchAll,
       openPropertyDetails,
       confirm,
-      repository,
+      repository: {
+        remove: repository.remove,
+        deleteMetadata: repository.deleteMetadata,
+      },
       refreshWorkspace,
       maintenanceModule: modules.deleteMaintenance,
     });
@@ -32,7 +35,7 @@
       getDocuments,
       toast,
       openWindow,
-      repository,
+      repository: { signedUrl: repository.signedUrl },
     });
 
     return Object.freeze({ deletePropertyDocument, openPropertyDocument });

@@ -103,7 +103,14 @@ test("document actions separate deletion and signed-link dependencies", () => {
     openPropertyDetails() {},
     confirm() {},
     openWindow() {},
-    repository: {},
+    repository: {
+      upload() {},
+      insertMetadata() {},
+      remove() {},
+      deleteMetadata() {},
+      signedUrl() {},
+      download() {},
+    },
     refreshWorkspace() {},
     modules: {
       delete: context.window.PropertyDeskDocumentDelete,
@@ -126,7 +133,18 @@ test("document actions separate deletion and signed-link dependencies", () => {
   assert.equal(passed.deletion.getDocuments, dependencies.getDocuments);
   assert.equal(passed.deletion.fetchAll, dependencies.fetchAll);
   assert.equal(passed.deletion.confirm, dependencies.confirm);
-  assert.equal(passed.deletion.repository, dependencies.repository);
+  assert.deepEqual(Object.keys(passed.deletion.repository).sort(), [
+    "deleteMetadata",
+    "remove",
+  ]);
+  assert.equal(
+    passed.deletion.repository.remove,
+    dependencies.repository.remove,
+  );
+  assert.equal(
+    passed.deletion.repository.deleteMetadata,
+    dependencies.repository.deleteMetadata,
+  );
   assert.equal(passed.deletion.refreshWorkspace, dependencies.refreshWorkspace);
   assert.equal(
     passed.deletion.maintenanceModule,
@@ -139,10 +157,77 @@ test("document actions separate deletion and signed-link dependencies", () => {
   );
   assert.equal(passed.open.getDocuments, dependencies.getDocuments);
   assert.equal(passed.open.openWindow, dependencies.openWindow);
-  assert.equal(passed.open.repository, dependencies.repository);
+  assert.deepEqual(Object.keys(passed.open.repository), ["signedUrl"]);
+  assert.equal(
+    passed.open.repository.signedUrl,
+    dependencies.repository.signedUrl,
+  );
   assert.equal(passed.open.fetchAll, undefined);
   assert.equal(actions.deletePropertyDocument, deleteAction);
   assert.equal(actions.openPropertyDocument, openAction);
+});
+
+test("document upload receives only file and metadata write operations", () => {
+  const context = vm.createContext({
+    window: {
+      PropertyDeskDocumentUploadPolicy: { describe() {} },
+    },
+  });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "documents.js"),
+      "utf8",
+    ),
+    context,
+  );
+  let uploadOptions;
+  const uploadAction = () => {};
+  const actions = {
+    deletePropertyDocument() {},
+    openPropertyDocument() {},
+  };
+  const repository = {
+    upload() {},
+    insertMetadata() {},
+    remove() {},
+    deleteMetadata() {},
+    signedUrl() {},
+    download() {},
+  };
+
+  context.window.PropertyDeskDocuments.create({
+    repository,
+    modules: {
+      upload: {
+        create(options) {
+          uploadOptions = options;
+          return { uploadPropertyDocument: uploadAction };
+        },
+      },
+      uploadPolicy: { describe() {} },
+      uploadMaintenance: {},
+      actions: {
+        create() {
+          return actions;
+        },
+        modules: {},
+      },
+    },
+  });
+
+  assert.deepEqual(Object.keys(uploadOptions.repository).sort(), [
+    "insertMetadata",
+    "remove",
+    "upload",
+  ]);
+  assert.equal(uploadOptions.repository.upload, repository.upload);
+  assert.equal(
+    uploadOptions.repository.insertMetadata,
+    repository.insertMetadata,
+  );
+  assert.equal(uploadOptions.repository.remove, repository.remove);
+  assert.equal(uploadOptions.repository.signedUrl, undefined);
+  assert.equal(uploadOptions.repository.download, undefined);
 });
 
 test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {

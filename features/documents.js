@@ -24,7 +24,11 @@
       fetchAll,
       openPropertyDetails,
       makeId,
-      repository,
+      repository: {
+        upload: repository.upload,
+        insertMetadata: repository.insertMetadata,
+        remove: repository.remove,
+      },
       refreshWorkspace,
       describeUpload: modules.uploadPolicy.describe,
       maintenanceModule: modules.uploadMaintenance,
