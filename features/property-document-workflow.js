@@ -14,6 +14,7 @@
     refreshWorkspace,
     confirm,
     openWindow,
+    makeId,
     modules,
     documentsWorkflow,
     documentEventsWorkflow,
@@ -29,6 +30,7 @@
       refreshWorkspace,
       confirm,
       openWindow,
+      makeId,
       modules,
     });
     const { attachPropertyDocumentEvents } = documentEventsWorkflow.create({

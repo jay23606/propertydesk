@@ -97,6 +97,7 @@
           fetchAll: services.fetchAll,
           confirm: ui.confirmAction,
           openWindow: ui.openWindow,
+          makeId: ui.makeId,
           documentRepository: services.documentRepository,
           refreshWorkspace: services.refreshWorkspace,
           modules: workflows.documentModules,

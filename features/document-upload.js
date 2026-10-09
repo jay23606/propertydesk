@@ -9,7 +9,7 @@
     toast,
     fetchAll,
     openPropertyDetails,
-    makeId = () => crypto.randomUUID(),
+    makeId,
     repository,
     describeUpload,
     refreshWorkspace,

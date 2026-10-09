@@ -11,6 +11,18 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   );
   const context = vm.createContext({ window: {} });
   vm.runInContext(source, context);
+  const appSource = fs.readFileSync(
+    path.join(__dirname, "..", "app.js"),
+    "utf8",
+  );
+  assert.match(
+    appSource,
+    /const makeId = \(\) => window\.crypto\.randomUUID\(\);/,
+  );
+  assert.match(
+    appSource,
+    /PropertyDeskPropertyWorkspaceSetup\.create\(\{[\s\S]*?makeId,/,
+  );
 
   let received;
   const result = { renderProperties() {} };
@@ -55,6 +67,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "todayIso",
     "confirmAction",
     "openWindow",
+    "makeId",
     "monthlyScheduledEstimate",
     "summarizeAccount",
     "collectedSince",
@@ -198,6 +211,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     received.detail.documents.documentRepository,
     services.documentRepository,
   );
+  assert.equal(received.detail.documents.makeId, ui.makeId);
   assert.equal(received.detail.documents.modules, workflows.documentModules);
   assert.equal(
     received.detail.workflows.contentModules,

@@ -194,9 +194,11 @@ test("document upload receives only file and metadata write operations", () => {
     signedUrl() {},
     download() {},
   };
+  const makeId = () => "agreement-id";
 
   context.window.PropertyDeskDocuments.create({
     repository,
+    makeId,
     modules: {
       upload: {
         create(options) {
@@ -228,6 +230,7 @@ test("document upload receives only file and metadata write operations", () => {
   assert.equal(uploadOptions.repository.remove, repository.remove);
   assert.equal(uploadOptions.repository.signedUrl, undefined);
   assert.equal(uploadOptions.repository.download, undefined);
+  assert.equal(uploadOptions.makeId, makeId);
 });
 
 test("private document workflows handle rejected storage requests without leaking blank tabs", async () => {

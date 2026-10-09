@@ -73,6 +73,7 @@ test("property screen workflow passes detail actions to management and returns b
     refreshWorkspace() {},
     confirm: () => true,
     openWindow: () => null,
+    makeId: () => "agreement-id",
     modules: { kind: "document-modules" },
     unusedDependency: true,
   };
@@ -269,6 +270,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[3][1].refreshWorkspace, documents.refreshWorkspace);
   assert.equal(calls[3][1].confirm, documents.confirm);
   assert.equal(calls[3][1].openWindow, documents.openWindow);
+  assert.equal(calls[3][1].makeId, documents.makeId);
   assert.equal(calls[3][1].modules, documents.modules);
   assert.equal(calls[3][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[3][1].$, documents.$);

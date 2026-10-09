@@ -7,6 +7,7 @@
   const promptAction = (message, initialValue) =>
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
+  const makeId = () => window.crypto.randomUUID();
   const reportError = (message, error) => window.console?.error(message, error);
   const appServices = window.PropertyDeskAppServices.create({
     $,
@@ -519,6 +520,7 @@
       todayIso,
       confirmAction,
       openWindow,
+      makeId,
       schedule: window.setTimeout.bind(window),
       monthlyScheduledEstimate,
       summarizeAccount,

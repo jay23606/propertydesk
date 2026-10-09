@@ -177,6 +177,7 @@ test("property document workflow routes actions through one explicit binder", ()
     openPropertyDetails() {},
     confirm: () => true,
     openWindow: () => null,
+    makeId: () => "agreement-id",
     repository: {},
     refreshWorkspace() {},
     modules: { kind: "document-modules" },
@@ -194,6 +195,7 @@ test("property document workflow routes actions through one explicit binder", ()
     "getDocuments",
     "getSelectedPropertyId",
     "getWorkspaceOwnerId",
+    "makeId",
     "modules",
     "openPropertyDetails",
     "openWindow",
@@ -214,6 +216,7 @@ test("property document workflow routes actions through one explicit binder", ()
   assert.equal(calls[0][1].modules, dependencies.modules);
   assert.equal(calls[0][1].confirm, dependencies.confirm);
   assert.equal(calls[0][1].openWindow, dependencies.openWindow);
+  assert.equal(calls[0][1].makeId, dependencies.makeId);
   assert.equal(calls[0][1].refreshWorkspace, dependencies.refreshWorkspace);
   assert.equal(calls[1][0], "events");
   assert.equal(calls[1][1].$, dependencies.$);

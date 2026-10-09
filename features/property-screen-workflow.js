@@ -78,6 +78,7 @@
       refreshWorkspace: documents.refreshWorkspace,
       confirm: documents.confirm,
       openWindow: documents.openWindow,
+      makeId: documents.makeId,
       modules: documents.modules,
       documentsWorkflow: documents.documentsWorkflow,
       documentEventsWorkflow: documents.documentEventsWorkflow,
