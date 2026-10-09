@@ -281,7 +281,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountWorkspaceWorkflow,
-    /contentWorkflow\.create\(\{[\s\S]*?accountHistoryRepository: content\.accountHistoryRepository,[\s\S]*?workflows: content\.workflows,[\s\S]*?actionWorkflow\.create\(\{[\s\S]*?repository: actions\.repository,/,
+    /contentWorkflow\.create\(\{\s*\.\.\.content,[\s\S]*?actionWorkflow\.create\(\{\s*\.\.\.actions,\s*workflows: actionWorkflows,/,
   );
   assert.doesNotMatch(
     accountWorkspaceWorkflow,

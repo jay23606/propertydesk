@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("account detail workspace joins content rendering and action binding", () => {
+test("account detail workspace forwards scoped content and action inputs", () => {
   const passed = {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
@@ -110,6 +110,7 @@ test("account detail workspace joins content rendering and action binding", () =
     "propertyAddress",
     "sumPosted",
     "summarizeAccount",
+    "unusedDependency",
     "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.actions).sort(), [
@@ -124,6 +125,7 @@ test("account detail workspace joins content rendering and action binding", () =
     "repository",
     "saveAndRefreshWorkspaceRecord",
     "toast",
+    "unusedDependency",
     "workflows",
   ]);
   for (const key of Object.keys(passed.content))
@@ -131,8 +133,8 @@ test("account detail workspace joins content rendering and action binding", () =
   for (const key of Object.keys(passed.actions))
     if (key === "workflows") assert.equal(passed.actions[key], actionWorkflows);
     else assert.equal(passed.actions[key], actions[key]);
-  assert.equal("unusedDependency" in passed.content, false);
-  assert.equal("unusedDependency" in passed.actions, false);
+  assert.equal("unusedDependency" in passed.content, true);
+  assert.equal("unusedDependency" in passed.actions, true);
   assert.equal(workflow.openAccountDetails, openAccountDetails);
   assert.equal(
     workflow.attachAccountDetailActionEvents,
