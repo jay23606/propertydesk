@@ -45,7 +45,7 @@ test("reminder activity model resolves account/property labels and delivery deta
     ],
   };
   const model = context.window.PropertyDeskReminderActivityModel.create({
-    state,
+    getActivityData: () => state,
   });
 
   assert.deepEqual(JSON.parse(JSON.stringify(model.buildRows())), [

@@ -14,7 +14,7 @@
     ["mailersend_request_failed", "MailerSend request failed"],
   ]);
 
-  function createReminderActivityModel({ state }) {
+  function createReminderActivityModel({ getActivityData }) {
     function statusLabel(status) {
       return STATUS_LABELS.get(status) || "Sending";
     }
@@ -53,16 +53,19 @@
     }
 
     function buildRows() {
+      const {
+        accounts: accountRows,
+        properties: propertyRows,
+        reminderLogs,
+      } = getActivityData();
       const accounts = new Map(
-        state.accounts.map((account) => [account.id, account]),
+        accountRows.map((account) => [account.id, account]),
       );
       const properties = new Map(
-        state.properties.map((property) => [property.id, property]),
+        propertyRows.map((property) => [property.id, property]),
       );
 
-      return state.reminderLogs.map((log) =>
-        buildRow(log, accounts, properties),
-      );
+      return reminderLogs.map((log) => buildRow(log, accounts, properties));
     }
 
     return Object.freeze({ buildRows });

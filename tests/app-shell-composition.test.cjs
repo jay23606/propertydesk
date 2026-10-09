@@ -35,7 +35,7 @@ test("app shell composes workspace settings and page navigation", () => {
   );
   assert.match(
     workspace,
-    /reminder\.workflow\.create\(\{\s*\$: reminder\.\$,\s*state: reminder\.state,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*fmtDateTime: reminder\.fmtDateTime,\s*money: reminder\.money,\s*activityModelWorkflow: reminder\.activityModelWorkflow,\s*activityViewWorkflow: reminder\.activityViewWorkflow,/,
+    /reminder\.workflow\.create\(\{\s*\$: reminder\.\$,\s*getActivityData: getReminderActivityData,\s*esc: reminder\.esc,\s*fmtDate: reminder\.fmtDate,\s*fmtDateTime: reminder\.fmtDateTime,\s*money: reminder\.money,\s*activityModelWorkflow: reminder\.activityModelWorkflow,\s*activityViewWorkflow: reminder\.activityViewWorkflow,/,
   );
   assert.match(
     workspace,

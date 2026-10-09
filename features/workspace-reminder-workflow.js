@@ -4,7 +4,7 @@
 
   function createWorkspaceReminderWorkflow({
     $,
-    state,
+    getActivityData,
     esc,
     fmtDate,
     fmtDateTime,
@@ -12,9 +12,7 @@
     activityModelWorkflow,
     activityViewWorkflow,
   }) {
-    const activityModel = activityModelWorkflow.create({
-      state,
-    });
+    const activityModel = activityModelWorkflow.create({ getActivityData });
     const { renderReminderActivity } = activityViewWorkflow.create({
       $,
       esc,

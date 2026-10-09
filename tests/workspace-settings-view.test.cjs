@@ -196,7 +196,7 @@ test("reminder activity view summarizes delivery results and escapes log data", 
     ],
   };
   const model = context.window.PropertyDeskReminderActivityModel.create({
-    state,
+    getActivityData: () => state,
   });
   const feature = context.window.PropertyDeskReminderActivityView.create({
     $,

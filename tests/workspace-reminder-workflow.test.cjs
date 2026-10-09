@@ -10,7 +10,9 @@ test("workspace reminder workflow composes only its activity view", () => {
   const renderReminderActivity = () => "activity";
   const reminder = {
     $() {},
-    state: {},
+    getActivityData() {
+      return { accounts: [], properties: [], reminderLogs: [] };
+    },
     esc() {},
     fmtDate() {},
     money() {},
@@ -51,8 +53,8 @@ test("workspace reminder workflow composes only its activity view", () => {
     calls.map(([name]) => name),
     ["activity-model", "activity-view"],
   );
-  assert.equal(calls[0][1].state, reminder.state);
-  assert.deepEqual(Object.keys(calls[0][1]), ["state"]);
+  assert.equal(calls[0][1].getActivityData, reminder.getActivityData);
+  assert.deepEqual(Object.keys(calls[0][1]), ["getActivityData"]);
   assert.equal(calls[1][1].$, reminder.$);
   assert.equal(calls[1][1].esc, reminder.esc);
   assert.equal(calls[1][1].fmtDate, reminder.fmtDate);
