@@ -62,6 +62,16 @@ test("CSV import feature loads as an isolated browser module", () => {
 test("import workflow keeps file import handlers inside its event bindings", () => {
   const calls = [];
   const passed = {};
+  const importSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "imports.js"),
+    "utf8",
+  );
+  const workspaceSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "import-workspace-workflow.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(importSource, /\bstate\b/);
+  assert.doesNotMatch(workspaceSource, /\bstate\b/);
   const createImportLookup = () => ({});
   const accounts = { attachEvents: () => calls.push("account events") };
   const payments = { attachEvents: () => calls.push("payment events") };
@@ -140,9 +150,19 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     ),
     context,
   );
+  const state = {};
   const dependencies = {
     $() {},
-    state: {},
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getImportBatches: () => state.importBatches,
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getProperties: () => state.properties,
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
     todayIso() {},
     fetchAll() {},
     toast() {},
@@ -193,9 +213,10 @@ test("import workflow keeps file import handlers inside its event bindings", () 
       "buildPayloads",
       "commitAccounts",
       "createFileWorkflow",
+      "getAccounts",
+      "getProperties",
       "importReview",
       "parseCSV",
-      "state",
       "todayIso",
       "validateAccountRows",
     ].sort(),
@@ -214,9 +235,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.transactions.payment).sort(),
     [
       "commitTransactions",
+      "getAccounts",
+      "getPayments",
+      "getProperties",
       "importReview",
       "parseCSV",
-      "state",
       "validatePaymentRows",
     ].sort(),
   );
@@ -224,9 +247,11 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     Object.keys(passed.transactions.expense).sort(),
     [
       "commitTransactions",
+      "getAccounts",
+      "getExpenses",
+      "getProperties",
       "importReview",
       "parseCSV",
-      "state",
       "validateExpenseRows",
     ].sort(),
   );

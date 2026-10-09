@@ -4,7 +4,8 @@
 
   function createImportPreviewEvents({
     $,
-    state,
+    getPendingImport,
+    setPendingImport,
     selectImportRows,
     renderImportPreview,
     updateImportCommitButton,
@@ -14,7 +15,7 @@
     function attachEvents() {
       $("import-correction-body").addEventListener("change", (event) => {
         const input = event.target.closest("[data-import-correction]");
-        const pending = state.pendingImport;
+        const pending = getPendingImport();
         if (!input || !pending?.revalidate) return;
         const row = pending.rawRows.find(
           (item) => Number(item._source_row) === Number(input.dataset.row),
@@ -39,7 +40,7 @@
         updateImportCommitButton,
       );
       $("import-commit").addEventListener("click", async () => {
-        const pending = state.pendingImport;
+        const pending = getPendingImport();
         if (!pending) return;
         const selected = selectImportRows(
           pending.rows,
@@ -53,7 +54,7 @@
         $("import-commit").textContent = "Importing…";
         try {
           await pending.commit(selected, pending);
-          state.pendingImport = null;
+          setPendingImport(null);
           closeModal("import-preview-modal");
         } catch (error) {
           pending.commitUnconfirmed = true;

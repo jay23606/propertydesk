@@ -17,7 +17,7 @@
 
   function createImportPreviewRendering({
     $,
-    state,
+    getPendingImport,
     selectImportRows,
     esc,
     renderImportCorrections,
@@ -56,7 +56,7 @@
     }
 
     function renderImportPreview() {
-      const pending = state.pendingImport;
+      const pending = getPendingImport();
       if (!pending) return;
 
       const { rows, errors } = pending;
@@ -72,7 +72,7 @@
     }
 
     function updateImportCommitButton() {
-      const pending = state.pendingImport;
+      const pending = getPendingImport();
       const selected = selectImportRows(
         pending?.rows || [],
         $("import-include-duplicates").checked,

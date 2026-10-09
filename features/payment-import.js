@@ -2,8 +2,13 @@
 (() => {
   "use strict";
 
-  function mapPaymentRows(rowsToImport, state, createImportLookup) {
-    const lookup = createImportLookup(state.properties, state.accounts);
+  function mapPaymentRows(
+    rowsToImport,
+    getProperties,
+    getAccounts,
+    createImportLookup,
+  ) {
+    const lookup = createImportLookup(getProperties(), getAccounts());
     const rowsToInsert = rowsToImport.map((row) => ({
       account_id: lookup.findExactAccount(
         lookup.findExactProperty(row.property_name, row.property_address)?.id,
@@ -30,7 +35,9 @@
 
   function createPaymentImport({
     $,
-    state,
+    getProperties,
+    getAccounts,
+    getPayments,
     parseCSV,
     validatePaymentRows,
     commitTransactions,
@@ -51,9 +58,9 @@
       validateRows: (sourceRows) =>
         validatePaymentRows(
           sourceRows,
-          state.properties,
-          state.accounts,
-          state.payments,
+          getProperties(),
+          getAccounts(),
+          getPayments(),
         ),
       correctionKeys: [
         "property_name",
@@ -71,7 +78,12 @@
         "memo",
       ],
       mapRows: (rowsToImport) =>
-        mapPaymentRows(rowsToImport, state, createImportLookup),
+        mapPaymentRows(
+          rowsToImport,
+          getProperties,
+          getAccounts,
+          createImportLookup,
+        ),
       commitTransactions,
       kind: "payments",
       label: "payment",

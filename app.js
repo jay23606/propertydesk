@@ -860,7 +860,16 @@
     attachExpenseEvents: attachExpenseImportEvents,
   } = window.PropertyDeskImportWorkspaceWorkflow.create({
     $,
-    state,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getImportBatches: () => state.importBatches,
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getProperties: () => state.properties,
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
     esc,
     openModal,
     closeModal,

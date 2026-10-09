@@ -4,7 +4,8 @@
 
   function createImportPreview({
     $,
-    state,
+    getPendingImport,
+    setPendingImport,
     selectImportRows,
     esc,
     openModal,
@@ -12,13 +13,13 @@
   }) {
     const { renderImportCorrections } = modules.correctionView.create({
       $,
-      state,
+      getPendingImport,
       esc,
     });
     const { renderImportPreview, updateImportCommitButton } =
       modules.rendering.create({
         $,
-        state,
+        getPendingImport,
         selectImportRows,
         esc,
         renderImportCorrections,
@@ -54,7 +55,7 @@
     }
 
     function stageImport(title, rows, commit, note = "", report = {}) {
-      state.pendingImport = pendingImportFor(title, rows, commit, note, report);
+      setPendingImport(pendingImportFor(title, rows, commit, note, report));
       $("import-include-duplicates").checked = false;
       renderImportPreview();
       openModal("import-preview-modal");

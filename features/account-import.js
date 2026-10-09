@@ -4,7 +4,8 @@
 
   function createAccountImport({
     $,
-    state,
+    getProperties,
+    getAccounts,
     parseCSV,
     validateAccountRows,
     todayIso,
@@ -23,8 +24,8 @@
         const validateRows = (sourceRows) =>
           validateAccountRows(
             sourceRows,
-            state.properties,
-            state.accounts,
+            getProperties(),
+            getAccounts(),
             todayIso(),
           );
         importReview.stage({

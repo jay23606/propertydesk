@@ -4,7 +4,14 @@
 
   function createImportWorkspaceWorkflow({
     $,
-    state,
+    getWorkspaceOwnerId,
+    getImportBatches,
+    getAccounts,
+    getPayments,
+    getExpenses,
+    getProperties,
+    getPendingImport,
+    setPendingImport,
     esc,
     openModal,
     closeModal,
@@ -41,7 +48,14 @@
 
     return workflows.feature.create({
       $,
-      state,
+      getWorkspaceOwnerId,
+      getImportBatches,
+      getAccounts,
+      getPayments,
+      getExpenses,
+      getProperties,
+      getPendingImport,
+      setPendingImport,
       esc,
       openModal,
       closeModal,

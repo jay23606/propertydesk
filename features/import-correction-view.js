@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createImportCorrectionView({ $, state, esc }) {
+  function createImportCorrectionView({ $, getPendingImport, esc }) {
     function renderCorrectionCell(error, raw, key) {
       const content =
         raw && !raw._parse_error
@@ -12,7 +12,7 @@
     }
 
     function renderImportCorrections() {
-      const pending = state.pendingImport;
+      const pending = getPendingImport();
       if (!pending) return;
 
       const { errors } = pending;

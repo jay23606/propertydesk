@@ -44,7 +44,9 @@
 
   function createExpenseImport({
     $,
-    state,
+    getProperties,
+    getAccounts,
+    getExpenses,
     parseCSV,
     validateExpenseRows,
     commitTransactions,
@@ -65,9 +67,9 @@
       validateRows: (sourceRows) =>
         validateExpenseRows(
           sourceRows,
-          state.properties,
-          state.accounts,
-          state.expenses,
+          getProperties(),
+          getAccounts(),
+          getExpenses(),
         ),
       correctionKeys: [
         "property_name",
@@ -82,7 +84,7 @@
         "source_note",
       ],
       mapRows(rowsToImport) {
-        const lookup = createImportLookup(state.properties, state.accounts);
+        const lookup = createImportLookup(getProperties(), getAccounts());
         return rowsToImport.map((row) => mapExpenseRow(row, lookup));
       },
       commitTransactions,

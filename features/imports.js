@@ -4,7 +4,14 @@
 
   function createImportWorkflows({
     $,
-    state,
+    getWorkspaceOwnerId,
+    getImportBatches,
+    getAccounts,
+    getPayments,
+    getExpenses,
+    getProperties,
+    getPendingImport,
+    setPendingImport,
     esc,
     openModal,
     closeModal,
@@ -35,7 +42,8 @@
       validators;
     const importPreview = preview.create({
       $,
-      state,
+      getPendingImport,
+      setPendingImport,
       selectImportRows,
       esc,
       openModal,
@@ -43,7 +51,8 @@
     });
     const { attachEvents: attachPreviewEvents } = previewEvents.create({
       $,
-      state,
+      getPendingImport,
+      setPendingImport,
       selectImportRows,
       renderImportPreview: importPreview.renderImportPreview,
       updateImportCommitButton: importPreview.updateImportCommitButton,
@@ -51,11 +60,11 @@
       toast,
     });
     const { commitAccounts, commitTransactions } = commit.create({
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getImportBatches: () => state.importBatches,
-      getAccounts: () => state.accounts,
-      getPayments: () => state.payments,
-      getExpenses: () => state.expenses,
+      getWorkspaceOwnerId,
+      getImportBatches,
+      getAccounts,
+      getPayments,
+      getExpenses,
       fetchAll,
       status: $("import-status"),
       toast,
@@ -68,7 +77,8 @@
     });
     const accounts = accountImport.create({
       $,
-      state,
+      getProperties,
+      getAccounts,
       parseCSV,
       validateAccountRows,
       todayIso,
@@ -85,14 +95,18 @@
         createTransactionImportWorkflow: transactionImportWorkflow.create,
       },
       payment: {
-        state,
+        getProperties,
+        getAccounts,
+        getPayments,
         parseCSV,
         validatePaymentRows,
         commitTransactions,
         importReview,
       },
       expense: {
-        state,
+        getProperties,
+        getAccounts,
+        getExpenses,
         parseCSV,
         validateExpenseRows,
         commitTransactions,

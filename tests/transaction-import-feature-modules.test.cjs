@@ -20,6 +20,15 @@ function overrideImportStage(context, stageImport) {
   };
 }
 
+function pendingImportAccess(state) {
+  return {
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
+  };
+}
+
 test("transaction import feature shares setup without mixing payment and expense inputs", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-import-feature.js"),
@@ -62,7 +71,9 @@ test("transaction import feature shares setup without mixing payment and expense
     unusedSharedValue: true,
   };
   const payment = {
-    state: {},
+    getProperties() {},
+    getAccounts() {},
+    getPayments() {},
     parseCSV() {},
     validatePaymentRows() {},
     commitTransactions() {},
@@ -70,7 +81,9 @@ test("transaction import feature shares setup without mixing payment and expense
     unusedPaymentValue: true,
   };
   const expense = {
-    state: {},
+    getProperties() {},
+    getAccounts() {},
+    getExpenses() {},
     parseCSV() {},
     validateExpenseRows() {},
     commitTransactions() {},
@@ -90,8 +103,10 @@ test("transaction import feature shares setup without mixing payment and expense
   assert.equal(Object.isFrozen(feature), true);
   assert.equal(passed.payment.$, shared.$);
   assert.equal(passed.expense.$, shared.$);
-  assert.equal(passed.payment.state, payment.state);
-  assert.equal(passed.expense.state, expense.state);
+  for (const key of ["getProperties", "getAccounts", "getPayments"])
+    assert.equal(passed.payment[key], payment[key]);
+  for (const key of ["getProperties", "getAccounts", "getExpenses"])
+    assert.equal(passed.expense[key], expense[key]);
   assert.equal(passed.payment.validatePaymentRows, payment.validatePaymentRows);
   assert.equal(passed.expense.validateExpenseRows, expense.validateExpenseRows);
   assert.equal(
@@ -291,7 +306,13 @@ test("payment and expense CSV importers save their own validated transaction pay
         fileHandlers.set(`${id}:${event}`, handler);
       return element;
     },
-    state,
+    getWorkspaceOwnerId: () => "owner-1",
+    getImportBatches: () => [],
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getProperties: () => state.properties,
+    ...pendingImportAccess(state),
     repository: context.window.PropertyDeskImportRepository.create({
       getClient: () => state.client,
     }),
@@ -400,7 +421,7 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
   const closed = [];
   const preview = context.window.PropertyDeskImportPreview.create({
     $,
-    state,
+    ...pendingImportAccess(state),
     selectImportRows: (rows) => rows,
     esc: String,
     openModal() {},
@@ -409,7 +430,7 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
   });
   const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
     $,
-    state,
+    ...pendingImportAccess(state),
     selectImportRows: (rows) => rows,
     renderImportPreview: preview.renderImportPreview,
     updateImportCommitButton: preview.updateImportCommitButton,
@@ -465,7 +486,7 @@ test("a saved import with refresh failure explains the save and still blocks ret
   const state = { pendingImport: null };
   const preview = context.window.PropertyDeskImportPreview.create({
     $,
-    state,
+    ...pendingImportAccess(state),
     selectImportRows: (rows) => rows,
     esc: String,
     openModal() {},
@@ -474,7 +495,7 @@ test("a saved import with refresh failure explains the save and still blocks ret
   });
   const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
     $,
-    state,
+    ...pendingImportAccess(state),
     selectImportRows: (rows) => rows,
     renderImportPreview: preview.renderImportPreview,
     updateImportCommitButton: preview.updateImportCommitButton,
@@ -545,7 +566,13 @@ test("CSV imports report a real zero accepted by the server as zero", async () =
   });
   const feature = context.window.PropertyDeskImportFeature.create({
     $: element,
-    state,
+    getWorkspaceOwnerId: () => "owner-1",
+    getImportBatches: () => [],
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getProperties: () => state.properties,
+    ...pendingImportAccess(state),
     repository: context.window.PropertyDeskImportRepository.create({
       getClient: () => state.client,
     }),

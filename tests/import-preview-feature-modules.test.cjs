@@ -32,7 +32,8 @@ test("CSV preview renderer receives only rendering dependencies", () => {
   );
   const dependencies = {
     $() {},
-    state: {},
+    getPendingImport: () => null,
+    setPendingImport() {},
     selectImportRows() {},
     esc() {},
     openModal() {},
@@ -70,7 +71,7 @@ test("CSV preview renderer receives only rendering dependencies", () => {
       "modules",
       "renderImportCorrections",
       "selectImportRows",
-      "state",
+      "getPendingImport",
     ].sort(),
   );
   assert.equal(passed.renderer.selectImportRows, dependencies.selectImportRows);
@@ -93,7 +94,8 @@ test("import preview enforces batch size and rejects empty CSV data", () => {
   });
   loadImportPreview(context);
   const preview = context.window.PropertyDeskImportPreview.create({
-    state: { pendingImport: null },
+    getPendingImport: () => null,
+    setPendingImport() {},
     modules: importPreviewModules(context),
   });
 
@@ -129,7 +131,7 @@ test("CSV correction view escapes raw values and validation messages", () => {
   };
   const corrections = context.window.PropertyDeskImportCorrectionView.create({
     $,
-    state,
+    getPendingImport: () => state.pendingImport,
     esc: (value) =>
       String(value ?? "")
         .replaceAll("<", "&lt;")
@@ -169,7 +171,10 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   const opened = [];
   const preview = context.window.PropertyDeskImportPreview.create({
     $: getElement,
-    state,
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
     modules: importPreviewModules(context),
     selectImportRows: (rows, includeDuplicates) =>
       rows.filter((row) => includeDuplicates || !row._possible_duplicate),
@@ -248,7 +253,10 @@ test("import preview event router corrects rows, updates duplicate selection, an
   const calls = [];
   const events = context.window.PropertyDeskImportPreviewEvents.create({
     $: getElement,
-    state,
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
     selectImportRows: (rows) => rows,
     renderImportPreview: () => calls.push("render"),
     updateImportCommitButton: () => calls.push("update-button"),

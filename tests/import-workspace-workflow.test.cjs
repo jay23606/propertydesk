@@ -8,6 +8,7 @@ test("import workspace supplies configured validators to the import feature", ()
   const calls = [];
   const validators = { validators: true };
   const feature = { feature: true };
+  const state = {};
   const validationWorkflowNames = [
     "csvValueUtils",
     "accountImportTerms",
@@ -35,7 +36,16 @@ test("import workspace supplies configured validators to the import feature", ()
   );
   const dependencies = {
     $() {},
-    state: {},
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    getImportBatches: () => state.importBatches,
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getProperties: () => state.properties,
+    getPendingImport: () => state.pendingImport,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
     esc() {},
     openModal() {},
     closeModal() {},
@@ -93,4 +103,8 @@ test("import workspace supplies configured validators to the import feature", ()
   assert.equal(calls[1][1].modules.csvParser, modules.csvParser);
   assert.equal(calls[1][1].repository, dependencies.repository);
   assert.equal(calls[1][1].refreshWorkspace, dependencies.refreshWorkspace);
+  assert.equal(calls[1][1].getAccounts, dependencies.getAccounts);
+  assert.equal(calls[1][1].getPendingImport, dependencies.getPendingImport);
+  assert.equal(calls[1][1].setPendingImport, dependencies.setPendingImport);
+  assert.equal("state" in calls[1][1], false);
 });
