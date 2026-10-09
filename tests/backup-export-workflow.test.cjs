@@ -150,6 +150,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
       now,
       todayIso: () => "2026-10-07",
       toast: () => {},
+      unusedExportOption: true,
       downloadBlob: () => {},
       zipUtils: { createZip: () => {} },
       collectBackupAgreementFiles: async () => ({
@@ -211,6 +212,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     "todayIso",
     "zipUtils",
   ]);
+  assert.equal("unusedExportOption" in calls.exporter, false);
   assert.deepEqual(Object.keys(calls.records).sort(), [
     "loadAllPages",
     "tables",
