@@ -86,6 +86,8 @@ test("transaction maintenance coordinator joins isolated correction and void act
     closeModal() {},
     prettyType() {},
     promptAction() {},
+    EventClass: class MockEvent {},
+    OptionClass: class MockOption {},
     repository: {},
     writeFeedback,
     findCorrectionTarget() {},

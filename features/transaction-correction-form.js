@@ -11,8 +11,8 @@
     openPayment,
     openExpense,
     updatePaymentGuidance,
-    EventClass = Event,
-    OptionClass = Option,
+    EventClass,
+    OptionClass,
     findCorrectionTarget,
     viewModule,
   }) {

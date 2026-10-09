@@ -6,8 +6,8 @@
     $,
     prettyType,
     updatePaymentGuidance,
-    EventClass = Event,
-    OptionClass = Option,
+    EventClass,
+    OptionClass,
   }) {
     function populatePayment(payment, account) {
       const select = $("payment-account");

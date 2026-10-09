@@ -5,12 +5,21 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 test("transaction correction workflow owns correction persistence and forms", () => {
+  for (const filename of [
+    "transaction-correction-workflow.js",
+    "transaction-correction-form.js",
+    "transaction-correction-view.js",
+  ]) {
+    const source = fs.readFileSync(
+      path.join(__dirname, "..", "features", filename),
+      "utf8",
+    );
+    assert.doesNotMatch(source, /(?:EventClass = Event|OptionClass = Option)/);
+  }
   const passed = {};
   const saveCorrection = () => {};
   const correctTransaction = () => {};
   const context = vm.createContext({
-    Event: class MockEvent {},
-    Option: class MockOption {},
     window: {},
     correctionModules: {
       maintenance: {
@@ -48,6 +57,8 @@ test("transaction correction workflow owns correction persistence and forms", ()
     closeModal() {},
     prettyType() {},
     promptAction() {},
+    EventClass: class MockEvent {},
+    OptionClass: class MockOption {},
     repository: {},
     writeFeedback: {},
     findCorrectionTarget() {},
@@ -88,6 +99,8 @@ test("transaction correction workflow owns correction persistence and forms", ()
     passed.form.findCorrectionTarget,
     correctionContext.findCorrectionTarget,
   );
+  assert.equal(passed.form.EventClass, correctionContext.EventClass);
+  assert.equal(passed.form.OptionClass, correctionContext.OptionClass);
   assert.equal(passed.form.openPayment, actions.openPayment);
   assert.equal(passed.form.openExpense, actions.openExpense);
   assert.equal(passed.form.viewModule, context.correctionModules.view);

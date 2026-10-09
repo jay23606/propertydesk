@@ -148,6 +148,8 @@ test("transaction correction form reopens posted payments and expenses with audi
     ],
     pendingCorrection: null,
   };
+  const EventClass = context.Event;
+  const OptionClass = context.Option;
   const calls = [];
   const feature = context.window.PropertyDeskTransactionCorrectionForm.create({
     $: (id) => field(id),
@@ -156,6 +158,8 @@ test("transaction correction form reopens posted payments and expenses with audi
       context.window.PropertyDeskTransactionCorrectionModel
         .findCorrectionTarget,
     viewModule: context.window.PropertyDeskTransactionCorrectionView,
+    EventClass,
+    OptionClass,
     promptAction: () => "Corrected bank posting date",
     prettyType: () => "Land contract",
     openPayment: () => calls.push("open-payment"),
