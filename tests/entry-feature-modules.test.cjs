@@ -5,30 +5,28 @@ const path = require("node:path");
 
 test("account records and ledger entries use separate workspace workflows", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const appServices = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-services.js"),
+    "utf8",
+  );
 
-  assert.ok(
-    app.indexOf("PropertyDeskNotifications.create(") <
-      app.indexOf("PropertyDeskWorkspaceRuntime.create("),
-  );
   assert.match(
     app,
-    /PropertyDeskWorkspaceRuntime\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,\s*repositories:/,
-  );
-  assert.match(
-    app,
-    /repositories: \{\s*queryUtils: window\.PropertyDeskRepositoryQueryUtils,/,
-  );
-  assert.match(
-    app,
-    /PropertyDeskFormOptions\.create\(\{[\s\S]*?modules: \{\s*domainOptions: window\.PropertyDeskDomainOptions,\s*transactionOptions: window\.PropertyDeskTransactionOptions,/,
+    /PropertyDeskAppServices\.create\(\{[\s\S]*?modules: \{[\s\S]*?workspaceRuntime: \{[\s\S]*?factory: window\.PropertyDeskWorkspaceRuntime/,
   );
   assert.doesNotMatch(
     app,
-    /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,
+    /PropertyDesk(?:Notifications|WorkspaceRuntime|WorkspaceFinancialContext|WorkspaceDepositContext)\.create\(/,
   );
   assert.match(
+    appServices,
+    /modules\.workspaceRuntime\.factory\.create\(\{[\s\S]*?repositories: modules\.workspaceRuntime\.repositories,[\s\S]*?workflows: modules\.workspaceRuntime\.workflows,/,
+  );
+  assert.match(appServices, /modules\.financialContext\.factory\.create\(/);
+  assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
+  assert.match(
     app,
-    /tables: window\.PropertyDeskWorkspaceTables,\s*workflows: \{\s*backendClient: window\.PropertyDeskBackendClient,[\s\S]*?refresh: window\.PropertyDeskWorkspaceRefresh,/,
+    /PropertyDeskFormOptions\.create\(\{[\s\S]*?modules: \{\s*domainOptions: window\.PropertyDeskDomainOptions,\s*transactionOptions: window\.PropertyDeskTransactionOptions,/,
   );
   assert.doesNotMatch(
     fs.readFileSync(
@@ -143,7 +141,11 @@ test("account records and ledger entries use separate workspace workflows", () =
 
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
+  const appServices = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-services.js"),
+    "utf8",
+  );
+  assert.match(appServices, /modules\.financialContext\.factory\.create\(/);
   assert.match(app, /window\.PropertyDeskPostedLedgerUtils/);
   assert.doesNotMatch(
     app,
@@ -167,7 +169,7 @@ test("app coordinator passes the amortization helper into account details", () =
     financialWorkflow,
     /PropertyDeskDepositLedgerUtils\.create\(/,
   );
-  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
+  assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
   assert.match(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-deposit-context.js"),
@@ -220,7 +222,7 @@ test("app coordinator passes the amortization helper into account details", () =
     financialWorkflow,
     /PropertyDeskDepositContext\.create\(/,
   );
-  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
+  assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskOverviewWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskPropertyPortfolioWorkflow\.create\(/);
   assert.match(app, /attachPropertyGridEvents,\s*attachPropertyActionEvents,/);
@@ -345,13 +347,17 @@ test("app passes reminder services into the app-shell coordinator", () => {
 
 test("app root composes shared state and workspace services directly", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
-  assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
+  const appServices = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-services.js"),
+    "utf8",
+  );
+  assert.match(appServices, /modules\.workspaceRuntime\.factory\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:BackendClient|AppState|WorkspaceData|WorkspaceRefresh)\.create\(/,
   );
-  assert.doesNotMatch(app, /PropertyDeskAppServices/);
-  assert.match(app, /PropertyDeskWorkspaceFinancialContext\.create\(/);
+  assert.match(app, /PropertyDeskAppServices\.create\(/);
+  assert.match(appServices, /modules\.financialContext\.factory\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAccountFinancialSummary\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerContext\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskDepositContext\.create\(/);

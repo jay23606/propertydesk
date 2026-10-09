@@ -10,21 +10,96 @@
   const openWindow = (...args) => window.open(...args);
   const reportError = (message, error) => window.console?.error(message, error);
   const transactionTimestamp = () => now().toISOString();
-  const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
+  const appServices = window.PropertyDeskAppServices.create({
+    $,
+    config: window.PROPERTYDESK_CONFIG || {},
+    supabase: window.supabase,
+    reportError,
     modules: {
-      reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
-      recordWrites: window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      writeFeedback: {
+        factory: window.PropertyDeskRepositoryWriteFeedback,
+        reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
+        recordWrites: window.PropertyDeskWorkspaceRecordWriteWorkflow,
+      },
+      emailUtils: {
+        factory: window.PropertyDeskEmailUtils,
+        emailAddressUtils: window.PropertyDeskEmailAddressUtils,
+        reminderCopy: window.PropertyDeskReminderCopy,
+      },
+      postedLedger: {
+        factory: window.PropertyDeskPostedLedgerUtils,
+        currencyUtils: window.PropertyDeskCurrencyUtils,
+      },
+      notifications: window.PropertyDeskNotifications,
+      workspaceRuntime: {
+        factory: window.PropertyDeskWorkspaceRuntime,
+        repositories: {
+          queryUtils: window.PropertyDeskRepositoryQueryUtils,
+          accounts: window.PropertyDeskAccountRepository,
+          accountHistory: window.PropertyDeskAccountHistoryRepository,
+          deposits: window.PropertyDeskDepositRepository,
+          documents: window.PropertyDeskDocumentRepository,
+          imports: window.PropertyDeskImportRepository,
+          properties: window.PropertyDeskPropertyRepository,
+          propertyHolders: window.PropertyDeskPropertyHolderRepository,
+          transactions: window.PropertyDeskTransactionRepository,
+          workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
+        },
+        tables: window.PropertyDeskWorkspaceTables,
+        workflows: {
+          backendClient: window.PropertyDeskBackendClient,
+          appState: window.PropertyDeskAppState,
+          authClient: window.PropertyDeskAuthClient,
+          repositoryRegistry: window.PropertyDeskRepositoryRegistry,
+          query: window.PropertyDeskWorkspaceQuery,
+          readCatalog: window.PropertyDeskWorkspaceReadCatalog,
+          data: window.PropertyDeskWorkspaceData,
+          refresh: window.PropertyDeskWorkspaceRefresh,
+        },
+      },
+      paymentNotifications: window.PropertyDeskPaymentNotifications,
+      displayUtils: window.PropertyDeskDisplayUtils,
+      propertyAddressUtils: window.PropertyDeskPropertyAddressUtils,
+      dateUtils: window.PropertyDeskDateUtils,
+      currencyUtils: window.PropertyDeskCurrencyUtils,
+      accountStatusUtils: window.PropertyDeskAccountStatusUtils,
+      financialContext: {
+        factory: window.PropertyDeskWorkspaceFinancialContext,
+        workflows: {
+          schedule: window.PropertyDeskScheduleUtils,
+          loanSchedule: window.PropertyDeskLoanAmortizationUtils,
+          accountFinancialContext:
+            window.PropertyDeskWorkspaceAccountFinancialContext,
+          ledgerContext: window.PropertyDeskLedgerContext,
+          accountSummary: window.PropertyDeskAccountFinancialSummary,
+        },
+      },
+      depositContext: {
+        factory: window.PropertyDeskWorkspaceDepositContext,
+        workflows: {
+          depositLedger: window.PropertyDeskDepositLedgerUtils,
+          depositContext: window.PropertyDeskDepositContext,
+        },
+      },
     },
   });
-  const emailUtils = window.PropertyDeskEmailUtils.create({
-    modules: {
-      emailAddressUtils: window.PropertyDeskEmailAddressUtils,
-      reminderCopy: window.PropertyDeskReminderCopy,
-    },
-  });
-  const postedLedgerUtils = window.PropertyDeskPostedLedgerUtils.create({
-    modules: { currencyUtils: window.PropertyDeskCurrencyUtils },
-  });
+  const {
+    writeFeedback,
+    emailUtils,
+    toast,
+    backendConfigured,
+    state,
+    fetchAll,
+    loadAllWorkspacePages,
+    repositories,
+    setRender: setWorkspaceRender,
+    authClient,
+    initializeClient,
+    isClientReady,
+    paymentNotifications,
+    financialContext,
+    depositLedger,
+  } = appServices;
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -39,71 +114,6 @@
     paymentFrequencyLabel,
     expenseCategoryLabel,
   } = window.PropertyDeskDisplayUtils;
-  const { toast } = window.PropertyDeskNotifications.create({ $ });
-  const {
-    backendConfigured,
-    state,
-    fetchAll,
-    loadAllWorkspacePages,
-    repositories,
-    setRender: setWorkspaceRender,
-    authClient,
-    initializeClient,
-    getClient,
-    isClientReady,
-  } = window.PropertyDeskWorkspaceRuntime.create({
-    config: window.PROPERTYDESK_CONFIG || {},
-    supabase: window.supabase,
-    repositories: {
-      queryUtils: window.PropertyDeskRepositoryQueryUtils,
-      accounts: window.PropertyDeskAccountRepository,
-      accountHistory: window.PropertyDeskAccountHistoryRepository,
-      deposits: window.PropertyDeskDepositRepository,
-      documents: window.PropertyDeskDocumentRepository,
-      imports: window.PropertyDeskImportRepository,
-      properties: window.PropertyDeskPropertyRepository,
-      propertyHolders: window.PropertyDeskPropertyHolderRepository,
-      transactions: window.PropertyDeskTransactionRepository,
-      workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
-    },
-    toast,
-    reportError,
-    tables: window.PropertyDeskWorkspaceTables,
-    workflows: {
-      backendClient: window.PropertyDeskBackendClient,
-      appState: window.PropertyDeskAppState,
-      authClient: window.PropertyDeskAuthClient,
-      repositoryRegistry: window.PropertyDeskRepositoryRegistry,
-      query: window.PropertyDeskWorkspaceQuery,
-      readCatalog: window.PropertyDeskWorkspaceReadCatalog,
-      data: window.PropertyDeskWorkspaceData,
-      refresh: window.PropertyDeskWorkspaceRefresh,
-    },
-  });
-  const paymentNotifications = window.PropertyDeskPaymentNotifications.create({
-    state,
-    getClient,
-    toast,
-    money,
-    propertyAddress,
-    refresh: fetchAll,
-  });
-  const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
-    state,
-    todayIso,
-    dateUtils: window.PropertyDeskDateUtils,
-    currencyUtils: window.PropertyDeskCurrencyUtils,
-    postedLedgerUtils,
-    isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
-    workflows: {
-      schedule: window.PropertyDeskScheduleUtils,
-      loanSchedule: window.PropertyDeskLoanAmortizationUtils,
-      accountFinancialContext:
-        window.PropertyDeskWorkspaceAccountFinancialContext,
-      ledgerContext: window.PropertyDeskLedgerContext,
-      accountSummary: window.PropertyDeskAccountFinancialSummary,
-    },
-  });
   const {
     isPosted,
     paymentStatusInMonth,
@@ -120,14 +130,6 @@
     collectedSince,
     summarizeAccount,
   } = financialContext;
-  const { depositLedger } = window.PropertyDeskWorkspaceDepositContext.create({
-    state,
-    postedLedgerUtils,
-    workflows: {
-      depositLedger: window.PropertyDeskDepositLedgerUtils,
-      depositContext: window.PropertyDeskDepositContext,
-    },
-  });
   // Feature modules receive shared state and helpers; app.js connects workflows.
   const { renderReports, attachReportExportEvents } =
     window.PropertyDeskReportWorkspaceWorkflow.create({

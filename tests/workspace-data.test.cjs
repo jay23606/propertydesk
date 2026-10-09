@@ -204,7 +204,6 @@ test("workspace data modules load before app root and are precached", () => {
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
-  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const runtime = fs.readFileSync(
     path.join(__dirname, "..", "features", "workspace-runtime.js"),
     "utf8",
@@ -245,7 +244,11 @@ test("workspace data modules load before app root and are precached", () => {
   );
   assert.match(worker, /'\.\/features\/workspace-refresh\.js'/);
   assert.match(worker, /'\.\/features\/workspace-runtime\.js'/);
-  assert.match(app, /PropertyDeskWorkspaceRuntime\.create\(/);
+  const appServices = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-services.js"),
+    "utf8",
+  );
+  assert.match(appServices, /modules\.workspaceRuntime\.factory\.create\(/);
   assert.match(runtime, /workflows\.query\.create\(\{/);
   assert.match(runtime, /workflows\.data\.create\(\{/);
   assert.match(runtime, /workflows\.refresh\.create\(/);

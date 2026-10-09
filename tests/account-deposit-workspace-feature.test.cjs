@@ -215,6 +215,10 @@ test("account and deposit workspace exposes only its supported operations", () =
 
 test("account and deposit workspaces connect at one feature boundary", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const appServices = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-services.js"),
+    "utf8",
+  );
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -336,8 +340,8 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?writeFeedback,/,
   );
   assert.match(
-    app,
-    /PropertyDeskRepositoryWriteFeedback\.create\(\{[\s\S]*?reconciliation: window\.PropertyDeskWorkspaceWriteReconciliation,[\s\S]*?recordWrites: window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
+    appServices,
+    /modules\.writeFeedback\.factory\.create\(\{[\s\S]*?reconciliation: modules\.writeFeedback\.reconciliation,[\s\S]*?recordWrites: modules\.writeFeedback\.recordWrites/,
   );
   assert.match(app, /repository: repositories\.transactions/);
   assert.match(

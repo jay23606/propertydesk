@@ -6,6 +6,10 @@ const test = require("node:test");
 test("app delegates account, deposit, and transaction maintenance", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const appServices = fs.readFileSync(
+    path.join(root, "features", "app-services.js"),
+    "utf8",
+  );
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
@@ -27,7 +31,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
 
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
+  assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);
   assert.doesNotMatch(
