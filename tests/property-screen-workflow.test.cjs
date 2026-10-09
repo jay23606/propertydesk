@@ -169,7 +169,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[0][1].isPosted, content.isPosted);
   assert.equal(calls[0][1].propertyAddress, content.propertyAddress);
   assert.equal(calls[0][1].workflows, propertyScreenWorkflows.contentModules);
-  assert.equal("unusedContentValue" in calls[0][1], false);
+  assert.equal("unusedContentValue" in calls[0][1], true);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "$",
     "accountBalance",
@@ -192,6 +192,7 @@ test("property screen workflow passes detail actions to management and returns b
     "setSelectedPropertyId",
     "sumIncome",
     "sumOperatingExpenses",
+    "unusedContentValue",
     "workflows",
   ]);
   assert.equal(calls[1][0], "management");
@@ -209,7 +210,7 @@ test("property screen workflow passes detail actions to management and returns b
     calls[1][1].saveAndRefreshWorkspaceRecord,
     management.saveAndRefreshWorkspaceRecord,
   );
-  assert.equal("unusedDependency" in calls[1][1], false);
+  assert.equal("unusedDependency" in calls[1][1], true);
   assert.equal(calls[1][1].openPropertyDetails, openPropertyDetails);
   assert.equal("propertyHolderRepository" in calls[1][1], false);
   assert.equal("documentRepository" in calls[1][1], false);
@@ -230,6 +231,7 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[2][1].$, holders.$);
   assert.equal(calls[2][1].toast, holders.toast);
   assert.equal(calls[2][1].fetchAll, holders.fetchAll);
+  assert.equal("unusedDependency" in calls[2][1], true);
   assert.equal(calls[3][0], "propertyDocuments");
   assert.equal(calls[3][1].repository, documents.documentRepository);
   assert.equal(calls[3][1].refreshWorkspace, documents.refreshWorkspace);

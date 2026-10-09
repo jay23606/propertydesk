@@ -274,7 +274,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     screenWorkflow,
-    /workflows\.holders\.create\([\s\S]*?repository: holders\.repository/,
+    /workflows\.holders\.create\(\{\s*\.\.\.holders,[\s\S]*?workflows: workflows\.holderModules/,
   );
   assert.match(
     holderWorkflow,
