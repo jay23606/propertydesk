@@ -28,6 +28,7 @@
     lateReminderSms,
     paymentStatusInMonth,
     toast,
+    openWindow,
     schedule,
     openPayment,
     openPropertyDetails,
@@ -98,6 +99,7 @@
       esc,
       money,
       toast,
+      openWindow,
       schedule,
     });
     const propertyViews = workflows.views.create({

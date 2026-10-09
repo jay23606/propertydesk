@@ -220,6 +220,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   assert.equal(received.overview.getPayments, records.getPayments);
   assert.equal(received.overview.workflows, workflows.overviewModules);
   assert.equal(received.portfolio.getSenderName, records.getSenderName);
+  assert.equal(received.portfolio.openWindow, ui.openWindow);
   assert.equal(received.portfolio.lateReminderMailto, ui.lateReminderMailto);
   assert.equal(received.portfolio.workflows, workflows.portfolioModules);
   assert.equal(received.portfolio.editPropertyQuickNote, editPropertyQuickNote);

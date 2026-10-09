@@ -15,7 +15,7 @@
     esc,
     money,
     toast,
-    openWindow = () => window.open("", "_blank"),
+    openWindow,
     schedule = (callback, delay) => window.setTimeout(callback, delay),
     now = () => new Date(),
   }) {
