@@ -56,9 +56,9 @@
   header { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 8px; }
   h1 { margin: 0; font-size: 16px; }
   .meta { color: #58665f; font-size: 8px; }
-  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-  th { background: #e8efeb; color: #25372f; font-size: 7px; text-align: left; text-transform: uppercase; letter-spacing: .03em; }
-  th, td { border: 1px solid #cbd5cf; padding: 3px 4px; vertical-align: top; }
+  table { border-collapse: collapse; width: calc(100% - 4px); max-width: 100%; table-layout: fixed; }
+  th { background: #e8efeb; color: #25372f; font-size: 7px; text-align: left; text-transform: uppercase; letter-spacing: .03em; overflow-wrap: anywhere; }
+  th, td { min-width: 0; border: 1px solid #cbd5cf; padding: 3px 4px; vertical-align: top; }
   td { overflow: hidden; overflow-wrap: anywhere; max-height: 2.6em; }
   tr { height: ${Math.max(11, Math.min(20, 540 / rowCount))}px; break-inside: avoid; }
   th:nth-child(1) { width: 15%; } th:nth-child(2) { width: 10%; }
