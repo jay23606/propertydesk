@@ -3,6 +3,13 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const quickNoteSource = fs.readFileSync(
+  path.join(__dirname, "..", "features", "property-quick-note.js"),
+  "utf8",
+);
+test("property quick note receives the prompt function from its app boundary", () => {
+  assert.doesNotMatch(quickNoteSource, /window\.prompt/);
+});
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {} });
   for (const source of [

@@ -51,6 +51,14 @@ test("app composes the Properties grid and action operations explicitly", () => 
   );
   assert.match(
     app,
+    /promptAction: \(message, initialValue\) =>\s*window\.prompt\(message, initialValue\),\s*openPayment,/,
+  );
+  assert.match(
+    workflow,
+    /workflows\.quickNote\.create\(\{[\s\S]*?promptAction,/,
+  );
+  assert.match(
+    app,
     /openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?editAccount: propertyAccountForms\.editAccount,/,
   );
   assert.match(
@@ -173,6 +181,7 @@ test("Properties workflow returns explicit view and action operations", () => {
     toast: action,
     fetchAll: action,
     writeFeedback: { kind: "write-feedback" },
+    promptAction: action,
     streetAddress: action,
     openPayment: action,
     propertyRepository,
@@ -202,6 +211,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
   assert.equal(passed.quickNote.toast, action);
   assert.equal(passed.quickNote.fetchAll, action);
+  assert.equal(passed.quickNote.promptAction, action);
   assert.equal(passed.quickNote.writeFeedback.kind, "write-feedback");
   assert.equal(passed.quickNote.streetAddress, action);
   assert.equal(passed.quickNote.repository, propertyRepository);

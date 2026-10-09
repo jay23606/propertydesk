@@ -72,6 +72,7 @@
       toast: portfolio.toast,
       fetchAll: portfolio.fetchAll,
       writeFeedback: portfolio.writeFeedback,
+      promptAction: portfolio.promptAction,
       openPayment: portfolio.openPayment,
       openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,

@@ -7,12 +7,11 @@
     toast,
     fetchAll,
     streetAddress,
+    promptAction,
     repository,
     writeFeedback,
     noteMaintenance,
     recordUpdateMaintenance,
-    promptAction = (message, initialValue) =>
-      window.prompt(message, initialValue),
   }) {
     const { savePropertyQuickNote } = noteMaintenance.create({
       state,

@@ -678,6 +678,8 @@
       toast,
       fetchAll,
       writeFeedback,
+      promptAction: (message, initialValue) =>
+        window.prompt(message, initialValue),
       openPayment,
       propertyRepository: repositories.properties,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,
