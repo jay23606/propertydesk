@@ -155,6 +155,7 @@
         lateReminderMailto: ui.lateReminderMailto,
         lateReminderSms: ui.lateReminderSms,
         paymentStatusInMonth: ui.paymentStatusInMonth,
+        storage: ui.storage,
         toast: ui.toast,
         openWindow: ui.openWindow,
         schedule: ui.schedule,

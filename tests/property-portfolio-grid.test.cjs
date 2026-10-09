@@ -182,14 +182,17 @@ test("Properties portfolio returns explicit view and action operations", () => {
 
   const workflows = {
     templateStore: {
-      create: () => ({
-        read: () => ({
-          email: { items: [], activeId: null },
-          sms: { items: [], activeId: null },
-        }),
-        write: () => true,
-        getTemplate: () => ({}),
-      }),
+      create: (options) => {
+        passed.templateStore = options;
+        return {
+          read: () => ({
+            email: { items: [], activeId: null },
+            sms: { items: [], activeId: null },
+          }),
+          write: () => true,
+          getTemplate: () => ({}),
+        };
+      },
     },
     table: context.window.PropertyDeskPropertyPortfolioTable,
     templateSettings: context.window.PropertyDeskReminderTemplateSettings,
@@ -202,6 +205,7 @@ test("Properties portfolio returns explicit view and action operations", () => {
     views: context.window.PropertyDeskPropertyViews,
     events: context.window.PropertyDeskPropertyViewEvents,
   };
+  const storage = { getItem() {}, setItem() {} };
   const workflow = context.window.PropertyDeskPropertyPortfolioWorkflow.create({
     $: action,
     getSenderName: () => state.user.user_metadata.display_name,
@@ -214,6 +218,7 @@ test("Properties portfolio returns explicit view and action operations", () => {
     groupAccountsByProperty: action,
     isActiveAccount: action,
     toast: action,
+    storage,
     openWindow: action,
     schedule: action,
     openPayment: action,
@@ -235,6 +240,7 @@ test("Properties portfolio returns explicit view and action operations", () => {
     "property views",
     "portfolio actions",
   ]);
+  assert.equal(passed.templateStore.storage, storage);
   assert.deepEqual(Object.keys(workflow).sort(), [
     "attachPropertyActionEvents",
     "attachPropertyGridEvents",

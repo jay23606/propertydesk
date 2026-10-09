@@ -23,6 +23,10 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     appSource,
     /PropertyDeskPropertyWorkspaceSetup\.create\(\{[\s\S]*?makeId,/,
   );
+  assert.match(
+    appSource,
+    /storage: \{\s*getItem: \(key\) => window\.localStorage\.getItem\(key\),\s*setItem: \(key, value\) => window\.localStorage\.setItem\(key, value\),\s*\},/,
+  );
 
   let received;
   const result = { renderProperties() {} };
@@ -82,6 +86,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "lateReminderMailto",
     "lateReminderSms",
     "paymentStatusInMonth",
+    "storage",
     "promptAction",
   ];
   const ui = Object.fromEntries(uiKeys.map((key) => [key, () => key]));
@@ -221,6 +226,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   assert.equal(received.overview.workflows, workflows.overviewModules);
   assert.equal(received.portfolio.getSenderName, records.getSenderName);
   assert.equal(received.portfolio.openWindow, ui.openWindow);
+  assert.equal(received.portfolio.storage, ui.storage);
   assert.equal(received.portfolio.lateReminderMailto, ui.lateReminderMailto);
   assert.equal(received.portfolio.workflows, workflows.portfolioModules);
   assert.equal(received.portfolio.editPropertyQuickNote, editPropertyQuickNote);

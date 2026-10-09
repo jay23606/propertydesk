@@ -18,10 +18,7 @@
     },
   });
 
-  function createReminderTemplateStore({
-    toast,
-    storage = window.localStorage,
-  }) {
+  function createReminderTemplateStore({ toast, storage }) {
     function defaults() {
       return Object.fromEntries(
         Object.entries(DEFAULT_TEMPLATES).map(([key, template]) => [

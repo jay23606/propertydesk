@@ -27,6 +27,7 @@
     lateReminderMailto,
     lateReminderSms,
     paymentStatusInMonth,
+    storage,
     toast,
     openWindow,
     schedule,
@@ -43,7 +44,10 @@
       paymentFrequencyLabel,
       isActiveAccount,
     });
-    const reminderTemplateStore = workflows.templateStore.create({ toast });
+    const reminderTemplateStore = workflows.templateStore.create({
+      toast,
+      storage,
+    });
     const reminderTemplates = workflows.templateSettings.create({
       $,
       openModal,

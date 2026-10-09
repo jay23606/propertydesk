@@ -54,6 +54,7 @@ function setup() {
   );
   const store = context.window.PropertyDeskReminderTemplateStore.create({
     toast: (message) => messages.push(message),
+    storage: context.window.localStorage,
   });
   vm.runInContext(
     fs.readFileSync(

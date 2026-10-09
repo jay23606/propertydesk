@@ -20,6 +20,11 @@ function loadStore(storage, toast = () => {}) {
 }
 
 test("template store supplies a shared default for each channel", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features/reminder-template-store.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /window\.localStorage/);
   const store = loadStore({ getItem: () => null, setItem() {} });
   assert.equal(store.getTemplate("email").id, "default-email");
   assert.equal(store.getTemplate("sms").id, "default-sms");
@@ -27,6 +32,19 @@ test("template store supplies a shared default for each channel", () => {
     store.getTemplate("email").body,
     /earlier balances or late fees/,
   );
+});
+
+test("template store falls back to defaults when injected browser storage is blocked", () => {
+  const store = loadStore({
+    getItem() {
+      throw new Error("storage blocked");
+    },
+    setItem() {
+      throw new Error("storage blocked");
+    },
+  });
+  assert.equal(store.getTemplate("email").id, "default-email");
+  assert.equal(store.write({}), false);
 });
 
 test("template store normalizes invalid active IDs and ignores malformed items", () => {

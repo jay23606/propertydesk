@@ -73,6 +73,7 @@
       lateReminderMailto: portfolio.lateReminderMailto,
       lateReminderSms: portfolio.lateReminderSms,
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
+      storage: portfolio.storage,
       toast: portfolio.toast,
       openWindow: portfolio.openWindow,
       schedule: portfolio.schedule,

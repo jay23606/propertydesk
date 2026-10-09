@@ -536,6 +536,10 @@
       lateReminderMailto,
       lateReminderSms,
       paymentStatusInMonth,
+      storage: {
+        getItem: (key) => window.localStorage.getItem(key),
+        setItem: (key, value) => window.localStorage.setItem(key, value),
+      },
       promptAction,
     },
     services: {
