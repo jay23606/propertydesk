@@ -45,7 +45,7 @@
           todayIso: ui.todayIso,
           propertyRepository: services.propertyRepository,
           saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
-          closeModal: ui.closeModal,
+          closeModal: services.closeModal,
           editAccount: services.editAccount,
           openAccountDetails: services.openAccountDetails,
           openPayment: services.openPayment,

@@ -135,6 +135,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     received.detail.management.propertyRepository,
     services.propertyRepository,
   );
+  assert.equal(received.detail.management.closeModal, services.closeModal);
   assert.equal(
     received.detail.holders.repository,
     services.propertyHolderRepository,
