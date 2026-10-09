@@ -10,11 +10,31 @@
     workspaceWorkflows,
   }) {
     const workspacePage = workspaceWorkflow.create({
-      ...workspace,
+      $: workspace.$,
+      getAccounts: workspace.getAccounts,
+      getProperties: workspace.getProperties,
+      getReminderLogs: workspace.getReminderLogs,
+      getUser: workspace.getUser,
+      setUser: workspace.setUser,
+      getWorkspaceMembers: workspace.getWorkspaceMembers,
+      getWorkspaceOwnerId: workspace.getWorkspaceOwnerId,
+      now: workspace.now,
+      esc: workspace.esc,
+      toast: workspace.toast,
+      fetchAll: workspace.fetchAll,
+      reminder: workspace.reminder,
+      memberRepository: workspace.memberRepository,
+      authClient: workspace.authClient,
+      run: workspace.run,
+      runAndRefreshWorkspaceChange: workspace.runAndRefreshWorkspaceChange,
+      confirmAction: workspace.confirmAction,
       workflows: workspaceWorkflows,
     });
     const pageNavigation = navigationWorkflow.create({
-      ...navigation,
+      $: navigation.$,
+      setView: navigation.setView,
+      documentRef: navigation.documentRef,
+      windowRef: navigation.windowRef,
       renderWorkspacePage: workspacePage.renderWorkspacePage,
     });
 

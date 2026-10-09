@@ -27,8 +27,9 @@ test("app shell composes workspace settings and page navigation", () => {
   );
   assert.match(
     appShell,
-    /workspaceWorkflow\.create\(\{\s*\.\.\.workspace,\s*workflows: workspaceWorkflows,[\s\S]*?navigationWorkflow\.create\(\{\s*\.\.\.navigation,\s*renderWorkspacePage: workspacePage\.renderWorkspacePage/,
+    /workspaceWorkflow\.create\(\{\s*\$: workspace\.\$,[\s\S]*?workflows: workspaceWorkflows,[\s\S]*?navigationWorkflow\.create\(\{\s*\$: navigation\.\$,[\s\S]*?renderWorkspacePage: workspacePage\.renderWorkspacePage/,
   );
+  assert.doesNotMatch(appShell, /\.\.\.workspace|\.\.\.navigation/);
   assert.doesNotMatch(
     appShell,
     /window\.PropertyDesk(?:Workspace|Navigation)\.create/,

@@ -60,7 +60,7 @@ test("app shell forwards scoped workspace settings and navigation", () => {
     runAndRefreshWorkspaceChange: () => {},
     authClient: {},
     confirmAction: () => true,
-    scopedWorkspaceValue: true,
+    unusedWorkspaceValue: true,
   };
   const navigationSelector = () => {};
   const workspaceWorkflows = {};
@@ -69,7 +69,7 @@ test("app shell forwards scoped workspace settings and navigation", () => {
     setView() {},
     documentRef: {},
     windowRef: {},
-    scopedNavigationValue: true,
+    unusedNavigationValue: true,
   };
   const appShell = context.window.PropertyDeskAppShellWorkflow.create({
     workspace,
@@ -96,12 +96,10 @@ test("app shell forwards scoped workspace settings and navigation", () => {
     "reminder",
     "run",
     "runAndRefreshWorkspaceChange",
-    "scopedWorkspaceValue",
     "setUser",
     "toast",
     "workflows",
   ]);
-  assert.equal(passed.workspace.scopedWorkspaceValue, true);
   assert.equal(Object.hasOwn(passed.workspace, "unusedWorkspaceValue"), false);
   assert.equal(passed.workspace.workflows, workspaceWorkflows);
   for (const key of Object.keys(passed.workspace)) {
@@ -112,11 +110,13 @@ test("app shell forwards scoped workspace settings and navigation", () => {
     "$",
     "documentRef",
     "renderWorkspacePage",
-    "scopedNavigationValue",
     "setView",
     "windowRef",
   ]);
-  assert.equal(passed.navigation.scopedNavigationValue, true);
+  assert.equal(
+    Object.hasOwn(passed.navigation, "unusedNavigationValue"),
+    false,
+  );
   assert.equal(
     Object.hasOwn(passed.navigation, "unusedNavigationValue"),
     false,
