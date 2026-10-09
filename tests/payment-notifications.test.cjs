@@ -59,7 +59,32 @@ function setup() {
     context,
   );
   const feature = context.window.PropertyDeskPaymentNotifications.create({
-    state,
+    getWorkspaceIdentity: () => ({
+      ownerId: state.workspaceOwnerId,
+      viewerId: state.user?.id,
+    }),
+    getPaymentNotificationData: () => ({
+      members: state.workspaceMembers.map(
+        ({ member_user_id, display_name, email }) => ({
+          member_user_id,
+          display_name,
+          email,
+        }),
+      ),
+      accounts: state.accounts.map(({ id, property_id }) => ({
+        id,
+        property_id,
+      })),
+      properties: state.properties.map(
+        ({ id, address, city, state, postal_code }) => ({
+          id,
+          address,
+          city,
+          state,
+          postal_code,
+        }),
+      ),
+    }),
     getClient: () => client,
     toast: (message) => messages.push(message),
     money: (amount) => `$${Number(amount).toFixed(2)}`,

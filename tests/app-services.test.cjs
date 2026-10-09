@@ -18,6 +18,26 @@ test("app services compose shared runtime and financial services explicitly", ()
     payments: [],
     depositEntries: [],
     expenses: [],
+    workspaceOwnerId: "owner-1",
+    user: { id: "viewer-1" },
+    workspaceMembers: [
+      {
+        member_user_id: "member-1",
+        display_name: "Member Name",
+        email: "member@example.test",
+        unrelated_private_field: "omit this",
+      },
+    ],
+    properties: [
+      {
+        id: "property-1",
+        address: "12 Main St",
+        city: "Altoona",
+        state: "PA",
+        postal_code: "16601",
+        unrelated_private_field: "omit this too",
+      },
+    ],
   };
   const client = {};
   const fetchAll = () => {};
@@ -166,7 +186,44 @@ test("app services compose shared runtime and financial services explicitly", ()
   assert.equal(calls[4][1].reportError, reportError);
   assert.equal(calls[4][1].tables, tables);
   assert.equal(calls[4][1].workflows, runtimeWorkflows);
-  assert.equal(calls[5][1].state, state);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(calls[5][1].getWorkspaceIdentity())),
+    {
+      ownerId: "owner-1",
+      viewerId: "viewer-1",
+    },
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(calls[5][1].getPaymentNotificationData())),
+    {
+      members: [
+        {
+          member_user_id: "member-1",
+          display_name: "Member Name",
+          email: "member@example.test",
+        },
+      ],
+      accounts: [],
+      properties: [
+        {
+          id: "property-1",
+          address: "12 Main St",
+          city: "Altoona",
+          state: "PA",
+          postal_code: "16601",
+        },
+      ],
+    },
+  );
+  assert.deepEqual(Object.keys(calls[5][1]).sort(), [
+    "getClient",
+    "getPaymentNotificationData",
+    "getWorkspaceIdentity",
+    "money",
+    "propertyAddress",
+    "refresh",
+    "toast",
+  ]);
   assert.equal(calls[5][1].getClient, getClient);
   assert.equal(calls[5][1].toast, toast);
   assert.equal(calls[5][1].money, money);

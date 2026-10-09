@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    state,
+    getWorkspaceIdentity,
+    getPaymentNotificationData,
     getClient,
     toast,
     money,
@@ -27,13 +28,14 @@
     }
 
     function describePayment(payment) {
-      const actor = state.workspaceMembers.find(
+      const data = getPaymentNotificationData();
+      const actor = data.members.find(
         (member) => member.member_user_id === payment.recorded_by,
       );
-      const account = state.accounts.find(
+      const account = data.accounts.find(
         (item) => item.id === payment.account_id,
       );
-      const property = state.properties.find(
+      const property = data.properties.find(
         (item) => item.id === account?.property_id,
       );
       const name = actor?.display_name || actor?.email || "A workspace member";
@@ -48,7 +50,7 @@
       if (
         !payment?.id ||
         !payment.recorded_by ||
-        payment.recorded_by === state.user?.id ||
+        payment.recorded_by === getWorkspaceIdentity().viewerId ||
         payment.status === "voided" ||
         seenPaymentIds.has(payment.id)
       ) {
@@ -65,8 +67,7 @@
 
     function start() {
       const client = getClient();
-      const ownerId = state.workspaceOwnerId;
-      const viewerId = state.user?.id;
+      const { ownerId, viewerId } = getWorkspaceIdentity();
       if (!client?.channel || !ownerId || !viewerId) return false;
 
       const nextKey = `${ownerId}:${viewerId}`;

@@ -16,6 +16,8 @@ Workflow coordinators pass only the dependencies each child needs instead of for
 
 Shared finance services read only the account and payment collections they use, while deposit calculations receive just deposit entries, payments, and expenses. These collections are provided through getters so calculations always see the latest workspace refresh without gaining access to unrelated workspace records.
 
+Payment notifications use the same boundary: their coordinator gets a small workspace identity and projected member, account, and address details instead of the full application state.
+
 `workspace-table-catalog.js` is the shared table inventory for workspace operations, and `workspace-read-catalog.js` explicitly lists the records hydrated into the client. `workspace-data.js` runs that read catalog to hydrate app state, `workspace-query.js` scopes and pages reads, and `workspace-refresh.js` coordinates loading and rendering. Row-level security and database grants remain the access boundary.
 
 ## Feature workflows

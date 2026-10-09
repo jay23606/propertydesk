@@ -29,7 +29,32 @@
       workflows: modules.workspaceRuntime.workflows,
     });
     const paymentNotifications = modules.paymentNotifications.create({
-      state: runtime.state,
+      getWorkspaceIdentity: () => ({
+        ownerId: runtime.state.workspaceOwnerId,
+        viewerId: runtime.state.user?.id,
+      }),
+      getPaymentNotificationData: () => ({
+        members: runtime.state.workspaceMembers.map(
+          ({ member_user_id, display_name, email }) => ({
+            member_user_id,
+            display_name,
+            email,
+          }),
+        ),
+        accounts: runtime.state.accounts.map(({ id, property_id }) => ({
+          id,
+          property_id,
+        })),
+        properties: runtime.state.properties.map(
+          ({ id, address, city, state, postal_code }) => ({
+            id,
+            address,
+            city,
+            state,
+            postal_code,
+          }),
+        ),
+      }),
       getClient: runtime.getClient,
       toast,
       money: modules.displayUtils.money,
