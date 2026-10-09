@@ -2,12 +2,12 @@
 (() => {
   "use strict";
 
-  function createReportViews({ $, esc, money, buildReportModel }) {
+  function createReportViews({ $, esc, money, fmtDateTime, buildReportModel }) {
     function renderImportBatchRow(batch) {
       return `<tr>
         <td><strong>${esc(batch.source_name || "CSV import")}</strong></td>
         <td>${esc(batch.source_type)}</td>
-        <td>${esc(new Date(batch.created_at).toLocaleString())}</td>
+        <td>${esc(fmtDateTime(batch.created_at))}</td>
         <td>${Number(batch.rows_accepted)} of ${Number(batch.rows_total)}</td>
         <td><span class="status-pill">${esc(batch.status)}</span></td>
       </tr>`;

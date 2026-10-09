@@ -93,12 +93,14 @@ test("report workspace preserves rendering and export APIs", () => {
   const rendering = {
     $() {},
     state: {},
+    now() {},
     dateOnly() {},
     sumIncome() {},
     sumOperatingExpenses() {},
     accountBalance() {},
     esc() {},
     money() {},
+    fmtDateTime() {},
     unusedRenderingValue: true,
   };
   const exporting = {
@@ -154,7 +156,9 @@ test("report workspace preserves rendering and export APIs", () => {
     "accountBalance",
     "dateOnly",
     "esc",
+    "fmtDateTime",
     "money",
+    "now",
     "state",
     "sumIncome",
     "sumOperatingExpenses",
@@ -211,12 +215,14 @@ test("Reports workflow composes calculation and view modules only", () => {
   const dependencies = {
     $() {},
     state: {},
+    now() {},
     dateOnly() {},
     sumIncome() {},
     sumOperatingExpenses() {},
     accountBalance() {},
     esc() {},
     money() {},
+    fmtDateTime() {},
     workflows: {
       model: context.window.PropertyDeskReportModel,
       views: context.window.PropertyDeskReportViews,
@@ -226,6 +232,7 @@ test("Reports workflow composes calculation and view modules only", () => {
     context.window.PropertyDeskReportWorkflow.create(dependencies);
 
   assert.equal(received.model.state, dependencies.state);
+  assert.equal(received.model.now, dependencies.now);
   assert.equal(received.model.dateOnly, dependencies.dateOnly);
   assert.equal(received.model.sumIncome, dependencies.sumIncome);
   assert.equal(
@@ -236,6 +243,7 @@ test("Reports workflow composes calculation and view modules only", () => {
   assert.equal(received.view.$, dependencies.$);
   assert.equal(received.view.esc, dependencies.esc);
   assert.equal(received.view.money, dependencies.money);
+  assert.equal(received.view.fmtDateTime, dependencies.fmtDateTime);
   assert.equal(received.view.buildReportModel, buildReportModel);
   assert.equal(workflow.renderReports, renderReports);
   assert.deepEqual(Object.keys(workflow), ["renderReports"]);

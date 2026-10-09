@@ -7,6 +7,7 @@
     state,
     esc,
     fmtDate,
+    fmtDateTime,
     money,
     activityModelWorkflow,
     activityViewWorkflow,
@@ -18,6 +19,7 @@
       $,
       esc,
       fmtDate,
+      fmtDateTime,
       money,
       model: activityModel,
     });

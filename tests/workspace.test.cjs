@@ -67,6 +67,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     state,
     esc() {},
     fmtDate() {},
+    fmtDateTime() {},
     money() {},
     workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
     activityModelWorkflow: {},
@@ -112,6 +113,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     "activityViewWorkflow",
     "esc",
     "fmtDate",
+    "fmtDateTime",
     "money",
     "state",
   ]);

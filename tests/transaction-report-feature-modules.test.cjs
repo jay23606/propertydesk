@@ -338,6 +338,7 @@ test("report views summarize the current-year ledger and escape import history",
     account.id === "rental" ? 0 : account.id === "note" ? 1200 : 800;
   const reportModel = context.window.PropertyDeskReportModel.create({
     state,
+    now: () => new Date(`${year}-10-05T12:00:00`),
     dateOnly,
     sumIncome: (rows) =>
       rows.reduce(
@@ -361,11 +362,13 @@ test("report views summarize the current-year ledger and escape import history",
     $,
     esc,
     money: (amount) => `$${Number(amount).toFixed(2)}`,
+    fmtDateTime: (value) => `local:${value}`,
     buildReportModel: reportModel.buildReportModel,
   });
 
   const model = reportModel.buildReportModel(year);
   feature.renderReports();
+  assert.equal(reportModel.buildReportModel().year, year);
 
   assert.equal(model.income, 600);
   assert.equal(model.costs, 100);
@@ -387,4 +390,8 @@ test("report views summarize the current-year ledger and escape import history",
   assert.match($("account-breakdown").innerHTML, /Private notes/);
   assert.match($("import-history").innerHTML, /&lt;import&gt;\.csv/);
   assert.match($("import-history").innerHTML, /2 of 3/);
+  assert.match(
+    $("import-history").innerHTML,
+    new RegExp(`local:${year}-02-01T12:00:00Z`),
+  );
 });

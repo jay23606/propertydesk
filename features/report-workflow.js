@@ -5,16 +5,19 @@
   function create({
     $,
     state,
+    now,
     dateOnly,
     sumIncome,
     sumOperatingExpenses,
     accountBalance,
     esc,
     money,
+    fmtDateTime,
     workflows,
   }) {
     const { buildReportModel } = workflows.model.create({
       state,
+      now,
       dateOnly,
       sumIncome,
       sumOperatingExpenses,
@@ -24,6 +27,7 @@
       $,
       esc,
       money,
+      fmtDateTime,
       buildReportModel,
     });
     return Object.freeze({ renderReports });

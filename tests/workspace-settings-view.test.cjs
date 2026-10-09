@@ -81,6 +81,7 @@ test("workspace settings render member labels and escape untrusted text", () => 
       state,
       esc() {},
       fmtDate() {},
+      fmtDateTime() {},
       money() {},
       workflow: context.window.PropertyDeskWorkspaceReminderWorkflow,
     },
@@ -203,6 +204,7 @@ test("reminder activity view summarizes delivery results and escapes log data", 
     esc: (value) =>
       String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
     fmtDate: () => "Oct 2026",
+    fmtDateTime: (value) => `local:${value}`,
     money: (value) => `$${Number(value).toFixed(2)}`,
   });
 
@@ -215,4 +217,5 @@ test("reminder activity view summarizes delivery results and escapes log data", 
   assert.match(html, /MailerSend rejected the request/);
   assert.match(html, /Unpaid due: \$550\.00/);
   assert.match(html, /reminder-failed/);
+  assert.match(html, /local:2026-10-31T12:00:00Z/);
 });

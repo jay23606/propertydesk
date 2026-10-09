@@ -4,6 +4,7 @@
 
   function createReportModel({
     state,
+    now,
     dateOnly,
     sumIncome,
     sumOperatingExpenses,
@@ -30,7 +31,7 @@
       );
     }
 
-    function buildReportModel(year = new Date().getFullYear()) {
+    function buildReportModel(year = now().getFullYear()) {
       const income = sumIncome(
         state.payments.filter(
           (payment) => dateOnly(payment.received_date)?.getFullYear() === year,

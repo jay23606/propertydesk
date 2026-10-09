@@ -3,12 +3,13 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  const now = () => new Date();
   const confirmAction = (message) => window.confirm(message);
   const promptAction = (message, initialValue) =>
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
   const reportError = (message, error) => window.console?.error(message, error);
-  const transactionTimestamp = () => new Date().toISOString();
+  const transactionTimestamp = () => now().toISOString();
   const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
     modules: {
       reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
@@ -133,12 +134,14 @@
       rendering: {
         $,
         state,
+        now,
         dateOnly,
         sumIncome,
         sumOperatingExpenses,
         accountBalance,
         esc,
         money,
+        fmtDateTime,
       },
       exporting: {
         $,
@@ -224,6 +227,7 @@
         state,
         esc,
         fmtDate,
+        fmtDateTime,
         money,
       },
       memberRepository: repositories.workspaceMembers,
@@ -402,7 +406,7 @@
         $,
         state,
         dateOnly,
-        now: () => new Date(),
+        now,
         fmtDate,
         esc,
         expenseCategoryLabel,

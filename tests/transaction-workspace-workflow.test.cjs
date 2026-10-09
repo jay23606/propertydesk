@@ -120,7 +120,7 @@ test("transaction workspace connects maintenance and records at the app root", (
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /const transactionTimestamp = \(\) => new Date\(\)\.toISOString\(\);/,
+    /const now = \(\) => new Date\(\);[\s\S]*?const transactionTimestamp = \(\) => now\(\)\.toISOString\(\);/,
   );
   assert.match(app, /correction: \{[\s\S]*?writeFeedback,/);
   assert.match(

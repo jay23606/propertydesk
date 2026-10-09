@@ -20,6 +20,7 @@
       state: reminder.state,
       esc: reminder.esc,
       fmtDate: reminder.fmtDate,
+      fmtDateTime: reminder.fmtDateTime,
       money: reminder.money,
       activityModelWorkflow: reminder.activityModelWorkflow,
       activityViewWorkflow: reminder.activityViewWorkflow,

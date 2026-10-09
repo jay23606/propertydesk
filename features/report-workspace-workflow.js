@@ -6,12 +6,14 @@
     const { renderReports } = workflows.report.create({
       $: rendering.$,
       state: rendering.state,
+      now: rendering.now,
       dateOnly: rendering.dateOnly,
       sumIncome: rendering.sumIncome,
       sumOperatingExpenses: rendering.sumOperatingExpenses,
       accountBalance: rendering.accountBalance,
       esc: rendering.esc,
       money: rendering.money,
+      fmtDateTime: rendering.fmtDateTime,
       workflows: { model: workflows.model, views: workflows.views },
     });
     const { attachEvents: attachReportExportEvents } =
