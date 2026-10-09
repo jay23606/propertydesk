@@ -3,6 +3,7 @@
   "use strict";
 
   function createAppBrowserAdapters({ windowRef, documentRef, downloadUtils }) {
+    const schedule = windowRef.setTimeout.bind(windowRef);
     return Object.freeze({
       $: (id) => documentRef.getElementById(id),
       confirmAction: (message) => windowRef.confirm(message),
@@ -10,6 +11,9 @@
         windowRef.prompt(message, initialValue),
       openWindow: (...args) => windowRef.open(...args),
       makeId: () => windowRef.crypto.randomUUID(),
+      schedule,
+      onDomContentLoaded: (callback) =>
+        documentRef.addEventListener("DOMContentLoaded", callback),
       browserStorage: Object.freeze({
         getItem: (key) => windowRef.localStorage.getItem(key),
         setItem: (key, value) => windowRef.localStorage.setItem(key, value),
@@ -18,7 +22,7 @@
         downloadUtils.downloadBlob(blob, filename, {
           documentRef,
           urlRef: windowRef.URL,
-          defer: windowRef.setTimeout.bind(windowRef),
+          defer: schedule,
         }),
       reportError: (message, error) => windowRef.console?.error(message, error),
     });

@@ -8,6 +8,8 @@
     promptAction,
     openWindow,
     makeId,
+    schedule,
+    onDomContentLoaded,
     browserStorage,
     downloadBlob,
     reportError,
@@ -462,7 +464,7 @@
       confirmAction,
       openWindow,
       makeId,
-      schedule: window.setTimeout.bind(window),
+      schedule,
       monthlyScheduledEstimate,
       summarizeAccount,
       collectedSince,
@@ -735,5 +737,5 @@
     },
   });
   setWorkspaceRender(appLifecycle.render);
-  document.addEventListener("DOMContentLoaded", appLifecycle.initialize);
+  onDomContentLoaded(appLifecycle.initialize);
 })();

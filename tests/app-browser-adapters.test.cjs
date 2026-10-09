@@ -43,7 +43,13 @@ test("app browser adapters wrap native APIs through explicit references", () => 
       },
     },
   };
-  const document = { getElementById: (id) => ({ id }) };
+  const listeners = new Map();
+  const document = {
+    getElementById: (id) => ({ id }),
+    addEventListener(name, listener) {
+      listeners.set(name, listener);
+    },
+  };
   const downloads = [];
   const downloadUtils = {
     downloadBlob(...args) {
@@ -66,6 +72,13 @@ test("app browser adapters wrap native APIs through explicit references", () => 
   assert.equal(adapters.promptAction("Reason", "Late"), "entered");
   assert.equal(adapters.openWindow("about:blank", "_blank"), "opened");
   assert.equal(adapters.makeId(), "generated-id");
+  let ready = false;
+  adapters.onDomContentLoaded(() => {
+    ready = true;
+  });
+  assert.equal(ready, false);
+  listeners.get("DOMContentLoaded")();
+  assert.equal(ready, true);
   assert.equal(adapters.browserStorage.getItem("theme"), null);
   adapters.browserStorage.setItem("theme", "dark");
   assert.equal(adapters.browserStorage.getItem("theme"), "dark");
@@ -78,13 +91,17 @@ test("app browser adapters wrap native APIs through explicit references", () => 
   assert.equal(downloads[0][2].documentRef, document);
   assert.equal(downloads[0][2].urlRef, window.URL);
   assert.equal(
+    adapters.schedule(() => {}, 250),
+    17,
+  );
+  assert.equal(
     downloads[0][2].defer(() => {}, 1000),
     17,
   );
   assert.equal(adapters.reportError("failed", "details"), undefined);
   assert.deepEqual(
     calls.map(([name]) => name),
-    ["confirm", "prompt", "open", "timeout", "error"],
+    ["confirm", "prompt", "open", "timeout", "timeout", "error"],
   );
 });
 

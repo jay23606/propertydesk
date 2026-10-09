@@ -20,7 +20,7 @@ test("browser download helper clicks a temporary link and releases its URL", () 
   );
   assert.match(
     browserAdapters,
-    /downloadBlob: \(blob, filename\) =>[\s\S]*?documentRef,[\s\S]*?urlRef: windowRef\.URL,[\s\S]*?defer: windowRef\.setTimeout\.bind\(windowRef\),/,
+    /const schedule = windowRef\.setTimeout\.bind\(windowRef\);[\s\S]*?downloadBlob: \(blob, filename\) =>[\s\S]*?documentRef,[\s\S]*?urlRef: windowRef\.URL,[\s\S]*?defer: schedule,/,
   );
   const context = vm.createContext({ window: {} });
   vm.runInContext(
