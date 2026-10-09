@@ -18,7 +18,7 @@
       fetchAll,
       openPropertyDetails,
       repository,
-      writeFeedback,
+      refreshWorkspace: writeFeedback.refreshWorkspace,
     });
 
     function documentForDeletion(id, propertyId) {

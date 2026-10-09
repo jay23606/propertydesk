@@ -8,7 +8,7 @@
     fetchAll,
     openPropertyDetails,
     repository,
-    writeFeedback,
+    refreshWorkspace,
   }) {
     async function removePropertyDocument(doc, propertyId) {
       if (!(await removeStoredAgreement(doc, propertyId))) return false;
@@ -37,7 +37,7 @@
       propertyId,
       requestError,
     ) {
-      const refreshed = await writeFeedback.refreshWorkspace({
+      const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => openPropertyDetails(propertyId),
         toast,
@@ -78,7 +78,7 @@
 
     async function refreshAfterDocumentRecordFailure(doc, propertyId) {
       let recordRemains = false;
-      const refreshed = await writeFeedback.refreshWorkspace({
+      const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
           recordRemains = state.documents.some((row) => row.id === doc.id);
@@ -98,7 +98,7 @@
     }
 
     async function refreshDeletedProperty(propertyId) {
-      await writeFeedback.refreshWorkspace({
+      await refreshWorkspace({
         fetchAll,
         beforeRefresh: () => toast("Agreement deleted"),
         afterRefresh: () => openPropertyDetails(propertyId),

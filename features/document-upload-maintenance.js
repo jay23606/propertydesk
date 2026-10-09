@@ -8,7 +8,7 @@
     fetchAll,
     openPropertyDetails,
     repository,
-    writeFeedback,
+    refreshWorkspace,
   }) {
     async function uploadFile(path, file, contentType) {
       let error;
@@ -58,7 +58,7 @@
 
     async function reconcileUnconfirmedMetadata(propertyId, metadata, error) {
       let recordWasSaved = false;
-      const refreshed = await writeFeedback.refreshWorkspace({
+      const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
           recordWasSaved = state.documents.some(

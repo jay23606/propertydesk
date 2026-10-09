@@ -25,7 +25,7 @@ test("private document module exposes upload, delete, and open workflows", () =>
   }
 });
 
-test("document maintenance receives write feedback through explicit dependencies", () => {
+test("document maintenance receives workspace refresh through explicit dependencies", () => {
   const root = path.join(__dirname, "..");
   for (const filename of [
     "document-upload.js",
@@ -38,7 +38,12 @@ test("document maintenance receives write feedback through explicit dependencies
       "utf8",
     );
     assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
-    assert.match(source, /writeFeedback/);
+    if (filename.endsWith("-maintenance.js")) {
+      assert.match(source, /refreshWorkspace/);
+      assert.doesNotMatch(source, /writeFeedback/);
+    } else {
+      assert.match(source, /writeFeedback/);
+    }
     if (filename === "document-upload.js" || filename === "document-delete.js")
       assert.doesNotMatch(
         source,

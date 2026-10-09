@@ -19,7 +19,7 @@
       fetchAll,
       openPropertyDetails,
       repository,
-      writeFeedback,
+      refreshWorkspace: writeFeedback.refreshWorkspace,
     });
 
     async function reopenPropertyDetails(propertyId) {
