@@ -55,7 +55,9 @@
     });
 
     return workflows.ledger.create({
-      maintenance: transactionMaintenance,
+      saveCorrection: transactionMaintenance.saveCorrection,
+      createTransactionActionHandlers:
+        transactionMaintenance.createTransactionActionHandlers,
       workflows: {
         entryForms: {
           create: workflows.entryForms.create,

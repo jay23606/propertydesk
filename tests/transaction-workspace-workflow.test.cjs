@@ -65,7 +65,12 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
     sumOperatingExpenses() {},
   };
   const ledger = { name: "ledger-workflow" };
-  const maintenance = { name: "maintenance" };
+  const saveCorrection = () => {};
+  const createTransactionActionHandlers = () => {};
+  const maintenance = {
+    saveCorrection,
+    createTransactionActionHandlers,
+  };
   const receivedMaintenance = {};
   const workflows = {
     correctionModel: {
@@ -129,7 +134,11 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
     workflows.correctionModel,
   );
   assert.equal(calls[1][0], "ledger");
-  assert.equal(calls[1][1].maintenance, maintenance);
+  assert.equal(calls[1][1].saveCorrection, saveCorrection);
+  assert.equal(
+    calls[1][1].createTransactionActionHandlers,
+    createTransactionActionHandlers,
+  );
   assert.equal(
     calls[1][1].entries.getWorkspaceOwnerId,
     records.getWorkspaceOwnerId,

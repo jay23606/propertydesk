@@ -111,7 +111,9 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
   );
 
   const workflow = context.window.PropertyDeskLedgerWorkflow.create({
-    maintenance,
+    saveCorrection: maintenance.saveCorrection,
+    createTransactionActionHandlers:
+      maintenance.createTransactionActionHandlers,
     entries,
     views,
     workflows,

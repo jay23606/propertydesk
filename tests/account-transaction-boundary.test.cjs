@@ -25,7 +25,7 @@ test("app composes independent property and account forms before action routing"
   assert.doesNotMatch(formOptions, /\bstate\b/);
   assert.match(
     composition,
-    /workflows\.maintenance\.create\([\s\S]*?return workflows\.ledger\.create\(\{\s*maintenance: transactionMaintenance,/,
+    /workflows\.maintenance\.create\([\s\S]*?return workflows\.ledger\.create\(\{\s*saveCorrection: transactionMaintenance\.saveCorrection,[\s\S]*?createTransactionActionHandlers:\s*transactionMaintenance\.createTransactionActionHandlers,/,
   );
   assert.match(transactionSetup, /workflows\.workspace\.create\(/);
   assert.match(
@@ -113,7 +113,7 @@ test("app composes independent property and account forms before action routing"
   }
   assert.match(
     transactionWorkflow,
-    /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;[\s\S]*?saveCorrection,[\s\S]*?workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
+    /function createLedgerWorkflow\(\{\s*saveCorrection,\s*createTransactionActionHandlers,[\s\S]*?saveCorrection,[\s\S]*?workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
   const transactionMaintenance = fs.readFileSync(
     path.join(root, "features", "transaction-maintenance-workflow.js"),

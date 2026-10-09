@@ -3,7 +3,8 @@
   "use strict";
 
   function createLedgerWorkflow({
-    maintenance,
+    saveCorrection,
+    createTransactionActionHandlers,
     workflows,
     entries: {
       $,
@@ -48,7 +49,6 @@
       sumOperatingExpenses,
     },
   }) {
-    const { saveCorrection, createTransactionActionHandlers } = maintenance;
     const ledgerEntryForms = workflows.entryForms.create({
       $,
       getAccounts: getEntryAccounts,
