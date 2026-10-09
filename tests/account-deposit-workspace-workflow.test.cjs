@@ -168,8 +168,8 @@ test("account and deposit workspace share detail rendering and events", () => {
   );
   assert.equal(passed.deposits.details, deposits.details);
   assert.equal(passed.deposits.adjustments, deposits.adjustments);
-  assert.equal(passed.accountDetails.actions, actions);
-  assert.equal("ignored" in passed.accountDetails.actions, true);
+  assert.notEqual(passed.accountDetails.actions, actions);
+  assert.equal("ignored" in passed.accountDetails.actions, false);
   assert.equal(
     passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,

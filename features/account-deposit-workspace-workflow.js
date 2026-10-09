@@ -45,7 +45,20 @@
           accountDetails.content.accountHistoryRepository,
         workflows: accountDetails.content.workflows,
       },
-      actions: accountDetails.actions,
+      actions: {
+        $: accountDetails.actions.$,
+        getAccount: accountDetails.actions.getAccount,
+        getCollection: accountDetails.actions.getCollection,
+        toast: accountDetails.actions.toast,
+        fetchAll: accountDetails.actions.fetchAll,
+        closeModal: accountDetails.actions.closeModal,
+        editAccount: accountDetails.actions.editAccount,
+        openPayment: accountDetails.actions.openPayment,
+        repository: accountDetails.actions.repository,
+        saveAndRefreshWorkspaceRecord:
+          accountDetails.actions.saveAndRefreshWorkspaceRecord,
+        confirmAction: accountDetails.actions.confirmAction,
+      },
     });
 
     return Object.freeze({

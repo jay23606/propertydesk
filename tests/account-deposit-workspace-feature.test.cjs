@@ -203,10 +203,22 @@ test("account and deposit workspace exposes only its supported operations", () =
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
   );
-  assert.equal(passed.accountDetails.actions, actions);
+  assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
+    "$",
+    "closeModal",
+    "confirmAction",
+    "editAccount",
+    "fetchAll",
+    "getAccount",
+    "getCollection",
+    "openPayment",
+    "repository",
+    "saveAndRefreshWorkspaceRecord",
+    "toast",
+  ]);
   for (const key of Object.keys(passed.accountDetails.actions))
     assert.equal(passed.accountDetails.actions[key], actions[key]);
-  assert.equal("unusedActionValue" in passed.accountDetails.actions, true);
+  assert.equal("unusedActionValue" in passed.accountDetails.actions, false);
   assert.equal(
     passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
     saveAndRefreshWorkspaceRecord,
@@ -299,11 +311,12 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /depositWorkspaceWorkflow\.create\(\{\s*details: deposits\.details,\s*adjustments: deposits\.adjustments,\s*workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?content: \{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository:\s*accountDetails\.content\.accountHistoryRepository,[\s\S]*?workflows: accountDetails\.content\.workflows,[\s\S]*?actions: accountDetails\.actions/,
+    /depositWorkspaceWorkflow\.create\(\{\s*details: deposits\.details,\s*adjustments: deposits\.adjustments,\s*workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?content: \{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository:\s*accountDetails\.content\.accountHistoryRepository,[\s\S]*?workflows: accountDetails\.content\.workflows,[\s\S]*?actions: \{[\s\S]*?getAccount: accountDetails\.actions\.getAccount,[\s\S]*?confirmAction: accountDetails\.actions\.confirmAction/,
   );
+  assert.doesNotMatch(accountDepositWorkspaceWorkflow, /\.\.\.accountDetails/);
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,
-    /\.\.\.accountDetails\.content/,
+    /actions:\s*accountDetails\.actions/,
   );
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,
