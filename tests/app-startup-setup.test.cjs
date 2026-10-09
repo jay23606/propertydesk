@@ -21,12 +21,14 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
       "resetWorkspaceState",
     ].map((name) => [name, () => name]),
   );
+  records.unusedRecordValue = true;
   const ui = Object.fromEntries(
     ["$", "todayIso", "toast"].map((name) => [name, () => name]),
   );
   ui.renderers = [() => {}];
   ui.eventBindersBeforeAuth = [() => {}];
   ui.eventBindersAfterAuth = [() => {}];
+  ui.unusedUiValue = true;
   const services = Object.fromEntries(
     [
       "backendConfigured",
@@ -37,6 +39,7 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
       "paymentNotifications",
     ].map((name) => [name, { name }]),
   );
+  services.unusedServiceValue = true;
   const received = {};
   const result = { initialize() {}, render() {} };
   const workflows = {
@@ -76,6 +79,17 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
     received.authContext.paymentNotifications,
     services.paymentNotifications,
   );
+  assert.deepEqual(Object.keys(received.authContext).sort(), [
+    "$",
+    "fetchAll",
+    "getPasswordRecoveryInProgress",
+    "getUser",
+    "paymentNotifications",
+    "resetWorkspaceState",
+    "setPasswordRecoveryInProgress",
+    "setUser",
+    "toast",
+  ]);
   assert.equal(received.renderers, ui.renderers);
   assert.equal(received.eventBindersBeforeAuth, ui.eventBindersBeforeAuth);
   assert.equal(received.eventBindersAfterAuth, ui.eventBindersAfterAuth);

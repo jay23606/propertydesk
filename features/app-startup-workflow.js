@@ -16,16 +16,8 @@
     workflows,
   }) {
     const auth = workflows.auth.create({
-      $: authContext.$,
-      getUser: authContext.getUser,
-      setUser: authContext.setUser,
-      getPasswordRecoveryInProgress: authContext.getPasswordRecoveryInProgress,
-      setPasswordRecoveryInProgress: authContext.setPasswordRecoveryInProgress,
-      resetWorkspaceState: authContext.resetWorkspaceState,
+      ...authContext,
       authClient,
-      fetchAll: authContext.fetchAll,
-      toast: authContext.toast,
-      paymentNotifications: authContext.paymentNotifications,
       modules: workflows.auth.modules,
     });
     const lifecycle = workflows.lifecycle.create({
