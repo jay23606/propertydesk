@@ -184,6 +184,21 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
         assert.equal(name in received[group], false);
         continue;
       }
+      if (group === "services" && name === "transactionRepository") {
+        assert.deepEqual(
+          Object.keys(received.services.transactionRepository).sort(),
+          ["insertExpense", "insertPayment"],
+        );
+        assert.equal(
+          received.services.transactionRepository.insertPayment,
+          value.insertPayment,
+        );
+        assert.equal(
+          received.services.transactionRepository.insertExpense,
+          value.insertExpense,
+        );
+        continue;
+      }
       assert.equal(
         received[group][name],
         value,

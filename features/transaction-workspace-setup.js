@@ -90,7 +90,10 @@
       },
       services: {
         fetchAll: services.fetchAll,
-        transactionRepository: services.transactionRepository,
+        transactionRepository: {
+          insertPayment: services.transactionRepository.insertPayment,
+          insertExpense: services.transactionRepository.insertExpense,
+        },
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
         saveWorkspaceRecord: services.saveWorkspaceRecord,
         saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
