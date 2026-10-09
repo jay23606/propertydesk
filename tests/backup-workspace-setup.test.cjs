@@ -38,6 +38,12 @@ test("backup setup maps scoped data, private document access, and export modules
       "documentRepository",
     ].map((key) => [key, { key }]),
   );
+  services.documentRepository = {
+    download() {},
+    upload() {},
+    signedUrl() {},
+    deleteMetadata() {},
+  };
   const workflows = {
     backup,
     zipUtils: { key: "zip" },
@@ -97,9 +103,12 @@ test("backup setup maps scoped data, private document access, and export modules
     received.exportOptions.collectBackupAgreementFiles,
     services.collectBackupAgreementFiles,
   );
+  assert.deepEqual(Object.keys(received.exportOptions.documentRepository), [
+    "download",
+  ]);
   assert.equal(
-    received.exportOptions.documentRepository,
-    services.documentRepository,
+    received.exportOptions.documentRepository.download,
+    services.documentRepository.download,
   );
   assert.equal(received.exportOptions.zipUtils, workflows.zipUtils);
   assert.equal(received.workflows.exporter.create, workflows.exporter.create);

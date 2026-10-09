@@ -21,7 +21,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
   );
   assert.match(
     setup,
-    /collectBackupAgreementFiles: services\.collectBackupAgreementFiles,[\s\S]*?documentRepository: services\.documentRepository,/,
+    /collectBackupAgreementFiles: services\.collectBackupAgreementFiles,[\s\S]*?documentRepository: \{\s*download: services\.documentRepository\.download,/,
   );
   assert.match(
     app,

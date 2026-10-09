@@ -19,7 +19,9 @@
         downloadBlob: services.downloadBlob,
         zipUtils: workflows.zipUtils,
         collectBackupAgreementFiles: services.collectBackupAgreementFiles,
-        documentRepository: services.documentRepository,
+        documentRepository: {
+          download: services.documentRepository.download,
+        },
       },
       workflows: {
         utils: workflows.utils,
