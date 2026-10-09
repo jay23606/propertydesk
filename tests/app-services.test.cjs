@@ -129,7 +129,23 @@ test("app services compose shared runtime and financial services explicitly", ()
     ),
     context,
   );
-  modules.stateAccess = context.window.PropertyDeskAppStateAccess;
+  const appStateAccess = context.window.PropertyDeskAppStateAccess;
+  modules.stateAccess = {
+    create(target) {
+      const access = appStateAccess.create(target);
+      return {
+        ...access,
+        financialContext: {
+          ...access.financialContext,
+          unusedRecordGetter() {},
+        },
+        depositContext: {
+          ...access.depositContext,
+          unusedRecordGetter() {},
+        },
+      };
+    },
+  };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "payment-notification-setup.js"),

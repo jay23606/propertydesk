@@ -47,7 +47,8 @@
       workflow: modules.paymentNotifications,
     });
     const financialContext = modules.financialContext.factory.create({
-      ...stateAccess.financialContext,
+      getAccounts: stateAccess.financialContext.getAccounts,
+      getPayments: stateAccess.financialContext.getPayments,
       todayIso: modules.dateUtils.todayIso,
       dateUtils: modules.dateUtils,
       currencyUtils: modules.currencyUtils,
@@ -56,7 +57,9 @@
       workflows: modules.financialContext.workflows,
     });
     const { depositLedger } = modules.depositContext.factory.create({
-      ...stateAccess.depositContext,
+      getDepositEntries: stateAccess.depositContext.getDepositEntries,
+      getPayments: stateAccess.depositContext.getPayments,
+      getExpenses: stateAccess.depositContext.getExpenses,
       postedLedgerUtils,
       workflows: modules.depositContext.workflows,
     });
