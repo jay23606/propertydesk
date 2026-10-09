@@ -74,6 +74,8 @@
       lateReminderSms: portfolio.lateReminderSms,
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
       toast: portfolio.toast,
+      openWindow: portfolio.openWindow,
+      schedule: portfolio.schedule,
       openPayment: portfolio.openPayment,
       openPropertyDetails: propertyDetails.openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
