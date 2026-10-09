@@ -7,7 +7,8 @@
     fetchAll,
     toast,
     repository,
-    writeFeedback,
+    saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion,
   }) {
     function runInsert(
@@ -18,8 +19,8 @@
       completion,
     ) {
       const save = completion
-        ? writeFeedback.saveAndRefreshWorkspaceRecord
-        : writeFeedback.saveWorkspaceRecord;
+        ? saveAndRefreshWorkspaceRecord
+        : saveWorkspaceRecord;
       return save({
         ...selectRecordWriteCompletion(completion),
         operation,

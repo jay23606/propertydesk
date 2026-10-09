@@ -404,7 +404,9 @@
       openModal,
       transactionRepository: repositories.transactions,
       transactionPayloads: window.PropertyDeskTransactionPayloads,
-      writeFeedback,
+      saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord:
+        writeFeedback.saveAndRefreshWorkspaceRecord,
       selectRecordWriteCompletion:
         window.PropertyDeskWorkspaceRecordWriteWorkflow
           .selectRecordWriteCompletion,

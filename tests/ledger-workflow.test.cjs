@@ -15,7 +15,8 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
   const attachTransactionFilterEvents = () => {};
   const attachTransactionActionEvents = () => {};
   const expenseAccountPolicy = {};
-  const writeFeedback = {};
+  const saveWorkspaceRecord = () => {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const selectRecordWriteCompletion = () => {};
   const entryWorkflows = {
     paymentView: {},
@@ -44,7 +45,8 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
     transactionRepository: {},
     transactionPayloads: {},
     expenseAccountPolicy,
-    writeFeedback,
+    saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion,
     workflows: entryWorkflows,
     unusedEntryDependency: true,
@@ -126,7 +128,9 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
     "openModal",
     "populateFormOptions",
     "prettyType",
+    "saveAndRefreshWorkspaceRecord",
     "saveCorrection",
+    "saveWorkspaceRecord",
     "selectRecordWriteCompletion",
     "state",
     "toast",
@@ -134,7 +138,6 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
     "transactionPayloads",
     "transactionRepository",
     "workflows",
-    "writeFeedback",
   ]);
   assert.equal(passed.entries.expenseAccountPolicy, expenseAccountPolicy);
   assert.equal(passed.entries.workflows, entryWorkflows);

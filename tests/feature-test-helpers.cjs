@@ -169,6 +169,7 @@ function loadLedgerEntryForms(context) {
 
 function ledgerEntryDependencies(context, state = {}) {
   const repositoryFactory = context.window.PropertyDeskTransactionRepository;
+  const writeFeedback = createRepositoryWriteFeedback(context);
   return {
     transactionRepository: repositoryFactory.create
       ? repositoryFactory.create({
@@ -177,7 +178,8 @@ function ledgerEntryDependencies(context, state = {}) {
         })
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
-    writeFeedback: createRepositoryWriteFeedback(context),
+    saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord: writeFeedback.saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,

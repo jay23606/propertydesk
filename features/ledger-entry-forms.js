@@ -17,7 +17,8 @@
     saveCorrection,
     transactionPayloads,
     transactionRepository,
-    writeFeedback,
+    saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion,
     expenseAccountPolicy,
     workflows,
@@ -34,7 +35,8 @@
       fetchAll,
       toast,
       repository: transactionRepository,
-      writeFeedback,
+      saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord,
       selectRecordWriteCompletion,
     });
     const { saveTransactionEntry } = modules.saveWorkflow.create({

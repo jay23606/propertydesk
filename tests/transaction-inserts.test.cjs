@@ -58,16 +58,19 @@ function loadTransactionInserts(client, messages = [], options = {}) {
     ),
     context,
   );
-  return context.window.PropertyDeskTransactionInserts.create({
-    state: options.state,
-    fetchAll: options.fetchAll,
-    toast: (message) => messages.push(message),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
+  const writeFeedback =
+    context.window.PropertyDeskRepositoryWriteFeedback.create({
       modules: {
         reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
         recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
       },
-    }),
+    });
+  return context.window.PropertyDeskTransactionInserts.create({
+    state: options.state,
+    fetchAll: options.fetchAll,
+    toast: (message) => messages.push(message),
+    saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord: writeFeedback.saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         .selectRecordWriteCompletion,
@@ -84,6 +87,7 @@ test("transaction inserts receive write services instead of reading globals", ()
     "utf8",
   );
   assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
+  assert.doesNotMatch(source, /writeFeedback/);
   assert.doesNotMatch(
     source,
     /window\.PropertyDeskWorkspaceRecordWriteWorkflow/,
