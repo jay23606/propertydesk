@@ -19,7 +19,9 @@
   }) {
     const view = viewModule.create({ $, documentRef });
     const { requestPasswordReset } = resetRequestModule.create({
-      authClient,
+      authClient: {
+        resetPasswordForEmail: authClient.resetPasswordForEmail,
+      },
       view,
       windowRef,
     });

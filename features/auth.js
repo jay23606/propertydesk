@@ -26,7 +26,10 @@
       modules.form.create({
         $,
         setUser,
-        authClient,
+        authClient: {
+          signUp: authClient.signUp,
+          signInWithPassword: authClient.signInWithPassword,
+        },
         documentRef,
         startWorkspace,
         viewModule: modules.formView,
@@ -42,7 +45,10 @@
       setUser,
       getPasswordRecoveryInProgress,
       setPasswordRecoveryInProgress,
-      authClient,
+      authClient: {
+        resetPasswordForEmail: authClient.resetPasswordForEmail,
+        updateUser: authClient.updateUser,
+      },
       toast,
       setAuthMode,
       startWorkspace,
@@ -69,7 +75,10 @@
         setUser,
         getPasswordRecoveryInProgress,
         setPasswordRecoveryInProgress,
-        authClient,
+        authClient: {
+          getSession: authClient.getSession,
+          signOut: authClient.signOut,
+        },
         toast,
         showAuth,
         setAuthMode,
