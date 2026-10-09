@@ -94,6 +94,11 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     save() {},
     updateOwned() {},
   };
+  services.propertyHolderRepository = {
+    clearPropertyHolders() {},
+    addPropertyHolders() {},
+    unusedOperation() {},
+  };
   services.unusedServiceValue = true;
   const workflows = {
     workspace,
@@ -177,9 +182,17 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     services.propertyRepository.updateOwned,
   );
   assert.equal(received.detail.management.closeModal, services.closeModal);
+  assert.deepEqual(Object.keys(received.detail.holders.repository).sort(), [
+    "addPropertyHolders",
+    "clearPropertyHolders",
+  ]);
   assert.equal(
-    received.detail.holders.repository,
-    services.propertyHolderRepository,
+    received.detail.holders.repository.clearPropertyHolders,
+    services.propertyHolderRepository.clearPropertyHolders,
+  );
+  assert.equal(
+    received.detail.holders.repository.addPropertyHolders,
+    services.propertyHolderRepository.addPropertyHolders,
   );
   assert.equal(
     received.detail.documents.documentRepository,

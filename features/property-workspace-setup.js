@@ -76,7 +76,12 @@
           getPropertyHolders: records.getPropertyHolders,
           toast: ui.toast,
           fetchAll: services.fetchAll,
-          repository: services.propertyHolderRepository,
+          repository: {
+            clearPropertyHolders:
+              services.propertyHolderRepository.clearPropertyHolders,
+            addPropertyHolders:
+              services.propertyHolderRepository.addPropertyHolders,
+          },
           reconcileWorkspaceChange: services.reconcileWorkspaceChange,
           refreshWorkspace: services.refreshWorkspace,
         },
