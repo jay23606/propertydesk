@@ -95,7 +95,9 @@ test("document actions separate deletion and signed-link dependencies", () => {
     context,
   );
   const dependencies = {
-    state: {},
+    getSelectedPropertyId() {},
+    getWorkspaceOwnerId() {},
+    getDocuments() {},
     toast() {},
     fetchAll() {},
     openPropertyDetails() {},
@@ -113,7 +115,15 @@ test("document actions separate deletion and signed-link dependencies", () => {
   const actions =
     context.window.PropertyDeskDocumentActions.create(dependencies);
 
-  assert.equal(passed.deletion.state, dependencies.state);
+  assert.equal(
+    passed.deletion.getSelectedPropertyId,
+    dependencies.getSelectedPropertyId,
+  );
+  assert.equal(
+    passed.deletion.getWorkspaceOwnerId,
+    dependencies.getWorkspaceOwnerId,
+  );
+  assert.equal(passed.deletion.getDocuments, dependencies.getDocuments);
   assert.equal(passed.deletion.fetchAll, dependencies.fetchAll);
   assert.equal(passed.deletion.confirm, dependencies.confirm);
   assert.equal(passed.deletion.repository, dependencies.repository);
@@ -123,7 +133,11 @@ test("document actions separate deletion and signed-link dependencies", () => {
     dependencies.modules.deleteMaintenance,
   );
   assert.equal(passed.deletion.openWindow, undefined);
-  assert.equal(passed.open.state, dependencies.state);
+  assert.equal(
+    passed.open.getWorkspaceOwnerId,
+    dependencies.getWorkspaceOwnerId,
+  );
+  assert.equal(passed.open.getDocuments, dependencies.getDocuments);
   assert.equal(passed.open.openWindow, dependencies.openWindow);
   assert.equal(passed.open.repository, dependencies.repository);
   assert.equal(passed.open.fetchAll, undefined);

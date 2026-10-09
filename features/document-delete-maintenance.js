@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    state,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -56,7 +57,7 @@
       try {
         ({ error } = await repository.deleteMetadata(
           doc.id,
-          state.workspaceOwnerId,
+          getWorkspaceOwnerId(),
           propertyId,
         ));
       } catch (requestError) {
@@ -81,7 +82,7 @@
       const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
-          recordRemains = state.documents.some((row) => row.id === doc.id);
+          recordRemains = getDocuments().some((row) => row.id === doc.id);
           openPropertyDetails(propertyId);
         },
         toast,

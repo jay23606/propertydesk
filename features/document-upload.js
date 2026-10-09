@@ -3,7 +3,9 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -14,7 +16,8 @@
     maintenanceModule,
   }) {
     const { uploadFile, saveDocumentMetadata } = maintenanceModule.create({
-      state,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       fetchAll,
       openPropertyDetails,
@@ -35,7 +38,7 @@
 
     async function uploadPropertyDocument(input) {
       const file = input.files?.[0];
-      const propertyId = state.selectedPropertyId;
+      const propertyId = getSelectedPropertyId();
       input.value = "";
       if (!file || !propertyId) return;
 
@@ -46,7 +49,7 @@
       }
 
       const { contentType, safeName } = upload;
-      const path = `${state.workspaceOwnerId}/${propertyId}/${makeId()}-${safeName}`;
+      const path = `${getWorkspaceOwnerId()}/${propertyId}/${makeId()}-${safeName}`;
       if (!(await uploadFile(path, file, contentType))) return;
       const savedMetadata = await saveDocumentMetadata(
         propertyId,

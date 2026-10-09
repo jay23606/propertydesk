@@ -3,7 +3,9 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -14,7 +16,9 @@
     modules,
   }) {
     const { deletePropertyDocument } = modules.delete.create({
-      state,
+      getSelectedPropertyId,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       fetchAll,
       openPropertyDetails,
@@ -24,7 +28,8 @@
       maintenanceModule: modules.deleteMaintenance,
     });
     const { openPropertyDocument } = modules.open.create({
-      state,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       openWindow,
       repository,

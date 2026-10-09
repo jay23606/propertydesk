@@ -27,6 +27,11 @@ function loadDocumentModules(context) {
 function createDocuments(context, options) {
   return context.window.PropertyDeskDocuments.create({
     ...options,
+    getSelectedPropertyId:
+      options.getSelectedPropertyId || (() => options.state.selectedPropertyId),
+    getWorkspaceOwnerId:
+      options.getWorkspaceOwnerId || (() => options.state.workspaceOwnerId),
+    getDocuments: options.getDocuments || (() => options.state.documents),
     confirm: options.confirm || (() => true),
     openWindow: options.openWindow || (() => null),
     repository:

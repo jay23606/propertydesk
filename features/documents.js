@@ -3,7 +3,9 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -15,7 +17,9 @@
     modules,
   }) {
     const { uploadPropertyDocument } = modules.upload.create({
-      state,
+      getSelectedPropertyId,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       fetchAll,
       openPropertyDetails,
@@ -28,7 +32,9 @@
 
     const { deletePropertyDocument, openPropertyDocument } =
       modules.actions.create({
-        state,
+        getSelectedPropertyId,
+        getWorkspaceOwnerId,
+        getDocuments,
         toast,
         fetchAll,
         openPropertyDetails,

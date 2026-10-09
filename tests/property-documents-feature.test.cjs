@@ -168,7 +168,9 @@ test("property document workflow routes actions through one explicit binder", ()
 
   const dependencies = {
     $() {},
-    state: {},
+    getSelectedPropertyId() {},
+    getWorkspaceOwnerId() {},
+    getDocuments() {},
     toast() {},
     fetchAll() {},
     openPropertyDetails() {},
@@ -188,15 +190,26 @@ test("property document workflow routes actions through one explicit binder", ()
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "confirm",
     "fetchAll",
+    "getDocuments",
+    "getSelectedPropertyId",
+    "getWorkspaceOwnerId",
     "modules",
     "openPropertyDetails",
     "openWindow",
     "refreshWorkspace",
     "repository",
-    "state",
     "toast",
   ]);
   assert.equal(calls[0][1].repository, dependencies.repository);
+  assert.equal(
+    calls[0][1].getSelectedPropertyId,
+    dependencies.getSelectedPropertyId,
+  );
+  assert.equal(
+    calls[0][1].getWorkspaceOwnerId,
+    dependencies.getWorkspaceOwnerId,
+  );
+  assert.equal(calls[0][1].getDocuments, dependencies.getDocuments);
   assert.equal(calls[0][1].modules, dependencies.modules);
   assert.equal(calls[0][1].confirm, dependencies.confirm);
   assert.equal(calls[0][1].openWindow, dependencies.openWindow);

@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    state,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -32,7 +33,7 @@
 
     async function saveDocumentMetadata(propertyId, file, path, contentType) {
       const metadata = {
-        user_id: state.workspaceOwnerId,
+        user_id: getWorkspaceOwnerId(),
         property_id: propertyId,
         account_id: null,
         file_name: file.name,
@@ -61,7 +62,7 @@
       const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
-          recordWasSaved = state.documents.some(
+          recordWasSaved = getDocuments().some(
             (document) =>
               document.user_id === metadata.user_id &&
               document.property_id === propertyId &&

@@ -4,7 +4,9 @@
 
   function createPropertyDocumentWorkflow({
     $,
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -17,7 +19,9 @@
     documentEventsWorkflow,
   }) {
     const documents = documentsWorkflow.create({
-      state,
+      getSelectedPropertyId,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       fetchAll,
       openPropertyDetails,

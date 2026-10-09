@@ -3,7 +3,9 @@
   "use strict";
 
   function create({
-    state,
+    getSelectedPropertyId,
+    getWorkspaceOwnerId,
+    getDocuments,
     toast,
     fetchAll,
     openPropertyDetails,
@@ -13,7 +15,8 @@
     maintenanceModule,
   }) {
     const { removePropertyDocument } = maintenanceModule.create({
-      state,
+      getWorkspaceOwnerId,
+      getDocuments,
       toast,
       fetchAll,
       openPropertyDetails,
@@ -22,19 +25,19 @@
     });
 
     function documentForDeletion(id, propertyId) {
-      const doc = state.documents.find((item) => item.id === id);
+      const doc = getDocuments().find((item) => item.id === id);
       if (
         doc &&
         propertyId &&
         doc.property_id === propertyId &&
-        doc.user_id === state.workspaceOwnerId
+        doc.user_id === getWorkspaceOwnerId()
       )
         return doc;
       return null;
     }
 
     async function deletePropertyDocument(id) {
-      const propertyId = state.selectedPropertyId;
+      const propertyId = getSelectedPropertyId();
       const doc = documentForDeletion(id, propertyId);
       if (!doc) return;
       if (
