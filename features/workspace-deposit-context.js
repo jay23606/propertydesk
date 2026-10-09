@@ -3,7 +3,9 @@
   "use strict";
 
   function createWorkspaceDepositContext({
-    state,
+    getDepositEntries,
+    getPayments,
+    getExpenses,
     postedLedgerUtils,
     workflows,
   }) {
@@ -11,7 +13,9 @@
       isPosted: postedLedgerUtils.isPosted,
     });
     return workflows.depositContext.create({
-      state,
+      getDepositEntries,
+      getPayments,
+      getExpenses,
       securityDepositBalance: depositCalculations.securityDepositBalance,
     });
   }

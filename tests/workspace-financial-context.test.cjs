@@ -6,12 +6,8 @@ const vm = require("node:vm");
 
 test("workspace financial context composes ledger, account, and loan services", () => {
   const calls = [];
-  const state = {
-    accounts: [],
-    payments: [],
-    depositEntries: [],
-    expenses: [],
-  };
+  const getAccounts = () => [];
+  const getPayments = () => [];
   const isDueReducingPayment = () => true;
   const isActiveAccount = () => true;
   const isPosted = () => true;
@@ -87,7 +83,8 @@ test("workspace financial context composes ledger, account, and loan services", 
 
   const financial = context.window.PropertyDeskWorkspaceFinancialContext.create(
     {
-      state,
+      getAccounts,
+      getPayments,
       todayIso,
       dateUtils,
       currencyUtils,
@@ -121,7 +118,16 @@ test("workspace financial context composes ledger, account, and loan services", 
     "todayIso",
   ]);
   assert.equal(calls[1][1].todayIso, todayIso);
-  assert.equal(calls[2][1].state, state);
+  assert.equal(calls[2][1].getAccounts, getAccounts);
+  assert.equal(calls[2][1].getPayments, getPayments);
+  assert.deepEqual(Object.keys(calls[2][1]).sort(), [
+    "amountDueSince",
+    "getAccounts",
+    "getPayments",
+    "ledger",
+    "unpaidDueAccrualStart",
+    "workflows",
+  ]);
   assert.equal(calls[2][1].ledger.todayIso, todayIso);
   assert.equal(calls[2][1].ledger.scheduledLoanBalance, scheduledLoanBalance);
   assert.equal(

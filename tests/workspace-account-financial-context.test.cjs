@@ -6,7 +6,10 @@ const vm = require("node:vm");
 
 test("workspace account financial context shares state with ledger summaries", () => {
   const calls = [];
-  const state = { accounts: [] };
+  const accounts = [];
+  const payments = [];
+  const getAccounts = () => accounts;
+  const getPayments = () => payments;
   const todayIso = () => "2026-10-07";
   const ledgerOptions = {
     todayIso,
@@ -53,14 +56,16 @@ test("workspace account financial context shares state with ledger summaries", (
 
   const workflow =
     context.window.PropertyDeskWorkspaceAccountFinancialContext.create({
-      state,
+      getAccounts,
+      getPayments,
       ledger: ledgerOptions,
       ...accountSummaryOptions,
       workflows,
     });
 
   assert.equal(calls[0][0], "ledger");
-  assert.equal(calls[0][1].state, state);
+  assert.equal(calls[0][1].getAccounts, getAccounts);
+  assert.equal(calls[0][1].getPayments, getPayments);
   assert.equal(calls[0][1].todayIso, ledgerOptions.todayIso);
   assert.equal(
     calls[0][1].scheduledLoanBalance,
@@ -74,10 +79,11 @@ test("workspace account financial context shares state with ledger summaries", (
   assert.equal(calls[0][1].sumPosted, ledgerOptions.sumPosted);
   assert.equal("unusedLedgerValue" in calls[0][1], false);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "getAccounts",
+    "getPayments",
     "monthlyScheduledEstimate",
     "postedOnOrAfter",
     "scheduledLoanBalance",
-    "state",
     "sumPosted",
     "todayIso",
   ]);

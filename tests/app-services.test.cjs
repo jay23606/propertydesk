@@ -13,7 +13,12 @@ test("app services compose shared runtime and financial services explicitly", ()
       return result;
     },
   });
-  const state = { accounts: [] };
+  const state = {
+    accounts: [],
+    payments: [],
+    depositEntries: [],
+    expenses: [],
+  };
   const client = {};
   const fetchAll = () => {};
   const getClient = () => client;
@@ -167,11 +172,31 @@ test("app services compose shared runtime and financial services explicitly", ()
   assert.equal(calls[5][1].money, money);
   assert.equal(calls[5][1].propertyAddress, propertyAddress);
   assert.equal(calls[5][1].refresh, fetchAll);
-  assert.equal(calls[6][1].state, state);
+  assert.equal(calls[6][1].getAccounts(), state.accounts);
+  assert.equal(calls[6][1].getPayments(), state.payments);
+  assert.deepEqual(Object.keys(calls[6][1]).sort(), [
+    "currencyUtils",
+    "dateUtils",
+    "getAccounts",
+    "getPayments",
+    "isActiveAccount",
+    "postedLedgerUtils",
+    "todayIso",
+    "workflows",
+  ]);
   assert.equal(calls[6][1].todayIso, dateUtils.todayIso);
   assert.equal(calls[6][1].postedLedgerUtils, postedLedgerUtils);
   assert.equal(calls[6][1].workflows, financialWorkflows);
-  assert.equal(calls[7][1].state, state);
+  assert.equal(calls[7][1].getDepositEntries(), state.depositEntries);
+  assert.equal(calls[7][1].getPayments(), state.payments);
+  assert.equal(calls[7][1].getExpenses(), state.expenses);
+  assert.deepEqual(Object.keys(calls[7][1]).sort(), [
+    "getDepositEntries",
+    "getExpenses",
+    "getPayments",
+    "postedLedgerUtils",
+    "workflows",
+  ]);
   assert.equal(calls[7][1].postedLedgerUtils, postedLedgerUtils);
   assert.equal(calls[7][1].workflows, depositWorkflows);
 });

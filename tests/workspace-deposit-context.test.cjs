@@ -31,12 +31,19 @@ test("workspace deposit context composes posted-ledger math with account scoping
     context,
   );
 
-  const state = { payments: [], expenses: [], depositEntries: [] };
+  const depositEntries = [];
+  const payments = [];
+  const expenses = [];
+  const getDepositEntries = () => depositEntries;
+  const getPayments = () => payments;
+  const getExpenses = () => expenses;
   const isPosted = () => true;
   const postedLedgerUtils = { isPosted, unused: true };
   const workspaceDeposits =
     context.window.PropertyDeskWorkspaceDepositContext.create({
-      state,
+      getDepositEntries,
+      getPayments,
+      getExpenses,
       postedLedgerUtils,
       workflows,
     });
@@ -47,11 +54,15 @@ test("workspace deposit context composes posted-ledger math with account scoping
   );
   assert.equal(calls[0][1].isPosted, isPosted);
   assert.deepEqual(Object.keys(calls[0][1]), ["isPosted"]);
-  assert.equal(calls[1][1].state, state);
+  assert.equal(calls[1][1].getDepositEntries, getDepositEntries);
+  assert.equal(calls[1][1].getPayments, getPayments);
+  assert.equal(calls[1][1].getExpenses, getExpenses);
   assert.equal(calls[1][1].securityDepositBalance, securityDepositBalance);
   assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+    "getDepositEntries",
+    "getExpenses",
+    "getPayments",
     "securityDepositBalance",
-    "state",
   ]);
   assert.equal(workspaceDeposits.depositLedger, depositLedger);
 });

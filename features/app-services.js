@@ -37,7 +37,8 @@
       refresh: runtime.fetchAll,
     });
     const financialContext = modules.financialContext.factory.create({
-      state: runtime.state,
+      getAccounts: () => runtime.state.accounts,
+      getPayments: () => runtime.state.payments,
       todayIso: modules.dateUtils.todayIso,
       dateUtils: modules.dateUtils,
       currencyUtils: modules.currencyUtils,
@@ -46,7 +47,9 @@
       workflows: modules.financialContext.workflows,
     });
     const { depositLedger } = modules.depositContext.factory.create({
-      state: runtime.state,
+      getDepositEntries: () => runtime.state.depositEntries,
+      getPayments: () => runtime.state.payments,
+      getExpenses: () => runtime.state.expenses,
       postedLedgerUtils,
       workflows: modules.depositContext.workflows,
     });

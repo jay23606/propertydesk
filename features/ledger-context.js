@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    state,
+    getAccounts,
+    getPayments,
     todayIso,
     scheduledLoanBalance,
     monthlyScheduledEstimate,
@@ -15,11 +16,11 @@
     }
 
     function scheduledMonthlyRunRate() {
-      return monthlyScheduledEstimate(state.accounts);
+      return monthlyScheduledEstimate(getAccounts());
     }
 
     function collectedSince(date) {
-      const payments = postedOnOrAfter(state.payments, "received_date", date);
+      const payments = postedOnOrAfter(getPayments(), "received_date", date);
       return sumPosted(payments);
     }
 

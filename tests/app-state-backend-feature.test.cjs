@@ -150,14 +150,15 @@ test("ledger context scopes balances and collections to workspace state", () => 
     ),
     context,
   );
-  const accounts = [{ id: "a1" }, { id: "a2" }];
-  const payments = [
+  let accounts = [{ id: "a1" }, { id: "a2" }];
+  let payments = [
     { account_id: "a1", received_date: "2026-10-01", amount: 20 },
     { account_id: "a1", received_date: "2026-09-30", amount: 100 },
   ];
   const calls = [];
   const ledger = context.window.PropertyDeskLedgerContext.create({
-    state: { accounts, payments },
+    getAccounts: () => accounts,
+    getPayments: () => payments,
     todayIso: () => "2026-10-04",
     scheduledLoanBalance: (account, date) => {
       calls.push(["balance", account.id, date]);
@@ -186,6 +187,10 @@ test("ledger context scopes balances and collections to workspace state", () => 
     ["balance", "a1", "2026-10-04"],
     ["balance", "a1", "2026-08-01"],
   ]);
+  accounts = [{ id: "a3" }];
+  payments = [{ account_id: "a3", received_date: "2026-10-02", amount: 35 }];
+  assert.equal(ledger.scheduledMonthlyRunRate(), 600);
+  assert.equal(ledger.collectedSince("2026-10-01"), 35);
 });
 
 test("deposit context scopes held-balance calculations to the selected account", () => {
@@ -197,15 +202,17 @@ test("deposit context scopes held-balance calculations to the selected account",
     ),
     context,
   );
-  const depositEntries = [
+  let depositEntries = [
     { account_id: "a1", amount: 40 },
     { account_id: "a2", amount: 90 },
   ];
-  const payments = [{ id: "p1" }];
-  const expenses = [{ id: "e1" }];
+  let payments = [{ id: "p1" }];
+  let expenses = [{ id: "e1" }];
   const passed = {};
   const depositContext = context.window.PropertyDeskDepositContext.create({
-    state: { depositEntries, payments, expenses },
+    getDepositEntries: () => depositEntries,
+    getPayments: () => payments,
+    getExpenses: () => expenses,
     securityDepositBalance(entries, passedPayments, passedExpenses) {
       passed.entries = entries;
       passed.payments = passedPayments;
@@ -229,6 +236,14 @@ test("deposit context scopes held-balance calculations to the selected account",
   );
   assert.equal(deposit.active.length, 1);
   assert.equal(deposit.totals.held, 40);
+  assert.equal(passed.entries[0], depositEntries[0]);
+  assert.equal(passed.payments, payments);
+  assert.equal(passed.expenses, expenses);
+  depositEntries = [{ account_id: "a2", amount: 60 }];
+  payments = [{ id: "p2" }];
+  expenses = [{ id: "e2" }];
+  const refreshedDeposit = depositContext.depositLedger("a2");
+  assert.equal(refreshedDeposit.totals.held, 60);
   assert.equal(passed.entries[0], depositEntries[0]);
   assert.equal(passed.payments, payments);
   assert.equal(passed.expenses, expenses);

@@ -2,15 +2,20 @@
 (() => {
   "use strict";
 
-  function create({ state, securityDepositBalance }) {
+  function create({
+    getDepositEntries,
+    getPayments,
+    getExpenses,
+    securityDepositBalance,
+  }) {
     function depositLedger(accountId) {
-      const entries = state.depositEntries.filter(
+      const entries = getDepositEntries().filter(
         (row) => row.account_id === accountId,
       );
       const result = securityDepositBalance(
         entries,
-        state.payments,
-        state.expenses,
+        getPayments(),
+        getExpenses(),
       );
       return {
         active: result.active,

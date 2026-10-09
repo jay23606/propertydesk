@@ -3,14 +3,16 @@
   "use strict";
 
   function createWorkspaceAccountFinancialContext({
-    state,
+    getAccounts,
+    getPayments,
     ledger,
     amountDueSince,
     unpaidDueAccrualStart,
     workflows,
   }) {
     const ledgerContext = workflows.ledger.create({
-      state,
+      getAccounts,
+      getPayments,
       todayIso: ledger.todayIso,
       scheduledLoanBalance: ledger.scheduledLoanBalance,
       monthlyScheduledEstimate: ledger.monthlyScheduledEstimate,

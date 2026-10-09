@@ -14,6 +14,8 @@ Workflow coordinators pass only the dependencies each child needs instead of for
 
 `features/app-services.js` creates the shared runtime through `features/workspace-runtime.js`; the root-level workspace modules supply the authenticated backend, shared state, repositories, scoped queries, and refresh pipeline. Repositories resolve the active authenticated client when an operation runs. Feature workflows receive repositories and callbacks; they do not pass Supabase clients through the UI.
 
+Shared finance services read only the account and payment collections they use, while deposit calculations receive just deposit entries, payments, and expenses. These collections are provided through getters so calculations always see the latest workspace refresh without gaining access to unrelated workspace records.
+
 `workspace-table-catalog.js` is the shared table inventory for workspace operations, and `workspace-read-catalog.js` explicitly lists the records hydrated into the client. `workspace-data.js` runs that read catalog to hydrate app state, `workspace-query.js` scopes and pages reads, and `workspace-refresh.js` coordinates loading and rendering. Row-level security and database grants remain the access boundary.
 
 ## Feature workflows
