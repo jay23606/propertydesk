@@ -94,6 +94,10 @@
         commitTransactions,
         importReview,
       },
+      modules: {
+        payment: modules.paymentImport,
+        expense: modules.expenseImport,
+      },
     });
 
     return Object.freeze({

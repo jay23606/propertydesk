@@ -2,8 +2,13 @@
 (() => {
   "use strict";
 
-  function createTransactionImportFeature({ shared, payment, expense }) {
-    const payments = window.PropertyDeskPaymentImport.create({
+  function createTransactionImportFeature({
+    shared,
+    payment,
+    expense,
+    modules,
+  }) {
+    const payments = modules.payment.create({
       $: shared.$,
       createImportLookup: shared.createImportLookup,
       createFileWorkflow: shared.createFileWorkflow,
@@ -14,7 +19,7 @@
       commitTransactions: payment.commitTransactions,
       importReview: payment.importReview,
     });
-    const expenses = window.PropertyDeskExpenseImport.create({
+    const expenses = modules.expense.create({
       $: shared.$,
       createImportLookup: shared.createImportLookup,
       createFileWorkflow: shared.createFileWorkflow,

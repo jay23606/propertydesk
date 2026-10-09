@@ -21,24 +21,31 @@ function overrideImportStage(context, stageImport) {
 }
 
 test("transaction import feature shares setup without mixing payment and expense inputs", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-import-feature.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /window\.PropertyDesk(?:Payment|Expense)Import\.create/,
+  );
   const passed = {};
   const paymentEvents = () => {};
   const expenseEvents = () => {};
-  const context = vm.createContext({
-    window: {
-      PropertyDeskPaymentImport: {
-        create: (options) => {
-          passed.payment = options;
-          return { attachEvents: paymentEvents };
-        },
-      },
-      PropertyDeskExpenseImport: {
-        create: (options) => {
-          passed.expense = options;
-          return { attachEvents: expenseEvents };
-        },
-      },
+  const paymentImportModule = {
+    create: (options) => {
+      passed.payment = options;
+      return { attachEvents: paymentEvents };
     },
+  };
+  const expenseImportModule = {
+    create: (options) => {
+      passed.expense = options;
+      return { attachEvents: expenseEvents };
+    },
+  };
+  const context = vm.createContext({
+    window: {},
   });
   vm.runInContext(
     fs.readFileSync(
@@ -74,6 +81,10 @@ test("transaction import feature shares setup without mixing payment and expense
     shared,
     payment,
     expense,
+    modules: {
+      payment: paymentImportModule,
+      expense: expenseImportModule,
+    },
   });
 
   assert.equal(Object.isFrozen(feature), true);

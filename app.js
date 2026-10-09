@@ -717,6 +717,8 @@
       accountImportPayload: window.PropertyDeskAccountImportPayload,
       csvImportFile: window.PropertyDeskCsvImportFile,
       transactionImport: window.PropertyDeskTransactionImportFeature,
+      paymentImport: window.PropertyDeskPaymentImport,
+      expenseImport: window.PropertyDeskExpenseImport,
       transactionImportWorkflow: window.PropertyDeskTransactionImportWorkflow,
     },
   });
