@@ -8,7 +8,11 @@ test("backup workspace workflow owns backup dependency composition", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(
     app,
-    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,[\s\S]*?workflows: \{[\s\S]*?PropertyDeskBackupExport,/,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?collectBackupAgreementFiles:[\s\S]*?window\.PropertyDeskBackupAgreementFiles\.collect,[\s\S]*?documentRepository: repositories\.documents,[\s\S]*?workflows: \{[\s\S]*?exporter:/,
+  );
+  assert.match(
+    app,
+    /exporter: \{\s*create: window\.PropertyDeskBackupExport\.create,\s*modules: \{ archive: window\.PropertyDeskBackupArchive \}/,
   );
   assert.match(
     app,
@@ -22,6 +26,11 @@ test("backup workspace workflow owns backup dependency composition", () => {
     workflow,
     /window\.PropertyDeskBackup(?:Utils|Records|Export)\.create/,
   );
+  const exporter = fs.readFileSync(
+    path.join(__dirname, "..", "features", "backup-export.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(exporter, /window\.PropertyDeskBackupArchive\.create/);
 });
 
 test("backup export requires an initialized runtime client", async () => {
@@ -49,6 +58,7 @@ test("backup export requires an initialized runtime client", async () => {
     $: () => button,
     state: { user: { id: "owner" } },
     isClientReady: () => false,
+    modules: { archive: context.window.PropertyDeskBackupArchive },
     createBackup: () => assert.fail("backup must not be created before init"),
     todayIso: () => "2026-10-07",
     toast: (message) => messages.push(message),
@@ -76,6 +86,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
   const tables = ["pd_properties", "pd_documents"];
   const load = async () => ({ pd_properties: [], pd_documents: [] });
   const createBackup = () => ({ manifest: {}, data: {} });
+  const archiveModule = { create() {} };
   const context = vm.createContext({
     window: {
       PropertyDeskBackupUtils: {
@@ -124,7 +135,10 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     workflows: {
       utils: context.window.PropertyDeskBackupUtils,
       records: context.window.PropertyDeskBackupRecords,
-      exporter: context.window.PropertyDeskBackupExport,
+      exporter: {
+        ...context.window.PropertyDeskBackupExport,
+        modules: { archive: archiveModule },
+      },
     },
   };
   const workflow =
@@ -144,6 +158,7 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
     calls.exporter.documentRepository,
     dependencies.documentRepository,
   );
+  assert.equal(calls.exporter.modules.archive, archiveModule);
   assert.equal(workflow.attachBackupExportEvents, attachEvents);
   assert.deepEqual(Object.keys(workflow), ["attachBackupExportEvents"]);
 });

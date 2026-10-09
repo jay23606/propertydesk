@@ -87,6 +87,7 @@ test("backup export aborts before download when a private document path escapes 
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
+    modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
     createBackup: () =>
       assert.fail("invalid paths must stop before backup creation"),
@@ -219,6 +220,7 @@ test("backup export adds the validated private agreement to the ZIP and manifest
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
     state,
+    modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
     createBackup(records, exportedAt, includedFiles) {
       backupContents = { records, exportedAt, includedFiles };

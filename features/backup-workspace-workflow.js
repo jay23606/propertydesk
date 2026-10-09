@@ -33,6 +33,7 @@
       loadBackupRecords: records.load,
       collectBackupAgreementFiles,
       documentRepository,
+      modules: workflows.exporter.modules,
     });
 
     return Object.freeze({

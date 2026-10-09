@@ -709,7 +709,10 @@
       workflows: {
         utils: window.PropertyDeskBackupUtils,
         records: window.PropertyDeskBackupRecords,
-        exporter: window.PropertyDeskBackupExport,
+        exporter: {
+          create: window.PropertyDeskBackupExport.create,
+          modules: { archive: window.PropertyDeskBackupArchive },
+        },
       },
     });
   appLifecycle = window.PropertyDeskAppStartupWorkflow.create({

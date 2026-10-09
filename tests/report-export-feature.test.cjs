@@ -54,6 +54,9 @@ test("backup and report exports own separate button bindings", () => {
         addEventListener: (event, handler) =>
           bindings.set(`${id}:${event}`, handler),
       }),
+      ...(file === "backup-export.js"
+        ? { modules: { archive: context.window.PropertyDeskBackupArchive } }
+        : {}),
     });
 
     (file === "backup-export.js"

@@ -14,8 +14,9 @@
     loadBackupRecords,
     collectBackupAgreementFiles,
     documentRepository,
+    modules,
   }) {
-    const archive = window.PropertyDeskBackupArchive.create({
+    const archive = modules.archive.create({
       createBackup,
       zipUtils,
       loadBackupRecords,
