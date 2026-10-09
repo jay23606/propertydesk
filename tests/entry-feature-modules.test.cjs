@@ -245,6 +245,19 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
   assert.match(
     app,
+    /workflows: window\.PropertyDeskPropertyAccountFormsModuleCatalog\.create\(\)/,
+  );
+  const formCatalog = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "property-account-forms-module-catalog.js",
+    ),
+    "utf8",
+  );
+  assert.match(
+    formCatalog,
     /propertyFormModules: \{\s*view: window\.PropertyDeskPropertyFormView,[\s\S]*?recordSaveMaintenance:\s*window\.PropertyDeskWorkspaceRecordSaveMaintenance,[\s\S]*?accountFormModules: \{\s*view: window\.PropertyDeskAccountFormView,[\s\S]*?recordSaveMaintenance:\s*window\.PropertyDeskWorkspaceRecordSaveMaintenance,/,
   );
   for (const filename of ["property-form.js", "account-form.js"]) {
