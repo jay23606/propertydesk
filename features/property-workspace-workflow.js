@@ -57,7 +57,6 @@
     groupAccountsByProperty,
     isActiveAccount,
     openPropertyDetails,
-    editPropertyQuickNote,
     workflow,
   }) {
     return workflow.create({
@@ -89,7 +88,7 @@
       openPropertyDetails,
       openAccountForProperty: portfolio.openAccountForProperty,
       editAccount: portfolio.editAccount,
-      editPropertyQuickNote,
+      editPropertyQuickNote: portfolio.editPropertyQuickNote,
       openModal: portfolio.openModal,
       workflows: portfolio.workflows,
     });
@@ -116,7 +115,6 @@
       groupAccountsByProperty,
       isActiveAccount,
       openPropertyDetails: propertyDetails.openPropertyDetails,
-      editPropertyQuickNote: portfolio.editPropertyQuickNote,
       workflow: workflows.portfolio,
     });
 
