@@ -35,6 +35,7 @@
       esc,
       money,
       paymentFrequencyLabel,
+      isActiveAccount,
     });
     const reminderModel = workflows.reminderModel.create({
       state,

@@ -35,6 +35,17 @@ test("app composes the Properties grid and action operations explicitly", () => 
     /PropertyDeskPropertyWorkspaceWorkflow\.create\(\{\s*groupAccountsByProperty:\s*window\.PropertyDeskPropertyAccountIndex\.groupByProperty,\s*isActiveAccount:\s*window\.PropertyDeskAccountStatusUtils\.isActiveAccount,/,
   );
   assert.match(
+    workflow,
+    /workflows\.table\.create\(\{[\s\S]*?isActiveAccount,/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(root, "features", "property-portfolio-table.js"),
+      "utf8",
+    ),
+    /window\.PropertyDeskAccountStatusUtils/,
+  );
+  assert.match(
     app,
     /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
   );
@@ -575,6 +586,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
       esc,
       money,
       paymentFrequencyLabel: () => "Monthly",
+      isActiveAccount:
+        context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
     });
   const accountRowModel =
     context.window.PropertyDeskPropertyPortfolioAccountRowModel.create({

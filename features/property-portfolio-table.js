@@ -2,7 +2,6 @@
 (() => {
   "use strict";
 
-  const { isActiveAccount } = window.PropertyDeskAccountStatusUtils;
   const PAYMENT_STATUS_CLASS = Object.freeze({
     none: "payment-not-received-this-month",
     partial: "payment-received-this-month",
@@ -20,7 +19,7 @@
   const PAYMENT_ICON =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.4 8.5c-.6-.7-1.6-1-2.8-1-1.5 0-2.5.8-2.5 1.9 0 2.7 5.4 1.3 5.4 4.3 0 1.2-1.1 2.1-2.8 2.1-1.4 0-2.5-.5-3.2-1.3M12 5.8v12.4"/></svg>';
 
-  function create({ esc, money, paymentFrequencyLabel }) {
+  function create({ esc, money, paymentFrequencyLabel, isActiveAccount }) {
     function propertyAddressCell(property, street) {
       const note = String(property.notes || "").trim();
       return `<td>

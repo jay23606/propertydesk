@@ -243,6 +243,8 @@ test("Properties table templates escape untrusted labels and render visible tota
     esc: escapeHTML,
     money: (value) => `$${Number(value).toFixed(2)}`,
     paymentFrequencyLabel: () => "Monthly",
+    isActiveAccount:
+      context.window.PropertyDeskAccountStatusUtils.isActiveAccount,
   });
 
   assert.deepEqual(Object.keys(table).sort(), [
