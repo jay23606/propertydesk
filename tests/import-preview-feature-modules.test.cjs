@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { loadImportPreview } = require("./feature-test-helpers.cjs");
+const {
+  loadImportPreview,
+  importPreviewModules,
+} = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -33,11 +36,23 @@ test("CSV preview renderer receives only rendering dependencies", () => {
     selectImportRows() {},
     esc() {},
     openModal() {},
+    modules: {
+      correctionView: context.window.PropertyDeskImportCorrectionView,
+      rendering: context.window.PropertyDeskImportPreviewRendering,
+    },
     closeModal() {},
     toast() {},
     unrelatedDependency() {},
   };
   const preview = context.window.PropertyDeskImportPreview.create(dependencies);
+  const previewSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "import-preview.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    previewSource,
+    /window\.PropertyDeskImport(?:CorrectionView|PreviewRendering)\.create/,
+  );
 
   assert.deepEqual(
     Object.keys(passed.renderer).sort(),
@@ -64,6 +79,7 @@ test("import preview enforces batch size and rejects empty CSV data", () => {
   loadImportPreview(context);
   const preview = context.window.PropertyDeskImportPreview.create({
     state: { pendingImport: null },
+    modules: importPreviewModules(context),
   });
 
   assert.throws(
@@ -139,6 +155,7 @@ test("CSV import preview escapes staged data and excludes possible duplicates by
   const preview = context.window.PropertyDeskImportPreview.create({
     $: getElement,
     state,
+    modules: importPreviewModules(context),
     selectImportRows: (rows, includeDuplicates) =>
       rows.filter((row) => includeDuplicates || !row._possible_duplicate),
     esc: (value) =>

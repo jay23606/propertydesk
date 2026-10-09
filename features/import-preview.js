@@ -2,11 +2,21 @@
 (() => {
   "use strict";
 
-  function createImportPreview({ $, state, selectImportRows, esc, openModal }) {
-    const { renderImportCorrections } =
-      window.PropertyDeskImportCorrectionView.create({ $, state, esc });
+  function createImportPreview({
+    $,
+    state,
+    selectImportRows,
+    esc,
+    openModal,
+    modules,
+  }) {
+    const { renderImportCorrections } = modules.correctionView.create({
+      $,
+      state,
+      esc,
+    });
     const { renderImportPreview, updateImportCommitButton } =
-      window.PropertyDeskImportPreviewRendering.create({
+      modules.rendering.create({
         $,
         state,
         selectImportRows,

@@ -3,6 +3,7 @@ const test = require("node:test");
 const {
   loadImportFeatures,
   loadImportPreview,
+  importPreviewModules,
   importFeatureModules,
   formElements,
 } = require("./feature-test-helpers.cjs");
@@ -392,6 +393,7 @@ test("an unconfirmed import disables retry and directs the owner to verify the r
     esc: String,
     openModal() {},
     closeModal: (id) => closed.push(id),
+    modules: importPreviewModules(context),
   });
   const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
     $,
@@ -456,6 +458,7 @@ test("a saved import with refresh failure explains the save and still blocks ret
     esc: String,
     openModal() {},
     closeModal() {},
+    modules: importPreviewModules(context),
   });
   const previewEvents = context.window.PropertyDeskImportPreviewEvents.create({
     $,

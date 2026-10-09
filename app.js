@@ -668,7 +668,13 @@
       importRows: window.PropertyDeskImportRows,
       csvParser: window.PropertyDeskCsvParser,
       validators: window.PropertyDeskImportWorkflows,
-      preview: window.PropertyDeskImportPreview,
+      preview: {
+        create: window.PropertyDeskImportPreview.create,
+        modules: {
+          correctionView: window.PropertyDeskImportCorrectionView,
+          rendering: window.PropertyDeskImportPreviewRendering,
+        },
+      },
       previewEvents: window.PropertyDeskImportPreviewEvents,
       commit: window.PropertyDeskImportCommit,
       review: window.PropertyDeskImportReview,

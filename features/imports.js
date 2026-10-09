@@ -39,6 +39,7 @@
       selectImportRows,
       esc,
       openModal,
+      modules: modules.preview.modules,
     });
     const { attachEvents: attachPreviewEvents } = previewEvents.create({
       $,

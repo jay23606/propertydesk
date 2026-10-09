@@ -283,7 +283,10 @@ function importFeatureModules(context) {
     importRows: window.PropertyDeskImportRows,
     csvParser: window.PropertyDeskCsvParser,
     validators: window.PropertyDeskImportWorkflows,
-    preview: window.PropertyDeskImportPreview,
+    preview: {
+      create: window.PropertyDeskImportPreview.create,
+      modules: importPreviewModules(context),
+    },
     previewEvents: window.PropertyDeskImportPreviewEvents,
     commit: window.PropertyDeskImportCommit,
     review: window.PropertyDeskImportReview,
@@ -308,6 +311,13 @@ function loadImportPreview(context) {
       context,
     );
   }
+}
+
+function importPreviewModules(context) {
+  return {
+    correctionView: context.window.PropertyDeskImportCorrectionView,
+    rendering: context.window.PropertyDeskImportPreviewRendering,
+  };
 }
 
 function formElements(values = {}) {
@@ -347,5 +357,6 @@ module.exports = {
   loadImportFeatures,
   importFeatureModules,
   loadImportPreview,
+  importPreviewModules,
   formElements,
 };
