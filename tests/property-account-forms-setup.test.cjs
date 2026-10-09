@@ -47,6 +47,11 @@ test("property and account form setup maps scoped inputs to separate forms", () 
     "saveAndRefreshWorkspaceRecord",
   ];
   const services = Object.fromEntries(serviceKeys.map((key) => [key, { key }]));
+  services.accountRepository = {
+    save() {},
+    close() {},
+    unusedOperation() {},
+  };
   const propertyFormModules = { key: "property-modules" };
   const accountFormModules = { key: "account-modules" };
   const accountPayload = { build: () => "payload" };
@@ -81,7 +86,11 @@ test("property and account form setup maps scoped inputs to separate forms", () 
   );
   assert.equal(received.property.repository, services.propertyRepository);
   assert.equal(received.account.getAccounts, records.getAccounts);
-  assert.equal(received.account.repository, services.accountRepository);
+  assert.deepEqual(Object.keys(received.account.repository), ["save"]);
+  assert.equal(
+    received.account.repository.save,
+    services.accountRepository.save,
+  );
   assert.equal(received.account.previewReminderEmail, ui.previewReminderEmail);
   assert.equal(received.account.buildAccountPayload, accountPayload.build);
   assert.equal(received.account.formModel, "model");

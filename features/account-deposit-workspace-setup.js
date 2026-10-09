@@ -76,7 +76,9 @@
           closeModal: ui.closeModal,
           editAccount: ui.editAccount,
           openPayment: ui.openPayment,
-          repository: services.accountRepository,
+          repository: {
+            close: services.accountRepository.close,
+          },
           saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
           confirmAction: ui.confirmAction,
         },

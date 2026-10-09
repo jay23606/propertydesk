@@ -227,7 +227,7 @@ test("app coordinator passes the amortization helper into account details", () =
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create/);
   assert.match(
     accountDepositSetup,
-    /workflows\.workspace\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?actions: \{[\s\S]*?repository: services\.accountRepository/,
+    /workflows\.workspace\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?actions: \{[\s\S]*?repository: \{\s*close: services\.accountRepository\.close/,
   );
   assert.match(app, /amortizationSchedule,/);
   assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);

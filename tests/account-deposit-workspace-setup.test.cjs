@@ -75,6 +75,11 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
       "saveAndRefreshWorkspaceRecord",
     ].map((key) => [key, { name: key }]),
   );
+  services.accountRepository = {
+    save() {},
+    close() {},
+    unusedOperation() {},
+  };
   services.unusedServiceValue = true;
   const workflows = {
     workspace,
@@ -149,9 +154,12 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
     received.accountDetails.actions.getCollection,
     records.getAccountCollection,
   );
+  assert.deepEqual(Object.keys(received.accountDetails.actions.repository), [
+    "close",
+  ]);
   assert.equal(
-    received.accountDetails.actions.repository,
-    services.accountRepository,
+    received.accountDetails.actions.repository.close,
+    services.accountRepository.close,
   );
   assert.equal(received.accountDetails.actions.confirmAction, ui.confirmAction);
   assert.deepEqual(Object.keys(received.deposits.details).sort(), [

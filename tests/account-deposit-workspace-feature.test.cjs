@@ -370,7 +370,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     setup,
-    /actions: \{[\s\S]*?repository: services\.accountRepository,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
+    /actions: \{[\s\S]*?repository: \{\s*close: services\.accountRepository\.close,\s*\},[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
     appServices,

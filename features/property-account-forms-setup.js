@@ -38,7 +38,9 @@
           workflows.emailAddressUtils,
         ),
         previewReminderEmail: ui.previewReminderEmail,
-        repository: services.accountRepository,
+        repository: {
+          save: services.accountRepository.save,
+        },
         saveWorkspaceRecord: services.saveWorkspaceRecord,
         saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
         selectRecordWriteCompletion:
