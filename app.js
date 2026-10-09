@@ -23,10 +23,6 @@
   const postedLedgerUtils = window.PropertyDeskPostedLedgerUtils.create({
     modules: { currencyUtils: window.PropertyDeskCurrencyUtils },
   });
-  let appLifecycle;
-  function render() {
-    appLifecycle.render();
-  }
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -48,6 +44,7 @@
     fetchAll,
     loadAllWorkspacePages,
     repositories,
+    setRender: setWorkspaceRender,
     authClient,
     initializeClient,
     getClient,
@@ -68,7 +65,6 @@
       workspaceMembers: window.PropertyDeskWorkspaceMemberRepository,
     },
     toast,
-    render,
     tables: window.PropertyDeskWorkspaceTables,
     workflows: {
       backendClient: window.PropertyDeskBackendClient,
@@ -789,7 +785,7 @@
         },
       },
     });
-  appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
+  const appLifecycle = window.PropertyDeskAppStartupWorkflow.create({
     $,
     backendConfigured,
     initializeClient,
@@ -851,5 +847,6 @@
       lifecycle: window.PropertyDeskAppLifecycle,
     },
   });
+  setWorkspaceRender(appLifecycle.render);
   document.addEventListener("DOMContentLoaded", appLifecycle.initialize);
 })();

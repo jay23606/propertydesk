@@ -7,7 +7,6 @@
     supabase,
     repositories,
     toast,
-    render,
     tables,
     workflows,
   }) {
@@ -38,17 +37,17 @@
       reads: workspaceReads,
       workspaceQuery,
     });
-    const { fetchAll } = workflows.refresh.create({
+    const workspaceRefresh = workflows.refresh.create({
       state,
       workspaceData,
       toast,
-      render,
     });
 
     return Object.freeze({
       backendConfigured: backend.configured,
       state,
-      fetchAll,
+      fetchAll: workspaceRefresh.fetchAll,
+      setRender: workspaceRefresh.setRender,
       loadAllWorkspacePages: workspaceQuery.loadAllPages,
       authClient,
       repositories: repositoryAdapters,

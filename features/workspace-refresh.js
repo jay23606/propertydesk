@@ -2,8 +2,16 @@
 (() => {
   "use strict";
 
-  function create({ state, workspaceData, toast, render }) {
+  function create({ state, workspaceData, toast, render = () => {} }) {
     let latestFetchId = 0;
+    let renderCallback = render;
+
+    function setRender(nextRender) {
+      if (typeof nextRender !== "function") {
+        throw new TypeError("Workspace render must be a function");
+      }
+      renderCallback = nextRender;
+    }
 
     function isCurrentFetch(fetchId, userId) {
       return fetchId === latestFetchId && state.user?.id === userId;
@@ -38,7 +46,7 @@
     function renderWorkspace(fetchId, userId) {
       if (!isCurrentFetch(fetchId, userId)) return;
       try {
-        render();
+        renderCallback();
       } catch (error) {
         window.console?.error(
           "PropertyDesk failed to render workspace data.",
@@ -60,7 +68,7 @@
       renderWorkspace(fetchId, userId);
     }
 
-    return Object.freeze({ fetchAll });
+    return Object.freeze({ fetchAll, setRender });
   }
 
   window.PropertyDeskWorkspaceRefresh = Object.freeze({ create });

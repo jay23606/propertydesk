@@ -55,6 +55,23 @@ test("workspace refresh resolves workspace, hydrates state, and rerenders", asyn
   assert.deepEqual(calls, [["load", "workspace-1"], ["render"]]);
 });
 
+test("workspace refresh accepts its renderer after runtime construction", async () => {
+  const calls = [];
+  const refresh = createRefresh({
+    state: {},
+    workspaceData: {
+      loadWorkspaceId: async () => ({ data: "workspace-1", error: null }),
+      loadWorkspaceRecords: async () => ({ properties: [] }),
+    },
+    toast() {},
+  });
+  refresh.setRender(() => calls.push("render"));
+
+  await refresh.fetchAll();
+
+  assert.deepEqual(calls, ["render"]);
+});
+
 test("workspace lookup failures show feedback and stop before loading records", async () => {
   const failure = new Error("Workspace lookup failed");
   const calls = [];

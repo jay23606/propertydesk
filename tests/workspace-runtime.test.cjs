@@ -25,12 +25,12 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   };
   const repositoryAdapters = { accounts: { name: "accounts" } };
   const fetchAll = async () => {};
+  const setRender = () => {};
   const options = {
     config: { supabaseUrl: "https://example.test" },
     supabase: { createClient() {} },
     repositories,
     toast() {},
-    render() {},
     tables: { properties: "pd_properties" },
     workflows: {},
   };
@@ -83,7 +83,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     refresh: {
       create(received) {
         calls.push(["refresh", received]);
-        return { fetchAll };
+        return { fetchAll, setRender };
       },
     },
   };
@@ -118,7 +118,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[7][1].state, state);
   assert.equal(calls[7][1].workspaceData, workspaceData);
   assert.equal(calls[7][1].toast, options.toast);
-  assert.equal(calls[7][1].render, options.render);
+  assert.equal("render" in calls[7][1], false);
   assert.equal(runtime.isClientReady(), false);
   assert.equal(runtime.initializeClient(), client);
   assert.equal(calls[8][0], "create-client");
@@ -129,9 +129,19 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(runtime.backendConfigured, true);
   assert.equal(runtime.state, state);
   assert.equal(runtime.fetchAll, fetchAll);
+  assert.equal(runtime.setRender, setRender);
   assert.equal(runtime.loadAllWorkspacePages, workspaceQuery.loadAllPages);
   assert.equal(runtime.authClient.id, "auth-client");
   assert.equal(runtime.repositories, repositoryAdapters);
+  const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  assert.doesNotMatch(
+    app,
+    /let appLifecycle|function render\(\) \{\s*appLifecycle\.render/,
+  );
+  assert.match(
+    app,
+    /const appLifecycle = window\.PropertyDeskAppStartupWorkflow\.create\([\s\S]*?\}\);\s*setWorkspaceRender\(appLifecycle\.render\);\s*document\.addEventListener\("DOMContentLoaded", appLifecycle\.initialize\);/,
+  );
   assert.deepEqual(Object.keys(runtime).sort(), [
     "authClient",
     "backendConfigured",
@@ -141,6 +151,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
     "isClientReady",
     "loadAllWorkspacePages",
     "repositories",
+    "setRender",
     "state",
   ]);
 });
