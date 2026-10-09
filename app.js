@@ -3,6 +3,10 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  const confirmAction = (message) => window.confirm(message);
+  const promptAction = (message, initialValue) =>
+    window.prompt(message, initialValue);
+  const openWindow = (...args) => window.open(...args);
   const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
     modules: {
       reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
@@ -225,7 +229,7 @@
       },
       memberRepository: repositories.workspaceMembers,
       writeFeedback,
-      confirmAction: (message) => window.confirm(message),
+      confirmAction,
       authClient,
     },
     navigation: {
@@ -309,8 +313,7 @@
           fetchAll,
           closeModal,
           prettyType,
-          promptAction: (message, initialValue) =>
-            window.prompt(message, initialValue),
+          promptAction,
           EventClass: Event,
           OptionClass: Option,
           repository: repositories.transactions,
@@ -322,9 +325,8 @@
           state,
           toast,
           fetchAll,
-          confirmAction: (message) => window.confirm(message),
-          promptAction: (message, initialValue) =>
-            window.prompt(message, initialValue),
+          confirmAction,
+          promptAction,
           repository: repositories.transactions,
           writeFeedback,
           resolveVoidTarget:
@@ -478,8 +480,7 @@
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
         resolveAdjustmentType:
           window.PropertyDeskDepositAdjustmentModel.resolveType,
-        promptAction: (message, initialValue) =>
-          window.prompt(message, initialValue),
+        promptAction,
       },
     },
     accountDetails: {
@@ -516,7 +517,7 @@
         openPayment,
         repository: repositories.accounts,
         writeFeedback,
-        confirmAction: (message) => window.confirm(message),
+        confirmAction,
       },
     },
   });
@@ -585,8 +586,8 @@
         state,
         toast,
         fetchAll,
-        confirm: (message) => window.confirm(message),
-        openWindow: (...args) => window.open(...args),
+        confirm: confirmAction,
+        openWindow,
         documentRepository: repositories.documents,
         writeFeedback,
         modules: {
@@ -681,8 +682,7 @@
       toast,
       fetchAll,
       writeFeedback,
-      promptAction: (message, initialValue) =>
-        window.prompt(message, initialValue),
+      promptAction,
       openPayment,
       propertyRepository: repositories.properties,
       openAccountForProperty: propertyAccountForms.openAccountForProperty,

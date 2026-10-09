@@ -89,7 +89,7 @@ test("property document workflow connects private actions and detail events", ()
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
   assert.match(
     app,
-    /documents:[\s\S]*?confirm: \(message\) => window\.confirm\(message\),[\s\S]*?openWindow: \(\.\.\.args\) => window\.open\(\.\.\.args\),/,
+    /documents:[\s\S]*?confirm: confirmAction,[\s\S]*?openWindow,/,
   );
   assert.doesNotMatch(
     app,

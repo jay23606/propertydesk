@@ -49,10 +49,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
     app,
     /propertyRepository: repositories\.properties,[\s\S]*?openAccountForProperty,/,
   );
-  assert.match(
-    app,
-    /promptAction: \(message, initialValue\) =>\s*window\.prompt\(message, initialValue\),\s*openPayment,/,
-  );
+  assert.match(app, /promptAction,\s*openPayment,/);
   assert.match(
     workflow,
     /workflows\.quickNote\.create\(\{[\s\S]*?promptAction,/,

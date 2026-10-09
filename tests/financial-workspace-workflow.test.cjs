@@ -9,6 +9,22 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
+  assert.match(
+    app,
+    /const confirmAction = \(message\) => window\.confirm\(message\);/,
+  );
+  assert.match(
+    app,
+    /const promptAction = \(message, initialValue\) =>\s*window\.prompt\(message, initialValue\);/,
+  );
+  assert.match(
+    app,
+    /const openWindow = \(\.\.\.args\) => window\.open\(\.\.\.args\);/,
+  );
+  assert.equal((app.match(/window\.confirm\(/g) || []).length, 1);
+  assert.equal((app.match(/window\.prompt\(/g) || []).length, 1);
+  assert.equal((app.match(/window\.open\(/g) || []).length, 1);
+
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
   assert.match(app, /PropertyDeskWorkspaceDepositContext\.create\(/);
