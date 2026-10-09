@@ -957,7 +957,22 @@
     todayIso,
     registerShell: window.PropertyDeskPwa.registerShell,
     authClient,
-    authContext: { $, state, fetchAll, toast, paymentNotifications },
+    authContext: {
+      $,
+      getUser: () => state.user,
+      setUser: (user) => {
+        state.user = user;
+      },
+      getPasswordRecoveryInProgress: () => state.passwordRecoveryInProgress,
+      setPasswordRecoveryInProgress: (value) => {
+        state.passwordRecoveryInProgress = value;
+      },
+      resetWorkspaceState: () =>
+        window.PropertyDeskAppState.resetWorkspaceState(state),
+      fetchAll,
+      toast,
+      paymentNotifications,
+    },
     renderers: [
       updateGreeting,
       renderOverview,
@@ -1006,7 +1021,6 @@
           recoveryView: window.PropertyDeskAuthRecoveryView,
           resetRequest: window.PropertyDeskAuthResetRequest,
           session: window.PropertyDeskAuthSession,
-          resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
         },
       },
       lifecycle: window.PropertyDeskAppLifecycle,

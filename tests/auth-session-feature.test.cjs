@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   authFeatureModules,
+  authStateAccess,
   createAuthClient,
   loadAuthFeatures,
 } = require("./feature-test-helpers.cjs");
@@ -47,7 +48,7 @@ test("auth feature delegates session restoration and state changes to its sessio
   const workspaceSnapshots = [];
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {
@@ -149,7 +150,7 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {},
@@ -228,7 +229,7 @@ test("auth feature restores login controls when the auth request rejects", async
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => {},
@@ -293,7 +294,9 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
   let workspaceStarts = 0;
   const form = context.window.PropertyDeskAuthForm.create({
     $: element,
-    state,
+    setUser: (user) => {
+      state.user = user;
+    },
     authClient: createAuthClient(context, state),
     viewModule: context.window.PropertyDeskAuthFormView,
     startWorkspace: async () => {
@@ -350,7 +353,7 @@ test("auth session restore and sign-out report rejected requests without clearin
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
     fetchAll: async () => assert.fail("session failure must not load records"),

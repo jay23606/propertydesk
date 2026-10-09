@@ -4,7 +4,7 @@
 
   function createAuthForm({
     $,
-    state,
+    setUser,
     authClient,
     startWorkspace,
     viewModule,
@@ -42,7 +42,7 @@
       }
       view.setMessage("");
       if (result.data.user) {
-        state.user = result.data.user;
+        setUser(result.data.user);
         await startWorkspace();
       }
     }

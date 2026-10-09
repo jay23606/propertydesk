@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const {
   createAuthClient,
+  authStateAccess,
   loadAuthFeatures,
 } = require("./feature-test-helpers.cjs");
 const vm = require("node:vm");
@@ -41,7 +42,7 @@ test("password recovery saves the new password before resuming workspace access"
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     authClient: createAuthClient(context, state),
     viewModule: context.window.PropertyDeskAuthRecoveryView,
     resetRequestModule: context.window.PropertyDeskAuthResetRequest,
@@ -101,7 +102,7 @@ test("password recovery restores its submit control when the auth request reject
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     authClient: createAuthClient(context, state),
     viewModule: context.window.PropertyDeskAuthRecoveryView,
     resetRequestModule: context.window.PropertyDeskAuthResetRequest,

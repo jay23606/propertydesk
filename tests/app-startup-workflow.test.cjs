@@ -10,7 +10,17 @@ test("app startup composes auth and lifecycle at the original event position", (
     auth: {
       modules: { screens: "auth-screens" },
       create(authContext) {
-        assert.equal(authContext.state.name, "shared-state");
+        assert.equal(authContext.getUser, getUser);
+        assert.equal(authContext.setUser, setUser);
+        assert.equal(
+          authContext.getPasswordRecoveryInProgress,
+          getPasswordRecoveryInProgress,
+        );
+        assert.equal(
+          authContext.setPasswordRecoveryInProgress,
+          setPasswordRecoveryInProgress,
+        );
+        assert.equal(authContext.resetWorkspaceState, resetWorkspaceState);
         assert.equal(authContext.$, selector);
         assert.equal(authContext.authClient, authClient);
         assert.equal(authContext.fetchAll, fetchAll);
@@ -21,9 +31,13 @@ test("app startup composes auth and lifecycle at the original event position", (
           "$",
           "authClient",
           "fetchAll",
+          "getPasswordRecoveryInProgress",
+          "getUser",
           "modules",
           "paymentNotifications",
-          "state",
+          "resetWorkspaceState",
+          "setPasswordRecoveryInProgress",
+          "setUser",
           "toast",
         ]);
         return {
@@ -70,10 +84,19 @@ test("app startup composes auth and lifecycle at the original event position", (
   const fetchAll = async () => {};
   const toast = () => {};
   const paymentNotifications = { start() {}, stop() {} };
+  const getUser = () => null;
+  const setUser = () => {};
+  const getPasswordRecoveryInProgress = () => false;
+  const setPasswordRecoveryInProgress = () => {};
+  const resetWorkspaceState = () => {};
   const startupContext = {
     authContext: {
       $: selector,
-      state: { name: "shared-state" },
+      getUser,
+      setUser,
+      getPasswordRecoveryInProgress,
+      setPasswordRecoveryInProgress,
+      resetWorkspaceState,
       fetchAll,
       toast,
       paymentNotifications,
@@ -109,7 +132,11 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
   assert.match(app, /PropertyDeskAppStartupWorkflow\.create\(/);
   assert.match(
     app,
-    /workflows: \{\s*auth: \{\s*create: window\.PropertyDeskAuth\.create,\s*modules: \{[\s\S]*?resetWorkspaceState:\s*window\.PropertyDeskAppState\.resetWorkspaceState,/,
+    /authContext: \{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?setPasswordRecoveryInProgress:[\s\S]*?resetWorkspaceState: \(\) =>[\s\S]*?resetWorkspaceState\(state\),/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(path.join(root, "features", "auth.js"), "utf8"),
+    /\bstate\b/,
   );
   assert.doesNotMatch(app, /PropertyDeskAuth\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskAppLifecycle\.create\(/);

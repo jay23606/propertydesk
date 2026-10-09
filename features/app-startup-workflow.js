@@ -17,7 +17,11 @@
   }) {
     const auth = workflows.auth.create({
       $: authContext.$,
-      state: authContext.state,
+      getUser: authContext.getUser,
+      setUser: authContext.setUser,
+      getPasswordRecoveryInProgress: authContext.getPasswordRecoveryInProgress,
+      setPasswordRecoveryInProgress: authContext.setPasswordRecoveryInProgress,
+      resetWorkspaceState: authContext.resetWorkspaceState,
       authClient,
       fetchAll: authContext.fetchAll,
       toast: authContext.toast,

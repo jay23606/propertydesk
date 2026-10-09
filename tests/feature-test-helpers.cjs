@@ -91,7 +91,21 @@ function authFeatureModules(context) {
     recoveryView: window.PropertyDeskAuthRecoveryView,
     resetRequest: window.PropertyDeskAuthResetRequest,
     session: window.PropertyDeskAuthSession,
-    resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
+  };
+}
+
+function authStateAccess(state, context) {
+  return {
+    getUser: () => state.user,
+    setUser: (user) => {
+      state.user = user;
+    },
+    getPasswordRecoveryInProgress: () => state.passwordRecoveryInProgress,
+    setPasswordRecoveryInProgress: (value) => {
+      state.passwordRecoveryInProgress = value;
+    },
+    resetWorkspaceState: () =>
+      context.window.PropertyDeskAppState.resetWorkspaceState(state),
   };
 }
 
@@ -409,6 +423,7 @@ module.exports = {
   workspaceChangeWriteOptions,
   loadAuthFeatures,
   authFeatureModules,
+  authStateAccess,
   createAuthClient,
   loadWorkspaceFeatures,
   loadLedgerEntryForms,

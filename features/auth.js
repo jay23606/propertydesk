@@ -4,7 +4,11 @@
 
   function create({
     $,
-    state,
+    getUser,
+    setUser,
+    getPasswordRecoveryInProgress,
+    setPasswordRecoveryInProgress,
+    resetWorkspaceState,
     authClient,
     fetchAll,
     toast,
@@ -21,7 +25,7 @@
     const { setAuthMode, attachEvents: attachAuthFormEvents } =
       modules.form.create({
         $,
-        state,
+        setUser,
         authClient,
         documentRef,
         startWorkspace,
@@ -34,7 +38,10 @@
       attachEvents: attachRecoveryEvents,
     } = modules.recovery.create({
       $,
-      state,
+      getUser,
+      setUser,
+      getPasswordRecoveryInProgress,
+      setPasswordRecoveryInProgress,
       authClient,
       toast,
       setAuthMode,
@@ -58,7 +65,10 @@
 
     const { handleAuthStateChange, restoreAuthSession, signOut } =
       modules.session.create({
-        state,
+        getUser,
+        setUser,
+        getPasswordRecoveryInProgress,
+        setPasswordRecoveryInProgress,
         authClient,
         toast,
         showAuth,
@@ -66,7 +76,7 @@
         showPasswordReset,
         isPasswordRecoverySession,
         startWorkspace,
-        resetWorkspaceState: modules.resetWorkspaceState,
+        resetWorkspaceState,
         stopWorkspaceNotifications: paymentNotifications.stop,
       });
 

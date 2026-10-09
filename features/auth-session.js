@@ -3,7 +3,10 @@
   "use strict";
 
   function createAuthSession({
-    state,
+    getUser,
+    setUser,
+    getPasswordRecoveryInProgress,
+    setPasswordRecoveryInProgress,
     authClient,
     toast,
     showAuth,
@@ -16,32 +19,32 @@
   }) {
     function finishSignOut() {
       stopWorkspaceNotifications();
-      resetWorkspaceState(state);
+      resetWorkspaceState();
       showAuth();
       setAuthMode(false);
     }
 
     function handlePasswordRecovery(session) {
       if (!session?.user) return false;
-      state.user = session.user;
+      setUser(session.user);
       showPasswordReset();
       return true;
     }
 
     function handleAuthenticatedSession(event, session) {
       if (!session?.user) return;
-      const previousUserId = state.user?.id;
+      const previousUserId = getUser()?.id;
       const signedIntoNewUser =
         event === "SIGNED_IN" && previousUserId !== session.user.id;
       const passwordRecoveryInProgress =
-        state.passwordRecoveryInProgress === true;
+        getPasswordRecoveryInProgress() === true;
       if (signedIntoNewUser) {
         stopWorkspaceNotifications();
-        resetWorkspaceState(state);
-        state.passwordRecoveryInProgress = passwordRecoveryInProgress;
+        resetWorkspaceState();
+        setPasswordRecoveryInProgress(passwordRecoveryInProgress);
       }
-      state.user = session.user;
-      if (signedIntoNewUser && !state.passwordRecoveryInProgress)
+      setUser(session.user);
+      if (signedIntoNewUser && !getPasswordRecoveryInProgress())
         startWorkspace();
     }
 
@@ -70,9 +73,9 @@
         return;
       }
 
-      state.user = session.user;
+      setUser(session.user);
       if (isPasswordRecoverySession(session)) showPasswordReset();
-      else if (!state.passwordRecoveryInProgress) await startWorkspace();
+      else if (!getPasswordRecoveryInProgress()) await startWorkspace();
     }
 
     async function signOut() {

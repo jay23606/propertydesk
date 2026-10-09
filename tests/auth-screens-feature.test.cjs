@@ -1,5 +1,6 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
+const { authStateAccess } = require("./feature-test-helpers.cjs");
 const { loadAuthFeatures } = require("./feature-test-helpers.cjs");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -85,7 +86,7 @@ test("password reset requests keep generic feedback and restore the submit contr
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
-    state,
+    ...authStateAccess(state, context),
     authClient: context.window.PropertyDeskAuthClient.create({
       getClient: () => state.client,
     }),

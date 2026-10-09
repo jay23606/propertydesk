@@ -4,7 +4,9 @@
 
   function createAuthRecovery({
     $,
-    state,
+    getUser,
+    setUser,
+    setPasswordRecoveryInProgress,
     authClient,
     toast,
     setAuthMode,
@@ -23,7 +25,7 @@
     });
 
     function showPasswordReset() {
-      state.passwordRecoveryInProgress = true;
+      setPasswordRecoveryInProgress(true);
       view.showPasswordReset();
       showAuth();
     }
@@ -50,8 +52,8 @@
         view.setMessage(error.message);
         return;
       }
-      state.user = data.user || state.user;
-      state.passwordRecoveryInProgress = false;
+      setUser(data.user || getUser());
+      setPasswordRecoveryInProgress(false);
       windowRef.history.replaceState(
         null,
         "",
@@ -73,7 +75,7 @@
     }
 
     function cancelPasswordReset() {
-      state.passwordRecoveryInProgress = false;
+      setPasswordRecoveryInProgress(false);
       setAuthMode(false);
       showAuth();
     }
