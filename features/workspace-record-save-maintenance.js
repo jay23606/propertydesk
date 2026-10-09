@@ -7,15 +7,16 @@
     fetchAll,
     toast,
     repository,
-    writeFeedback,
+    saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion,
     collection,
     recordLabel,
   }) {
     function saveRecord(payload, recordId, completion) {
       const save = completion
-        ? writeFeedback.saveAndRefreshWorkspaceRecord
-        : writeFeedback.saveWorkspaceRecord;
+        ? saveAndRefreshWorkspaceRecord
+        : saveWorkspaceRecord;
       return save({
         ...selectRecordWriteCompletion(completion),
         operation: () => repository.save(payload, recordId),

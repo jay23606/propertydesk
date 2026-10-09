@@ -47,7 +47,8 @@ test("property and account forms keep separate dependencies and expose explicit 
     closeModal: () => {},
     fetchAll: () => {},
     repository: { kind: "properties" },
-    writeFeedback: { kind: "write-feedback" },
+    saveWorkspaceRecord: () => {},
+    saveAndRefreshWorkspaceRecord: () => {},
     selectRecordWriteCompletion: () => {},
     workflows: { kind: "property-form-modules" },
     unusedDependency: true,
@@ -72,7 +73,8 @@ test("property and account forms keep separate dependencies and expose explicit 
     formModel: {},
     previewReminderEmail: () => {},
     repository: { kind: "accounts" },
-    writeFeedback: { kind: "write-feedback" },
+    saveWorkspaceRecord: () => {},
+    saveAndRefreshWorkspaceRecord: () => {},
     selectRecordWriteCompletion: () => {},
     workflows: { kind: "account-form-modules" },
     unusedDependency: true,
@@ -91,17 +93,19 @@ test("property and account forms keep separate dependencies and expose explicit 
     source,
     /window\.PropertyDesk(?:Property|Account)Form\.create/,
   );
+  assert.doesNotMatch(source, /writeFeedback/);
 
   assert.deepEqual(Object.keys(passed.property).sort(), [
     "$",
     "closeModal",
     "fetchAll",
     "repository",
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
     "selectRecordWriteCompletion",
     "state",
     "toast",
     "workflows",
-    "writeFeedback",
   ]);
   assert.deepEqual(Object.keys(passed.account).sort(), [
     "$",
@@ -114,12 +118,13 @@ test("property and account forms keep separate dependencies and expose explicit 
     "populateFormOptions",
     "previewReminderEmail",
     "repository",
+    "saveAndRefreshWorkspaceRecord",
+    "saveWorkspaceRecord",
     "selectRecordWriteCompletion",
     "state",
     "toast",
     "todayIso",
     "workflows",
-    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.property))
     assert.equal(passed.property[key], property[key]);

@@ -9,7 +9,8 @@
     closeModal,
     fetchAll,
     repository,
-    writeFeedback,
+    saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion,
     workflows,
   }) {
@@ -24,7 +25,8 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord,
       selectRecordWriteCompletion,
       recordSaveMaintenance: workflows.recordSaveMaintenance,
     });

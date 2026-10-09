@@ -14,7 +14,8 @@
       closeModal: property.closeModal,
       fetchAll: property.fetchAll,
       repository: property.repository,
-      writeFeedback: property.writeFeedback,
+      saveWorkspaceRecord: property.saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord: property.saveAndRefreshWorkspaceRecord,
       selectRecordWriteCompletion: property.selectRecordWriteCompletion,
       workflows: workflows.propertyFormModules,
     });
@@ -32,7 +33,8 @@
       formModel: account.formModel,
       previewReminderEmail: account.previewReminderEmail,
       repository: account.repository,
-      writeFeedback: account.writeFeedback,
+      saveWorkspaceRecord: account.saveWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord: account.saveAndRefreshWorkspaceRecord,
       selectRecordWriteCompletion: account.selectRecordWriteCompletion,
       workflows: workflows.accountFormModules,
     });

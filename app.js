@@ -289,7 +289,9 @@
         closeModal,
         fetchAll,
         repository: repositories.properties,
-        writeFeedback,
+        saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
         selectRecordWriteCompletion:
           window.PropertyDeskWorkspaceRecordWriteWorkflow
             .selectRecordWriteCompletion,
@@ -310,7 +312,9 @@
           window.PropertyDeskEmailAddressUtils,
         ),
         repository: repositories.accounts,
-        writeFeedback,
+        saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
         selectRecordWriteCompletion:
           window.PropertyDeskWorkspaceRecordWriteWorkflow
             .selectRecordWriteCompletion,

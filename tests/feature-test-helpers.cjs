@@ -197,8 +197,10 @@ function ledgerEntryDependencies(context, state = {}) {
 }
 
 function workspaceRecordWriteDependencies(context) {
+  const writeFeedback = createRepositoryWriteFeedback(context);
   return {
-    writeFeedback: createRepositoryWriteFeedback(context),
+    saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord: writeFeedback.saveAndRefreshWorkspaceRecord,
     recordSaveMaintenance:
       context.window.PropertyDeskWorkspaceRecordSaveMaintenance,
     selectRecordWriteCompletion:
@@ -208,8 +210,10 @@ function workspaceRecordWriteDependencies(context) {
 }
 
 function accountFormDependencies(context, state = {}) {
+  const writeFeedback = createRepositoryWriteFeedback(context);
   return {
-    writeFeedback: createRepositoryWriteFeedback(context),
+    saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord: writeFeedback.saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
@@ -235,8 +239,10 @@ function accountFormModel(context) {
 }
 
 function propertyFormDependencies(context, state = {}) {
+  const writeFeedback = createRepositoryWriteFeedback(context);
   return {
-    writeFeedback: createRepositoryWriteFeedback(context),
+    saveWorkspaceRecord: writeFeedback.saveWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord: writeFeedback.saveAndRefreshWorkspaceRecord,
     selectRecordWriteCompletion:
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
