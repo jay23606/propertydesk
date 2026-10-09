@@ -83,6 +83,10 @@ test("property detail document events route private document actions to document
 test("property document workflow connects private actions and detail events", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const appServiceCatalog = fs.readFileSync(
+    path.join(root, "features", "app-service-module-catalog.js"),
+    "utf8",
+  );
   const setup = fs.readFileSync(
     path.join(root, "features", "property-workspace-setup.js"),
     "utf8",
@@ -110,7 +114,7 @@ test("property document workflow connects private actions and detail events", ()
   assert.match(screenWorkflow, /repository: documents\.documentRepository/);
   assert.match(screenWorkflow, /refreshWorkspace: documents\.refreshWorkspace/);
   assert.match(
-    app,
+    appServiceCatalog,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
   );
   const registry = fs.readFileSync(

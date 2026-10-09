@@ -9,6 +9,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "app-services.js"),
     "utf8",
   );
+  const appServiceCatalog = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-service-module-catalog.js"),
+    "utf8",
+  );
   const transactionComposition = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
@@ -29,7 +33,11 @@ test("account records and ledger entries use separate workspace workflows", () =
 
   assert.match(
     app,
-    /PropertyDeskAppServices\.create\(\{[\s\S]*?modules: \{[\s\S]*?workspaceRuntime: \{[\s\S]*?factory: window\.PropertyDeskWorkspaceRuntime/,
+    /PropertyDeskAppServices\.create\(\{[\s\S]*?modules: window\.PropertyDeskAppServiceModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    appServiceCatalog,
+    /workspaceRuntime: \{[\s\S]*?factory: window\.PropertyDeskWorkspaceRuntime[\s\S]*?repositories: \{[\s\S]*?transactions: window\.PropertyDeskTransactionRepository/,
   );
   assert.doesNotMatch(
     app,
@@ -168,6 +176,10 @@ test("account records and ledger entries use separate workspace workflows", () =
 
 test("app coordinator passes the amortization helper into account details", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const appServiceCatalog = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-service-module-catalog.js"),
+    "utf8",
+  );
   const transactionComposition = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
@@ -186,7 +198,7 @@ test("app coordinator passes the amortization helper into account details", () =
     "utf8",
   );
   assert.match(appServices, /modules\.financialContext\.factory\.create\(/);
-  assert.match(app, /window\.PropertyDeskPostedLedgerUtils/);
+  assert.match(appServiceCatalog, /window\.PropertyDeskPostedLedgerUtils/);
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:ScheduleUtils|LoanAmortizationUtils|DepositLedgerUtils)\.create\(/,
@@ -196,7 +208,7 @@ test("app coordinator passes the amortization helper into account details", () =
     "utf8",
   );
   assert.match(
-    app,
+    appServiceCatalog,
     /workflows: \{\s*schedule: window\.PropertyDeskScheduleUtils,[\s\S]*?accountSummary: window\.PropertyDeskAccountFinancialSummary,/,
   );
   assert.match(financialWorkflow, /workflows\.loanSchedule\.create\(/);

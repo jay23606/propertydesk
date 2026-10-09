@@ -180,10 +180,17 @@ test("app state access module loads before the root and is precached", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const appServiceCatalog = fs.readFileSync(
+    path.join(root, "features/app-service-module-catalog.js"),
+    "utf8",
+  );
   const script = "features/app-state-access.js";
   assert.ok(html.indexOf(script) < html.indexOf("app.js"));
   assert.ok(worker.includes(`'./${script}'`));
-  assert.match(app, /stateAccess: window\.PropertyDeskAppStateAccess/);
+  assert.match(
+    appServiceCatalog,
+    /stateAccess: window\.PropertyDeskAppStateAccess/,
+  );
   assert.doesNotMatch(app, /\bstate\.[A-Za-z_$]/);
   assert.match(app, /records: stateAccess\.transactions/);
   assert.match(app, /records: stateAccess\.properties/);
