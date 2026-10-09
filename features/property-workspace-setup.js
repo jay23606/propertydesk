@@ -10,7 +10,9 @@
       fetchAll: services.fetchAll,
       streetAddress: ui.streetAddress,
       promptAction: ui.promptAction,
-      repository: services.propertyRepository,
+      repository: {
+        updateOwned: services.propertyRepository.updateOwned,
+      },
       saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
       noteMaintenance: workflows.quickNote.noteMaintenance,
       recordUpdateMaintenance: workflows.quickNote.recordUpdateMaintenance,
@@ -56,7 +58,9 @@
           toast: ui.toast,
           fetchAll: services.fetchAll,
           todayIso: ui.todayIso,
-          propertyRepository: services.propertyRepository,
+          propertyRepository: {
+            updateOwned: services.propertyRepository.updateOwned,
+          },
           saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
           closeModal: services.closeModal,
           editAccount: services.editAccount,

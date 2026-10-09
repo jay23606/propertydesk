@@ -53,7 +53,7 @@ test("app composes the Properties grid and action operations explicitly", () => 
   );
   assert.match(
     setup,
-    /propertyRepository: services\.propertyRepository,[\s\S]*?openAccountForProperty: services\.openAccountForProperty/,
+    /propertyRepository: \{\s*updateOwned: services\.propertyRepository\.updateOwned,\s*\},[\s\S]*?openAccountForProperty: services\.openAccountForProperty/,
   );
   assert.match(setup, /promptAction: ui\.promptAction/);
   assert.match(setup, /openPayment: services\.openPayment/);

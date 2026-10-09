@@ -16,7 +16,9 @@
         toast: ui.toast,
         closeModal: ui.closeModal,
         fetchAll: services.fetchAll,
-        repository: services.propertyRepository,
+        repository: {
+          save: services.propertyRepository.save,
+        },
         saveWorkspaceRecord: services.saveWorkspaceRecord,
         saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
         selectRecordWriteCompletion:

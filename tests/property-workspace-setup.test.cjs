@@ -90,6 +90,10 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "openPropertyPayment",
   ];
   const services = Object.fromEntries(serviceKeys.map((key) => [key, { key }]));
+  services.propertyRepository = {
+    save() {},
+    updateOwned() {},
+  };
   services.unusedServiceValue = true;
   const workflows = {
     workspace,
@@ -137,7 +141,11 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     receivedQuickNote.getWorkspaceOwnerId,
     records.getWorkspaceOwnerId,
   );
-  assert.equal(receivedQuickNote.repository, services.propertyRepository);
+  assert.deepEqual(Object.keys(receivedQuickNote.repository), ["updateOwned"]);
+  assert.equal(
+    receivedQuickNote.repository.updateOwned,
+    services.propertyRepository.updateOwned,
+  );
   assert.equal(
     receivedQuickNote.noteMaintenance,
     workflows.quickNote.noteMaintenance,
@@ -161,9 +169,12 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     received.detail.management.getSelectedPropertyId,
     records.getSelectedPropertyId,
   );
+  assert.deepEqual(Object.keys(received.detail.management.propertyRepository), [
+    "updateOwned",
+  ]);
   assert.equal(
-    received.detail.management.propertyRepository,
-    services.propertyRepository,
+    received.detail.management.propertyRepository.updateOwned,
+    services.propertyRepository.updateOwned,
   );
   assert.equal(received.detail.management.closeModal, services.closeModal);
   assert.equal(
