@@ -7,6 +7,7 @@
   const promptAction = (message, initialValue) =>
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
+  const transactionTimestamp = () => new Date().toISOString();
   const writeFeedback = window.PropertyDeskRepositoryWriteFeedback.create({
     modules: {
       reconciliation: window.PropertyDeskWorkspaceWriteReconciliation,
@@ -325,6 +326,7 @@
           state,
           toast,
           fetchAll,
+          timestamp: transactionTimestamp,
           confirmAction,
           promptAction,
           repository: repositories.transactions,

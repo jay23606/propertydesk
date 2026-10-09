@@ -145,6 +145,7 @@ test("transaction void maintenance reports rejected requests without refreshing"
   const state = { payments: [], expenses: [] };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     state,
+    timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => refreshes.push(true),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskTransactionRepository.create({
@@ -254,6 +255,7 @@ test("transaction void maintenance reports database errors without refreshing", 
       }),
     },
     ...transactionVoidModelOptions(context),
+    timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => assert.fail("database errors must not refresh"),
     toast: (message) => messages.push(message),
   });
@@ -283,6 +285,7 @@ test("transaction void maintenance reports an already-changed row without refres
       voidPosted: async () => ({ data: null, error: null }),
     },
     ...transactionVoidModelOptions(context),
+    timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => assert.fail("a missing row must not refresh"),
     toast: (message) => messages.push(message),
   });

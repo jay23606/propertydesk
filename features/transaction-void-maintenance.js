@@ -6,7 +6,7 @@
     state,
     toast,
     fetchAll,
-    timestamp = () => new Date().toISOString(),
+    timestamp,
     resolveVoidTarget,
     buildVoidPayload,
     repository,

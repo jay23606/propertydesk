@@ -118,8 +118,15 @@ test("transaction workspace connects maintenance to the records workflow", () =>
 test("transaction workspace connects maintenance and records at the app root", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /const transactionTimestamp = \(\) => new Date\(\)\.toISOString\(\);/,
+  );
   assert.match(app, /correction: \{[\s\S]*?writeFeedback,/);
-  assert.match(app, /voiding: \{[\s\S]*?writeFeedback,/);
+  assert.match(
+    app,
+    /voiding: \{[\s\S]*?timestamp: transactionTimestamp,[\s\S]*?writeFeedback,/,
+  );
   assert.match(
     app,
     /workflows: \{\s*maintenance: window\.PropertyDeskTransactionMaintenanceWorkflow,\s*records: window\.PropertyDeskTransactionRecordsWorkflow,/,
@@ -171,6 +178,11 @@ test("transaction workspace connects maintenance and records at the app root", (
     transactionWorkspace,
     /window\.PropertyDeskTransaction(?:Correction|Void|MaintenanceEvents)/,
   );
+  const voidMaintenance = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-void-maintenance.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(voidMaintenance, /new Date\(/);
   const transactionWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
     "utf8",

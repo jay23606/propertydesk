@@ -96,6 +96,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     state: {},
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
+    timestamp: () => "2026-10-08T12:00:00.000Z",
     confirmAction() {},
     promptAction() {},
     repository: correctionContext.repository,
@@ -182,6 +183,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
   assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
   assert.equal(passed.voidMaintenance.state, voidingContext.state);
   assert.equal(passed.voidMaintenance.fetchAll, voidingContext.fetchAll);
+  assert.equal(passed.voidMaintenance.timestamp, voidingContext.timestamp);
   assert.equal(
     passed.voidMaintenance.resolveVoidTarget,
     voidingContext.resolveVoidTarget,
