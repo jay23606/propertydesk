@@ -38,12 +38,8 @@ test("document maintenance receives workspace refresh through explicit dependenc
       "utf8",
     );
     assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
-    if (filename.endsWith("-maintenance.js")) {
-      assert.match(source, /refreshWorkspace/);
-      assert.doesNotMatch(source, /writeFeedback/);
-    } else {
-      assert.match(source, /writeFeedback/);
-    }
+    assert.match(source, /refreshWorkspace/);
+    assert.doesNotMatch(source, /writeFeedback/);
     if (filename === "document-upload.js" || filename === "document-delete.js")
       assert.doesNotMatch(
         source,
@@ -106,7 +102,7 @@ test("document actions separate deletion and signed-link dependencies", () => {
     confirm() {},
     openWindow() {},
     repository: {},
-    writeFeedback: { kind: "write-feedback" },
+    refreshWorkspace() {},
     modules: {
       delete: context.window.PropertyDeskDocumentDelete,
       deleteMaintenance: { kind: "delete-maintenance" },
@@ -121,7 +117,7 @@ test("document actions separate deletion and signed-link dependencies", () => {
   assert.equal(passed.deletion.fetchAll, dependencies.fetchAll);
   assert.equal(passed.deletion.confirm, dependencies.confirm);
   assert.equal(passed.deletion.repository, dependencies.repository);
-  assert.equal(passed.deletion.writeFeedback, dependencies.writeFeedback);
+  assert.equal(passed.deletion.refreshWorkspace, dependencies.refreshWorkspace);
   assert.equal(
     passed.deletion.maintenanceModule,
     dependencies.modules.deleteMaintenance,

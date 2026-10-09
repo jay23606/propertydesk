@@ -10,7 +10,7 @@
     makeId = () => crypto.randomUUID(),
     repository,
     describeUpload,
-    writeFeedback,
+    refreshWorkspace,
     maintenanceModule,
   }) {
     const { uploadFile, saveDocumentMetadata } = maintenanceModule.create({
@@ -19,11 +19,11 @@
       fetchAll,
       openPropertyDetails,
       repository,
-      refreshWorkspace: writeFeedback.refreshWorkspace,
+      refreshWorkspace,
     });
 
     async function reopenPropertyDetails(propertyId) {
-      await writeFeedback.refreshWorkspace({
+      await refreshWorkspace({
         fetchAll,
         beforeRefresh: () => toast("Agreement uploaded privately"),
         afterRefresh: () => openPropertyDetails(propertyId),

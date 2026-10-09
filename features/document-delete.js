@@ -9,7 +9,7 @@
     openPropertyDetails,
     confirm,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     maintenanceModule,
   }) {
     const { removePropertyDocument } = maintenanceModule.create({
@@ -18,7 +18,7 @@
       fetchAll,
       openPropertyDetails,
       repository,
-      refreshWorkspace: writeFeedback.refreshWorkspace,
+      refreshWorkspace,
     });
 
     function documentForDeletion(id, propertyId) {

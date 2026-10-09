@@ -104,7 +104,7 @@ test("property document workflow connects private actions and detail events", ()
     "utf8",
   );
   assert.match(screenWorkflow, /repository: documents\.documentRepository/);
-  assert.match(screenWorkflow, /writeFeedback: documents\.writeFeedback/);
+  assert.match(screenWorkflow, /refreshWorkspace: documents\.refreshWorkspace/);
   assert.match(
     app,
     /repositories: \{[\s\S]*?documents: window\.PropertyDeskDocumentRepository,/,
@@ -175,7 +175,7 @@ test("property document workflow routes actions through one explicit binder", ()
     confirm: () => true,
     openWindow: () => null,
     repository: {},
-    writeFeedback: { kind: "write-feedback" },
+    refreshWorkspace() {},
     modules: { kind: "document-modules" },
     documentsWorkflow: context.window.PropertyDeskDocuments,
     documentEventsWorkflow:
@@ -191,16 +191,16 @@ test("property document workflow routes actions through one explicit binder", ()
     "modules",
     "openPropertyDetails",
     "openWindow",
+    "refreshWorkspace",
     "repository",
     "state",
     "toast",
-    "writeFeedback",
   ]);
   assert.equal(calls[0][1].repository, dependencies.repository);
   assert.equal(calls[0][1].modules, dependencies.modules);
   assert.equal(calls[0][1].confirm, dependencies.confirm);
   assert.equal(calls[0][1].openWindow, dependencies.openWindow);
-  assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
+  assert.equal(calls[0][1].refreshWorkspace, dependencies.refreshWorkspace);
   assert.equal(calls[1][0], "events");
   assert.equal(calls[1][1].$, dependencies.$);
   assert.equal(

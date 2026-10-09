@@ -59,7 +59,7 @@
       fetchAll: documents.fetchAll,
       openPropertyDetails: details.openPropertyDetails,
       repository: documents.documentRepository,
-      writeFeedback: documents.writeFeedback,
+      refreshWorkspace: documents.refreshWorkspace,
       confirm: documents.confirm,
       openWindow: documents.openWindow,
       modules: documents.modules,

@@ -607,7 +607,7 @@
         confirm: confirmAction,
         openWindow,
         documentRepository: repositories.documents,
-        writeFeedback,
+        refreshWorkspace: writeFeedback.refreshWorkspace,
         modules: {
           upload: window.PropertyDeskDocumentUpload,
           uploadMaintenance: window.PropertyDeskDocumentUploadMaintenance,

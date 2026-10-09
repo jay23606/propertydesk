@@ -10,7 +10,7 @@
     confirm,
     openWindow,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     modules,
   }) {
     const { deletePropertyDocument } = modules.delete.create({
@@ -20,7 +20,7 @@
       openPropertyDetails,
       confirm,
       repository,
-      writeFeedback,
+      refreshWorkspace,
       maintenanceModule: modules.deleteMaintenance,
     });
     const { openPropertyDocument } = modules.open.create({

@@ -11,7 +11,7 @@
     confirm,
     openWindow,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     modules,
   }) {
     const { uploadPropertyDocument } = modules.upload.create({
@@ -21,7 +21,7 @@
       openPropertyDetails,
       makeId,
       repository,
-      writeFeedback,
+      refreshWorkspace,
       describeUpload: modules.uploadPolicy.describe,
       maintenanceModule: modules.uploadMaintenance,
     });
@@ -35,7 +35,7 @@
         confirm,
         openWindow,
         repository,
-        writeFeedback,
+        refreshWorkspace,
         modules: modules.actions.modules,
       });
 
