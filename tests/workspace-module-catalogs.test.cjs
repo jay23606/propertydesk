@@ -176,6 +176,25 @@ test("property account form module catalog owns both form feature trees", () => 
   );
 });
 
+test("app shell module catalog groups workspace settings and navigation", () => {
+  const { catalog, window } = loadCatalog(
+    "app-shell-module-catalog.js",
+    "PropertyDeskAppShellModuleCatalog",
+  );
+
+  assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(catalog.workspace, window.PropertyDeskWorkspace);
+  assert.equal(
+    catalog.workspaceModules.profileModules.settings,
+    window.PropertyDeskProfileSettings,
+  );
+  assert.equal(
+    catalog.workspaceModules.reminderActivityData,
+    window.PropertyDeskWorkspaceReminderActivityData,
+  );
+  assert.equal(catalog.navigation, window.PropertyDeskNavigation);
+});
+
 test("workspace module catalogs load before the root and stay in the PWA shell", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
@@ -186,6 +205,7 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
     "features/property-workspace-module-catalog.js",
     "features/import-workspace-module-catalog.js",
     "features/property-account-forms-module-catalog.js",
+    "features/app-shell-module-catalog.js",
   ];
 
   for (const catalog of catalogs) {
@@ -211,5 +231,9 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   assert.match(
     app,
     /workflows:\s*window\.PropertyDeskPropertyAccountFormsModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    app,
+    /workflows:\s*window\.PropertyDeskAppShellModuleCatalog\.create\(\)/,
   );
 });

@@ -20,6 +20,10 @@ test("app shell composes workspace settings and page navigation", () => {
     path.join(root, "features", "app-shell-setup.js"),
     "utf8",
   );
+  const shellCatalog = fs.readFileSync(
+    path.join(root, "features", "app-shell-module-catalog.js"),
+    "utf8",
+  );
 
   assert.match(
     app,
@@ -37,6 +41,14 @@ test("app shell composes workspace settings and page navigation", () => {
   assert.match(
     setup,
     /workspaceWorkflow: workflows\.workspace,[\s\S]*?navigationWorkflow: workflows\.navigation,/,
+  );
+  assert.match(
+    app,
+    /workflows: window\.PropertyDeskAppShellModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    shellCatalog,
+    /profileModules: \{\s*display: window\.PropertyDeskProfileDisplay,[\s\S]*?settings: window\.PropertyDeskProfileSettings,/,
   );
   assert.match(
     workspace,
@@ -57,6 +69,7 @@ test("app shell composes workspace settings and page navigation", () => {
     "features/navigation.js",
     "features/app-shell-workflow.js",
     "features/app-shell-setup.js",
+    "features/app-shell-module-catalog.js",
     "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));
