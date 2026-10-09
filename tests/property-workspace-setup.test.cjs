@@ -25,7 +25,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   );
   assert.match(
     appSource,
-    /storage: \{\s*getItem: \(key\) => window\.localStorage\.getItem\(key\),\s*setItem: \(key, value\) => window\.localStorage\.setItem\(key, value\),\s*\},/,
+    /const browserStorage = Object\.freeze\(\{\s*getItem: \(key\) => window\.localStorage\.getItem\(key\),\s*setItem: \(key, value\) => window\.localStorage\.setItem\(key, value\),\s*\}\);/,
   );
 
   let received;

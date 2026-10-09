@@ -119,7 +119,6 @@ test("theme controller synchronizes toggles and persists theme changes", () => {
   const storageWrites = [];
   const theme = context.window.PropertyDeskTheme.create({
     documentRef,
-    windowRef: {},
     storage: { setItem: (...args) => storageWrites.push(args) },
   });
 
@@ -165,11 +164,18 @@ test("theme controller loads before app startup and is precached", () => {
   assert.match(worker, /'\.\/features\/theme-controller\.js'/);
   assert.match(
     fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"),
-    /PropertyDeskTheme\.create\(\)/,
+    /PropertyDeskTheme\.create\(\{\s*storage: browserStorage,/,
   );
   assert.match(
     fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"),
-    /PropertyDeskTheme\.create\(\)[\s\S]*?attachThemeEvents,/,
+    /PropertyDeskTheme\.create\(\{\s*storage: browserStorage,[\s\S]*?attachThemeEvents,/,
+  );
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features/theme-controller.js"),
+      "utf8",
+    ),
+    /windowRef\.localStorage/,
   );
 });
 

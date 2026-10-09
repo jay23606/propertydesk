@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    documentRef = document,
-    windowRef = window,
-    storage,
-  } = {}) {
+  function create({ documentRef = document, storage } = {}) {
     function setTheme(theme, persist = false) {
       const next = theme === "light" ? "light" : "dark";
       documentRef.documentElement.dataset.theme = next;
@@ -16,10 +12,7 @@
         ?.setAttribute("content", themeColor);
       if (persist) {
         try {
-          (storage || windowRef.localStorage).setItem(
-            "propertydesk-theme",
-            next,
-          );
+          storage.setItem("propertydesk-theme", next);
         } catch {
           // Keep the active theme for this page when storage is unavailable.
         }

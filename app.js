@@ -8,6 +8,10 @@
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
   const makeId = () => window.crypto.randomUUID();
+  const browserStorage = Object.freeze({
+    getItem: (key) => window.localStorage.getItem(key),
+    setItem: (key, value) => window.localStorage.setItem(key, value),
+  });
   const reportError = (message, error) => window.console?.error(message, error);
   const appServices = window.PropertyDeskAppServices.create({
     $,
@@ -270,7 +274,9 @@
     attachNavigationEvents,
   } = appShell;
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
-  const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create();
+  const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create({
+    storage: browserStorage,
+  });
   const propertyAccountForms =
     window.PropertyDeskPropertyAccountFormsSetup.create({
       records: stateAccess.propertyAccountForms,
@@ -536,10 +542,7 @@
       lateReminderMailto,
       lateReminderSms,
       paymentStatusInMonth,
-      storage: {
-        getItem: (key) => window.localStorage.getItem(key),
-        setItem: (key, value) => window.localStorage.setItem(key, value),
-      },
+      storage: browserStorage,
       promptAction,
     },
     services: {

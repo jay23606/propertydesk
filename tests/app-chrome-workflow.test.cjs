@@ -9,7 +9,7 @@ test("device-local theme controls remain independent at the app root", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
-  assert.match(app, /PropertyDeskTheme\.create\(\)/);
+  assert.match(app, /PropertyDeskTheme\.create\(\{\s*storage: browserStorage,/);
   assert.match(
     app,
     /eventBindersBeforeAuth:[\s\S]*?attachNavigationEvents,\s*attachProfileEvents,\s*attachWorkspaceMemberEvents,/,
