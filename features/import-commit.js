@@ -9,15 +9,15 @@
     toast,
     repository,
     writeFeedback,
+    modules,
   }) {
-    const batchReconciliation =
-      window.PropertyDeskImportBatchReconciliation.create({
-        state,
-        fetchAll,
-        toast,
-        writeFeedback,
-      });
-    const { finish } = window.PropertyDeskImportCommitReporting.create({
+    const batchReconciliation = modules.batchReconciliation.create({
+      state,
+      fetchAll,
+      toast,
+      writeFeedback,
+    });
+    const { finish } = modules.reporting.create({
       status,
       fetchAll,
       toast,

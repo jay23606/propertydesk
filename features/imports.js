@@ -57,6 +57,7 @@
       toast,
       repository,
       writeFeedback,
+      modules: modules.commit.modules,
     });
     const importReview = review.create({
       stageImport: importPreview.stageImport,

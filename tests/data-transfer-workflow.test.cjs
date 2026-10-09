@@ -24,7 +24,10 @@ test("app wires CSV import and private backup workspace workflow independently",
   assert.match(imports, /validators;/);
   assert.doesNotMatch(imports, /window\.PropertyDesk(?!ImportFeature)/);
   assert.match(imports, /stageImport: importPreview\.stageImport/);
-  assert.match(imports, /repository,\s*\n\s*writeFeedback,\s*\n\s*\}\);/);
+  assert.match(
+    imports,
+    /repository,\s*\n\s*writeFeedback,\s*\n\s*modules: modules\.commit\.modules,\s*\n\s*\}\);/,
+  );
   assert.match(
     app,
     /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?validators: window\.PropertyDeskImportWorkflows,[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
@@ -33,6 +36,11 @@ test("app wires CSV import and private backup workspace workflow independently",
     app,
     /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,\s*table: window\.PropertyDeskImportPreviewTable,/,
   );
+  assert.match(
+    app,
+    /commit: \{\s*create: window\.PropertyDeskImportCommit\.create,\s*modules: \{\s*batchReconciliation: window\.PropertyDeskImportBatchReconciliation,\s*reporting: window\.PropertyDeskImportCommitReporting,/,
+  );
+  assert.match(imports, /modules: modules\.commit\.modules/);
   assert.match(
     app,
     /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?workspaceTables: window\.PropertyDeskWorkspaceTables,[\s\S]*?loadAllPages: loadAllWorkspacePages,[\s\S]*?\}\);/,

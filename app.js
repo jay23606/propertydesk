@@ -677,7 +677,13 @@
         },
       },
       previewEvents: window.PropertyDeskImportPreviewEvents,
-      commit: window.PropertyDeskImportCommit,
+      commit: {
+        create: window.PropertyDeskImportCommit.create,
+        modules: {
+          batchReconciliation: window.PropertyDeskImportBatchReconciliation,
+          reporting: window.PropertyDeskImportCommitReporting,
+        },
+      },
       review: window.PropertyDeskImportReview,
       accountImport: window.PropertyDeskAccountImport,
       accountImportPayload: window.PropertyDeskAccountImportPayload,
