@@ -9,11 +9,17 @@
       recordWrites: window.PropertyDeskWorkspaceRecordWriteWorkflow,
     },
   });
+  const emailUtils = window.PropertyDeskEmailUtils.create({
+    modules: {
+      emailAddressUtils: window.PropertyDeskEmailAddressUtils,
+      reminderCopy: window.PropertyDeskReminderCopy,
+    },
+  });
   let appLifecycle;
   function render() {
     appLifecycle.render();
   }
-  const { lateReminderMailto, lateReminderSms } = window.PropertyDeskEmailUtils;
+  const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
   const { dateOnly, fmtDate, todayIso, monthStart, monthEnd } =
@@ -162,8 +168,7 @@
     window.PropertyDeskReminderPreviewWorkflow.create({
       $,
       state,
-      paymentReminderMessage:
-        window.PropertyDeskEmailUtils.paymentReminderMessage,
+      paymentReminderMessage: emailUtils.paymentReminderMessage,
       amountDueSince,
       unpaidDueAccrualStart,
       monthEnd,

@@ -3,9 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
-require("../features/email-address-utils.js");
-require("../supabase/functions/_shared/reminder-copy.js");
-const { paymentReminderMessage } = require("../features/email-utils.js");
+const { paymentReminderMessage } = require("./email-utils-helper.cjs");
 
 test("reminder preview model derives the due and email content from current terms", () => {
   const messageCalls = [];

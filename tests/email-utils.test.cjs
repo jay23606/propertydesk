@@ -1,11 +1,9 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-require("../features/email-address-utils.js");
-require("../supabase/functions/_shared/reminder-copy.js");
 const {
   lateReminderMailto,
   lateReminderSms,
-} = require("../features/email-utils.js");
+} = require("./email-utils-helper.cjs");
 
 function parts(href) {
   const url = new URL(href);
@@ -125,5 +123,6 @@ test("the app renders the account holder as a mailto link instead of an account-
   );
   assert.match(worker, /\.\/supabase\/functions\/_shared\/reminder-copy\.js/);
   assert.match(worker, /'\.\/features\/email-utils\.js'/);
+  assert.match(html, /features\/email-utils\.js\?v=reminder-copy-r6/);
   assert.match(worker, /'\.\/features\/property-views\.js'/);
 });

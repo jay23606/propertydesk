@@ -4,8 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const emailAddressUtils = require("../features/email-address-utils.js");
-require("../supabase/functions/_shared/reminder-copy.js");
-const emailUtils = require("../features/email-utils.js");
+const emailUtils = require("./email-utils-helper.cjs");
 test("reminder preview uses current form values and escapes recipient-facing text", () => {
   const context = vm.createContext({
     window: { PropertyDeskEmailUtils: emailUtils },

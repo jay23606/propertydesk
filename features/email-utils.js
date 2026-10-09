@@ -2,50 +2,52 @@
 (() => {
   "use strict";
 
-  const { splitEmailAddresses, isValidEmailAddress } =
-    globalThis.PropertyDeskEmailAddressUtils;
+  function create({ modules }) {
+    const { splitEmailAddresses, isValidEmailAddress } =
+      modules.emailAddressUtils;
+    const paymentReminderMessage = modules.reminderCopy.buildReminderCopy;
 
-  const paymentReminderMessage =
-    globalThis.PropertyDeskReminderCopy.buildReminderCopy;
-
-  function lateReminderMailto({
-    email,
-    address,
-    subjectAddress,
-    unpaidDue,
-    recipientName,
-    month,
-    asOf,
-  }) {
-    const recipients = splitEmailAddresses(email)
-      .filter(isValidEmailAddress)
-      .map((value) => encodeURIComponent(value).replace(/%40/gi, "@"))
-      .join(",");
-    const message = paymentReminderMessage({
+    function lateReminderMailto({
+      email,
       address,
       subjectAddress,
       unpaidDue,
       recipientName,
       month,
       asOf,
+    }) {
+      const recipients = splitEmailAddresses(email)
+        .filter(isValidEmailAddress)
+        .map((value) => encodeURIComponent(value).replace(/%40/gi, "@"))
+        .join(",");
+      const message = paymentReminderMessage({
+        address,
+        subjectAddress,
+        unpaidDue,
+        recipientName,
+        month,
+        asOf,
+      });
+      return `mailto:${recipients}?subject=${encodeURIComponent(message.subject)}&body=${encodeURIComponent(message.body)}`;
+    }
+
+    function lateReminderSms({ phone, ...messageOptions }) {
+      const rawPhone = String(phone || "").trim();
+      const digits = rawPhone.replace(/\D/g, "");
+      if (!digits) return "";
+      const internationalPrefix = rawPhone.startsWith("+") ? "+" : "";
+      const message = paymentReminderMessage(messageOptions);
+      return `sms:${internationalPrefix}${digits}?body=${encodeURIComponent(message.body)}`;
+    }
+
+    return Object.freeze({
+      paymentReminderMessage,
+      lateReminderMailto,
+      lateReminderSms,
     });
-    return `mailto:${recipients}?subject=${encodeURIComponent(message.subject)}&body=${encodeURIComponent(message.body)}`;
   }
 
-  function lateReminderSms({ phone, ...messageOptions }) {
-    const rawPhone = String(phone || "").trim();
-    const digits = rawPhone.replace(/\D/g, "");
-    if (!digits) return "";
-    const internationalPrefix = rawPhone.startsWith("+") ? "+" : "";
-    const message = paymentReminderMessage(messageOptions);
-    return `sms:${internationalPrefix}${digits}?body=${encodeURIComponent(message.body)}`;
-  }
-
-  const helpers = Object.freeze({
-    paymentReminderMessage,
-    lateReminderMailto,
-    lateReminderSms,
-  });
-  globalThis.PropertyDeskEmailUtils = helpers;
-  if (typeof module !== "undefined" && module.exports) module.exports = helpers;
+  const api = Object.freeze({ create });
+  globalThis.PropertyDeskEmailUtils = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
 })();
