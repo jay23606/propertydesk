@@ -11,7 +11,12 @@
   }) {
     const { openAccountDetails } = contentWorkflow.create({
       $: content.$,
-      state: content.state,
+      getAccount: content.getAccount,
+      getProperty: content.getProperty,
+      getPaymentsForAccount: content.getPaymentsForAccount,
+      getAgreementVersions: content.getAgreementVersions,
+      beginAuditRequest: content.beginAuditRequest,
+      isCurrentAuditRequest: content.isCurrentAuditRequest,
       money: content.money,
       fmtDate: content.fmtDate,
       fmtDateTime: content.fmtDateTime,

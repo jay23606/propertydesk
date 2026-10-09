@@ -4,7 +4,8 @@
 
   function createAccountDetails({
     $,
-    state,
+    beginAuditRequest,
+    isCurrentAuditRequest,
     buildAccountDetailData,
     openModal,
     depositSectionHTML,
@@ -13,12 +14,12 @@
     fmtDate,
   }) {
     async function openAccountDetails(id) {
-      const auditRequestId = ++state.auditRequestId;
+      const auditRequestId = beginAuditRequest();
       const accountData = buildAccountDetailData(id);
       if (!accountData) return;
       const { account, payments, unpaidStart } = accountData;
       const historyHTML = await renderAccountHistory(account, payments);
-      if (auditRequestId !== state.auditRequestId) return;
+      if (!isCurrentAuditRequest(auditRequestId)) return;
 
       $("detail-title").textContent = account.name;
       $("detail-content").innerHTML = renderAccountDetails({

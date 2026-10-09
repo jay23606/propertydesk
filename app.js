@@ -524,7 +524,6 @@
     },
     deposits: {
       details: {
-        state,
         depositLedger,
         money,
         fmtDate,
@@ -550,7 +549,20 @@
     accountDetails: {
       content: {
         $,
-        state,
+        getAccount: (accountId) =>
+          state.accounts.find((account) => account.id === accountId) || null,
+        getProperty: (propertyId) =>
+          state.properties.find((property) => property.id === propertyId) ||
+          null,
+        getPaymentsForAccount: (accountId) =>
+          state.payments.filter((payment) => payment.account_id === accountId),
+        getAgreementVersions: (accountId) =>
+          state.agreementVersions.filter(
+            (version) => version.account_id === accountId,
+          ),
+        beginAuditRequest: () => ++state.auditRequestId,
+        isCurrentAuditRequest: (requestId) =>
+          requestId === state.auditRequestId,
         money,
         fmtDate,
         fmtDateTime,

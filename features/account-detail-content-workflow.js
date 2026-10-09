@@ -4,7 +4,12 @@
 
   function create({
     $,
-    state,
+    getAccount,
+    getProperty,
+    getPaymentsForAccount,
+    getAgreementVersions,
+    beginAuditRequest,
+    isCurrentAuditRequest,
     money,
     fmtDate,
     fmtDateTime,
@@ -21,7 +26,7 @@
     workflows,
   }) {
     const { loadAccountHistory } = workflows.accountHistoryModel.create({
-      state,
+      getAgreementVersions,
       repository: accountHistoryRepository,
     });
     const { accountHistoryHTML } = workflows.accountHistoryView.create({
@@ -44,7 +49,9 @@
       accountLoanScheduleHTML,
     });
     const { buildAccountDetailData } = workflows.accountDetailsModel.create({
-      state,
+      getAccount,
+      getProperty,
+      getPaymentsForAccount,
       sumPosted,
       summarizeAccount,
       amortizationSchedule,
@@ -52,7 +59,8 @@
     });
     const { openAccountDetails } = workflows.accountDetails.create({
       $,
-      state,
+      beginAuditRequest,
+      isCurrentAuditRequest,
       buildAccountDetailData,
       fmtDate,
       depositSectionHTML,

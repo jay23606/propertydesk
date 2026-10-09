@@ -3,20 +3,20 @@
   "use strict";
 
   function createAccountDetailsModel({
-    state,
+    getAccount,
+    getProperty,
+    getPaymentsForAccount,
     sumPosted,
     summarizeAccount,
     amortizationSchedule,
     propertyAddress,
   }) {
     function buildAccountDetailData(id) {
-      const account = state.accounts.find((row) => row.id === id);
+      const account = getAccount(id);
       if (!account) return null;
 
-      const property = state.properties.find(
-        (row) => row.id === account.property_id,
-      );
-      const payments = state.payments.filter((row) => row.account_id === id);
+      const property = getProperty(account.property_id);
+      const payments = getPaymentsForAccount(id);
       const schedule =
         account.account_type === "rental"
           ? []
@@ -27,7 +27,7 @@
               account.start_date,
               account.principal_interest_amount,
             );
-      const financials = summarizeAccount(account, state.payments);
+      const financials = summarizeAccount(account, payments);
 
       return {
         account,

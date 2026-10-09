@@ -23,7 +23,6 @@ test("account and deposit workspace share detail rendering and events", () => {
   };
   const deposits = {
     details: {
-      state: {},
       depositLedger: {},
       money() {},
       fmtDate() {},
@@ -122,7 +121,6 @@ test("account and deposit workspace share detail rendering and events", () => {
     "esc",
     "fmtDate",
     "money",
-    "state",
   ]);
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
     "$",

@@ -53,7 +53,6 @@ test("account and deposit workspace exposes only its supported operations", () =
   );
   const deposits = {
     details: {
-      state: {},
       depositLedger: {},
       money: () => {},
       fmtDate: () => {},
@@ -79,7 +78,12 @@ test("account and deposit workspace exposes only its supported operations", () =
   };
   const content = {
     $: () => {},
-    state: {},
+    getAccount: () => {},
+    getProperty: () => {},
+    getPaymentsForAccount: () => {},
+    getAgreementVersions: () => {},
+    beginAuditRequest: () => {},
+    isCurrentAuditRequest: () => {},
     money: () => {},
     fmtDate: () => {},
     fmtDateTime: () => {},
@@ -136,7 +140,6 @@ test("account and deposit workspace exposes only its supported operations", () =
     "esc",
     "fmtDate",
     "money",
-    "state",
   ]);
   assert.deepEqual(Object.keys(passed.deposits.adjustments).sort(), [
     "$",
@@ -163,16 +166,21 @@ test("account and deposit workspace exposes only its supported operations", () =
     "$",
     "accountHistoryRepository",
     "amortizationSchedule",
+    "beginAuditRequest",
     "depositSectionHTML",
     "esc",
     "fmtDate",
     "fmtDateTime",
+    "getAccount",
+    "getAgreementVersions",
+    "getPaymentsForAccount",
+    "getProperty",
+    "isCurrentAuditRequest",
     "money",
     "openModal",
     "paymentFrequencyLabel",
     "prettyType",
     "propertyAddress",
-    "state",
     "sumPosted",
     "summarizeAccount",
     "workflows",

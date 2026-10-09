@@ -14,7 +14,6 @@
   }) {
     const depositWorkspace = depositWorkspaceWorkflow.create({
       details: {
-        state: deposits.details.state,
         depositLedger: deposits.details.depositLedger,
         money: deposits.details.money,
         fmtDate: deposits.details.fmtDate,
@@ -43,7 +42,12 @@
       actionWorkflows: accountDetailActionWorkflows,
       content: {
         $: accountDetails.content.$,
-        state: accountDetails.content.state,
+        getAccount: accountDetails.content.getAccount,
+        getProperty: accountDetails.content.getProperty,
+        getPaymentsForAccount: accountDetails.content.getPaymentsForAccount,
+        getAgreementVersions: accountDetails.content.getAgreementVersions,
+        beginAuditRequest: accountDetails.content.beginAuditRequest,
+        isCurrentAuditRequest: accountDetails.content.isCurrentAuditRequest,
         money: accountDetails.content.money,
         fmtDate: accountDetails.content.fmtDate,
         fmtDateTime: accountDetails.content.fmtDateTime,

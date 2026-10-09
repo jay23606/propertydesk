@@ -37,7 +37,10 @@ test("account detail model separates rental totals from loan schedule data", () 
   };
   const scheduleCalls = [];
   const model = context.window.PropertyDeskAccountDetailsModel.create({
-    state,
+    getAccount: (id) => state.accounts.find((row) => row.id === id) || null,
+    getProperty: (id) => state.properties.find((row) => row.id === id) || null,
+    getPaymentsForAccount: (id) =>
+      state.payments.filter((row) => row.account_id === id),
     sumPosted: (rows) =>
       rows
         .filter((row) => row.status === "posted")
@@ -123,7 +126,10 @@ test("account details render action targets without owning action listeners", as
     ],
   };
   const model = context.window.PropertyDeskAccountDetailsModel.create({
-    state,
+    getAccount: (id) => state.accounts.find((row) => row.id === id) || null,
+    getProperty: (id) => state.properties.find((row) => row.id === id) || null,
+    getPaymentsForAccount: (id) =>
+      state.payments.filter((row) => row.account_id === id),
     sumPosted: (rows) =>
       rows
         .filter((payment) => payment.status !== "voided")
@@ -149,7 +155,8 @@ test("account details render action targets without owning action listeners", as
     });
   const feature = context.window.PropertyDeskAccountDetails.create({
     $,
-    state,
+    beginAuditRequest: () => ++state.auditRequestId,
+    isCurrentAuditRequest: (requestId) => requestId === state.auditRequestId,
     buildAccountDetailData: model.buildAccountDetailData,
     fmtDate: () => "today",
     openModal() {},
@@ -410,7 +417,10 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   const fmtDateTime = (value) => `local:${value}`;
   const { loadAccountHistory } =
     context.window.PropertyDeskAccountHistoryModel.create({
-      state,
+      getAgreementVersions: (accountId) =>
+        state.agreementVersions.filter(
+          (version) => version.account_id === accountId,
+        ),
       repository: context.window.PropertyDeskAccountHistoryRepository.create({
         getClient: () => state.client,
       }),
@@ -526,7 +536,12 @@ test("account detail content workflow composes schedule, history, and account", 
   );
   const dependencies = {
     $() {},
-    state: {},
+    getAccount() {},
+    getProperty() {},
+    getPaymentsForAccount() {},
+    getAgreementVersions() {},
+    beginAuditRequest() {},
+    isCurrentAuditRequest() {},
     money() {},
     fmtDate() {},
     fmtDateTime() {},
@@ -549,14 +564,22 @@ test("account detail content workflow composes schedule, history, and account", 
 
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.view.accountLoanScheduleHTML, accountLoanScheduleHTML);
-  assert.equal(passed.historyModel.state, dependencies.state);
+  assert.equal(
+    passed.historyModel.getAgreementVersions,
+    dependencies.getAgreementVersions,
+  );
   assert.equal(
     passed.historyModel.repository,
     dependencies.accountHistoryRepository,
   );
   assert.equal(passed.historyView.esc, dependencies.esc);
   assert.equal(passed.historyView.fmtDateTime, dependencies.fmtDateTime);
-  assert.equal(passed.model.state, dependencies.state);
+  assert.equal(passed.model.getAccount, dependencies.getAccount);
+  assert.equal(passed.model.getProperty, dependencies.getProperty);
+  assert.equal(
+    passed.model.getPaymentsForAccount,
+    dependencies.getPaymentsForAccount,
+  );
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(passed.model.summarizeAccount, dependencies.summarizeAccount);
   assert.equal(passed.details.renderAccountDetails, renderAccountDetails);

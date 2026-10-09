@@ -9,7 +9,7 @@
     deleted: "Deleted",
   });
 
-  function createAccountHistoryModel({ state, repository }) {
+  function createAccountHistoryModel({ getAgreementVersions, repository }) {
     const { loadAccountAuditEvents } = repository;
     async function loadAccountHistory(account, payments) {
       const auditIds = [
@@ -22,9 +22,7 @@
       const { events: history, error: auditError } =
         await loadAccountAuditEvents(auditIds);
 
-      const accountVersions = state.agreementVersions.filter(
-        (version) => version.account_id === account.id,
-      );
+      const accountVersions = getAgreementVersions(account.id);
       const auditEvents = history.map((event) => ({
         target: event.entity_type === "pd_accounts" ? "account" : "payment",
         action: auditActionLabels[event.action] || "Recorded",
