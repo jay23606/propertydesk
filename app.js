@@ -368,7 +368,8 @@
         setPendingCorrection: (value) => {
           state.pendingCorrection = value;
         },
-        getCollectionRows: (collection) => state[collection] || [],
+        getPayments: () => state.payments,
+        getExpenses: () => state.expenses,
         toast,
         fetchAll,
         closeModal,
@@ -382,7 +383,8 @@
         findCorrectionTarget: transactionCorrectionModel.findCorrectionTarget,
       },
       voiding: {
-        getCollectionRows: (collection) => state[collection] || [],
+        getPayments: () => state.payments,
+        getExpenses: () => state.expenses,
         toast,
         fetchAll,
         timestamp: transactionTimestamp,

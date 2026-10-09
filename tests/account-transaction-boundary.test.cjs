@@ -19,7 +19,7 @@ test("app composes independent property and account forms before action routing"
   assert.match(app, /setPendingCorrection: \(value\) =>/);
   assert.match(
     app,
-    /getCollectionRows: \(collection\) => state\[collection\] \|\| \[\]/,
+    /getPayments: \(\) => state\.payments,[\s\S]*?getExpenses: \(\) => state\.expenses/,
   );
   assert.match(
     app,

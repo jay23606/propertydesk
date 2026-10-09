@@ -11,7 +11,8 @@ const {
 function correctionStateOptions(state) {
   return {
     getPendingCorrection: () => state.pendingCorrection,
-    getCollectionRows: (collection) => state[collection] || [],
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
   };
 }
 

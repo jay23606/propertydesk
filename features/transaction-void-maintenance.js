@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    getCollectionRows,
+    getPayments,
+    getExpenses,
     toast,
     fetchAll,
     timestamp,
@@ -29,7 +30,8 @@
           }),
         fetchAll,
         isConfirmed: () => {
-          const rows = getCollectionRows(target.collection);
+          const rows =
+            target.collection === "payments" ? getPayments() : getExpenses();
           return rows.some(
             (row) =>
               row.id === id &&

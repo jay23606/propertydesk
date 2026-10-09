@@ -5,7 +5,8 @@
   function create({
     $,
     getPendingCorrection,
-    getCollectionRows,
+    getPayments,
+    getExpenses,
     toast,
     fetchAll,
     closeModal,
@@ -46,7 +47,7 @@
           }),
         fetchAll,
         isConfirmed: () =>
-          getCollectionRows(type.collection).some(
+          (type.collection === "payments" ? getPayments() : getExpenses()).some(
             (row) => row[type.correctionKey] === pending.id,
           ),
         toast,

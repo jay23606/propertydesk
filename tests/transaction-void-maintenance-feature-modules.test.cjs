@@ -10,7 +10,10 @@ const {
 } = require("./transaction-test-helpers.cjs");
 
 function voidStateOptions(state = {}) {
-  return { getCollectionRows: (collection) => state[collection] || [] };
+  return {
+    getPayments: () => state.payments || [],
+    getExpenses: () => state.expenses || [],
+  };
 }
 
 test("transaction void maintenance voids a posted row with an audit reason", async () => {

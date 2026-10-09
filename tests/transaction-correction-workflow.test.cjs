@@ -53,7 +53,8 @@ test("transaction correction workflow owns correction persistence and forms", ()
     $() {},
     getPendingCorrection() {},
     setPendingCorrection() {},
-    getCollectionRows() {},
+    getPayments() {},
+    getExpenses() {},
     toast() {},
     fetchAll() {},
     closeModal() {},
@@ -95,10 +96,8 @@ test("transaction correction workflow owns correction persistence and forms", ()
     passed.corrections.getPendingCorrection,
     correctionContext.getPendingCorrection,
   );
-  assert.equal(
-    passed.corrections.getCollectionRows,
-    correctionContext.getCollectionRows,
-  );
+  assert.equal(passed.corrections.getPayments, correctionContext.getPayments);
+  assert.equal(passed.corrections.getExpenses, correctionContext.getExpenses);
   assert.equal(passed.corrections.repository, correctionContext.repository);
   assert.equal(
     passed.corrections.runAndRefreshWorkspaceChange,
