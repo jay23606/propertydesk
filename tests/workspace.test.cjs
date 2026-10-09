@@ -221,7 +221,18 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   }
   assert.equal(typeof passed.reminderWorkflow.getActivityData, "function");
   assert.equal(passed.profileWorkflow.toast instanceof Function, true);
-  assert.equal(passed.memberActions.repository, memberRepository);
+  assert.deepEqual(Object.keys(passed.memberActions.repository).sort(), [
+    "addMember",
+    "removeMember",
+  ]);
+  assert.equal(
+    passed.memberActions.repository.addMember,
+    memberRepository.addMember,
+  );
+  assert.equal(
+    passed.memberActions.repository.removeMember,
+    memberRepository.removeMember,
+  );
   assert.equal(
     passed.memberActions.maintenanceWorkflow,
     context.window.PropertyDeskWorkspaceMemberMaintenance,

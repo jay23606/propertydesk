@@ -21,7 +21,10 @@
         toast: ui.toast,
         fetchAll: services.fetchAll,
         reminder: ui.reminder,
-        memberRepository: services.memberRepository,
+        memberRepository: {
+          addMember: services.memberRepository.addMember,
+          removeMember: services.memberRepository.removeMember,
+        },
         run: services.run,
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
         authClient: {

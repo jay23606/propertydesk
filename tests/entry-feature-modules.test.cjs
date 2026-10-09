@@ -396,7 +396,10 @@ test("app passes reminder services into the app-shell coordinator", () => {
     /PropertyDeskAppShellSetup\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository:/,
   );
   assert.match(setup, /reminder: ui\.reminder/);
-  assert.match(setup, /memberRepository: services\.memberRepository/);
+  assert.match(
+    setup,
+    /memberRepository: \{\s*addMember: services\.memberRepository\.addMember,\s*removeMember: services\.memberRepository\.removeMember,/,
+  );
   assert.match(setup, /workspaceWorkflow: workflows\.workspace/);
   assert.match(
     app,

@@ -61,6 +61,11 @@ test("app shell setup maps workspace state, services, and navigation", () => {
     signOut() {},
     signInWithPassword() {},
   };
+  services.memberRepository = {
+    addMember() {},
+    removeMember() {},
+    unusedOperation() {},
+  };
   services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     ["shell", "workspace", "navigation", "workspaceModules"].map((key) => [
@@ -79,10 +84,21 @@ test("app shell setup maps workspace state, services, and navigation", () => {
     result,
   );
   assert.equal(received.workspace.getAccounts, records.getAccounts);
+  assert.deepEqual(Object.keys(received.workspace.memberRepository).sort(), [
+    "addMember",
+    "removeMember",
+  ]);
+  assert.equal(
+    received.workspace.memberRepository.addMember,
+    services.memberRepository.addMember,
+  );
+  assert.equal(
+    received.workspace.memberRepository.removeMember,
+    services.memberRepository.removeMember,
+  );
   assert.equal(received.workspace.getReminderLogs, records.getReminderLogs);
   assert.equal(received.workspace.setUser, records.setUser);
   assert.equal(received.workspace.reminder, ui.reminder);
-  assert.equal(received.workspace.memberRepository, services.memberRepository);
   assert.equal(received.workspace.run, services.run);
   assert.deepEqual(Object.keys(received.workspace.authClient).sort(), [
     "getUser",
