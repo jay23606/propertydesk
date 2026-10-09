@@ -24,7 +24,10 @@
       fetchAll: workspace.fetchAll,
       reminder: workspace.reminder,
       memberRepository: workspace.memberRepository,
-      authClient: workspace.authClient,
+      authClient: {
+        getUser: workspace.authClient.getUser,
+        updateUser: workspace.authClient.updateUser,
+      },
       run: workspace.run,
       runAndRefreshWorkspaceChange: workspace.runAndRefreshWorkspaceChange,
       confirmAction: workspace.confirmAction,

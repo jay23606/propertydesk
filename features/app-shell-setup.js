@@ -24,7 +24,10 @@
         memberRepository: services.memberRepository,
         run: services.run,
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-        authClient: services.authClient,
+        authClient: {
+          getUser: services.authClient.getUser,
+          updateUser: services.authClient.updateUser,
+        },
         confirmAction: ui.confirmAction,
       },
       navigation: {

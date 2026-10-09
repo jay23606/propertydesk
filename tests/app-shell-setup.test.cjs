@@ -55,6 +55,12 @@ test("app shell setup maps workspace state, services, and navigation", () => {
       "authClient",
     ].map((key) => [key, { key }]),
   );
+  services.authClient = {
+    getUser() {},
+    updateUser() {},
+    signOut() {},
+    signInWithPassword() {},
+  };
   services.unusedServiceValue = true;
   const workflows = Object.fromEntries(
     ["shell", "workspace", "navigation", "workspaceModules"].map((key) => [
@@ -78,6 +84,12 @@ test("app shell setup maps workspace state, services, and navigation", () => {
   assert.equal(received.workspace.reminder, ui.reminder);
   assert.equal(received.workspace.memberRepository, services.memberRepository);
   assert.equal(received.workspace.run, services.run);
+  assert.deepEqual(Object.keys(received.workspace.authClient).sort(), [
+    "getUser",
+    "updateUser",
+  ]);
+  assert.equal("signOut" in received.workspace.authClient, false);
+  assert.equal("signInWithPassword" in received.workspace.authClient, false);
   assert.equal(
     received.workspace.runAndRefreshWorkspaceChange,
     services.runAndRefreshWorkspaceChange,

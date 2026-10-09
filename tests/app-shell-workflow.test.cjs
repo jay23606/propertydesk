@@ -58,7 +58,12 @@ test("app shell forwards scoped workspace settings and navigation", () => {
     memberRepository: {},
     run: () => {},
     runAndRefreshWorkspaceChange: () => {},
-    authClient: {},
+    authClient: {
+      getUser() {},
+      updateUser() {},
+      signOut() {},
+      signInWithPassword() {},
+    },
     confirmAction: () => true,
     unusedWorkspaceValue: true,
   };
@@ -102,8 +107,22 @@ test("app shell forwards scoped workspace settings and navigation", () => {
   ]);
   assert.equal(Object.hasOwn(passed.workspace, "unusedWorkspaceValue"), false);
   assert.equal(passed.workspace.workflows, workspaceWorkflows);
+  assert.deepEqual(Object.keys(passed.workspace.authClient).sort(), [
+    "getUser",
+    "updateUser",
+  ]);
+  assert.equal("signOut" in passed.workspace.authClient, false);
+  assert.equal("signInWithPassword" in passed.workspace.authClient, false);
+  assert.equal(
+    passed.workspace.authClient.getUser,
+    workspace.authClient.getUser,
+  );
+  assert.equal(
+    passed.workspace.authClient.updateUser,
+    workspace.authClient.updateUser,
+  );
   for (const key of Object.keys(passed.workspace)) {
-    if (key === "workflows") continue;
+    if (key === "workflows" || key === "authClient") continue;
     assert.equal(passed.workspace[key], workspace[key]);
   }
   assert.deepEqual(Object.keys(passed.navigation).sort(), [
