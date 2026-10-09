@@ -21,6 +21,7 @@
       fetchAll: correctionContext.fetchAll,
       closeModal: correctionContext.closeModal,
       prettyType: correctionContext.prettyType,
+      promptAction: correctionContext.promptAction,
       EventClass: correctionContext.EventClass,
       OptionClass: correctionContext.OptionClass,
       repository: correctionContext.repository,
@@ -41,6 +42,8 @@
     const { voidTransaction } = voidEntryWorkflow.create({
       toast: voidingContext.toast,
       saveVoidTransaction,
+      confirmAction: voidingContext.confirmAction,
+      promptAction: voidingContext.promptAction,
       resolveVoidTarget: voidingContext.resolveVoidTarget,
     });
 

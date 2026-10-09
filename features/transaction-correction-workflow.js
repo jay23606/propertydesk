@@ -9,6 +9,7 @@
     fetchAll,
     closeModal,
     prettyType,
+    promptAction,
     EventClass = Event,
     OptionClass = Option,
     repository,
@@ -35,6 +36,7 @@
         $,
         state,
         toast,
+        promptAction,
         prettyType,
         openPayment,
         openExpense,
@@ -42,6 +44,7 @@
         findCorrectionTarget,
         EventClass,
         OptionClass,
+        viewModule: workflows.view,
       });
     }
 

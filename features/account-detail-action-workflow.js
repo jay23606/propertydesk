@@ -12,6 +12,7 @@
     openPayment,
     repository,
     writeFeedback,
+    confirmAction,
     workflows: {
       closeMaintenance: closeMaintenanceWorkflow,
       closeEntry: closeEntryWorkflow,
@@ -28,6 +29,7 @@
     });
     const { closeAccount } = closeEntryWorkflow.create({
       saveCloseAccount,
+      confirmAction,
     });
     const { attachAccountDetailActionEvents } = detailEventsWorkflow.create({
       $,

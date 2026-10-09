@@ -155,6 +155,7 @@ test("transaction correction form reopens posted payments and expenses with audi
     findCorrectionTarget:
       context.window.PropertyDeskTransactionCorrectionModel
         .findCorrectionTarget,
+    viewModule: context.window.PropertyDeskTransactionCorrectionView,
     promptAction: () => "Corrected bank posting date",
     prettyType: () => "Land contract",
     openPayment: () => calls.push("open-payment"),

@@ -6,8 +6,7 @@
     $,
     state,
     toast,
-    promptAction = (message, initialValue) =>
-      window.prompt(message, initialValue),
+    promptAction,
     prettyType,
     openPayment,
     openExpense,
@@ -15,8 +14,9 @@
     EventClass = Event,
     OptionClass = Option,
     findCorrectionTarget,
+    viewModule,
   }) {
-    const view = window.PropertyDeskTransactionCorrectionView.create({
+    const view = viewModule.create({
       $,
       prettyType,
       updatePaymentGuidance,

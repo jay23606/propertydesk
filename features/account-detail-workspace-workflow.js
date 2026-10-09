@@ -36,6 +36,7 @@
       openPayment: actions.openPayment,
       repository: actions.repository,
       writeFeedback: actions.writeFeedback,
+      confirmAction: actions.confirmAction,
       workflows: actionWorkflows,
     });
 

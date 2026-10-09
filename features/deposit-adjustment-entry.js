@@ -7,8 +7,7 @@
     moneyInput,
     toast,
     saveDepositAdjustment,
-    promptAction = (message, initialValue) =>
-      window.prompt(message, initialValue),
+    promptAction,
     validateAdjustment,
     resolveAdjustmentType,
   }) {

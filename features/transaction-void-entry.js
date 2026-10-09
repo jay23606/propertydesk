@@ -5,9 +5,8 @@
   function create({
     toast,
     saveVoidTransaction,
-    confirmAction = (message) => window.confirm(message),
-    promptAction = (message, initialValue) =>
-      window.prompt(message, initialValue),
+    confirmAction,
+    promptAction,
     resolveVoidTarget,
   }) {
     async function voidTransaction(kind, id) {

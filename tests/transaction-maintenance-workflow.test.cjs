@@ -85,6 +85,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     fetchAll() {},
     closeModal() {},
     prettyType() {},
+    promptAction() {},
     repository: {},
     writeFeedback,
     findCorrectionTarget() {},
@@ -95,6 +96,8 @@ test("transaction maintenance coordinator joins isolated correction and void act
     state: {},
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
+    confirmAction() {},
+    promptAction() {},
     repository: correctionContext.repository,
     writeFeedback,
     resolveVoidTarget() {},
@@ -169,6 +172,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "fetchAll",
     "findCorrectionTarget",
     "prettyType",
+    "promptAction",
     "repository",
     "state",
     "toast",
@@ -209,6 +213,8 @@ test("transaction maintenance coordinator joins isolated correction and void act
     voidingContext.resolveVoidTarget,
   );
   assert.deepEqual(Object.keys(passed.voidEntry).sort(), [
+    "confirmAction",
+    "promptAction",
     "resolveVoidTarget",
     "saveVoidTransaction",
     "toast",

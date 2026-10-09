@@ -287,6 +287,8 @@
           fetchAll,
           closeModal,
           prettyType,
+          promptAction: (message, initialValue) =>
+            window.prompt(message, initialValue),
           EventClass: Event,
           OptionClass: Option,
           repository: repositories.transactions,
@@ -298,6 +300,9 @@
           state,
           toast,
           fetchAll,
+          confirmAction: (message) => window.confirm(message),
+          promptAction: (message, initialValue) =>
+            window.prompt(message, initialValue),
           repository: repositories.transactions,
           writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
           resolveVoidTarget:
@@ -312,6 +317,7 @@
         correctionModules: {
           maintenance: window.PropertyDeskTransactionCorrectionMaintenance,
           form: window.PropertyDeskTransactionCorrectionForm,
+          view: window.PropertyDeskTransactionCorrectionView,
         },
         voidMaintenance: window.PropertyDeskTransactionVoidMaintenance,
         voidEntry: window.PropertyDeskTransactionVoidEntry,
@@ -450,6 +456,8 @@
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
         resolveAdjustmentType:
           window.PropertyDeskDepositAdjustmentModel.resolveType,
+        promptAction: (message, initialValue) =>
+          window.prompt(message, initialValue),
       },
     },
     accountDetails: {
@@ -486,6 +494,7 @@
         openPayment,
         repository: repositories.accounts,
         writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
+        confirmAction: (message) => window.confirm(message),
       },
     },
   });

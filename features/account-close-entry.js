@@ -4,7 +4,7 @@
 
   function create({
     saveCloseAccount,
-    confirmAction = (message) => window.confirm(message),
+    confirmAction,
   }) {
     function closeAccount(account) {
       if (

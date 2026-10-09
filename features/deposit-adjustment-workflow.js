@@ -15,6 +15,7 @@
     validateAdjustment,
     resolveAdjustmentType,
     writeFeedback,
+    promptAction,
     workflows,
   }) {
     const { saveDepositAdjustment } = workflows.maintenance.create({
@@ -34,6 +35,7 @@
       saveDepositAdjustment,
       validateAdjustment,
       resolveAdjustmentType,
+      promptAction,
     });
     const { attachDepositAdjustmentEvents } = workflows.events.create({
       $,

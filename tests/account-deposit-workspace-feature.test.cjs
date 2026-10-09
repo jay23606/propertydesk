@@ -71,6 +71,7 @@ test("account and deposit workspace exposes only its supported operations", () =
       prepareAdjustment: () => {},
       validateAdjustment: () => {},
       resolveAdjustmentType: () => {},
+      promptAction: () => {},
       writeFeedback,
       unusedAdjustmentValue: true,
     },
@@ -141,6 +142,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     "fetchAll",
     "moneyInput",
     "prepareAdjustment",
+    "promptAction",
     "repository",
     "resolveAdjustmentType",
     "state",
@@ -185,6 +187,7 @@ test("account and deposit workspace exposes only its supported operations", () =
   assert.deepEqual(Object.keys(passed.accountDetails.actions).sort(), [
     "$",
     "closeModal",
+    "confirmAction",
     "editAccount",
     "fetchAll",
     "openPayment",

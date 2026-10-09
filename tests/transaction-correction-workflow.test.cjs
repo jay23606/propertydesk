@@ -25,6 +25,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
           return { correctTransaction };
         },
       },
+      view: { create() {} },
     },
   });
   vm.runInContext(
@@ -46,6 +47,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     fetchAll() {},
     closeModal() {},
     prettyType() {},
+    promptAction() {},
     repository: {},
     writeFeedback: {},
     findCorrectionTarget() {},
@@ -88,6 +90,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
   );
   assert.equal(passed.form.openPayment, actions.openPayment);
   assert.equal(passed.form.openExpense, actions.openExpense);
+  assert.equal(passed.form.viewModule, context.correctionModules.view);
   assert.equal("unusedContext" in passed.form, false);
   assert.equal("unusedAction" in passed.form, false);
   assert.deepEqual(Object.keys(passed.form).sort(), [
@@ -98,9 +101,11 @@ test("transaction correction workflow owns correction persistence and forms", ()
     "openExpense",
     "openPayment",
     "prettyType",
+    "promptAction",
     "state",
     "toast",
     "updatePaymentGuidance",
+    "viewModule",
   ]);
   assert.equal(handlers.correctTransaction, correctTransaction);
   assert.equal(workflow.saveCorrection, saveCorrection);

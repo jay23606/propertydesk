@@ -57,6 +57,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
     validateAdjustment,
     resolveAdjustmentType,
     writeFeedback,
+    promptAction() {},
     workflows: {
       maintenance: context.window.PropertyDeskDepositMaintenance,
       entry: context.window.PropertyDeskDepositAdjustmentEntry,
@@ -82,6 +83,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   assert.equal(passed.entry.moneyInput, dependencies.moneyInput);
   assert.equal(passed.entry.validateAdjustment, validateAdjustment);
   assert.equal(passed.entry.resolveAdjustmentType, resolveAdjustmentType);
+  assert.equal(passed.entry.promptAction, dependencies.promptAction);
   assert.equal(passed.events.recordDepositAdjustment, recordDepositAdjustment);
   assert.equal(
     passed.events.depositSectionHTML,

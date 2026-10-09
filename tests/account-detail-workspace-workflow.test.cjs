@@ -41,6 +41,7 @@ test("account detail workspace joins content rendering and action binding", () =
     openPayment() {},
     repository: {},
     writeFeedback: {},
+    confirmAction() {},
     unusedDependency: true,
   };
   const context = vm.createContext({
@@ -101,6 +102,7 @@ test("account detail workspace joins content rendering and action binding", () =
   assert.deepEqual(Object.keys(passed.actions).sort(), [
     "$",
     "closeModal",
+    "confirmAction",
     "editAccount",
     "fetchAll",
     "openPayment",
