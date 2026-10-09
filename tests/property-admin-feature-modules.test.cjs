@@ -3,6 +3,23 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+
+function createWriteFeedback(context) {
+  return context.window.PropertyDeskRepositoryWriteFeedback.create({
+    modules: {
+      reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
+      recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+    },
+  });
+}
+
+function propertyHolderWriteOperations(context) {
+  const feedback = createWriteFeedback(context);
+  return {
+    reconcileWorkspaceChange: feedback.reconcileWorkspaceChange,
+    refreshWorkspace: feedback.refreshWorkspace,
+  };
+}
 test("property holder and archive workflows reconcile rejected writes before retry", async () => {
   const context = vm.createContext({
     window: {},
@@ -62,13 +79,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
       fetchAll: async () => {
         throw new Error("offline");
       },
-      writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-        modules: {
-          reconciliation:
-            context.window.PropertyDeskWorkspaceWriteReconciliation,
-          recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-        },
-      }),
+      ...propertyHolderWriteOperations(context),
       openPropertyDetails: () =>
         assert.fail("a rejected write must not reopen details"),
       repository: context.window.PropertyDeskPropertyHolderRepository.create({
@@ -82,12 +93,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
     fetchAll: async () => {
       throw new Error("offline");
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    writeFeedback: createWriteFeedback(context),
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
@@ -137,12 +143,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
       property.archived_at = "2026-10-08";
       events.push(["refresh"]);
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    writeFeedback: createWriteFeedback(context),
     todayIso: () => "2026-10-08",
     openPropertyDetails: (id) => events.push(["open", id]),
     statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
@@ -222,12 +223,7 @@ test("archive and restore use status maintenance and reopen updated details", as
         ([operation]) => operation === "update",
       )[1].archived_at;
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    writeFeedback: createWriteFeedback(context),
     todayIso: () => "2026-10-06",
     openPropertyDetails: (id) => calls.push(["open", id]),
     statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
@@ -306,12 +302,7 @@ test("property holder save persists the member IDs supplied by the event layer",
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => calls.push(["refresh"]),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...propertyHolderWriteOperations(context),
     openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
     repository: context.window.PropertyDeskPropertyHolderRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
@@ -367,12 +358,7 @@ test("property holder refreshes displayed labels after a partial save failure", 
     },
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => events.push(["refresh"]),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...propertyHolderWriteOperations(context),
     openPropertyDetails: (id) => events.push(["open", id]),
     repository: {
       clearPropertyHolders: async () => ({ error: null }),
@@ -417,12 +403,7 @@ test("property holder reports when a partial save cannot refresh the displayed l
       events.push(["refresh"]);
       throw new Error("offline");
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...propertyHolderWriteOperations(context),
     openPropertyDetails: () => events.push(["open"]),
     repository: {
       clearPropertyHolders: async () => ({ error: null }),
@@ -476,15 +457,7 @@ test("property holder reloads after a rejected label write with an unknown resul
           ];
           events.push(["refresh"]);
         },
-        writeFeedback:
-          context.window.PropertyDeskRepositoryWriteFeedback.create({
-            modules: {
-              reconciliation:
-                context.window.PropertyDeskWorkspaceWriteReconciliation,
-              recordWrites:
-                context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-            },
-          }),
+        ...propertyHolderWriteOperations(context),
         openPropertyDetails: (id) => events.push(["open", id]),
         repository: {
           clearPropertyHolders: async () => {

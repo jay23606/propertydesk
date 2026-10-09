@@ -17,7 +17,8 @@
       toast,
       fetchAll,
       repository,
-      writeFeedback,
+      reconcileWorkspaceChange: writeFeedback.reconcileWorkspaceChange,
+      refreshWorkspace: writeFeedback.refreshWorkspace,
       openPropertyDetails,
     });
     const { attachPropertyHolderEvents } = workflows.events.create({

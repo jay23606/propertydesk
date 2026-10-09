@@ -8,14 +8,15 @@
     fetchAll,
     openPropertyDetails,
     repository,
-    writeFeedback,
+    reconcileWorkspaceChange,
+    refreshWorkspace,
   }) {
     async function refreshUncertainLabels(
       id,
       expectedMemberIds,
       refreshFailureMessage,
     ) {
-      return writeFeedback.reconcileWorkspaceChange({
+      return reconcileWorkspaceChange({
         fetchAll,
         isConfirmed: () => {
           const actualMemberIds = (state.propertyHolders || [])
@@ -89,7 +90,7 @@
           return;
         }
       }
-      await writeFeedback.refreshWorkspace({
+      await refreshWorkspace({
         fetchAll,
         afterRefresh: () => openPropertyDetails(id),
         toast,

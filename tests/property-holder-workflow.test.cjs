@@ -7,6 +7,8 @@ const vm = require("node:vm");
 test("property-holder workflow connects saving to one explicit event binder", () => {
   const root = path.join(__dirname, "..");
   const calls = [];
+  const reconcileWorkspaceChange = () => {};
+  const refreshWorkspace = () => {};
   const savePropertyHolders = () => {};
   const attachPropertyHolderEvents = () => {};
   const context = vm.createContext({
@@ -39,7 +41,7 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     toast() {},
     fetchAll() {},
     repository: {},
-    writeFeedback: { kind: "write-feedback" },
+    writeFeedback: { reconcileWorkspaceChange, refreshWorkspace },
     openPropertyDetails() {},
     workflows: {
       management: context.window.PropertyDeskPropertyHolderManagement,
@@ -50,8 +52,25 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     context.window.PropertyDeskPropertyHolderWorkflow.create(dependencies);
 
   assert.equal(calls[0][0], "management");
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(root, "features", "property-holder-management.js"),
+      "utf8",
+    ),
+    /writeFeedback/,
+  );
   assert.equal(calls[0][1].repository, dependencies.repository);
-  assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
+  assert.equal(calls[0][1].reconcileWorkspaceChange, reconcileWorkspaceChange);
+  assert.equal(calls[0][1].refreshWorkspace, refreshWorkspace);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "fetchAll",
+    "openPropertyDetails",
+    "reconcileWorkspaceChange",
+    "refreshWorkspace",
+    "repository",
+    "state",
+    "toast",
+  ]);
   assert.equal(calls[0][1].state, dependencies.state);
   assert.equal(
     calls[0][1].openPropertyDetails,
