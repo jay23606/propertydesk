@@ -9,43 +9,49 @@ test("app composes independent property and account forms before action routing"
 
   assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  const composition = fs.readFileSync(
+    path.join(root, "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
   const formOptions = fs.readFileSync(
     path.join(root, "features", "form-options.js"),
     "utf8",
   );
   assert.doesNotMatch(formOptions, /\bstate\b/);
   assert.match(
-    app,
-    /const transactionMaintenance =\s*window\.PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?\);\s*const ledgerWorkflow = window\.PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+    composition,
+    /workflows\.maintenance\.create\([\s\S]*?return workflows\.ledger\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
   assert.match(app, /getPendingCorrection: \(\) => state\.pendingCorrection/);
   assert.match(app, /setPendingCorrection: \(value\) =>/);
   assert.match(app, /getAccounts: \(\) => state\.accounts/);
   assert.match(app, /getWorkspaceOwnerId: \(\) => state\.workspaceOwnerId/);
-  const ledgerEntries =
-    app.match(/entries: \{([\s\S]*?)\n    \},\n    views:/)?.[1] || "";
-  assert.ok(ledgerEntries, "ledger entry dependencies should be explicit");
+  assert.match(
+    composition,
+    /entries: \{[\s\S]*?transactionRepository: services\.transactionRepository/,
+  );
   assert.doesNotMatch(
-    ledgerEntries,
+    composition,
     /\bstate\s*,/,
-    "ledger forms receive scoped getters instead of the app state object",
+    "transaction setup receives record accessors instead of the app state object",
   );
   assert.match(
-    app,
-    /getPayments: \(\) => state\.payments,[\s\S]*?getExpenses: \(\) => state\.expenses/,
+    composition,
+    /getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
   );
   assert.match(
-    app,
-    /PropertyDeskTransactionCorrectionModel\.create\(\{[\s\S]*?getPayments: \(\) => state\.payments,[\s\S]*?getExpenses: \(\) => state\.expenses,[\s\S]*?getAccounts: \(\) => state\.accounts/,
+    composition,
+    /workflows\.correctionModel\.create\(\{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
   );
   assert.match(
-    app,
-    /findCorrectionTarget: transactionCorrectionModel\.findCorrectionTarget/,
+    composition,
+    /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
   );
   assert.doesNotMatch(
-    app.match(/correction: \{[\s\S]*?\n      \},\n      voiding:/)?.[0] || "",
+    composition.match(
+      /correction: \{[\s\S]*?\n      \},\n      voiding:/,
+    )?.[0] || "",
     /\bstate\s*,/,
     "transaction correction receives specific state accessors, not the app state object",
   );

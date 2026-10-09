@@ -5,9 +5,13 @@ const path = require("node:path");
 
 test("transaction maintenance stays separate from ledger history composition", () => {
   const root = path.join(__dirname, "..");
-  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const composition = fs.readFileSync(
+    path.join(root, "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
   const maintenance = fs.readFileSync(
     path.join(root, "features", "transaction-maintenance-workflow.js"),
     "utf8",
@@ -17,14 +21,14 @@ test("transaction maintenance stays separate from ledger history composition", (
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
   assert.match(
-    app,
-    /PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+    composition,
+    /workflows\.ledger\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
   assert.ok(
-    app.indexOf("PropertyDeskTransactionMaintenanceWorkflow.create(") <
-      app.indexOf("PropertyDeskLedgerWorkflow.create("),
+    composition.indexOf("workflows.maintenance.create(") <
+      composition.indexOf("workflows.ledger.create("),
   );
   assert.match(
     maintenance,
@@ -42,13 +46,6 @@ test("transaction maintenance stays separate from ledger history composition", (
   );
   assert.match(html, /features\/ledger-workflow\.js/);
   assert.match(worker, /'\.\/features\/ledger-workflow\.js'/);
-  assert.doesNotMatch(
-    html,
-    /transaction-workspace-workflow|transaction-records-workflow/,
-  );
-  assert.doesNotMatch(
-    worker,
-    /transaction-workspace-workflow|transaction-records-workflow/,
-  );
-  assert.doesNotMatch(app, /PropertyDeskTransactionWorkspaceWorkflow/);
+  assert.doesNotMatch(html, /transaction-records-workflow/);
+  assert.doesNotMatch(worker, /transaction-records-workflow/);
 });

@@ -241,6 +241,10 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     "utf8",
   );
   const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  const transactionComposition = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
+    "utf8",
+  );
   assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
   assert.doesNotMatch(
     app,
@@ -362,21 +366,21 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     appServices,
     /modules\.writeFeedback\.factory\.create\(\{[\s\S]*?reconciliation: modules\.writeFeedback\.reconciliation,[\s\S]*?recordWrites: modules\.writeFeedback\.recordWrites/,
   );
-  assert.match(app, /repository: repositories\.transactions/);
+  assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
-    app,
-    /resolveVoidTarget:\s*window\.PropertyDeskTransactionVoidModel\.resolveVoidTarget/,
+    transactionComposition,
+    /resolveVoidTarget: workflows\.voidModel\.resolveVoidTarget/,
   );
   assert.match(
-    app,
-    /buildVoidPayload:\s*window\.PropertyDeskTransactionVoidModel\.buildVoidPayload/,
+    transactionComposition,
+    /buildVoidPayload: workflows\.voidModel\.buildVoidPayload/,
   );
   assert.match(
-    app,
-    /PropertyDeskTransactionCorrectionModel\.create\(\{[\s\S]*?getPayments:\s*\(\)\s*=> state\.payments,[\s\S]*?getExpenses:\s*\(\)\s*=> state\.expenses,[\s\S]*?getAccounts:\s*\(\)\s*=> state\.accounts/,
+    transactionComposition,
+    /workflows\.correctionModel\.create\(\{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
   );
   assert.match(
-    app,
+    transactionComposition,
     /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
   );
   assert.match(app, /repository: repositories\.accounts/);
@@ -432,6 +436,7 @@ test("account, deposit, and transaction persistence receive only record getters"
     "features/deposit-maintenance.js",
     "features/workspace-record-write-workflow.js",
     "features/transaction-inserts.js",
+    "features/transaction-workspace-workflow.js",
   ];
 
   for (const filename of scopedModules) {
