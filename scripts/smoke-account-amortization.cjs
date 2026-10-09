@@ -73,7 +73,10 @@ async function smokeAccountAmortization(page, runtimeErrors, consoleErrors) {
     }).renderAccountDetails;
     const { buildAccountDetailData } =
       window.PropertyDeskAccountDetailsModel.create({
-        state,
+        getAccount: (id) => state.accounts.find((item) => item.id === id),
+        getProperty: (id) => state.properties.find((item) => item.id === id),
+        getPaymentsForAccount: (id) =>
+          state.payments.filter((item) => item.account_id === id),
         sumPosted: (rows) =>
           rows
             .filter((payment) => !payment.status || payment.status === "posted")
@@ -89,7 +92,8 @@ async function smokeAccountAmortization(page, runtimeErrors, consoleErrors) {
       });
     const feature = details.create({
       $: (id) => document.getElementById(id),
-      state,
+      beginAuditRequest: () => ++state.auditRequestId,
+      isCurrentAuditRequest: (requestId) => requestId === state.auditRequestId,
       buildAccountDetailData,
       fmtDate: (value, options) =>
         value
