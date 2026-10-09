@@ -78,6 +78,63 @@ test("shared transaction save routes corrections and completes successful entrie
   ]);
 });
 
+test("successful entries close payment or prepare the next expense", async () => {
+  const context = loadSaveWorkflow();
+  const calls = [];
+  const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
+    $: (id) => id,
+    getPendingCorrection: () => null,
+    saveCorrection() {},
+    closeModal: (id) => calls.push(["close", id]),
+    toast: (message) => calls.push(["toast", message]),
+  });
+  const insert = async ({ completion }) => {
+    completion.onSaved();
+    calls.push(["refresh"]);
+    completion.afterRefresh();
+    calls.push(["toast", completion.successMessage]);
+    return true;
+  };
+
+  await workflow.saveTransactionEntry({
+    kind: "payment",
+    event: { submitter: { id: "payment-save-button" } },
+    payload: { amount: 550 },
+    buildCorrection: (payload) => payload,
+    insert,
+    failureMessage: "payment failed",
+    label: "Payment",
+    modalId: "payment-modal",
+    resetAfterSave: () => calls.push(["reset", "payment"]),
+  });
+  assert.deepEqual(calls, [
+    ["reset", "payment"],
+    ["refresh"],
+    ["close", "payment-modal"],
+    ["toast", "Payment recorded"],
+  ]);
+
+  calls.length = 0;
+  await workflow.saveTransactionEntry({
+    kind: "expense",
+    event: { submitter: { id: "expense-save-next" } },
+    payload: { amount: 100 },
+    buildCorrection: (payload) => payload,
+    insert,
+    failureMessage: "expense failed",
+    label: "Expense",
+    modalId: "expense-modal",
+    resetAfterSave: () => calls.push(["reset", "expense"]),
+    prepareNext: () => calls.push(["prepare-next", "property-1"]),
+  });
+  assert.deepEqual(calls, [
+    ["reset", "expense"],
+    ["refresh"],
+    ["prepare-next", "property-1"],
+    ["toast", "Expense recorded. Ready for the next entry"],
+  ]);
+});
+
 test("failed transaction insert skips successful-entry completion", async () => {
   const context = loadSaveWorkflow();
   const calls = [];
