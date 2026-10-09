@@ -10,6 +10,7 @@
     const date = dateOnly(value);
     return date ? date.toLocaleDateString(undefined, options) : "—";
   };
+  const fmtDateTime = (value) => new Date(value).toLocaleString();
   const isoDate = (date) => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -58,6 +59,7 @@
   const dateUtils = Object.freeze({
     dateOnly,
     fmtDate,
+    fmtDateTime,
     isoDate,
     todayIso,
     monthStart,
@@ -69,6 +71,7 @@
     window.PropertyDeskDateUtils = Object.freeze({
       dateOnly,
       fmtDate,
+      fmtDateTime,
       isoDate,
       todayIso,
       monthStart,

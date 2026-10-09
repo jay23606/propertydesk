@@ -22,7 +22,7 @@
       );
     }
 
-    function filterRows(rows, { period, query, type, now = new Date() }) {
+    function filterRows(rows, { period, query, type, now }) {
       const normalizedQuery = query.trim().toLowerCase();
       return rows
         .filter((row) => matchesPeriodAndType(row, period, type, now))

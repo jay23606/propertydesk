@@ -27,7 +27,7 @@
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
-  const { dateOnly, fmtDate, todayIso, monthStart, monthEnd } =
+  const { dateOnly, fmtDate, fmtDateTime, todayIso, monthStart, monthEnd } =
     window.PropertyDeskDateUtils;
   const { moneyInput } = window.PropertyDeskCurrencyUtils;
   const {
@@ -402,6 +402,7 @@
         $,
         state,
         dateOnly,
+        now: () => new Date(),
         fmtDate,
         esc,
         expenseCategoryLabel,
@@ -489,6 +490,7 @@
         state,
         money,
         fmtDate,
+        fmtDateTime,
         esc,
         sumPosted,
         prettyType,

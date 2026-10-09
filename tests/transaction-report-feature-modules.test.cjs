@@ -129,7 +129,7 @@ test("transaction view renders filtered rows and independent month totals", () =
     }
     return elements.get(id);
   };
-  $("payment-period").value = "all";
+  $("payment-period").value = "month";
   $("payment-search").value = "";
   $("transaction-type").value = "all";
   $("payments-empty").classList = { toggle() {} };
@@ -157,10 +157,15 @@ test("transaction view renders filtered rows and independent month totals", () =
     ],
     expenses: [],
   };
+  let clockReads = 0;
   const feature = context.window.PropertyDeskTransactionViews.create({
     $,
     state,
     dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
+    now: () => {
+      clockReads += 1;
+      return new Date("2026-10-05T12:00:00");
+    },
     fmtDate: (value) => value,
     esc: String,
     expenseCategoryLabel: (value) => value,
@@ -178,6 +183,7 @@ test("transaction view renders filtered rows and independent month totals", () =
 
   feature.renderPayments();
 
+  assert.equal(clockReads, 1);
   assert.match($("payments-table").innerHTML, /Oak House/);
   assert.equal($("payments-collected").textContent, "$500.00");
   assert.equal($("expenses-total").textContent, "$0.00");

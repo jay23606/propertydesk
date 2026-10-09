@@ -407,6 +407,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
     String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   const money = (value) => `$${Number(value || 0).toFixed(2)}`;
   const fmtDate = (value) => value || "—";
+  const fmtDateTime = (value) => `local:${value}`;
   const { loadAccountHistory } =
     context.window.PropertyDeskAccountHistoryModel.create({
       state,
@@ -419,6 +420,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
       esc,
       money,
       fmtDate,
+      fmtDateTime,
     });
   const renderAccountHistory = async (account, payments) =>
     accountHistoryHTML(await loadAccountHistory(account, payments));
@@ -433,6 +435,7 @@ test("account history renders scoped prior terms and escaped void reasons", asyn
   assert.match(html, /&lt;Buyer&gt;/);
   assert.doesNotMatch(html, /Should not appear/);
   assert.match(html, /Voided payment/);
+  assert.match(html, /local:2026-10-01T12:00:00Z/);
   assert.match(html, /Reason: &lt;duplicate&gt;/);
   assert.doesNotMatch(html, /wrong workspace copy/);
 
@@ -526,6 +529,7 @@ test("account detail content workflow composes schedule, history, and account", 
     state: {},
     money() {},
     fmtDate() {},
+    fmtDateTime() {},
     esc() {},
     sumPosted() {},
     prettyType() {},
@@ -551,6 +555,7 @@ test("account detail content workflow composes schedule, history, and account", 
     dependencies.accountHistoryRepository,
   );
   assert.equal(passed.historyView.esc, dependencies.esc);
+  assert.equal(passed.historyView.fmtDateTime, dependencies.fmtDateTime);
   assert.equal(passed.model.state, dependencies.state);
   assert.equal(passed.model.sumPosted, dependencies.sumPosted);
   assert.equal(passed.model.summarizeAccount, dependencies.summarizeAccount);

@@ -23,6 +23,10 @@ test("date-only parsing and display formatting preserve local calendar dates", (
     date.toLocaleDateString(undefined, { year: "numeric" }),
   );
   assert.equal(dates.fmtDate(null), "—");
+  assert.equal(
+    dates.fmtDateTime("2026-10-05T12:00:00Z"),
+    new Date("2026-10-05T12:00:00Z").toLocaleString(),
+  );
 });
 
 test("today and month boundaries agree with the local calendar", () => {

@@ -47,7 +47,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     },
     ignored: true,
   };
-  const content = { accountHistoryRepository: {} };
+  const content = { fmtDateTime() {}, accountHistoryRepository: {} };
   const actions = {
     $() {},
     state: {},
@@ -151,6 +151,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     passed.accountDetails.content.accountHistoryRepository,
     content.accountHistoryRepository,
   );
+  assert.equal(passed.accountDetails.content.fmtDateTime, content.fmtDateTime);
   assert.equal(
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,

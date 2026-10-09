@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createAccountHistoryView({ esc, money, fmtDate }) {
+  function createAccountHistoryView({ esc, money, fmtDate, fmtDateTime }) {
     function accountHistoryHTML({ accountVersions, auditEvents, auditError }) {
       const versionsHTML = `<div class="detail-section">
         <h3>Prior agreement terms</h3>${
@@ -29,7 +29,7 @@
                   (event) => `<div class="audit-row">
         <div>
         <strong>${event.action} ${event.target}</strong>${event.reason ? `<small>Reason: ${esc(event.reason)}</small>` : ""}</div>
-        <time datetime="${esc(event.created_at)}">${esc(new Date(event.created_at).toLocaleString())}</time>
+        <time datetime="${esc(event.created_at)}">${esc(fmtDateTime(event.created_at))}</time>
         </div>`,
                 )
                 .join("")}</div>`

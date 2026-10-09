@@ -6,6 +6,7 @@
     $,
     state,
     dateOnly,
+    now,
     fmtDate,
     esc,
     expenseCategoryLabel,
@@ -51,6 +52,7 @@
         period: $("payment-period").value,
         query: $("payment-search").value,
         type: $("transaction-type").value,
+        now: now(),
       });
       const totals = currentMonthTotals();
       $("payments-table").innerHTML = rows.map(transactionRowHTML).join("");

@@ -14,6 +14,7 @@
       state: content.state,
       money: content.money,
       fmtDate: content.fmtDate,
+      fmtDateTime: content.fmtDateTime,
       esc: content.esc,
       sumPosted: content.sumPosted,
       prettyType: content.prettyType,

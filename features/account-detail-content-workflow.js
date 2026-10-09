@@ -7,6 +7,7 @@
     state,
     money,
     fmtDate,
+    fmtDateTime,
     esc,
     sumPosted,
     prettyType,
@@ -27,6 +28,7 @@
       esc,
       money,
       fmtDate,
+      fmtDateTime,
     });
     async function renderAccountHistory(account, payments) {
       return accountHistoryHTML(await loadAccountHistory(account, payments));

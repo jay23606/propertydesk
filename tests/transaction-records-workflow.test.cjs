@@ -53,6 +53,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     $: () => {},
     state: {},
     dateOnly: () => {},
+    now: () => new Date("2026-10-05T12:00:00"),
     fmtDate: () => {},
     esc: () => {},
     expenseCategoryLabel: () => {},
@@ -149,6 +150,7 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
     [
       "$",
       "dateOnly",
+      "now",
       "esc",
       "expenseCategoryLabel",
       "fmtDate",

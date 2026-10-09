@@ -45,6 +45,7 @@
         state: accountDetails.content.state,
         money: accountDetails.content.money,
         fmtDate: accountDetails.content.fmtDate,
+        fmtDateTime: accountDetails.content.fmtDateTime,
         esc: accountDetails.content.esc,
         sumPosted: accountDetails.content.sumPosted,
         prettyType: accountDetails.content.prettyType,
