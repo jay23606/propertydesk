@@ -3,17 +3,21 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 require("../features/date-utils.js");
-require("../features/currency-utils.js");
+const currencyUtils = require("../features/currency-utils.js");
+const dateUtils = require("../features/date-utils.js");
 const accountStatus = require("../features/account-status-utils.js");
 const scheduleFactory = require("../features/ledger-schedule-utils.js");
 const loanAmortizationFactory = require("../features/loan-amortization-utils.js");
 const depositFactory = require("../features/deposit-ledger-utils.js");
-const ledgerUtils = require("../features/posted-ledger-utils.js");
+const ledgerUtils = require("./posted-ledger-utils-helper.cjs");
 const scheduleUtils = scheduleFactory.create({
+  modules: { dateUtils, currencyUtils },
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
 });
-const loanUtils = loanAmortizationFactory.create();
+const loanUtils = loanAmortizationFactory.create({
+  modules: { dateUtils, currencyUtils },
+});
 const depositUtils = depositFactory.create({ isPosted: ledgerUtils.isPosted });
 const { amountDueSince } = scheduleUtils;
 const { amortizationSchedule, scheduledLoanBalance } = loanUtils;

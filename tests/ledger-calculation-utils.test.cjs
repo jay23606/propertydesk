@@ -1,10 +1,12 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 require("../features/date-utils.js");
-require("../features/currency-utils.js");
+const currencyUtils = require("../features/currency-utils.js");
+const dateUtils = require("../features/date-utils.js");
 const accountStatus = require("../features/account-status-utils.js");
-const ledgerUtils = require("../features/posted-ledger-utils.js");
+const ledgerUtils = require("./posted-ledger-utils-helper.cjs");
 const scheduleUtils = require("../features/ledger-schedule-utils.js").create({
+  modules: { dateUtils, currencyUtils },
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
 });

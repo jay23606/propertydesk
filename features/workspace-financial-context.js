@@ -5,15 +5,20 @@
   function createWorkspaceFinancialContext({
     state,
     todayIso,
+    dateUtils,
+    currencyUtils,
     postedLedgerUtils,
     isActiveAccount,
     workflows,
   }) {
     const schedule = workflows.schedule.create({
+      modules: { dateUtils, currencyUtils },
       isDueReducingPayment: postedLedgerUtils.isDueReducingPayment,
       isActiveAccount,
     });
-    const loanSchedule = workflows.loanSchedule.create();
+    const loanSchedule = workflows.loanSchedule.create({
+      modules: { dateUtils, currencyUtils },
+    });
     const financial = workflows.accountFinancialContext.create({
       state,
       ledger: {

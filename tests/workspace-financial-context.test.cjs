@@ -68,6 +68,8 @@ test("workspace financial context composes ledger, account, and loan services", 
     accountSummary: { create() {} },
   };
   const todayIso = () => "2026-10-07";
+  const dateUtils = { monthDateWithAnchor() {} };
+  const currencyUtils = { roundCurrency() {} };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-financial-context.js"),
@@ -80,6 +82,8 @@ test("workspace financial context composes ledger, account, and loan services", 
     {
       state,
       todayIso,
+      dateUtils,
+      currencyUtils,
       postedLedgerUtils,
       isActiveAccount,
       workflows,
@@ -92,7 +96,10 @@ test("workspace financial context composes ledger, account, and loan services", 
   );
   assert.equal(calls[0][1].isDueReducingPayment, isDueReducingPayment);
   assert.equal(calls[0][1].isActiveAccount, isActiveAccount);
-  assert.equal(calls[1][1], undefined);
+  assert.equal(calls[0][1].modules.dateUtils, dateUtils);
+  assert.equal(calls[0][1].modules.currencyUtils, currencyUtils);
+  assert.equal(calls[1][1].modules.dateUtils, dateUtils);
+  assert.equal(calls[1][1].modules.currencyUtils, currencyUtils);
   assert.equal(calls[2][1].state, state);
   assert.equal(calls[2][1].ledger.todayIso, todayIso);
   assert.equal(calls[2][1].ledger.scheduledLoanBalance, scheduledLoanBalance);

@@ -15,6 +15,9 @@
       reminderCopy: window.PropertyDeskReminderCopy,
     },
   });
+  const postedLedgerUtils = window.PropertyDeskPostedLedgerUtils.create({
+    modules: { currencyUtils: window.PropertyDeskCurrencyUtils },
+  });
   let appLifecycle;
   function render() {
     appLifecycle.render();
@@ -84,7 +87,9 @@
   const financialContext = window.PropertyDeskWorkspaceFinancialContext.create({
     state,
     todayIso,
-    postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
+    dateUtils: window.PropertyDeskDateUtils,
+    currencyUtils: window.PropertyDeskCurrencyUtils,
+    postedLedgerUtils,
     isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,
     workflows: {
       schedule: window.PropertyDeskScheduleUtils,
@@ -113,7 +118,7 @@
   } = financialContext;
   const { depositLedger } = window.PropertyDeskWorkspaceDepositContext.create({
     state,
-    postedLedgerUtils: window.PropertyDeskPostedLedgerUtils,
+    postedLedgerUtils,
     workflows: {
       depositLedger: window.PropertyDeskDepositLedgerUtils,
       depositContext: window.PropertyDeskDepositContext,

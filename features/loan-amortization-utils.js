@@ -2,12 +2,11 @@
 (() => {
   "use strict";
 
-  function createLoanAmortizationUtils() {
-    const { monthDateWithAnchor, isoDate } =
-      globalThis.PropertyDeskDateUtils || {};
+  function createLoanAmortizationUtils({ modules }) {
+    const { monthDateWithAnchor, isoDate } = modules.dateUtils;
     if (!monthDateWithAnchor || !isoDate)
       throw new Error("PropertyDeskDateUtils must load before loan utils.");
-    const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+    const { roundCurrency } = modules.currencyUtils;
     if (!roundCurrency)
       throw new Error("PropertyDeskCurrencyUtils must load before loan utils.");
 

@@ -1,12 +1,15 @@
 /* Projected rent and installment due dates, separate from posted ledger totals. */
 (() => {
   "use strict";
-  function createScheduleUtils({ isDueReducingPayment, isActiveAccount }) {
-    const monthDateWithAnchor =
-      globalThis.PropertyDeskDateUtils?.monthDateWithAnchor;
+  function createScheduleUtils({
+    modules,
+    isDueReducingPayment,
+    isActiveAccount,
+  }) {
+    const { monthDateWithAnchor } = modules.dateUtils;
     if (!monthDateWithAnchor)
       throw new Error("PropertyDeskDateUtils must load before schedule utils.");
-    const roundCurrency = globalThis.PropertyDeskCurrencyUtils?.roundCurrency;
+    const { roundCurrency } = modules.currencyUtils;
     if (!roundCurrency)
       throw new Error(
         "PropertyDeskCurrencyUtils must load before schedule utils.",

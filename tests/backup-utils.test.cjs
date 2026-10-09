@@ -5,7 +5,7 @@ require("../features/currency-utils.js");
 const { createBackup } = require("../features/backup-utils.js").create({
   workspaceTables,
 });
-const ledgerUtils = require("../features/posted-ledger-utils.js");
+const ledgerUtils = require("./posted-ledger-utils-helper.cjs");
 
 test("backup manifest generation stays separate from ledger calculations", () => {
   assert.equal(typeof createBackup, "function");
