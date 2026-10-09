@@ -34,7 +34,8 @@ test("reminder preview workflow composes the account editor preview directly", (
 
   const services = {
     $() {},
-    state: {},
+    getProperty() {},
+    getPaymentsForAccount() {},
     paymentReminderMessage() {},
     amountDueSince() {},
     unpaidDueAccrualStart() {},
@@ -80,7 +81,11 @@ test("reminder preview workflow composes the account editor preview directly", (
     "unpaidDueAccrualStart",
   ]);
   assert.equal(calls[1][1].$, services.$);
-  assert.equal(calls[1][1].state, services.state);
+  assert.equal(calls[1][1].getProperty, services.getProperty);
+  assert.equal(
+    calls[1][1].getPaymentsForAccount,
+    services.getPaymentsForAccount,
+  );
   assert.equal(calls[1][1].model, model);
   assert.equal(calls[1][1].openModal, services.openModal);
   assert.equal(calls[1][1].splitEmailAddresses, services.splitEmailAddresses);

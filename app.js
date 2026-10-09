@@ -186,7 +186,38 @@
   const { previewReminderEmail } =
     window.PropertyDeskReminderPreviewWorkflow.create({
       $,
-      state,
+      getProperty: (propertyId) => {
+        const property = state.properties.find(
+          (item) => item.id === propertyId,
+        );
+        if (!property) return null;
+        const {
+          id,
+          address,
+          city,
+          state: propertyState,
+          postal_code,
+        } = property;
+        return { id, address, city, state: propertyState, postal_code };
+      },
+      getPaymentsForAccount: (accountId) =>
+        state.payments
+          .filter((payment) => payment.account_id === accountId)
+          .map(
+            ({
+              account_id,
+              received_date,
+              amount,
+              status,
+              income_category,
+            }) => ({
+              account_id,
+              received_date,
+              amount,
+              status,
+              income_category,
+            }),
+          ),
       paymentReminderMessage: emailUtils.paymentReminderMessage,
       amountDueSince,
       unpaidDueAccrualStart,

@@ -4,7 +4,8 @@
 
   function create({
     $,
-    state,
+    getProperty,
+    getPaymentsForAccount,
     todayIso,
     moneyInput,
     toast,
@@ -14,9 +15,7 @@
     splitEmailAddresses,
   }) {
     function previewReminderEmail() {
-      const property = state.properties.find(
-        (item) => item.id === $("account-property").value,
-      );
+      const property = getProperty($("account-property").value);
       if (!property) {
         toast("Choose a property to preview its reminder");
         return;
@@ -38,7 +37,7 @@
         property,
         account,
         recipients,
-        payments: state.payments,
+        payments: getPaymentsForAccount(account.id),
       });
       $("reminder-preview-content").innerHTML = `
         <div class="reminder-preview-meta">

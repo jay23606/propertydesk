@@ -4,7 +4,8 @@
 
   function create({
     $,
-    state,
+    getProperty,
+    getPaymentsForAccount,
     paymentReminderMessage,
     amountDueSince,
     unpaidDueAccrualStart,
@@ -33,7 +34,8 @@
     });
     const { previewReminderEmail } = workflows.preview.create({
       $,
-      state,
+      getProperty,
+      getPaymentsForAccount,
       todayIso,
       moneyInput,
       toast,

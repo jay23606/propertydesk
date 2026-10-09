@@ -18,6 +18,8 @@ Shared finance services read only the account and payment collections they use, 
 
 Payment notifications use the same boundary: their coordinator gets a small workspace identity and projected member, account, and address details instead of the full application state.
 
+Reminder previews receive only the selected property's address fields and that account's payment history, rather than the full property and payment collections. The preview still derives the unpaid amount from the current account terms and posted payment history.
+
 Transaction correction and void workflows receive callbacks for the pending correction and the payment or expense collection they must verify. The correction form gets a target lookup over only accounts, payments, and expenses, keeping audit and readback behavior current after refresh without passing the full state object into maintenance.
 
 `workspace-table-catalog.js` is the shared table inventory for workspace operations, and `workspace-read-catalog.js` explicitly lists the records hydrated into the client. `workspace-data.js` runs that read catalog to hydrate app state, `workspace-query.js` scopes and pages reads, and `workspace-refresh.js` coordinates loading and rendering. Row-level security and database grants remain the access boundary.

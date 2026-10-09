@@ -45,7 +45,6 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   };
   const state = {
     properties: [{ id: "property-1", address: "10 Main <St>" }],
-    payments: [],
   };
   const calls = [];
   const model = context.window.PropertyDeskReminderPreviewModel.create({
@@ -63,7 +62,14 @@ test("reminder preview uses current form values and escapes recipient-facing tex
   });
   const feature = context.window.PropertyDeskReminderPreview.create({
     $: (id) => values[id],
-    state,
+    getProperty: (id) => {
+      calls.push(["property", id]);
+      return state.properties.find((property) => property.id === id) || null;
+    },
+    getPaymentsForAccount: (accountId) => {
+      calls.push(["payments", accountId]);
+      return [];
+    },
     todayIso: () => "2026-10-04",
     moneyInput: Number,
     toast: (message) => calls.push(message),
@@ -86,8 +92,23 @@ test("reminder preview uses current form values and escapes recipient-facing tex
 
   feature.previewReminderEmail();
 
-  assert.equal(calls[0].account.payment_amount, 550);
-  assert.equal(calls[0].start, "2026-10-01");
+  const scheduleCall = calls.find((call) => call.account);
+  assert.equal(scheduleCall.account.payment_amount, 550);
+  assert.equal(scheduleCall.start, "2026-10-01");
+  assert.ok(
+    calls.some(
+      (call) =>
+        Array.isArray(call) &&
+        call[0] === "property" &&
+        call[1] === "property-1",
+    ),
+  );
+  assert.ok(
+    calls.some(
+      (call) =>
+        Array.isArray(call) && call[0] === "payments" && call[1] === "preview",
+    ),
+  );
   assert.match(
     values["reminder-preview-content"].innerHTML,
     /buyer@example\.test/,
