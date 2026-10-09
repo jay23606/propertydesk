@@ -89,7 +89,7 @@ test("Properties workflow returns explicit view and action operations", () => {
   const action = () => {};
   const editPropertyQuickNote = () => {};
   const propertyRepository = {};
-  const state = {};
+  const state = { properties: [], accounts: [], workspaceOwnerId: "owner-1" };
   const passed = {};
   const context = vm.createContext({
     window: {
@@ -228,7 +228,8 @@ test("Properties workflow returns explicit view and action operations", () => {
     "attachPropertyGridEvents",
     "renderProperties",
   ]);
-  assert.equal(passed.quickNote.state, state);
+  assert.equal(passed.quickNote.getProperties(), state.properties);
+  assert.equal(passed.quickNote.getWorkspaceOwnerId(), state.workspaceOwnerId);
   assert.equal(passed.filterModel.isActiveAccount, action);
   assert.equal(passed.portfolioModel.groupAccountsByProperty, action);
   assert.equal(passed.quickNote.toast, action);

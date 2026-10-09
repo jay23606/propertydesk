@@ -8,7 +8,7 @@
     editPropertyQuickNote,
     openPropertyDetails,
     openAccountForProperty,
-    state,
+    getAccount,
     editAccount,
   }) {
     function attachEvents() {
@@ -24,9 +24,7 @@
         if (accountEdit) {
           event.preventDefault();
           event.stopPropagation();
-          const account = state.accounts.find(
-            (item) => String(item.id) === accountEdit.dataset.accountEdit,
-          );
+          const account = getAccount(accountEdit.dataset.accountEdit);
           if (account) editAccount(account);
           return;
         }

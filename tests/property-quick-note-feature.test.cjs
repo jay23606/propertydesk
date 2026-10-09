@@ -9,6 +9,7 @@ const quickNoteSource = fs.readFileSync(
 );
 test("property quick note receives the prompt function from its app boundary", () => {
   assert.doesNotMatch(quickNoteSource, /window\.prompt/);
+  assert.doesNotMatch(quickNoteSource, /state\.(properties|workspaceOwnerId)/);
 });
 test("property quick notes normalize whitespace and scope updates to the workspace", async () => {
   const context = vm.createContext({ window: {} });
@@ -59,7 +60,8 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     },
   };
   const feature = context.window.PropertyDeskPropertyQuickNote.create({
-    state,
+    getProperties: () => state.properties,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     toast: (message) => messages.push(message),
     fetchAll: async () => {
       refreshed = true;
@@ -117,7 +119,8 @@ test("property quick notes enforce the character limit before writing", async ()
     client: { from: () => assert.fail("an overlong note must not write") },
   };
   const feature = context.window.PropertyDeskPropertyQuickNote.create({
-    state,
+    getProperties: () => state.properties,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("an overlong note must not refresh"),
     saveAndRefreshWorkspaceRecord:
@@ -165,7 +168,8 @@ test("quick note reconciles a lost response against refreshed property state", a
     properties: [property],
   };
   const feature = context.window.PropertyDeskPropertyQuickNote.create({
-    state,
+    getProperties: () => state.properties,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     toast: (message) => events.push(["toast", message]),
     fetchAll: async () => {
       property.notes = "Updated note";

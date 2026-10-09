@@ -3,7 +3,8 @@
   "use strict";
 
   function create({
-    state,
+    getProperties,
+    getWorkspaceOwnerId,
     toast,
     fetchAll,
     streetAddress,
@@ -15,7 +16,7 @@
   }) {
     const { savePropertyQuickNote } = noteMaintenance.create({
       getCollection: (collection) =>
-        collection === "properties" ? state.properties : null,
+        collection === "properties" ? getProperties() : null,
       fetchAll,
       toast,
       repository,
@@ -24,7 +25,7 @@
     });
 
     async function editPropertyQuickNote(id) {
-      const property = state.properties.find((item) => item.id === id);
+      const property = getProperties().find((item) => item.id === id);
       if (!property) return;
       const entered = promptAction(
         `Quick note shown under ${streetAddress(property)} (140 characters max):`,
@@ -36,7 +37,7 @@
         toast("Quick notes are limited to 140 characters.");
         return;
       }
-      await savePropertyQuickNote(id, state.workspaceOwnerId, note, () =>
+      await savePropertyQuickNote(id, getWorkspaceOwnerId(), note, () =>
         toast(note ? "Property note saved" : "Property note removed"),
       );
     }

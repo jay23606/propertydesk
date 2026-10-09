@@ -31,7 +31,7 @@ test("property view actions route payment, note, address, and add-account action
   const account = { id: "account-9", party_name: "Buyer" };
   const feature = context.window.PropertyDeskPropertyViewEvents.create({
     $,
-    state: { accounts: [account] },
+    getAccount: (id) => (id === account.id ? account : null),
     editAccount: (value) => calls.push(["edit-account", value.id]),
     openPayment: (id) => calls.push(["payment", id]),
     editPropertyQuickNote: (id) => calls.push(["note", id]),
@@ -64,6 +64,10 @@ test("property view actions route payment, note, address, and add-account action
 });
 
 test("property action router loads after its view and is precached", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "property-view-events.js"),
+    "utf8",
+  );
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",
@@ -76,6 +80,7 @@ test("property action router loads after its view and is precached", () => {
     "property view should load before its action router and the app",
   );
   assert.match(worker, /'\.\/features\/property-view-events\.js'/);
+  assert.doesNotMatch(source, /state\.accounts/);
 });
 
 test("property detail model loads before its coordinator and is precached", () => {

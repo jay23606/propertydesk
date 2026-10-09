@@ -105,7 +105,8 @@
       attachTemplateEvents: reminderTemplates.attachEvents,
     });
     const { editPropertyQuickNote } = workflows.quickNote.create({
-      state,
+      getProperties: () => state.properties,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
       toast,
       fetchAll,
       promptAction,
@@ -122,7 +123,9 @@
         editPropertyQuickNote,
         openPropertyDetails,
         openAccountForProperty,
-        state,
+        getAccount: (accountId) =>
+          state.accounts.find((account) => String(account.id) === accountId) ||
+          null,
         editAccount,
       });
 
