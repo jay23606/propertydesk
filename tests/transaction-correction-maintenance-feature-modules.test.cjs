@@ -8,6 +8,13 @@ const {
   transactionWriteFeedbackOptions,
 } = require("./transaction-test-helpers.cjs");
 
+function correctionStateOptions(state) {
+  return {
+    getPendingCorrection: () => state.pendingCorrection,
+    getCollectionRows: (collection) => state[collection] || [],
+  };
+}
+
 test("transaction corrections save payment and expense changes with their audit reasons", async () => {
   const context = vm.createContext({ window: {} });
   loadTransactionRepository(context);
@@ -44,7 +51,7 @@ test("transaction corrections save payment and expense changes with their audit 
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
       ...transactionWriteFeedbackOptions(context),
-      state,
+      ...correctionStateOptions(state),
       closeModal: (modal) => events.push(["close", modal.id]),
       fetchAll: async () => events.push("refresh"),
       toast: (message) => events.push(["toast", message]),
@@ -125,7 +132,7 @@ test("transaction correction failures preserve the open form and pending correct
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
       ...transactionWriteFeedbackOptions(context),
-      state,
+      ...correctionStateOptions(state),
       closeModal: () => {
         closes += 1;
       },
@@ -182,7 +189,7 @@ test("transaction correction confirms a lost response from the audit link", asyn
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: (id) => ({ id }),
       ...transactionWriteFeedbackOptions(context),
-      state,
+      ...correctionStateOptions(state),
       closeModal: (modal) => events.push(["close", modal.id]),
       fetchAll: async () => {
         state.payments = [
@@ -227,20 +234,20 @@ test("transaction correction database errors keep the correction open", async ()
   const messages = [];
   let closes = 0;
   let refreshes = 0;
+  const state = {
+    pendingCorrection: {
+      kind: "payment",
+      id: "payment-1",
+      reason: "Fix date",
+    },
+    payments: [],
+    expenses: [],
+  };
   const feature =
     context.window.PropertyDeskTransactionCorrectionMaintenance.create({
       $: () => ({}),
       ...transactionWriteFeedbackOptions(context),
-      state: {
-        pendingCorrection: {
-          kind: "payment",
-          id: "payment-1",
-          reason: "Fix date",
-        },
-        client: {
-          rpc: async () => ({ error: { message: "permission denied" } }),
-        },
-      },
+      ...correctionStateOptions(state),
       closeModal: () => closes++,
       fetchAll: async () => refreshes++,
       toast: (message) => messages.push(message),

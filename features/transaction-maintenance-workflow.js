@@ -16,7 +16,9 @@
   }) {
     const correction = correctionWorkflow.create({
       $: correctionContext.$,
-      state: correctionContext.state,
+      getPendingCorrection: correctionContext.getPendingCorrection,
+      setPendingCorrection: correctionContext.setPendingCorrection,
+      getCollectionRows: correctionContext.getCollectionRows,
       toast: correctionContext.toast,
       fetchAll: correctionContext.fetchAll,
       closeModal: correctionContext.closeModal,
@@ -31,7 +33,7 @@
       workflows: correctionModules,
     });
     const { saveVoidTransaction } = voidMaintenanceWorkflow.create({
-      state: voidingContext.state,
+      getCollectionRows: voidingContext.getCollectionRows,
       toast: voidingContext.toast,
       fetchAll: voidingContext.fetchAll,
       timestamp: voidingContext.timestamp,

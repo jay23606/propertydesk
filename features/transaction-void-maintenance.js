@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getCollectionRows,
     toast,
     fetchAll,
     timestamp,
@@ -29,7 +29,7 @@
           }),
         fetchAll,
         isConfirmed: () => {
-          const rows = state?.[target.collection] || [];
+          const rows = getCollectionRows(target.collection);
           return rows.some(
             (row) =>
               row.id === id &&

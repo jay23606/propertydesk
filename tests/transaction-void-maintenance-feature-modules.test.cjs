@@ -9,6 +9,10 @@ const {
   transactionVoidModelOptions,
 } = require("./transaction-test-helpers.cjs");
 
+function voidStateOptions(state = {}) {
+  return { getCollectionRows: (collection) => state[collection] || [] };
+}
+
 test("transaction void maintenance voids a posted row with an audit reason", async () => {
   const context = vm.createContext({
     window: {},
@@ -64,6 +68,7 @@ test("transaction void maintenance voids a posted row with an audit reason", asy
     },
   };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
+    ...voidStateOptions(),
     repository: context.window.PropertyDeskTransactionRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
@@ -106,6 +111,7 @@ test("transaction void maintenance rejects unsupported kinds before prompting or
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
+    ...voidStateOptions(),
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
     repository: context.window.PropertyDeskTransactionRepository.create({
@@ -147,7 +153,7 @@ test("transaction void maintenance reports rejected requests without refreshing"
   const refreshes = [];
   const state = { payments: [], expenses: [] };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
-    state,
+    ...voidStateOptions(state),
     timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => refreshes.push(true),
     toast: (message) => messages.push(message),
@@ -205,7 +211,7 @@ test("transaction void confirms a lost response from the refreshed audit fields"
     state[collection] = [{ id, status: "posted" }];
     const feature =
       context.window.PropertyDeskTransactionVoidMaintenance.create({
-        state,
+        ...voidStateOptions(state),
         repository: {
           voidPosted: async () => {
             throw new Error("connection lost");
@@ -253,6 +259,7 @@ test("transaction void maintenance reports database errors without refreshing", 
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
+    ...voidStateOptions(),
     repository: {
       voidPosted: async () => ({
         data: null,
@@ -287,6 +294,7 @@ test("transaction void maintenance reports an already-changed row without refres
   }
   const messages = [];
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
+    ...voidStateOptions(),
     repository: {
       voidPosted: async () => ({ data: null, error: null }),
     },

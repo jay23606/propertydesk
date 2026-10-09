@@ -4,7 +4,8 @@
 
   function create({
     $,
-    state,
+    getPendingCorrection,
+    getCollectionRows,
     toast,
     fetchAll,
     closeModal,
@@ -28,7 +29,7 @@
 
     async function saveCorrection(kind, correction) {
       const type = correctionTypes[kind];
-      const pending = state.pendingCorrection;
+      const pending = getPendingCorrection();
       if (!type || !pending || pending.kind !== kind) {
         toast("This correction is no longer available.");
         return false;
@@ -45,7 +46,7 @@
           }),
         fetchAll,
         isConfirmed: () =>
-          (state[type.collection] || []).some(
+          getCollectionRows(type.collection).some(
             (row) => row[type.correctionKey] === pending.id,
           ),
         toast,

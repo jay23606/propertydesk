@@ -324,7 +324,11 @@
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
       correction: {
         $,
-        state,
+        getPendingCorrection: () => state.pendingCorrection,
+        setPendingCorrection: (value) => {
+          state.pendingCorrection = value;
+        },
+        getCollectionRows: (collection) => state[collection] || [],
         toast,
         fetchAll,
         closeModal,
@@ -335,11 +339,19 @@
         repository: repositories.transactions,
         runAndRefreshWorkspaceChange:
           writeFeedback.runAndRefreshWorkspaceChange,
-        findCorrectionTarget:
-          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
+        findCorrectionTarget: (kind, id) =>
+          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget(
+            {
+              accounts: state.accounts,
+              payments: state.payments,
+              expenses: state.expenses,
+            },
+            kind,
+            id,
+          ),
       },
       voiding: {
-        state,
+        getCollectionRows: (collection) => state[collection] || [],
         toast,
         fetchAll,
         timestamp: transactionTimestamp,

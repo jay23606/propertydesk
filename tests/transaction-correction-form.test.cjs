@@ -153,10 +153,19 @@ test("transaction correction form reopens posted payments and expenses with audi
   const calls = [];
   const feature = context.window.PropertyDeskTransactionCorrectionForm.create({
     $: (id) => field(id),
-    state,
-    findCorrectionTarget:
-      context.window.PropertyDeskTransactionCorrectionModel
-        .findCorrectionTarget,
+    setPendingCorrection: (pending) => {
+      state.pendingCorrection = pending;
+    },
+    findCorrectionTarget: (kind, id) =>
+      context.window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget(
+        {
+          payments: state.payments,
+          accounts: state.accounts,
+          expenses: state.expenses,
+        },
+        kind,
+        id,
+      ),
     viewModule: context.window.PropertyDeskTransactionCorrectionView,
     EventClass,
     OptionClass,

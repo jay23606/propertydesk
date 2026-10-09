@@ -4,7 +4,6 @@
 
   function create({
     $,
-    state,
     toast,
     promptAction,
     prettyType,
@@ -13,6 +12,7 @@
     updatePaymentGuidance,
     EventClass,
     OptionClass,
+    setPendingCorrection,
     findCorrectionTarget,
     viewModule,
   }) {
@@ -25,7 +25,7 @@
     });
 
     function correctTransaction(kind, id) {
-      const target = findCorrectionTarget(state, kind, id);
+      const target = findCorrectionTarget(kind, id);
       if (!target) {
         toast("Only posted transactions can be corrected");
         return;
@@ -41,13 +41,13 @@
       if (target.kind === "payment") {
         openPayment();
         view.populatePayment(target.record, target.account);
-        state.pendingCorrection = { kind: "payment", id, reason: auditReason };
+        setPendingCorrection({ kind: "payment", id, reason: auditReason });
         return;
       }
 
       openExpense();
       view.populateExpense(target.record);
-      state.pendingCorrection = { kind: "expense", id, reason: auditReason };
+      setPendingCorrection({ kind: "expense", id, reason: auditReason });
     }
 
     return Object.freeze({ correctTransaction });

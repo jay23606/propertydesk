@@ -51,7 +51,9 @@ test("transaction correction workflow owns correction persistence and forms", ()
   );
   const correctionContext = {
     $() {},
-    state: {},
+    getPendingCorrection() {},
+    setPendingCorrection() {},
+    getCollectionRows() {},
     toast() {},
     fetchAll() {},
     closeModal() {},
@@ -89,15 +91,22 @@ test("transaction correction workflow owns correction persistence and forms", ()
   const handlers = workflow.createCorrectionActionHandlers(actions);
 
   assert.equal(Object.isFrozen(workflow), true);
-  assert.equal(passed.corrections.state, correctionContext.state);
+  assert.equal(
+    passed.corrections.getPendingCorrection,
+    correctionContext.getPendingCorrection,
+  );
+  assert.equal(
+    passed.corrections.getCollectionRows,
+    correctionContext.getCollectionRows,
+  );
   assert.equal(passed.corrections.repository, correctionContext.repository);
   assert.equal(
     passed.corrections.runAndRefreshWorkspaceChange,
     correctionContext.runAndRefreshWorkspaceChange,
   );
   assert.equal(
-    passed.form.findCorrectionTarget,
-    correctionContext.findCorrectionTarget,
+    passed.form.setPendingCorrection,
+    correctionContext.setPendingCorrection,
   );
   assert.equal(passed.form.EventClass, correctionContext.EventClass);
   assert.equal(passed.form.OptionClass, correctionContext.OptionClass);
@@ -115,7 +124,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     "openPayment",
     "prettyType",
     "promptAction",
-    "state",
+    "setPendingCorrection",
     "toast",
     "updatePaymentGuidance",
     "viewModule",

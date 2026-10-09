@@ -15,6 +15,21 @@ test("app composes independent property and account forms before action routing"
     app,
     /const transactionMaintenance =\s*window\.PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?\);\s*const ledgerWorkflow = window\.PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
+  assert.match(app, /getPendingCorrection: \(\) => state\.pendingCorrection/);
+  assert.match(app, /setPendingCorrection: \(value\) =>/);
+  assert.match(
+    app,
+    /getCollectionRows: \(collection\) => state\[collection\] \|\| \[\]/,
+  );
+  assert.match(
+    app,
+    /accounts: state\.accounts,[\s\S]*?payments: state\.payments,[\s\S]*?expenses: state\.expenses,/,
+  );
+  assert.doesNotMatch(
+    app.match(/correction: \{[\s\S]*?\n      \},\n      voiding:/)?.[0] || "",
+    /\bstate\s*,/,
+    "transaction correction receives specific state accessors, not the app state object",
+  );
   assert.match(
     app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountForms\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,

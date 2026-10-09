@@ -4,7 +4,9 @@
 
   function createTransactionCorrectionWorkflow({
     $,
-    state,
+    getPendingCorrection,
+    setPendingCorrection,
+    getCollectionRows,
     toast,
     fetchAll,
     closeModal,
@@ -19,7 +21,8 @@
   }) {
     const { saveCorrection } = workflows.maintenance.create({
       $,
-      state,
+      getPendingCorrection,
+      getCollectionRows,
       toast,
       fetchAll,
       closeModal,
@@ -34,7 +37,7 @@
     }) {
       return workflows.form.create({
         $,
-        state,
+        setPendingCorrection,
         toast,
         promptAction,
         prettyType,

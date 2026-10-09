@@ -81,7 +81,9 @@ test("transaction maintenance coordinator joins isolated correction and void act
 
   const correctionContext = {
     $: () => {},
-    state: {},
+    getPendingCorrection() {},
+    setPendingCorrection() {},
+    getCollectionRows() {},
     toast() {},
     fetchAll() {},
     closeModal() {},
@@ -96,7 +98,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
     unusedCorrectionValue: true,
   };
   const voidingContext = {
-    state: {},
+    getCollectionRows() {},
     toast: correctionContext.toast,
     fetchAll: correctionContext.fetchAll,
     timestamp: () => "2026-10-08T12:00:00.000Z",
@@ -143,7 +145,18 @@ test("transaction maintenance coordinator joins isolated correction and void act
   assert.equal(Object.isFrozen(handlers), true);
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.correctionWorkflow.$, correctionContext.$);
-  assert.equal(passed.correctionWorkflow.state, correctionContext.state);
+  assert.equal(
+    passed.correctionWorkflow.getPendingCorrection,
+    correctionContext.getPendingCorrection,
+  );
+  assert.equal(
+    passed.correctionWorkflow.setPendingCorrection,
+    correctionContext.setPendingCorrection,
+  );
+  assert.equal(
+    passed.correctionWorkflow.getCollectionRows,
+    correctionContext.getCollectionRows,
+  );
   assert.equal(passed.correctionWorkflow.toast, correctionContext.toast);
   assert.equal(passed.correctionWorkflow.fetchAll, correctionContext.fetchAll);
   assert.equal(
@@ -178,16 +191,21 @@ test("transaction maintenance coordinator joins isolated correction and void act
     "closeModal",
     "fetchAll",
     "findCorrectionTarget",
+    "getCollectionRows",
+    "getPendingCorrection",
     "prettyType",
     "promptAction",
     "repository",
     "runAndRefreshWorkspaceChange",
-    "state",
+    "setPendingCorrection",
     "toast",
     "workflows",
   ]);
   assert.equal(passed.voidMaintenance.toast, voidingContext.toast);
-  assert.equal(passed.voidMaintenance.state, voidingContext.state);
+  assert.equal(
+    passed.voidMaintenance.getCollectionRows,
+    voidingContext.getCollectionRows,
+  );
   assert.equal(passed.voidMaintenance.fetchAll, voidingContext.fetchAll);
   assert.equal(passed.voidMaintenance.timestamp, voidingContext.timestamp);
   assert.equal(
@@ -207,10 +225,10 @@ test("transaction maintenance coordinator joins isolated correction and void act
   assert.deepEqual(Object.keys(passed.voidMaintenance).sort(), [
     "buildVoidPayload",
     "fetchAll",
+    "getCollectionRows",
     "repository",
     "resolveVoidTarget",
     "runAndRefreshWorkspaceChange",
-    "state",
     "timestamp",
     "toast",
   ]);
