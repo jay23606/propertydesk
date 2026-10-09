@@ -673,6 +673,7 @@
         modules: {
           correctionView: window.PropertyDeskImportCorrectionView,
           rendering: window.PropertyDeskImportPreviewRendering,
+          table: window.PropertyDeskImportPreviewTable,
         },
       },
       previewEvents: window.PropertyDeskImportPreviewEvents,

@@ -53,10 +53,25 @@ test("CSV preview renderer receives only rendering dependencies", () => {
     previewSource,
     /window\.PropertyDeskImport(?:CorrectionView|PreviewRendering)\.create/,
   );
+  const renderingSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "import-preview-rendering.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    renderingSource,
+    /window\.PropertyDeskImportPreviewTable\.create/,
+  );
 
   assert.deepEqual(
     Object.keys(passed.renderer).sort(),
-    ["$", "esc", "renderImportCorrections", "selectImportRows", "state"].sort(),
+    [
+      "$",
+      "esc",
+      "modules",
+      "renderImportCorrections",
+      "selectImportRows",
+      "state",
+    ].sort(),
   );
   assert.equal(passed.renderer.selectImportRows, dependencies.selectImportRows);
   assert.equal(typeof preview.stageImport, "function");

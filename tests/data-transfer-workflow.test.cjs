@@ -31,7 +31,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     app,
-    /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,/,
+    /preview: \{\s*create: window\.PropertyDeskImportPreview\.create,\s*modules: \{\s*correctionView: window\.PropertyDeskImportCorrectionView,\s*rendering: window\.PropertyDeskImportPreviewRendering,\s*table: window\.PropertyDeskImportPreviewTable,/,
   );
   assert.match(
     app,

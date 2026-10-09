@@ -22,6 +22,7 @@
         selectImportRows,
         esc,
         renderImportCorrections,
+        modules,
       });
 
     function validateImportStage(rows, total, errors) {

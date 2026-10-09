@@ -21,10 +21,9 @@
     selectImportRows,
     esc,
     renderImportCorrections,
+    modules,
   }) {
-    const { renderPreviewTable } = window.PropertyDeskImportPreviewTable.create(
-      { $, esc },
-    );
+    const { renderPreviewTable } = modules.table.create({ $, esc });
 
     function renderSummary(pending, duplicateCount) {
       const { rows, errors, total, note } = pending;

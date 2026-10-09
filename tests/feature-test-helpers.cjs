@@ -317,6 +317,7 @@ function importPreviewModules(context) {
   return {
     correctionView: context.window.PropertyDeskImportCorrectionView,
     rendering: context.window.PropertyDeskImportPreviewRendering,
+    table: context.window.PropertyDeskImportPreviewTable,
   };
 }
 
