@@ -11,13 +11,18 @@
     isActiveAccount,
     workflows,
   }) {
+    const { monthDateWithAnchor, isoDate } = dateUtils;
+    const { roundCurrency } = currencyUtils;
     const schedule = workflows.schedule.create({
-      modules: { dateUtils, currencyUtils },
+      monthDateWithAnchor,
+      roundCurrency,
       isDueReducingPayment: postedLedgerUtils.isDueReducingPayment,
       isActiveAccount,
     });
     const loanSchedule = workflows.loanSchedule.create({
-      modules: { dateUtils, currencyUtils },
+      monthDateWithAnchor,
+      isoDate,
+      roundCurrency,
       todayIso,
     });
     const financial = workflows.accountFinancialContext.create({

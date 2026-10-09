@@ -68,8 +68,15 @@ test("workspace financial context composes ledger, account, and loan services", 
     accountSummary: { create() {} },
   };
   const todayIso = () => "2026-10-07";
-  const dateUtils = { monthDateWithAnchor() {} };
-  const currencyUtils = { roundCurrency() {} };
+  const monthDateWithAnchor = () => {};
+  const isoDate = () => {};
+  const roundCurrency = () => {};
+  const dateUtils = {
+    monthDateWithAnchor,
+    isoDate,
+    unrelatedDateHelper() {},
+  };
+  const currencyUtils = { roundCurrency, unrelatedCurrencyHelper() {} };
   vm.runInContext(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-financial-context.js"),
@@ -96,10 +103,23 @@ test("workspace financial context composes ledger, account, and loan services", 
   );
   assert.equal(calls[0][1].isDueReducingPayment, isDueReducingPayment);
   assert.equal(calls[0][1].isActiveAccount, isActiveAccount);
-  assert.equal(calls[0][1].modules.dateUtils, dateUtils);
-  assert.equal(calls[0][1].modules.currencyUtils, currencyUtils);
-  assert.equal(calls[1][1].modules.dateUtils, dateUtils);
-  assert.equal(calls[1][1].modules.currencyUtils, currencyUtils);
+  assert.equal(calls[0][1].monthDateWithAnchor, monthDateWithAnchor);
+  assert.equal(calls[0][1].roundCurrency, roundCurrency);
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "isActiveAccount",
+    "isDueReducingPayment",
+    "monthDateWithAnchor",
+    "roundCurrency",
+  ]);
+  assert.equal(calls[1][1].monthDateWithAnchor, monthDateWithAnchor);
+  assert.equal(calls[1][1].isoDate, isoDate);
+  assert.equal(calls[1][1].roundCurrency, roundCurrency);
+  assert.deepEqual(Object.keys(calls[1][1]).sort(), [
+    "isoDate",
+    "monthDateWithAnchor",
+    "roundCurrency",
+    "todayIso",
+  ]);
   assert.equal(calls[1][1].todayIso, todayIso);
   assert.equal(calls[2][1].state, state);
   assert.equal(calls[2][1].ledger.todayIso, todayIso);

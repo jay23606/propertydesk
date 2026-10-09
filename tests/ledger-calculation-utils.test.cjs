@@ -6,7 +6,8 @@ const dateUtils = require("../features/date-utils.js");
 const accountStatus = require("../features/account-status-utils.js");
 const ledgerUtils = require("./posted-ledger-utils-helper.cjs");
 const scheduleUtils = require("../features/ledger-schedule-utils.js").create({
-  modules: { dateUtils, currencyUtils },
+  monthDateWithAnchor: dateUtils.monthDateWithAnchor,
+  roundCurrency: currencyUtils.roundCurrency,
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
 });

@@ -2,13 +2,16 @@
 (() => {
   "use strict";
 
-  function createLoanAmortizationUtils({ modules, todayIso }) {
-    const { monthDateWithAnchor, isoDate } = modules.dateUtils;
+  function createLoanAmortizationUtils({
+    monthDateWithAnchor,
+    isoDate,
+    roundCurrency,
+    todayIso,
+  }) {
     if (!monthDateWithAnchor || !isoDate || typeof todayIso !== "function")
       throw new Error(
         "Date, currency, and current-date dependencies are required for loan utils.",
       );
-    const { roundCurrency } = modules.currencyUtils;
     if (!roundCurrency)
       throw new Error("PropertyDeskCurrencyUtils must load before loan utils.");
 

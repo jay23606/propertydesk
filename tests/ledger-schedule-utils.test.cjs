@@ -6,7 +6,8 @@ const accountStatus = require("../features/account-status-utils.js");
 const postedLedger = require("./posted-ledger-utils-helper.cjs");
 const { amountDueSince, unpaidDueAccrualStart } =
   require("../features/ledger-schedule-utils.js").create({
-    modules: { dateUtils, currencyUtils },
+    monthDateWithAnchor: dateUtils.monthDateWithAnchor,
+    roundCurrency: currencyUtils.roundCurrency,
     isDueReducingPayment: postedLedger.isDueReducingPayment,
     isActiveAccount: accountStatus.isActiveAccount,
   });

@@ -11,12 +11,15 @@ const loanAmortizationFactory = require("../features/loan-amortization-utils.js"
 const depositFactory = require("../features/deposit-ledger-utils.js");
 const ledgerUtils = require("./posted-ledger-utils-helper.cjs");
 const scheduleUtils = scheduleFactory.create({
-  modules: { dateUtils, currencyUtils },
+  monthDateWithAnchor: dateUtils.monthDateWithAnchor,
+  roundCurrency: currencyUtils.roundCurrency,
   isDueReducingPayment: ledgerUtils.isDueReducingPayment,
   isActiveAccount: accountStatus.isActiveAccount,
 });
 const loanUtils = loanAmortizationFactory.create({
-  modules: { dateUtils, currencyUtils },
+  monthDateWithAnchor: dateUtils.monthDateWithAnchor,
+  isoDate: dateUtils.isoDate,
+  roundCurrency: currencyUtils.roundCurrency,
   todayIso: () => "2026-10-08",
 });
 const depositUtils = depositFactory.create({ isPosted: ledgerUtils.isPosted });

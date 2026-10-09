@@ -2,14 +2,13 @@
 (() => {
   "use strict";
   function createScheduleUtils({
-    modules,
+    monthDateWithAnchor,
+    roundCurrency,
     isDueReducingPayment,
     isActiveAccount,
   }) {
-    const { monthDateWithAnchor } = modules.dateUtils;
     if (!monthDateWithAnchor)
       throw new Error("PropertyDeskDateUtils must load before schedule utils.");
-    const { roundCurrency } = modules.currencyUtils;
     if (!roundCurrency)
       throw new Error(
         "PropertyDeskCurrencyUtils must load before schedule utils.",
