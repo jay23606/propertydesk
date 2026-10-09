@@ -95,7 +95,8 @@
     });
     const propertyViews = workflows.views.create({
       $,
-      state,
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getProperties: () => state.properties,
       esc,
       portfolioTable,
       portfolioModel,

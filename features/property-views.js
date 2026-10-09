@@ -4,7 +4,8 @@
 
   function createPropertyViews({
     $,
-    state,
+    getWorkspaceMembers,
+    getProperties,
     esc,
     portfolioTable,
     portfolioModel,
@@ -34,19 +35,19 @@
         current = holder.value;
       holder.innerHTML =
         '<option value="all">All account holders</option>' +
-        state.workspaceMembers
+        getWorkspaceMembers()
           .map(
             (m) =>
               `<option value="${esc(m.member_user_id)}">${esc(m.display_name || m.email)}</option>`,
           )
           .join("");
-      holder.value = state.workspaceMembers.some(
+      holder.value = getWorkspaceMembers().some(
         (m) => m.member_user_id === current,
       )
         ? current
         : "all";
       renderPropertyRows();
-      $("property-nav-count").textContent = state.properties.filter(
+      $("property-nav-count").textContent = getProperties().filter(
         (p) => !p.archived_at,
       ).length;
     }

@@ -249,12 +249,15 @@ test("Properties workflow returns explicit view and action operations", () => {
     "attachTemplateEvents",
     "esc",
     "exportPDF",
+    "getProperties",
+    "getWorkspaceMembers",
     "openEmailTemplateSettings",
     "openSmsTemplateSettings",
     "portfolioModel",
     "portfolioTable",
-    "state",
   ]);
+  assert.equal(passed.views.getProperties(), state.properties);
+  assert.equal(passed.views.getWorkspaceMembers(), state.workspaceMembers);
   assert.equal(passed.views.exportPDF, action);
   assert.equal(typeof passed.pdfExport.getRows, "function");
   assert.equal("unusedDependency" in passed.views, false);
@@ -668,7 +671,8 @@ test("Properties grid totals the visible due, monthly payments, and loan balance
     });
   const feature = context.window.PropertyDeskPropertyViews.create({
     $: getElement,
-    state,
+    getProperties: () => state.properties,
+    getWorkspaceMembers: () => state.workspaceMembers,
     esc,
     portfolioTable,
     portfolioModel,
