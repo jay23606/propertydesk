@@ -687,6 +687,37 @@
       },
     },
   });
+  const importValidators = window.PropertyDeskImportValidationApi.create({
+    account: {
+      validator: window.PropertyDeskAccountImportValidation,
+      modules: {
+        importRows: window.PropertyDeskImportRows,
+        csvValueUtils: window.PropertyDeskCsvValueUtils,
+        identity: window.PropertyDeskAccountImportIdentity,
+        domainOptions: window.PropertyDeskDomainOptions,
+        terms: window.PropertyDeskAccountImportTerms,
+        emailAddresses: window.PropertyDeskEmailAddressUtils,
+      },
+    },
+    expense: {
+      validator: window.PropertyDeskExpenseImportValidation,
+      modules: {
+        importRows: window.PropertyDeskImportRows,
+        csvValueUtils: window.PropertyDeskCsvValueUtils,
+        transactionOptions: window.PropertyDeskTransactionOptions,
+        expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
+      },
+    },
+    payment: {
+      validator: window.PropertyDeskPaymentImportValidation,
+      modules: {
+        importRows: window.PropertyDeskImportRows,
+        csvValueUtils: window.PropertyDeskCsvValueUtils,
+        paymentAllocation: window.PropertyDeskPaymentImportAllocation,
+        transactionOptions: window.PropertyDeskTransactionOptions,
+      },
+    },
+  });
   const {
     attachPreviewEvents: attachImportPreviewEvents,
     attachAccountEvents: attachAccountImportEvents,
@@ -706,7 +737,7 @@
     modules: {
       importRows: window.PropertyDeskImportRows,
       csvParser: window.PropertyDeskCsvParser,
-      validators: window.PropertyDeskImportWorkflows,
+      validators: importValidators,
       preview: {
         create: window.PropertyDeskImportPreview.create,
         modules: {

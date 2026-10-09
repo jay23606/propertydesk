@@ -2,21 +2,52 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
 require("../features/currency-utils.js");
-require("../features/csv-value-utils.js");
-require("../features/email-address-utils.js");
-require("../features/domain-options.js");
-require("../features/transaction-options.js");
+const csvValueUtils = require("../features/csv-value-utils.js");
+const emailAddresses = require("../features/email-address-utils.js");
+const domainOptions = require("../features/domain-options.js");
+const transactionOptions = require("../features/transaction-options.js");
 require("../features/display-utils.js");
-require("../features/import-row-utils.js");
-require("../features/account-import-identity.js");
-require("../features/account-import-terms.js");
-require("../features/payment-import-allocation.js");
-require("../features/expense-account-policy.js");
+const importRows = require("../features/import-row-utils.js");
+const identity = require("../features/account-import-identity.js");
+const terms = require("../features/account-import-terms.js");
+const paymentAllocation = require("../features/payment-import-allocation.js");
+const expenseAccountPolicy = require("../features/expense-account-policy.js");
 const { selectImportRows } = require("../features/import-row-utils.js");
-require("../features/account-import-validation.js");
-require("../features/expense-import-validation.js");
-require("../features/payment-import-validation.js");
-const importWorkflows = require("../features/import-validation-api.js");
+const accountValidation = require("../features/account-import-validation.js");
+const expenseValidation = require("../features/expense-import-validation.js");
+const paymentValidation = require("../features/payment-import-validation.js");
+const importValidationApi = require("../features/import-validation-api.js");
+const importWorkflows = importValidationApi.create({
+  account: {
+    validator: accountValidation,
+    modules: {
+      importRows,
+      csvValueUtils,
+      identity,
+      domainOptions,
+      terms,
+      emailAddresses,
+    },
+  },
+  expense: {
+    validator: expenseValidation,
+    modules: {
+      importRows,
+      csvValueUtils,
+      transactionOptions,
+      expenseAccountPolicy,
+    },
+  },
+  payment: {
+    validator: paymentValidation,
+    modules: {
+      importRows,
+      csvValueUtils,
+      paymentAllocation,
+      transactionOptions,
+    },
+  },
+});
 
 const properties = [{ id: "p1", name: "Oak House", address: "10 Oak St" }];
 const accounts = [
@@ -40,6 +71,7 @@ module.exports = {
   validateExpenseRows: importWorkflows.validateExpenseRows,
   validatePaymentRows: importWorkflows.validatePaymentRows,
   importWorkflows,
+  importValidationApi,
   properties,
   accounts,
   readTemplate,

@@ -30,7 +30,15 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     app,
-    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?validators: window\.PropertyDeskImportWorkflows,[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
+    /modules:\s*\{[\s\S]*?importRows: window\.PropertyDeskImportRows,[\s\S]*?validators: importValidators,[\s\S]*?transactionImportWorkflow: window\.PropertyDeskTransactionImportWorkflow,/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskImportValidationApi\.create\(\{[\s\S]*?validator: window\.PropertyDeskAccountImportValidation,[\s\S]*?validator: window\.PropertyDeskExpenseImportValidation,[\s\S]*?expenseAccountPolicy: window\.PropertyDeskExpenseAccountPolicy,[\s\S]*?validator: window\.PropertyDeskPaymentImportValidation/,
+  );
+  assert.match(
+    app,
+    /PropertyDeskImportValidationApi\.create\(\{[\s\S]*?validator: window\.PropertyDeskAccountImportValidation,[\s\S]*?validator: window\.PropertyDeskExpenseImportValidation,[\s\S]*?validator: window\.PropertyDeskPaymentImportValidation/,
   );
   assert.match(
     app,
