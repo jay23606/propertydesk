@@ -109,7 +109,7 @@ test("app services compose shared runtime and financial services explicitly", ()
   assert.equal(Object.isFrozen(services), true);
   assert.equal(services.writeFeedback, writeFeedback);
   assert.equal(services.emailUtils, emailUtils);
-  assert.equal(services.postedLedgerUtils, postedLedgerUtils);
+  assert.equal("postedLedgerUtils" in services, false);
   assert.equal(services.toast, toast);
   assert.equal(services.state, state);
   assert.equal(services.repositories, repositories);

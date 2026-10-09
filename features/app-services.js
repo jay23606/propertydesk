@@ -54,7 +54,6 @@
     return Object.freeze({
       writeFeedback,
       emailUtils,
-      postedLedgerUtils,
       toast,
       ...runtime,
       paymentNotifications,
