@@ -17,7 +17,13 @@ test("feature module namespaces expose frozen API objects", () => {
     for (const assignment of assignments) {
       apiCount += 1;
       const initializer = source.slice(assignment.index + assignment[0].length);
-      if (!initializer.startsWith("Object.freeze({")) {
+      const alias = initializer.match(/^([A-Za-z_$][\w$]*);/)?.[1];
+      const frozenAlias = alias
+        ? new RegExp(`const\\s+${alias}\\s*=\\s*Object\\.freeze\\(\\{`).test(
+            source,
+          )
+        : false;
+      if (!initializer.startsWith("Object.freeze({") && !frozenAlias) {
         mutableApis.push(filename);
       }
     }

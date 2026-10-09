@@ -2,6 +2,12 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const dates = require("../features/date-utils.js");
 
+test("date utilities expose one shared browser and module API", () => {
+  assert.equal(globalThis.PropertyDeskDateUtils, dates);
+  assert.equal(typeof dates.now, "function");
+  assert.equal(typeof dates.timestampIso, "function");
+});
+
 test("date-only parsing and display formatting preserve local calendar dates", () => {
   const date = dates.dateOnly("2026-10-05");
 
@@ -40,6 +46,8 @@ test("today and month boundaries agree with the local calendar", () => {
 
   global.Date = FixedDate;
   try {
+    assert.equal(dates.now().getTime(), new FixedDate().getTime());
+    assert.equal(dates.timestampIso(), new FixedDate().toISOString());
     assert.equal(dates.todayIso(), "2024-02-29");
     assert.equal(dates.monthStart(), "2024-02-01");
     assert.equal(dates.monthEnd(), "2024-02-29");

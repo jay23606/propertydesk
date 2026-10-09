@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const now = () => new Date();
+  const timestampIso = () => now().toISOString();
   const dateOnly = (value) => (value ? new Date(`${value}T12:00:00`) : null);
   const fmtDate = (
     value,
@@ -16,15 +18,15 @@
     const day = String(date.getDate()).padStart(2, "0");
     return `${date.getFullYear()}-${month}-${day}`;
   };
-  const todayIso = () => isoDate(new Date());
+  const todayIso = () => isoDate(now());
   const monthStart = () => {
-    const date = new Date();
+    const date = now();
     date.setDate(1);
     const month = String(date.getMonth() + 1).padStart(2, "0");
     return `${date.getFullYear()}-${month}-01`;
   };
   const monthEnd = () => {
-    const date = new Date();
+    const date = now();
     date.setMonth(date.getMonth() + 1, 0);
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -57,6 +59,8 @@
   };
 
   const dateUtils = Object.freeze({
+    now,
+    timestampIso,
     dateOnly,
     fmtDate,
     fmtDateTime,
@@ -66,18 +70,12 @@
     monthEnd,
     monthDateWithAnchor,
   });
-  globalThis.PropertyDeskDateUtils = dateUtils;
-  if (typeof window !== "undefined")
-    window.PropertyDeskDateUtils = Object.freeze({
-      dateOnly,
-      fmtDate,
-      fmtDateTime,
-      isoDate,
-      todayIso,
-      monthStart,
-      monthEnd,
-      monthDateWithAnchor,
-    });
+  if (typeof window !== "undefined") {
+    window.PropertyDeskDateUtils = dateUtils;
+    globalThis.PropertyDeskDateUtils = window.PropertyDeskDateUtils;
+  } else {
+    globalThis.PropertyDeskDateUtils = dateUtils;
+  }
   if (typeof module !== "undefined" && module.exports)
     module.exports = dateUtils;
 })();

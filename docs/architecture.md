@@ -28,7 +28,7 @@ Workflow coordinators pass only the dependencies each child needs instead of for
 
 ## Shared domain logic
 
-Keep reusable rules in focused modules rather than duplicating them in views. Date, currency, and display helpers are separate from account-type and transaction-option catalogs. Financial context modules compose rolling unpaid-due calculations, on-time amortization estimates, posted transaction summaries, and held-deposit balances for use by screens and forms.
+Keep reusable rules in focused modules rather than duplicating them in views. Date, currency, and display helpers are separate from account-type and transaction-option catalogs. `features/date-utils.js` owns the shared clock and ISO timestamps as well as calendar formatting and boundaries. Financial context modules compose rolling unpaid-due calculations, on-time amortization estimates, posted transaction summaries, and held-deposit balances for use by screens and forms.
 
 Manual reminder drafts and automated reminders share the message builder in `supabase/functions/_shared/reminder-copy.js`. The month-end reminder function owns its authorization, eligibility checks, delivery, and activity logging; reminders remain disabled by default.
 

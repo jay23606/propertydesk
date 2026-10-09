@@ -3,13 +3,11 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const now = () => new Date();
   const confirmAction = (message) => window.confirm(message);
   const promptAction = (message, initialValue) =>
     window.prompt(message, initialValue);
   const openWindow = (...args) => window.open(...args);
   const reportError = (message, error) => window.console?.error(message, error);
-  const transactionTimestamp = () => now().toISOString();
   const appServices = window.PropertyDeskAppServices.create({
     $,
     config: window.PROPERTYDESK_CONFIG || {},
@@ -103,8 +101,16 @@
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
-  const { dateOnly, fmtDate, fmtDateTime, todayIso, monthStart, monthEnd } =
-    window.PropertyDeskDateUtils;
+  const {
+    now,
+    timestampIso: transactionTimestamp,
+    dateOnly,
+    fmtDate,
+    fmtDateTime,
+    todayIso,
+    monthStart,
+    monthEnd,
+  } = window.PropertyDeskDateUtils;
   const { moneyInput } = window.PropertyDeskCurrencyUtils;
   const {
     money,
