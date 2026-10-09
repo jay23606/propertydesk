@@ -191,12 +191,14 @@ test("account and deposit workspace exposes only its supported operations", () =
     "propertyAddress",
     "sumPosted",
     "summarizeAccount",
-    "unusedContentValue",
     "workflows",
   ]);
-  for (const key of Object.keys(content)) {
+  for (const key of Object.keys(passed.accountDetails.content).filter(
+    (key) => key !== "depositSectionHTML",
+  )) {
     assert.equal(passed.accountDetails.content[key], content[key]);
   }
+  assert.equal("unusedContentValue" in passed.accountDetails.content, false);
   assert.equal(
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
@@ -297,7 +299,11 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     accountDepositWorkspaceWorkflow,
-    /depositWorkspaceWorkflow\.create\(\{\s*details: deposits\.details,\s*adjustments: deposits\.adjustments,\s*workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?content: \{\s*\.\.\.accountDetails\.content,[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?actions: accountDetails\.actions/,
+    /depositWorkspaceWorkflow\.create\(\{\s*details: deposits\.details,\s*adjustments: deposits\.adjustments,\s*workflows: depositWorkflows,[\s\S]*?accountDetailWorkspaceWorkflow\.create\([\s\S]*?content: \{[\s\S]*?depositSectionHTML: depositWorkspace\.depositSectionHTML,[\s\S]*?accountHistoryRepository:\s*accountDetails\.content\.accountHistoryRepository,[\s\S]*?workflows: accountDetails\.content\.workflows,[\s\S]*?actions: accountDetails\.actions/,
+  );
+  assert.doesNotMatch(
+    accountDepositWorkspaceWorkflow,
+    /\.\.\.accountDetails\.content/,
   );
   assert.doesNotMatch(
     accountDepositWorkspaceWorkflow,

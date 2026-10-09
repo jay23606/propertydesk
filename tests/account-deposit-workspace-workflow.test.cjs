@@ -48,7 +48,11 @@ test("account and deposit workspace share detail rendering and events", () => {
     },
     ignored: true,
   };
-  const content = { fmtDateTime() {}, accountHistoryRepository: {} };
+  const content = {
+    fmtDateTime() {},
+    accountHistoryRepository: {},
+    ignored: true,
+  };
   const actions = {
     $() {},
     getAccount() {},
@@ -157,6 +161,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     content.accountHistoryRepository,
   );
   assert.equal(passed.accountDetails.content.fmtDateTime, content.fmtDateTime);
+  assert.equal("ignored" in passed.accountDetails.content, false);
   assert.equal(
     passed.accountDetails.content.depositSectionHTML,
     depositSectionHTML,
