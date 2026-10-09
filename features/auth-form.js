@@ -7,9 +7,10 @@
     state,
     authClient,
     startWorkspace,
+    viewModule,
     documentRef = document,
   }) {
-    const view = window.PropertyDeskAuthFormView.create({ $, documentRef });
+    const view = viewModule.create({ $, documentRef });
 
     async function submitAuth(event) {
       event.preventDefault();

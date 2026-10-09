@@ -61,7 +61,10 @@ function authFeatureModules(context) {
   return {
     screens: window.PropertyDeskAuthScreens,
     form: window.PropertyDeskAuthForm,
+    formView: window.PropertyDeskAuthFormView,
     recovery: window.PropertyDeskAuthRecovery,
+    recoveryView: window.PropertyDeskAuthRecoveryView,
+    resetRequest: window.PropertyDeskAuthResetRequest,
     session: window.PropertyDeskAuthSession,
     resetWorkspaceState: window.PropertyDeskAppState.resetWorkspaceState,
   };

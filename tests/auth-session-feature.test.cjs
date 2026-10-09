@@ -295,6 +295,7 @@ test("auth form sends sign-in to the workspace and asks unconfirmed sign-ups to 
     $: element,
     state,
     authClient: createAuthClient(context, state),
+    viewModule: context.window.PropertyDeskAuthFormView,
     startWorkspace: async () => {
       workspaceStarts += 1;
     },

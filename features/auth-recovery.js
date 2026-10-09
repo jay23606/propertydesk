@@ -10,17 +10,17 @@
     setAuthMode,
     startWorkspace,
     showAuth,
+    viewModule,
+    resetRequestModule,
     windowRef = window,
     documentRef = document,
   }) {
-    const view = window.PropertyDeskAuthRecoveryView.create({ $, documentRef });
-    const { requestPasswordReset } = window.PropertyDeskAuthResetRequest.create(
-      {
-        authClient,
-        view,
-        windowRef,
-      },
-    );
+    const view = viewModule.create({ $, documentRef });
+    const { requestPasswordReset } = resetRequestModule.create({
+      authClient,
+      view,
+      windowRef,
+    });
 
     function showPasswordReset() {
       state.passwordRecoveryInProgress = true;

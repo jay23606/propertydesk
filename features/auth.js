@@ -25,6 +25,7 @@
         authClient,
         documentRef,
         startWorkspace,
+        viewModule: modules.formView,
       });
 
     const {
@@ -41,6 +42,8 @@
       showAuth,
       windowRef,
       documentRef,
+      viewModule: modules.recoveryView,
+      resetRequestModule: modules.resetRequest,
     });
 
     async function startWorkspace() {

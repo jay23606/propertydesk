@@ -89,6 +89,8 @@ test("password reset requests keep generic feedback and restore the submit contr
     authClient: context.window.PropertyDeskAuthClient.create({
       getClient: () => state.client,
     }),
+    viewModule: context.window.PropertyDeskAuthRecoveryView,
+    resetRequestModule: context.window.PropertyDeskAuthResetRequest,
     fetchAll: async () => {},
     toast() {},
     setAuthMode() {},
