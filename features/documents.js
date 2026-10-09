@@ -23,6 +23,7 @@
       repository,
       writeFeedback,
       describeUpload: modules.uploadPolicy.describe,
+      maintenanceModule: modules.uploadMaintenance,
     });
 
     const { deletePropertyDocument, openPropertyDocument } =

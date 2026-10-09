@@ -567,11 +567,13 @@
         writeFeedback: window.PropertyDeskRepositoryWriteFeedback,
         modules: {
           upload: window.PropertyDeskDocumentUpload,
+          uploadMaintenance: window.PropertyDeskDocumentUploadMaintenance,
           uploadPolicy: window.PropertyDeskDocumentUploadPolicy,
           actions: {
             create: window.PropertyDeskDocumentActions.create,
             modules: {
               delete: window.PropertyDeskDocumentDelete,
+              deleteMaintenance: window.PropertyDeskDocumentDeleteMaintenance,
               open: window.PropertyDeskDocumentOpen,
             },
           },

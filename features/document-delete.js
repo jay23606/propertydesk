@@ -10,16 +10,16 @@
     confirm = (message) => window.confirm(message),
     repository,
     writeFeedback,
+    maintenanceModule,
   }) {
-    const { removePropertyDocument } =
-      window.PropertyDeskDocumentDeleteMaintenance.create({
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-        repository,
-        writeFeedback,
-      });
+    const { removePropertyDocument } = maintenanceModule.create({
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+      repository,
+      writeFeedback,
+    });
 
     function documentForDeletion(id, propertyId) {
       const doc = state.documents.find((item) => item.id === id);

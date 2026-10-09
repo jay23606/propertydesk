@@ -39,6 +39,11 @@ test("document maintenance receives write feedback through explicit dependencies
     );
     assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
     assert.match(source, /writeFeedback/);
+    if (filename === "document-upload.js" || filename === "document-delete.js")
+      assert.doesNotMatch(
+        source,
+        /window\.PropertyDeskDocument(?:Upload|Delete)Maintenance\.create/,
+      );
   }
 });
 
@@ -89,6 +94,7 @@ test("document actions separate deletion and signed-link dependencies", () => {
     writeFeedback: { kind: "write-feedback" },
     modules: {
       delete: context.window.PropertyDeskDocumentDelete,
+      deleteMaintenance: { kind: "delete-maintenance" },
       open: context.window.PropertyDeskDocumentOpen,
     },
   };
@@ -101,6 +107,10 @@ test("document actions separate deletion and signed-link dependencies", () => {
   assert.equal(passed.deletion.confirm, dependencies.confirm);
   assert.equal(passed.deletion.repository, dependencies.repository);
   assert.equal(passed.deletion.writeFeedback, dependencies.writeFeedback);
+  assert.equal(
+    passed.deletion.maintenanceModule,
+    dependencies.modules.deleteMaintenance,
+  );
   assert.equal(passed.deletion.openWindow, undefined);
   assert.equal(passed.open.state, dependencies.state);
   assert.equal(passed.open.openWindow, dependencies.openWindow);

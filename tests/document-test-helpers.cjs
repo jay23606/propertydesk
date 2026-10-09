@@ -35,11 +35,14 @@ function createDocuments(context, options) {
     writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
     modules: {
       upload: context.window.PropertyDeskDocumentUpload,
+      uploadMaintenance: context.window.PropertyDeskDocumentUploadMaintenance,
       uploadPolicy: context.window.PropertyDeskDocumentUploadPolicy,
       actions: {
         create: context.window.PropertyDeskDocumentActions.create,
         modules: {
           delete: context.window.PropertyDeskDocumentDelete,
+          deleteMaintenance:
+            context.window.PropertyDeskDocumentDeleteMaintenance,
           open: context.window.PropertyDeskDocumentOpen,
         },
       },

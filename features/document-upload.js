@@ -11,16 +11,16 @@
     repository,
     describeUpload,
     writeFeedback,
+    maintenanceModule,
   }) {
-    const { uploadFile, saveDocumentMetadata } =
-      window.PropertyDeskDocumentUploadMaintenance.create({
-        state,
-        toast,
-        fetchAll,
-        openPropertyDetails,
-        repository,
-        writeFeedback,
-      });
+    const { uploadFile, saveDocumentMetadata } = maintenanceModule.create({
+      state,
+      toast,
+      fetchAll,
+      openPropertyDetails,
+      repository,
+      writeFeedback,
+    });
 
     async function reopenPropertyDetails(propertyId) {
       await writeFeedback.refreshWorkspace({

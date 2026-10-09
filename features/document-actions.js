@@ -21,6 +21,7 @@
       confirm,
       repository,
       writeFeedback,
+      maintenanceModule: modules.deleteMaintenance,
     });
     const { openPropertyDocument } = modules.open.create({
       state,
