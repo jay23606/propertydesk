@@ -18,7 +18,7 @@
     prepareAdjustment,
     repository,
     resolveAdjustmentType,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
   }) {
     async function saveDepositAdjustment(accountId, type, amount, reason) {
       const account = state.accounts.find((row) => row.id === accountId);
@@ -37,7 +37,7 @@
       });
       if (!adjustmentIsReady(prepared, toast)) return false;
       const message = adjustmentType.successMessage;
-      return writeFeedback.saveAndRefreshWorkspaceRecord({
+      return saveAndRefreshWorkspaceRecord({
         operation: () => repository.insert(prepared.payload),
         state,
         collection: "depositEntries",

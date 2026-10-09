@@ -31,7 +31,7 @@ test("account detail action workflow wires only account close concerns", () => {
     return elements.get(id);
   };
   const closeModal = (element) => (passed.closedModal = element);
-  const writeFeedback = {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const confirmAction = () => true;
   const context = vm.createContext({
     window: {
@@ -65,7 +65,7 @@ test("account detail action workflow wires only account close concerns", () => {
     editAccount() {},
     openPayment() {},
     repository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     confirmAction,
     workflows: {
       closeMaintenance: context.window.PropertyDeskAccountCloseMaintenance,
@@ -83,7 +83,10 @@ test("account detail action workflow wires only account close concerns", () => {
     context.window.PropertyDeskAccountCloseMaintenance,
   );
   assert.equal(passed.maintenance.repository, repository);
-  assert.equal(passed.maintenance.writeFeedback, writeFeedback);
+  assert.equal(
+    passed.maintenance.saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(typeof passed.maintenance.closeAccountDetails, "function");
   assert.equal(passed.entry.saveCloseAccount, saveCloseAccount);
   assert.equal(passed.entry.confirmAction, confirmAction);

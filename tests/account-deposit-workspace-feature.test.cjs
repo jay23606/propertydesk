@@ -10,7 +10,7 @@ test("account and deposit workspace exposes only its supported operations", () =
   const attachAccountDetailActionEvents = () => {};
   const attachDepositAdjustmentEvents = () => {};
   const depositSectionHTML = () => "deposit";
-  const writeFeedback = {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskDepositWorkspaceWorkflow: {
@@ -72,7 +72,7 @@ test("account and deposit workspace exposes only its supported operations", () =
       validateAdjustment: () => {},
       resolveAdjustmentType: () => {},
       promptAction: () => {},
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       unusedAdjustmentValue: true,
     },
     unusedDepositValue: true,
@@ -103,7 +103,7 @@ test("account and deposit workspace exposes only its supported operations", () =
     editAccount: () => {},
     openPayment: () => {},
     repository: {},
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     unusedActionValue: true,
   };
   const accountDetails = { content, actions };
@@ -146,11 +146,11 @@ test("account and deposit workspace exposes only its supported operations", () =
     "promptAction",
     "repository",
     "resolveAdjustmentType",
+    "saveAndRefreshWorkspaceRecord",
     "state",
     "toast",
     "todayIso",
     "validateAdjustment",
-    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.deposits.details))
     assert.equal(passed.deposits.details[key], deposits.details[key]);
@@ -194,14 +194,17 @@ test("account and deposit workspace exposes only its supported operations", () =
     "fetchAll",
     "openPayment",
     "repository",
+    "saveAndRefreshWorkspaceRecord",
     "state",
     "toast",
-    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.accountDetails.actions))
     assert.equal(passed.accountDetails.actions[key], actions[key]);
   assert.equal("unusedActionValue" in passed.accountDetails.actions, false);
-  assert.equal(passed.accountDetails.actions.writeFeedback, writeFeedback);
+  assert.equal(
+    passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,
@@ -309,12 +312,13 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.match(accountWorkflow, /closeMaintenanceWorkflow\.create\(/);
   assert.match(accountWorkflow, /closeEntryWorkflow\.create\(/);
   assert.match(accountWorkflow, /detailEventsWorkflow\.create\(/);
+  assert.doesNotMatch(accountWorkflow, /writeFeedback/);
   assert.match(
     accountWorkflow,
     /closeAccountDetails: \(\) => closeModal\(\$\("detail-modal"\)\)/,
   );
   assert.match(accountWorkflow, /repository,/);
-  assert.match(accountWorkflow, /writeFeedback,/);
+  assert.match(accountWorkflow, /saveAndRefreshWorkspaceRecord,/);
   const depositWorkflow = fs.readFileSync(
     path.join(__dirname, "..", "features", "deposit-adjustment-workflow.js"),
     "utf8",
@@ -330,14 +334,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /window\.PropertyDeskDeposit(?:Maintenance|AdjustmentEntry|DetailEvents)\.create/,
   );
   assert.match(depositWorkflow, /repository,/);
-  assert.match(depositWorkflow, /writeFeedback,/);
+  assert.match(depositWorkflow, /saveAndRefreshWorkspaceRecord,/);
+  assert.doesNotMatch(depositWorkflow, /writeFeedback/);
   assert.match(
     app,
-    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?writeFeedback,/,
+    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
     app,
-    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?writeFeedback,/,
+    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
     appServices,

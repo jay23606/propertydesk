@@ -36,7 +36,7 @@
       editAccount: actions.editAccount,
       openPayment: actions.openPayment,
       repository: actions.repository,
-      writeFeedback: actions.writeFeedback,
+      saveAndRefreshWorkspaceRecord: actions.saveAndRefreshWorkspaceRecord,
       confirmAction: actions.confirmAction,
       workflows: actionWorkflows,
     });

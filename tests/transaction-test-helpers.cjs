@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { createRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
 
 function loadTransactionRepository(context) {
   for (const filename of [
@@ -27,19 +28,7 @@ function transactionVoidModelOptions(context) {
       context,
     );
   }
-  const feedback = context.window.PropertyDeskRepositoryWriteFeedback;
   return {
-    writeFeedback:
-      typeof feedback?.create === "function"
-        ? feedback.create({
-            modules: {
-              reconciliation:
-                context.window.PropertyDeskWorkspaceWriteReconciliation,
-              recordWrites:
-                context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-            },
-          })
-        : feedback || {},
     resolveVoidTarget:
       context.window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
     buildVoidPayload:
@@ -48,19 +37,9 @@ function transactionVoidModelOptions(context) {
 }
 
 function transactionWriteFeedbackOptions(context) {
-  const feedback = context.window.PropertyDeskRepositoryWriteFeedback;
   return {
-    writeFeedback:
-      typeof feedback?.create === "function"
-        ? feedback.create({
-            modules: {
-              reconciliation:
-                context.window.PropertyDeskWorkspaceWriteReconciliation,
-              recordWrites:
-                context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-            },
-          })
-        : feedback || {},
+    runAndRefreshWorkspaceChange:
+      createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
   };
 }
 

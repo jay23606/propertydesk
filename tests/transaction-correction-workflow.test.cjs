@@ -60,7 +60,7 @@ test("transaction correction workflow owns correction persistence and forms", ()
     EventClass: class MockEvent {},
     OptionClass: class MockOption {},
     repository: {},
-    writeFeedback: {},
+    runAndRefreshWorkspaceChange() {},
     findCorrectionTarget() {},
     workflows: context.correctionModules,
   };
@@ -92,8 +92,8 @@ test("transaction correction workflow owns correction persistence and forms", ()
   assert.equal(passed.corrections.state, correctionContext.state);
   assert.equal(passed.corrections.repository, correctionContext.repository);
   assert.equal(
-    passed.corrections.writeFeedback,
-    correctionContext.writeFeedback,
+    passed.corrections.runAndRefreshWorkspaceChange,
+    correctionContext.runAndRefreshWorkspaceChange,
   );
   assert.equal(
     passed.form.findCorrectionTarget,

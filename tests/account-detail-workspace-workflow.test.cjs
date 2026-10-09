@@ -41,7 +41,7 @@ test("account detail workspace joins content rendering and action binding", () =
     editAccount() {},
     openPayment() {},
     repository: {},
-    writeFeedback: {},
+    saveAndRefreshWorkspaceRecord() {},
     confirmAction() {},
     unusedDependency: true,
   };
@@ -109,10 +109,10 @@ test("account detail workspace joins content rendering and action binding", () =
     "fetchAll",
     "openPayment",
     "repository",
+    "saveAndRefreshWorkspaceRecord",
     "state",
     "toast",
     "workflows",
-    "writeFeedback",
   ]);
   for (const key of Object.keys(passed.content))
     assert.equal(passed.content[key], content[key]);

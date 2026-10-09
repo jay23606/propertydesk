@@ -9,7 +9,7 @@
     fetchAll,
     closeModal,
     repository,
-    writeFeedback,
+    runAndRefreshWorkspaceChange,
   }) {
     const correctionTypes = Object.freeze({
       payment: Object.freeze({
@@ -35,7 +35,7 @@
       }
       const successMessage = `${type.label} corrected; original kept in history`;
       const closeCorrectionForm = () => closeModal($(type.modalId));
-      return writeFeedback.runAndRefreshWorkspaceChange({
+      return runAndRefreshWorkspaceChange({
         operation: () =>
           repository.correct({
             kind,

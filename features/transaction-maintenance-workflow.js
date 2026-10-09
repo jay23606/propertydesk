@@ -25,7 +25,8 @@
       EventClass: correctionContext.EventClass,
       OptionClass: correctionContext.OptionClass,
       repository: correctionContext.repository,
-      writeFeedback: correctionContext.writeFeedback,
+      runAndRefreshWorkspaceChange:
+        correctionContext.runAndRefreshWorkspaceChange,
       findCorrectionTarget: correctionContext.findCorrectionTarget,
       workflows: correctionModules,
     });
@@ -37,7 +38,7 @@
       resolveVoidTarget: voidingContext.resolveVoidTarget,
       buildVoidPayload: voidingContext.buildVoidPayload,
       repository: voidingContext.repository,
-      writeFeedback: voidingContext.writeFeedback,
+      runAndRefreshWorkspaceChange: voidingContext.runAndRefreshWorkspaceChange,
     });
     const { voidTransaction } = voidEntryWorkflow.create({
       toast: voidingContext.toast,

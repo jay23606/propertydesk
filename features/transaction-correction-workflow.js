@@ -13,7 +13,7 @@
     EventClass,
     OptionClass,
     repository,
-    writeFeedback,
+    runAndRefreshWorkspaceChange,
     findCorrectionTarget,
     workflows,
   }) {
@@ -24,7 +24,7 @@
       fetchAll,
       closeModal,
       repository,
-      writeFeedback,
+      runAndRefreshWorkspaceChange,
     });
 
     function createCorrectionActionHandlers({

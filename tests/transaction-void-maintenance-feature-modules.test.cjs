@@ -5,6 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 const {
   loadTransactionRepository,
+  transactionWriteFeedbackOptions,
   transactionVoidModelOptions,
 } = require("./transaction-test-helpers.cjs");
 
@@ -67,6 +68,7 @@ test("transaction void maintenance voids a posted row with an audit reason", asy
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
+    ...transactionWriteFeedbackOptions(context),
     ...transactionVoidModelOptions(context),
     timestamp: () => "2026-10-04T12:00:00.000Z",
     fetchAll: async () => {
@@ -112,6 +114,7 @@ test("transaction void maintenance rejects unsupported kinds before prompting or
         from: () => assert.fail("unsupported kind must not write"),
       }),
     }),
+    ...transactionWriteFeedbackOptions(context),
     ...transactionVoidModelOptions(context),
   });
 
@@ -166,6 +169,7 @@ test("transaction void maintenance reports rejected requests without refreshing"
         }),
       }),
     }),
+    ...transactionWriteFeedbackOptions(context),
     ...transactionVoidModelOptions(context),
   });
 
@@ -207,6 +211,7 @@ test("transaction void confirms a lost response from the refreshed audit fields"
             throw new Error("connection lost");
           },
         },
+        ...transactionWriteFeedbackOptions(context),
         ...transactionVoidModelOptions(context),
         timestamp: () => "2026-10-08T12:00:00.000Z",
         fetchAll: async () => {
@@ -254,6 +259,7 @@ test("transaction void maintenance reports database errors without refreshing", 
         error: { message: "Permission denied" },
       }),
     },
+    ...transactionWriteFeedbackOptions(context),
     ...transactionVoidModelOptions(context),
     timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => assert.fail("database errors must not refresh"),
@@ -284,6 +290,7 @@ test("transaction void maintenance reports an already-changed row without refres
     repository: {
       voidPosted: async () => ({ data: null, error: null }),
     },
+    ...transactionWriteFeedbackOptions(context),
     ...transactionVoidModelOptions(context),
     timestamp: () => "2026-10-08T12:00:00.000Z",
     fetchAll: async () => assert.fail("a missing row must not refresh"),

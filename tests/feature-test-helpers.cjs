@@ -47,6 +47,13 @@ function createRepositoryWriteFeedback(context) {
   });
 }
 
+function workspaceRecordWriteOptions(context) {
+  return {
+    saveAndRefreshWorkspaceRecord:
+      createRepositoryWriteFeedback(context).saveAndRefreshWorkspaceRecord,
+  };
+}
+
 function loadAuthFeatures(context) {
   for (const filename of [
     "app-state.js",
@@ -375,6 +382,7 @@ function formElements(values = {}) {
 module.exports = {
   loadRepositoryWriteFeedback,
   createRepositoryWriteFeedback,
+  workspaceRecordWriteOptions,
   loadAuthFeatures,
   authFeatureModules,
   createAuthClient,

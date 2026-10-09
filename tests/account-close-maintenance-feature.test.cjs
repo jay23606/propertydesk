@@ -3,9 +3,12 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const { loadRepositoryWriteFeedback } = require("./feature-test-helpers.cjs");
+const {
+  loadRepositoryWriteFeedback,
+  workspaceRecordWriteOptions,
+} = require("./feature-test-helpers.cjs");
 
-test("account close maintenance uses injected write feedback", () => {
+test("account close maintenance uses its injected record-save operation", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "account-close-maintenance.js"),
     "utf8",
@@ -59,12 +62,7 @@ test("account close maintenance preserves the account history", async () => {
     },
   };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...workspaceRecordWriteOptions(context),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
@@ -113,12 +111,7 @@ test("account close maintenance reports rejected requests without closing detail
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...workspaceRecordWriteOptions(context),
     repository: context.window.PropertyDeskAccountRepository.create({
       queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => ({
@@ -160,12 +153,7 @@ test("account close confirms a lost response from refreshed account status", asy
   const state = { accounts: [{ id: "account-1", status: "active" }] };
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
     state,
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...workspaceRecordWriteOptions(context),
     repository: {
       close: async () => {
         throw new Error("connection lost");
@@ -200,12 +188,7 @@ test("account close maintenance reports database errors before closing details",
   const calls = [];
   const messages = [];
   const feature = context.window.PropertyDeskAccountCloseMaintenance.create({
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    ...workspaceRecordWriteOptions(context),
     repository: {
       close: async (id) => {
         calls.push(["close", id]);

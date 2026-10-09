@@ -20,7 +20,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
   const saveDepositAdjustment = () => {};
   const recordDepositAdjustment = () => {};
   const attachDepositAdjustmentEvents = () => {};
-  const writeFeedback = {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const context = vm.createContext({
     window: {
       PropertyDeskDepositMaintenance: {
@@ -56,7 +56,7 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
     prepareAdjustment,
     validateAdjustment,
     resolveAdjustmentType,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     promptAction() {},
     workflows: {
       maintenance: context.window.PropertyDeskDepositMaintenance,
@@ -77,7 +77,10 @@ test("deposit adjustment workflow wires only deposit concerns", () => {
 
   assert.equal(Object.isFrozen(workflow), true);
   assert.equal(passed.maintenance.repository, repository);
-  assert.equal(passed.maintenance.writeFeedback, writeFeedback);
+  assert.equal(
+    passed.maintenance.saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(passed.maintenance.prepareAdjustment, prepareAdjustment);
   assert.equal(passed.maintenance.resolveAdjustmentType, resolveAdjustmentType);
   assert.equal(passed.entry.moneyInput, dependencies.moneyInput);

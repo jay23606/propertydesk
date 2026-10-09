@@ -14,7 +14,7 @@
     prepareAdjustment,
     validateAdjustment,
     resolveAdjustmentType,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     promptAction,
     workflows,
   }) {
@@ -26,7 +26,7 @@
       repository,
       prepareAdjustment,
       resolveAdjustmentType,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
     });
     const { recordDepositAdjustment } = workflows.entry.create({
       state,

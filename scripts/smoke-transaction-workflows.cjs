@@ -97,7 +97,19 @@ async function smokeTransactionMaintenance(signedInPage) {
   await signedInPage
     .locator('[data-account-detail-close="smoke-account"]')
     .click();
-  await signedInPage.getByText("Account closed").waitFor();
+  try {
+    await signedInPage.getByText("Account closed").waitFor();
+  } catch (error) {
+    const closeState = await signedInPage.evaluate(() => ({
+      toast: document.getElementById("toast")?.innerText,
+      account: window.__smokeRows.pd_accounts.find(
+        (row) => row.id === "smoke-account",
+      ),
+    }));
+    throw new Error(
+      `Account close did not complete: ${JSON.stringify(closeState)}. ${error.message}`,
+    );
+  }
   const accountClosed = await signedInPage.evaluate(
     () =>
       window.__smokeRows.pd_accounts.find((row) => row.id === "smoke-account")

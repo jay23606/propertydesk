@@ -10,7 +10,7 @@ test("account and deposit workspace share detail rendering and events", () => {
   const attachDepositAdjustmentEvents = () => {};
   const openAccountDetails = () => {};
   const attachAccountDetailActionEvents = () => {};
-  const writeFeedback = {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const depositWorkflows = {
     detailsModel: {},
     detailsView: {},
@@ -42,7 +42,7 @@ test("account and deposit workspace share detail rendering and events", () => {
       validateAdjustment() {},
       resolveAdjustmentType() {},
       promptAction() {},
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       ignored: true,
     },
     ignored: true,
@@ -58,7 +58,7 @@ test("account and deposit workspace share detail rendering and events", () => {
     editAccount() {},
     openPayment() {},
     repository: {},
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     ignored: true,
   };
   const context = vm.createContext({
@@ -132,11 +132,11 @@ test("account and deposit workspace share detail rendering and events", () => {
     "promptAction",
     "repository",
     "resolveAdjustmentType",
+    "saveAndRefreshWorkspaceRecord",
     "state",
     "toast",
     "todayIso",
     "validateAdjustment",
-    "writeFeedback",
   ]);
   assert.equal("ignored" in passed.deposits, false);
   assert.deepEqual(Object.keys(passed.deposits.workflows).sort(), [
@@ -164,12 +164,15 @@ test("account and deposit workspace share detail rendering and events", () => {
     "fetchAll",
     "openPayment",
     "repository",
+    "saveAndRefreshWorkspaceRecord",
     "state",
     "toast",
-    "writeFeedback",
   ]);
   assert.equal("ignored" in passed.accountDetails.actions, false);
-  assert.equal(passed.accountDetails.actions.writeFeedback, writeFeedback);
+  assert.equal(
+    passed.accountDetails.actions.saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(workspace.openAccountDetails, openAccountDetails);
   assert.equal(
     workspace.attachAccountDetailActionEvents,

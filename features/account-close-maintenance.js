@@ -8,10 +8,10 @@
     fetchAll,
     closeAccountDetails,
     repository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
   }) {
     function saveCloseAccount(account) {
-      return writeFeedback.saveAndRefreshWorkspaceRecord({
+      return saveAndRefreshWorkspaceRecord({
         operation: () => repository.close(account.id),
         state,
         collection: "accounts",

@@ -328,7 +328,8 @@
         EventClass: Event,
         OptionClass: Option,
         repository: repositories.transactions,
-        writeFeedback,
+        runAndRefreshWorkspaceChange:
+          writeFeedback.runAndRefreshWorkspaceChange,
         findCorrectionTarget:
           window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
       },
@@ -340,7 +341,8 @@
         confirmAction,
         promptAction,
         repository: repositories.transactions,
-        writeFeedback,
+        runAndRefreshWorkspaceChange:
+          writeFeedback.runAndRefreshWorkspaceChange,
         resolveVoidTarget:
           window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
         buildVoidPayload:
@@ -486,7 +488,8 @@
         fetchAll,
         moneyInput,
         repository: repositories.deposits,
-        writeFeedback,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
         prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
         validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
         resolveAdjustmentType:
@@ -528,7 +531,8 @@
         editAccount: propertyAccountForms.editAccount,
         openPayment,
         repository: repositories.accounts,
-        writeFeedback,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
         confirmAction,
       },
     },

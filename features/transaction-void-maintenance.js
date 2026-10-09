@@ -10,7 +10,7 @@
     resolveVoidTarget,
     buildVoidPayload,
     repository,
-    writeFeedback,
+    runAndRefreshWorkspaceChange,
   }) {
     async function saveVoidTransaction(kind, id, reason) {
       const target = resolveVoidTarget(kind);
@@ -20,7 +20,7 @@
       }
       const payload = buildVoidPayload(reason, timestamp());
       const successMessage = "Transaction voided; original entry preserved";
-      const saved = await writeFeedback.runAndRefreshWorkspaceChange({
+      const saved = await runAndRefreshWorkspaceChange({
         operation: () =>
           repository.voidPosted({
             target,
