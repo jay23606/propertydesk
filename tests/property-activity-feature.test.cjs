@@ -18,40 +18,38 @@ test("property activity details include posted and voided records without counti
     );
   }
   const activity = context.window.PropertyDeskPropertyActivityDetails.create({
-    state: {
-      payments: [
-        {
-          account_id: "account-1",
-          amount: 500,
-          received_date: "2026-10-04",
-          status: "posted",
-          memo: "October rent",
-        },
-        {
-          account_id: "account-1",
-          amount: 90,
-          received_date: "2026-10-03",
-          status: "voided",
-          memo: "<cancelled>",
-        },
-      ],
-      expenses: [
-        {
-          property_id: "property-1",
-          amount: 75,
-          expense_date: "2026-10-02",
-          status: "posted",
-          payee: "Plumber",
-        },
-        {
-          property_id: "property-1",
-          amount: 40,
-          expense_date: "2026-10-01",
-          status: "voided",
-          payee: "Old vendor",
-        },
-      ],
-    },
+    getPayments: () => [
+      {
+        account_id: "account-1",
+        amount: 500,
+        received_date: "2026-10-04",
+        status: "posted",
+        memo: "October rent",
+      },
+      {
+        account_id: "account-1",
+        amount: 90,
+        received_date: "2026-10-03",
+        status: "voided",
+        memo: "<cancelled>",
+      },
+    ],
+    getExpenses: () => [
+      {
+        property_id: "property-1",
+        amount: 75,
+        expense_date: "2026-10-02",
+        status: "posted",
+        payee: "Plumber",
+      },
+      {
+        property_id: "property-1",
+        amount: 40,
+        expense_date: "2026-10-01",
+        status: "voided",
+        payee: "Old vendor",
+      },
+    ],
     isPosted: (record) => record.status !== "voided",
     sumIncome: (rows) =>
       rows.reduce((total, row) => total + Number(row.amount || 0), 0),
@@ -136,7 +134,8 @@ test("property activity model aggregates posted cash flow and sorts eight recent
   };
   const statusChecks = [];
   const model = context.window.PropertyDeskPropertyActivityModel.create({
-    state,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
     buildRecentTransactions,
     isPosted: (record) => {
       statusChecks.push(record);
@@ -225,6 +224,13 @@ test("property detail content workflow connects activity summaries to property r
   const detailsDependencies = {
     $() {},
     state: {},
+    getPayments() {},
+    getExpenses() {},
+    getProperties() {},
+    getAccounts() {},
+    getDocuments() {},
+    getWorkspaceMembers() {},
+    getPropertyHolders() {},
     isPosted() {},
     sumIncome() {},
     sumOperatingExpenses() {},
@@ -292,13 +298,24 @@ test("property detail content workflow connects activity summaries to property r
   assert.equal(detailContext.propertyDetailsHTML, propertyDetailsHTML);
   assert.equal("unusedDependency" in detailContext, false);
   assert.equal(detailContext.renderPropertyActivity, renderPropertyActivity);
-  assert.equal(modelContext.state, detailsDependencies.state);
+  assert.equal(modelContext.getProperties, detailsDependencies.getProperties);
+  assert.equal(modelContext.getAccounts, detailsDependencies.getAccounts);
+  assert.equal(modelContext.getDocuments, detailsDependencies.getDocuments);
+  assert.equal(
+    modelContext.getWorkspaceMembers,
+    detailsDependencies.getWorkspaceMembers,
+  );
+  assert.equal(
+    modelContext.getPropertyHolders,
+    detailsDependencies.getPropertyHolders,
+  );
   assert.equal(
     modelContext.propertyAddress,
     detailsDependencies.propertyAddress,
   );
   assert.equal(typeof detailContext.buildPropertyDetailData, "function");
-  assert.equal(activityContext.state, detailsDependencies.state);
+  assert.equal(activityContext.getPayments, detailsDependencies.getPayments);
+  assert.equal(activityContext.getExpenses, detailsDependencies.getExpenses);
   assert.equal(activityContext.isPosted, detailsDependencies.isPosted);
   assert.equal(activityContext.sumIncome, detailsDependencies.sumIncome);
   assert.deepEqual(JSON.parse(JSON.stringify(activityContext.workflows)), {

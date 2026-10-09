@@ -5,6 +5,13 @@
   function create({
     $,
     state,
+    getPayments,
+    getExpenses,
+    getProperties,
+    getAccounts,
+    getDocuments,
+    getWorkspaceMembers,
+    getPropertyHolders,
     isPosted,
     sumIncome,
     sumOperatingExpenses,
@@ -36,7 +43,8 @@
       propertyAccountsHTML,
     });
     const { renderPropertyActivity } = workflows.activityDetails.create({
-      state,
+      getPayments,
+      getExpenses,
       isPosted,
       sumIncome,
       sumOperatingExpenses,
@@ -46,7 +54,11 @@
       workflows: workflows.activityModules,
     });
     const { buildPropertyDetailData } = workflows.detailsModel.create({
-      state,
+      getProperties,
+      getAccounts,
+      getDocuments,
+      getWorkspaceMembers,
+      getPropertyHolders,
       propertyAddress,
     });
     const { openPropertyDetails } = workflows.details.create({

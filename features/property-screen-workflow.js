@@ -12,6 +12,13 @@
     const details = workflows.content.create({
       $: content.$,
       state: content.state,
+      getPayments: content.getPayments,
+      getExpenses: content.getExpenses,
+      getProperties: content.getProperties,
+      getAccounts: content.getAccounts,
+      getDocuments: content.getDocuments,
+      getWorkspaceMembers: content.getWorkspaceMembers,
+      getPropertyHolders: content.getPropertyHolders,
       isPosted: content.isPosted,
       sumIncome: content.sumIncome,
       sumOperatingExpenses: content.sumOperatingExpenses,

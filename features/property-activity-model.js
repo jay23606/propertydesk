@@ -3,7 +3,8 @@
   "use strict";
 
   function createPropertyActivityModel({
-    state,
+    getPayments,
+    getExpenses,
     isPosted,
     sumIncome,
     sumOperatingExpenses,
@@ -18,11 +19,11 @@
         voidedPayments = [],
         expenses = [],
         voidedExpenses = [];
-      for (const payment of state.payments) {
+      for (const payment of getPayments()) {
         if (!accountIds.has(payment.account_id)) continue;
         (isPosted(payment) ? income : voidedPayments).push(payment);
       }
-      for (const expense of state.expenses) {
+      for (const expense of getExpenses()) {
         if (expense.property_id !== propertyId) continue;
         (isPosted(expense) ? expenses : voidedExpenses).push(expense);
       }

@@ -28,7 +28,11 @@ test("property detail model selects only records linked to the requested propert
     propertyHolders: [{ property_id: property.id, member_user_id: "member-1" }],
   };
   const model = context.window.PropertyDeskPropertyDetailsModel.create({
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
+    getDocuments: () => state.documents,
+    getWorkspaceMembers: () => state.workspaceMembers,
+    getPropertyHolders: () => state.propertyHolders,
     propertyAddress: (value) => value.address,
   });
 
@@ -164,7 +168,11 @@ test("opening a property delegates modal markup and preserves scoped details", (
   const propertyAddress = () => "Oak House address";
   const { buildPropertyDetailData } =
     context.window.PropertyDeskPropertyDetailsModel.create({
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
+      getDocuments: () => state.documents,
+      getWorkspaceMembers: () => state.workspaceMembers,
+      getPropertyHolders: () => state.propertyHolders,
       propertyAddress,
     });
   const feature = context.window.PropertyDeskPropertyDetails.create({

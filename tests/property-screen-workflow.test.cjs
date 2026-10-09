@@ -10,6 +10,13 @@ test("property screen workflow passes detail actions to management and returns b
   const content = {
     $() {},
     state: {},
+    getPayments() {},
+    getExpenses() {},
+    getProperties() {},
+    getAccounts() {},
+    getDocuments() {},
+    getWorkspaceMembers() {},
+    getPropertyHolders() {},
     isPosted() {},
     sumIncome() {},
     sumOperatingExpenses() {},
@@ -134,6 +141,13 @@ test("property screen workflow passes detail actions to management and returns b
 
   assert.equal(calls[0][0], "content");
   assert.equal(calls[0][1].state, content.state);
+  assert.equal(calls[0][1].getPayments, content.getPayments);
+  assert.equal(calls[0][1].getExpenses, content.getExpenses);
+  assert.equal(calls[0][1].getProperties, content.getProperties);
+  assert.equal(calls[0][1].getAccounts, content.getAccounts);
+  assert.equal(calls[0][1].getDocuments, content.getDocuments);
+  assert.equal(calls[0][1].getWorkspaceMembers, content.getWorkspaceMembers);
+  assert.equal(calls[0][1].getPropertyHolders, content.getPropertyHolders);
   assert.equal(calls[0][1].isPosted, content.isPosted);
   assert.equal(calls[0][1].propertyAddress, content.propertyAddress);
   assert.equal(calls[0][1].workflows, propertyScreenWorkflows.contentModules);
@@ -143,6 +157,13 @@ test("property screen workflow passes detail actions to management and returns b
     "accountBalance",
     "esc",
     "fmtDate",
+    "getAccounts",
+    "getDocuments",
+    "getExpenses",
+    "getPayments",
+    "getProperties",
+    "getPropertyHolders",
+    "getWorkspaceMembers",
     "isPosted",
     "money",
     "openModal",

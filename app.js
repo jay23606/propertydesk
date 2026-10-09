@@ -628,6 +628,13 @@
       content: {
         $,
         state,
+        getPayments: () => state.payments,
+        getExpenses: () => state.expenses,
+        getProperties: () => state.properties,
+        getAccounts: () => state.accounts,
+        getDocuments: () => state.documents,
+        getWorkspaceMembers: () => state.workspaceMembers,
+        getPropertyHolders: () => state.propertyHolders,
         isPosted,
         sumIncome,
         sumOperatingExpenses,

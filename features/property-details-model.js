@@ -2,20 +2,27 @@
 (() => {
   "use strict";
 
-  function createPropertyDetailsModel({ state, propertyAddress }) {
+  function createPropertyDetailsModel({
+    getProperties,
+    getAccounts,
+    getDocuments,
+    getWorkspaceMembers,
+    getPropertyHolders,
+    propertyAddress,
+  }) {
     function buildPropertyDetailData(id) {
-      const property = state.properties.find((row) => row.id === id);
+      const property = getProperties().find((row) => row.id === id);
       if (!property) return null;
 
-      const accounts = state.accounts.filter(
+      const accounts = getAccounts().filter(
         (account) => account.property_id === id,
       );
       return {
         property,
         accounts,
-        propertyDocs: state.documents.filter((doc) => doc.property_id === id),
-        workspaceMembers: state.workspaceMembers,
-        propertyHolders: state.propertyHolders,
+        propertyDocs: getDocuments().filter((doc) => doc.property_id === id),
+        workspaceMembers: getWorkspaceMembers(),
+        propertyHolders: getPropertyHolders(),
         propertyAddressText: propertyAddress(property),
         hasActiveAccount: accounts.some(
           (account) => account.status === "active",

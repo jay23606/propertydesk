@@ -3,7 +3,8 @@
   "use strict";
 
   function createPropertyActivityDetails({
-    state,
+    getPayments,
+    getExpenses,
     isPosted,
     sumIncome,
     sumOperatingExpenses,
@@ -14,7 +15,8 @@
   }) {
     const { buildRecentTransactions } = workflows.transactions.create();
     const { buildPropertyActivity } = workflows.model.create({
-      state,
+      getPayments,
+      getExpenses,
       isPosted,
       sumIncome,
       sumOperatingExpenses,
