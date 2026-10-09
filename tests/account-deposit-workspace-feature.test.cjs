@@ -373,7 +373,11 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     app,
-    /findCorrectionTarget:\s*\(kind, id\)\s*=>\s*window\.PropertyDeskTransactionCorrectionModel\.findCorrectionTarget/,
+    /PropertyDeskTransactionCorrectionModel\.create\(\{[\s\S]*?getPayments:\s*\(\)\s*=> state\.payments,[\s\S]*?getExpenses:\s*\(\)\s*=> state\.expenses,[\s\S]*?getAccounts:\s*\(\)\s*=> state\.accounts/,
+  );
+  assert.match(
+    app,
+    /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
   );
   assert.match(app, /repository: repositories\.accounts/);
   assert.match(app, /repository: repositories\.deposits/);

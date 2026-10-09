@@ -24,20 +24,24 @@ test("transaction correction model resolves only posted payments and expenses", 
     expenses: [expense, { id: "voided-expense", status: "voided" }],
     accounts: [{ id: "account-1" }],
   };
-  const findTarget =
-    context.window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget;
+  const model = context.window.PropertyDeskTransactionCorrectionModel.create({
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
+    getAccounts: () => state.accounts,
+  });
+  const findTarget = model.findCorrectionTarget;
 
-  const paymentTarget = findTarget(state, "income", payment.id);
+  const paymentTarget = findTarget("income", payment.id);
   assert.equal(paymentTarget.kind, "payment");
   assert.equal(paymentTarget.record, payment);
   assert.equal(paymentTarget.account, state.accounts[0]);
-  const expenseTarget = findTarget(state, "expense", expense.id);
+  const expenseTarget = findTarget("expense", expense.id);
   assert.equal(expenseTarget.kind, "expense");
   assert.equal(expenseTarget.record, expense);
-  assert.equal(findTarget(state, "income", "voided-payment"), null);
-  assert.equal(findTarget(state, "expense", "voided-expense"), null);
-  assert.equal(findTarget(state, "income", "missing"), null);
-  assert.equal(findTarget(state, "unknown", payment.id), null);
+  assert.equal(findTarget("income", "voided-payment"), null);
+  assert.equal(findTarget("expense", "voided-expense"), null);
+  assert.equal(findTarget("income", "missing"), null);
+  assert.equal(findTarget("unknown", payment.id), null);
 });
 
 test("transaction correction form reopens posted payments and expenses with audit reasons", () => {
@@ -151,21 +155,18 @@ test("transaction correction form reopens posted payments and expenses with audi
   const EventClass = context.Event;
   const OptionClass = context.Option;
   const calls = [];
+  const correctionModel =
+    context.window.PropertyDeskTransactionCorrectionModel.create({
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getAccounts: () => state.accounts,
+    });
   const feature = context.window.PropertyDeskTransactionCorrectionForm.create({
     $: (id) => field(id),
     setPendingCorrection: (pending) => {
       state.pendingCorrection = pending;
     },
-    findCorrectionTarget: (kind, id) =>
-      context.window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget(
-        {
-          payments: state.payments,
-          accounts: state.accounts,
-          expenses: state.expenses,
-        },
-        kind,
-        id,
-      ),
+    findCorrectionTarget: correctionModel.findCorrectionTarget,
     viewModule: context.window.PropertyDeskTransactionCorrectionView,
     EventClass,
     OptionClass,

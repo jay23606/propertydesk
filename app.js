@@ -354,6 +354,12 @@
             .selectRecordWriteCompletion,
       },
     });
+  const transactionCorrectionModel =
+    window.PropertyDeskTransactionCorrectionModel.create({
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getAccounts: () => state.accounts,
+    });
   const transactionMaintenance =
     window.PropertyDeskTransactionMaintenanceWorkflow.create({
       correction: {
@@ -373,16 +379,7 @@
         repository: repositories.transactions,
         runAndRefreshWorkspaceChange:
           writeFeedback.runAndRefreshWorkspaceChange,
-        findCorrectionTarget: (kind, id) =>
-          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget(
-            {
-              accounts: state.accounts,
-              payments: state.payments,
-              expenses: state.expenses,
-            },
-            kind,
-            id,
-          ),
+        findCorrectionTarget: transactionCorrectionModel.findCorrectionTarget,
       },
       voiding: {
         getCollectionRows: (collection) => state[collection] || [],

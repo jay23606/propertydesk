@@ -23,7 +23,11 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     app,
-    /accounts: state\.accounts,[\s\S]*?payments: state\.payments,[\s\S]*?expenses: state\.expenses,/,
+    /PropertyDeskTransactionCorrectionModel\.create\(\{[\s\S]*?getPayments: \(\) => state\.payments,[\s\S]*?getExpenses: \(\) => state\.expenses,[\s\S]*?getAccounts: \(\) => state\.accounts/,
+  );
+  assert.match(
+    app,
+    /findCorrectionTarget: transactionCorrectionModel\.findCorrectionTarget/,
   );
   assert.doesNotMatch(
     app.match(/correction: \{[\s\S]*?\n      \},\n      voiding:/)?.[0] || "",
