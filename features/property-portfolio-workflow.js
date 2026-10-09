@@ -23,7 +23,7 @@
     paymentStatusInMonth,
     toast,
     fetchAll,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     promptAction,
     openPayment,
     openPropertyDetails,
@@ -84,7 +84,7 @@
       promptAction,
       streetAddress,
       repository: propertyRepository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       noteMaintenance: workflows.noteMaintenance,
       recordUpdateMaintenance: workflows.recordUpdateMaintenance,
     });

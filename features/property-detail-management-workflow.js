@@ -16,7 +16,7 @@
     openExpense,
     openAccountForProperty,
     propertyRepository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     workflows,
   }) {
     const { toggleArchiveProperty } = workflows.archive.create({
@@ -26,7 +26,7 @@
       todayIso,
       openPropertyDetails,
       repository: propertyRepository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       statusMaintenance: workflows.statusMaintenance,
       recordUpdateMaintenance: workflows.recordUpdateMaintenance,
     });

@@ -9,7 +9,7 @@
     todayIso,
     openPropertyDetails,
     repository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     statusMaintenance,
     recordUpdateMaintenance,
   }) {
@@ -18,7 +18,7 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       recordUpdateMaintenance,
     });
 

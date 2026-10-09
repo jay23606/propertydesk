@@ -7,7 +7,7 @@
     fetchAll,
     toast,
     repository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     recordUpdateMaintenance,
   }) {
     const { savePropertyUpdate } = recordUpdateMaintenance.create({
@@ -15,8 +15,7 @@
       fetchAll,
       toast,
       repository,
-      saveAndRefreshWorkspaceRecord:
-        writeFeedback.saveAndRefreshWorkspaceRecord,
+      saveAndRefreshWorkspaceRecord,
     });
 
     function savePropertyArchive({

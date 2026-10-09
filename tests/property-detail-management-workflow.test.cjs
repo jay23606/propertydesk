@@ -52,6 +52,7 @@ test("property detail coordinator connects archive and quick actions", () => {
   const openPayment = () => {};
   const openExpense = () => {};
   const openAccountForProperty = () => {};
+  const saveAndRefreshWorkspaceRecord = () => {};
   const propertyRepository = { updateOwned() {} };
   const dependencies = {
     $() {},
@@ -67,6 +68,7 @@ test("property detail coordinator connects archive and quick actions", () => {
     openExpense,
     openAccountForProperty,
     propertyRepository,
+    saveAndRefreshWorkspaceRecord,
     workflows: {
       archive: context.window.PropertyDeskPropertyArchive,
       statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
@@ -84,6 +86,10 @@ test("property detail coordinator connects archive and quick actions", () => {
 
   assert.equal(passed.archive.openPropertyDetails, openPropertyDetails);
   assert.equal(passed.archive.repository, propertyRepository);
+  assert.equal(
+    passed.archive.saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(
     passed.archive.statusMaintenance,
     dependencies.workflows.statusMaintenance,

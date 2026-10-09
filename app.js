@@ -579,7 +579,8 @@
         fetchAll,
         todayIso,
         propertyRepository: repositories.properties,
-        writeFeedback,
+        saveAndRefreshWorkspaceRecord:
+          writeFeedback.saveAndRefreshWorkspaceRecord,
         closeModal,
         editAccount: propertyAccountForms.editAccount,
         openAccountDetails,
@@ -698,7 +699,8 @@
       paymentStatusInMonth,
       toast,
       fetchAll,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord:
+        writeFeedback.saveAndRefreshWorkspaceRecord,
       promptAction,
       openPayment,
       propertyRepository: repositories.properties,

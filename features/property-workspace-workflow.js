@@ -71,7 +71,7 @@
       paymentStatusInMonth: portfolio.paymentStatusInMonth,
       toast: portfolio.toast,
       fetchAll: portfolio.fetchAll,
-      writeFeedback: portfolio.writeFeedback,
+      saveAndRefreshWorkspaceRecord: portfolio.saveAndRefreshWorkspaceRecord,
       promptAction: portfolio.promptAction,
       openPayment: portfolio.openPayment,
       openPropertyDetails,

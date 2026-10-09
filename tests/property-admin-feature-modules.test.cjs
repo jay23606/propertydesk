@@ -20,6 +20,10 @@ function propertyHolderWriteOperations(context) {
     refreshWorkspace: feedback.refreshWorkspace,
   };
 }
+
+function propertyRecordSaveOperation(context) {
+  return createWriteFeedback(context).saveAndRefreshWorkspaceRecord;
+}
 test("property holder and archive workflows reconcile rejected writes before retry", async () => {
   const context = vm.createContext({
     window: {},
@@ -93,7 +97,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
     fetchAll: async () => {
       throw new Error("offline");
     },
-    writeFeedback: createWriteFeedback(context),
+    saveAndRefreshWorkspaceRecord: propertyRecordSaveOperation(context),
     todayIso: () => "2026-10-05",
     openPropertyDetails: () =>
       assert.fail("a rejected write must not reopen details"),
@@ -143,7 +147,7 @@ test("archive reconciles a lost response against refreshed property state", asyn
       property.archived_at = "2026-10-08";
       events.push(["refresh"]);
     },
-    writeFeedback: createWriteFeedback(context),
+    saveAndRefreshWorkspaceRecord: propertyRecordSaveOperation(context),
     todayIso: () => "2026-10-08",
     openPropertyDetails: (id) => events.push(["open", id]),
     statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,
@@ -223,7 +227,7 @@ test("archive and restore use status maintenance and reopen updated details", as
         ([operation]) => operation === "update",
       )[1].archived_at;
     },
-    writeFeedback: createWriteFeedback(context),
+    saveAndRefreshWorkspaceRecord: propertyRecordSaveOperation(context),
     todayIso: () => "2026-10-06",
     openPropertyDetails: (id) => calls.push(["open", id]),
     statusMaintenance: context.window.PropertyDeskPropertyStatusMaintenance,

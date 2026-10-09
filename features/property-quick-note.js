@@ -9,7 +9,7 @@
     streetAddress,
     promptAction,
     repository,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     noteMaintenance,
     recordUpdateMaintenance,
   }) {
@@ -18,7 +18,7 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord,
       recordUpdateMaintenance,
     });
 

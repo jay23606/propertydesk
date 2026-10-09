@@ -27,7 +27,7 @@ test("property workspace shares detail actions across overview and grid", () => 
   const lateReminderSms = () => "sms";
   const promptAction = () => "note";
   const portfolioWorkflows = {};
-  const writeFeedback = { kind: "write-feedback" };
+  const saveAndRefreshWorkspaceRecord = () => {};
   const overviewWorkflow = {
     create(options) {
       calls.push(["overview", options]);
@@ -56,7 +56,7 @@ test("property workspace shares detail actions across overview and grid", () => 
     propertyAddress,
     lateReminderMailto,
     lateReminderSms,
-    writeFeedback,
+    saveAndRefreshWorkspaceRecord,
     promptAction,
     openPayment,
     workflows: portfolioWorkflows,
@@ -131,7 +131,10 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[2][1].propertyAddress, propertyAddress);
   assert.equal(calls[2][1].lateReminderMailto, lateReminderMailto);
   assert.equal(calls[2][1].lateReminderSms, lateReminderSms);
-  assert.equal(calls[2][1].writeFeedback, writeFeedback);
+  assert.equal(
+    calls[2][1].saveAndRefreshWorkspaceRecord,
+    saveAndRefreshWorkspaceRecord,
+  );
   assert.equal(calls[2][1].promptAction, promptAction);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[2][1].openPayment, openPayment);

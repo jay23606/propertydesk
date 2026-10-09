@@ -64,12 +64,14 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     fetchAll: async () => {
       refreshed = true;
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    saveAndRefreshWorkspaceRecord:
+      context.window.PropertyDeskRepositoryWriteFeedback.create({
+        modules: {
+          reconciliation:
+            context.window.PropertyDeskWorkspaceWriteReconciliation,
+          recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+        },
+      }).saveAndRefreshWorkspaceRecord,
     streetAddress: (property) => property.address,
     noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
     recordUpdateMaintenance:
@@ -118,12 +120,14 @@ test("property quick notes enforce the character limit before writing", async ()
     state,
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("an overlong note must not refresh"),
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    saveAndRefreshWorkspaceRecord:
+      context.window.PropertyDeskRepositoryWriteFeedback.create({
+        modules: {
+          reconciliation:
+            context.window.PropertyDeskWorkspaceWriteReconciliation,
+          recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+        },
+      }).saveAndRefreshWorkspaceRecord,
     streetAddress: (property) => property.address,
     noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
     recordUpdateMaintenance:
@@ -167,12 +171,14 @@ test("quick note reconciles a lost response against refreshed property state", a
       property.notes = "Updated note";
       events.push(["refresh"]);
     },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback.create({
-      modules: {
-        reconciliation: context.window.PropertyDeskWorkspaceWriteReconciliation,
-        recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
-      },
-    }),
+    saveAndRefreshWorkspaceRecord:
+      context.window.PropertyDeskRepositoryWriteFeedback.create({
+        modules: {
+          reconciliation:
+            context.window.PropertyDeskWorkspaceWriteReconciliation,
+          recordWrites: context.window.PropertyDeskWorkspaceRecordWriteWorkflow,
+        },
+      }).saveAndRefreshWorkspaceRecord,
     streetAddress: (item) => item.address,
     noteMaintenance: context.window.PropertyDeskPropertyNoteMaintenance,
     recordUpdateMaintenance:

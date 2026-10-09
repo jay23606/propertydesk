@@ -39,7 +39,7 @@
       openExpense: management.openExpense,
       openAccountForProperty: management.openAccountForProperty,
       propertyRepository: management.propertyRepository,
-      writeFeedback: management.writeFeedback,
+      saveAndRefreshWorkspaceRecord: management.saveAndRefreshWorkspaceRecord,
       workflows: workflows.managementModules,
     });
     const { attachPropertyHolderEvents } = workflows.holders.create({
