@@ -51,7 +51,11 @@
       toast,
     });
     const { commitAccounts, commitTransactions } = commit.create({
-      state,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getImportBatches: () => state.importBatches,
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
       fetchAll,
       status: $("import-status"),
       toast,

@@ -163,13 +163,25 @@ test("import workflow keeps file import handlers inside its event bindings", () 
   ]);
   assert.equal(passed.commit.repository, dependencies.repository);
   assert.equal(passed.commit.refreshWorkspace, dependencies.refreshWorkspace);
-  assert.equal(passed.commit.state, dependencies.state);
+  for (const key of [
+    "getWorkspaceOwnerId",
+    "getImportBatches",
+    "getAccounts",
+    "getPayments",
+    "getExpenses",
+  ]) {
+    assert.equal(typeof passed.commit[key], "function");
+  }
   assert.deepEqual(Object.keys(passed.commit).sort(), [
     "fetchAll",
+    "getAccounts",
+    "getExpenses",
+    "getImportBatches",
+    "getPayments",
+    "getWorkspaceOwnerId",
     "modules",
     "refreshWorkspace",
     "repository",
-    "state",
     "status",
     "toast",
   ]);

@@ -20,8 +20,21 @@ function loadCommitFeature() {
       context,
     );
   }
+  const commitWorkflow = context.window.PropertyDeskImportCommit;
   return {
-    commit: context.window.PropertyDeskImportCommit,
+    commit: Object.freeze({
+      create(options) {
+        const { state = {}, ...dependencies } = options;
+        return commitWorkflow.create({
+          ...dependencies,
+          getWorkspaceOwnerId: () => state.workspaceOwnerId,
+          getImportBatches: () => state.importBatches,
+          getAccounts: () => state.accounts,
+          getPayments: () => state.payments,
+          getExpenses: () => state.expenses,
+        });
+      },
+    }),
     modules: {
       batchReconciliation: context.window.PropertyDeskImportBatchReconciliation,
       reporting: context.window.PropertyDeskImportCommitReporting,
@@ -36,13 +49,15 @@ function loadCommitFeature() {
   };
 }
 
-test("import batch reconciliation receives only workspace refresh", () => {
+test("import batch reconciliation receives scoped records and workspace refresh", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "features", "import-batch-reconciliation.js"),
     "utf8",
   );
   assert.doesNotMatch(source, /window\.PropertyDeskRepositoryWriteFeedback/);
   assert.doesNotMatch(source, /writeFeedback/);
+  assert.doesNotMatch(source, /\bstate\b|collection/);
+  assert.match(source, /getImportedRows\(\)/);
   assert.match(source, /refreshWorkspace/);
 });
 
@@ -257,6 +272,106 @@ test("an import with a lost response reconciles from the new committed batch", a
   assert.match(status.textContent, /Imported 2 accounts; 0 rows were skipped/);
   assert.deepEqual(refreshes, ["workspace", "success"]);
   assert.deepEqual(messages, ["Import complete"]);
+});
+
+for (const [kind, label] of [
+  ["payments", "payment"],
+  ["expenses", "expense"],
+]) {
+  test(`lost ${label} imports reconcile against only ${kind} rows`, async () => {
+    const state = {
+      workspaceOwnerId: "workspace-1",
+      importBatches: [],
+      accounts: [],
+      payments: [],
+      expenses: [],
+    };
+    const { commit: feature, writeFeedback, modules } = loadCommitFeature();
+    const commit = feature.create({
+      modules,
+      refreshWorkspace: writeFeedback.refreshWorkspace,
+      state,
+      repository: {
+        commitAccounts: async () => assert.fail("wrong import method"),
+        commitTransactions: async () => {
+          throw new Error("connection lost");
+        },
+      },
+      fetchAll: async () => {
+        state.importBatches = [
+          {
+            id: `${kind}-batch`,
+            user_id: "workspace-1",
+            source_type: "csv",
+            source_name: `${kind}.csv`,
+            status: "committed",
+            rows_total: 1,
+            rows_accepted: 1,
+          },
+        ];
+        state[kind] = [{ import_batch_id: `${kind}-batch` }];
+      },
+      status: { textContent: "", classList: { add() {} } },
+      toast() {},
+    });
+
+    await commit.commitTransactions({
+      kind,
+      rows: [{ amount: 550 }],
+      sourceName: `${kind}.csv`,
+      total: 1,
+      label,
+    });
+  });
+}
+
+test("a payment batch cannot be confirmed by a matching expense row", async () => {
+  const state = {
+    workspaceOwnerId: "workspace-1",
+    importBatches: [],
+    accounts: [],
+    payments: [],
+    expenses: [],
+  };
+  const { commit: feature, writeFeedback, modules } = loadCommitFeature();
+  const commit = feature.create({
+    modules,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
+    state,
+    repository: {
+      commitAccounts: async () => assert.fail("wrong import method"),
+      commitTransactions: async () => {
+        throw new Error("connection lost");
+      },
+    },
+    fetchAll: async () => {
+      state.importBatches = [
+        {
+          id: "batch-1",
+          user_id: "workspace-1",
+          source_type: "csv",
+          source_name: "payments.csv",
+          status: "committed",
+          rows_total: 1,
+          rows_accepted: 1,
+        },
+      ];
+      state.expenses = [{ import_batch_id: "batch-1" }];
+    },
+    status: { textContent: "", classList: { add() {} } },
+    toast() {},
+  });
+
+  await assert.rejects(
+    commit.commitTransactions({
+      kind: "payments",
+      rows: [{ amount: 550 }],
+      sourceName: "payments.csv",
+      total: 1,
+      label: "payment",
+    }),
+    /no matching completed batch appeared/i,
+  );
 });
 
 test("an import with a lost response ignores older batches with the same source", async () => {

@@ -3,7 +3,11 @@
   "use strict";
 
   function createImportCommit({
-    state,
+    getWorkspaceOwnerId,
+    getImportBatches,
+    getAccounts,
+    getPayments,
+    getExpenses,
     fetchAll,
     status,
     toast,
@@ -11,11 +15,20 @@
     refreshWorkspace,
     modules,
   }) {
-    const batchReconciliation = modules.batchReconciliation.create({
-      state,
-      fetchAll,
-      toast,
-      refreshWorkspace,
+    function createBatchReconciliation(getImportedRows) {
+      return modules.batchReconciliation.create({
+        getWorkspaceOwnerId,
+        getImportBatches,
+        getImportedRows,
+        fetchAll,
+        toast,
+        refreshWorkspace,
+      });
+    }
+    const accountBatchReconciliation = createBatchReconciliation(getAccounts);
+    const transactionBatchReconciliation = Object.freeze({
+      payments: createBatchReconciliation(getPayments),
+      expenses: createBatchReconciliation(getExpenses),
     });
     const { finish } = modules.reporting.create({
       status,
@@ -30,23 +43,21 @@
       rows,
       label,
       toastMessage,
-      collection,
+      reconciliation,
     }) {
-      const baselineBatchIds = batchReconciliation.captureBaselineBatchIds(
+      const baselineBatchIds = reconciliation.captureBaselineBatchIds(
         sourceName,
         total,
-        collection,
       );
       let data;
       try {
         data = await operation();
       } catch (error) {
-        data = await batchReconciliation.recoverCommit({
+        data = await reconciliation.recoverCommit({
           error,
           baselineBatchIds,
           sourceName,
           total,
-          collection,
         });
         await finish({
           data,
@@ -75,7 +86,7 @@
         rows,
         label: "account",
         toastMessage: "Import complete",
-        collection: "accounts",
+        reconciliation: accountBatchReconciliation,
       });
     }
 
@@ -86,6 +97,10 @@
       total,
       label,
     }) {
+      const reconciliation = transactionBatchReconciliation[kind];
+      if (!reconciliation) {
+        throw new TypeError("Unsupported transaction import kind");
+      }
       await commitWithReconciliation({
         operation: () =>
           repository.commitTransactions({ kind, rows, sourceName, total }),
@@ -93,7 +108,7 @@
         total,
         rows,
         label,
-        collection: kind,
+        reconciliation,
       });
     }
 

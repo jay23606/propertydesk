@@ -3,7 +3,9 @@
   "use strict";
 
   function createImportBatchReconciliation({
-    state,
+    getWorkspaceOwnerId,
+    getImportBatches,
+    getImportedRows,
     fetchAll,
     toast,
     refreshWorkspace,
@@ -23,28 +25,29 @@
       );
     }
 
-    function batchHasImportedRows(batch, collection) {
-      return (state[collection] || []).some(
+    function batchHasImportedRows(batch) {
+      return (getImportedRows() || []).some(
         (row) => row.import_batch_id === batch.id,
       );
     }
 
-    function matchesCommittedBatch(batch, sourceName, total, collection) {
+    function matchesCommittedBatch(batch, sourceName, total) {
       return (
-        batch.user_id === state.workspaceOwnerId &&
+        batch.user_id === getWorkspaceOwnerId() &&
         batchMatchesSource(batch, sourceName) &&
         batch.status === "committed" &&
         Number(batch.rows_total) === Number(total) &&
-        batchHasImportedRows(batch, collection)
+        batchHasImportedRows(batch)
       );
     }
 
-    function captureBaselineBatchIds(sourceName, total, collection) {
-      return Array.isArray(state?.importBatches)
+    function captureBaselineBatchIds(sourceName, total) {
+      const importBatches = getImportBatches();
+      return Array.isArray(importBatches)
         ? new Set(
-            state.importBatches
+            importBatches
               .filter((batch) =>
-                matchesCommittedBatch(batch, sourceName, total, collection),
+                matchesCommittedBatch(batch, sourceName, total),
               )
               .map(({ id }) => id),
           )
@@ -56,7 +59,6 @@
       baselineBatchIds,
       sourceName,
       total,
-      collection,
     }) {
       if (baselineBatchIds === null || !fetchAll || error?.code) throw error;
 
@@ -64,10 +66,10 @@
       const refreshed = await refreshWorkspace({
         fetchAll,
         afterRefresh: () => {
-          committedBatch = state.importBatches.find(
+          committedBatch = getImportBatches().find(
             (batch) =>
               !baselineBatchIds.has(batch.id) &&
-              matchesCommittedBatch(batch, sourceName, total, collection),
+              matchesCommittedBatch(batch, sourceName, total),
           );
         },
         toast,
