@@ -3,7 +3,6 @@
   "use strict";
 
   function createTransactionMaintenanceWorkflow({
-    records: { getPayments, getExpenses, getAccounts },
     correction: correctionContext,
     voiding: voidingContext,
     events: eventsContext,
@@ -17,9 +16,9 @@
     },
   }) {
     const correctionModel = correctionModelWorkflow.create({
-      getPayments,
-      getExpenses,
-      getAccounts,
+      getPayments: correctionContext.getPayments,
+      getExpenses: correctionContext.getExpenses,
+      getAccounts: correctionContext.getAccounts,
     });
     const correction = correctionWorkflow.create({
       $: correctionContext.$,

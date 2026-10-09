@@ -88,6 +88,7 @@ test("transaction maintenance coordinator joins isolated correction and void act
 
   const correctionContext = {
     $: () => {},
+    getAccounts: () => [],
     getPendingCorrection() {},
     setPendingCorrection() {},
     getPayments() {},
@@ -103,11 +104,6 @@ test("transaction maintenance coordinator joins isolated correction and void act
     runAndRefreshWorkspaceChange,
     unusedContext: true,
     unusedCorrectionValue: true,
-  };
-  const records = {
-    getPayments: () => [],
-    getExpenses: () => [],
-    getAccounts: () => [],
   };
   const voidingContext = {
     getPayments() {},
@@ -128,7 +124,6 @@ test("transaction maintenance coordinator joins isolated correction and void act
     unusedEventValue: true,
   };
   const dependencies = {
-    records,
     correction: correctionContext,
     voiding: voidingContext,
     events: eventsContext,
@@ -157,9 +152,18 @@ test("transaction maintenance coordinator joins isolated correction and void act
   const handlers = workflow.createTransactionActionHandlers(actions);
 
   assert.equal(Object.isFrozen(workflow), true);
-  assert.equal(passed.correctionModel.getPayments, records.getPayments);
-  assert.equal(passed.correctionModel.getExpenses, records.getExpenses);
-  assert.equal(passed.correctionModel.getAccounts, records.getAccounts);
+  assert.equal(
+    passed.correctionModel.getPayments,
+    correctionContext.getPayments,
+  );
+  assert.equal(
+    passed.correctionModel.getExpenses,
+    correctionContext.getExpenses,
+  );
+  assert.equal(
+    passed.correctionModel.getAccounts,
+    correctionContext.getAccounts,
+  );
   assert.equal(Object.isFrozen(handlers), true);
   assert.equal(workflow.saveCorrection, saveCorrection);
   assert.equal(passed.correctionWorkflow.$, correctionContext.$);

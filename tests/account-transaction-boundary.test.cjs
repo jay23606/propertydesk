@@ -52,7 +52,7 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     composition,
-    /records: \{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
+    /correction: \{[\s\S]*?getAccounts: records\.getAccounts,[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
   );
   assert.match(
     composition,

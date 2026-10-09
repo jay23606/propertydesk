@@ -392,7 +392,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     transactionComposition,
-    /records: \{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
+    /correction: \{[\s\S]*?getAccounts: records\.getAccounts,[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
   );
   assert.match(
     transactionComposition,

@@ -117,9 +117,10 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
 
   assert.equal(result, ledger);
   assert.equal(calls[0][0], "maintenance");
-  assert.equal(receivedMaintenance.records.getPayments, records.getPayments);
-  assert.equal(receivedMaintenance.records.getExpenses, records.getExpenses);
-  assert.equal(receivedMaintenance.records.getAccounts, records.getAccounts);
+  assert.equal("records" in receivedMaintenance, false);
+  assert.equal(receivedMaintenance.correction.getAccounts, records.getAccounts);
+  assert.equal(receivedMaintenance.correction.getPayments, records.getPayments);
+  assert.equal(receivedMaintenance.correction.getExpenses, records.getExpenses);
   assert.equal(
     receivedMaintenance.correction.getPendingCorrection,
     records.getPendingCorrection,

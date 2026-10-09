@@ -9,13 +9,9 @@
     workflows,
   }) {
     const transactionMaintenance = workflows.maintenance.create({
-      records: {
-        getPayments: records.getPayments,
-        getExpenses: records.getExpenses,
-        getAccounts: records.getAccounts,
-      },
       correction: {
         $: ui.$,
+        getAccounts: records.getAccounts,
         getPendingCorrection: records.getPendingCorrection,
         setPendingCorrection: records.setPendingCorrection,
         getPayments: records.getPayments,
