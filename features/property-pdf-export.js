@@ -51,25 +51,26 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PropertyDesk property report</title>
 <style>
-  @page { size: letter landscape; margin: .3in; }
+  @page { size: letter landscape; margin: .25in; }
   * { box-sizing: border-box; }
-  body { width: 100%; margin: 0; color: #17231f; font: ${fontSize}px/1.2 Arial, sans-serif; }
+  html, body { width: 100%; max-width: 100%; margin: 0; }
+  body { color: #17231f; font: ${fontSize}px/1.2 Arial, sans-serif; }
   header { display: flex; align-items: baseline; justify-content: space-between; width: 100%; margin: 0 0 8px; }
   h1 { margin: 0; font-size: 16px; }
   .meta { color: #58665f; font-size: 8px; }
   table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 0; table-layout: fixed; }
-  col:nth-child(1) { width: 15%; } col:nth-child(2) { width: 10%; }
+  col:nth-child(1) { width: 14%; } col:nth-child(2) { width: 10%; }
   col:nth-child(3) { width: 13%; } col:nth-child(4) { width: 9%; }
   col:nth-child(5) { width: 9%; } col:nth-child(6), col:nth-child(7), col:nth-child(8) { width: 8%; }
-  col:nth-child(9) { width: 10%; } col:nth-child(10) { width: 10%; }
+  col:nth-child(9) { width: 11%; } col:nth-child(10) { width: 10%; }
   th { background: #e8efeb; color: #25372f; font-size: 7px; text-align: left; text-transform: uppercase; letter-spacing: .03em; overflow-wrap: anywhere; }
   th, td { min-width: 0; border: 1px solid #cbd5cf; padding: 3px 4px; vertical-align: top; }
   td { overflow: hidden; overflow-wrap: anywhere; max-height: 2.6em; }
   tr { height: ${Math.max(11, Math.min(20, 540 / rowCount))}px; break-inside: avoid; }
   .empty { padding: 12px; color: #58665f; text-align: center; }
   @media print {
-    html, body { width: 10.2in; max-width: 10.2in; }
-    table { width: 10.2in; max-width: 10.2in; }
+    html, body { width: 100%; max-width: 100%; }
+    table { width: 100%; max-width: 100%; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style></head><body>
