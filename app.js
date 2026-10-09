@@ -309,41 +309,39 @@
             .selectRecordWriteCompletion,
       },
     });
-  const transactionWorkspace =
-    window.PropertyDeskTransactionWorkspaceWorkflow.create({
-      maintenance: {
-        correction: {
-          $,
-          state,
-          toast,
-          fetchAll,
-          closeModal,
-          prettyType,
-          promptAction,
-          EventClass: Event,
-          OptionClass: Option,
-          repository: repositories.transactions,
-          writeFeedback,
-          findCorrectionTarget:
-            window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
-        },
-        voiding: {
-          state,
-          toast,
-          fetchAll,
-          timestamp: transactionTimestamp,
-          confirmAction,
-          promptAction,
-          repository: repositories.transactions,
-          writeFeedback,
-          resolveVoidTarget:
-            window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
-          buildVoidPayload:
-            window.PropertyDeskTransactionVoidModel.buildVoidPayload,
-        },
-        events: { documentRef: document },
+  const transactionMaintenance =
+    window.PropertyDeskTransactionMaintenanceWorkflow.create({
+      correction: {
+        $,
+        state,
+        toast,
+        fetchAll,
+        closeModal,
+        prettyType,
+        promptAction,
+        EventClass: Event,
+        OptionClass: Option,
+        repository: repositories.transactions,
+        writeFeedback,
+        findCorrectionTarget:
+          window.PropertyDeskTransactionCorrectionModel.findCorrectionTarget,
       },
-      maintenanceWorkflows: {
+      voiding: {
+        state,
+        toast,
+        fetchAll,
+        timestamp: transactionTimestamp,
+        confirmAction,
+        promptAction,
+        repository: repositories.transactions,
+        writeFeedback,
+        resolveVoidTarget:
+          window.PropertyDeskTransactionVoidModel.resolveVoidTarget,
+        buildVoidPayload:
+          window.PropertyDeskTransactionVoidModel.buildVoidPayload,
+      },
+      events: { documentRef: document },
+      workflows: {
         correction: window.PropertyDeskTransactionCorrectionWorkflow,
         correctionModules: {
           maintenance: window.PropertyDeskTransactionCorrectionMaintenance,
@@ -354,72 +352,71 @@
         voidEntry: window.PropertyDeskTransactionVoidEntry,
         events: window.PropertyDeskTransactionMaintenanceEvents,
       },
-      recordWorkflows: {
-        entryForms: {
-          create: window.PropertyDeskLedgerEntryForms.create,
-          modules: {
-            transactionInserts: window.PropertyDeskTransactionInserts,
-            saveWorkflow: window.PropertyDeskLedgerEntrySaveWorkflow,
-            paymentForm: window.PropertyDeskPaymentEntryForm,
-            expenseForm: window.PropertyDeskExpenseEntryForm,
-          },
-        },
-        views: {
-          create: window.PropertyDeskTransactionViews.create,
-          modules: {
-            filterModel: window.PropertyDeskTransactionListFilterModel,
-            associationModel: window.PropertyDeskTransactionAssociationModel,
-            displayRowModel: window.PropertyDeskTransactionDisplayRowModel,
-            listModel: window.PropertyDeskTransactionListModel,
-            summaryModel: window.PropertyDeskTransactionSummaryModel,
-            rowView: window.PropertyDeskTransactionRowView,
-          },
-        },
-      },
-      workflows: {
-        maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,
-        records: window.PropertyDeskTransactionRecordsWorkflow,
-      },
-      entries: {
-        $,
-        state,
-        moneyInput,
-        todayIso,
-        toast,
-        closeModal,
-        fetchAll,
-        populateFormOptions,
-        fillSelect,
-        prettyType,
-        openModal,
-        transactionRepository: repositories.transactions,
-        transactionPayloads: window.PropertyDeskTransactionPayloads,
-        writeFeedback,
-        selectRecordWriteCompletion:
-          window.PropertyDeskWorkspaceRecordWriteWorkflow
-            .selectRecordWriteCompletion,
-        expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
-        workflows: {
-          paymentView: window.PropertyDeskPaymentEntryView,
-          expenseView: window.PropertyDeskExpenseEntryView,
-          propertyPaymentAction: window.PropertyDeskPropertyPaymentAction,
+    });
+  const ledgerWorkflow = window.PropertyDeskLedgerWorkflow.create({
+    maintenance: transactionMaintenance,
+    workflows: {
+      entryForms: {
+        create: window.PropertyDeskLedgerEntryForms.create,
+        modules: {
+          transactionInserts: window.PropertyDeskTransactionInserts,
+          saveWorkflow: window.PropertyDeskLedgerEntrySaveWorkflow,
+          paymentForm: window.PropertyDeskPaymentEntryForm,
+          expenseForm: window.PropertyDeskExpenseEntryForm,
         },
       },
       views: {
-        $,
-        state,
-        dateOnly,
-        now,
-        fmtDate,
-        esc,
-        expenseCategoryLabel,
-        money,
-        postedOnOrAfter,
-        monthStart,
-        sumIncome,
-        sumOperatingExpenses,
+        create: window.PropertyDeskTransactionViews.create,
+        modules: {
+          filterModel: window.PropertyDeskTransactionListFilterModel,
+          associationModel: window.PropertyDeskTransactionAssociationModel,
+          displayRowModel: window.PropertyDeskTransactionDisplayRowModel,
+          listModel: window.PropertyDeskTransactionListModel,
+          summaryModel: window.PropertyDeskTransactionSummaryModel,
+          rowView: window.PropertyDeskTransactionRowView,
+        },
       },
-    });
+    },
+    entries: {
+      $,
+      state,
+      moneyInput,
+      todayIso,
+      toast,
+      closeModal,
+      fetchAll,
+      populateFormOptions,
+      fillSelect,
+      prettyType,
+      openModal,
+      transactionRepository: repositories.transactions,
+      transactionPayloads: window.PropertyDeskTransactionPayloads,
+      writeFeedback,
+      selectRecordWriteCompletion:
+        window.PropertyDeskWorkspaceRecordWriteWorkflow
+          .selectRecordWriteCompletion,
+      expenseAccountPolicy: window.PropertyDeskExpenseAccountPolicy,
+      workflows: {
+        paymentView: window.PropertyDeskPaymentEntryView,
+        expenseView: window.PropertyDeskExpenseEntryView,
+        propertyPaymentAction: window.PropertyDeskPropertyPaymentAction,
+      },
+    },
+    views: {
+      $,
+      state,
+      dateOnly,
+      now,
+      fmtDate,
+      esc,
+      expenseCategoryLabel,
+      money,
+      postedOnOrAfter,
+      monthStart,
+      sumIncome,
+      sumOperatingExpenses,
+    },
+  });
   const {
     attachLedgerEntryFormEvents,
     attachTransactionActionEvents,
@@ -428,7 +425,7 @@
     openPayment,
     openPropertyPayment,
     renderPayments,
-  } = transactionWorkspace;
+  } = ledgerWorkflow;
   const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
     $,
     state,

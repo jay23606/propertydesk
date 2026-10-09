@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-test("transaction records connect maintenance, entry, view, and row actions", () => {
+test("ledger workflow connects entry, history, and delegated maintenance actions", () => {
   const passed = {};
   const saveCorrection = () => {};
   const openPayment = () => {};
@@ -94,20 +94,18 @@ test("transaction records connect maintenance, entry, view, and row actions", ()
   };
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "..", "features", "transaction-records-workflow.js"),
+      path.join(__dirname, "..", "features", "ledger-workflow.js"),
       "utf8",
     ),
     context,
   );
 
-  const workflow = context.window.PropertyDeskTransactionRecordsWorkflow.create(
-    {
-      maintenance,
-      entries,
-      views,
-      workflows,
-    },
-  );
+  const workflow = context.window.PropertyDeskLedgerWorkflow.create({
+    maintenance,
+    entries,
+    views,
+    workflows,
+  });
 
   assert.equal(Object.isFrozen(workflow), true);
   for (const [key, value] of Object.entries(entries)) {

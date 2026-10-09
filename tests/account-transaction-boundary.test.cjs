@@ -9,12 +9,12 @@ test("app composes independent property and account forms before action routing"
 
   assert.match(app, /PropertyDeskPropertyAccountFormsWorkflow\.create\(/);
   assert.doesNotMatch(app, /PropertyDesk(?:Property|Account)Form\.create\(/);
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskLedgerWorkflow\.create\(/);
   assert.match(
     app,
-    /const transactionWorkspace =\s*window\.PropertyDeskTransactionWorkspaceWorkflow\.create\(/,
+    /const transactionMaintenance =\s*window\.PropertyDeskTransactionMaintenanceWorkflow\.create\([\s\S]*?\);\s*const ledgerWorkflow = window\.PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
   );
-  assert.doesNotMatch(app, /const transactionRecords =/);
   assert.match(
     app,
     /PropertyDeskCreateActions\.create\([\s\S]*?resetPropertyForm: propertyAccountForms\.resetPropertyForm,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty,[\s\S]*?openPayment,[\s\S]*?openExpense,/,
@@ -29,23 +29,19 @@ test("app composes independent property and account forms before action routing"
   );
 
   const transactionWorkflow = fs.readFileSync(
-    path.join(root, "features", "transaction-records-workflow.js"),
+    path.join(root, "features", "ledger-workflow.js"),
     "utf8",
   );
   assert.match(
     transactionWorkflow,
     /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;[\s\S]*?saveCorrection,[\s\S]*?workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
-  assert.doesNotMatch(
-    app,
-    /PropertyDeskTransactionMaintenanceWorkflow\.create\(/,
-  );
-  const transactionWorkspace = fs.readFileSync(
-    path.join(root, "features", "transaction-workspace-workflow.js"),
+  const transactionMaintenance = fs.readFileSync(
+    path.join(root, "features", "transaction-maintenance-workflow.js"),
     "utf8",
   );
   assert.match(
-    transactionWorkspace,
-    /workflows\.maintenance\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,\s*workflows: maintenanceWorkflows,[\s\S]*?workflows\.records\.create\(\{\s*maintenance: transactionMaintenance,/,
+    transactionMaintenance,
+    /correctionWorkflow\.create\([\s\S]*?voidMaintenanceWorkflow\.create\([\s\S]*?voidEntryWorkflow\.create\(/,
   );
 });

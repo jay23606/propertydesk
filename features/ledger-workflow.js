@@ -1,8 +1,8 @@
-/* Connect transaction entry, maintenance, list rendering, and row actions. */
+/* Compose ledger entry forms, transaction history, and delegated row actions. */
 (() => {
   "use strict";
 
-  function createTransactionRecordsWorkflow({
+  function createLedgerWorkflow({
     maintenance,
     workflows,
     entries: {
@@ -94,7 +94,7 @@
     });
   }
 
-  window.PropertyDeskTransactionRecordsWorkflow = Object.freeze({
-    create: createTransactionRecordsWorkflow,
+  window.PropertyDeskLedgerWorkflow = Object.freeze({
+    create: createLedgerWorkflow,
   });
 })();

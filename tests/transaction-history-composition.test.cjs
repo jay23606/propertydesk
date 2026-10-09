@@ -3,38 +3,52 @@ const test = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-test("transaction workspace composes history and maintenance actions", () => {
+test("transaction maintenance stays separate from ledger history composition", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
-  const workspaceWorkflow = fs.readFileSync(
-    path.join(root, "features", "transaction-workspace-workflow.js"),
+  const maintenance = fs.readFileSync(
+    path.join(root, "features", "transaction-maintenance-workflow.js"),
     "utf8",
   );
-  assert.match(
-    workspaceWorkflow,
-    /workflows\.maintenance\.create\(\{\s*correction: maintenance\.correction,\s*voiding: maintenance\.voiding,\s*events: maintenance\.events,[\s\S]*?workflows\.records\.create\(/,
-  );
-  const transactionWorkflow = fs.readFileSync(
-    path.join(root, "features", "transaction-records-workflow.js"),
+  const ledger = fs.readFileSync(
+    path.join(root, "features", "ledger-workflow.js"),
     "utf8",
   );
+
+  assert.match(app, /PropertyDeskTransactionMaintenanceWorkflow\.create\(/);
   assert.match(
-    transactionWorkflow,
-    /workflows\.entryForms\.create\([\s\S]*?saveCorrection,/,
+    app,
+    /PropertyDeskLedgerWorkflow\.create\(\{\s*maintenance: transactionMaintenance,/,
+  );
+  assert.ok(
+    app.indexOf("PropertyDeskTransactionMaintenanceWorkflow.create(") <
+      app.indexOf("PropertyDeskLedgerWorkflow.create("),
   );
   assert.match(
-    transactionWorkflow,
-    /workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,/,
+    maintenance,
+    /createTransactionActionHandlers\([\s\S]*?maintenanceEventsWorkflow\.create\(/,
   );
+  assert.match(ledger, /workflows\.entryForms\.create\(/);
+  assert.match(ledger, /workflows\.views\.create\(/);
   assert.match(
-    transactionWorkflow,
+    ledger,
     /createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,
   );
-  assert.doesNotMatch(app, /PropertyDeskTransactionScreenWorkflow/);
-  assert.doesNotMatch(html, /transaction-screen-workflow/);
-  assert.doesNotMatch(worker, /transaction-screen-workflow/);
-  assert.doesNotMatch(app, /transactionMaintenance\.createActionHandlers\(/);
+  assert.doesNotMatch(
+    ledger,
+    /window\.PropertyDesk(?:TransactionMaintenanceWorkflow|LedgerEntryForms|TransactionViews)\.create/,
+  );
+  assert.match(html, /features\/ledger-workflow\.js/);
+  assert.match(worker, /'\.\/features\/ledger-workflow\.js'/);
+  assert.doesNotMatch(
+    html,
+    /transaction-workspace-workflow|transaction-records-workflow/,
+  );
+  assert.doesNotMatch(
+    worker,
+    /transaction-workspace-workflow|transaction-records-workflow/,
+  );
+  assert.doesNotMatch(app, /PropertyDeskTransactionWorkspaceWorkflow/);
 });
