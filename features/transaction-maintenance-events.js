@@ -3,7 +3,7 @@
   "use strict";
 
   function createTransactionMaintenanceEvents({
-    documentRef = document,
+    documentRef,
     correctTransaction,
     voidTransaction,
   }) {

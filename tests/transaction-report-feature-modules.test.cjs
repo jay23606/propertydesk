@@ -201,6 +201,11 @@ test("transaction maintenance router loads after its view and is precached", () 
 });
 
 test("transaction maintenance router routes correction and void actions", () => {
+  const maintenanceEventsSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "transaction-maintenance-events.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(maintenanceEventsSource, /documentRef = document/);
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
