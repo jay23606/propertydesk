@@ -58,7 +58,7 @@
   header { display: flex; align-items: baseline; justify-content: space-between; width: 100%; margin: 0 0 8px; }
   h1 { margin: 0; font-size: 16px; }
   .meta { color: #58665f; font-size: 8px; }
-  table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 0; table-layout: fixed; }
+  table { border-collapse: collapse; width: 99%; max-width: 99%; margin: 0; table-layout: fixed; }
   col:nth-child(1) { width: 14%; } col:nth-child(2) { width: 10%; }
   col:nth-child(3) { width: 13%; } col:nth-child(4) { width: 9%; }
   col:nth-child(5) { width: 9%; } col:nth-child(6), col:nth-child(7), col:nth-child(8) { width: 8%; }
@@ -70,7 +70,7 @@
   .empty { padding: 12px; color: #58665f; text-align: center; }
   @media print {
     html, body { width: 100%; max-width: 100%; }
-    table { width: 100%; max-width: 100%; }
+    table { width: 99%; max-width: 99%; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style></head><body>
