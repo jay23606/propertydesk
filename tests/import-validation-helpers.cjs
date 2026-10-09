@@ -3,7 +3,7 @@ const path = require("node:path");
 const { parseCSV } = require("../features/csv-parser.js");
 require("../features/currency-utils.js");
 const csvValueUtils = require("../features/csv-value-utils.js").create({
-  modules: { currencyUtils: globalThis.PropertyDeskCurrencyUtils },
+  moneyInput: globalThis.PropertyDeskCurrencyUtils.moneyInput,
 });
 const emailAddresses = require("../features/email-address-utils.js");
 const domainOptions = require("../features/domain-options.js");

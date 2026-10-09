@@ -36,6 +36,7 @@ test("import validation workflow composes account, payment, and expense rules", 
     "importRows",
   ];
   const modules = Object.fromEntries(moduleNames.map((key) => [key, { key }]));
+  modules.currencyUtils.moneyInput = () => {};
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
@@ -55,6 +56,8 @@ test("import validation workflow composes account, payment, and expense rules", 
     calls.map(([name]) => name),
     ["csv", "terms", "allocation", "validators"],
   );
+  assert.equal(calls[0][1].moneyInput, modules.currencyUtils.moneyInput);
+  assert.deepEqual(Object.keys(calls[0][1]), ["moneyInput"]);
   assert.equal(calls[1][1].modules.csvValueUtils, csvValueUtils);
   assert.equal(calls[2][1].modules.csvValueUtils, csvValueUtils);
   assert.equal(calls[3][1].account.modules.terms, accountTerms);

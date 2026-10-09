@@ -4,7 +4,7 @@ const { parseCSV } = require("../features/csv-parser.js");
 require("../features/currency-utils.js");
 const { csvMoney, csvRate, validIsoDate } =
   require("../features/csv-value-utils.js").create({
-    modules: { currencyUtils: globalThis.PropertyDeskCurrencyUtils },
+    moneyInput: globalThis.PropertyDeskCurrencyUtils.moneyInput,
   });
 const {
   createImportLookup,

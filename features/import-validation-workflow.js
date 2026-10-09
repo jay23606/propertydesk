@@ -4,7 +4,7 @@
 
   function createImportValidationWorkflow({ workflows, modules }) {
     const csvValueUtils = workflows.csvValueUtils.create({
-      modules: { currencyUtils: modules.currencyUtils },
+      moneyInput: modules.currencyUtils.moneyInput,
     });
     const accountImportTerms = workflows.accountImportTerms.create({
       modules: {

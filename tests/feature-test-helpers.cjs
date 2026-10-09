@@ -274,7 +274,7 @@ function loadImportFeatures(context) {
   context.window.PropertyDeskCsvParser = require("../features/csv-parser.js");
   context.window.PropertyDeskCsvValueUtils =
     require("../features/csv-value-utils.js").create({
-      modules: { currencyUtils: globalThis.PropertyDeskCurrencyUtils },
+      moneyInput: globalThis.PropertyDeskCurrencyUtils.moneyInput,
     });
   context.window.PropertyDeskImportRows = require("../features/import-row-utils.js");
   for (const filename of [

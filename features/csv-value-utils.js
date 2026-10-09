@@ -2,8 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ modules }) {
-    const { moneyInput } = modules.currencyUtils;
+  function create({ moneyInput }) {
     if (!moneyInput)
       throw new Error("The PropertyDesk currency helper is not loaded.");
 
