@@ -4,7 +4,8 @@
 
   function createReportExport({
     $,
-    state,
+    getAccounts,
+    getProperties,
     todayIso,
     prettyType,
     accountBalance,
@@ -38,10 +39,10 @@
           "next_due_date",
           "status",
         ],
-        state.accounts.map((account) => [
+        getAccounts().map((account) => [
           account.name,
           prettyType(account.account_type),
-          state.properties.find(
+          getProperties().find(
             (property) => property.id === account.property_id,
           )?.name || "",
           account.party_name,

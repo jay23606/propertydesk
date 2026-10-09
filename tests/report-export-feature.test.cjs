@@ -82,6 +82,10 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
     "utf8",
   );
   assert.match(
+    app,
+    /exporting: \{[\s\S]*?getAccounts: \(\) => state\.accounts,[\s\S]*?getProperties: \(\) => state\.properties,/,
+  );
+  assert.match(
     workspace,
     /workflows\.report\.create\(\{[\s\S]*?money: rendering\.money,[\s\S]*?workflows\.exporter\.create\(\{[\s\S]*?downloadBlob: exporting\.downloadBlob,/,
   );
@@ -108,7 +112,8 @@ test("report workspace preserves rendering and export APIs", () => {
   };
   const exporting = {
     $() {},
-    state: {},
+    getAccounts() {},
+    getProperties() {},
     todayIso() {},
     prettyType() {},
     accountBalance() {},
@@ -174,10 +179,18 @@ test("report workspace preserves rendering and export APIs", () => {
     "$",
     "accountBalance",
     "downloadBlob",
+    "getAccounts",
+    "getProperties",
     "prettyType",
-    "state",
     "todayIso",
   ]);
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(__dirname, "..", "features", "report-export.js"),
+      "utf8",
+    ),
+    /\bstate\b/,
+  );
   for (const key of Object.keys(passed.rendering)) {
     if (key === "workflows") continue;
     assert.equal(passed.rendering[key], rendering[key]);
@@ -289,31 +302,29 @@ test("account CSV export keeps rental balances blank and escapes spreadsheet fie
         },
       };
     },
-    state: {
-      properties: [{ id: "property-1", name: "Main House, East" }],
-      accounts: [
-        {
-          id: "rental-1",
-          property_id: "property-1",
-          name: "Lease",
-          account_type: "rental",
-          party_name: "Tenant",
-          payment_amount: 825,
-          next_due_date: "2026-11-01",
-          status: "active",
-        },
-        {
-          id: "note-1",
-          property_id: "property-1",
-          name: "Seller note",
-          account_type: "note",
-          party_name: "Buyer",
-          payment_amount: 400,
-          next_due_date: "2026-11-01",
-          status: "active",
-        },
-      ],
-    },
+    getProperties: () => [{ id: "property-1", name: "Main House, East" }],
+    getAccounts: () => [
+      {
+        id: "rental-1",
+        property_id: "property-1",
+        name: "Lease",
+        account_type: "rental",
+        party_name: "Tenant",
+        payment_amount: 825,
+        next_due_date: "2026-11-01",
+        status: "active",
+      },
+      {
+        id: "note-1",
+        property_id: "property-1",
+        name: "Seller note",
+        account_type: "note",
+        party_name: "Buyer",
+        payment_amount: 400,
+        next_due_date: "2026-11-01",
+        status: "active",
+      },
+    ],
     todayIso: () => "2026-10-05",
     prettyType: (type) => type,
     accountBalance: (account) => (account.id === "note-1" ? 12000 : 0),

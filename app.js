@@ -156,7 +156,8 @@
       },
       exporting: {
         $,
-        state,
+        getAccounts: () => state.accounts,
+        getProperties: () => state.properties,
         todayIso,
         prettyType,
         accountBalance,

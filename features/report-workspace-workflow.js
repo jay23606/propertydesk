@@ -22,7 +22,8 @@
     const { attachEvents: attachReportExportEvents } =
       workflows.exporter.create({
         $: exporting.$,
-        state: exporting.state,
+        getAccounts: exporting.getAccounts,
+        getProperties: exporting.getProperties,
         todayIso: exporting.todayIso,
         prettyType: exporting.prettyType,
         accountBalance: exporting.accountBalance,
