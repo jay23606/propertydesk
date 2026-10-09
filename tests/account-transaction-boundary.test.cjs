@@ -33,10 +33,10 @@ test("app composes independent property and account forms before action routing"
     /getPendingCorrection: records\.getPendingCorrection/,
   );
   assert.doesNotMatch(transactionSetup, /\bstate\./);
-  assert.match(app, /getPendingCorrection: \(\) => state\.pendingCorrection/);
-  assert.match(app, /setPendingCorrection: \(value\) =>/);
-  assert.match(app, /getAccounts: \(\) => state\.accounts/);
-  assert.match(app, /getWorkspaceOwnerId: \(\) => state\.workspaceOwnerId/);
+  assert.match(app, /appRecords\.getPendingCorrection/);
+  assert.match(app, /appRecords\.setPendingCorrection/);
+  assert.match(app, /appRecords\.getAccounts/);
+  assert.match(app, /appRecords\.getWorkspaceOwnerId/);
   assert.match(
     composition,
     /entries: \{[\s\S]*?transactionRepository: services\.transactionRepository/,
@@ -71,7 +71,7 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     app,
-    /PropertyDeskCreateActions\.create\(\{[\s\S]*?getProperties: \(\) => state\.properties,[\s\S]*?getAccounts: \(\) => state\.accounts,/,
+    /PropertyDeskCreateActions\.create\(\{[\s\S]*?getProperties: appRecords\.getProperties,[\s\S]*?getAccounts: appRecords\.getAccounts,/,
   );
   const createActions = fs.readFileSync(
     path.join(root, "features", "create-actions.js"),

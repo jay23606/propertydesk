@@ -139,7 +139,7 @@ test("app startup workflow loads after auth and lifecycle and is precached", () 
   assert.match(app, /PropertyDeskAppStartupSetup\.create\(/);
   assert.match(
     app,
-    /records: \{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?setPasswordRecoveryInProgress:[\s\S]*?resetWorkspaceState: \(\) =>[\s\S]*?resetWorkspaceState\(state\),/,
+    /records: \{[\s\S]*?getUser: appRecords\.getUser,[\s\S]*?setPasswordRecoveryInProgress: appRecords\.setPasswordRecoveryInProgress,[\s\S]*?resetWorkspaceState: \(\) =>[\s\S]*?resetWorkspaceState\(state\),/,
   );
   assert.match(
     setupSource,

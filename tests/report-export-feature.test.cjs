@@ -83,7 +83,7 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   );
   assert.match(
     app,
-    /getAccounts: \(\) => state\.accounts,[\s\S]*?getProperties: \(\) => state\.properties,/,
+    /getAccounts: appRecords\.getAccounts,[\s\S]*?getProperties: appRecords\.getProperties,/,
   );
   const setup = fs.readFileSync(
     path.join(__dirname, "..", "features", "report-workspace-setup.js"),

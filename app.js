@@ -99,6 +99,7 @@
     financialContext,
     depositLedger,
   } = appServices;
+  const appRecords = window.PropertyDeskAppStateAccess.create(state);
   const { lateReminderMailto, lateReminderSms } = emailUtils;
   const { propertyAddress, streetAddress } =
     window.PropertyDeskPropertyAddressUtils;
@@ -141,11 +142,11 @@
   const { renderReports, attachReportExportEvents } =
     window.PropertyDeskReportWorkspaceSetup.create({
       records: {
-        getPayments: () => state.payments,
-        getExpenses: () => state.expenses,
-        getAccounts: () => state.accounts,
-        getImportBatches: () => state.importBatches,
-        getProperties: () => state.properties,
+        getPayments: appRecords.getPayments,
+        getExpenses: appRecords.getExpenses,
+        getAccounts: appRecords.getAccounts,
+        getImportBatches: appRecords.getImportBatches,
+        getProperties: appRecords.getProperties,
       },
       ui: {
         $,
@@ -173,22 +174,16 @@
     });
   const modal = window.PropertyDeskModalController.create({
     $,
-    setPendingImport: (value) => {
-      state.pendingImport = value;
-    },
-    setPendingCorrection: (value) => {
-      state.pendingCorrection = value;
-    },
-    advanceAuditRequestId: () => {
-      state.auditRequestId++;
-    },
+    setPendingImport: appRecords.setPendingImport,
+    setPendingCorrection: appRecords.setPendingCorrection,
+    advanceAuditRequestId: appRecords.beginAuditRequest,
     documentRef: document,
   });
   const { fillSelect, populateFormOptions } =
     window.PropertyDeskFormOptions.create({
       $,
-      getProperties: () => state.properties,
-      getAccounts: () => state.accounts,
+      getProperties: appRecords.getProperties,
+      getAccounts: appRecords.getAccounts,
       esc,
       propertyAddress,
       prettyType,
@@ -200,8 +195,8 @@
   const { previewReminderEmail } =
     window.PropertyDeskReminderPreviewSetup.create({
       records: {
-        getProperties: () => state.properties,
-        getPayments: () => state.payments,
+        getProperties: appRecords.getProperties,
+        getPayments: appRecords.getPayments,
       },
       ui: {
         $,
@@ -231,18 +226,14 @@
     });
   const appShell = window.PropertyDeskAppShellSetup.create({
     records: {
-      getAccounts: () => state.accounts,
-      getProperties: () => state.properties,
-      getReminderLogs: () => state.reminderLogs,
-      getUser: () => state.user,
-      setUser: (user) => {
-        state.user = user;
-      },
-      getWorkspaceMembers: () => state.workspaceMembers,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      setView: (view) => {
-        state.view = view;
-      },
+      getAccounts: appRecords.getAccounts,
+      getProperties: appRecords.getProperties,
+      getReminderLogs: appRecords.getReminderLogs,
+      getUser: appRecords.getUser,
+      setUser: appRecords.setUser,
+      getWorkspaceMembers: appRecords.getWorkspaceMembers,
+      getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
+      setView: appRecords.setView,
     },
     ui: {
       $,
@@ -300,9 +291,9 @@
   const propertyAccountForms =
     window.PropertyDeskPropertyAccountFormsSetup.create({
       records: {
-        getProperties: () => state.properties,
-        getAccounts: () => state.accounts,
-        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getProperties: appRecords.getProperties,
+        getAccounts: appRecords.getAccounts,
+        getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
       },
       ui: {
         $,
@@ -349,15 +340,13 @@
     });
   const ledgerWorkflow = window.PropertyDeskTransactionWorkspaceSetup.create({
     records: {
-      getProperties: () => state.properties,
-      getAccounts: () => state.accounts,
-      getPayments: () => state.payments,
-      getExpenses: () => state.expenses,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getPendingCorrection: () => state.pendingCorrection,
-      setPendingCorrection: (value) => {
-        state.pendingCorrection = value;
-      },
+      getProperties: appRecords.getProperties,
+      getAccounts: appRecords.getAccounts,
+      getPayments: appRecords.getPayments,
+      getExpenses: appRecords.getExpenses,
+      getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
+      getPendingCorrection: appRecords.getPendingCorrection,
+      setPendingCorrection: appRecords.setPendingCorrection,
     },
     ui: {
       $,
@@ -450,8 +439,8 @@
   } = ledgerWorkflow;
   const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
     $,
-    getProperties: () => state.properties,
-    getAccounts: () => state.accounts,
+    getProperties: appRecords.getProperties,
+    getAccounts: appRecords.getAccounts,
     toast,
     resetPropertyForm: propertyAccountForms.resetPropertyForm,
     openModal,
@@ -467,23 +456,15 @@
     attachDepositAdjustmentEvents,
   } = window.PropertyDeskAccountDepositWorkspaceSetup.create({
     records: {
-      getAccount: (accountId) =>
-        state.accounts.find((account) => account.id === accountId) || null,
-      getProperty: (propertyId) =>
-        state.properties.find((property) => property.id === propertyId) || null,
-      getPaymentsForAccount: (accountId) =>
-        state.payments.filter((payment) => payment.account_id === accountId),
-      getAgreementVersions: (accountId) =>
-        state.agreementVersions.filter(
-          (version) => version.account_id === accountId,
-        ),
-      beginAuditRequest: () => ++state.auditRequestId,
-      isCurrentAuditRequest: (requestId) => requestId === state.auditRequestId,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getDepositCollection: (collection) =>
-        collection === "depositEntries" ? state.depositEntries : null,
-      getAccountCollection: (collection) =>
-        collection === "accounts" ? state.accounts : null,
+      getAccount: appRecords.getAccount,
+      getProperty: appRecords.getProperty,
+      getPaymentsForAccount: appRecords.getPaymentsForAccount,
+      getAgreementVersions: appRecords.getAgreementVersions,
+      beginAuditRequest: appRecords.beginAuditRequest,
+      isCurrentAuditRequest: appRecords.isCurrentAuditRequest,
+      getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
+      getDepositCollection: appRecords.getDepositCollection,
+      getAccountCollection: appRecords.getAccountCollection,
     },
     ui: {
       $,
@@ -562,21 +543,18 @@
     attachPropertyActionEvents,
   } = window.PropertyDeskPropertyWorkspaceSetup.create({
     records: {
-      beginAuditRequest: () => ++state.auditRequestId,
-      setSelectedPropertyId: (id) => {
-        state.selectedPropertyId = id;
-      },
-      getSelectedPropertyId: () => state.selectedPropertyId,
-      getPayments: () => state.payments,
-      getExpenses: () => state.expenses,
-      getProperties: () => state.properties,
-      getAccounts: () => state.accounts,
-      getDocuments: () => state.documents,
-      getWorkspaceMembers: () => state.workspaceMembers,
-      getPropertyHolders: () => state.propertyHolders,
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getSenderName: () =>
-        state.user?.user_metadata?.display_name?.trim() || "PropertyDesk",
+      beginAuditRequest: appRecords.beginAuditRequest,
+      setSelectedPropertyId: appRecords.setSelectedPropertyId,
+      getSelectedPropertyId: appRecords.getSelectedPropertyId,
+      getPayments: appRecords.getPayments,
+      getExpenses: appRecords.getExpenses,
+      getProperties: appRecords.getProperties,
+      getAccounts: appRecords.getAccounts,
+      getDocuments: appRecords.getDocuments,
+      getWorkspaceMembers: appRecords.getWorkspaceMembers,
+      getPropertyHolders: appRecords.getPropertyHolders,
+      getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
+      getSenderName: appRecords.getSenderName,
     },
     ui: {
       $,
@@ -715,16 +693,14 @@
     attachExpenseEvents: attachExpenseImportEvents,
   } = window.PropertyDeskImportWorkspaceSetup.create({
     records: {
-      getWorkspaceOwnerId: () => state.workspaceOwnerId,
-      getImportBatches: () => state.importBatches,
-      getAccounts: () => state.accounts,
-      getPayments: () => state.payments,
-      getExpenses: () => state.expenses,
-      getProperties: () => state.properties,
-      getPendingImport: () => state.pendingImport,
-      setPendingImport: (value) => {
-        state.pendingImport = value;
-      },
+      getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
+      getImportBatches: appRecords.getImportBatches,
+      getAccounts: appRecords.getAccounts,
+      getPayments: appRecords.getPayments,
+      getExpenses: appRecords.getExpenses,
+      getProperties: appRecords.getProperties,
+      getPendingImport: appRecords.getPendingImport,
+      setPendingImport: appRecords.setPendingImport,
     },
     ui: { $, esc, openModal, closeModal, todayIso, toast },
     services: {
@@ -783,8 +759,8 @@
   const { attachBackupExportEvents } =
     window.PropertyDeskBackupWorkspaceSetup.create({
       records: {
-        getUser: () => state.user,
-        getWorkspaceOwnerId: () => state.workspaceOwnerId,
+        getUser: appRecords.getUser,
+        getWorkspaceOwnerId: appRecords.getWorkspaceOwnerId,
       },
       ui: { $, now, todayIso, toast },
       services: {
@@ -809,14 +785,10 @@
     });
   const appLifecycle = window.PropertyDeskAppStartupSetup.create({
     records: {
-      getUser: () => state.user,
-      setUser: (user) => {
-        state.user = user;
-      },
-      getPasswordRecoveryInProgress: () => state.passwordRecoveryInProgress,
-      setPasswordRecoveryInProgress: (value) => {
-        state.passwordRecoveryInProgress = value;
-      },
+      getUser: appRecords.getUser,
+      setUser: appRecords.setUser,
+      getPasswordRecoveryInProgress: appRecords.getPasswordRecoveryInProgress,
+      setPasswordRecoveryInProgress: appRecords.setPasswordRecoveryInProgress,
       resetWorkspaceState: () =>
         window.PropertyDeskAppState.resetWorkspaceState(state),
     },
