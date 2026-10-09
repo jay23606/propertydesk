@@ -495,86 +495,80 @@
     openAccountDetails,
     attachAccountDetailActionEvents,
     attachDepositAdjustmentEvents,
-  } = window.PropertyDeskAccountDepositWorkspaceWorkflow.create({
-    depositWorkspaceWorkflow: window.PropertyDeskDepositWorkspaceWorkflow,
-    depositWorkflows: {
-      detailsModel: window.PropertyDeskDepositDetailsModel,
-      detailsView: window.PropertyDeskDepositDetailsView,
-      adjustmentWorkflow: window.PropertyDeskDepositAdjustmentWorkflow,
-      adjustmentModules: {
-        maintenance: window.PropertyDeskDepositMaintenance,
-        entry: window.PropertyDeskDepositAdjustmentEntry,
-        events: window.PropertyDeskDepositDetailEvents,
-      },
+  } = window.PropertyDeskAccountDepositWorkspaceSetup.create({
+    records: {
+      getAccount: (accountId) =>
+        state.accounts.find((account) => account.id === accountId) || null,
+      getProperty: (propertyId) =>
+        state.properties.find((property) => property.id === propertyId) || null,
+      getPaymentsForAccount: (accountId) =>
+        state.payments.filter((payment) => payment.account_id === accountId),
+      getAgreementVersions: (accountId) =>
+        state.agreementVersions.filter(
+          (version) => version.account_id === accountId,
+        ),
+      beginAuditRequest: () => ++state.auditRequestId,
+      isCurrentAuditRequest: (requestId) => requestId === state.auditRequestId,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getDepositCollection: (collection) =>
+        collection === "depositEntries" ? state.depositEntries : null,
+      getAccountCollection: (collection) =>
+        collection === "accounts" ? state.accounts : null,
     },
-    accountDetailWorkspaceWorkflow:
-      window.PropertyDeskAccountDetailWorkspaceWorkflow,
-    accountDetailContentWorkflow:
-      window.PropertyDeskAccountDetailContentWorkflow,
-    accountDetailActionWorkflow: window.PropertyDeskAccountDetailActionWorkflow,
-    accountDetailActionWorkflows: {
-      closeMaintenance: window.PropertyDeskAccountCloseMaintenance,
-      closeEntry: window.PropertyDeskAccountCloseEntry,
-      detailEvents: window.PropertyDeskAccountDetailEvents,
+    ui: {
+      $,
+      money,
+      fmtDate,
+      fmtDateTime,
+      esc,
+      sumPosted,
+      prettyType,
+      paymentFrequencyLabel,
+      summarizeAccount,
+      amortizationSchedule,
+      propertyAddress,
+      todayIso,
+      toast,
+      moneyInput,
+      promptAction,
+      openModal,
+      closeModal,
+      editAccount: propertyAccountForms.editAccount,
+      openPayment,
+      confirmAction,
     },
-    deposits: {
-      details: {
-        depositLedger,
-        money,
-        fmtDate,
-        esc,
-      },
-      adjustments: {
-        $,
-        getAccount: (accountId) =>
-          state.accounts.find((account) => account.id === accountId) || null,
-        getWorkspaceOwnerId: () => state.workspaceOwnerId,
-        getCollection: (collection) =>
-          collection === "depositEntries" ? state.depositEntries : null,
-        todayIso,
-        toast,
-        fetchAll,
-        moneyInput,
-        repository: repositories.deposits,
-        saveAndRefreshWorkspaceRecord:
-          writeFeedback.saveAndRefreshWorkspaceRecord,
-        prepareAdjustment: window.PropertyDeskDepositAdjustmentModel.prepare,
-        validateAdjustment: window.PropertyDeskDepositAdjustmentModel.validate,
-        resolveAdjustmentType:
-          window.PropertyDeskDepositAdjustmentModel.resolveType,
-        promptAction,
-      },
+    services: {
+      depositLedger,
+      fetchAll,
+      depositRepository: repositories.deposits,
+      accountHistoryRepository: repositories.accountHistory,
+      accountRepository: repositories.accounts,
+      saveAndRefreshWorkspaceRecord:
+        writeFeedback.saveAndRefreshWorkspaceRecord,
     },
-    accountDetails: {
-      content: {
-        $,
-        getAccount: (accountId) =>
-          state.accounts.find((account) => account.id === accountId) || null,
-        getProperty: (propertyId) =>
-          state.properties.find((property) => property.id === propertyId) ||
-          null,
-        getPaymentsForAccount: (accountId) =>
-          state.payments.filter((payment) => payment.account_id === accountId),
-        getAgreementVersions: (accountId) =>
-          state.agreementVersions.filter(
-            (version) => version.account_id === accountId,
-          ),
-        beginAuditRequest: () => ++state.auditRequestId,
-        isCurrentAuditRequest: (requestId) =>
-          requestId === state.auditRequestId,
-        money,
-        fmtDate,
-        fmtDateTime,
-        esc,
-        sumPosted,
-        prettyType,
-        paymentFrequencyLabel,
-        summarizeAccount,
-        amortizationSchedule,
-        openModal,
-        propertyAddress,
-        accountHistoryRepository: repositories.accountHistory,
-        workflows: {
+    workflows: {
+      workspace: window.PropertyDeskAccountDepositWorkspaceWorkflow,
+      deposit: {
+        workspace: window.PropertyDeskDepositWorkspaceWorkflow,
+        detailsModel: window.PropertyDeskDepositDetailsModel,
+        detailsView: window.PropertyDeskDepositDetailsView,
+        adjustmentWorkflow: window.PropertyDeskDepositAdjustmentWorkflow,
+        adjustmentModules: {
+          maintenance: window.PropertyDeskDepositMaintenance,
+          entry: window.PropertyDeskDepositAdjustmentEntry,
+          events: window.PropertyDeskDepositDetailEvents,
+        },
+      },
+      accountDetails: {
+        workspace: window.PropertyDeskAccountDetailWorkspaceWorkflow,
+        content: window.PropertyDeskAccountDetailContentWorkflow,
+        action: window.PropertyDeskAccountDetailActionWorkflow,
+        actionWorkflows: {
+          closeMaintenance: window.PropertyDeskAccountCloseMaintenance,
+          closeEntry: window.PropertyDeskAccountCloseEntry,
+          detailEvents: window.PropertyDeskAccountDetailEvents,
+        },
+        contentModules: {
           accountHistoryModel: window.PropertyDeskAccountHistoryModel,
           accountHistoryView: window.PropertyDeskAccountHistoryView,
           accountLoanScheduleView: window.PropertyDeskAccountLoanScheduleView,
@@ -583,22 +577,7 @@
           accountDetails: window.PropertyDeskAccountDetails,
         },
       },
-      actions: {
-        $,
-        getAccount: (accountId) =>
-          state.accounts.find((account) => account.id === accountId) || null,
-        getCollection: (collection) =>
-          collection === "accounts" ? state.accounts : null,
-        toast,
-        fetchAll,
-        closeModal,
-        editAccount: propertyAccountForms.editAccount,
-        openPayment,
-        repository: repositories.accounts,
-        saveAndRefreshWorkspaceRecord:
-          writeFeedback.saveAndRefreshWorkspaceRecord,
-        confirmAction,
-      },
+      adjustmentModel: window.PropertyDeskDepositAdjustmentModel,
     },
   });
   const {

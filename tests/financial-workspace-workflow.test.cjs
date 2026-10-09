@@ -30,7 +30,7 @@ test("app delegates account, deposit, and transaction maintenance", () => {
   assert.equal((app.match(/window\.open\(/g) || []).length, 1);
 
   assert.match(app, /PropertyDeskTransactionWorkspaceWorkflow\.create\(/);
-  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskTransactionViews\.create\(/);
   assert.doesNotMatch(app, /PropertyDeskLedgerEntryForms\.create\(/);

@@ -245,7 +245,16 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
-  assert.match(app, /PropertyDeskAccountDepositWorkspaceWorkflow\.create\(/);
+  const setup = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "account-deposit-workspace-setup.js",
+    ),
+    "utf8",
+  );
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:DepositWorkspace|AccountDetailWorkspace)Workflow\.create\(/,
@@ -256,10 +265,7 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.doesNotMatch(app, /PropertyDeskAccountScreenWorkflow/);
   assert.doesNotMatch(app, /PropertyDeskDepositDetails(?:Model|View)\.create/);
-  assert.match(
-    app,
-    /depositWorkflows: \{[\s\S]*?adjustmentModules: \{\s*maintenance: window\.PropertyDeskDepositMaintenance,[\s\S]*?events: window\.PropertyDeskDepositDetailEvents/,
-  );
+  assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create\(/);
   const accountDetailWorkflow = fs.readFileSync(
     path.join(
       __dirname,
@@ -355,12 +361,12 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   assert.match(depositWorkflow, /saveAndRefreshWorkspaceRecord,/);
   assert.doesNotMatch(depositWorkflow, /writeFeedback/);
   assert.match(
-    app,
-    /adjustments: \{[\s\S]*?repository: repositories\.deposits,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
+    setup,
+    /adjustments: \{[\s\S]*?repository: services\.depositRepository,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
-    app,
-    /actions: \{[\s\S]*?repository: repositories\.accounts,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
+    setup,
+    /actions: \{[\s\S]*?repository: services\.accountRepository,[\s\S]*?saveAndRefreshWorkspaceRecord:/,
   );
   assert.match(
     appServices,
@@ -383,27 +389,21 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     transactionComposition,
     /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
   );
-  assert.match(app, /repository: repositories\.accounts/);
-  assert.match(app, /repository: repositories\.deposits/);
+  assert.match(app, /accountRepository: repositories\.accounts/);
+  assert.match(app, /depositRepository: repositories\.deposits/);
+  assert.match(app, /action: window\.PropertyDeskAccountDetailActionWorkflow/);
   assert.match(
     app,
-    /accountDetailActionWorkflow:\s*window\.PropertyDeskAccountDetailActionWorkflow/,
+    /content: window\.PropertyDeskAccountDetailContentWorkflow/,
+  );
+  assert.match(setup, /prepareAdjustment: workflows\.adjustmentModel\.prepare/);
+  assert.match(
+    setup,
+    /validateAdjustment: workflows\.adjustmentModel\.validate/,
   );
   assert.match(
-    app,
-    /accountDetailContentWorkflow:\s*window\.PropertyDeskAccountDetailContentWorkflow/,
-  );
-  assert.match(
-    app,
-    /prepareAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.prepare/,
-  );
-  assert.match(
-    app,
-    /validateAdjustment:\s*window\.PropertyDeskDepositAdjustmentModel\.validate/,
-  );
-  assert.match(
-    app,
-    /resolveAdjustmentType:\s*window\.PropertyDeskDepositAdjustmentModel\.resolveType/,
+    setup,
+    /resolveAdjustmentType: workflows\.adjustmentModel\.resolveType/,
   );
   assert.doesNotMatch(app, /PropertyDeskAccountHistoryDetails\.create\(/);
   assert.match(
@@ -411,14 +411,17 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     /eventBindersBeforeAuth:[\s\S]*?attachAccountDetailActionEvents,\s*attachDepositAdjustmentEvents,/,
   );
   assert.match(
-    app,
-    /PropertyDeskAccountDepositWorkspaceWorkflow\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?accountHistoryRepository: repositories\.accountHistory/,
+    setup,
+    /workflows\.workspace\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?accountHistoryRepository: services\.accountHistoryRepository/,
   );
+  assert.doesNotMatch(setup, /\bstate\b/);
   assert.match(html, /features\/account-deposit-workspace-workflow\.js/);
   assert.match(
     worker,
     /'\.\/features\/account-deposit-workspace-workflow\.js'/,
   );
+  assert.match(html, /features\/account-deposit-workspace-setup\.js/);
+  assert.match(worker, /'\.\/features\/account-deposit-workspace-setup\.js'/);
   assert.doesNotMatch(app, /PropertyDeskAccountDetailsWorkflow\.create\(/);
 });
 
