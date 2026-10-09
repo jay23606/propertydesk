@@ -3,40 +3,21 @@
   "use strict";
 
   function createBackupWorkspaceWorkflow({
-    $,
-    getUser,
-    getWorkspaceOwnerId,
-    isClientReady,
-    now,
-    todayIso,
-    toast,
-    downloadBlob,
-    zipUtils,
-    workspaceTables,
-    loadAllPages,
-    collectBackupAgreementFiles,
-    documentRepository,
+    backupRecords,
+    exportOptions,
     workflows,
   }) {
-    const backup = workflows.utils.create({ workspaceTables });
+    const backup = workflows.utils.create({
+      workspaceTables: backupRecords.workspaceTables,
+    });
     const records = workflows.records.create({
       tables: backup.tables,
-      loadAllPages,
+      loadAllPages: backupRecords.loadAllPages,
     });
     const exporter = workflows.exporter.create({
-      $,
-      getUser,
-      getWorkspaceOwnerId,
-      isClientReady,
-      now,
+      ...exportOptions,
       createBackup: backup.createBackup,
-      todayIso,
-      toast,
-      downloadBlob,
-      zipUtils,
       loadBackupRecords: records.load,
-      collectBackupAgreementFiles,
-      documentRepository,
       modules: workflows.exporter.modules,
     });
 

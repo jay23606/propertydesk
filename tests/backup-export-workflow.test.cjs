@@ -135,22 +135,29 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
 
   const now = () => new Date("2026-10-08T12:00:00.000Z");
   const dependencies = {
-    $: () => null,
-    getUser: () => null,
-    getWorkspaceOwnerId: () => null,
-    isClientReady: () => false,
-    now,
-    todayIso: () => "2026-10-07",
-    toast: () => {},
-    downloadBlob: () => {},
-    zipUtils: { createZip: () => {} },
-    workspaceTables: { properties: "pd_properties", documents: "pd_documents" },
-    loadAllPages: async () => [],
-    collectBackupAgreementFiles: async () => ({
-      entries: [],
-      includedFiles: [],
-    }),
-    documentRepository: {},
+    backupRecords: {
+      workspaceTables: {
+        properties: "pd_properties",
+        documents: "pd_documents",
+      },
+      loadAllPages: async () => [],
+    },
+    exportOptions: {
+      $: () => null,
+      getUser: () => null,
+      getWorkspaceOwnerId: () => null,
+      isClientReady: () => false,
+      now,
+      todayIso: () => "2026-10-07",
+      toast: () => {},
+      downloadBlob: () => {},
+      zipUtils: { createZip: () => {} },
+      collectBackupAgreementFiles: async () => ({
+        entries: [],
+        includedFiles: [],
+      }),
+      documentRepository: {},
+    },
     workflows: {
       utils: context.window.PropertyDeskBackupUtils,
       records: context.window.PropertyDeskBackupRecords,
@@ -163,22 +170,51 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
   const workflow =
     context.window.PropertyDeskBackupWorkspaceWorkflow.create(dependencies);
 
-  assert.equal(calls.utils.workspaceTables, dependencies.workspaceTables);
+  assert.equal(
+    calls.utils.workspaceTables,
+    dependencies.backupRecords.workspaceTables,
+  );
   assert.deepEqual(calls.records.tables, tables);
-  assert.equal(calls.records.loadAllPages, dependencies.loadAllPages);
+  assert.equal(
+    calls.records.loadAllPages,
+    dependencies.backupRecords.loadAllPages,
+  );
   assert.equal(calls.exporter.createBackup, createBackup);
   assert.equal(calls.exporter.now, now);
-  assert.equal(calls.exporter.isClientReady, dependencies.isClientReady);
+  assert.equal(
+    calls.exporter.isClientReady,
+    dependencies.exportOptions.isClientReady,
+  );
   assert.equal(calls.exporter.loadBackupRecords, load);
   assert.equal(
     calls.exporter.collectBackupAgreementFiles,
-    dependencies.collectBackupAgreementFiles,
+    dependencies.exportOptions.collectBackupAgreementFiles,
   );
   assert.equal(
     calls.exporter.documentRepository,
-    dependencies.documentRepository,
+    dependencies.exportOptions.documentRepository,
   );
   assert.equal(calls.exporter.modules.archive, archiveModule);
+  assert.deepEqual(Object.keys(calls.exporter).sort(), [
+    "$",
+    "collectBackupAgreementFiles",
+    "createBackup",
+    "documentRepository",
+    "downloadBlob",
+    "getUser",
+    "getWorkspaceOwnerId",
+    "isClientReady",
+    "loadBackupRecords",
+    "modules",
+    "now",
+    "toast",
+    "todayIso",
+    "zipUtils",
+  ]);
+  assert.deepEqual(Object.keys(calls.records).sort(), [
+    "loadAllPages",
+    "tables",
+  ]);
   assert.equal(workflow.attachBackupExportEvents, attachEvents);
   assert.deepEqual(Object.keys(workflow), ["attachBackupExportEvents"]);
 });

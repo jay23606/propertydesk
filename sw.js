@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v900';
+const CACHE_NAME = 'propertydesk-shell-v901';
 const SHELL_FILES = [
   './',
   './index.html',

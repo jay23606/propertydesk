@@ -4,19 +4,23 @@
 
   function createBackupWorkspaceSetup({ records, ui, services, workflows }) {
     return workflows.backup.create({
-      $: ui.$,
-      getUser: records.getUser,
-      getWorkspaceOwnerId: records.getWorkspaceOwnerId,
-      isClientReady: services.isClientReady,
-      now: ui.now,
-      todayIso: ui.todayIso,
-      toast: ui.toast,
-      downloadBlob: services.downloadBlob,
-      zipUtils: workflows.zipUtils,
-      workspaceTables: services.workspaceTables,
-      loadAllPages: services.loadAllPages,
-      collectBackupAgreementFiles: services.collectBackupAgreementFiles,
-      documentRepository: services.documentRepository,
+      backupRecords: {
+        workspaceTables: services.workspaceTables,
+        loadAllPages: services.loadAllPages,
+      },
+      exportOptions: {
+        $: ui.$,
+        getUser: records.getUser,
+        getWorkspaceOwnerId: records.getWorkspaceOwnerId,
+        isClientReady: services.isClientReady,
+        now: ui.now,
+        todayIso: ui.todayIso,
+        toast: ui.toast,
+        downloadBlob: services.downloadBlob,
+        zipUtils: workflows.zipUtils,
+        collectBackupAgreementFiles: services.collectBackupAgreementFiles,
+        documentRepository: services.documentRepository,
+      },
       workflows: {
         utils: workflows.utils,
         records: workflows.records,

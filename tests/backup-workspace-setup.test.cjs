@@ -23,6 +23,7 @@ test("backup setup maps scoped data, private document access, and export modules
   const records = {
     getUser: () => "user",
     getWorkspaceOwnerId: () => "owner",
+    unusedRecordValue: true,
   };
   const ui = Object.fromEntries(
     ["$", "now", "todayIso", "toast"].map((key) => [key, () => key]),
@@ -54,18 +55,53 @@ test("backup setup maps scoped data, private document access, and export modules
     }),
     result,
   );
-  assert.equal(received.getUser, records.getUser);
-  assert.equal(received.getWorkspaceOwnerId, records.getWorkspaceOwnerId);
-  assert.equal(received.$, ui.$);
-  assert.equal(received.isClientReady, services.isClientReady);
-  assert.equal(received.workspaceTables, services.workspaceTables);
-  assert.equal(received.loadAllPages, services.loadAllPages);
+  assert.deepEqual(Object.keys(received).sort(), [
+    "backupRecords",
+    "exportOptions",
+    "workflows",
+  ]);
+  assert.deepEqual(Object.keys(received.backupRecords).sort(), [
+    "loadAllPages",
+    "workspaceTables",
+  ]);
+  assert.deepEqual(Object.keys(received.exportOptions).sort(), [
+    "$",
+    "collectBackupAgreementFiles",
+    "documentRepository",
+    "downloadBlob",
+    "getUser",
+    "getWorkspaceOwnerId",
+    "isClientReady",
+    "now",
+    "toast",
+    "todayIso",
+    "zipUtils",
+  ]);
   assert.equal(
-    received.collectBackupAgreementFiles,
+    Object.hasOwn(received.exportOptions, "unusedRecordValue"),
+    false,
+  );
+  assert.equal(received.exportOptions.getUser, records.getUser);
+  assert.equal(
+    received.exportOptions.getWorkspaceOwnerId,
+    records.getWorkspaceOwnerId,
+  );
+  assert.equal(received.exportOptions.$, ui.$);
+  assert.equal(received.exportOptions.isClientReady, services.isClientReady);
+  assert.equal(
+    received.backupRecords.workspaceTables,
+    services.workspaceTables,
+  );
+  assert.equal(received.backupRecords.loadAllPages, services.loadAllPages);
+  assert.equal(
+    received.exportOptions.collectBackupAgreementFiles,
     services.collectBackupAgreementFiles,
   );
-  assert.equal(received.documentRepository, services.documentRepository);
-  assert.equal(received.zipUtils, workflows.zipUtils);
+  assert.equal(
+    received.exportOptions.documentRepository,
+    services.documentRepository,
+  );
+  assert.equal(received.exportOptions.zipUtils, workflows.zipUtils);
   assert.equal(received.workflows.exporter.create, workflows.exporter.create);
   assert.equal(received.workflows.exporter.modules, workflows.exporter.modules);
   assert.doesNotMatch(source, /\bstate\b/);
