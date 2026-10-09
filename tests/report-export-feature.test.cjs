@@ -91,10 +91,9 @@ test("app delegates Reports rendering and CSV export to one coordinator", () => 
   assert.match(setup, /getProperties: records\.getProperties/);
   assert.match(setup, /downloadBlob: services\.downloadBlob/);
   assert.doesNotMatch(setup, /\bstate\b/);
-  assert.match(
-    workspace,
-    /workflows\.report\.create\(\{\s*\.\.\.rendering,[\s\S]*?workflows: \{ model: workflows\.model, views: workflows\.views \},[\s\S]*?workflows\.exporter\.create\(\{\s*\.\.\.exporting,/,
-  );
+  assert.match(workspace, /getPayments: rendering\.getPayments/);
+  assert.match(workspace, /getProperties: exporting\.getProperties/);
+  assert.doesNotMatch(workspace, /\.\.\.rendering|\.\.\.exporting/);
 });
 
 test("report workspace preserves rendering and export APIs", () => {
@@ -179,7 +178,6 @@ test("report workspace preserves rendering and export APIs", () => {
     "now",
     "sumIncome",
     "sumOperatingExpenses",
-    "unusedRenderingValue",
     "workflows",
   ]);
   assert.deepEqual(Object.keys(passed.exporting).sort(), [
@@ -190,8 +188,9 @@ test("report workspace preserves rendering and export APIs", () => {
     "getProperties",
     "prettyType",
     "todayIso",
-    "unusedExportingValue",
   ]);
+  assert.equal("unusedRenderingValue" in passed.rendering, false);
+  assert.equal("unusedExportingValue" in passed.exporting, false);
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "report-export.js"),
