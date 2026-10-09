@@ -141,7 +141,7 @@ test("account records and ledger entries use separate workspace workflows", () =
   assert.match(app, /PropertyDeskTransactionWorkspaceSetup\.create\(/);
   assert.match(
     transactionComposition,
-    /ledgerWorkflows\.workflow\.create\(\{[\s\S]*?entries: \{[\s\S]*?transactionRepository: services\.transactionRepository,[\s\S]*?transactionPayloads: ledgerWorkflows\.transactionPayloads/,
+    /ledgerWorkflows\.workflow\.create\(\{[\s\S]*?entries: \{[\s\S]*?transactionRepository: \{\s*insertPayment: services\.transactionRepository\.insertPayment,\s*insertExpense: services\.transactionRepository\.insertExpense,\s*\},[\s\S]*?transactionPayloads: ledgerWorkflows\.transactionPayloads/,
   );
   assert.match(
     transactionComposition,

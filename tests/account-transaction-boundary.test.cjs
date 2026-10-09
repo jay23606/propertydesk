@@ -37,7 +37,7 @@ test("app composes independent property and account forms before action routing"
   assert.match(app, /records: stateAccess\.accountDeposit/);
   assert.match(
     composition,
-    /entries: \{[\s\S]*?transactionRepository: services\.transactionRepository/,
+    /entries: \{[\s\S]*?transactionRepository: \{\s*insertPayment: services\.transactionRepository\.insertPayment,\s*insertExpense: services\.transactionRepository\.insertExpense,/,
   );
   assert.doesNotMatch(
     composition,

@@ -57,7 +57,13 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   };
   const services = {
     fetchAll() {},
-    transactionRepository: {},
+    transactionRepository: {
+      correct() {},
+      voidPosted() {},
+      insertPayment() {},
+      insertExpense() {},
+      unusedMaintenanceOperation() {},
+    },
     runAndRefreshWorkspaceChange() {},
     saveWorkspaceRecord() {},
     saveAndRefreshWorkspaceRecord() {},
@@ -142,14 +148,24 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
     receivedMaintenance.correction.getPendingCorrection,
     records.getPendingCorrection,
   );
+  assert.deepEqual(Object.keys(receivedMaintenance.correction.repository), [
+    "correct",
+  ]);
   assert.equal(
-    receivedMaintenance.correction.repository,
-    services.transactionRepository,
+    receivedMaintenance.correction.repository.correct,
+    services.transactionRepository.correct,
   );
   assert.equal(receivedMaintenance.voiding.getExpenses, records.getExpenses);
   assert.equal("unusedRecord" in receivedMaintenance.voiding, false);
   assert.equal("unusedUi" in receivedMaintenance.voiding, false);
   assert.equal("unusedService" in receivedMaintenance.voiding, false);
+  assert.deepEqual(Object.keys(receivedMaintenance.voiding.repository), [
+    "voidPosted",
+  ]);
+  assert.equal(
+    receivedMaintenance.voiding.repository.voidPosted,
+    services.transactionRepository.voidPosted,
+  );
   assert.equal(
     receivedMaintenance.workflows.correctionModel,
     workflows.maintenance.correctionModel,
@@ -172,6 +188,18 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   assert.equal("unusedUi" in calls[1][1].views, false);
   assert.equal("unusedService" in calls[1][1].views, false);
   assert.equal("unusedLedgerWorkflow" in calls[1][1].workflows, false);
+  assert.deepEqual(
+    Object.keys(calls[1][1].entries.transactionRepository).sort(),
+    ["insertExpense", "insertPayment"],
+  );
+  assert.equal(
+    calls[1][1].entries.transactionRepository.insertPayment,
+    services.transactionRepository.insertPayment,
+  );
+  assert.equal(
+    calls[1][1].entries.transactionRepository.insertExpense,
+    services.transactionRepository.insertExpense,
+  );
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(

@@ -23,7 +23,9 @@
         promptAction: ui.promptAction,
         EventClass: ui.EventClass,
         OptionClass: ui.OptionClass,
-        repository: services.transactionRepository,
+        repository: {
+          correct: services.transactionRepository.correct,
+        },
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
       },
       voiding: {
@@ -34,7 +36,9 @@
         timestamp: ui.transactionTimestamp,
         confirmAction: ui.confirmAction,
         promptAction: ui.promptAction,
-        repository: services.transactionRepository,
+        repository: {
+          voidPosted: services.transactionRepository.voidPosted,
+        },
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
         resolveVoidTarget: maintenanceWorkflows.voidModel.resolveVoidTarget,
         buildVoidPayload: maintenanceWorkflows.voidModel.buildVoidPayload,
@@ -81,7 +85,10 @@
         populateFormOptions: ui.populateFormOptions,
         prettyType: ui.prettyType,
         openModal: ui.openModal,
-        transactionRepository: services.transactionRepository,
+        transactionRepository: {
+          insertPayment: services.transactionRepository.insertPayment,
+          insertExpense: services.transactionRepository.insertExpense,
+        },
         transactionPayloads: ledgerWorkflows.transactionPayloads,
         saveWorkspaceRecord: services.saveWorkspaceRecord,
         saveAndRefreshWorkspaceRecord: services.saveAndRefreshWorkspaceRecord,
