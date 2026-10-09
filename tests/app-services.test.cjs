@@ -107,6 +107,24 @@ test("app services compose shared runtime and financial services explicitly", ()
   });
 
   assert.equal(Object.isFrozen(services), true);
+  assert.equal("getClient" in services, false);
+  assert.deepEqual(Object.keys(services).sort(), [
+    "authClient",
+    "backendConfigured",
+    "depositLedger",
+    "emailUtils",
+    "fetchAll",
+    "financialContext",
+    "initializeClient",
+    "isClientReady",
+    "loadAllWorkspacePages",
+    "paymentNotifications",
+    "repositories",
+    "setRender",
+    "state",
+    "toast",
+    "writeFeedback",
+  ]);
   assert.equal(services.writeFeedback, writeFeedback);
   assert.equal(services.emailUtils, emailUtils);
   assert.equal("postedLedgerUtils" in services, false);
