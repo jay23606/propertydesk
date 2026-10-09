@@ -42,7 +42,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   );
   assert.match(
     importWorkspace,
-    /validationWorkflow\.create\(\{ workflows, modules \}\)/,
+    /validationWorkflow\.create\(\{\s*workflows: \{[\s\S]*?validationApi: workflows\.validationApi,[\s\S]*?modules: \{[\s\S]*?paymentValidation: modules\.paymentValidation,/,
   );
   assert.doesNotMatch(
     importWorkspace,

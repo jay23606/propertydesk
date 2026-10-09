@@ -17,7 +17,27 @@
     validationWorkflow,
     modules,
   }) {
-    const { validators } = validationWorkflow.create({ workflows, modules });
+    const { validators } = validationWorkflow.create({
+      workflows: {
+        csvValueUtils: workflows.csvValueUtils,
+        accountImportTerms: workflows.accountImportTerms,
+        paymentImportAllocation: workflows.paymentImportAllocation,
+        validationApi: workflows.validationApi,
+      },
+      modules: {
+        currencyUtils: modules.currencyUtils,
+        domainOptions: modules.domainOptions,
+        displayUtils: modules.displayUtils,
+        accountValidation: modules.accountValidation,
+        importRows: modules.importRows,
+        accountImportIdentity: modules.accountImportIdentity,
+        emailAddresses: modules.emailAddresses,
+        expenseValidation: modules.expenseValidation,
+        transactionOptions: modules.transactionOptions,
+        expenseAccountPolicy: modules.expenseAccountPolicy,
+        paymentValidation: modules.paymentValidation,
+      },
+    });
 
     return workflows.feature.create({
       $,
