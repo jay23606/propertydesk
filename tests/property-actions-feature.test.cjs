@@ -234,8 +234,9 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(
     workspaceWorkflow,
-    /detail\.workflows\.screen\.create\(\{[\s\S]*?content: detail\.content,[\s\S]*?documents: detail\.documents,[\s\S]*?workflows: detail\.workflows/,
+    /detail\.workflows\.screen\.create\(\{[\s\S]*?content: detail\.content,[\s\S]*?documents: detail\.documents,[\s\S]*?workflows: \{[\s\S]*?content: detail\.workflows\.content,[\s\S]*?holderModules: detail\.workflows\.holderModules/,
   );
+  assert.doesNotMatch(workspaceWorkflow, /workflows:\s*detail\.workflows\b/);
   const workflow = fs.readFileSync(
     path.join(
       __dirname,

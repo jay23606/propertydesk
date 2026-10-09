@@ -8,12 +8,21 @@ test("property workspace shares detail actions across overview and grid", () => 
   const root = path.join(__dirname, "..");
   const calls = [];
   const openPropertyDetails = () => "details";
+  const detailWorkflows = {
+    content: { name: "content" },
+    management: { name: "management" },
+    holders: { name: "holders" },
+    contentModules: { name: "content modules" },
+    managementModules: { name: "management modules" },
+    holderModules: { name: "holder modules" },
+    unusedWorkflow: { name: "unused" },
+  };
   const detail = {
     content: {},
     management: {},
     holders: {},
     documents: {},
-    workflows: {},
+    workflows: detailWorkflows,
     unusedDetailValue: true,
   };
   const openPropertyPayment = () => "overview-payment";
@@ -78,7 +87,7 @@ test("property workspace shares detail actions across overview and grid", () => 
       },
     },
   });
-  detail.workflows.screen = context.window.PropertyDeskPropertyScreenWorkflow;
+  detailWorkflows.screen = context.window.PropertyDeskPropertyScreenWorkflow;
   vm.runInContext(
     fs.readFileSync(
       path.join(root, "features", "property-workspace-workflow.js"),
@@ -109,6 +118,18 @@ test("property workspace shares detail actions across overview and grid", () => 
   assert.equal(calls[0][1].management, detail.management);
   assert.equal(calls[0][1].holders, detail.holders);
   assert.equal(calls[0][1].documents, detail.documents);
+  assert.deepEqual(Object.keys(calls[0][1].workflows).sort(), [
+    "content",
+    "contentModules",
+    "holderModules",
+    "holders",
+    "management",
+    "managementModules",
+  ]);
+  for (const key of Object.keys(calls[0][1].workflows))
+    assert.equal(calls[0][1].workflows[key], detailWorkflows[key]);
+  assert.equal("screen" in calls[0][1].workflows, false);
+  assert.equal("unusedWorkflow" in calls[0][1].workflows, false);
   assert.equal("unusedDetailValue" in calls[0][1], false);
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
     "content",

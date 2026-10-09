@@ -8,7 +8,14 @@
       management: detail.management,
       holders: detail.holders,
       documents: detail.documents,
-      workflows: detail.workflows,
+      workflows: {
+        content: detail.workflows.content,
+        management: detail.workflows.management,
+        holders: detail.workflows.holders,
+        contentModules: detail.workflows.contentModules,
+        managementModules: detail.workflows.managementModules,
+        holderModules: detail.workflows.holderModules,
+      },
     });
   }
 
