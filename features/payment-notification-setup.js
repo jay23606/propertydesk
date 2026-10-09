@@ -30,7 +30,14 @@
             postal_code,
           })),
       }),
-      getClient: services.getClient,
+      getRealtimeClient: () => {
+        const client = services.getClient();
+        if (!client) return null;
+        return {
+          channel: (...args) => client.channel(...args),
+          removeChannel: (...args) => client.removeChannel(...args),
+        };
+      },
       toast: ui.toast,
       money: ui.money,
       propertyAddress: ui.propertyAddress,

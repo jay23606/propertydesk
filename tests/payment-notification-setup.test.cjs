@@ -41,7 +41,20 @@ test("payment notification setup projects current workspace records for display"
     },
   ];
   const ui = { toast() {}, money() {}, propertyAddress() {} };
-  const services = { getClient() {}, refresh() {} };
+  const realtimeCalls = [];
+  const client = {
+    auth: { secret: "excluded" },
+    from() {},
+    channel(name) {
+      realtimeCalls.push(["channel", name, this === client]);
+      return "channel result";
+    },
+    removeChannel(channel) {
+      realtimeCalls.push(["remove", channel, this === client]);
+      return "remove result";
+    },
+  };
+  const services = { getClient: () => client, refresh() {} };
   const workflow = {
     create(options) {
       return options;
@@ -99,5 +112,18 @@ test("payment notification setup projects current workspace records for display"
     JSON.parse(JSON.stringify(notification.getPaymentNotificationData())),
     { members: [], accounts: [], properties: [] },
   );
+  const realtimeClient = notification.getRealtimeClient();
+  assert.deepEqual(Object.keys(realtimeClient).sort(), [
+    "channel",
+    "removeChannel",
+  ]);
+  assert.equal("auth" in realtimeClient, false);
+  assert.equal("from" in realtimeClient, false);
+  assert.equal(realtimeClient.channel("test"), "channel result");
+  assert.equal(realtimeClient.removeChannel("test"), "remove result");
+  assert.deepEqual(realtimeCalls, [
+    ["channel", "test", true],
+    ["remove", "test", true],
+  ]);
   assert.doesNotMatch(source, /runtime\.state|\bstate\./);
 });

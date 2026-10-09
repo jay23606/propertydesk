@@ -268,15 +268,15 @@ test("app services compose shared runtime and financial services explicitly", ()
     },
   );
   assert.deepEqual(Object.keys(calls[5][1]).sort(), [
-    "getClient",
     "getPaymentNotificationData",
+    "getRealtimeClient",
     "getWorkspaceIdentity",
     "money",
     "propertyAddress",
     "refresh",
     "toast",
   ]);
-  assert.equal(calls[5][1].getClient, getClient);
+  assert.equal(typeof calls[5][1].getRealtimeClient, "function");
   assert.equal(calls[5][1].toast, toast);
   assert.equal(calls[5][1].money, money);
   assert.equal(calls[5][1].propertyAddress, propertyAddress);

@@ -85,7 +85,7 @@ function setup() {
         }),
       ),
     }),
-    getClient: () => client,
+    getRealtimeClient: () => client,
     toast: (message) => messages.push(message),
     money: (amount) => `$${Number(amount).toFixed(2)}`,
     propertyAddress: (property) => property.address,

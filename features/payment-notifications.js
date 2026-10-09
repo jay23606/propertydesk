@@ -5,7 +5,7 @@
   function create({
     getWorkspaceIdentity,
     getPaymentNotificationData,
-    getClient,
+    getRealtimeClient,
     toast,
     money,
     propertyAddress,
@@ -66,7 +66,7 @@
     }
 
     function start() {
-      const client = getClient();
+      const client = getRealtimeClient();
       const { ownerId, viewerId } = getWorkspaceIdentity();
       if (!client?.channel || !ownerId || !viewerId) return false;
 
