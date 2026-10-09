@@ -43,7 +43,10 @@
       getUser,
       setUser,
       now,
-      authClient,
+      authClient: {
+        getUser: authClient.getUser,
+        updateUser: authClient.updateUser,
+      },
       toast,
       run,
       workflows: workflows.profileModules,

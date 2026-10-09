@@ -119,7 +119,12 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     },
     getWorkspaceMembers: () => state.workspaceMembers,
     getWorkspaceOwnerId: () => "owner-1",
-    authClient: { getUser() {}, updateUser() {} },
+    authClient: {
+      getUser() {},
+      updateUser() {},
+      signOut() {},
+      signInWithPassword() {},
+    },
     now,
     esc() {},
     toast() {},
@@ -154,6 +159,15 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   assert.equal("state" in passed.profileWorkflow, false);
   assert.equal(typeof passed.profileWorkflow.setUser, "function");
   assert.equal(passed.profileWorkflow.now, now);
+  assert.deepEqual(Object.keys(passed.profileWorkflow.authClient).sort(), [
+    "getUser",
+    "updateUser",
+  ]);
+  assert.equal("signOut" in passed.profileWorkflow.authClient, false);
+  assert.equal(
+    "signInWithPassword" in passed.profileWorkflow.authClient,
+    false,
+  );
   assert.equal(passed.profileWorkflow.run, run);
   assert.equal(
     passed.memberActions.runAndRefreshWorkspaceChange,
