@@ -17,7 +17,15 @@ function loadRepository(filename, key) {
     fs.readFileSync(path.join(__dirname, "..", "features", filename), "utf8"),
     context,
   );
-  return context.window[key];
+  const repository = context.window[key];
+  return {
+    ...repository,
+    create: (options) =>
+      repository.create({
+        ...options,
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
+      }),
+  };
 }
 
 test("account repository inserts and updates only account rows", async () => {

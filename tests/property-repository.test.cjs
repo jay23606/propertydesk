@@ -20,7 +20,15 @@ function loadRepository() {
     ),
     context,
   );
-  return context.window.PropertyDeskPropertyRepository;
+  const repository = context.window.PropertyDeskPropertyRepository;
+  return {
+    ...repository,
+    create: (options) =>
+      repository.create({
+        ...options,
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
+      }),
+  };
 }
 
 test("property repository inserts and updates the selected property", async () => {

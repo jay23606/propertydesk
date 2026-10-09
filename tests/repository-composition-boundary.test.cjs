@@ -32,6 +32,18 @@ test("feature workflows receive repository instances from the app composition ro
 
   assert.deepEqual(internalFactories, []);
 
+  for (const file of [
+    "account-repository.js",
+    "deposit-repository.js",
+    "property-holder-repository.js",
+    "property-repository.js",
+    "transaction-repository.js",
+  ]) {
+    const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");
+    assert.doesNotMatch(source, /window\.PropertyDeskRepositoryQueryUtils/);
+    assert.match(source, /function create\(\{ getClient, queryUtils \}\)/);
+  }
+
   const directDataAccess = featureFiles.filter((file) => {
     if (dataAccessModules.has(file)) return false;
     const source = fs.readFileSync(path.join(featureDirectory, file), "utf8");

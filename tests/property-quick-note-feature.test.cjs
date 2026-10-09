@@ -68,6 +68,7 @@ test("property quick notes normalize whitespace and scope updates to the workspa
     recordUpdateMaintenance:
       context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     promptAction: () => "  Follow-up\n needed   soon ",
@@ -121,6 +122,7 @@ test("property quick notes enforce the character limit before writing", async ()
     recordUpdateMaintenance:
       context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     promptAction: () => "x".repeat(141),

@@ -2,9 +2,9 @@
 (() => {
   "use strict";
 
-  const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
+  function create({ getClient, queryUtils }) {
+    const { insert: insertRecord } = queryUtils;
 
-  function create({ getClient }) {
     async function clearPropertyHolders(ownerId, propertyId) {
       return getClient()
         .from("pd_property_holders")

@@ -187,6 +187,7 @@ test("property and account maintenance save inserts and updates to their own tab
     ...workspaceRecordWriteDependencies(context),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
   });
@@ -196,6 +197,7 @@ test("property and account maintenance save inserts and updates to their own tab
     ...workspaceRecordWriteDependencies(context),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskAccountRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
   });

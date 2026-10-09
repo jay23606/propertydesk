@@ -14,6 +14,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /PropertyDeskWorkspaceRuntime\.create\(\{\s*config: window\.PROPERTYDESK_CONFIG \|\| \{\},\s*supabase: window\.supabase,\s*repositories:/,
   );
+  assert.match(
+    app,
+    /repositories: \{\s*queryUtils: window\.PropertyDeskRepositoryQueryUtils,/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDesk(?:BackendClient|AppState|WorkspaceRefresh)\.create\(/,

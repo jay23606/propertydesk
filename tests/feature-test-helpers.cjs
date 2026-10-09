@@ -157,7 +157,10 @@ function ledgerEntryDependencies(context, state = {}) {
   const repositoryFactory = context.window.PropertyDeskTransactionRepository;
   return {
     transactionRepository: repositoryFactory.create
-      ? repositoryFactory.create({ getClient: () => state.client })
+      ? repositoryFactory.create({
+          getClient: () => state.client,
+          queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
+        })
       : repositoryFactory,
     transactionPayloads: context.window.PropertyDeskTransactionPayloads,
     writeFeedback: createRepositoryWriteFeedback(context),
@@ -197,6 +200,7 @@ function accountFormDependencies(context, state = {}) {
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
     repository: context.window.PropertyDeskAccountRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     workflows: {
@@ -223,6 +227,7 @@ function propertyFormDependencies(context, state = {}) {
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         ?.selectRecordWriteCompletion,
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     workflows: {

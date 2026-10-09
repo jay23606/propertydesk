@@ -163,6 +163,7 @@ test("deposit maintenance retains adjustment audit details", async () => {
       refreshes += 1;
     },
     repository: context.window.PropertyDeskDepositRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     prepareAdjustment:
@@ -486,6 +487,7 @@ test("deposit maintenance reports a rejected save without refreshing as if it su
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("failed save must not refresh"),
     repository: context.window.PropertyDeskDepositRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => ({
         from: () => ({
           insert: async () => ({ error: { message: "Denied" } }),

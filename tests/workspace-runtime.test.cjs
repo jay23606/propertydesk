@@ -18,7 +18,11 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   const workspaceData = { loadWorkspaceId() {}, loadWorkspaceRecords() {} };
   const workspaceQuery = { loadAllPages() {} };
   const workspaceReads = [{ key: "properties", table: "pd_properties" }];
-  const repositories = { accounts: { name: "account-repository" } };
+  const queryUtils = { insert() {} };
+  const repositories = {
+    accounts: { name: "account-repository" },
+    queryUtils,
+  };
   const repositoryAdapters = { accounts: { name: "accounts" } };
   const fetchAll = async () => {};
   const options = {
@@ -101,6 +105,7 @@ test("workspace runtime connects backend, fresh state, and data refresh", () => 
   assert.equal(calls[2][1].getClient(), null);
   assert.equal(calls[3][0], "repositories");
   assert.equal(calls[3][1].repositories, repositories);
+  assert.equal(calls[3][1].queryUtils, queryUtils);
   assert.equal(calls[3][1].getClient(), null);
   assert.equal(calls[4][0], "query");
   assert.equal(calls[4][1].getClient(), null);

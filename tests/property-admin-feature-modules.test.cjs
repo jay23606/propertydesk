@@ -72,6 +72,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
       openPropertyDetails: () =>
         assert.fail("a rejected write must not reopen details"),
       repository: context.window.PropertyDeskPropertyHolderRepository.create({
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
         getClient: () => state.client,
       }),
     });
@@ -94,6 +95,7 @@ test("property holder and archive workflows reconcile rejected writes before ret
     recordUpdateMaintenance:
       context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
   });
@@ -232,6 +234,7 @@ test("archive and restore use status maintenance and reopen updated details", as
     recordUpdateMaintenance:
       context.window.PropertyDeskPropertyRecordUpdateMaintenance,
     repository: context.window.PropertyDeskPropertyRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
   });
@@ -311,6 +314,7 @@ test("property holder save persists the member IDs supplied by the event layer",
     }),
     openPropertyDetails: (propertyId) => calls.push(["open", propertyId]),
     repository: context.window.PropertyDeskPropertyHolderRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
   });

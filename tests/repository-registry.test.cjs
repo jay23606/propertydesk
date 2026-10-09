@@ -14,14 +14,16 @@ test("registry creates frozen adapters that resolve the active client lazily", (
 
   let activeClient = null;
   const clientAccessors = [];
+  const queryUtils = { insert() {} };
   const makeClientRepository = {
-    create({ getClient }) {
-      clientAccessors.push(getClient);
+    create({ getClient, queryUtils: receivedQueryUtils }) {
+      clientAccessors.push({ getClient, queryUtils: receivedQueryUtils });
       return { getClient };
     },
   };
   const repositories = context.window.PropertyDeskRepositoryRegistry.create({
     repositories: {
+      queryUtils,
       accounts: makeClientRepository,
       accountHistory: makeClientRepository,
       deposits: makeClientRepository,
@@ -32,6 +34,7 @@ test("registry creates frozen adapters that resolve the active client lazily", (
       transactions: makeClientRepository,
       workspaceMembers: makeClientRepository,
     },
+    queryUtils,
     getClient: () => activeClient,
   });
 
@@ -40,7 +43,8 @@ test("registry creates frozen adapters that resolve the active client lazily", (
   assert.equal(repositories.documents.getClient(), null);
 
   activeClient = { id: "signed-in-client" };
-  for (const getClient of clientAccessors) {
+  for (const { getClient, queryUtils: receivedQueryUtils } of clientAccessors) {
     assert.equal(getClient(), activeClient);
+    assert.equal(receivedQueryUtils, queryUtils);
   }
 });

@@ -20,7 +20,15 @@ function loadRepository() {
     ),
     context,
   );
-  return context.window.PropertyDeskTransactionRepository;
+  const repository = context.window.PropertyDeskTransactionRepository;
+  return {
+    ...repository,
+    create: (options) =>
+      repository.create({
+        ...options,
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
+      }),
+  };
 }
 
 test("transaction repository pins payment and expense inserts to their ledgers", async () => {

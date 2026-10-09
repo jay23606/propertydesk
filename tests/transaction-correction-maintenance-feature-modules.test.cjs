@@ -49,6 +49,7 @@ test("transaction corrections save payment and expense changes with their audit 
       fetchAll: async () => events.push("refresh"),
       toast: (message) => events.push(["toast", message]),
       repository: context.window.PropertyDeskTransactionRepository.create({
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
         getClient: () => state.client,
       }),
     });
@@ -133,6 +134,7 @@ test("transaction correction failures preserve the open form and pending correct
       },
       toast: (message) => messages.push(message),
       repository: context.window.PropertyDeskTransactionRepository.create({
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
         getClient: () => state.client,
       }),
     });
@@ -243,6 +245,7 @@ test("transaction correction database errors keep the correction open", async ()
       fetchAll: async () => refreshes++,
       toast: (message) => messages.push(message),
       repository: context.window.PropertyDeskTransactionRepository.create({
+        queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
         getClient: () => ({
           rpc: async () => ({ error: { message: "permission denied" } }),
         }),

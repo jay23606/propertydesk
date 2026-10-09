@@ -66,6 +66,7 @@ test("account close maintenance preserves the account history", async () => {
       },
     }),
     repository: context.window.PropertyDeskAccountRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     closeAccountDetails: () => calls.push(["close-details"]),
@@ -119,6 +120,7 @@ test("account close maintenance reports rejected requests without closing detail
       },
     }),
     repository: context.window.PropertyDeskAccountRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => ({
         from: () => ({
           update: () => ({

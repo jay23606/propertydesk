@@ -64,6 +64,7 @@ test("transaction void maintenance voids a posted row with an audit reason", asy
   };
   const feature = context.window.PropertyDeskTransactionVoidMaintenance.create({
     repository: context.window.PropertyDeskTransactionRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => state.client,
     }),
     ...transactionVoidModelOptions(context),
@@ -106,6 +107,7 @@ test("transaction void maintenance rejects unsupported kinds before prompting or
     toast: (message) => messages.push(message),
     fetchAll: async () => assert.fail("unsupported kind must not refresh"),
     repository: context.window.PropertyDeskTransactionRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => ({
         from: () => assert.fail("unsupported kind must not write"),
       }),
@@ -146,6 +148,7 @@ test("transaction void maintenance reports rejected requests without refreshing"
     fetchAll: async () => refreshes.push(true),
     toast: (message) => messages.push(message),
     repository: context.window.PropertyDeskTransactionRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => ({
         from: () => ({
           update: () => ({

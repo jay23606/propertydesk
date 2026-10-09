@@ -28,6 +28,7 @@
     const repositoryAdapters = workflows.repositoryRegistry.create({
       repositories,
       getClient,
+      queryUtils: repositories.queryUtils,
     });
     const workspaceQuery = workflows.query.create({
       getClient,

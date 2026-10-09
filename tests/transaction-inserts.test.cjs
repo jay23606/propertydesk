@@ -72,6 +72,7 @@ function loadTransactionInserts(client, messages = [], options = {}) {
       context.window.PropertyDeskWorkspaceRecordWriteWorkflow
         .selectRecordWriteCompletion,
     repository: context.window.PropertyDeskTransactionRepository.create({
+      queryUtils: context.window.PropertyDeskRepositoryQueryUtils,
       getClient: () => client,
     }),
   });

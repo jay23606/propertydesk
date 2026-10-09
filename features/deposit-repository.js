@@ -2,9 +2,9 @@
 (() => {
   "use strict";
 
-  const { insert: insertRecord } = window.PropertyDeskRepositoryQueryUtils;
+  function create({ getClient, queryUtils }) {
+    const { insert: insertRecord } = queryUtils;
 
-  function create({ getClient }) {
     function insert(payload) {
       return insertRecord(getClient(), "pd_deposit_entries", payload);
     }

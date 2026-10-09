@@ -2,9 +2,9 @@
 (() => {
   "use strict";
 
-  const { saveById, updateById } = window.PropertyDeskRepositoryQueryUtils;
+  function create({ getClient, queryUtils }) {
+    const { saveById, updateById } = queryUtils;
 
-  function create({ getClient }) {
     function save(payload, accountId) {
       return saveById(getClient(), "pd_accounts", payload, accountId);
     }

@@ -42,6 +42,7 @@
     config: window.PROPERTYDESK_CONFIG || {},
     supabase: window.supabase,
     repositories: {
+      queryUtils: window.PropertyDeskRepositoryQueryUtils,
       accounts: window.PropertyDeskAccountRepository,
       accountHistory: window.PropertyDeskAccountHistoryRepository,
       deposits: window.PropertyDeskDepositRepository,
