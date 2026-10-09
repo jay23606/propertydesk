@@ -87,7 +87,15 @@ function createController() {
   };
   const controller = context.window.PropertyDeskModalController.create({
     $: getElement,
-    state,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
+    setPendingCorrection: (value) => {
+      state.pendingCorrection = value;
+    },
+    advanceAuditRequestId: () => {
+      state.auditRequestId++;
+    },
   });
   const formOptions = context.window.PropertyDeskFormOptions.create({
     $: getElement,
@@ -187,6 +195,11 @@ test("modal controller wires close buttons to modal cleanup", () => {
 });
 
 test("modal controller is loaded before app startup and precached", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "features", "modal-controller.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /\bstate\s*[,.=]/);
   const html = fs.readFileSync(
     path.join(__dirname, "..", "index.html"),
     "utf8",

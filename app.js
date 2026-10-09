@@ -172,7 +172,15 @@
     });
   const modal = window.PropertyDeskModalController.create({
     $,
-    state,
+    setPendingImport: (value) => {
+      state.pendingImport = value;
+    },
+    setPendingCorrection: (value) => {
+      state.pendingCorrection = value;
+    },
+    advanceAuditRequestId: () => {
+      state.auditRequestId++;
+    },
     documentRef: document,
   });
   const { fillSelect, populateFormOptions } =

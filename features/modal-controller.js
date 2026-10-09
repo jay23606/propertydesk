@@ -2,7 +2,13 @@
 (() => {
   "use strict";
 
-  function create({ $, state, documentRef = document }) {
+  function create({
+    $,
+    setPendingImport,
+    setPendingCorrection,
+    advanceAuditRequestId,
+    documentRef = document,
+  }) {
     function openModal(id) {
       $(id).classList.remove("hidden");
       document.body.style.overflow = "hidden";
@@ -28,11 +34,11 @@
       modal.classList.add("hidden");
       document.body.style.overflow = "";
 
-      if (modal.id === "import-preview-modal") state.pendingImport = null;
-      if (modal.id === "detail-modal") state.auditRequestId++;
+      if (modal.id === "import-preview-modal") setPendingImport(null);
+      if (modal.id === "detail-modal") advanceAuditRequestId();
       if (modal.id !== "payment-modal" && modal.id !== "expense-modal") return;
 
-      state.pendingCorrection = null;
+      setPendingCorrection(null);
       if (modal.id === "payment-modal") resetPaymentModal();
       else resetExpenseModal();
     }
