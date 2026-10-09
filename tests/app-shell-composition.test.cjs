@@ -16,10 +16,14 @@ test("app shell composes workspace settings and page navigation", () => {
     path.join(root, "features", "app-shell-workflow.js"),
     "utf8",
   );
+  const setup = fs.readFileSync(
+    path.join(root, "features", "app-shell-setup.js"),
+    "utf8",
+  );
 
   assert.match(
     app,
-    /PropertyDeskReminderPreviewWorkflow\.create\([\s\S]*?openModal: modal\.openModal,[\s\S]*?PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
+    /PropertyDeskReminderPreviewWorkflow\.create\([\s\S]*?openModal: modal\.openModal,[\s\S]*?PropertyDeskAppShellSetup\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
     appShell,
@@ -30,8 +34,8 @@ test("app shell composes workspace settings and page navigation", () => {
     /window\.PropertyDesk(?:Workspace|Navigation)\.create/,
   );
   assert.match(
-    app,
-    /workspaceWorkflow: window\.PropertyDeskWorkspace,[\s\S]*?navigationWorkflow: window\.PropertyDeskNavigation,/,
+    setup,
+    /workspaceWorkflow: workflows\.workspace,[\s\S]*?navigationWorkflow: workflows\.navigation,/,
   );
   assert.match(
     workspace,
@@ -50,6 +54,7 @@ test("app shell composes workspace settings and page navigation", () => {
     "features/workspace.js",
     "features/navigation.js",
     "features/app-shell-workflow.js",
+    "features/app-shell-setup.js",
     "features/workspace-reminder-workflow.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));

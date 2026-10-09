@@ -1,4 +1,4 @@
-const CACHE_NAME = 'propertydesk-shell-v875';
+const CACHE_NAME = 'propertydesk-shell-v876';
 const SHELL_FILES = [
   './',
   './index.html',
@@ -247,6 +247,7 @@ const SHELL_FILES = [
   './features/modal-controller.js',
   './features/navigation.js',
   './features/app-shell-workflow.js',
+  './features/app-shell-setup.js',
   './features/theme-controller.js',
   './features/notifications.js',
   './features/pwa-registration.js',

@@ -13,7 +13,7 @@ test("workspace reminder activity stays independent of account email preview", (
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskAppShellWorkflow\.create\(/);
+  assert.match(app, /PropertyDeskAppShellSetup\.create\(/);
   assert.match(
     fs.readFileSync(
       path.join(root, "features", "app-shell-workflow.js"),

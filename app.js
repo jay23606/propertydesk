@@ -251,22 +251,8 @@
         preview: window.PropertyDeskReminderPreview,
       },
     });
-  const appShell = window.PropertyDeskAppShellWorkflow.create({
-    workspaceWorkflow: window.PropertyDeskWorkspace,
-    navigationWorkflow: window.PropertyDeskNavigation,
-    workspaceWorkflows: {
-      profile: window.PropertyDeskWorkspaceProfileWorkflow,
-      memberView: window.PropertyDeskWorkspaceMembersView,
-      memberMaintenance: window.PropertyDeskWorkspaceMemberMaintenance,
-      members: window.PropertyDeskWorkspaceMembers,
-      profileModules: {
-        display: window.PropertyDeskProfileDisplay,
-        view: window.PropertyDeskProfileSettingsView,
-        settings: window.PropertyDeskProfileSettings,
-      },
-    },
-    workspace: {
-      $,
+  const appShell = window.PropertyDeskAppShellSetup.create({
+    records: {
       getAccounts: () => state.accounts,
       getProperties: () => state.properties,
       getReminderLogs: () => state.reminderLogs,
@@ -276,10 +262,16 @@
       },
       getWorkspaceMembers: () => state.workspaceMembers,
       getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      setView: (view) => {
+        state.view = view;
+      },
+    },
+    ui: {
+      $,
       now,
       esc,
       toast,
-      fetchAll,
+      confirmAction,
       reminder: {
         workflow: window.PropertyDeskWorkspaceReminderWorkflow,
         activityModelWorkflow: window.PropertyDeskReminderActivityModel,
@@ -290,19 +282,31 @@
         fmtDateTime,
         money,
       },
+      documentRef: document,
+      windowRef: window,
+    },
+    services: {
+      fetchAll,
       memberRepository: repositories.workspaceMembers,
       run: writeFeedback.run,
       runAndRefreshWorkspaceChange: writeFeedback.runAndRefreshWorkspaceChange,
-      confirmAction,
       authClient,
     },
-    navigation: {
-      $,
-      setView: (view) => {
-        state.view = view;
+    workflows: {
+      shell: window.PropertyDeskAppShellWorkflow,
+      workspace: window.PropertyDeskWorkspace,
+      navigation: window.PropertyDeskNavigation,
+      workspaceModules: {
+        profile: window.PropertyDeskWorkspaceProfileWorkflow,
+        memberView: window.PropertyDeskWorkspaceMembersView,
+        memberMaintenance: window.PropertyDeskWorkspaceMemberMaintenance,
+        members: window.PropertyDeskWorkspaceMembers,
+        profileModules: {
+          display: window.PropertyDeskProfileDisplay,
+          view: window.PropertyDeskProfileSettingsView,
+          settings: window.PropertyDeskProfileSettings,
+        },
       },
-      documentRef: document,
-      windowRef: window,
     },
   });
   const {

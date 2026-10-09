@@ -369,10 +369,17 @@ test("property workspace composes screens and shares detail actions", () => {
 
 test("app passes reminder services into the app-shell coordinator", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
+  const setup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-shell-setup.js"),
+    "utf8",
+  );
   assert.match(
     app,
-    /PropertyDeskAppShellWorkflow\.create\(\{[\s\S]*?workspace: \{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository:/,
+    /PropertyDeskAppShellSetup\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository:/,
   );
+  assert.match(setup, /reminder: ui\.reminder/);
+  assert.match(setup, /memberRepository: services\.memberRepository/);
+  assert.match(setup, /workspaceWorkflow: workflows\.workspace/);
   assert.match(
     app,
     /PropertyDeskReminderPreviewWorkflow\.create\(\{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
