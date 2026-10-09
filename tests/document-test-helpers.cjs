@@ -27,6 +27,8 @@ function loadDocumentModules(context) {
 function createDocuments(context, options) {
   return context.window.PropertyDeskDocuments.create({
     ...options,
+    confirm: options.confirm || (() => true),
+    openWindow: options.openWindow || (() => null),
     repository:
       options.repository ||
       context.window.PropertyDeskDocumentRepository.create({

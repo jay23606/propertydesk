@@ -60,6 +60,8 @@
       openPropertyDetails: details.openPropertyDetails,
       repository: documents.documentRepository,
       writeFeedback: documents.writeFeedback,
+      confirm: documents.confirm,
+      openWindow: documents.openWindow,
       modules: documents.modules,
       documentsWorkflow: documents.documentsWorkflow,
       documentEventsWorkflow: documents.documentEventsWorkflow,

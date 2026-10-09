@@ -87,6 +87,10 @@ test("property document workflow connects private actions and detail events", ()
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 
   assert.match(app, /PropertyDeskPropertyWorkspaceWorkflow\.create\(/);
+  assert.match(
+    app,
+    /documents:[\s\S]*?confirm: \(message\) => window\.confirm\(message\),[\s\S]*?openWindow: \(\.\.\.args\) => window\.open\(\.\.\.args\),/,
+  );
   assert.doesNotMatch(
     app,
     /PropertyDeskPropertyDetailManagementWorkflow\.create\(/,
@@ -168,6 +172,8 @@ test("property document workflow routes actions through one explicit binder", ()
     toast() {},
     fetchAll() {},
     openPropertyDetails() {},
+    confirm: () => true,
+    openWindow: () => null,
     repository: {},
     writeFeedback: { kind: "write-feedback" },
     modules: { kind: "document-modules" },
@@ -180,9 +186,11 @@ test("property document workflow routes actions through one explicit binder", ()
 
   assert.equal(calls[0][0], "documents");
   assert.deepEqual(Object.keys(calls[0][1]).sort(), [
+    "confirm",
     "fetchAll",
     "modules",
     "openPropertyDetails",
+    "openWindow",
     "repository",
     "state",
     "toast",
@@ -190,6 +198,8 @@ test("property document workflow routes actions through one explicit binder", ()
   ]);
   assert.equal(calls[0][1].repository, dependencies.repository);
   assert.equal(calls[0][1].modules, dependencies.modules);
+  assert.equal(calls[0][1].confirm, dependencies.confirm);
+  assert.equal(calls[0][1].openWindow, dependencies.openWindow);
   assert.equal(calls[0][1].writeFeedback, dependencies.writeFeedback);
   assert.equal(calls[1][0], "events");
   assert.equal(calls[1][1].$, dependencies.$);

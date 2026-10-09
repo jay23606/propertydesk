@@ -585,6 +585,8 @@
         state,
         toast,
         fetchAll,
+        confirm: (message) => window.confirm(message),
+        openWindow: (...args) => window.open(...args),
         documentRepository: repositories.documents,
         writeFeedback,
         modules: {

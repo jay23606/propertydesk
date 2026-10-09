@@ -2,12 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    state,
-    toast,
-    openWindow = (...args) => window.open(...args),
-    repository,
-  }) {
+  function create({ state, toast, openWindow, repository }) {
     async function openPropertyDocument(id) {
       const doc = state.documents.find((item) => item.id === id);
       if (!doc || doc.user_id !== state.workspaceOwnerId) return;

@@ -10,6 +10,8 @@
     openPropertyDetails,
     repository,
     writeFeedback,
+    confirm,
+    openWindow,
     modules,
     documentsWorkflow,
     documentEventsWorkflow,
@@ -21,6 +23,8 @@
       openPropertyDetails,
       repository,
       writeFeedback,
+      confirm,
+      openWindow,
       modules,
     });
     const { attachPropertyDocumentEvents } = documentEventsWorkflow.create({

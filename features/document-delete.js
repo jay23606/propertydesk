@@ -7,7 +7,7 @@
     toast,
     fetchAll,
     openPropertyDetails,
-    confirm = (message) => window.confirm(message),
+    confirm,
     repository,
     writeFeedback,
     maintenanceModule,

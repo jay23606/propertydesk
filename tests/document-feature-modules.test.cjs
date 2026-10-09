@@ -45,6 +45,16 @@ test("document maintenance receives write feedback through explicit dependencies
         /window\.PropertyDeskDocument(?:Upload|Delete)Maintenance\.create/,
       );
   }
+  for (const [filename, globalApi] of [
+    ["document-delete.js", /window\.confirm/],
+    ["document-open.js", /window\.open/],
+    ["documents.js", /window\.(?:confirm|open)/],
+  ]) {
+    assert.doesNotMatch(
+      fs.readFileSync(path.join(root, "features", filename), "utf8"),
+      globalApi,
+    );
+  }
 });
 
 test("document actions separate deletion and signed-link dependencies", () => {
