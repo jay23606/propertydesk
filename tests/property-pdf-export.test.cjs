@@ -137,9 +137,14 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
 
 test("Properties PDF button opens the local printable report and calls print", () => {
   const { feature, output, click } = createFeature();
+  const source = fs.readFileSync(
+    path.join(root, "features/property-pdf-export.js"),
+    "utf8",
+  );
   feature.attachEvents();
   click();
 
+  assert.doesNotMatch(source, /window\.setTimeout/);
   assert.match(output.written, /PropertyDesk · Properties/);
   assert.match(output.written, /tenant@example.com/);
   assert.equal(output.printed, 1);

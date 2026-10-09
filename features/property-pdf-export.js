@@ -16,7 +16,7 @@
     money,
     toast,
     openWindow,
-    schedule = (callback, delay) => window.setTimeout(callback, delay),
+    schedule,
     now = () => new Date(),
   }) {
     function reportHTML(rows) {
