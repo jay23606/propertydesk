@@ -158,6 +158,25 @@ async function smokeSignedInWorkflows(browser, url) {
     narrowMobileGrid.monthlyPaymentLeft >= narrowMobileGrid.wrapperRight - 1,
     `the sixth column should stay off-screen at 320px: ${JSON.stringify(narrowMobileGrid)}`,
   );
+  for (const width of [361, 375, 399]) {
+    await signedInPage.setViewportSize({ width, height: 844 });
+    const grid = await signedInPage.evaluate(() => {
+      const table = document.querySelector(".portfolio-table");
+      const row = document.querySelector("#properties-table tr");
+      return {
+        wrapperLeft: table?.getBoundingClientRect().left ?? 0,
+        wrapperRight: table?.getBoundingClientRect().right ?? 0,
+        firstFiveRight: row?.cells[5]?.getBoundingClientRect().right ?? 0,
+        monthlyPaymentLeft: row?.cells[6]?.getBoundingClientRect().left ?? 0,
+      };
+    });
+    assert.ok(
+      grid.wrapperLeft <= 1 &&
+        grid.firstFiveRight <= grid.wrapperRight + 1 &&
+        grid.monthlyPaymentLeft >= grid.wrapperRight - 1,
+      `the first five columns should fill the screen and keep Monthly Payment offscreen at ${width}px: ${JSON.stringify(grid)}`,
+    );
+  }
   await signedInPage.setViewportSize({ width: 1280, height: 720 });
   await smokePropertyWorkflows(
     signedInPage,
