@@ -4,7 +4,12 @@
 
   function createLedgerEntryForms({
     $,
-    state,
+    getAccounts,
+    getPayments,
+    getExpenses,
+    getWorkspaceOwnerId,
+    getPendingCorrection,
+    setPendingCorrection,
     moneyInput,
     todayIso,
     toast,
@@ -33,9 +38,9 @@
     const { insertPayment, insertExpense } = modules.transactionInserts.create({
       getCollection: (collection) =>
         collection === "payments"
-          ? state.payments
+          ? getPayments()
           : collection === "expenses"
-            ? state.expenses
+            ? getExpenses()
             : null,
       fetchAll,
       toast,
@@ -46,14 +51,16 @@
     });
     const { saveTransactionEntry } = modules.saveWorkflow.create({
       $,
-      state,
+      getPendingCorrection,
       saveCorrection,
       closeModal,
       toast,
     });
     const payments = modules.paymentForm.create({
       $,
-      state,
+      getAccounts,
+      getWorkspaceOwnerId,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       toast,
@@ -72,7 +79,9 @@
     });
     const expenses = modules.expenseForm.create({
       $,
-      state,
+      getAccounts,
+      getWorkspaceOwnerId,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       toast,

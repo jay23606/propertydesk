@@ -60,7 +60,10 @@ function createView() {
   };
   const view = context.window.PropertyDeskExpenseEntryView.create({
     $,
-    state,
+    getAccounts: () => state.accounts,
+    setPendingCorrection: (value) => {
+      state.pendingCorrection = value;
+    },
     todayIso: () => "2026-10-05",
     fillSelect: (...args) => calls.push(["fillSelect", ...args]),
     populateFormOptions: () => calls.push("populate-options"),

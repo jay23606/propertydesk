@@ -437,7 +437,14 @@
     },
     entries: {
       $,
-      state,
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
+      getPendingCorrection: () => state.pendingCorrection,
+      setPendingCorrection: (value) => {
+        state.pendingCorrection = value;
+      },
       moneyInput,
       todayIso,
       toast,

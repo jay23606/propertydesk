@@ -2,9 +2,9 @@
 (() => {
   "use strict";
 
-  function create({ state, toast, openPayment }) {
+  function create({ getAccounts, toast, openPayment }) {
     function openPropertyPayment(propertyId) {
-      const accounts = state.accounts.filter(
+      const accounts = getAccounts().filter(
         (account) =>
           account.property_id === propertyId && account.status === "active",
       );

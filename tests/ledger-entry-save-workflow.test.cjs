@@ -26,7 +26,7 @@ test("shared transaction save routes corrections and completes successful entrie
   const state = { pendingCorrection: null };
   const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
     $: (id) => id,
-    state,
+    getPendingCorrection: () => state.pendingCorrection,
     saveCorrection: (...args) => calls.push(["correct", ...args]),
     closeModal: (id) => calls.push(["close", id]),
     toast: (message) => calls.push(["toast", message]),
@@ -83,7 +83,7 @@ test("failed transaction insert skips successful-entry completion", async () => 
   const calls = [];
   const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
     $: (id) => id,
-    state: { pendingCorrection: null },
+    getPendingCorrection: () => null,
     saveCorrection() {},
     closeModal() {},
     toast: (message) => calls.push(message),
@@ -109,7 +109,7 @@ test("saved transaction explains refresh failure to prevent duplicate entry", as
   const calls = [];
   const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
     $: (id) => id,
-    state: { pendingCorrection: null },
+    getPendingCorrection: () => null,
     saveCorrection() {},
     closeModal: (id) => calls.push(["close", id]),
     toast: (message) => calls.push(["toast", message]),

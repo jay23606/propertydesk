@@ -4,7 +4,8 @@
 
   function createPaymentEntryView({
     $,
-    state,
+    getAccounts,
+    setPendingCorrection,
     moneyInput,
     todayIso,
     fillSelect,
@@ -13,7 +14,7 @@
     openModal,
   }) {
     function updatePaymentGuidance() {
-      const account = state.accounts.find(
+      const account = getAccounts().find(
         (item) => item.id === $("payment-account").value,
       );
       const amount = moneyInput($("payment-amount").value);
@@ -36,7 +37,7 @@
     function prefillPaymentAmount() {
       const amountInput = $("payment-amount");
       if (amountInput.value) return false;
-      const account = state.accounts.find(
+      const account = getAccounts().find(
         (item) => item.id === $("payment-account").value,
       );
       const scheduledAmount = Number(account?.payment_amount || 0);
@@ -69,12 +70,12 @@
     }
 
     function openPayment(accountId, propertyId = null) {
-      state.pendingCorrection = null;
+      setPendingCorrection(null);
       populateFormOptions();
       if (propertyId) {
         fillSelect(
           "payment-account",
-          state.accounts
+          getAccounts()
             .filter(
               (account) =>
                 account.property_id === propertyId &&

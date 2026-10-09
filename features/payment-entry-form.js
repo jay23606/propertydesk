@@ -4,7 +4,9 @@
 
   function createPaymentEntryForm({
     $,
-    state,
+    getAccounts,
+    getWorkspaceOwnerId,
+    setPendingCorrection,
     toast,
     saveTransactionEntry,
     insertPayment,
@@ -20,7 +22,8 @@
   }) {
     const paymentView = workflows.view.create({
       $,
-      state,
+      getAccounts,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       fillSelect,
@@ -29,7 +32,7 @@
       openModal,
     });
     const { openPropertyPayment } = workflows.propertyPaymentAction.create({
-      state,
+      getAccounts,
       toast,
       openPayment: paymentView.openPayment,
     });
@@ -44,11 +47,11 @@
         incomeCategory,
         memo,
       } = paymentView.readValues();
-      const account = state.accounts.find((item) => item.id === accountId);
+      const account = getAccounts().find((item) => item.id === accountId);
       if (!account || !amount) return;
 
       const payload = buildPaymentPayload({
-        ownerId: state.workspaceOwnerId,
+        ownerId: getWorkspaceOwnerId(),
         account,
         amount,
         receivedDate,

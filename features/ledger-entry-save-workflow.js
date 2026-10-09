@@ -2,7 +2,13 @@
 (() => {
   "use strict";
 
-  function create({ $, state, saveCorrection, closeModal, toast }) {
+  function create({
+    $,
+    getPendingCorrection,
+    saveCorrection,
+    closeModal,
+    toast,
+  }) {
     function successfulEntryCompletion({
       label,
       addAnother,
@@ -44,7 +50,7 @@
       resetAfterSave,
       prepareNext,
     }) {
-      if (state.pendingCorrection?.kind === kind) {
+      if (getPendingCorrection()?.kind === kind) {
         await saveCorrection(kind, buildCorrection(payload));
         return;
       }

@@ -66,7 +66,7 @@ test("expense entry saves a property-level contractor expense through the expens
   const captured = captureFormSubmissions(element, ["expense-form"]);
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
     $: captured.$,
-    state,
+    ...ledgerEntryDependencies(context, state),
     moneyInput: Number,
     todayIso: () => "2026-10-05",
     toast: (message) => calls.push(`toast:${message}`),
@@ -109,17 +109,13 @@ test("expense entry requires a rental account before recording a deposit refund"
     (id) => ({ value: values[id] || "" }),
     ["expense-form"],
   );
+  const state = {
+    accounts: [{ id: "loan-account", account_type: "note" }],
+    pendingCorrection: null,
+  };
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
     $: captured.$,
-    state: {
-      accounts: [{ id: "loan-account", account_type: "note" }],
-      pendingCorrection: null,
-      client: {
-        from() {
-          throw new Error("should not save");
-        },
-      },
-    },
+    ...ledgerEntryDependencies(context, state),
     moneyInput: Number,
     todayIso: () => "2026-10-05",
     toast: (message) => calls.push(message),

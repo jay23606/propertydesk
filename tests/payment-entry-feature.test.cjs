@@ -52,7 +52,10 @@ test("opening a payment for an account prefills its scheduled installment withou
         handlers.set(`${id}:${event}`, handler);
       return element;
     },
-    state,
+    getAccounts: () => state.accounts,
+    setPendingCorrection: (value) => {
+      state.pendingCorrection = value;
+    },
     moneyInput: Number,
     todayIso: () => "2026-10-04",
     populateFormOptions() {},
@@ -90,7 +93,7 @@ test("property payment action targets the active account or asks for a choice", 
     ],
   };
   const feature = context.window.PropertyDeskPropertyPaymentAction.create({
-    state,
+    getAccounts: () => state.accounts,
     toast: (message) => messages.push(message),
     openPayment: (...args) => calls.push(args),
   });
@@ -150,7 +153,7 @@ test("recording a loan payment does not invent principal or interest splits", as
   };
   const feature = context.window.PropertyDeskLedgerEntryForms.create({
     $: element,
-    state,
+    ...ledgerEntryDependencies(context, state),
     moneyInput: (value) => Number(value),
     todayIso: () => "2026-10-04",
     toast() {},

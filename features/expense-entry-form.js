@@ -4,7 +4,9 @@
 
   function createExpenseEntryForm({
     $,
-    state,
+    getAccounts,
+    getWorkspaceOwnerId,
+    setPendingCorrection,
     toast,
     saveTransactionEntry,
     insertExpense,
@@ -21,7 +23,8 @@
   }) {
     const expenseView = workflows.view.create({
       $,
-      state,
+      getAccounts,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       fillSelect,
@@ -43,14 +46,14 @@
         paymentMethod,
         memo,
       } = expenseView.readValues();
-      const account = state.accounts.find((item) => item.id === accountId);
+      const account = getAccounts().find((item) => item.id === accountId);
       if (!expenseAccountPolicy.accountMatchesCategory(category, account)) {
         toast("Choose a rental account for a security deposit refund");
         return;
       }
 
       const payload = buildExpensePayload({
-        ownerId: state.workspaceOwnerId,
+        ownerId: getWorkspaceOwnerId(),
         propertyId,
         accountId,
         amount,

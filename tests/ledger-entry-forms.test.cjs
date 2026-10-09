@@ -101,7 +101,12 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   );
   const dependencies = {
     $() {},
-    state: {},
+    getAccounts: () => [],
+    getPayments: () => [],
+    getExpenses: () => [],
+    getWorkspaceOwnerId: () => null,
+    getPendingCorrection: () => null,
+    setPendingCorrection() {},
     moneyInput() {},
     todayIso() {},
     toast() {},
@@ -154,7 +159,9 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "populateFormOptions",
       "prettyType",
       "saveTransactionEntry",
-      "state",
+      "getAccounts",
+      "getWorkspaceOwnerId",
+      "setPendingCorrection",
       "todayIso",
       "toast",
       "workflows",
@@ -174,7 +181,9 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
       "populateFormOptions",
       "prettyType",
       "saveTransactionEntry",
-      "state",
+      "getAccounts",
+      "getWorkspaceOwnerId",
+      "setPendingCorrection",
       "todayIso",
       "toast",
       "workflows",
@@ -218,7 +227,10 @@ test("ledger entry forms publish an explicit payment and expense interface", () 
   );
   assert.equal(passed.saveWorkflowOptions.closeModal, dependencies.closeModal);
   assert.equal(passed.saveWorkflowOptions.fetchAll, undefined);
-  assert.equal(passed.saveWorkflowOptions.state, dependencies.state);
+  assert.equal(
+    passed.saveWorkflowOptions.getPendingCorrection,
+    dependencies.getPendingCorrection,
+  );
   assert.equal(
     passed.saveWorkflowOptions.saveCorrection,
     dependencies.saveCorrection,
@@ -275,7 +287,7 @@ test("shared ledger save resets, refreshes, then continues or closes", async () 
   );
   const workflow = context.window.PropertyDeskLedgerEntrySaveWorkflow.create({
     $: (id) => id,
-    state: { pendingCorrection: null },
+    getPendingCorrection: () => null,
     saveCorrection() {},
     closeModal: (id) => calls.push(`close:${id}`),
     fetchAll: async () => {
@@ -451,7 +463,7 @@ test("payment and expense form workflows publish explicit view operations", () =
   };
   const dependencies = {
     $,
-    state: { accounts: [] },
+    ...ledgerEntryDependencies(context, { accounts: [] }),
     toast() {},
     closeModal() {},
     fetchAll() {},
@@ -491,22 +503,24 @@ test("payment and expense form workflows publish explicit view operations", () =
   assert.deepEqual(Object.keys(viewDependencies.payment).sort(), [
     "$",
     "fillSelect",
+    "getAccounts",
     "moneyInput",
     "openModal",
     "populateFormOptions",
     "prettyType",
-    "state",
+    "setPendingCorrection",
     "todayIso",
   ]);
   assert.deepEqual(Object.keys(viewDependencies.expense).sort(), [
     "$",
     "expenseAccountPolicy",
     "fillSelect",
+    "getAccounts",
     "moneyInput",
     "openModal",
     "populateFormOptions",
     "prettyType",
-    "state",
+    "setPendingCorrection",
     "todayIso",
   ]);
 
@@ -575,6 +589,11 @@ test("payment and expense callbacks retain values at their form boundary", async
         if (event === "submit") submitHandlers.set(id, handler);
       },
     }),
+    getAccounts: () => [
+      { id: "rental-1", property_id: "property-1", account_type: "rental" },
+    ],
+    getWorkspaceOwnerId: () => "workspace-1",
+    setPendingCorrection() {},
     state: {
       workspaceOwnerId: "workspace-1",
       accounts: [
@@ -684,7 +703,7 @@ test("payment and expense forms report rejected saves without clearing the entri
   const corrections = [];
   const forms = context.window.PropertyDeskLedgerEntryForms.create({
     $,
-    state,
+    ...ledgerEntryDependencies(context, state),
     moneyInput: Number,
     todayIso: () => "2026-10-05",
     toast: (message) => messages.push(message),
@@ -695,7 +714,6 @@ test("payment and expense forms report rejected saves without clearing the entri
     prettyType: (type) => type,
     openModal() {},
     saveCorrection: (...args) => corrections.push(args),
-    ...ledgerEntryDependencies(context),
   });
 
   forms.attachLedgerEntryFormEvents();

@@ -171,6 +171,14 @@ function ledgerEntryDependencies(context, state = {}) {
   const repositoryFactory = context.window.PropertyDeskTransactionRepository;
   const writeFeedback = createRepositoryWriteFeedback(context);
   return {
+    getAccounts: () => state.accounts || [],
+    getPayments: () => state.payments || [],
+    getExpenses: () => state.expenses || [],
+    getWorkspaceOwnerId: () => state.workspaceOwnerId || null,
+    getPendingCorrection: () => state.pendingCorrection || null,
+    setPendingCorrection: (value) => {
+      state.pendingCorrection = value;
+    },
     transactionRepository: repositoryFactory.create
       ? repositoryFactory.create({
           getClient: () => state.client,

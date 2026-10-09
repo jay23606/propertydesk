@@ -17,6 +17,16 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(app, /getPendingCorrection: \(\) => state\.pendingCorrection/);
   assert.match(app, /setPendingCorrection: \(value\) =>/);
+  assert.match(app, /getAccounts: \(\) => state\.accounts/);
+  assert.match(app, /getWorkspaceOwnerId: \(\) => state\.workspaceOwnerId/);
+  const ledgerEntries =
+    app.match(/entries: \{([\s\S]*?)\n    \},\n    views:/)?.[1] || "";
+  assert.ok(ledgerEntries, "ledger entry dependencies should be explicit");
+  assert.doesNotMatch(
+    ledgerEntries,
+    /\bstate\s*,/,
+    "ledger forms receive scoped getters instead of the app state object",
+  );
   assert.match(
     app,
     /getPayments: \(\) => state\.payments,[\s\S]*?getExpenses: \(\) => state\.expenses/,
@@ -51,6 +61,26 @@ test("app composes independent property and account forms before action routing"
     path.join(root, "features", "ledger-workflow.js"),
     "utf8",
   );
+  const entryCoordinator = fs.readFileSync(
+    path.join(root, "features", "ledger-entry-forms.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(entryCoordinator, /\bstate\b/);
+  for (const filename of [
+    "ledger-workflow.js",
+    "ledger-entry-save-workflow.js",
+    "payment-entry-form.js",
+    "expense-entry-form.js",
+    "payment-entry-view.js",
+    "expense-entry-view.js",
+    "property-payment-action.js",
+  ]) {
+    assert.doesNotMatch(
+      fs.readFileSync(path.join(root, "features", filename), "utf8"),
+      /\bstate\b/,
+      `${filename} should use its scoped record accessors`,
+    );
+  }
   assert.match(
     transactionWorkflow,
     /const \{ saveCorrection, createTransactionActionHandlers \} = maintenance;[\s\S]*?saveCorrection,[\s\S]*?workflows\.views\.create\(\{[\s\S]*?sumOperatingExpenses,[\s\S]*?\}\)[\s\S]*?createTransactionActionHandlers\([\s\S]*?openPayment: ledgerEntryForms\.openPayment/,

@@ -4,7 +4,8 @@
 
   function createExpenseEntryView({
     $,
-    state,
+    getAccounts,
+    setPendingCorrection,
     moneyInput,
     todayIso,
     fillSelect,
@@ -14,7 +15,7 @@
     expenseAccountPolicy,
   }) {
     function openExpense(propertyId) {
-      state.pendingCorrection = null;
+      setPendingCorrection(null);
       populateFormOptions();
       $("expense-form").reset();
       $("expense-modal-title").textContent = "Record expense";
@@ -65,7 +66,7 @@
     function attachEvents() {
       $("expense-property").addEventListener("change", () => {
         const propertyId = $("expense-property").value;
-        const relatedAccounts = state.accounts.filter(
+        const relatedAccounts = getAccounts().filter(
           (account) => account.property_id === propertyId,
         );
         fillSelect(

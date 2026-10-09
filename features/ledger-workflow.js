@@ -7,7 +7,12 @@
     workflows,
     entries: {
       $,
-      state,
+      getAccounts: getEntryAccounts,
+      getPayments: getEntryPayments,
+      getExpenses: getEntryExpenses,
+      getWorkspaceOwnerId,
+      getPendingCorrection,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       toast,
@@ -46,7 +51,12 @@
     const { saveCorrection, createTransactionActionHandlers } = maintenance;
     const ledgerEntryForms = workflows.entryForms.create({
       $,
-      state,
+      getAccounts: getEntryAccounts,
+      getPayments: getEntryPayments,
+      getExpenses: getEntryExpenses,
+      getWorkspaceOwnerId,
+      getPendingCorrection,
+      setPendingCorrection,
       moneyInput,
       todayIso,
       toast,
