@@ -25,6 +25,33 @@ test("workspace member maintenance uses its injected change operation", () => {
   assert.match(members, /runAndRefreshWorkspaceChange,/);
 });
 
+test("workspace member maintenance reconciles against its injected roster", async () => {
+  const context = vm.createContext({ window: {} });
+  loadWorkspaceFeatures(context);
+  const state = { workspaceMembers: [] };
+  let confirmed = false;
+  const maintenance =
+    context.window.PropertyDeskWorkspaceMemberMaintenance.create({
+      getWorkspaceMembers: () => state.workspaceMembers,
+      toast() {},
+      fetchAll() {},
+      refreshWorkspaceSettings() {},
+      repository: { addMember() {} },
+      runAndRefreshWorkspaceChange: async (options) => {
+        state.workspaceMembers.push({ email: "member@example.test" });
+        confirmed = options.isConfirmed();
+        return confirmed;
+      },
+      confirmAction: () => true,
+    });
+
+  assert.equal(
+    await maintenance.addWorkspaceMember("member@example.test"),
+    true,
+  );
+  assert.equal(confirmed, true);
+});
+
 test("workspace feature owns profile and member form bindings", () => {
   const context = vm.createContext({ window: {} });
   const workflows = loadWorkspaceFeatures(context);
@@ -93,7 +120,7 @@ test("adding a workspace member clears the address only after successful refresh
     workspaceOwnerId: "owner-1",
   };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    state,
+    getWorkspaceMembers: () => state.workspaceMembers,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     runAndRefreshWorkspaceChange:
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
@@ -146,7 +173,7 @@ test("adding a workspace member keeps the address when refresh fails", async () 
     workspaceOwnerId: "owner-1",
   };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    state,
+    getWorkspaceMembers: () => state.workspaceMembers,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     runAndRefreshWorkspaceChange:
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,
@@ -283,7 +310,7 @@ test("workspace member actions reconcile lost responses against refreshed member
   const member = { member_user_id: "member-1", email: "spouse@example.test" };
   const state = { workspaceMembers: [], properties: [] };
   const feature = context.window.PropertyDeskWorkspaceMembers.create({
-    state,
+    getWorkspaceMembers: () => state.workspaceMembers,
     maintenanceWorkflow: context.window.PropertyDeskWorkspaceMemberMaintenance,
     runAndRefreshWorkspaceChange:
       createRepositoryWriteFeedback(context).runAndRefreshWorkspaceChange,

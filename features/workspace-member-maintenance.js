@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getWorkspaceMembers,
     toast,
     fetchAll,
     refreshWorkspaceSettings,
@@ -13,7 +13,7 @@
   }) {
     function memberWithEmailExists(email) {
       const normalizedEmail = email.trim().toLowerCase();
-      return state.workspaceMembers.some(
+      return getWorkspaceMembers().some(
         (member) =>
           String(member.email || "")
             .trim()
@@ -63,7 +63,7 @@
     }
 
     async function removeWorkspaceMember(memberId) {
-      const member = state.workspaceMembers.find(
+      const member = getWorkspaceMembers().find(
         (item) => item.member_user_id === memberId,
       );
       if (
@@ -76,7 +76,7 @@
       return persistMembershipChange({
         operation: () => repository.removeMember(memberId),
         isConfirmed: () =>
-          !state.workspaceMembers.some(
+          !getWorkspaceMembers().some(
             (item) => item.member_user_id === memberId,
           ),
         failureMessage:

@@ -89,7 +89,7 @@
     }
 
     const members = workflows.members.create({
-      state,
+      getWorkspaceMembers: () => state.workspaceMembers,
       toast,
       fetchAll,
       view: memberView,

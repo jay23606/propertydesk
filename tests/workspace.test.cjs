@@ -68,6 +68,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
         email: "private@example.test",
       },
     ],
+    workspaceMembers: [{ member_user_id: "member-1" }],
     properties: [
       { id: "property-1", address: "10 Main St", postal_code: "16601" },
     ],
@@ -138,6 +139,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     runAndRefreshWorkspaceChange,
   );
   assert.equal(passed.memberActions.confirmAction, confirmAction);
+  assert.equal("state" in passed.memberActions, false);
   const reminderActivityData = passed.reminderWorkflow.getActivityData();
   assert.deepEqual(Object.keys(reminderActivityData).sort(), [
     "accounts",
@@ -188,6 +190,10 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
   assert.equal(
     passed.memberActions.maintenanceWorkflow,
     context.window.PropertyDeskWorkspaceMemberMaintenance,
+  );
+  assert.equal(
+    passed.memberActions.getWorkspaceMembers(),
+    state.workspaceMembers,
   );
   assert.equal(
     passed.memberActions.view.renderWorkspaceMembers,

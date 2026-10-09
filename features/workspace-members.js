@@ -3,7 +3,7 @@
   "use strict";
 
   function create({
-    state,
+    getWorkspaceMembers,
     toast,
     fetchAll,
     view,
@@ -14,7 +14,7 @@
     confirmAction,
   }) {
     const maintenance = maintenanceWorkflow.create({
-      state,
+      getWorkspaceMembers,
       toast,
       fetchAll,
       refreshWorkspaceSettings,
