@@ -12,6 +12,12 @@
     getItem: (key) => window.localStorage.getItem(key),
     setItem: (key, value) => window.localStorage.setItem(key, value),
   });
+  const downloadBlob = (blob, filename) =>
+    window.PropertyDeskDownloadUtils.downloadBlob(blob, filename, {
+      documentRef: document,
+      urlRef: window.URL,
+      defer: window.setTimeout.bind(window),
+    });
   const reportError = (message, error) => window.console?.error(message, error);
   const appServices = window.PropertyDeskAppServices.create({
     $,
@@ -162,7 +168,7 @@
         prettyType,
       },
       services: {
-        downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+        downloadBlob,
       },
       workflows: {
         reportWorkspace: window.PropertyDeskReportWorkspaceWorkflow,
@@ -709,7 +715,7 @@
       ui: { $, now, todayIso, toast },
       services: {
         isClientReady,
-        downloadBlob: window.PropertyDeskDownloadUtils.downloadBlob,
+        downloadBlob,
         workspaceTables: window.PropertyDeskWorkspaceTables,
         loadAllPages: loadAllWorkspacePages,
         collectBackupAgreementFiles:

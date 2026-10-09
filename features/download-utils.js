@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function downloadBlob(
-    blob,
-    filename,
-    { documentRef = document, urlRef = URL, defer = setTimeout } = {},
-  ) {
+  function downloadBlob(blob, filename, { documentRef, urlRef, defer }) {
     const url = urlRef.createObjectURL(blob);
     const link = documentRef.createElement("a");
     link.href = url;

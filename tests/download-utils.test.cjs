@@ -5,6 +5,20 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 test("browser download helper clicks a temporary link and releases its URL", () => {
+  const root = path.join(__dirname, "..");
+  const source = fs.readFileSync(
+    path.join(root, "features", "download-utils.js"),
+    "utf8",
+  );
+  const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  assert.doesNotMatch(
+    source,
+    /documentRef = document|urlRef = URL|defer = setTimeout/,
+  );
+  assert.match(
+    app,
+    /const downloadBlob = \(blob, filename\) =>[\s\S]*?documentRef: document,[\s\S]*?urlRef: window\.URL,[\s\S]*?defer: window\.setTimeout\.bind\(window\),/,
+  );
   const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(
