@@ -148,9 +148,9 @@
     max-width: 41vw;
   }
   .portfolio-table .portfolio-icon-action {
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
+    width: 5vw;
+    min-width: 5vw;
+    height: 5vw;
   }
   .portfolio-table .portfolio-payment-action {
     width: 16px;

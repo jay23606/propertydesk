@@ -55,7 +55,7 @@ test("Properties grid styles stay in their feature stylesheet", () => {
   );
   assert.match(
     portfolio,
-    /\.portfolio-table \.portfolio-icon-action\s*\{\s*width: 20px;\s*min-width: 20px;\s*height: 20px;/,
+    /\.portfolio-table \.portfolio-icon-action\s*\{\s*width: 5vw;\s*min-width: 5vw;\s*height: 5vw;/,
   );
   assert.match(
     portfolio,
