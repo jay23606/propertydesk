@@ -197,56 +197,33 @@
       },
     });
   const { previewReminderEmail } =
-    window.PropertyDeskReminderPreviewWorkflow.create({
-      $,
-      getProperty: (propertyId) => {
-        const property = state.properties.find(
-          (item) => item.id === propertyId,
-        );
-        if (!property) return null;
-        const {
-          id,
-          address,
-          city,
-          state: propertyState,
-          postal_code,
-        } = property;
-        return { id, address, city, state: propertyState, postal_code };
+    window.PropertyDeskReminderPreviewSetup.create({
+      records: {
+        getProperties: () => state.properties,
+        getPayments: () => state.payments,
       },
-      getPaymentsForAccount: (accountId) =>
-        state.payments
-          .filter((payment) => payment.account_id === accountId)
-          .map(
-            ({
-              account_id,
-              received_date,
-              amount,
-              status,
-              income_category,
-            }) => ({
-              account_id,
-              received_date,
-              amount,
-              status,
-              income_category,
-            }),
-          ),
-      paymentReminderMessage: emailUtils.paymentReminderMessage,
-      amountDueSince,
-      unpaidDueAccrualStart,
-      monthEnd,
-      dateOnly,
-      monthStart,
-      propertyAddress,
-      money,
-      todayIso,
-      moneyInput,
-      toast,
-      esc,
-      openModal: modal.openModal,
-      splitEmailAddresses:
-        window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
+      ui: {
+        $,
+        monthEnd,
+        dateOnly,
+        monthStart,
+        propertyAddress,
+        money,
+        todayIso,
+        moneyInput,
+        toast,
+        esc,
+        openModal: modal.openModal,
+      },
+      services: {
+        paymentReminderMessage: emailUtils.paymentReminderMessage,
+        amountDueSince,
+        unpaidDueAccrualStart,
+        splitEmailAddresses:
+          window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
+      },
       workflows: {
+        previewWorkflow: window.PropertyDeskReminderPreviewWorkflow,
         model: window.PropertyDeskReminderPreviewModel,
         preview: window.PropertyDeskReminderPreview,
       },

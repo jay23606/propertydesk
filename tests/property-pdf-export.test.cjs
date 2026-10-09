@@ -101,10 +101,10 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     { hasAccount: false, property: { notes: "Vacant property note" } },
   ]);
 
-  assert.match(html, /@page \{ size: letter landscape; margin: \.2in; \}/);
+  assert.match(html, /@page \{ size: letter landscape; margin: \.3in; \}/);
   assert.match(
     html,
-    /table \{ border-collapse: collapse; width: 100%; max-width: 100%; margin: 0; table-layout: fixed; \}/,
+    /table \{ border-collapse: collapse; width: 99%; max-width: 100%; margin: 0; table-layout: fixed; \}/,
   );
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(html, /10 Main St, Altoona, PA 16601/);

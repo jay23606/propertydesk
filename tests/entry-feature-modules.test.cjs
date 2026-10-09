@@ -331,6 +331,7 @@ test("property workspace composes screens and shares detail actions", () => {
     "features/property-screen-workflow.js",
     "features/property-workspace-workflow.js",
     "features/property-workspace-setup.js",
+    "features/reminder-preview-setup.js",
     "features/import-workspace-setup.js",
     "features/backup-workspace-setup.js",
     "features/report-workspace-setup.js",
@@ -382,7 +383,7 @@ test("app passes reminder services into the app-shell coordinator", () => {
   assert.match(setup, /workspaceWorkflow: workflows\.workspace/);
   assert.match(
     app,
-    /PropertyDeskReminderPreviewWorkflow\.create\(\{[\s\S]*?amountDueSince,[\s\S]*?unpaidDueAccrualStart,[\s\S]*?openModal: modal\.openModal,/,
+    /PropertyDeskReminderPreviewSetup\.create\(\{[\s\S]*?getPayments: \(\) => state\.payments,[\s\S]*?openModal: modal\.openModal,/,
   );
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
