@@ -4,7 +4,8 @@
 
   function createActions({
     $,
-    state,
+    getProperties,
+    getAccounts,
     toast,
     resetPropertyForm,
     openModal,
@@ -28,7 +29,7 @@
         .querySelectorAll('[data-open="account-modal"]')
         .forEach((button) => {
           button.addEventListener("click", () => {
-            if (!state.properties.length) {
+            if (!getProperties().length) {
               toast("Add a property before creating an account");
               navigate("properties");
               return;
@@ -38,7 +39,7 @@
         });
 
       const openPayments = () => {
-        if (!state.accounts.length) {
+        if (!getAccounts().length) {
           toast("Add an account before recording a payment");
           navigate("properties");
           return;
@@ -55,7 +56,7 @@
         .querySelectorAll('[data-open="expense-modal"]')
         .forEach((button) => {
           button.addEventListener("click", () => {
-            if (!state.properties.length) {
+            if (!getProperties().length) {
               toast("Add a property before recording an expense");
               navigate("properties");
               return;

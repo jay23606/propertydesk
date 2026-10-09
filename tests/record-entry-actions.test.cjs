@@ -119,7 +119,8 @@ test("record-entry feature owns create actions and handles empty workspace state
   const navigate = (view) => calls.push(`navigate:${view}`);
   const feature = context.window.PropertyDeskCreateActions.create({
     $: getElement,
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
     resetPropertyForm: () => getElement("property-form").reset(),
     openAccountForProperty: (propertyId) =>
       calls.push(`open-account:${propertyId || "any"}`),

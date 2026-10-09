@@ -498,7 +498,8 @@
   } = ledgerWorkflow;
   const { attachCreateActionEvents } = window.PropertyDeskCreateActions.create({
     $,
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
     toast,
     resetPropertyForm: propertyAccountForms.resetPropertyForm,
     openModal,

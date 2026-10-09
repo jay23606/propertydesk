@@ -50,6 +50,15 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     app,
+    /PropertyDeskCreateActions\.create\(\{[\s\S]*?getProperties: \(\) => state\.properties,[\s\S]*?getAccounts: \(\) => state\.accounts,/,
+  );
+  const createActions = fs.readFileSync(
+    path.join(root, "features", "create-actions.js"),
+    "utf8",
+  );
+  assert.doesNotMatch(createActions, /\bstate\b/);
+  assert.match(
+    app,
     /editAccount: propertyAccountForms\.editAccount,[\s\S]*?openAccountForProperty: propertyAccountForms\.openAccountForProperty/,
   );
   assert.match(
