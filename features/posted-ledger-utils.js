@@ -2,8 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ modules }) {
-    const { roundCurrency } = modules.currencyUtils;
+  function create({ roundCurrency }) {
     if (!roundCurrency)
       throw new Error("The shared currency helper is not loaded.");
 

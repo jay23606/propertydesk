@@ -24,7 +24,7 @@ test("app services compose shared runtime and financial services explicitly", ()
   const paymentNotifications = {};
   const financialContext = {};
   const depositLedger = {};
-  const currencyUtils = {};
+  const currencyUtils = { roundCurrency() {} };
   const dateUtils = { todayIso() {} };
   const money = () => {};
   const propertyAddress = () => {};
@@ -133,7 +133,8 @@ test("app services compose shared runtime and financial services explicitly", ()
   assert.equal(calls[0][1].modules.recordWrites, recordWrites);
   assert.equal(calls[1][1].modules.emailAddressUtils, emailAddressUtils);
   assert.equal(calls[1][1].modules.reminderCopy, reminderCopy);
-  assert.equal(calls[2][1].modules.currencyUtils, currencyUtils);
+  assert.equal(calls[2][1].roundCurrency, currencyUtils.roundCurrency);
+  assert.deepEqual(Object.keys(calls[2][1]), ["roundCurrency"]);
   assert.equal(calls[3][1].$, $);
   assert.equal(calls[4][1].config, config);
   assert.equal(calls[4][1].supabase, supabase);

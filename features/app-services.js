@@ -16,7 +16,7 @@
       },
     });
     const postedLedgerUtils = modules.postedLedger.factory.create({
-      modules: { currencyUtils: modules.postedLedger.currencyUtils },
+      roundCurrency: modules.postedLedger.currencyUtils.roundCurrency,
     });
     const { toast } = modules.notifications.create({ $ });
     const runtime = modules.workspaceRuntime.factory.create({
