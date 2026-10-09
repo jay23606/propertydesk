@@ -8,12 +8,12 @@
     services,
     workflows,
   }) {
-    const transactionCorrectionModel = workflows.correctionModel.create({
-      getPayments: records.getPayments,
-      getExpenses: records.getExpenses,
-      getAccounts: records.getAccounts,
-    });
     const transactionMaintenance = workflows.maintenance.create({
+      records: {
+        getPayments: records.getPayments,
+        getExpenses: records.getExpenses,
+        getAccounts: records.getAccounts,
+      },
       correction: {
         $: ui.$,
         getPendingCorrection: records.getPendingCorrection,
@@ -29,7 +29,6 @@
         OptionClass: ui.OptionClass,
         repository: services.transactionRepository,
         runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-        findCorrectionTarget: transactionCorrectionModel.findCorrectionTarget,
       },
       voiding: {
         getPayments: records.getPayments,
@@ -46,6 +45,7 @@
       },
       events: { documentRef: ui.documentRef },
       workflows: {
+        correctionModel: workflows.correctionModel,
         correction: workflows.correction,
         correctionModules: workflows.correctionModules,
         voidMaintenance: workflows.voidMaintenance,

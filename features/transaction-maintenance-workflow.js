@@ -3,10 +3,12 @@
   "use strict";
 
   function createTransactionMaintenanceWorkflow({
+    records: { getPayments, getExpenses, getAccounts },
     correction: correctionContext,
     voiding: voidingContext,
     events: eventsContext,
     workflows: {
+      correctionModel: correctionModelWorkflow,
       correction: correctionWorkflow,
       correctionModules,
       voidMaintenance: voidMaintenanceWorkflow,
@@ -14,6 +16,11 @@
       events: maintenanceEventsWorkflow,
     },
   }) {
+    const correctionModel = correctionModelWorkflow.create({
+      getPayments,
+      getExpenses,
+      getAccounts,
+    });
     const correction = correctionWorkflow.create({
       $: correctionContext.$,
       getPendingCorrection: correctionContext.getPendingCorrection,
@@ -30,7 +37,7 @@
       repository: correctionContext.repository,
       runAndRefreshWorkspaceChange:
         correctionContext.runAndRefreshWorkspaceChange,
-      findCorrectionTarget: correctionContext.findCorrectionTarget,
+      findCorrectionTarget: correctionModel.findCorrectionTarget,
       workflows: correctionModules,
     });
     const { saveVoidTransaction } = voidMaintenanceWorkflow.create({

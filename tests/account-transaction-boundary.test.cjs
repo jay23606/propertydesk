@@ -52,11 +52,11 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     composition,
-    /workflows\.correctionModel\.create\(\{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
+    /records: \{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
   );
   assert.match(
     composition,
-    /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
+    /workflows: \{[\s\S]*?correctionModel: workflows\.correctionModel/,
   );
   assert.doesNotMatch(
     composition.match(
@@ -121,6 +121,6 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(
     transactionMaintenance,
-    /correctionWorkflow\.create\([\s\S]*?voidMaintenanceWorkflow\.create\([\s\S]*?voidEntryWorkflow\.create\(/,
+    /correctionModelWorkflow\.create\([\s\S]*?correctionWorkflow\.create\([\s\S]*?findCorrectionTarget: correctionModel\.findCorrectionTarget,[\s\S]*?voidMaintenanceWorkflow\.create\([\s\S]*?voidEntryWorkflow\.create\(/,
   );
 });

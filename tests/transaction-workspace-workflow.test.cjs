@@ -66,16 +66,17 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   };
   const ledger = { name: "ledger-workflow" };
   const maintenance = { name: "maintenance" };
+  const receivedMaintenance = {};
   const workflows = {
     correctionModel: {
-      create(received) {
-        calls.push(["correction-model", received]);
-        return { findCorrectionTarget() {} };
+      create() {
+        throw new Error("correction model belongs to maintenance workflow");
       },
     },
     maintenance: {
       create(received) {
-        calls.push(["maintenance", received]);
+        calls.push(["maintenance"]);
+        Object.assign(receivedMaintenance, received);
         return maintenance;
       },
     },
@@ -110,25 +111,30 @@ test("transaction workspace composes maintenance and ledger flows from scoped de
   );
 
   assert.equal(result, ledger);
-  assert.equal(calls[0][0], "correction-model");
-  assert.equal(calls[0][1].getPayments, records.getPayments);
-  assert.equal(calls[1][0], "maintenance");
+  assert.equal(calls[0][0], "maintenance");
+  assert.equal(receivedMaintenance.records.getPayments, records.getPayments);
+  assert.equal(receivedMaintenance.records.getExpenses, records.getExpenses);
+  assert.equal(receivedMaintenance.records.getAccounts, records.getAccounts);
   assert.equal(
-    calls[1][1].correction.getPendingCorrection,
+    receivedMaintenance.correction.getPendingCorrection,
     records.getPendingCorrection,
   );
   assert.equal(
-    calls[1][1].correction.repository,
+    receivedMaintenance.correction.repository,
     services.transactionRepository,
   );
-  assert.equal(calls[1][1].voiding.getExpenses, records.getExpenses);
-  assert.equal(calls[2][0], "ledger");
-  assert.equal(calls[2][1].maintenance, maintenance);
+  assert.equal(receivedMaintenance.voiding.getExpenses, records.getExpenses);
   assert.equal(
-    calls[2][1].entries.getWorkspaceOwnerId,
+    receivedMaintenance.workflows.correctionModel,
+    workflows.correctionModel,
+  );
+  assert.equal(calls[1][0], "ledger");
+  assert.equal(calls[1][1].maintenance, maintenance);
+  assert.equal(
+    calls[1][1].entries.getWorkspaceOwnerId,
     records.getWorkspaceOwnerId,
   );
-  assert.equal(calls[2][1].views.getProperties, records.getProperties);
+  assert.equal(calls[1][1].views.getProperties, records.getProperties);
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(

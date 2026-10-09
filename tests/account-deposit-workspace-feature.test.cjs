@@ -245,6 +245,15 @@ test("account and deposit workspaces connect at one feature boundary", () => {
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
+  const transactionMaintenance = fs.readFileSync(
+    path.join(
+      __dirname,
+      "..",
+      "features",
+      "transaction-maintenance-workflow.js",
+    ),
+    "utf8",
+  );
   const setup = fs.readFileSync(
     path.join(
       __dirname,
@@ -383,11 +392,19 @@ test("account and deposit workspaces connect at one feature boundary", () => {
   );
   assert.match(
     transactionComposition,
-    /workflows\.correctionModel\.create\(\{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
+    /records: \{[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses,[\s\S]*?getAccounts: records\.getAccounts/,
   );
   assert.match(
     transactionComposition,
-    /findCorrectionTarget:\s*transactionCorrectionModel\.findCorrectionTarget/,
+    /workflows: \{[\s\S]*?correctionModel: workflows\.correctionModel/,
+  );
+  assert.match(
+    transactionMaintenance,
+    /correctionModelWorkflow\.create\(\{[\s\S]*?getPayments,[\s\S]*?getExpenses,[\s\S]*?getAccounts/,
+  );
+  assert.match(
+    transactionMaintenance,
+    /findCorrectionTarget: correctionModel\.findCorrectionTarget/,
   );
   assert.match(app, /accountRepository: repositories\.accounts/);
   assert.match(app, /depositRepository: repositories\.deposits/);
