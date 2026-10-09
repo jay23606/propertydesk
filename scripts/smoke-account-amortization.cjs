@@ -11,6 +11,7 @@ async function smokeAccountAmortization(page, runtimeErrors, consoleErrors) {
         dateUtils: window.PropertyDeskDateUtils,
         currencyUtils: window.PropertyDeskCurrencyUtils,
       },
+      todayIso: () => "2026-10-08",
     });
     const details = window.PropertyDeskAccountDetails;
     if (!utilities || !details) {

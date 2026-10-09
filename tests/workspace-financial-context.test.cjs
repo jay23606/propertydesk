@@ -100,6 +100,7 @@ test("workspace financial context composes ledger, account, and loan services", 
   assert.equal(calls[0][1].modules.currencyUtils, currencyUtils);
   assert.equal(calls[1][1].modules.dateUtils, dateUtils);
   assert.equal(calls[1][1].modules.currencyUtils, currencyUtils);
+  assert.equal(calls[1][1].todayIso, todayIso);
   assert.equal(calls[2][1].state, state);
   assert.equal(calls[2][1].ledger.todayIso, todayIso);
   assert.equal(calls[2][1].ledger.scheduledLoanBalance, scheduledLoanBalance);

@@ -18,6 +18,7 @@
     });
     const loanSchedule = workflows.loanSchedule.create({
       modules: { dateUtils, currencyUtils },
+      todayIso,
     });
     const financial = workflows.accountFinancialContext.create({
       state,

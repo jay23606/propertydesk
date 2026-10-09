@@ -17,6 +17,7 @@ const scheduleUtils = scheduleFactory.create({
 });
 const loanUtils = loanAmortizationFactory.create({
   modules: { dateUtils, currencyUtils },
+  todayIso: () => "2026-10-08",
 });
 const depositUtils = depositFactory.create({ isPosted: ledgerUtils.isPosted });
 const { amountDueSince } = scheduleUtils;
@@ -83,6 +84,22 @@ test("scheduled loan balance follows amortization and accepts positive or negati
     ),
     125,
   );
+});
+
+test("loan schedules without a saved start date use the injected current date", () => {
+  const account = {
+    account_type: "land_contract",
+    original_principal: 1000,
+    interest_rate: 0,
+    term_months: 4,
+    principal_interest_amount: 250,
+    start_date: null,
+  };
+  assert.equal(
+    amortizationSchedule(1000, 0, 4, null, 250)[0].date,
+    "2026-10-08",
+  );
+  assert.equal(scheduledLoanBalance(account), 750);
 });
 
 test("on-time land-contract schedule provides the hypothetical balance independently of payments received", () => {

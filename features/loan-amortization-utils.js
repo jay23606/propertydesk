@@ -2,10 +2,12 @@
 (() => {
   "use strict";
 
-  function createLoanAmortizationUtils({ modules }) {
+  function createLoanAmortizationUtils({ modules, todayIso }) {
     const { monthDateWithAnchor, isoDate } = modules.dateUtils;
-    if (!monthDateWithAnchor || !isoDate)
-      throw new Error("PropertyDeskDateUtils must load before loan utils.");
+    if (!monthDateWithAnchor || !isoDate || typeof todayIso !== "function")
+      throw new Error(
+        "Date, currency, and current-date dependencies are required for loan utils.",
+      );
     const { roundCurrency } = modules.currencyUtils;
     if (!roundCurrency)
       throw new Error("PropertyDeskCurrencyUtils must load before loan utils.");
@@ -62,7 +64,7 @@
     function dueDateFormatter(startDate) {
       const anchor = /^\d{4}-\d{2}-\d{2}$/.test(String(startDate || ""))
         ? new Date(`${startDate}T12:00:00`)
-        : new Date();
+        : new Date(`${todayIso()}T12:00:00`);
       return (offset) =>
         isoDate(monthDateWithAnchor(anchor, offset, anchor.getDate()));
     }
@@ -88,10 +90,7 @@
       return rows;
     }
 
-    function scheduledLoanBalance(
-      account,
-      asOf = new Date().toISOString().slice(0, 10),
-    ) {
+    function scheduledLoanBalance(account, asOf = todayIso()) {
       if (!account || account.account_type === "rental") return null;
       // This is a hypothetical on-time schedule estimate. Actual receipt history is intentionally ignored.
       const rows = amortizationSchedule(
