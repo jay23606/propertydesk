@@ -47,7 +47,6 @@
       $,
       openModal,
       toast,
-      schedule,
       store: reminderTemplateStore,
       onChange: () => propertyViews.renderProperties(),
     });
@@ -99,6 +98,7 @@
       esc,
       money,
       toast,
+      schedule,
     });
     const propertyViews = workflows.views.create({
       $,

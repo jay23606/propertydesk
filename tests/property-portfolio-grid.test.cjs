@@ -214,6 +214,7 @@ test("Properties portfolio returns explicit view and action operations", () => {
     groupAccountsByProperty: action,
     isActiveAccount: action,
     toast: action,
+    schedule: action,
     openPayment: action,
     openPropertyDetails: action,
     openAccountForProperty: action,
@@ -256,6 +257,7 @@ test("Properties portfolio returns explicit view and action operations", () => {
   assert.equal(passed.views.getWorkspaceMembers(), state.workspaceMembers);
   assert.equal(passed.views.exportPDF, action);
   assert.equal(typeof passed.pdfExport.getRows, "function");
+  assert.equal(passed.pdfExport.schedule, action);
   assert.equal("unusedDependency" in passed.views, false);
   assert.equal(passed.actions.$, action);
   assert.equal(passed.actions.openPayment, action);
