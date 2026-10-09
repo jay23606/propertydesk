@@ -898,7 +898,8 @@
   const { attachBackupExportEvents } =
     window.PropertyDeskBackupWorkspaceWorkflow.create({
       $,
-      state,
+      getUser: () => state.user,
+      getWorkspaceOwnerId: () => state.workspaceOwnerId,
       todayIso,
       now,
       toast,

@@ -86,7 +86,8 @@ test("backup export aborts before download when a private document path escapes 
   const downloads = [];
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
-    state,
+    getUser: () => state.user,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
     now: () => new Date("2026-10-04T12:00:00.000Z"),
@@ -220,7 +221,8 @@ test("backup export adds the validated private agreement to the ZIP and manifest
     context.window.PropertyDeskBackupAgreementFiles.collect;
   const feature = context.window.PropertyDeskBackupExport.create({
     $: (id) => (id === "export-all" ? button : null),
-    state,
+    getUser: () => state.user,
+    getWorkspaceOwnerId: () => state.workspaceOwnerId,
     modules: { archive: context.window.PropertyDeskBackupArchive },
     isClientReady: () => true,
     now: () => new Date("2026-10-04T12:00:00.000Z"),

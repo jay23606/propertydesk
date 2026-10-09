@@ -12,6 +12,10 @@ test("backup workspace workflow owns backup dependency composition", () => {
   );
   assert.match(
     app,
+    /PropertyDeskBackupWorkspaceWorkflow\.create\(\{[\s\S]*?getUser: \(\) => state\.user,[\s\S]*?getWorkspaceOwnerId: \(\) => state\.workspaceOwnerId,/,
+  );
+  assert.match(
+    app,
     /exporter: \{\s*create: window\.PropertyDeskBackupExport\.create,\s*modules: \{ archive: window\.PropertyDeskBackupArchive \}/,
   );
   assert.match(
@@ -31,6 +35,7 @@ test("backup workspace workflow owns backup dependency composition", () => {
     "utf8",
   );
   assert.doesNotMatch(exporter, /window\.PropertyDeskBackupArchive\.create/);
+  assert.doesNotMatch(exporter, /\bstate\s*[,.=]/);
 });
 
 test("backup export requires an initialized runtime client", async () => {
@@ -56,7 +61,8 @@ test("backup export requires an initialized runtime client", async () => {
   };
   const feature = context.window.PropertyDeskBackupExport.create({
     $: () => button,
-    state: { user: { id: "owner" } },
+    getUser: () => ({ id: "owner" }),
+    getWorkspaceOwnerId: () => "owner",
     isClientReady: () => false,
     modules: { archive: context.window.PropertyDeskBackupArchive },
     createBackup: () => assert.fail("backup must not be created before init"),
@@ -121,7 +127,8 @@ test("backup workspace workflow wires the manifest, record loader, and export ac
   const now = () => new Date("2026-10-08T12:00:00.000Z");
   const dependencies = {
     $: () => null,
-    state: { user: null },
+    getUser: () => null,
+    getWorkspaceOwnerId: () => null,
     isClientReady: () => false,
     now,
     todayIso: () => "2026-10-07",

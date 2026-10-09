@@ -4,7 +4,8 @@
 
   function createBackupWorkspaceWorkflow({
     $,
-    state,
+    getUser,
+    getWorkspaceOwnerId,
     isClientReady,
     now,
     todayIso,
@@ -24,7 +25,8 @@
     });
     const exporter = workflows.exporter.create({
       $,
-      state,
+      getUser,
+      getWorkspaceOwnerId,
       isClientReady,
       now,
       createBackup: backup.createBackup,

@@ -4,7 +4,8 @@
 
   function create({
     $,
-    state,
+    getUser,
+    getWorkspaceOwnerId,
     isClientReady,
     createBackup,
     now,
@@ -27,7 +28,7 @@
     });
 
     async function exportAll() {
-      if (!state.user || !isClientReady()) {
+      if (!getUser() || !isClientReady()) {
         toast("Sign in before exporting your private records.");
         return;
       }
@@ -39,7 +40,7 @@
 
       try {
         const { blob, recordCount, agreementCount } = await archive.prepare({
-          workspaceOwnerId: state.workspaceOwnerId,
+          workspaceOwnerId: getWorkspaceOwnerId(),
         });
         downloadBlob(blob, `propertydesk-backup-${todayIso()}.zip`);
         toast(
