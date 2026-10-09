@@ -104,7 +104,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
   assert.match(html, /@page \{ size: letter landscape/);
   assert.match(
     html,
-    /table \{ border-collapse: collapse; width: calc\(100% - 4px\); max-width: 100%; table-layout: fixed; \}/,
+    /table \{ border-collapse: collapse; width: 98%; max-width: 100%; table-layout: fixed; \}/,
   );
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(html, /10 Main St, Altoona, PA 16601/);

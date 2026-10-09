@@ -56,7 +56,7 @@
   header { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 8px; }
   h1 { margin: 0; font-size: 16px; }
   .meta { color: #58665f; font-size: 8px; }
-  table { border-collapse: collapse; width: calc(100% - 4px); max-width: 100%; table-layout: fixed; }
+  table { border-collapse: collapse; width: 98%; max-width: 100%; table-layout: fixed; }
   th { background: #e8efeb; color: #25372f; font-size: 7px; text-align: left; text-transform: uppercase; letter-spacing: .03em; overflow-wrap: anywhere; }
   th, td { min-width: 0; border: 1px solid #cbd5cf; padding: 3px 4px; vertical-align: top; }
   td { overflow: hidden; overflow-wrap: anywhere; max-height: 2.6em; }
