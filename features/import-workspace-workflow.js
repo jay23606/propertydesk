@@ -12,7 +12,7 @@
     fetchAll,
     toast,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     workflows,
     validationWorkflow,
     modules,
@@ -49,7 +49,7 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      refreshWorkspace,
       modules: {
         importRows: modules.importRows,
         csvParser: modules.csvParser,

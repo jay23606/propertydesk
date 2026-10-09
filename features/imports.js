@@ -12,7 +12,7 @@
     fetchAll,
     toast,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     modules,
   }) {
     const {
@@ -56,7 +56,7 @@
       status: $("import-status"),
       toast,
       repository,
-      writeFeedback,
+      refreshWorkspace,
       modules: modules.commit.modules,
     });
     const importReview = review.create({

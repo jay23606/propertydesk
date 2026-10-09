@@ -32,7 +32,7 @@ test("CSV import feature loads as an isolated browser module", () => {
       addEventListener: (event, handler) =>
         handlers.set(`${id}:${event}`, handler),
     }),
-    writeFeedback: { refreshWorkspace: async () => true },
+    refreshWorkspace: async () => true,
     modules: importFeatureModules(context),
   });
   assert.deepEqual(Object.keys(feature), [
@@ -105,7 +105,9 @@ test("import workflow keeps file import handlers inside its event bindings", () 
           return { kind: "import-repository" };
         },
       },
-      PropertyDeskRepositoryWriteFeedback: { kind: "write-feedback" },
+      PropertyDeskRepositoryWriteFeedback: {
+        refreshWorkspace() {},
+      },
       PropertyDeskTransactionImportWorkflow: { create() {} },
       PropertyDeskCsvImportFile: { create: () => ({ attachEvents() {} }) },
       PropertyDeskImportReview: {
@@ -145,7 +147,8 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     fetchAll() {},
     toast() {},
     repository: { kind: "injected-import-repository" },
-    writeFeedback: context.window.PropertyDeskRepositoryWriteFeedback,
+    refreshWorkspace:
+      context.window.PropertyDeskRepositoryWriteFeedback.refreshWorkspace,
     modules: importFeatureModules(context),
     unrelatedDependency() {},
   };
@@ -159,16 +162,16 @@ test("import workflow keeps file import handlers inside its event bindings", () 
     "attachExpenseEvents",
   ]);
   assert.equal(passed.commit.repository, dependencies.repository);
-  assert.equal(passed.commit.writeFeedback, dependencies.writeFeedback);
+  assert.equal(passed.commit.refreshWorkspace, dependencies.refreshWorkspace);
   assert.equal(passed.commit.state, dependencies.state);
   assert.deepEqual(Object.keys(passed.commit).sort(), [
     "fetchAll",
     "modules",
+    "refreshWorkspace",
     "repository",
     "state",
     "status",
     "toast",
-    "writeFeedback",
   ]);
   assert.equal(passed.importRepository, undefined);
   assert.deepEqual(

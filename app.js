@@ -734,7 +734,7 @@
     fetchAll,
     toast,
     repository: repositories.imports,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     workflows: {
       csvValueUtils: window.PropertyDeskCsvValueUtils,
       accountImportTerms: window.PropertyDeskAccountImportTerms,

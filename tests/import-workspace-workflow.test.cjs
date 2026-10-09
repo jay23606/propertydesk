@@ -43,7 +43,7 @@ test("import workspace supplies configured validators to the import feature", ()
     fetchAll() {},
     toast() {},
     repository: {},
-    writeFeedback: {},
+    refreshWorkspace() {},
     workflows: {
       ...workflows,
       feature: {
@@ -92,5 +92,5 @@ test("import workspace supplies configured validators to the import feature", ()
   assert.equal(calls[1][1].modules.validators, validators);
   assert.equal(calls[1][1].modules.csvParser, modules.csvParser);
   assert.equal(calls[1][1].repository, dependencies.repository);
-  assert.equal(calls[1][1].writeFeedback, dependencies.writeFeedback);
+  assert.equal(calls[1][1].refreshWorkspace, dependencies.refreshWorkspace);
 });

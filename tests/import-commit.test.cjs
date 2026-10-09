@@ -79,7 +79,7 @@ test("account and transaction imports share the commit refresh and result report
   } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshes.push("workspace refreshed"),
     status,
@@ -145,7 +145,7 @@ test("failed import commits do not refresh or report success", async () => {
   } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => refreshCount++,
     status: { textContent: "", classList: { add() {} } },
@@ -179,7 +179,7 @@ test("a confirmed import distinguishes refresh failure from save failure", async
   } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     repository: repository.create({ getClient: () => client }),
     fetchAll: async () => {
       throw new Error("workspace refresh failed");
@@ -221,7 +221,7 @@ test("an import with a lost response reconciles from the new committed batch", a
   const { commit: feature, writeFeedback, modules } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     state,
     repository: {
       commitAccounts: async () => {
@@ -279,7 +279,7 @@ test("an import with a lost response ignores older batches with the same source"
   const { commit: feature, writeFeedback, modules } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     state,
     repository: {
       commitAccounts: async () => {
@@ -321,7 +321,7 @@ test("an unconfirmed import stays unresolved when refreshed history has no batch
   const { commit: feature, writeFeedback, modules } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     state,
     repository: {
       commitAccounts: async () => {
@@ -353,7 +353,7 @@ test("database import errors keep their specific message without reconciliation"
   const { commit: feature, writeFeedback, modules } = loadCommitFeature();
   const commit = feature.create({
     modules,
-    writeFeedback,
+    refreshWorkspace: writeFeedback.refreshWorkspace,
     state: { workspaceOwnerId: "workspace-1", importBatches: [] },
     repository: {
       commitAccounts: async () => {

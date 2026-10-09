@@ -8,14 +8,14 @@
     status,
     toast,
     repository,
-    writeFeedback,
+    refreshWorkspace,
     modules,
   }) {
     const batchReconciliation = modules.batchReconciliation.create({
       state,
       fetchAll,
       toast,
-      refreshWorkspace: writeFeedback.refreshWorkspace,
+      refreshWorkspace,
     });
     const { finish } = modules.reporting.create({
       status,

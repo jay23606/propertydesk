@@ -11,7 +11,7 @@ test("app wires CSV import and private backup workspace workflow independently",
 
   assert.match(
     app,
-    /PropertyDeskImportWorkspaceWorkflow\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?writeFeedback,/,
+    /PropertyDeskImportWorkspaceWorkflow\.create\(\{[\s\S]*?state,[\s\S]*?esc,[\s\S]*?openModal,[\s\S]*?closeModal,[\s\S]*?repository: repositories\.imports,[\s\S]*?refreshWorkspace: writeFeedback\.refreshWorkspace,/,
   );
   assert.doesNotMatch(
     app,
@@ -30,7 +30,7 @@ test("app wires CSV import and private backup workspace workflow independently",
   assert.match(imports, /stageImport: importPreview\.stageImport/);
   assert.match(
     imports,
-    /repository,\s*\n\s*writeFeedback,\s*\n\s*modules: modules\.commit\.modules,\s*\n\s*\}\);/,
+    /repository,\s*\n\s*refreshWorkspace,\s*\n\s*modules: modules\.commit\.modules,\s*\n\s*\}\);/,
   );
   assert.match(
     app,
