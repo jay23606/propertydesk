@@ -21,7 +21,10 @@
     const profile = workflows.settings.create({
       getUser,
       setUser,
-      authClient,
+      authClient: {
+        getUser: authClient.getUser,
+        updateUser: authClient.updateUser,
+      },
       toast,
       run,
       updateGreeting: profileDisplay.updateGreeting,

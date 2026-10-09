@@ -10,6 +10,12 @@ test("workspace profile workflow joins display, editing, and settings rendering"
   const saveProfile = () => {};
   const now = () => new Date("2026-10-08T12:00:00.000Z");
   const state = { user: { user_metadata: { display_name: "Workspace" } } };
+  const authClient = {
+    getUser() {},
+    updateUser() {},
+    signOut() {},
+    signInWithPassword() {},
+  };
   const context = vm.createContext({
     window: {
       PropertyDeskProfileDisplay: {
@@ -55,7 +61,7 @@ test("workspace profile workflow joins display, editing, and settings rendering"
       state.user = user;
     },
     now,
-    authClient: {},
+    authClient,
     toast() {},
     run() {},
     workflows: {
@@ -78,7 +84,14 @@ test("workspace profile workflow joins display, editing, and settings rendering"
 
   assert.equal(passed.display.getUser(), state.user);
   assert.equal(passed.display.now, now);
-  assert.equal(passed.settings.authClient, dependencies.authClient);
+  assert.deepEqual(Object.keys(passed.settings.authClient).sort(), [
+    "getUser",
+    "updateUser",
+  ]);
+  assert.equal(passed.settings.authClient.getUser, authClient.getUser);
+  assert.equal(passed.settings.authClient.updateUser, authClient.updateUser);
+  assert.equal("signOut" in passed.settings.authClient, false);
+  assert.equal("signInWithPassword" in passed.settings.authClient, false);
   assert.equal(passed.settings.getUser(), state.user);
   assert.equal(typeof passed.settings.setUser, "function");
   assert.equal(passed.settings.run, dependencies.run);

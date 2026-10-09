@@ -85,6 +85,7 @@ test("workspace feature owns profile and member form bindings", () => {
     setUser() {},
     getWorkspaceMembers: () => [],
     getWorkspaceOwnerId: () => null,
+    authClient: { getUser() {}, updateUser() {} },
   });
 
   feature.attachProfileEvents();

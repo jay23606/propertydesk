@@ -66,7 +66,11 @@
   td { overflow: hidden; overflow-wrap: anywhere; max-height: 2.6em; }
   tr { height: ${Math.max(11, Math.min(20, 540 / rowCount))}px; break-inside: avoid; }
   .empty { padding: 12px; color: #58665f; text-align: center; }
-  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  @media print {
+    html, body { width: 10.6in; max-width: 10.6in; }
+    table { width: 10.6in; max-width: 10.6in; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
 </style></head><body>
 <header><h1>PropertyDesk · Properties</h1><div class="meta">${rows.length} visible property/account row(s) · ${esc(generated)}</div></header>
 <table><colgroup><col><col><col><col><col><col><col><col><col><col></colgroup><thead><tr><th>Property address</th><th>Buyer / tenant</th><th>Email</th><th>Phone</th><th>Account</th><th>Monthly payment</th><th>Unpaid due</th><th>Estimated loan balance</th><th>Payment this month</th><th>Property note</th></tr></thead>

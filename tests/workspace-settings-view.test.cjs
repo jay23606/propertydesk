@@ -68,6 +68,7 @@ test("workspace settings render member labels and escape untrusted text", () => 
     setUser() {},
     getWorkspaceMembers: () => state.workspaceMembers,
     getWorkspaceOwnerId: () => state.workspaceOwnerId,
+    authClient: { getUser() {}, updateUser() {} },
     esc: (value) =>
       String(value ?? "").replace(
         /[&<>"']/g,

@@ -119,6 +119,7 @@ test("workspace workflow composes profile, member, and reminder settings", () =>
     },
     getWorkspaceMembers: () => state.workspaceMembers,
     getWorkspaceOwnerId: () => "owner-1",
+    authClient: { getUser() {}, updateUser() {} },
     now,
     esc() {},
     toast() {},
