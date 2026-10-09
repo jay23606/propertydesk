@@ -163,7 +163,10 @@ test("transaction view renders filtered rows and independent month totals", () =
   let clockReads = 0;
   const feature = context.window.PropertyDeskTransactionViews.create({
     $,
-    state,
+    getProperties: () => state.properties,
+    getAccounts: () => state.accounts,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
     dateOnly: (value) => (value ? new Date(`${value}T12:00:00`) : null),
     now: () => {
       clockReads += 1;

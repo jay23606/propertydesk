@@ -3,7 +3,8 @@
   "use strict";
 
   function createTransactionSummaryModel({
-    state,
+    getPayments,
+    getExpenses,
     postedOnOrAfter,
     monthStart,
     sumIncome,
@@ -12,12 +13,12 @@
     function currentMonthTotals() {
       const currentMonthStart = monthStart();
       const monthPayments = postedOnOrAfter(
-        state.payments,
+        getPayments(),
         "received_date",
         currentMonthStart,
       );
       const monthExpenses = postedOnOrAfter(
-        state.expenses,
+        getExpenses(),
         "expense_date",
         currentMonthStart,
       );

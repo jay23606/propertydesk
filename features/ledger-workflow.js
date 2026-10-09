@@ -27,7 +27,10 @@
     },
     views: {
       $: viewQuery,
-      state: viewState,
+      getProperties,
+      getAccounts,
+      getPayments,
+      getExpenses,
       dateOnly,
       now,
       fmtDate,
@@ -65,7 +68,10 @@
     });
     const transactionViews = workflows.views.create({
       $: viewQuery,
-      state: viewState,
+      getProperties,
+      getAccounts,
+      getPayments,
+      getExpenses,
       dateOnly,
       now,
       fmtDate,

@@ -4,7 +4,10 @@
 
   function createTransactionViews({
     $,
-    state,
+    getProperties,
+    getAccounts,
+    getPayments,
+    getExpenses,
     dateOnly,
     now,
     fmtDate,
@@ -18,18 +21,23 @@
     modules,
   }) {
     const filterModel = modules.filterModel.create({ dateOnly });
-    const associationModel = modules.associationModel.create({ state });
+    const associationModel = modules.associationModel.create({
+      getProperties,
+      getAccounts,
+    });
     const displayRowModel = modules.displayRowModel.create({
       expenseCategoryLabel,
     });
     const { buildTransactionList } = modules.listModel.create({
-      state,
+      getPayments,
+      getExpenses,
       associationModel,
       displayRowModel,
       filterModel,
     });
     const { currentMonthTotals } = modules.summaryModel.create({
-      state,
+      getPayments,
+      getExpenses,
       postedOnOrAfter,
       monthStart,
       sumIncome,

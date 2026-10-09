@@ -53,7 +53,10 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
   };
   const views = {
     $: () => {},
-    state: {},
+    getProperties: () => [],
+    getAccounts: () => [],
+    getPayments: () => [],
+    getExpenses: () => [],
     dateOnly: () => {},
     now: () => new Date("2026-10-05T12:00:00"),
     fmtDate: () => {},
@@ -159,7 +162,10 @@ test("ledger workflow connects entry, history, and delegated maintenance actions
       "monthStart",
       "modules",
       "postedOnOrAfter",
-      "state",
+      "getProperties",
+      "getAccounts",
+      "getPayments",
+      "getExpenses",
       "sumIncome",
       "sumOperatingExpenses",
     ].sort(),

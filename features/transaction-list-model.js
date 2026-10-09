@@ -3,20 +3,21 @@
   "use strict";
 
   function createTransactionListModel({
-    state,
+    getPayments,
+    getExpenses,
     associationModel,
     displayRowModel,
     filterModel,
   }) {
     function buildTransactionList(filters) {
       const rows = [
-        ...state.payments.map((item) => ({
+        ...getPayments().map((item) => ({
           kind: "income",
           date: item.received_date,
           amount: Number(item.amount),
           item,
         })),
-        ...state.expenses.map((item) => ({
+        ...getExpenses().map((item) => ({
           kind: "expense",
           date: item.expense_date,
           amount: Number(item.amount),

@@ -39,7 +39,8 @@ test("transaction association model joins rows and builds searchable text", () =
     ],
   };
   const model = context.window.PropertyDeskTransactionAssociationModel.create({
-    state,
+    getAccounts: () => state.accounts,
+    getProperties: () => state.properties,
   });
   const income = model.associateTransaction({
     kind: "income",
@@ -230,7 +231,10 @@ test("transaction list model filters rows and resolves their display association
     ],
   };
   const associationModel =
-    context.window.PropertyDeskTransactionAssociationModel.create({ state });
+    context.window.PropertyDeskTransactionAssociationModel.create({
+      getAccounts: () => state.accounts,
+      getProperties: () => state.properties,
+    });
   const displayRowModel =
     context.window.PropertyDeskTransactionDisplayRowModel.create({
       expenseCategoryLabel: (value) => value,
@@ -238,7 +242,8 @@ test("transaction list model filters rows and resolves their display association
   delete context.window.PropertyDeskTransactionAssociationModel;
   delete context.window.PropertyDeskTransactionDisplayRowModel;
   const model = context.window.PropertyDeskTransactionListModel.create({
-    state,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
     associationModel,
     displayRowModel,
     filterModel: context.window.PropertyDeskTransactionListFilterModel.create({
@@ -246,7 +251,8 @@ test("transaction list model filters rows and resolves their display association
     }),
   });
   const summary = context.window.PropertyDeskTransactionSummaryModel.create({
-    state,
+    getPayments: () => state.payments,
+    getExpenses: () => state.expenses,
     postedOnOrAfter: (rows, field, start) =>
       rows.filter(
         (row) => row.status === "posted" && String(row[field]) >= start,

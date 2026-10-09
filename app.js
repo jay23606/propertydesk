@@ -465,7 +465,10 @@
     },
     views: {
       $,
-      state,
+      getProperties: () => state.properties,
+      getAccounts: () => state.accounts,
+      getPayments: () => state.payments,
+      getExpenses: () => state.expenses,
       dateOnly,
       now,
       fmtDate,

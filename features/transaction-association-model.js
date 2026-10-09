@@ -2,11 +2,11 @@
 (() => {
   "use strict";
 
-  function createTransactionAssociationModel({ state }) {
+  function createTransactionAssociationModel({ getProperties, getAccounts }) {
     function findTransactionProperty(row, account) {
       const propertyId =
         row.kind === "expense" ? row.item.property_id : account?.property_id;
-      return state.properties.find((candidate) => candidate.id === propertyId);
+      return getProperties().find((candidate) => candidate.id === propertyId);
     }
 
     function transactionSearchText(row, account, property) {
@@ -23,7 +23,7 @@
     }
 
     function associateTransaction(row) {
-      const account = state.accounts.find(
+      const account = getAccounts().find(
         (candidate) => candidate.id === row.item.account_id,
       );
       const property = findTransactionProperty(row, account);
