@@ -100,6 +100,35 @@ test("account and deposit module catalog keeps detail and adjustment workflows t
   );
 });
 
+test("property workspace module catalog owns overview, detail, and portfolio dependencies", () => {
+  const { catalog, window } = loadCatalog(
+    "property-workspace-module-catalog.js",
+    "PropertyDeskPropertyWorkspaceModuleCatalog",
+  );
+
+  assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(
+    catalog.contentModules.activityModules.transactions,
+    window.PropertyDeskPropertyActivityTransactions,
+  );
+  assert.equal(
+    catalog.managementModules.detailEvents,
+    window.PropertyDeskPropertyDetailEvents,
+  );
+  assert.equal(
+    catalog.portfolioModules.pdfExport,
+    window.PropertyDeskPropertyPdfExport,
+  );
+  assert.equal(
+    catalog.documentModules.actions.modules.open,
+    window.PropertyDeskDocumentOpen,
+  );
+  assert.equal(
+    catalog.quickNote.noteMaintenance,
+    window.PropertyDeskPropertyNoteMaintenance,
+  );
+});
+
 test("workspace module catalogs load before the root and stay in the PWA shell", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
@@ -107,6 +136,7 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   const catalogs = [
     "features/transaction-workspace-module-catalog.js",
     "features/account-deposit-workspace-module-catalog.js",
+    "features/property-workspace-module-catalog.js",
   ];
 
   for (const catalog of catalogs) {
@@ -120,5 +150,9 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   assert.match(
     app,
     /workflows:\s*window\.PropertyDeskAccountDepositWorkspaceModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    app,
+    /workflows:\s*window\.PropertyDeskPropertyWorkspaceModuleCatalog\.create\(\)/,
   );
 });
