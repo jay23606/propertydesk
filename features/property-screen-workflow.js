@@ -48,7 +48,8 @@
       toast: holders.toast,
       fetchAll: holders.fetchAll,
       repository: holders.repository,
-      writeFeedback: holders.writeFeedback,
+      reconcileWorkspaceChange: holders.reconcileWorkspaceChange,
+      refreshWorkspace: holders.refreshWorkspace,
       openPropertyDetails: details.openPropertyDetails,
       workflows: workflows.holderModules,
     });

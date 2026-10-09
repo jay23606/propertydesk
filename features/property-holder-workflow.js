@@ -8,7 +8,8 @@
     toast,
     fetchAll,
     repository,
-    writeFeedback,
+    reconcileWorkspaceChange,
+    refreshWorkspace,
     openPropertyDetails,
     workflows,
   }) {
@@ -17,8 +18,8 @@
       toast,
       fetchAll,
       repository,
-      reconcileWorkspaceChange: writeFeedback.reconcileWorkspaceChange,
-      refreshWorkspace: writeFeedback.refreshWorkspace,
+      reconcileWorkspaceChange,
+      refreshWorkspace,
       openPropertyDetails,
     });
     const { attachPropertyHolderEvents } = workflows.events.create({

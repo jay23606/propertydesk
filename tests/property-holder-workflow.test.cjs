@@ -41,7 +41,8 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     toast() {},
     fetchAll() {},
     repository: {},
-    writeFeedback: { reconcileWorkspaceChange, refreshWorkspace },
+    reconcileWorkspaceChange,
+    refreshWorkspace,
     openPropertyDetails() {},
     workflows: {
       management: context.window.PropertyDeskPropertyHolderManagement,
@@ -52,6 +53,13 @@ test("property-holder workflow connects saving to one explicit event binder", ()
     context.window.PropertyDeskPropertyHolderWorkflow.create(dependencies);
 
   assert.equal(calls[0][0], "management");
+  assert.doesNotMatch(
+    fs.readFileSync(
+      path.join(root, "features", "property-holder-workflow.js"),
+      "utf8",
+    ),
+    /writeFeedback/,
+  );
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(root, "features", "property-holder-management.js"),

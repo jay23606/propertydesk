@@ -35,7 +35,8 @@ test("property screen workflow passes detail actions to management and returns b
     toast() {},
     fetchAll() {},
     repository: { kind: "holder-repository" },
-    writeFeedback: { kind: "write-feedback" },
+    reconcileWorkspaceChange() {},
+    refreshWorkspace() {},
     unusedDependency: true,
   };
   const documents = {
@@ -163,7 +164,11 @@ test("property screen workflow passes detail actions to management and returns b
   assert.equal(calls[2][0], "propertyHolders");
   assert.equal(calls[2][1].state, holders.state);
   assert.equal(calls[2][1].repository, holders.repository);
-  assert.equal(calls[2][1].writeFeedback, holders.writeFeedback);
+  assert.equal(
+    calls[2][1].reconcileWorkspaceChange,
+    holders.reconcileWorkspaceChange,
+  );
+  assert.equal(calls[2][1].refreshWorkspace, holders.refreshWorkspace);
   assert.equal(calls[2][1].openPropertyDetails, openPropertyDetails);
   assert.equal(calls[2][1].$, holders.$);
   assert.equal(calls[2][1].toast, holders.toast);

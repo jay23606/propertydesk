@@ -594,7 +594,8 @@
         toast,
         fetchAll,
         repository: repositories.propertyHolders,
-        writeFeedback,
+        reconcileWorkspaceChange: writeFeedback.reconcileWorkspaceChange,
+        refreshWorkspace: writeFeedback.refreshWorkspace,
       },
       documents: {
         workflow: window.PropertyDeskPropertyDocumentWorkflow,
