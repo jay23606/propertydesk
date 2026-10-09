@@ -15,7 +15,8 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord:
+        writeFeedback.saveAndRefreshWorkspaceRecord,
     });
 
     function savePropertyQuickNote(propertyId, ownerId, note, onReconciled) {

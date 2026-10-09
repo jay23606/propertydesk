@@ -15,7 +15,8 @@
       fetchAll,
       toast,
       repository,
-      writeFeedback,
+      saveAndRefreshWorkspaceRecord:
+        writeFeedback.saveAndRefreshWorkspaceRecord,
     });
 
     function savePropertyArchive({

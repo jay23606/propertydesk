@@ -2,7 +2,13 @@
 (() => {
   "use strict";
 
-  function create({ state, fetchAll, toast, repository, writeFeedback }) {
+  function create({
+    state,
+    fetchAll,
+    toast,
+    repository,
+    saveAndRefreshWorkspaceRecord,
+  }) {
     function savePropertyUpdate({
       propertyId,
       ownerId,
@@ -16,7 +22,7 @@
       successMessage,
       savedRefreshFailureMessage,
     }) {
-      return writeFeedback.saveAndRefreshWorkspaceRecord({
+      return saveAndRefreshWorkspaceRecord({
         operation: () => repository.updateOwned(propertyId, ownerId, payload),
         state,
         collection: "properties",
