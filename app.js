@@ -101,13 +101,7 @@
       services: {
         downloadBlob,
       },
-      workflows: {
-        reportWorkspace: window.PropertyDeskReportWorkspaceWorkflow,
-        report: window.PropertyDeskReportWorkflow,
-        exporter: window.PropertyDeskReportExport,
-        model: window.PropertyDeskReportModel,
-        views: window.PropertyDeskReportViews,
-      },
+      workflows: window.PropertyDeskReportWorkspaceModuleCatalog.create(),
     });
   const modal = window.PropertyDeskModalController.create({
     $,
@@ -151,11 +145,7 @@
         splitEmailAddresses:
           window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
       },
-      workflows: {
-        previewWorkflow: window.PropertyDeskReminderPreviewWorkflow,
-        model: window.PropertyDeskReminderPreviewModel,
-        preview: window.PropertyDeskReminderPreview,
-      },
+      workflows: window.PropertyDeskReminderPreviewModuleCatalog.create(),
     });
   const appShell = window.PropertyDeskAppShellSetup.create({
     records: stateAccess.appShell,

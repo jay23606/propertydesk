@@ -226,6 +226,33 @@ test("app startup module catalog owns auth screens and lifecycle dependencies", 
   assert.equal(catalog.lifecycle, window.PropertyDeskAppLifecycle);
 });
 
+test("report module catalog keeps report components together", () => {
+  const { catalog, window } = loadCatalog(
+    "report-workspace-module-catalog.js",
+    "PropertyDeskReportWorkspaceModuleCatalog",
+  );
+
+  assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(catalog.report, window.PropertyDeskReportWorkflow);
+  assert.equal(catalog.model, window.PropertyDeskReportModel);
+  assert.equal(catalog.exporter, window.PropertyDeskReportExport);
+});
+
+test("reminder preview module catalog keeps preview model and view together", () => {
+  const { catalog, window } = loadCatalog(
+    "reminder-preview-module-catalog.js",
+    "PropertyDeskReminderPreviewModuleCatalog",
+  );
+
+  assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(
+    catalog.previewWorkflow,
+    window.PropertyDeskReminderPreviewWorkflow,
+  );
+  assert.equal(catalog.model, window.PropertyDeskReminderPreviewModel);
+  assert.equal(catalog.preview, window.PropertyDeskReminderPreview);
+});
+
 test("workspace module catalogs load before the root and stay in the PWA shell", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
@@ -239,6 +266,8 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
     "features/app-shell-module-catalog.js",
     "features/backup-workspace-module-catalog.js",
     "features/app-startup-module-catalog.js",
+    "features/report-workspace-module-catalog.js",
+    "features/reminder-preview-module-catalog.js",
   ];
 
   for (const catalog of catalogs) {
@@ -276,5 +305,13 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   assert.match(
     app,
     /workflows:\s*window\.PropertyDeskAppStartupModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    app,
+    /workflows:\s*window\.PropertyDeskReportWorkspaceModuleCatalog\.create\(\)/,
+  );
+  assert.match(
+    app,
+    /workflows:\s*window\.PropertyDeskReminderPreviewModuleCatalog\.create\(\)/,
   );
 });
