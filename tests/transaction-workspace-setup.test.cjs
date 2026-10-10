@@ -15,6 +15,13 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
     ),
     { window },
   );
+  vm.runInNewContext(
+    fs.readFileSync(
+      path.join(root, "features/transaction-workspace-context-setup.js"),
+      "utf8",
+    ),
+    { window },
+  );
 
   const records = Object.fromEntries(
     [
@@ -95,6 +102,7 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       "propertyPaymentAction",
     ].map((name) => [name, { name }]),
   );
+  workflows.contextSetup = window.PropertyDeskTransactionWorkspaceContextSetup;
   const maintenanceApi = {
     saveCorrection() {},
     createTransactionActionHandlers() {},
@@ -292,11 +300,14 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
 
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+  const contextScript = "features/transaction-workspace-context-setup.js";
   const setupScript = "features/transaction-workspace-setup.js";
+  assert.ok(html.indexOf(contextScript) < html.indexOf(setupScript));
   assert.ok(
     html.indexOf("features/transaction-workspace-workflow.js") <
       html.indexOf(setupScript),
   );
   assert.ok(html.indexOf(setupScript) < html.indexOf("app.js"));
   assert.ok(worker.includes(`'./${setupScript}'`));
+  assert.ok(worker.includes(`'./${contextScript}'`));
 });

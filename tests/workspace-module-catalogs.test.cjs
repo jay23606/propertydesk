@@ -36,11 +36,8 @@ test("transaction workspace module catalog owns its workflow dependencies", () =
   );
 
   assert.equal(Object.isFrozen(catalog), true);
-  assert.equal(
-    catalog.detailContextSetup,
-    window.PropertyDeskPropertyDetailContextSetup,
-  );
   assert.deepEqual(Object.keys(catalog).sort(), [
+    "contextSetup",
     "correction",
     "correctionModel",
     "correctionModules",
@@ -89,6 +86,10 @@ test("account and deposit module catalog keeps detail and adjustment workflows t
   );
 
   assert.equal(Object.isFrozen(catalog), true);
+  assert.equal(
+    catalog.detailContextSetup,
+    window.PropertyDeskPropertyDetailContextSetup,
+  );
   assert.deepEqual(Object.keys(catalog).sort(), [
     "accountDetails",
     "adjustmentModel",

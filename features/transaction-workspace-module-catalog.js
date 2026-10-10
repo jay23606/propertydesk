@@ -5,6 +5,7 @@
   function createTransactionWorkspaceModuleCatalog() {
     return Object.freeze({
       workspace: window.PropertyDeskTransactionWorkspaceWorkflow,
+      contextSetup: window.PropertyDeskTransactionWorkspaceContextSetup,
       correctionModel: window.PropertyDeskTransactionCorrectionModel,
       maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,
       maintenanceSetup: window.PropertyDeskTransactionMaintenanceSetup,
