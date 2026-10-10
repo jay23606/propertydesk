@@ -59,10 +59,11 @@
   h1 { margin: 0; font-size: 16px; }
   .meta { color: #58665f; font-size: 8px; }
   table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 0; table-layout: fixed; }
-  col:nth-child(1) { width: 14%; } col:nth-child(2) { width: 10%; }
+  col:nth-child(1) { width: 15%; } col:nth-child(2) { width: 10%; }
   col:nth-child(3) { width: 13%; } col:nth-child(4) { width: 9%; }
-  col:nth-child(5) { width: 9%; } col:nth-child(6), col:nth-child(7), col:nth-child(8) { width: 8%; }
-  col:nth-child(9) { width: 11%; } col:nth-child(10) { width: 10%; }
+  col:nth-child(5) { width: 9%; } col:nth-child(6) { width: 8%; }
+  col:nth-child(7) { width: 8%; } col:nth-child(8) { width: 8%; }
+  col:nth-child(9) { width: 12%; } col:nth-child(10) { width: 8%; }
   th { background: #e8efeb; color: #25372f; font-size: 7px; text-align: left; text-transform: uppercase; letter-spacing: .03em; overflow-wrap: anywhere; }
   th, td { min-width: 0; border: 1px solid #cbd5cf; padding: 3px 4px; vertical-align: top; }
   td { overflow: hidden; overflow-wrap: anywhere; max-height: 2.6em; }

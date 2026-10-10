@@ -118,7 +118,18 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     html,
     /<table><colgroup><col><col><col><col><col><col><col><col><col><col><\/colgroup>/,
   );
-  assert.match(html, /col:nth-child\(10\) \{ width: 10%; \}/);
+  assert.match(html, /col:nth-child\(10\) \{ width: 8%; \}/);
+  const columnWidths = Array.from(
+    html.matchAll(/col:nth-child\((\d+)\) \{ width: (\d+)%/g),
+  );
+  const widthsByColumn = new Map(
+    columnWidths.map(([, column, width]) => [Number(column), Number(width)]),
+  );
+  assert.equal(widthsByColumn.size, 10);
+  assert.equal(
+    [...widthsByColumn.values()].reduce((total, width) => total + width, 0),
+    100,
+  );
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(
     html,
