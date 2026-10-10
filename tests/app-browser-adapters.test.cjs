@@ -122,7 +122,7 @@ test("app browser adapters load after download helper and are cached", () => {
 test("feature modules do not default to global browser capabilities", () => {
   const featureDirectory = path.join(root, "features");
   const hiddenBrowserDefaults =
-    /\b(?:documentRef|windowRef|navigatorRef)\s*=\s*(?:document|window|navigator)\b|\blogger\s*=\s*console\b/;
+    /\b(?:documentRef|windowRef|navigatorRef)\s*=\s*(?:document|window|navigator)\b|\b(?:documentRef|windowRef|navigatorRef)\s*\|\|\s*(?:document|window|navigator)\b|\blogger\s*=\s*console\b/;
 
   for (const filename of fs.readdirSync(featureDirectory)) {
     if (!filename.endsWith(".js")) continue;

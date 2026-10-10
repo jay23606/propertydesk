@@ -16,8 +16,7 @@
     documentRef,
   }) {
     function attachCreateActionEvents() {
-      const browserDocument = documentRef || document;
-      browserDocument
+      documentRef
         .querySelectorAll('[data-open="property-modal"]')
         .forEach((button) => {
           button.addEventListener("click", () => {
@@ -25,7 +24,7 @@
             openModal("property-modal");
           });
         });
-      browserDocument
+      documentRef
         .querySelectorAll('[data-open="account-modal"]')
         .forEach((button) => {
           button.addEventListener("click", () => {
@@ -46,13 +45,13 @@
         }
         openPayment();
       };
-      browserDocument
+      documentRef
         .querySelectorAll('[data-open="payment-modal"]')
         .forEach((button) => {
           button.addEventListener("click", openPayments);
         });
       $("quick-payment").addEventListener("click", openPayments);
-      browserDocument
+      documentRef
         .querySelectorAll('[data-open="expense-modal"]')
         .forEach((button) => {
           button.addEventListener("click", () => {
