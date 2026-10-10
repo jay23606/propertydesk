@@ -28,7 +28,7 @@
     }
 
     function voidPosted({ kind, id, payload }) {
-      const table = VOID_TABLES[kind];
+      const table = Object.hasOwn(VOID_TABLES, kind) ? VOID_TABLES[kind] : null;
       if (!table) throw new Error("Unsupported transaction kind.");
 
       return getClient()

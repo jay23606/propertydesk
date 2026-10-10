@@ -141,7 +141,7 @@ test("transaction repository only voids posted rows and returns the selected row
   ]);
 });
 
-test("transaction repository rejects unsupported void kinds before selecting a table", async () => {
+test("transaction repository rejects unsupported and inherited void kinds before selecting a table", async () => {
   let selectedTable = false;
   const repository = loadRepository().create({
     getClient: () => ({
@@ -152,14 +152,16 @@ test("transaction repository rejects unsupported void kinds before selecting a t
     }),
   });
 
-  await assert.rejects(
-    async () =>
-      repository.voidPosted({
-        kind: "property",
-        id: "record-1",
-        payload: { status: "voided" },
-      }),
-    /Unsupported transaction kind/,
-  );
+  for (const kind of ["property", "constructor", "toString"]) {
+    await assert.rejects(
+      async () =>
+        repository.voidPosted({
+          kind,
+          id: "record-1",
+          payload: { status: "voided" },
+        }),
+      /Unsupported transaction kind/,
+    );
+  }
   assert.equal(selectedTable, false);
 });
