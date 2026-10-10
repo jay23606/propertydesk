@@ -21,7 +21,6 @@ test("transaction void model maps supported kinds and preserves audit defaults",
   assert.deepEqual(
     JSON.parse(JSON.stringify(model.resolveVoidTarget("income"))),
     {
-      table: "pd_payments",
       label: "income entry",
       collection: "payments",
     },
@@ -29,7 +28,6 @@ test("transaction void model maps supported kinds and preserves audit defaults",
   assert.deepEqual(
     JSON.parse(JSON.stringify(model.resolveVoidTarget("expense"))),
     {
-      table: "pd_expenses",
       label: "expense",
       collection: "expenses",
     },

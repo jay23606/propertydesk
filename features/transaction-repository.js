@@ -2,6 +2,11 @@
 (() => {
   "use strict";
 
+  const VOID_TABLES = Object.freeze({
+    income: "pd_payments",
+    expense: "pd_expenses",
+  });
+
   function create({ getClient, queryUtils }) {
     const { insert: insertRecord } = queryUtils;
 
@@ -22,9 +27,12 @@
       });
     }
 
-    function voidPosted({ target, id, payload }) {
+    function voidPosted({ kind, id, payload }) {
+      const table = VOID_TABLES[kind];
+      if (!table) throw new Error("Unsupported transaction kind.");
+
       return getClient()
-        .from(target.table)
+        .from(table)
         .update(payload)
         .eq("id", id)
         .eq("status", "posted")

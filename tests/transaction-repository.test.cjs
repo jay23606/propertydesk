@@ -125,7 +125,7 @@ test("transaction repository only voids posted rows and returns the selected row
   const repository = loadRepository().create({ getClient: () => client });
   assert.equal(
     await repository.voidPosted({
-      target: { table: "pd_expenses" },
+      kind: "expense",
       id: "expense-1",
       payload: { status: "voided", void_reason: "Duplicate" },
     }),
@@ -139,4 +139,27 @@ test("transaction repository only voids posted rows and returns the selected row
     ["select", "id"],
     ["maybeSingle"],
   ]);
+});
+
+test("transaction repository rejects unsupported void kinds before selecting a table", async () => {
+  let selectedTable = false;
+  const repository = loadRepository().create({
+    getClient: () => ({
+      from() {
+        selectedTable = true;
+        assert.fail("unsupported kinds must not select a table");
+      },
+    }),
+  });
+
+  await assert.rejects(
+    async () =>
+      repository.voidPosted({
+        kind: "property",
+        id: "record-1",
+        payload: { status: "voided" },
+      }),
+    /Unsupported transaction kind/,
+  );
+  assert.equal(selectedTable, false);
 });

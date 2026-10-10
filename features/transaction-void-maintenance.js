@@ -24,7 +24,7 @@
       const saved = await runAndRefreshWorkspaceChange({
         operation: () =>
           repository.voidPosted({
-            target,
+            kind,
             id,
             payload,
           }),
