@@ -3,7 +3,7 @@
   "use strict";
 
   function createAccountDepositContexts({ records, ui, services, workflows }) {
-    return {
+    return Object.freeze({
       deposits: {
         details: {
           depositLedger: services.depositLedger,
@@ -65,7 +65,7 @@
           confirmAction: ui.confirmAction,
         },
       },
-    };
+    });
   }
 
   window.PropertyDeskAccountDepositContextSetup = Object.freeze({

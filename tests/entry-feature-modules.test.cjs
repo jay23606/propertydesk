@@ -21,13 +21,8 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "transaction-workspace-setup.js"),
     "utf8",
   );
-  const accountDepositSetup = fs.readFileSync(
-    path.join(
-      __dirname,
-      "..",
-      "features",
-      "account-deposit-workspace-setup.js",
-    ),
+  const accountDepositContextSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-deposit-context-setup.js"),
     "utf8",
   );
 
@@ -82,7 +77,7 @@ test("account records and ledger entries use separate workspace workflows", () =
     /PropertyDeskAccountDetail(?:Content|Action)Workflow\.create\(/,
   );
   assert.match(
-    accountDepositSetup,
+    accountDepositContextSetup,
     /accountHistoryRepository: services\.accountHistoryRepository/,
   );
   assert.match(app, /PropertyDeskReportWorkspaceSetup\.create\(/);
@@ -184,13 +179,8 @@ test("app coordinator passes the amortization helper into account details", () =
     path.join(__dirname, "..", "features", "transaction-workspace-workflow.js"),
     "utf8",
   );
-  const accountDepositSetup = fs.readFileSync(
-    path.join(
-      __dirname,
-      "..",
-      "features",
-      "account-deposit-workspace-setup.js",
-    ),
+  const accountDepositContextSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-deposit-context-setup.js"),
     "utf8",
   );
   const appServices = fs.readFileSync(
@@ -238,8 +228,8 @@ test("app coordinator passes the amortization helper into account details", () =
   );
   assert.match(app, /PropertyDeskAccountDepositWorkspaceSetup\.create/);
   assert.match(
-    accountDepositSetup,
-    /workflows\.workspace\.create\([\s\S]*?deposits: \{[\s\S]*?accountDetails: \{[\s\S]*?actions: \{[\s\S]*?repository: \{\s*close: services\.accountRepository\.close/,
+    accountDepositContextSetup,
+    /actions: \{[\s\S]*?repository: \{ close: services\.accountRepository\.close/,
   );
   assert.match(app, /amortizationSchedule,/);
   assert.match(app, /PropertyDeskPropertyWorkspaceSetup\.create\(/);
