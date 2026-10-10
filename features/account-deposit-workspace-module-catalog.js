@@ -5,6 +5,7 @@
   function createAccountDepositWorkspaceModuleCatalog() {
     return Object.freeze({
       workspace: window.PropertyDeskAccountDepositWorkspaceWorkflow,
+      contextSetup: window.PropertyDeskAccountDepositContextSetup,
       deposit: {
         workspace: window.PropertyDeskDepositWorkspaceWorkflow,
         detailsModel: window.PropertyDeskDepositDetailsModel,

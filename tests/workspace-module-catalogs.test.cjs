@@ -88,9 +88,14 @@ test("account and deposit module catalog keeps detail and adjustment workflows t
   assert.deepEqual(Object.keys(catalog).sort(), [
     "accountDetails",
     "adjustmentModel",
+    "contextSetup",
     "deposit",
     "workspace",
   ]);
+  assert.equal(
+    catalog.contextSetup,
+    window.PropertyDeskAccountDepositContextSetup,
+  );
   assert.equal(
     catalog.deposit.adjustmentModules.maintenance,
     window.PropertyDeskDepositMaintenance,

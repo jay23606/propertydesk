@@ -16,6 +16,11 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
   );
   const context = vm.createContext({ window: {} });
   vm.runInContext(source, context);
+  const contextSetupSource = fs.readFileSync(
+    path.join(__dirname, "..", "features", "account-deposit-context-setup.js"),
+    "utf8",
+  );
+  vm.runInContext(contextSetupSource, context);
 
   let received;
   const result = { openAccountDetails() {} };
@@ -98,6 +103,7 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
       actionWorkflows: { name: "account-action-modules" },
       contentModules: { name: "account-content-modules" },
     },
+    contextSetup: context.window.PropertyDeskAccountDepositContextSetup,
     adjustmentModel: {
       prepare() {},
       validate() {},
@@ -129,6 +135,10 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
     workflows.accountDetails.action,
   );
   assert.equal(received.deposits.details.depositLedger, services.depositLedger);
+  assert.deepEqual(Object.keys(received.deposits).sort(), [
+    "adjustments",
+    "details",
+  ]);
   assert.equal(received.deposits.adjustments.getAccount, records.getAccount);
   assert.equal(
     received.deposits.adjustments.getCollection,
@@ -224,4 +234,42 @@ test("account and deposit workspace setup wires scoped records, UI, services, an
     "toast",
   ]);
   assert.doesNotMatch(source, /\bstate\b/);
+
+  const contextBuilder =
+    context.window.PropertyDeskAccountDepositContextSetup.create({
+      records,
+      ui,
+      services,
+      workflows: {
+        adjustmentModel: workflows.adjustmentModel,
+        accountDetails: {
+          contentModules: workflows.accountDetails.contentModules,
+        },
+      },
+    });
+  assert.deepEqual(Object.keys(contextBuilder).sort(), [
+    "accountDetails",
+    "deposits",
+  ]);
+  assert.equal(
+    contextBuilder.deposits.details.depositLedger,
+    services.depositLedger,
+  );
+  assert.equal(
+    contextBuilder.deposits.adjustments.repository.insert,
+    services.depositRepository.insert,
+  );
+  assert.equal(
+    contextBuilder.accountDetails.content.getAgreementVersions,
+    records.getAgreementVersions,
+  );
+  assert.equal(
+    contextBuilder.accountDetails.actions.repository.close,
+    services.accountRepository.close,
+  );
+  assert.equal(
+    "unusedRecordValue" in contextBuilder.accountDetails.content,
+    false,
+  );
+  assert.equal("unusedUiValue" in contextBuilder.deposits.adjustments, false);
 });
