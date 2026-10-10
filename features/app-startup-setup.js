@@ -22,6 +22,8 @@
       },
       authContext: {
         $: ui.$,
+        windowRef: ui.windowRef,
+        documentRef: ui.documentRef,
         getUser: records.getUser,
         setUser: records.setUser,
         getPasswordRecoveryInProgress: records.getPasswordRecoveryInProgress,

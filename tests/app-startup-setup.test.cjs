@@ -25,6 +25,8 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
   const ui = Object.fromEntries(
     ["$", "todayIso", "toast"].map((name) => [name, () => name]),
   );
+  ui.windowRef = { name: "window" };
+  ui.documentRef = { name: "document" };
   ui.renderers = [() => {}];
   ui.eventBindersBeforeAuth = [() => {}];
   ui.eventBindersAfterAuth = [() => {}];
@@ -98,6 +100,8 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
     services.authClient.onAuthStateChange,
   );
   assert.equal(received.authContext.getUser, records.getUser);
+  assert.equal(received.authContext.windowRef, ui.windowRef);
+  assert.equal(received.authContext.documentRef, ui.documentRef);
   assert.equal(received.authContext.setUser, records.setUser);
   assert.equal(
     received.authContext.getPasswordRecoveryInProgress,
@@ -113,6 +117,7 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
   );
   assert.deepEqual(Object.keys(received.authContext).sort(), [
     "$",
+    "documentRef",
     "fetchAll",
     "getPasswordRecoveryInProgress",
     "getUser",
@@ -121,6 +126,7 @@ test("app startup setup maps state, UI bindings, services, and workflows", () =>
     "setPasswordRecoveryInProgress",
     "setUser",
     "toast",
+    "windowRef",
   ]);
   assert.equal(received.renderers, ui.renderers);
   assert.equal(received.eventBindersBeforeAuth, ui.eventBindersBeforeAuth);

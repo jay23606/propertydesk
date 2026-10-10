@@ -7,13 +7,15 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..");
 
 test("auth coordinator gives each child only the auth operations it uses", () => {
-  const context = vm.createContext({ window: {}, document: {} });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(root, "features/auth.js"), "utf8"),
     context,
   );
 
   const received = {};
+  const windowRef = {};
+  const documentRef = {};
   const authClient = Object.fromEntries(
     [
       "signUp",
@@ -28,21 +30,28 @@ test("auth coordinator gives each child only the auth operations it uses", () =>
   );
   const modules = {
     screens: {
-      create: () => ({
-        showAuth() {},
-        showApp() {},
-        showConfigError() {},
-      }),
+      create: (options) => {
+        received.screensWindow = options.windowRef;
+        received.screensDocument = options.documentRef;
+        return {
+          showAuth() {},
+          showApp() {},
+          showConfigError() {},
+        };
+      },
     },
     form: {
       create: (options) => {
         received.form = options.authClient;
+        received.formDocument = options.documentRef;
         return { setAuthMode() {}, attachEvents() {} };
       },
     },
     recovery: {
       create: (options) => {
         received.recovery = options.authClient;
+        received.recoveryWindow = options.windowRef;
+        received.recoveryDocument = options.documentRef;
         return {
           showPasswordReset() {},
           isPasswordRecoverySession() {},
@@ -64,6 +73,8 @@ test("auth coordinator gives each child only the auth operations it uses", () =>
 
   context.window.PropertyDeskAuth.create({
     $: () => ({ addEventListener() {} }),
+    windowRef,
+    documentRef,
     authClient,
     modules,
   });
@@ -80,20 +91,28 @@ test("auth coordinator gives each child only the auth operations it uses", () =>
     "getSession",
     "signOut",
   ]);
-  for (const child of Object.values(received)) {
+  assert.equal(received.screensWindow, undefined);
+  assert.equal(received.screensDocument, documentRef);
+  assert.equal(received.formDocument, documentRef);
+  assert.equal(received.recoveryWindow, windowRef);
+  assert.equal(received.recoveryDocument, documentRef);
+  for (const child of [received.form, received.recovery, received.session]) {
     assert.equal("getUser" in child, false);
     assert.equal("onAuthStateChange" in child, false);
   }
 });
 
 test("password reset request receives only its reset operation", () => {
-  const context = vm.createContext({ window: {}, document: {} });
+  const context = vm.createContext({ window: {} });
   vm.runInContext(
     fs.readFileSync(path.join(root, "features/auth-recovery.js"), "utf8"),
     context,
   );
 
   let resetRequestClient;
+  const windowRef = {};
+  const documentRef = {};
+  let viewDocument;
   context.window.PropertyDeskAuthRecovery.create({
     $: () => ({}),
     getUser() {},
@@ -108,14 +127,23 @@ test("password reset request receives only its reset operation", () => {
     setAuthMode() {},
     startWorkspace() {},
     showAuth() {},
-    viewModule: { create: () => ({}) },
+    windowRef,
+    documentRef,
+    viewModule: {
+      create: (options) => {
+        viewDocument = options.documentRef;
+        return {};
+      },
+    },
     resetRequestModule: {
-      create: ({ authClient }) => {
+      create: ({ authClient, windowRef: receivedWindowRef }) => {
         resetRequestClient = authClient;
+        assert.equal(receivedWindowRef, windowRef);
         return { requestPasswordReset() {} };
       },
     },
   });
 
   assert.deepEqual(Object.keys(resetRequestClient), ["resetPasswordForEmail"]);
+  assert.equal(viewDocument, documentRef);
 });

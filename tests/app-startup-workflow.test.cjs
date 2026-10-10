@@ -22,6 +22,8 @@ test("app startup composes auth and lifecycle at the original event position", (
         );
         assert.equal(authContext.resetWorkspaceState, resetWorkspaceState);
         assert.equal(authContext.$, selector);
+        assert.equal(authContext.windowRef, windowRef);
+        assert.equal(authContext.documentRef, documentRef);
         assert.equal(authContext.authClient, authClient);
         assert.deepEqual(Object.keys(authContext.authClient).sort(), [
           "getSession",
@@ -39,6 +41,7 @@ test("app startup composes auth and lifecycle at the original event position", (
         assert.deepEqual(Object.keys(authContext).sort(), [
           "$",
           "authClient",
+          "documentRef",
           "fetchAll",
           "getPasswordRecoveryInProgress",
           "getUser",
@@ -48,6 +51,7 @@ test("app startup composes auth and lifecycle at the original event position", (
           "setPasswordRecoveryInProgress",
           "setUser",
           "toast",
+          "windowRef",
         ]);
         return {
           setAuthMode() {},
@@ -101,6 +105,8 @@ test("app startup composes auth and lifecycle at the original event position", (
   };
   const lifecycleAuthClient = { onAuthStateChange() {} };
   const selector = () => {};
+  const windowRef = {};
+  const documentRef = {};
   const fetchAll = async () => {};
   const toast = () => {};
   const paymentNotifications = { start() {}, stop() {} };
@@ -112,6 +118,8 @@ test("app startup composes auth and lifecycle at the original event position", (
   const startupContext = {
     authContext: {
       $: selector,
+      windowRef,
+      documentRef,
       getUser,
       setUser,
       getPasswordRecoveryInProgress,

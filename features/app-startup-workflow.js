@@ -18,6 +18,8 @@
   }) {
     const auth = workflows.auth.create({
       $: authContext.$,
+      windowRef: authContext.windowRef,
+      documentRef: authContext.documentRef,
       getUser: authContext.getUser,
       setUser: authContext.setUser,
       getPasswordRecoveryInProgress: authContext.getPasswordRecoveryInProgress,

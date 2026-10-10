@@ -42,6 +42,7 @@ test("password recovery saves the new password before resuming workspace access"
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
+    documentRef: context.document,
     ...authStateAccess(state, context),
     authClient: createAuthClient(context, state),
     viewModule: context.window.PropertyDeskAuthRecoveryView,
@@ -102,6 +103,7 @@ test("password recovery restores its submit control when the auth request reject
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
+    documentRef: context.document,
     ...authStateAccess(state, context),
     authClient: createAuthClient(context, state),
     viewModule: context.window.PropertyDeskAuthRecoveryView,

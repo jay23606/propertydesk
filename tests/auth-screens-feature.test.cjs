@@ -86,6 +86,7 @@ test("password reset requests keep generic feedback and restore the submit contr
   };
   const feature = context.window.PropertyDeskAuthRecovery.create({
     $: element,
+    documentRef: context.document,
     ...authStateAccess(state, context),
     authClient: context.window.PropertyDeskAuthClient.create({
       getClient: () => state.client,
@@ -100,7 +101,6 @@ test("password reset requests keep generic feedback and restore the submit contr
     windowRef: {
       location: { origin: "https://example.test", pathname: "/propertydesk/" },
     },
-    documentRef: {},
   });
 
   assert.deepEqual(Object.keys(feature).sort(), [

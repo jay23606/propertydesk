@@ -13,8 +13,8 @@
     fetchAll,
     toast,
     paymentNotifications = { start() {}, stop() {} },
-    windowRef = window,
-    documentRef = document,
+    windowRef,
+    documentRef,
     modules,
   }) {
     const { showAuth, showApp, showConfigError } = modules.screens.create({

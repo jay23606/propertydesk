@@ -417,6 +417,8 @@
     },
     ui: {
       $,
+      windowRef: window,
+      documentRef: document,
       todayIso,
       toast,
       renderers: [

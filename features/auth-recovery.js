@@ -14,8 +14,8 @@
     showAuth,
     viewModule,
     resetRequestModule,
-    windowRef = window,
-    documentRef = document,
+    windowRef,
+    documentRef,
   }) {
     const view = viewModule.create({ $, documentRef });
     const { requestPasswordReset } = resetRequestModule.create({

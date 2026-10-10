@@ -150,6 +150,7 @@ test("auth feature owns login controls and clears workspace data on sign-out", a
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
+    windowRef: context.window,
     ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
@@ -229,6 +230,7 @@ test("auth feature restores login controls when the auth request rejects", async
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
+    windowRef: context.window,
     ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
@@ -353,6 +355,7 @@ test("auth session restore and sign-out report rejected requests without clearin
   };
   const feature = context.window.PropertyDeskAuth.create({
     $: element,
+    windowRef: context.window,
     ...authStateAccess(state, context),
     modules: authFeatureModules(context),
     authClient: createAuthClient(context, state),
