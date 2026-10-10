@@ -88,7 +88,7 @@ test("property document workflow connects private actions and detail events", ()
     "utf8",
   );
   const setup = fs.readFileSync(
-    path.join(root, "features", "property-workspace-setup.js"),
+    path.join(root, "features", "property-detail-context-setup.js"),
     "utf8",
   );
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");

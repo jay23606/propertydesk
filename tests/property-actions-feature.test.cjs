@@ -218,6 +218,10 @@ test("property detail events own editing and quick-action bindings", () => {
 test("app composes property detail content, actions, and document routes", () => {
   const root = path.join(__dirname, "..");
   const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
+  const detailContextSetup = fs.readFileSync(
+    path.join(root, "features", "property-detail-context-setup.js"),
+    "utf8",
+  );
   const setup = fs.readFileSync(
     path.join(root, "features", "property-workspace-setup.js"),
     "utf8",
@@ -241,7 +245,7 @@ test("app composes property detail content, actions, and document routes", () =>
   );
   assert.match(setup, /workflows\.workspace\.create\(/);
   assert.match(
-    setup,
+    detailContextSetup,
     /documents: \{[\s\S]*?documentRepository: services\.documentRepository/,
   );
   assert.match(workspaceWorkflow, /detail\.workflows\.screen\.create\(/);

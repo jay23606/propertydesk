@@ -5,6 +5,7 @@
   function createPropertyWorkspaceModuleCatalog() {
     return Object.freeze({
       workspace: window.PropertyDeskPropertyWorkspaceWorkflow,
+      detailContextSetup: window.PropertyDeskPropertyDetailContextSetup,
       groupAccountsByProperty:
         window.PropertyDeskPropertyAccountIndex.groupByProperty,
       isActiveAccount: window.PropertyDeskAccountStatusUtils.isActiveAccount,

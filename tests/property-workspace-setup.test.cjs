@@ -10,6 +10,18 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     "utf8",
   );
   const context = vm.createContext({ window: {} });
+  vm.runInContext(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "property-detail-context-setup.js",
+      ),
+      "utf8",
+    ),
+    context,
+  );
   vm.runInContext(source, context);
   const appSource = fs.readFileSync(
     path.join(__dirname, "..", "app.js"),
@@ -124,6 +136,7 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
   services.unusedServiceValue = true;
   const workflows = {
     workspace,
+    detailContextSetup: context.window.PropertyDeskPropertyDetailContextSetup,
     quickNote: {
       workflow: {
         create(options) {
@@ -249,4 +262,14 @@ test("property workspace setup wires detail, overview, and portfolio dependencie
     assert.equal("unusedServiceValue" in scope, false);
   }
   assert.doesNotMatch(source, /\bstate\b/);
+  const html = fs.readFileSync(
+    path.join(__dirname, "..", "index.html"),
+    "utf8",
+  );
+  const worker = fs.readFileSync(path.join(__dirname, "..", "sw.js"), "utf8");
+  assert.ok(
+    html.indexOf("features/property-detail-context-setup.js") <
+      html.indexOf("features/property-workspace-setup.js"),
+  );
+  assert.ok(worker.includes("'./features/property-detail-context-setup.js'"));
 });

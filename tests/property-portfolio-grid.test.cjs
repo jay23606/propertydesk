@@ -51,9 +51,13 @@ test("app composes the Properties grid and action operations explicitly", () => 
     ),
     /window\.PropertyDeskAccountStatusUtils/,
   );
+  const detailContextSetup = fs.readFileSync(
+    path.join(root, "features", "property-detail-context-setup.js"),
+    "utf8",
+  );
   assert.match(
-    setup,
-    /propertyRepository: \{\s*updateOwned: services\.propertyRepository\.updateOwned,\s*\},[\s\S]*?openAccountForProperty: services\.openAccountForProperty/,
+    detailContextSetup,
+    /propertyRepository: \{\s*updateOwned: services\.propertyRepository\.updateOwned,?\s*\}[\s\S]*?openAccountForProperty: services\.openAccountForProperty/,
   );
   assert.match(setup, /promptAction: ui\.promptAction/);
   assert.match(setup, /openPayment: services\.openPayment/);
