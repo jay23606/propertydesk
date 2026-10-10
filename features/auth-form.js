@@ -8,7 +8,7 @@
     authClient,
     startWorkspace,
     viewModule,
-    documentRef = document,
+    documentRef,
   }) {
     const view = viewModule.create({ $, documentRef });
 

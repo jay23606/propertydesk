@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ $, documentRef = document }) {
+  function create({ $, documentRef }) {
     function setAuthMode(signup) {
       $("auth-form").classList.remove("hidden");
       $("password-reset-form").classList.add("hidden");

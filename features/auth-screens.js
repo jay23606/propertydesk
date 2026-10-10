@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function createAuthScreens({ $, documentRef = document }) {
+  function createAuthScreens({ $, documentRef }) {
     function showAuth() {
       $("auth-view").classList.remove("hidden");
       $("app-view").classList.add("hidden");

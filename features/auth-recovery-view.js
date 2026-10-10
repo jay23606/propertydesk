@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ $, documentRef = document }) {
+  function create({ $, documentRef }) {
     function showPasswordReset() {
       $("auth-title").textContent = "Choose a new password";
       documentRef.querySelector(".auth-intro").textContent =
