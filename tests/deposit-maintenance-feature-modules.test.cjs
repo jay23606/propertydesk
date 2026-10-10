@@ -76,10 +76,13 @@ test("deposit adjustment model validates inputs and prepares audited payloads", 
     "Deposit retention reversed",
   );
   assert.equal(model.resolveType("unknown"), null);
-  assert.equal(
-    model.prepare({ ...common, type: "unknown", reason: "Reason" }).status,
-    "unsupported-type",
-  );
+  for (const type of ["unknown", "constructor", "toString"]) {
+    assert.equal(model.resolveType(type), null);
+    assert.equal(
+      model.prepare({ ...common, type, reason: "Reason" }).status,
+      "unsupported-type",
+    );
+  }
   assert.equal(model.prepare({ ...common, reason: null }).status, "cancelled");
   assert.equal(
     model.prepare({ ...common, reason: "   " }).status,

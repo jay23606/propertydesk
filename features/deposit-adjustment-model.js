@@ -14,7 +14,7 @@
   });
 
   function resolveAdjustmentType(type) {
-    return adjustmentTypes[type] || null;
+    return Object.hasOwn(adjustmentTypes, type) ? adjustmentTypes[type] : null;
   }
 
   function validateDepositAdjustment({ account, amount }) {
