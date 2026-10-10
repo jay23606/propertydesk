@@ -21,7 +21,15 @@ function loadCatalog(filename, exportName) {
       name === "PropertyDeskLedgerEntryForms" ||
       name === "PropertyDeskTransactionViews"
         ? { create() {} }
-        : Object.freeze({ name }),
+        : name === "PropertyDeskReminderPreviewModuleCatalog"
+          ? {
+              create: () => ({
+                previewWorkflow: {},
+                model: {},
+                preview: {},
+              }),
+            }
+          : Object.freeze({ name }),
     ]),
   );
   const context = vm.createContext({ window });
@@ -268,6 +276,25 @@ test("reminder preview module catalog keeps preview model and view together", ()
   assert.equal(catalog.preview, window.PropertyDeskReminderPreview);
 });
 
+test("app entry form catalog keeps shared form dependencies together", () => {
+  const { catalog, window } = loadCatalog(
+    "app-entry-form-module-catalog.js",
+    "PropertyDeskAppEntryFormModuleCatalog",
+  );
+
+  assert.equal(catalog.modal, window.PropertyDeskModalController);
+  assert.equal(catalog.formOptions, window.PropertyDeskFormOptions);
+  assert.equal(
+    catalog.reminderPreviewSetup,
+    window.PropertyDeskReminderPreviewSetup,
+  );
+  assert.equal(catalog.emailAddressUtils, window.PropertyDeskEmailAddressUtils);
+  assert.deepEqual(Object.keys(catalog.formOptionModules).sort(), [
+    "domainOptions",
+    "transactionOptions",
+  ]);
+});
+
 test("workspace module catalogs load before the root and stay in the PWA shell", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
@@ -283,6 +310,7 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
     "features/app-startup-module-catalog.js",
     "features/report-workspace-module-catalog.js",
     "features/reminder-preview-module-catalog.js",
+    "features/app-entry-form-module-catalog.js",
   ];
 
   for (const catalog of catalogs) {
@@ -327,6 +355,6 @@ test("workspace module catalogs load before the root and stay in the PWA shell",
   );
   assert.match(
     app,
-    /workflows:\s*window\.PropertyDeskReminderPreviewModuleCatalog\.create\(\)/,
+    /modules:\s*window\.PropertyDeskAppEntryFormModuleCatalog\.create\(\)/,
   );
 });

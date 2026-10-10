@@ -214,6 +214,17 @@ test("modal controller is loaded before app startup and precached", () => {
   assert.ok(html.indexOf("features/form-options.js") < html.indexOf("app.js"));
   assert.match(worker, /'\.\/features\/modal-controller\.js'/);
   assert.match(worker, /'\.\/features\/form-options\.js'/);
-  assert.match(app, /PropertyDeskModalController\.create/);
-  assert.match(app, /PropertyDeskFormOptions\.create/);
+  assert.match(app, /PropertyDeskAppEntryFormSetup\.create/);
+  assert.match(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "..",
+        "features",
+        "app-entry-form-module-catalog.js",
+      ),
+      "utf8",
+    ),
+    /modal: window\.PropertyDeskModalController,[\s\S]*?formOptions: window\.PropertyDeskFormOptions,/,
+  );
 });

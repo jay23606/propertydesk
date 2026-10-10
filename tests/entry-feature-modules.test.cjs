@@ -25,6 +25,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     path.join(__dirname, "..", "features", "account-deposit-context-setup.js"),
     "utf8",
   );
+  const appEntryFormSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-entry-form-setup.js"),
+    "utf8",
+  );
 
   assert.match(
     app,
@@ -44,10 +48,12 @@ test("account records and ledger entries use separate workspace workflows", () =
   );
   assert.match(appServices, /modules\.financialContext\.factory\.create\(/);
   assert.match(appServices, /modules\.depositContext\.factory\.create\(/);
+  assert.match(app, /PropertyDeskAppEntryFormSetup\.create\(/);
   assert.match(
-    app,
-    /PropertyDeskFormOptions\.create\(\{[\s\S]*?modules: \{\s*domainOptions: window\.PropertyDeskDomainOptions,\s*transactionOptions: window\.PropertyDeskTransactionOptions,/,
+    appEntryFormSetup,
+    /modules\.formOptions\.create\([\s\S]*?modules: modules\.formOptionModules,/,
   );
+  assert.doesNotMatch(app, /PropertyDeskFormOptions\.create\(/);
   assert.doesNotMatch(
     fs.readFileSync(
       path.join(__dirname, "..", "features", "workspace-runtime.js"),
@@ -402,10 +408,14 @@ test("property workspace composes screens and shares detail actions", () => {
   );
 });
 
-test("app passes reminder services into the app-shell coordinator", () => {
+test("app passes reminder services into entry form support and app shell", () => {
   const app = fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8");
   const setup = fs.readFileSync(
     path.join(__dirname, "..", "features", "app-shell-setup.js"),
+    "utf8",
+  );
+  const entryFormSetup = fs.readFileSync(
+    path.join(__dirname, "..", "features", "app-entry-form-setup.js"),
     "utf8",
   );
   assert.match(
@@ -418,10 +428,9 @@ test("app passes reminder services into the app-shell coordinator", () => {
     /memberRepository: \{\s*addMember: services\.memberRepository\.addMember,\s*removeMember: services\.memberRepository\.removeMember,/,
   );
   assert.match(setup, /workspaceWorkflow: workflows\.workspace/);
-  assert.match(
-    app,
-    /PropertyDeskReminderPreviewSetup\.create\(\{[\s\S]*?records: stateAccess\.reminderPreview,[\s\S]*?openModal: modal\.openModal,/,
-  );
+  assert.match(app, /PropertyDeskAppEntryFormSetup\.create\(/);
+  assert.match(entryFormSetup, /reminderPreviewSetup\.create\(/);
+  assert.match(entryFormSetup, /openModal: modal\.openModal/);
   assert.doesNotMatch(app, /PropertyDeskWorkspaceReminderWorkflow\.create\(/);
   assert.match(app, /previewReminderEmail,/);
   assert.match(app, /memberRepository: repositories\.workspaceMembers/);

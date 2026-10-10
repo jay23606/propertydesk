@@ -25,9 +25,10 @@ test("app shell composes workspace settings and page navigation", () => {
     "utf8",
   );
 
+  assert.match(app, /PropertyDeskAppEntryFormSetup\.create\(/);
   assert.match(
     app,
-    /PropertyDeskReminderPreviewSetup\.create\([\s\S]*?openModal: modal\.openModal,[\s\S]*?PropertyDeskAppShellSetup\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
+    /PropertyDeskAppShellSetup\.create\(\{[\s\S]*?reminder: \{[\s\S]*?fmtDate,[\s\S]*?money,[\s\S]*?\},[\s\S]*?memberRepository: repositories\.workspaceMembers,[\s\S]*?authClient,/,
   );
   assert.match(
     appShell,
@@ -71,6 +72,8 @@ test("app shell composes workspace settings and page navigation", () => {
     "features/app-shell-setup.js",
     "features/app-shell-module-catalog.js",
     "features/workspace-reminder-workflow.js",
+    "features/app-entry-form-setup.js",
+    "features/app-entry-form-module-catalog.js",
   ]) {
     assert.ok(html.indexOf(script) < html.indexOf("app.js"));
     assert.ok(worker.includes(`'./${script}'`));

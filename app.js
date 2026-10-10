@@ -103,50 +103,42 @@
       },
       workflows: window.PropertyDeskReportWorkspaceModuleCatalog.create(),
     });
-  const modal = window.PropertyDeskModalController.create({
-    $,
-    setPendingImport: stateAccess.modal.setPendingImport,
-    setPendingCorrection: stateAccess.modal.setPendingCorrection,
-    advanceAuditRequestId: stateAccess.modal.advanceAuditRequestId,
-    documentRef: document,
-  });
-  const { fillSelect, populateFormOptions } =
-    window.PropertyDeskFormOptions.create({
+  const {
+    attachModalEvents,
+    closeModal,
+    fillSelect,
+    openModal,
+    populateFormOptions,
+    previewReminderEmail,
+  } = window.PropertyDeskAppEntryFormSetup.create({
+    records: {
+      modal: stateAccess.modal,
+      formOptions: stateAccess.formOptions,
+      reminderPreview: stateAccess.reminderPreview,
+    },
+    ui: {
       $,
-      ...stateAccess.formOptions,
+      documentRef: document,
       esc,
       propertyAddress,
       prettyType,
-      modules: {
-        domainOptions: window.PropertyDeskDomainOptions,
-        transactionOptions: window.PropertyDeskTransactionOptions,
-      },
-    });
-  const { previewReminderEmail } =
-    window.PropertyDeskReminderPreviewSetup.create({
-      records: stateAccess.reminderPreview,
-      ui: {
-        $,
-        monthEnd,
-        dateOnly,
-        monthStart,
-        propertyAddress,
-        money,
-        todayIso,
-        moneyInput,
-        toast,
-        esc,
-        openModal: modal.openModal,
-      },
-      services: {
-        paymentReminderMessage: emailUtils.paymentReminderMessage,
-        amountDueSince,
-        unpaidDueAccrualStart,
-        splitEmailAddresses:
-          window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
-      },
-      workflows: window.PropertyDeskReminderPreviewModuleCatalog.create(),
-    });
+      monthEnd,
+      dateOnly,
+      monthStart,
+      money,
+      todayIso,
+      moneyInput,
+      toast,
+    },
+    services: {
+      paymentReminderMessage: emailUtils.paymentReminderMessage,
+      amountDueSince,
+      unpaidDueAccrualStart,
+      splitEmailAddresses:
+        window.PropertyDeskEmailAddressUtils.splitEmailAddresses,
+    },
+    modules: window.PropertyDeskAppEntryFormModuleCatalog.create(),
+  });
   const appShell = window.PropertyDeskAppShellSetup.create({
     records: stateAccess.appShell,
     ui: {
@@ -184,7 +176,6 @@
     navigate,
     attachNavigationEvents,
   } = appShell;
-  const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create({
     documentRef: document,
     storage: browserStorage,

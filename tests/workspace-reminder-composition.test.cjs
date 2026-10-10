@@ -14,7 +14,7 @@ test("account forms receive reminder preview independently of workspace activity
     "utf8",
   );
 
-  assert.match(app, /PropertyDeskReminderPreviewSetup\.create\(/);
+  assert.match(app, /PropertyDeskAppEntryFormSetup\.create\(/);
   assert.doesNotMatch(
     workspaceReminder,
     /ReminderPreviewModel|PropertyDeskReminderPreview\./,
