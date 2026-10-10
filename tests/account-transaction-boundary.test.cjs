@@ -25,7 +25,7 @@ test("app composes independent property and account forms before action routing"
   assert.doesNotMatch(formOptions, /\bstate\b/);
   assert.match(
     transactionSetup,
-    /workflows\.maintenance\.create\([\s\S]*?return workflows\.workspace\.create\([\s\S]*?maintenance: transactionMaintenance/,
+    /workflows\.maintenanceSetup\.create\([\s\S]*?return workflows\.workspace\.create\([\s\S]*?maintenance: transactionMaintenance/,
   );
   assert.match(
     composition,
@@ -52,13 +52,17 @@ test("app composes independent property and account forms before action routing"
     composition,
     /getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
   );
+  const maintenanceSetup = fs.readFileSync(
+    path.join(root, "features", "transaction-maintenance-setup.js"),
+    "utf8",
+  );
   assert.match(
-    transactionSetup,
+    maintenanceSetup,
     /correction: \{[\s\S]*?getAccounts: records\.getAccounts,[\s\S]*?getPayments: records\.getPayments,[\s\S]*?getExpenses: records\.getExpenses/,
   );
-  assert.match(transactionSetup, /correctionModel: workflows\.correctionModel/);
+  assert.match(maintenanceSetup, /correctionModel: workflows\.correctionModel/);
   assert.doesNotMatch(
-    transactionSetup.match(
+    maintenanceSetup.match(
       /correction: \{[\s\S]*?\n      \},\n      voiding:/,
     )?.[0] || "",
     /\bstate\s*,/,
@@ -124,11 +128,11 @@ test("app composes independent property and account forms before action routing"
   );
   assert.match(app, /transactionRepository: repositories\.transactions/);
   assert.match(
-    transactionSetup,
+    maintenanceSetup,
     /resolveVoidTarget: workflows\.voidModel\.resolveVoidTarget/,
   );
   assert.match(
-    transactionSetup,
+    maintenanceSetup,
     /buildVoidPayload: workflows\.voidModel\.buildVoidPayload/,
   );
   assert.match(

@@ -106,6 +106,29 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
       return maintenanceApi;
     },
   };
+  let setupOptions;
+  workflows.maintenanceSetup = {
+    create(options) {
+      setupOptions = options;
+      return workflows.maintenance.create({
+        correction: {
+          getAccounts: options.records.getAccounts,
+          getPayments: options.records.getPayments,
+          getPendingCorrection: options.records.getPendingCorrection,
+          repository: {
+            correct: options.services.transactionRepository.correct,
+          },
+        },
+        voiding: {
+          getExpenses: options.records.getExpenses,
+          repository: {
+            voidPosted: options.services.transactionRepository.voidPosted,
+          },
+        },
+        events: { documentRef: options.ui.documentRef },
+      });
+    },
+  };
   workflows.voidModel = {
     resolveVoidTarget() {},
     buildVoidPayload() {},
@@ -210,6 +233,39 @@ test("transaction workspace setup forwards scoped dependencies to its workflow",
   assert.equal(received.workflows.ledger.workflow, workflows.ledger);
   assert.equal(received.workflows.ledger.entryForms, workflows.entryForms);
   assert.equal(received.workflows.ledger.views, workflows.views);
+  assert.deepEqual(Object.keys(setupOptions.records).sort(), [
+    "getAccounts",
+    "getExpenses",
+    "getPayments",
+    "getPendingCorrection",
+    "setPendingCorrection",
+  ]);
+  assert.deepEqual(Object.keys(setupOptions.ui).sort(), [
+    "$",
+    "EventClass",
+    "OptionClass",
+    "closeModal",
+    "confirmAction",
+    "documentRef",
+    "prettyType",
+    "promptAction",
+    "toast",
+    "transactionTimestamp",
+  ]);
+  assert.deepEqual(
+    Object.keys(setupOptions.services.transactionRepository).sort(),
+    ["correct", "voidPosted"],
+  );
+  assert.deepEqual(Object.keys(setupOptions.workflows).sort(), [
+    "correction",
+    "correctionModel",
+    "correctionModules",
+    "maintenance",
+    "maintenanceEvents",
+    "voidEntry",
+    "voidMaintenance",
+    "voidModel",
+  ]);
   assert.equal(maintenanceOptions.correction.getAccounts, records.getAccounts);
   assert.equal(maintenanceOptions.correction.getPayments, records.getPayments);
   assert.equal(

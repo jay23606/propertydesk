@@ -7,6 +7,7 @@
       workspace: window.PropertyDeskTransactionWorkspaceWorkflow,
       correctionModel: window.PropertyDeskTransactionCorrectionModel,
       maintenance: window.PropertyDeskTransactionMaintenanceWorkflow,
+      maintenanceSetup: window.PropertyDeskTransactionMaintenanceSetup,
       correction: window.PropertyDeskTransactionCorrectionWorkflow,
       correctionModules: {
         maintenance: window.PropertyDeskTransactionCorrectionMaintenance,

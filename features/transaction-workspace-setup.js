@@ -8,49 +8,43 @@
     services,
     workflows,
   }) {
-    const transactionMaintenance = workflows.maintenance.create({
-      correction: {
-        $: ui.$,
+    const transactionMaintenance = workflows.maintenanceSetup.create({
+      records: {
         getAccounts: records.getAccounts,
-        getPendingCorrection: records.getPendingCorrection,
-        setPendingCorrection: records.setPendingCorrection,
         getPayments: records.getPayments,
         getExpenses: records.getExpenses,
+        getPendingCorrection: records.getPendingCorrection,
+        setPendingCorrection: records.setPendingCorrection,
+      },
+      ui: {
+        $: ui.$,
         toast: ui.toast,
-        fetchAll: services.fetchAll,
         closeModal: ui.closeModal,
         prettyType: ui.prettyType,
         promptAction: ui.promptAction,
+        confirmAction: ui.confirmAction,
+        transactionTimestamp: ui.transactionTimestamp,
         EventClass: ui.EventClass,
         OptionClass: ui.OptionClass,
-        repository: {
-          correct: services.transactionRepository.correct,
-        },
-        runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
+        documentRef: ui.documentRef,
       },
-      voiding: {
-        getPayments: records.getPayments,
-        getExpenses: records.getExpenses,
-        toast: ui.toast,
+      services: {
         fetchAll: services.fetchAll,
-        timestamp: ui.transactionTimestamp,
-        confirmAction: ui.confirmAction,
-        promptAction: ui.promptAction,
-        repository: {
+        runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
+        transactionRepository: {
+          correct: services.transactionRepository.correct,
           voidPosted: services.transactionRepository.voidPosted,
         },
-        runAndRefreshWorkspaceChange: services.runAndRefreshWorkspaceChange,
-        resolveVoidTarget: workflows.voidModel.resolveVoidTarget,
-        buildVoidPayload: workflows.voidModel.buildVoidPayload,
       },
-      events: { documentRef: ui.documentRef },
       workflows: {
+        maintenance: workflows.maintenance,
         correctionModel: workflows.correctionModel,
         correction: workflows.correction,
         correctionModules: workflows.correctionModules,
+        voidModel: workflows.voidModel,
         voidMaintenance: workflows.voidMaintenance,
         voidEntry: workflows.voidEntry,
-        events: workflows.maintenanceEvents,
+        maintenanceEvents: workflows.maintenanceEvents,
       },
     });
 

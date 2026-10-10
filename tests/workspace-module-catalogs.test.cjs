@@ -46,6 +46,7 @@ test("transaction workspace module catalog owns its workflow dependencies", () =
     "ledger",
     "maintenance",
     "maintenanceEvents",
+    "maintenanceSetup",
     "paymentView",
     "propertyPaymentAction",
     "transactionPayloads",
@@ -70,6 +71,10 @@ test("transaction workspace module catalog owns its workflow dependencies", () =
   assert.equal(
     catalog.maintenanceEvents,
     window.PropertyDeskTransactionMaintenanceEvents,
+  );
+  assert.equal(
+    catalog.maintenanceSetup,
+    window.PropertyDeskTransactionMaintenanceSetup,
   );
 });
 
