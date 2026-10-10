@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  function create({ documentRef = document, storage } = {}) {
+  function create({ documentRef, storage }) {
     function setTheme(theme, persist = false) {
       const next = theme === "light" ? "light" : "dark";
       documentRef.documentElement.dataset.theme = next;

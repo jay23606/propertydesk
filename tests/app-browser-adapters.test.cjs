@@ -118,3 +118,18 @@ test("app browser adapters load after download helper and are cached", () => {
   assert.ok(worker.includes(`'./${adapterScript}'`));
   assert.match(app, /PropertyDeskAppBrowserAdapters\.create\(/);
 });
+
+test("feature modules do not default to global browser capabilities", () => {
+  const featureDirectory = path.join(root, "features");
+  const hiddenBrowserDefaults =
+    /\b(?:documentRef|windowRef|navigatorRef)\s*=\s*(?:document|window|navigator)\b|\blogger\s*=\s*console\b/;
+
+  for (const filename of fs.readdirSync(featureDirectory)) {
+    if (!filename.endsWith(".js")) continue;
+    const source = fs.readFileSync(
+      path.join(featureDirectory, filename),
+      "utf8",
+    );
+    assert.doesNotMatch(source, hiddenBrowserDefaults, filename);
+  }
+});

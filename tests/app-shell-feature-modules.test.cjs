@@ -164,11 +164,11 @@ test("theme controller loads before app startup and is precached", () => {
   assert.match(worker, /'\.\/features\/theme-controller\.js'/);
   assert.match(
     fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"),
-    /PropertyDeskTheme\.create\(\{\s*storage: browserStorage,/,
+    /PropertyDeskTheme\.create\(\{\s*documentRef: document,\s*storage: browserStorage,/,
   );
   assert.match(
     fs.readFileSync(path.join(__dirname, "..", "app.js"), "utf8"),
-    /PropertyDeskTheme\.create\(\{\s*storage: browserStorage,[\s\S]*?attachThemeEvents,/,
+    /PropertyDeskTheme\.create\(\{\s*documentRef: document,\s*storage: browserStorage,[\s\S]*?attachThemeEvents,/,
   );
   assert.doesNotMatch(
     fs.readFileSync(

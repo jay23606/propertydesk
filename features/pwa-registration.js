@@ -2,11 +2,7 @@
 (() => {
   "use strict";
 
-  function registerShell({
-    navigatorRef = navigator,
-    windowRef = window,
-    logger = console,
-  } = {}) {
+  function registerShell({ navigatorRef, windowRef, logger }) {
     if (
       !("serviceWorker" in navigatorRef) ||
       !windowRef.location.protocol.startsWith("http")

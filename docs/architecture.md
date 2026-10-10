@@ -2,6 +2,8 @@
 
 PropertyDesk is a plain HTML, CSS, and JavaScript app with no build step. Browser scripts are loaded in dependency order from `index.html`; their public feature APIs are exposed on `window.PropertyDesk*` globals.
 
+Native browser capabilities used by feature workflows are passed explicitly from `app.js` or the browser-adapter module. Features should not silently fall back to global `window`, `document`, or `navigator` values; this keeps their dependencies visible and makes them straightforward to exercise without a real browser.
+
 ## Entry point
 
 `app.js` is the feature composition root. It supplies explicit dependencies to feature workflows and connects their renderers and event binders. `features/app-state-access.js` owns live workspace-state reads and small state updates; it exposes frozen, feature-scoped accessor groups so the composition root can pass a feature's record boundary directly instead of recreating callbacks or embedding record lookups. `features/app-services.js` constructs shared write feedback, reminder, notification, workspace runtime, financial, and deposit services before feature wiring begins. `features/payment-notification-setup.js` projects only the workspace identity, member labels, account/property links, and address fields needed by payment notifications, and provides only channel subscribe/remove operations instead of the full Supabase client. Keep these modules focused on composition rather than moving domain rules or UI behavior into them.

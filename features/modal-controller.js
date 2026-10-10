@@ -7,7 +7,7 @@
     setPendingImport,
     setPendingCorrection,
     advanceAuditRequestId,
-    documentRef = document,
+    documentRef,
   }) {
     function openModal(id) {
       $(id).classList.remove("hidden");

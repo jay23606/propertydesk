@@ -2,13 +2,7 @@
 (() => {
   "use strict";
 
-  function create({
-    $,
-    setView,
-    renderWorkspacePage,
-    documentRef = document,
-    windowRef = window,
-  }) {
+  function create({ $, setView, renderWorkspacePage, documentRef, windowRef }) {
     function navigate(view) {
       setView(view);
       documentRef.querySelectorAll(".page").forEach((page) => {

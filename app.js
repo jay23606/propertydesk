@@ -186,6 +186,7 @@
   } = appShell;
   const { attachEvents: attachModalEvents, openModal, closeModal } = modal;
   const { attachEvents: attachThemeEvents } = window.PropertyDeskTheme.create({
+    documentRef: document,
     storage: browserStorage,
   });
   const propertyAccountForms =
@@ -462,7 +463,12 @@
     services: {
       backendConfigured,
       initializeClient,
-      registerShell: window.PropertyDeskPwa.registerShell,
+      registerShell: () =>
+        window.PropertyDeskPwa.registerShell({
+          navigatorRef: window.navigator,
+          windowRef: window,
+          logger: window.console,
+        }),
       authClient,
       fetchAll,
       paymentNotifications,

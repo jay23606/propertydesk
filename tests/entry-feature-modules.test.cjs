@@ -85,8 +85,10 @@ test("account records and ledger entries use separate workspace workflows", () =
     app,
     /PropertyDeskReport(?:Model|Views|Export)\.create\(/,
   );
-  assert.match(app, /registerShell: window\.PropertyDeskPwa\.registerShell/);
-  assert.doesNotMatch(app, /registerShell: \(\) =>/);
+  assert.match(
+    app,
+    /registerShell: \(\) =>\s*window\.PropertyDeskPwa\.registerShell\(\{\s*navigatorRef: window\.navigator,\s*windowRef: window,\s*logger: window\.console,/,
+  );
   assert.match(app, /attachCreateActionEvents/);
   assert.match(
     app,
