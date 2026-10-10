@@ -105,10 +105,10 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     { hasAccount: false, property: { notes: "Vacant property note" } },
   ]);
 
-  assert.match(html, /@page \{ size: letter landscape; margin: \.3in; \}/);
+  assert.match(html, /@page \{ size: letter landscape; margin: \.25in; \}/);
   assert.match(
     html,
-    /html, body \{ width: 100%; max-width: 100%; margin: 0; padding: 0; \}/,
+    /html, body \{ width: 10\.5in; max-width: 10\.5in; margin: 0; padding: 0; \}/,
   );
   assert.match(
     html,
@@ -118,7 +118,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
     html,
     /<table><colgroup><col><col><col><col><col><col><col><col><col><col><\/colgroup>/,
   );
-  assert.match(html, /col:nth-child\(10\) \{ width: 8%; \}/);
+  assert.match(html, /col:nth-child\(10\) \{ width: 12%; \}/);
   const columnWidths = Array.from(
     html.matchAll(/col:nth-child\((\d+)\) \{ width: (\d+)%/g),
   );
@@ -133,7 +133,7 @@ test("Properties PDF report includes useful details, escapes PII, and prints lan
   assert.match(html, /th \{[^}]*overflow-wrap: anywhere;/);
   assert.match(
     html,
-    /@media print \{\s*html, body \{ width: 100%; max-width: 100%; margin: 0; padding: 0; \}\s*header, table \{ width: 100%; max-width: 100%; \}/,
+    /@media print \{\s*html, body \{ width: 10\.5in; max-width: 10\.5in; margin: 0; padding: 0; \}\s*header, table \{ width: 100%; max-width: 100%; \}/,
   );
   assert.match(html, /10 Main St, Altoona, PA 16601/);
   assert.match(html, /tenant@example\.com/);
